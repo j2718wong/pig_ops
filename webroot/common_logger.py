@@ -80,7 +80,7 @@ class Logger:
         return None
         
         
-    def append_to_log_file(self, log_level = LOG_DEBUG, log_name = None, 
+    def append(self, log_level = LOG_DEBUG, log_name = None, 
             tag = None, msg = None, write_plain_msg = 0):
         """
         Will append msg to log file.

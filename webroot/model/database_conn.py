@@ -204,12 +204,12 @@ class Model:
                 
                 s  = '\nConnected to MySQL\n'
                 s += self.get_info_str() + '\n'
-                self.logger.append_to_log_file(tag = self.TAG, msg = s)
+                self.logger.append(tag = self.TAG, msg = s)
                 
             except Exception as e:
                 s  = self.get_info_str() + '\n'
                 s += 'Cannot connect to MySQL DB' + str(e)
-                self.logger.append_to_log_file(
+                self.logger.append(
                         log_level   = LOG_FATAL, 
                         tag         = self.TAG, 
                         msg         = s)
@@ -225,7 +225,7 @@ class Model:
                     self.ssh_tunnel.stop()
                 except Exception as e:
                     s = 'Cannot stop SSH tunnel; error\n' + str(e)
-                    self.logger.append_to_log_file(tag = self.TAG, msg = s)
+                    self.logger.append(tag = self.TAG, msg = s)
                     
                     # continue  below
             
@@ -259,12 +259,12 @@ class Model:
                 s  = '\n\nNo database connection to: %s\n' % database
                 s += 'SSH local_bind_address cannot find unused port for '
                 s += '%s; from port = %s; to port = %s\n\n' % values
-                self.logger.append_to_log_file(tag = self.TAG, msg = s)
+                self.logger.append(tag = self.TAG, msg = s)
                 return
             
             
             s  = '\nFound unused port at: %s\n\n' % local_port_num
-            self.logger.append_to_log_file(tag = self.TAG, msg = s)
+            self.logger.append(tag = self.TAG, msg = s)
             
             
             ssh_address     = (settings['ssh_host'], settings['ssh_port'])
@@ -277,7 +277,7 @@ class Model:
             s += 'SSH         ip_address: %s; port: %s\n'   % ssh_address
             s += 'Remote bind ip_address: %s; port: %s\n'   % remote_address
             s += 'Local  bind ip_address: %s; port: %s\n\n' % local_address
-            self.logger.append_to_log_file(tag = self.TAG, msg = s)
+            self.logger.append(tag = self.TAG, msg = s)
         
         
             """
@@ -327,7 +327,7 @@ class Model:
             
             except Exception as e:
                 s = 'Cannot start SSH tunnel; error\n' + str(e)
-                self.logger.append_to_log_file(tag = self.TAG, msg = s)
+                self.logger.append(tag = self.TAG, msg = s)
                 return
             
             
@@ -348,12 +348,12 @@ class Model:
                     
                 values = (hostname, port, database)
                 s = '\nConnected to MySQL at %s:%s; db: %s\n' % values
-                self.logger.append_to_log_file(tag = self.TAG, msg = s)
+                self.logger.append(tag = self.TAG, msg = s)
             
             except Exception as e:
                 s  = self.get_info_str() + '\n'
                 s += 'Cannot connect to MySQL DB' + str(e)
-                self.logger.append_to_log_file(
+                self.logger.append(
                         log_level   = LOG_FATAL, 
                         tag         = self.TAG, 
                         msg         = s)
@@ -392,7 +392,7 @@ class Model:
                 
             except Exception as e:
                 s = 'Cannot stop SSH tunnel; error\n' + str(e)
-                self.logger.append_to_log_file(tag = self.TAG, msg = s)
+                self.logger.append(tag = self.TAG, msg = s)
                 return
         
         self.db_conn = None
@@ -428,7 +428,7 @@ class Model:
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
-            self.logger.append_to_log_file(
+            self.logger.append(
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
             
             return False

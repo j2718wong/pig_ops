@@ -44,7 +44,7 @@ config_file.close()
 # Create logger
 logger      = common_logger.Logger(path_logs = path_logs, log_name = 'web')
 s = '\n\nStarting Pig Operations application\n'
-logger.append_to_log_file(tag = 'Main', msg = s)
+logger.append(tag = 'Main', msg = s)
 
 """
 # Models for connecting to booking database

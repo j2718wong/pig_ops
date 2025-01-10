@@ -91,7 +91,7 @@ class SowActivity:
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
-            self.model.logger.append_to_log_file(
+            self.model.logger.append(
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
             rows = None
         
@@ -206,7 +206,7 @@ class SowActivity:
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
-            self.model.logger.append_to_log_file(
+            self.model.logger.append(
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
             rows = None
         
@@ -320,7 +320,7 @@ class SowActivity:
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
-            self.model.logger.append_to_log_file(
+            self.model.logger.append(
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
             rows = None
         
