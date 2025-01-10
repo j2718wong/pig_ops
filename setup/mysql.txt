@@ -1,0 +1,55 @@
+
+// Follow these steps to install MySQL 5.7
+//https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-18-04
+
+
+
+/* Alter root password*/
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '0@Root1234.';
+
+
+
+
+/* This is for po database*/
+
+CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED WITH mysql_native_password BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED WITH mysql_native_password BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED WITH mysql_native_password BY '1@PO#db$1234.';
+
+CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED WITH mysql_native_password BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED WITH mysql_native_password BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops3'@'localhost' IDENTIFIED WITH mysql_native_password BY '2@PO#db$1234.';
+
+CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED WITH mysql_native_password BY '3@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED WITH mysql_native_password BY '4@PO#db$1234.';
+
+
+
+/* Step 2: Grant all privileges*/
+GRANT ALL PRIVILEGES ON *.* TO 'pops_web'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'pops_web2'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'pops_web3'@'localhost';
+
+GRANT ALL PRIVILEGES ON *.* TO 'pops_bkops'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'pops_bkops2'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'pops_bkops3'@'localhost';
+
+
+/* Step 3: Grant privileges to other users*/  
+GRANT ALL PRIVILEGES ON *.* TO 'pops_sched'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'pops_msgr'@'localhost';  
+
+FLUSH PRIVILEGES;
+
+
+/*
+// start mysql
+sudo /etc/init.d/mysql start 
+
+// stop mysql
+sudo /etc/init.d/mysql stop 
+
+Mysql logs 
+/var/log/mysql/mysql.log
+*/
+

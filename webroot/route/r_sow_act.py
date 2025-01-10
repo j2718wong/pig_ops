@@ -1,0 +1,332 @@
+# December 16, 2024
+# Jack Wong
+
+import os
+import sys
+import pprint
+
+from datetime               import datetime, timedelta 
+from pydantic               import BaseModel
+    
+sys.path.append('..')
+from common_constants       import *
+from common_app             import *
+from common_fast_api        import *
+
+from fastapi.responses      import PlainTextResponse
+
+
+RES_NUM_SUCCESS                         = 0
+
+
+
+MONDAY                          = 0
+TUESDAY                         = 1
+WEDNESDAY                       = 2
+THURSDAY                        = 3
+FRIDAY                          = 4
+SATURDAY                        = 5
+SUNDAY                          = 6
+
+s_day_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+
+
+    
+@app.get("/sow/activities", response_class=PlainTextResponse)
+async def sow_activities(ai_id:str = None, full_info: int = 0):
+    """
+    Will get latest coming sow activities.
+    
+    Parameters
+    ----------
+    ai_id:str
+        comma separated string of ai_id; example 1,2
+    
+    full_info:int
+        0 = will return minimum info older dates not return; 
+        1 = will return full info
+
+        
+    """
+    
+    list_ai_id = []
+    
+    if ai_id is not None:
+        items = ai_id.split(',')
+        
+        # reject invalid ai_id
+        for cur_entry in items:
+            try:
+                cur_ai_id = int(cur_entry)
+                list_ai_id.append(str(cur_ai_id)) # need to convert back to str
+            except:
+                test = 1
+        
+        if len(list_ai_id) == 0:
+            res = model['sow_act'].get_latest_sow_activities(full_info)
+        else:
+            res = model['sow_act'].get_latest_sow_activities(full_info, 
+                list_ai_id)
+        
+    else:
+        res = model['sow_act'].get_latest_sow_activities(full_info)
+    
+        
+    s = ' AI_ID   Sow_Number   Act_ID   Date             Days_AI   Activity               Description\n'
+    
+    last_ai_id = None
+    
+    
+    for cur_entry in res:
+        cur_ai_id = cur_entry['ai_id']
+        
+        line_count = 0
+        for cur_act in cur_entry['activities']:
+            
+            cur_date    = datetime.strptime(cur_act['date'], '%Y-%m-%d')
+            cur_day     = cur_date.weekday()
+        
+            if line_count == 0:
+                s_temp      = str(cur_ai_id)
+                num_chars   = len(s_temp)
+                num_space   = 6 - num_chars
+                s           += ' ' * num_space + s_temp
+                s           += '   '
+                
+                
+                s_temp      = str(cur_entry['sow_number'])
+                num_chars   = len(s_temp)
+                num_space   = 10 - num_chars
+                s           += ' ' * num_space + s_temp
+                s           += '   '
+            
+            else:
+                s           += ' ' * 22
+            
+            
+            s_temp      = str(cur_act['id'])
+            num_chars   = len(s_temp)
+            num_space   = 6 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '   '
+            
+            
+            s_temp      = cur_act['date']
+            s           += s_temp
+            s           += '(' + s_day_week[cur_day] +')'
+            s           += '   '
+            
+            
+            
+            if cur_act['days_ai'] is not None:
+                s_temp      = str(cur_act['days_ai'])
+                num_chars   = len(s_temp)
+                num_space   = 6 - num_chars
+                s           += ' ' * num_space + s_temp
+                s           += '   '
+            else:
+                s           += '         '
+            
+            s_temp      = cur_act['activity']
+            num_chars   = len(s_temp)
+            num_space   = 20 - num_chars
+            s           += s_temp + ' ' * num_space
+            s           += '   '
+            
+            cur_date_2  = cur_act['date_2']
+            
+            if cur_date_2 is None:
+                s_temp  = cur_act['desc']
+            else:
+                s_temp  = 'until ' + cur_date_2 + '; ' + cur_act['desc']
+            s           += s_temp
+            s           += '\n'
+            
+            line_count  += 1
+        
+        s           += '\n'
+        
+    return s
+    
+    
+@app.get("/ai/list", response_class=PlainTextResponse)
+async def ai_list():
+    """
+    Will get ai list.
+    
+    Parameters
+    ----------
+        
+    """
+    res = model['sow_act'].get_ai_list()
+    
+    s  = '                                                                       Num baktin birth   Number baktin lutas\n'
+    s += '                                                                       ----------------   -------------------\n'
+    s += 'Sow_Number   AI_ID   Status         Date_AI      Date_Birth   NumDays   Dead    M    F     Dead    M    F\n'
+    
+    
+    last_sow_number = 0
+    for cur_entry in res:
+        if last_sow_number > 0 and last_sow_number != cur_entry['sow_number']:
+            s           += '\n'
+        
+        s_temp      = str(cur_entry['sow_number'])
+        num_chars   = len(s_temp)
+        num_space   = 10 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '   '
+        
+        s_temp      = str(cur_entry['id'])
+        num_chars   = len(s_temp)
+        num_space   = 5 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '   '
+        
+        
+        s_temp      = cur_entry['status']
+        num_chars   = len(s_temp)
+        num_space   = 12 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '   '
+        
+        s_temp      = cur_entry['date_ai']
+        s           += s_temp 
+        s           += '   '
+        
+        if cur_entry['date_actual_birth'] is not None:
+            s_temp      = cur_entry['date_actual_birth']
+            s           += s_temp 
+            s           += '   '
+        else:
+            s           += ' ' * 13
+        
+        cur_days_ai = cur_entry['days_ai']
+        if cur_days_ai is not None and cur_days_ai > 0:
+            s_temp      = str(cur_days_ai)
+            num_chars   = len(s_temp)
+            num_space   = 7 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '   '
+        else:
+            s           += ' ' * 10
+            
+            
+        num_piglets_birth = cur_entry['num_piglets_birth']
+        num_dead        = num_piglets_birth['dead']
+        num_male        = num_piglets_birth['male']
+        num_female      = num_piglets_birth['female']
+        
+        if num_dead is not None:
+            s_temp      = str(num_dead)
+            num_chars   = len(s_temp)
+            num_space   = 4 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        
+        if num_male is not None:
+            s_temp      = str(num_male)
+            num_chars   = len(s_temp)
+            num_space   = 3 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        
+        if num_female is not None:
+            s_temp      = str(num_female)
+            num_chars   = len(s_temp)
+            num_space   = 3 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        
+        
+        s           += '\n'
+        
+        
+        
+        last_sow_number = cur_entry['sow_number']
+        
+    return s
+    
+    
+@app.get("/cal/activities", response_class=PlainTextResponse)
+async def cal_activities(num_days: int = 30):
+    """
+    Will get latest coming calendar activities.
+    
+    Parameters
+    ----------
+    num_days:int
+        number of days starting today
+
+        
+    """
+    
+    now             = datetime.now()
+    date_start_str  = now.strftime('%Y-%m-%d')
+    
+    date_end        = now + timedelta(days=num_days) 
+    date_end_str    = date_end.strftime('%Y-%m-%d')
+
+    res = model['sow_act'].get_latest_calendar_activities(date_start_str, 
+        date_end_str)
+    
+        
+    s = 'Date               Sow_Number   Act_ID   Days_AI   Activity               Description\n'
+    
+    
+    
+    for cur_entry in res:
+        cur_date = cur_entry['date']
+        
+        line_count = 0
+        for cur_act in cur_entry['activities']:
+        
+            if line_count == 0:
+                cur_date    = datetime.strptime(cur_entry['date'], '%Y-%m-%d')
+                cur_day     = cur_date.weekday()
+                
+                s_temp      = cur_entry['date']
+                s           += s_temp
+                s           += '(' + s_day_week[cur_day] +')'
+                s           += '    '
+            else:
+                s           += ' ' * 19
+
+                
+            s_temp      = str(cur_act['sow_number'])
+            num_chars   = len(s_temp)
+            num_space   = 10 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '   '
+        
+            
+            s_temp      = str(cur_act['id'])
+            num_chars   = len(s_temp)
+            num_space   = 6 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '   '
+            
+            
+            if cur_act['days_ai'] is not None:
+                s_temp      = str(cur_act['days_ai'])
+                num_chars   = len(s_temp)
+                num_space   = 7 - num_chars
+                s           += ' ' * num_space + s_temp
+                s           += '   '
+            else:
+                s           += '          '
+            
+            s_temp      = cur_act['activity']
+            num_chars   = len(s_temp)
+            num_space   = 20 - num_chars
+            s           += s_temp + ' ' * num_space
+            s           += '   '
+            
+            s_temp      = cur_act['desc']
+            s           += s_temp
+            s           += '\n'
+            
+            line_count  += 1
+        
+        s           += '\n'
+        
+    return s
