@@ -318,6 +318,7 @@ class Model:
                     (settings['ssh_host'], settings['ssh_port']),
                     ssh_username        = settings['ssh_username'],
                     ssh_password        = settings['ssh_password'],
+                    ssh_pkey            = settings['ssh_pkey'],
                     remote_bind_address = remote_address,
                     local_bind_address  = local_address
                 )

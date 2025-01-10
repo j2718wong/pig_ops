@@ -136,21 +136,46 @@ def extract_db_credentials(s):
     
 
 credentials_po = {
-    'db_host':      'localhost',
+    'db_host':      '127.0.0.1',
     'db_user':      'pops_web',
     'db_password':  '1@PO#db$1234.',
     'database':     DATABASE_NAME_PIG_OPERATIONS
 }
 
 
+ssh_tunnel_aws = {
+    'ssh_host':         'ec2-13-250-35-87.ap-southeast-1.compute.amazonaws.com',
+    'ssh_port':         22,
+    'ssh_username':     'ubuntu',
+    'ssh_password':     None,
+    'ssh_pkey':         'sow_prod_key.pem',
+
+    'remote_hostname':  '127.0.0.1',
+    'remote_port':      3306,
+    'local_hostname':   '127.0.0.1',
+    'local_port':       3307
+}
+
+
 ssl_po = {'ca': None}
 
-
+"""
 model = Model(
             database_id     = 1, 
             logger          = logger, 
             credentials     = credentials_po,
             ssl             = ssl_po)
+"""
+
+# SSH tunnel to remote host
+model = Model(
+            database_id     = 1, 
+            logger          = logger, 
+            credentials     = credentials_po,
+            ssl             = ssl_po,
+            tunnel_settings = ssh_tunnel_aws)
+
+            
 model.append_models(model_names)
 
 
