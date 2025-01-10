@@ -16,17 +16,12 @@ Debate on which library to use
 https://stackoverflow.com/questions/43102442/whats-the-difference-between-mysqldb-mysqlclient-and-mysql-connector-python
 """
 
-
-# Import a module from directory above or different directory.
-# Append the directory where the module is found to sys.path. 
-cur_path        = os.getcwd()
-index           = cur_path.find('/webroot')
-path_webroot    = cur_path[0:index+8]
-
-
-if path_webroot not in sys.path:
-    sys.path.append(path_webroot)
-from common_constants       import *
+# These logging constants are taken from common_constants and should be 
+# the same as the common_logger constants. 
+LOG_DEBUG               = 0
+LOG_WARNING             = 1
+LOG_ERROR               = 2
+LOG_FATAL               = 3
 
 
 MAX_NUM_LOOK_AVAILABLE_PORT = 20
