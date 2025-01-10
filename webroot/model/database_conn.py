@@ -40,7 +40,7 @@ class Model:
         database_id : integer
             unique identifier of the database to connect.
         
-        logger : common.commmon_logger.Logger object
+        logger : commmon_logger.Logger object
         
         credentials : dictionary 
             This is a structure similar to this :: 
@@ -63,8 +63,7 @@ class Model:
             
         
         tunnel_settings : dictionary, optional 
-            if the application using this Model is not in the host machine 
-            as the database, this must be provided for SSH tunneling.
+            if the application needs to SSH to host, this must be provided.
         
             This must be similar to this structure ::
             
@@ -74,6 +73,7 @@ class Model:
                     'ssh_username':     'dev01',
                     'ssh_password':     '**********',
                     'ssh_pkey':         None,
+                    'ssh_pkey_pw':      None,
 
                     'remote_hostname':  '127.0.0.1',
                     'remote_port':      3306,
@@ -309,14 +309,29 @@ class Model:
             """
             
             try:
-                self.ssh_tunnel = sshtunnel.SSHTunnelForwarder(
-                    (settings['ssh_host'], settings['ssh_port']),
-                    ssh_username        = settings['ssh_username'],
-                    ssh_password        = settings['ssh_password'],
-                    ssh_pkey            = settings['ssh_pkey'],
-                    remote_bind_address = remote_address,
-                    local_bind_address  = local_address
-                )
+                
+                if 'ssh_pkey_pw' in settings:
+                    self.ssh_tunnel = sshtunnel.SSHTunnelForwarder(
+                        (settings['ssh_host'], settings['ssh_port']),
+                        ssh_username        = settings['ssh_username'],
+                        ssh_password        = settings['ssh_password'],
+                        ssh_pkey            = settings['ssh_pkey'],
+                        ssh_private_key_password = settings['ssh_pkey_pw'],
+                        
+                        remote_bind_address = remote_address,
+                        local_bind_address  = local_address
+                    )
+                
+                else:
+                    self.ssh_tunnel = sshtunnel.SSHTunnelForwarder(
+                        (settings['ssh_host'], settings['ssh_port']),
+                        ssh_username        = settings['ssh_username'],
+                        ssh_password        = settings['ssh_password'],
+                        ssh_pkey            = settings['ssh_pkey'],
+                        
+                        remote_bind_address = remote_address,
+                        local_bind_address  = local_address
+                    )
                 
                 self.ssh_tunnel.start()
             
