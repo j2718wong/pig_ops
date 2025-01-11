@@ -22,10 +22,7 @@ from model.database_conn    import *
 
 
 cur_path        = os.getcwd()
-index           = cur_path.find('webroot')
-path_app        = cur_path[0:index-1]
-
-path_logs       = os.path.join(path_app, 'webroot', 'data', 'logs')
+path_logs       = os.path.join(cur_path, 'data', 'logs')
 
 
 """
@@ -160,21 +157,25 @@ ssh_tunnel_aws = {
 
 ssl_po = {'ca': None}
 
-"""
-model = Model(
-            database_id     = 1, 
-            logger          = logger, 
-            credentials     = credentials_po,
-            ssl             = ssl_po)
-"""
 
-# SSH tunnel to remote host
+# Read PO_DATABASE_LOC environment variable if there is any.
+# This environment variable is used to control what database to access.
+
+ssh_tunnel = ssh_tunnel_aws
+try:
+    database_loc = os.environ['PO_DATABASE_LOC']
+    if database_loc == 'LOCAL':
+        ssh_tunnel = None
+except:
+    ssh_tunnel = ssh_tunnel_aws
+
+
 model = Model(
             database_id     = 1, 
             logger          = logger, 
             credentials     = credentials_po,
             ssl             = ssl_po,
-            tunnel_settings = ssh_tunnel_aws)
+            tunnel_settings = ssh_tunnel)
 
             
 model.append_models(model_names)
