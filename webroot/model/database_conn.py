@@ -336,7 +336,11 @@ class Model:
                 self.ssh_tunnel.start()
             
             except Exception as e:
-                s = 'Cannot start SSH tunnel; error\n' + str(e)
+                s = 'Cannot start SSH tunnel; error\n' + str(e) + '\n'
+                s += '\n\nCurrent Working Directory: ' + os.getcwd()
+                s += '\n\nSSH Settings: '
+                s += str(settings)
+                print(s)
                 self.logger.append(tag = self.TAG, msg = s)
                 return
             
@@ -363,6 +367,7 @@ class Model:
             except Exception as e:
                 s  = self.get_info_str() + '\n'
                 s += 'Cannot connect to MySQL DB' + str(e)
+                print(s)
                 self.logger.append(
                         log_level   = LOG_FATAL, 
                         tag         = self.TAG, 

@@ -13,4 +13,6 @@ RUN pip install --no-cache-dir --upgrade -r /pig_ops/requirements.txt
 
 EXPOSE 5000
 
-CMD ["python3", "webroot/pig_ops_web.py"]
+CD /pig_ops/webroot
+
+CMD ["python3", "pig_ops_web.py"]
