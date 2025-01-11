@@ -1,8 +1,8 @@
-FROM python::3.12
+FROM python:3.12
 
 WORKDIR /pig_ops
 
-COPY ./requirements.txt /pig_ops/requirements.txt
+COPY requirements.txt /pig_ops/requirements.txt
 COPY ./webroot /pig_ops/webroot
 
 # Set the environment variable
