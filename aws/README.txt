@@ -9,3 +9,5 @@ ubuntu       latest    b1d9df8ab815   7 weeks ago      78.1MB
 
 2.) Map port 80 of the AWS EC2 host to docker proxy
 ubuntu@ip-172-31-23-184:~/projects/pig_ops/pig_ops$ docker run -it -p 80:5000 b26fbcd88e4e
+
+ubuntu@ip-172-31-23-184:~/projects/pig_ops/pig_ops$ docker run -it -v ~/projects/pig_ops/pig_ops/data:/pig_ops/data  -p 80:5000 b26fbcd88e4e
