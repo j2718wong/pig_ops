@@ -14,6 +14,26 @@ from common_constants       import *
 LOG_LEVELS  = ('DEBUG', 'WARN', 'ERROR', 'FATAL')
 
 
+"""
+2025-01-13
+This can be set as environment variable to determine if the application runs 
+in a docker container.
+
+1.) Originally this custom logger is designed to write dated logs in files.
+Also it was designed such that multiple log files can be generated in parallel
+if the application has multiple threads that require separate log per thread.  
+
+2.) Writing files inside docker container cannot be done. So a separate
+method is implemented to deal application logging inside a docker container.
+
+"""
+inside_container = 0
+SECRET_KEY = os.environ.get('IN_A_DOCKER_CONTAINER', False)
+
+if SECRET_KEY:
+    inside_container = 1
+
+
 JOKES_SPIDER = [
     'A spider is enjoying the bug at',
     'Please love me, i bring you a bug at',

@@ -397,6 +397,126 @@ class SowActivity:
         return result
     
     
+    def get_sow_farrowing_list(self):
+        """
+        Will get list of latest sow_farrowing list.
+        
+        
+        Returns
+        -------
+        list of dictionary
+
+        """
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+      
+        sql =   """
+                SELECT 
+                    a.ai_id,
+                    b.sow_number,
+                    b.date_actual_birth,
+                    b.num_days_since_ai,
+                    
+                    a.date_start_night_support,
+                    a.date_stop_night_support
+                    
+                FROM sow_farrowing a
+                LEFT OUTER JOIN artificial_insemination b  ON a.ai_id = b.id
+                ORDER BY a.ai_id DESC
+                """ 
+    
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            msg = 'get_sow_farrowing_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_ai_id               = row[0]
+                cur_sow_number          = row[1]
+                cur_date_actual         = str(row[2])
+                cur_days_since_ai       = row[3]
+                    
+                cur_status              = row[5]
+                    
+                cur_num_b_dead          = None
+                if row[6] is not None:
+                    cur_num_b_dead      = row[6]
+                
+                cur_num_b_male          = None
+                if row[7] is not None:
+                    cur_num_b_male      = row[7]
+                
+                cur_num_b_female        = None
+                if row[8] is not None:
+                    cur_num_b_female    = row[8]
+                    
+                cur_num_w_male          = None
+                if row[9] is not None:
+                    cur_num_w_male      = row[9]
+                
+                cur_num_w_female        = None
+                if row[10] is not None:
+                    cur_num_w_female    = row[10]
+                
+                cur_num_w_dead          = None
+                if cur_num_w_male is not None and cur_num_w_female is not None:
+                    cur_num_w_dead = cur_num_b_male + cur_num_b_female - \
+                                        cur_num_w_male - cur_num_w_female
+                
+                cur_entry = {
+                    'id':               cur_id,
+                    'sow_number':       cur_sow_number, 
+                    'date_ai':          cur_date_ai,
+                    'date_actual_birth': cur_date_actual,
+                    'days_ai':          cur_days_since_ai,
+                    'status':           cur_status,
+                   
+                    'num_piglets_birth':{
+                        'dead':         cur_num_b_dead, 
+                        'male':         cur_num_b_male,
+                        'female':       cur_num_b_female
+                    },
+                    
+                    'num_piglets_weaning':{
+                        'dead':         cur_num_w_dead, 
+                        'male':         cur_num_w_male,
+                        'female':       cur_num_w_female
+                    }
+                   
+                }
+                
+                result.append(cur_entry)
+
+        
+        return result
+    
     
     
     

@@ -40,6 +40,8 @@ DECLARE COMING_ACT_ID_PIGLET_PROCESSING         INT             DEFAULT 10;
 DECLARE COMING_ACT_ID_PIGLET_VITAMINS           INT             DEFAULT 11;
 DECLARE COMING_ACT_ID_PIGLET_IRON_2             INT             DEFAULT 12;
 DECLARE COMING_ACT_ID_WEANING                   INT             DEFAULT 13;
+DECLARE COMING_ACT_ID_CHECK_IF_PREGNANT         INT             DEFAULT 14;
+
 
 
 
@@ -147,9 +149,71 @@ INSERT INTO sow_coming_activity (
     in_sow_number,
     COMING_ACT_ID_BACK_NORMAL_FEEDING,
     DATE_ADD(in_date_ai, INTERVAL 5 DAY),
-    22,
+    5,
     "3.0 kg per day gestating"
 );
+
+/* Record for check if buntis*/
+INSERT INTO sow_coming_activity (
+    ai_id,
+    
+    sow_number,
+    coming_activity_id,
+    date,
+    days_since_ai,
+    description
+    
+) VALUES(
+    cur_artificial_insemination_id,
+
+    in_sow_number,
+    COMING_ACT_ID_CHECK_IF_PREGNANT,
+    DATE_ADD(in_date_ai, INTERVAL 21 DAY),
+    21,
+    "3.0 kg per day gestating"
+);
+
+/* Record for check if buntis*/
+INSERT INTO sow_coming_activity (
+    ai_id,
+    
+    sow_number,
+    coming_activity_id,
+    date,
+    days_since_ai,
+    description
+    
+) VALUES(
+    cur_artificial_insemination_id,
+
+    in_sow_number,
+    COMING_ACT_ID_CHECK_IF_PREGNANT,
+    DATE_ADD(in_date_ai, INTERVAL 42 DAY),
+    42,
+    "3.0 kg per day gestating"
+);
+
+/* Record for check if buntis*/
+INSERT INTO sow_coming_activity (
+    ai_id,
+    
+    sow_number,
+    coming_activity_id,
+    date,
+    days_since_ai,
+    description
+    
+) VALUES(
+    cur_artificial_insemination_id,
+
+    in_sow_number,
+    COMING_ACT_ID_CHECK_IF_PREGNANT,
+    DATE_ADD(in_date_ai, INTERVAL 63 DAY),
+    63,
+    "3.0 kg per day gestating"
+);
+
+
 
 /* Record for inject iron*/
 INSERT INTO sow_coming_activity (
