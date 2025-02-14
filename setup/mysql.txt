@@ -26,18 +26,18 @@ CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED WITH mysql_native
 
 
 /* Step 2: Grant all privileges*/
-GRANT ALL PRIVILEGES ON *.* TO 'pops_web'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'pops_web2'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'pops_web3'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_web'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_web2'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_web3'@'localhost';
 
-GRANT ALL PRIVILEGES ON *.* TO 'pops_bkops'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'pops_bkops2'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'pops_bkops3'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_bkops'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_bkops2'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_bkops3'@'localhost';
 
 
 /* Step 3: Grant privileges to other users*/  
-GRANT ALL PRIVILEGES ON *.* TO 'pops_sched'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'pops_msgr'@'localhost';  
+GRANT ALL PRIVILEGES ON po.* TO 'pops_sched'@'localhost';
+GRANT ALL PRIVILEGES ON po.* TO 'pops_msgr'@'localhost';  
 
 FLUSH PRIVILEGES;
 
