@@ -543,6 +543,83 @@ class Model:
         return s
         
         
+    def update_table_row(self, table_name, pk_col_name, id, fields_to_update):
+        """
+        Generic update for a table row.
+
+        Parameters
+        ----------
+        table_name : str
+            table name to update
+        
+        pk_col_name : str
+            primary key column name
+        
+        id: int
+            primary key id
+            
+        fields_to_update : list of tuples
+            This is a list of ::
+            (column_name, column_value)
+            
+        """
+        
+        sql = 'UPDATE %s SET ' % table_name
+        
+        count = 0
+        for cur_entry in fields_to_update:
+            if count > 0: sql += ','
+            
+            sql += cur_entry[0] + '=' 
+
+            if type(cur_entry[1]) == str:
+                s_data  = cur_entry[1]
+                index   = s_data.find('"')
+                
+                # Need to fix for mixed single quote and double quote
+                if index >= 0:
+                    sql += "'" + s_data + "'"
+                else:
+                    sql += '"' + s_data + '"'
+            else:
+                sql += str(cur_entry[1])
+            
+            count +=1
+        
+        sql += ' WHERE %s = %s' % (pk_col_name, id)
+        
+        
+        # Check if still connected to database
+        if self.check_if_connected() == False:
+            # Make new connection
+            self.connect_to_db()
+
+        # Get database connection
+        conn = self.db_conn
+        
+        row_id = None
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row_id = cursor.lastrowid
+            cursor.close()
+            #conn.close()  # do not close connection here
+            
+        except Exception as e:
+            msg = 'update_table_row(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+        
+            return None 
+        
+        return row_id
+        
+        
+        
         
 def get_database_model(logger, host_ip_address, db_access, model_names):
     """
