@@ -150,19 +150,19 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
     
     
 @app.get("/ai/list", response_class=PlainTextResponse)
-async def ai_list():
+async def ai_list(is_active: int = 0, is_completed:int = 0, year:int = None):
     """
     Will get ai list.
-    
+    , 
     Parameters
     ----------
         
     """
-    res = model['sow_act'].get_ai_list()
+    res = model['sow_act'].get_ai_list(is_active, is_completed, year)
     
     s  = '                                                                       Num baktin birth   Number baktin lutas\n'
     s += '                                                                       ----------------   -------------------\n'
-    s += 'Sow_Number   AI_ID   Status         Date_AI      Date_Birth   NumDays   Dead    M    F     Dead    M    F\n'
+    s += 'Sow_Number   AI_ID   Status         Date_AI      Date_Birth   NumDays   Dead    M    F       Dead    M    F     Date_Lutas   Num_Baktin\n'
     
     
     last_sow_number = 0
@@ -238,9 +238,60 @@ async def ai_list():
             s           += '  '
         
         
+        num_piglets_weaning = cur_entry['num_piglets_weaning']
+        num_dead        = num_piglets_weaning['dead']
+        num_male        = num_piglets_weaning['male']
+        num_female      = num_piglets_weaning['female']
+        
+        num_piglets     = None
+        if num_male is not None and num_female is not None:
+            num_piglets = num_male + num_female
+        
+        
+        s           += '     '
+        
+        if num_dead is not None:
+            s_temp      = str(num_dead)
+            num_chars   = len(s_temp)
+            num_space   = 4 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        
+        if num_male is not None:
+            s_temp      = str(num_male)
+            num_chars   = len(s_temp)
+            num_space   = 3 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+            
+        if num_female is not None:
+            s_temp      = str(num_female)
+            num_chars   = len(s_temp)
+            num_space   = 3 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+            
+        s           += '   '
+            
+        if cur_entry['date_weaning'] is not None:
+            s_temp      = cur_entry['date_weaning']
+            s           += s_temp 
+            s           += '   '
+        else:
+            s           += ' ' * 13
+            
+        
+        s           += '     '
+        
+        if num_piglets is not None:
+            s_temp      = str(num_piglets)
+            num_chars   = len(s_temp)
+            num_space   = 4 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+            
+        
         s           += '\n'
-        
-        
         
         last_sow_number = cur_entry['sow_number']
         

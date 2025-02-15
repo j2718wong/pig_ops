@@ -264,10 +264,19 @@ class SowActivity:
         return result
     
     
-    def get_ai_list(self):
+    def get_ai_list(self, is_active = 0, is_completed = 0, year = None):
         """
-        Will get list of latest calendar activities.
+        Will get list of artificial insemination list.
         
+        Parameters
+        ----------
+        is_active : int
+            if > 0, AI with status On-Going and lactating will be returned
+            
+  
+        is_completed : int
+            if > 0, AI with status Completed will be returned
+            
         
         Returns
         -------
@@ -285,25 +294,65 @@ class SowActivity:
         conn = self.model.db_conn
         
       
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.sow_number,
-                    a.date_ai,
-                    a.date_actual_birth,
-                    a.num_days_since_ai,
-                    b.name,
+        if is_active == 0:
+            where_clause = ''
+            
+            if is_completed > 0:
+                where_clause = 'WHERE a.status_id = 5'
+                if year is not None:
+                    where_clause += ' AND YEAR(a.date_weaning) =  %s' % year
+            
+            else:
+                if year is not None:
+                    where_clause = ' WHERE YEAR(a.date_ai) =  %s' % year
                     
-                    a.num_piglets_dead_at_birth,
-                    a.num_piglets_live_male,
-                    a.num_piglets_live_female,
-                    a.num_piglets_weaning_male,
-                    a.num_piglets_weaning_female
+                    
+            
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.sow_number,
+                        a.date_ai,
+                        a.date_actual_birth,
+                        a.num_days_since_ai,
+                        b.name,
+                        
+                        a.num_piglets_dead_at_birth,
+                        a.num_piglets_live_male,
+                        a.num_piglets_live_female,
+                        a.num_piglets_weaning_male,
+                        a.num_piglets_weaning_female,
+                        
+                        a.date_weaning
 
-                FROM artificial_insemination a
-                LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
-                ORDER BY a.sow_number ASC, a.id DESC
-                """ 
+                    FROM artificial_insemination a
+                    LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
+                    %s
+                    ORDER BY a.sow_number ASC, a.id DESC
+                    """ % where_clause 
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.sow_number,
+                        a.date_ai,
+                        a.date_actual_birth,
+                        a.num_days_since_ai,
+                        b.name,
+                        
+                        a.num_piglets_dead_at_birth,
+                        a.num_piglets_live_male,
+                        a.num_piglets_live_female,
+                        a.num_piglets_weaning_male,
+                        a.num_piglets_weaning_female,
+                        
+                        a.date_weaning
+
+                    FROM artificial_insemination a
+                    LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
+                    WHERE status_id IN(1,4)
+                    ORDER BY a.sow_number ASC, a.id DESC
+                    """ 
     
         rows = None
         
@@ -368,6 +417,12 @@ class SowActivity:
                 if cur_num_w_male is not None and cur_num_w_female is not None:
                     cur_num_w_dead = cur_num_b_male + cur_num_b_female - \
                                         cur_num_w_male - cur_num_w_female
+                                        
+                                        
+                cur_date_weaning        = None
+                if row[11] is not None:
+                    cur_date_weaning    = str(row[11])
+                
                 
                 cur_entry = {
                     'id':               cur_id,
@@ -376,6 +431,7 @@ class SowActivity:
                     'date_actual_birth': cur_date_actual,
                     'days_ai':          cur_days_since_ai,
                     'status':           cur_status,
+                    'date_weaning':     cur_date_weaning,
                    
                     'num_piglets_birth':{
                         'dead':         cur_num_b_dead, 
