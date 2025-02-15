@@ -72,7 +72,7 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
         res = model['sow_act'].get_latest_sow_activities(full_info)
     
         
-    s = ' AI_ID   Sow_Number   Act_ID   Date             Days_AI   Activity               Description\n'
+    s = 'AI_ID       Sow   Act_ID   Date             Days_AI   Activity               Description\n'
     
     last_ai_id = None
     
@@ -89,19 +89,19 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
             if line_count == 0:
                 s_temp      = str(cur_ai_id)
                 num_chars   = len(s_temp)
-                num_space   = 6 - num_chars
+                num_space   = 5 - num_chars
                 s           += ' ' * num_space + s_temp
                 s           += '   '
                 
                 
                 s_temp      = str(cur_entry['sow_number'])
                 num_chars   = len(s_temp)
-                num_space   = 10 - num_chars
+                num_space   = 7 - num_chars
                 s           += ' ' * num_space + s_temp
                 s           += '   '
             
             else:
-                s           += ' ' * 22
+                s           += ' ' * 18
             
             
             s_temp      = str(cur_act['id'])
@@ -160,9 +160,9 @@ async def ai_list(is_active: int = 0, is_completed:int = 0, year:int = None):
     """
     res = model['sow_act'].get_ai_list(is_active, is_completed, year)
     
-    s  = '                                                                       Num baktin birth   Number baktin lutas\n'
-    s += '                                                                       ----------------   -------------------\n'
-    s += 'Sow_Number   AI_ID   Status         Date_AI      Date_Birth   NumDays   Dead    M    F       Dead    M    F     Date_Lutas   Num_Baktin\n'
+    s  = '                                                                                 Num baktin birth   Number baktin lutas\n'
+    s += '                                                                                 ----------------   -------------------\n'
+    s += '    Sow   AI_ID   Status         Date_AI      Expected     Date_Birth   NumDays   Dead    M    F       Dead    M    F     Date_Lutas   Num_Baktin\n'
     
     
     last_sow_number = 0
@@ -172,7 +172,7 @@ async def ai_list(is_active: int = 0, is_completed:int = 0, year:int = None):
         
         s_temp      = str(cur_entry['sow_number'])
         num_chars   = len(s_temp)
-        num_space   = 10 - num_chars
+        num_space   = 7 - num_chars
         s           += ' ' * num_space + s_temp
         s           += '   '
         
@@ -190,6 +190,10 @@ async def ai_list(is_active: int = 0, is_completed:int = 0, year:int = None):
         s           += '   '
         
         s_temp      = cur_entry['date_ai']
+        s           += s_temp 
+        s           += '   '
+        
+        s_temp      = cur_entry['date_expected']
         s           += s_temp 
         s           += '   '
         
@@ -321,7 +325,7 @@ async def cal_activities(num_days: int = 30):
         date_end_str)
     
         
-    s = 'Date               Sow_Number   Act_ID   Days_AI   Activity               Description\n'
+    s = 'Date                  Sow   Act_ID   Days_AI   Activity               Description\n'
     
     
     
@@ -345,7 +349,7 @@ async def cal_activities(num_days: int = 30):
                 
             s_temp      = str(cur_act['sow_number'])
             num_chars   = len(s_temp)
-            num_space   = 10 - num_chars
+            num_space   = 6 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '   '
         

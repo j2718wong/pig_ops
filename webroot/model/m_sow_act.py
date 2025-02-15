@@ -313,6 +313,7 @@ class SowActivity:
                         a.id,
                         a.sow_number,
                         a.date_ai,
+                        a.date_expected_birth,
                         a.date_actual_birth,
                         a.num_days_since_ai,
                         b.name,
@@ -336,6 +337,7 @@ class SowActivity:
                         a.id,
                         a.sow_number,
                         a.date_ai,
+                        a.date_expected_birth,
                         a.date_actual_birth,
                         a.num_days_since_ai,
                         b.name,
@@ -382,36 +384,37 @@ class SowActivity:
                 cur_id                  = row[0]
                 cur_sow_number          = row[1]
                 cur_date_ai             = str(row[2])
+                cur_date_expected       = str(row[3])
                 
                 cur_date_actual         = None
-                if row[3] is not None:
-                    cur_date_actual     = str(row[3])
+                if row[4] is not None:
+                    cur_date_actual     = str(row[4])
                 
                 cur_days_since_ai       = None
-                if row[4] is not None:
-                    cur_days_since_ai   = row[4]
+                if row[5] is not None:
+                    cur_days_since_ai   = row[5]
                     
-                cur_status              = row[5]
+                cur_status              = row[6]
                     
                 cur_num_b_dead          = None
-                if row[6] is not None:
-                    cur_num_b_dead      = row[6]
+                if row[7] is not None:
+                    cur_num_b_dead      = row[7]
                 
                 cur_num_b_male          = None
-                if row[7] is not None:
-                    cur_num_b_male      = row[7]
+                if row[8] is not None:
+                    cur_num_b_male      = row[8]
                 
                 cur_num_b_female        = None
-                if row[8] is not None:
-                    cur_num_b_female    = row[8]
+                if row[9] is not None:
+                    cur_num_b_female    = row[9]
                     
                 cur_num_w_male          = None
-                if row[9] is not None:
-                    cur_num_w_male      = row[9]
+                if row[10] is not None:
+                    cur_num_w_male      = row[10]
                 
                 cur_num_w_female        = None
-                if row[10] is not None:
-                    cur_num_w_female    = row[10]
+                if row[11] is not None:
+                    cur_num_w_female    = row[11]
                 
                 cur_num_w_dead          = None
                 if cur_num_w_male is not None and cur_num_w_female is not None:
@@ -420,14 +423,15 @@ class SowActivity:
                                         
                                         
                 cur_date_weaning        = None
-                if row[11] is not None:
-                    cur_date_weaning    = str(row[11])
+                if row[12] is not None:
+                    cur_date_weaning    = str(row[12])
                 
                 
                 cur_entry = {
                     'id':               cur_id,
                     'sow_number':       cur_sow_number, 
                     'date_ai':          cur_date_ai,
+                    'date_expected':    cur_date_expected,
                     'date_actual_birth': cur_date_actual,
                     'days_ai':          cur_days_since_ai,
                     'status':           cur_status,
