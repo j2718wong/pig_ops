@@ -84,7 +84,6 @@ class SowActivity:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
             
         except Exception as e:
             msg = 'get_latest_sow_activities(); error in executing query[] = ' + sql
@@ -199,7 +198,6 @@ class SowActivity:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
             
         except Exception as e:
             msg = 'get_latest_calendar_activities(); error in executing query[] = ' + sql
@@ -364,8 +362,7 @@ class SowActivity:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
-            
+
         except Exception as e:
             msg = 'get_ai_list(); error in executing query[] = ' + sql
             msg += '\n'
