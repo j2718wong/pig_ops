@@ -454,6 +454,89 @@ class SowActivity:
         return result
     
     
+    def get_sow_list(self):
+        """
+        Will get sow list.
+        
+        
+        Returns
+        -------
+        list of dictionary
+
+        """
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+      
+        sql =   """
+                SELECT 
+                    tag_number,
+                    flag,
+                    date_of_birth,
+                    date_culled,
+                    comment
+                FROM sow
+                ORDER BY id DESC
+                """ 
+    
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            msg = 'get_sow_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_sow_number          = row[0]
+                cur_flag                = row[1]
+                cur_date_of_birth       = str(row[2])
+                    
+                cur_date_culled         = None
+                if row[3] is not None:
+                    cur_date_culled     = str(row[3])
+                
+                cur_comment             = None
+                if row[4] is not None:
+                    cur_comment         = row[4]
+                
+                cur_entry = {
+                    'sow_number':       cur_sow_number, 
+                    'flag':             cur_flag,
+                    'date_of_birth':    cur_date_of_birth,
+                    'date_culled':      cur_date_culled,
+                    'comment':          cur_comment
+                }
+                
+                result.append(cur_entry)
+
+        
+        return result
+    
+    
     def get_sow_farrowing_list(self):
         """
         Will get list of latest sow_farrowing list.

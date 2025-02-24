@@ -30,6 +30,63 @@ SUNDAY                          = 6
 s_day_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
 
+@app.get("/sow/list", response_class=PlainTextResponse)
+async def sow_list(full_info: int = 0):
+    """
+    Will get sow list.
+    
+    Parameters
+    ----------
+    
+    full_info:int
+        0 = will return minimum info older dates not return; 
+        1 = will return full info
+
+        
+    """
+    
+    res = model['sow_act'].get_sow_list()
+    
+    
+    
+        
+    s = '    Sow   Date of Birth   Date Culled   Comment\n'
+    
+   
+    
+    for cur_entry in res:
+            
+        s_temp      = str(cur_entry['sow_number'])
+        num_chars   = len(s_temp)
+        num_space   = 7 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '   '
+    
+        s_temp      = cur_entry['date_of_birth']
+        s           += s_temp
+        s           += '      '
+        
+        
+        s_temp      = '          '   
+        if cur_entry['date_culled'] is not None:
+            s_temp  = cur_entry['date_culled']
+        s           += s_temp
+        s           += '    '
+        
+        s_temp      = '          '
+        if cur_entry['comment'] is not None:
+            s_temp  = cur_entry['comment']
+        s           += s_temp
+        s           += '    '
+        
+        
+        s           += '\n'
+        
+    return s
+    
+
+
+
     
 @app.get("/sow/activities", response_class=PlainTextResponse)
 async def sow_activities(ai_id:str = None, full_info: int = 0):

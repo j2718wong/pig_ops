@@ -41,7 +41,7 @@ model_names = [
 ]
 
 
-DATABASE_NAME_PIG_OPERATIONS = 'po'
+DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
 
 
 credentials_po = {
