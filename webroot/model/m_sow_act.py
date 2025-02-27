@@ -262,7 +262,8 @@ class SowActivity:
         return result
     
     
-    def get_ai_list(self, is_active = 0, is_completed = 0, year = None):
+    def get_ai_list(self, is_active = 0, is_completed = 0, year = None, 
+            sow = None):
         """
         Will get list of artificial insemination list.
         
@@ -291,69 +292,51 @@ class SowActivity:
         # Get database connection
         conn = self.model.db_conn
         
-      
-        if is_active == 0:
-            where_clause = ''
+        where_clause    = ''
+        order_by        = ' a.sow_number ASC, a.id DESC'
+        
+        if sow is not None:
+            where_clause = 'WHERE a.sow_number = %s' % sow
             
+        else:
             if is_completed > 0:
                 where_clause = 'WHERE a.status_id = 5'
                 if year is not None:
                     where_clause += ' AND YEAR(a.date_weaning) =  %s' % year
-            
+                
             else:
-                if year is not None:
-                    where_clause = ' WHERE YEAR(a.date_ai) =  %s' % year
+                if is_active > 0:
+                    where_clause = 'WHERE status_id IN(1,4) '
+                    if year is not None:
+                        where_clause += ' AND YEAR(a.date_ai) =  %s' % year
+                        
+                    order_by        = 'a.date_expected_birth '
+        
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.sow_number,
+                    a.date_ai,
+                    a.date_expected_birth,
+                    a.date_actual_birth,
+                    a.num_days_since_ai,
+                    b.name,
                     
+                    a.num_piglets_dead_at_birth,
+                    a.num_piglets_live_male,
+                    a.num_piglets_live_female,
+                    a.num_piglets_weaning_male,
+                    a.num_piglets_weaning_female,
                     
-            
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.sow_number,
-                        a.date_ai,
-                        a.date_expected_birth,
-                        a.date_actual_birth,
-                        a.num_days_since_ai,
-                        b.name,
-                        
-                        a.num_piglets_dead_at_birth,
-                        a.num_piglets_live_male,
-                        a.num_piglets_live_female,
-                        a.num_piglets_weaning_male,
-                        a.num_piglets_weaning_female,
-                        
-                        a.date_weaning
+                    a.date_weaning
 
-                    FROM artificial_insemination a
-                    LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
-                    %s
-                    ORDER BY a.sow_number ASC, a.id DESC
-                    """ % where_clause 
-        else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.sow_number,
-                        a.date_ai,
-                        a.date_expected_birth,
-                        a.date_actual_birth,
-                        a.num_days_since_ai,
-                        b.name,
-                        
-                        a.num_piglets_dead_at_birth,
-                        a.num_piglets_live_male,
-                        a.num_piglets_live_female,
-                        a.num_piglets_weaning_male,
-                        a.num_piglets_weaning_female,
-                        
-                        a.date_weaning
-
-                    FROM artificial_insemination a
-                    LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
-                    WHERE status_id IN(1,4)
-                    ORDER BY a.sow_number ASC, a.id DESC
-                    """ 
+                FROM artificial_insemination a
+                LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
+                %s
+                ORDER BY %s
+                """ % (where_clause, order_by)
     
+        
         rows = None
         
         try:

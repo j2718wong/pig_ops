@@ -39,8 +39,8 @@ async def sow_list(full_info: int = 0):
     ----------
     
     full_info:int
-        0 = will return minimum info older dates not return; 
-        1 = will return full info
+        0 = will return active sows only; 
+        1 = will return including culled sows
 
         
     """
@@ -55,7 +55,11 @@ async def sow_list(full_info: int = 0):
    
     
     for cur_entry in res:
-            
+        
+        if full_info == 0:
+            if cur_entry['date_culled'] is not None:
+                continue
+        
         s_temp      = str(cur_entry['sow_number'])
         num_chars   = len(s_temp)
         num_space   = 7 - num_chars
@@ -85,9 +89,6 @@ async def sow_list(full_info: int = 0):
     return s
     
 
-
-
-    
 @app.get("/sow/activities", response_class=PlainTextResponse)
 async def sow_activities(ai_id:str = None, full_info: int = 0):
     """
@@ -206,15 +207,28 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
     
     
 @app.get("/ai/list", response_class=PlainTextResponse)
-async def ai_list(is_active: int = 0, is_completed:int = 0, year:int = None):
+async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None, 
+        sow = None):
     """
     Will get ai list.
-    , 
+
     Parameters
     ----------
+    full_info : int
+        if 0, will include historical data per sow
+        if > 0, will return only active  AI per sow
+        
+    is_completed : int
+        
+    
         
     """
-    res = model['sow_act'].get_ai_list(is_active, is_completed, year)
+    is_active = 1
+    
+    if full_info > 0:
+        is_active = 0
+    
+    res = model['sow_act'].get_ai_list(is_active, is_completed, year, sow)
     
     s  = '                                                                                 Num baktin birth   Number baktin lutas\n'
     s += '                                                                                 ----------------   -------------------\n'

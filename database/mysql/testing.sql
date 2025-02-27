@@ -10,6 +10,11 @@ CALL sow_new_ai_entry(342271, 2, 2, '2025-01-06', 'AI PIC 337');
 
 CALL sow_new_ai_entry(324478, 2, 2, '2025-01-09', 'AI PIC 337');
 
+CALL sow_new_ai_entry(324658, 2, 2, '2025-02-06', 'AI PIC 337');
+CALL sow_new_ai_entry(324658, 2, 2, '2025-02-24', 'AI PIC 337');
+
+
+
 CALL sow_update_actual_birth_date(1, '2025-01-05', 4, 3, 6);
 
 
