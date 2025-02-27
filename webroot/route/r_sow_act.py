@@ -230,13 +230,16 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
     
     res = model['sow_act'].get_ai_list(is_active, is_completed, year, sow)
     
-    s  = '                                                                                 Num baktin birth   Number baktin lutas\n'
-    s += '                                                                                 ----------------   -------------------\n'
-    s += '    Sow   AI_ID   Status         Date_AI      Expected     Date_Birth   NumDays   Dead    M    F       Dead    M    F     Date_Lutas   Num_Baktin\n'
+    s  = '                                                                                              Num baktin birth   Number baktin lutas\n'
+    s += '                                                                                              ----------------   -------------------\n'
+    s += '    Sow   AI_ID   Status         Date_AI      Expected     Date_Birth   NumDays   Birth+45D    Dead    M    F       Dead    M    F     Date_Lutas   Num_Baktin\n'
     
     
     last_sow_number = 0
     for cur_entry in res:
+        date_birth  = cur_entry['date_actual_birth']
+        
+        
         if last_sow_number > 0 and last_sow_number != cur_entry['sow_number']:
             s           += '\n'
         
@@ -267,8 +270,8 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
         s           += s_temp 
         s           += '   '
         
-        if cur_entry['date_actual_birth'] is not None:
-            s_temp      = cur_entry['date_actual_birth']
+        if date_birth is not None:
+            s_temp      = date_birth
             s           += s_temp 
             s           += '   '
         else:
@@ -283,6 +286,18 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             s           += '   '
         else:
             s           += ' ' * 10
+            
+            
+        if date_birth is not None:
+            
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+            dt_birth_45 = dt_birth + timedelta(days=45) 
+            
+            s_temp      = dt_birth_45.strftime('%Y-%m-%d')
+            s           += s_temp 
+            s           += '   '
+        else:
+            s           += ' ' * 13
             
             
         num_piglets_birth = cur_entry['num_piglets_birth']
