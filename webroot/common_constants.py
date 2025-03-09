@@ -9,6 +9,7 @@ LOG_ERROR               = 2
 LOG_FATAL               = 3
 
 
+AI_STATUS_ID_TERMINATED             = 2
 
 
 ERROR_DATABASE_ERROR                                = 0x01

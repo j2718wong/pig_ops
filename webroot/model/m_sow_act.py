@@ -320,6 +320,7 @@ class SowActivity:
                     a.date_expected_birth,
                     a.date_actual_birth,
                     a.num_days_since_ai,
+                    a.status_id,
                     b.name,
                     
                     a.num_piglets_dead_at_birth,
@@ -374,27 +375,28 @@ class SowActivity:
                 if row[5] is not None:
                     cur_days_since_ai   = row[5]
                     
-                cur_status              = row[6]
+                cur_status_id           = row[6]
+                cur_status              = row[7]
                     
                 cur_num_b_dead          = None
-                if row[7] is not None:
-                    cur_num_b_dead      = row[7]
+                if row[8] is not None:
+                    cur_num_b_dead      = row[8]
                 
                 cur_num_b_male          = None
-                if row[8] is not None:
-                    cur_num_b_male      = row[8]
+                if row[9] is not None:
+                    cur_num_b_male      = row[9]
                 
                 cur_num_b_female        = None
-                if row[9] is not None:
-                    cur_num_b_female    = row[9]
+                if row[10] is not None:
+                    cur_num_b_female    = row[10]
                     
                 cur_num_w_male          = None
-                if row[10] is not None:
-                    cur_num_w_male      = row[10]
+                if row[11] is not None:
+                    cur_num_w_male      = row[11]
                 
                 cur_num_w_female        = None
-                if row[11] is not None:
-                    cur_num_w_female    = row[11]
+                if row[12] is not None:
+                    cur_num_w_female    = row[12]
                 
                 cur_num_w_dead          = None
                 if cur_num_w_male is not None and cur_num_w_female is not None:
@@ -403,8 +405,8 @@ class SowActivity:
                                         
                                         
                 cur_date_weaning        = None
-                if row[12] is not None:
-                    cur_date_weaning    = str(row[12])
+                if row[13] is not None:
+                    cur_date_weaning    = str(row[13])
                 
                 
                 cur_entry = {
@@ -414,6 +416,7 @@ class SowActivity:
                     'date_expected':    cur_date_expected,
                     'date_actual_birth': cur_date_actual,
                     'days_ai':          cur_days_since_ai,
+                    'status_id':        cur_status_id,
                     'status':           cur_status,
                     'date_weaning':     cur_date_weaning,
                    
@@ -437,7 +440,7 @@ class SowActivity:
         return result
     
     
-    def get_sow_list(self):
+    def get_sow_list(self, list_tag_numbers = None):
         """
         Will get sow list.
         
@@ -448,6 +451,31 @@ class SowActivity:
 
         """
         
+        where_clause = ''
+        if list_tag_numbers is not None:
+            s = ''
+            count = 0
+            for cur_entry in list_tag_numbers:
+                if count > 0: 
+                    s += ','
+                
+                s += str(cur_entry)
+                
+            where_clause = ' WHERE tag_number IN (%s) ' %s
+        
+        
+        sql =   """
+                SELECT 
+                    tag_number,
+                    flag,
+                    date_of_birth,
+                    date_culled,
+                    comment
+                FROM sow
+                %s
+                ORDER BY tag_number DESC
+                """ % where_clause
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -457,18 +485,7 @@ class SowActivity:
         # Get database connection
         conn = self.model.db_conn
         
-      
-        sql =   """
-                SELECT 
-                    tag_number,
-                    flag,
-                    date_of_birth,
-                    date_culled,
-                    comment
-                FROM sow
-                ORDER BY id DESC
-                """ 
-    
+        
         rows = None
         
         try:
