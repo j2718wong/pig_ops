@@ -4,7 +4,7 @@ DROP PROCEDURE IF EXISTS sow_new_ai_entry $$
 CREATE PROCEDURE sow_new_ai_entry(
     in_sow_number           INT,
     
-    in_ai_line_id           INT,
+    in_semen_source_id      INT,
     in_staff_id             INT,
     in_date_ai              VARCHAR(10),  /* in YYYY-MM-DD format*/
     in_description          VARCHAR(200)
@@ -42,8 +42,11 @@ DECLARE COMING_ACT_ID_PIGLET_IRON_2             INT             DEFAULT 12;
 DECLARE COMING_ACT_ID_WEANING                   INT             DEFAULT 13;
 DECLARE COMING_ACT_ID_CHECK_IF_PREGNANT         INT             DEFAULT 14;
 
+DECLARE COMING_ACT_ID_NATURAL_COUPLING          INT             DEFAULT 15;
 
 
+DECLARE cur_is_ai                               INT             DEFAULT 0;
+DECLARE cur_coming_activity_id                  INT             DEFAULT 0;
 
 DECLARE cur_artificial_insemination_id          INT             DEFAULT 0;
 
@@ -58,16 +61,16 @@ SET res_num         = RES_NUM_SUCCESS;
 
 
 SELECT  id
-INTO    cur_sow_coming_act_id
-FROM    sow_coming_activity
+INTO    cur_artificial_insemination_id
+FROM    artificial_insemination
 WHERE   sow_number      = in_sow_number     AND 
-        date            = in_date_ai 
+        date_ai         = in_date_ai 
 LIMIT   1;
 
 
 process_user : BEGIN
 
-IF cur_sow_coming_act_id > 0 THEN
+IF cur_artificial_insemination_id > 0 THEN
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -75,18 +78,21 @@ IF cur_sow_coming_act_id > 0 THEN
 END IF;
 
 
+
+
+
 INSERT INTO artificial_insemination (
     sow_number,
     date_ai,
     date_expected_birth,
-    ai_line_id,
+    semen_source_id,
     status_id,
     staff_id
 ) VALUES (
     in_sow_number,
     in_date_ai,
     DATE_ADD(in_date_ai, INTERVAL 115 DAY),
-    in_ai_line_id,
+    in_semen_source_id,
     AI_STATUS_ID_ON_GOING,
     in_staff_id
 );
@@ -94,8 +100,18 @@ INSERT INTO artificial_insemination (
 SELECT LAST_INSERT_ID() INTO cur_artificial_insemination_id;
 
 
+SELECT  is_ai
+INTO    cur_is_ai
+FROM    semen_source
+WHERE   id = in_semen_source_id;
 
-/* Record for artificial insemination*/
+IF cur_is_ai > 0 THEN 
+    SET cur_coming_activity_id  = COMING_ACT_ID_ARTIFICAL_INSEMINATION;
+ELSE
+    SET cur_coming_activity_id  = COMING_ACT_ID_NATURAL_COUPLING;
+END IF;
+
+/* Record for artificial insemination or natural coupling*/
 INSERT INTO sow_coming_activity (
     ai_id,
     
@@ -108,7 +124,7 @@ INSERT INTO sow_coming_activity (
     cur_artificial_insemination_id,
 
     in_sow_number,
-    COMING_ACT_ID_ARTIFICAL_INSEMINATION,
+    cur_coming_activity_id,
     in_date_ai,
     CONCAT(in_description, '; walay kaon, tubig ra')
 );
