@@ -1,6 +1,8 @@
 
 /* New AI entry*/
 CALL sow_new_ai_entry(342298, 1, 3, '2024-09-10', 'AI PIC 337');
+CALL sow_new_ai_entry(342298, 1, 3, '2025-03-18', 'AI PIC 337');
+
 
 
 

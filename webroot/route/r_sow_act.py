@@ -246,9 +246,9 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
                         cur_entry['date_culled'] = cur_sow['date_culled']
                         break
     
-    s  = '                                                                                              Num baktin birth   Number baktin lutas\n'
-    s += '                                                                                              ----------------   -------------------\n'
-    s += '    Sow   AI_ID   Status         Date_AI      Expected     Date_Birth   NumDays   Birth+45D    Dead    M    F       Dead    M    F     Date_Lutas   Num_Baktin\n'
+    s  = '                                                                                      Num baktin birth  Num baktin lutas\n'
+    s += '                                                                                      ----------------  ----------------\n'
+    s += '    Sow  AI_ID  Status        Date_AI     Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
     
     
     last_sow_number = 0
@@ -263,28 +263,28 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
         num_chars   = len(s_temp)
         num_space   = 7 - num_chars
         s           += ' ' * num_space + s_temp
-        s           += '   '
+        s           += '  '
         
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
         num_space   = 5 - num_chars
         s           += ' ' * num_space + s_temp
-        s           += '   '
+        s           += '  '
         
         
         s_temp      = cur_entry['status']
         num_chars   = len(s_temp)
         num_space   = 12 - num_chars
         s           += s_temp + ' ' * num_space 
-        s           += '   '
+        s           += '  '
         
         s_temp      = cur_entry['date_ai']
         s           += s_temp 
-        s           += '   '
+        s           += '  '
         
         s_temp      = cur_entry['date_expected']
         s           += s_temp 
-        s           += '   '
+        s           += '  '
         
         
         if cur_entry['status_id'] == AI_STATUS_ID_TERMINATED:
@@ -299,9 +299,9 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
         if date_birth is not None:
             s_temp      = date_birth
             s           += s_temp 
-            s           += '   '
+            s           += '  '
         else:
-            s           += ' ' * 13
+            s           += ' ' * 12
         
         cur_days_ai = cur_entry['days_ai']
         if cur_days_ai is not None and cur_days_ai > 0:
@@ -309,9 +309,9 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_chars   = len(s_temp)
             num_space   = 7 - num_chars
             s           += ' ' * num_space + s_temp
-            s           += '   '
+            s           += '  '
         else:
-            s           += ' ' * 10
+            s           += ' ' * 9
             
             
         if date_birth is not None:
@@ -321,9 +321,9 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             
             s_temp      = dt_birth_45.strftime('%Y-%m-%d')
             s           += s_temp 
-            s           += '   '
+            s           += '  '
         else:
-            s           += ' ' * 13
+            s           += ' ' * 12
             
             
         num_piglets_birth = cur_entry['num_piglets_birth']
@@ -337,6 +337,8 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_space   = 4 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
+        else:
+            s           += ' ' * 5
         
         if num_male is not None:
             s_temp      = str(num_male)
@@ -344,6 +346,8 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_space   = 3 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
+        else:
+            s           += ' ' * 5
         
         if num_female is not None:
             s_temp      = str(num_female)
@@ -351,6 +355,8 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_space   = 3 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
+        else:
+            s           += ' ' * 5
         
         
         num_piglets_weaning = cur_entry['num_piglets_weaning']
@@ -363,7 +369,7 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_piglets = num_male + num_female
         
         
-        s           += '     '
+        s           += '  '
         
         if num_dead is not None:
             s_temp      = str(num_dead)
@@ -371,32 +377,38 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_space   = 4 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
-        
+        else:
+            s           += ' ' * 5
+            
         if num_male is not None:
             s_temp      = str(num_male)
             num_chars   = len(s_temp)
             num_space   = 3 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
-            
+        else:
+            s           += ' ' * 5
+        
         if num_female is not None:
             s_temp      = str(num_female)
             num_chars   = len(s_temp)
             num_space   = 3 - num_chars
             s           += ' ' * num_space + s_temp
-            s           += '  '
+            s           += ' '
+        else:
+            s           += ' ' * 5
             
-        s           += '   '
+        s           += '  '
             
         if cur_entry['date_weaning'] is not None:
             s_temp      = cur_entry['date_weaning']
             s           += s_temp 
-            s           += '   '
+            s           += '  '
         else:
             s           += ' ' * 13
             
         
-        s           += '     '
+        s           += '  '
         
         if num_piglets is not None:
             s_temp      = str(num_piglets)
@@ -404,8 +416,13 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
             num_space   = 4 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
-            
         
+        else:
+            s           += ' ' * 13
+        
+        
+        s           += cur_entry['semen_desc']
+            
         s           += '\n'
         
         last_sow_number = cur_entry['sow_number']

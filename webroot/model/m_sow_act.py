@@ -321,6 +321,7 @@ class SowActivity:
                     a.date_actual_birth,
                     a.num_days_since_ai,
                     a.status_id,
+                    a.semen_desc,
                     b.name,
                     
                     a.num_piglets_dead_at_birth,
@@ -376,27 +377,28 @@ class SowActivity:
                     cur_days_since_ai   = row[5]
                     
                 cur_status_id           = row[6]
-                cur_status              = row[7]
+                cur_semen_desc          = row[7]
+                cur_status              = row[8]
                     
                 cur_num_b_dead          = None
-                if row[8] is not None:
-                    cur_num_b_dead      = row[8]
+                if row[9] is not None:
+                    cur_num_b_dead      = row[9]
                 
                 cur_num_b_male          = None
-                if row[9] is not None:
-                    cur_num_b_male      = row[9]
+                if row[10] is not None:
+                    cur_num_b_male      = row[10]
                 
                 cur_num_b_female        = None
-                if row[10] is not None:
-                    cur_num_b_female    = row[10]
+                if row[11] is not None:
+                    cur_num_b_female    = row[11]
                     
                 cur_num_w_male          = None
-                if row[11] is not None:
-                    cur_num_w_male      = row[11]
+                if row[12] is not None:
+                    cur_num_w_male      = row[12]
                 
                 cur_num_w_female        = None
-                if row[12] is not None:
-                    cur_num_w_female    = row[12]
+                if row[13] is not None:
+                    cur_num_w_female    = row[13]
                 
                 cur_num_w_dead          = None
                 if cur_num_w_male is not None and cur_num_w_female is not None:
@@ -405,8 +407,8 @@ class SowActivity:
                                         
                                         
                 cur_date_weaning        = None
-                if row[13] is not None:
-                    cur_date_weaning    = str(row[13])
+                if row[14] is not None:
+                    cur_date_weaning    = str(row[14])
                 
                 
                 cur_entry = {
@@ -418,6 +420,7 @@ class SowActivity:
                     'days_ai':          cur_days_since_ai,
                     'status_id':        cur_status_id,
                     'status':           cur_status,
+                    'semen_desc':       cur_semen_desc,
                     'date_weaning':     cur_date_weaning,
                    
                     'num_piglets_birth':{

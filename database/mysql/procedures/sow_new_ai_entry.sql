@@ -46,12 +46,18 @@ DECLARE COMING_ACT_ID_NATURAL_COUPLING          INT             DEFAULT 15;
 
 
 DECLARE cur_is_ai                               INT             DEFAULT 0;
+DECLARE cur_semen_source_name                   VARCHAR(50)     DEFAULT '';
+DECLARE cur_pig_race_name                       VARCHAR(50)     DEFAULT '';
+
+DECLARE cur_semen_desc                          VARCHAR(100)    DEFAULT '';
+
+
 DECLARE cur_coming_activity_id                  INT             DEFAULT 0;
 
 DECLARE cur_artificial_insemination_id          INT             DEFAULT 0;
 
-DECLARE cur_sow_coming_act_id                   INT             DEFAULT 0;
 
+DECLARE cur_sow_coming_act_id                   INT             DEFAULT 0;
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(180)    DEFAULT '';
@@ -78,7 +84,24 @@ IF cur_artificial_insemination_id > 0 THEN
 END IF;
 
 
+SELECT  a.is_ai,
+        a.name,
+        b.name
 
+INTO    cur_is_ai,
+        cur_semen_source_name,
+        cur_pig_race_name
+FROM    semen_source a 
+LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
+WHERE   a.id = in_semen_source_id;
+
+IF cur_is_ai > 0 THEN 
+    SET cur_semen_desc = CONCAT(cur_pig_race_name, ' FROM ');
+    SET cur_semen_desc = CONCAT(cur_semen_desc, cur_semen_source_name);
+ELSE
+    SET cur_semen_desc = CONCAT(cur_pig_race_name, ' TAKAL FROM ');
+    SET cur_semen_desc = CONCAT(cur_semen_desc, cur_semen_source_name);
+END IF;
 
 
 INSERT INTO artificial_insemination (
@@ -86,6 +109,7 @@ INSERT INTO artificial_insemination (
     date_ai,
     date_expected_birth,
     semen_source_id,
+    semen,
     status_id,
     staff_id
 ) VALUES (
@@ -93,6 +117,7 @@ INSERT INTO artificial_insemination (
     in_date_ai,
     DATE_ADD(in_date_ai, INTERVAL 115 DAY),
     in_semen_source_id,
+    cur_semen_desc,
     AI_STATUS_ID_ON_GOING,
     in_staff_id
 );
