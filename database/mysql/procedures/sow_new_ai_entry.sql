@@ -109,7 +109,7 @@ INSERT INTO artificial_insemination (
     date_ai,
     date_expected_birth,
     semen_source_id,
-    semen,
+    semen_desc,
     status_id,
     staff_id
 ) VALUES (

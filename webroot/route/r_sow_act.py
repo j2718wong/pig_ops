@@ -233,14 +233,14 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
     culled_sows = []
     
     for cur_entry in res:
-        if cur_entry['status_id'] == AI_STATUS_ID_TERMINATED:
+        if cur_entry['status_id'] == INS_STATUS_ID_TERMINATED:
             culled_sows.append(cur_entry['sow_number'])
             
     if len(culled_sows) > 0:
         res_sows = model['sow_act'].get_sow_list(culled_sows)
         
         for cur_entry in res:
-            if cur_entry['status_id'] == AI_STATUS_ID_TERMINATED:
+            if cur_entry['status_id'] == INS_STATUS_ID_TERMINATED:
                 for cur_sow in res_sows:
                     if cur_entry['sow_number'] == cur_sow['sow_number']:
                         cur_entry['date_culled'] = cur_sow['date_culled']
@@ -289,7 +289,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
         s           += '  '
         
         
-        if cur_entry['status_id'] == AI_STATUS_ID_TERMINATED:
+        if cur_entry['status_id'] == INS_STATUS_ID_TERMINATED:
             s_temp = 'girasyon; date_culled: %s' % cur_entry['date_culled']
             s           += s_temp 
             s           += '\n'

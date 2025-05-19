@@ -1,7 +1,9 @@
 
 /* New AI entry*/
 CALL sow_new_ai_entry(342298, 1, 3, '2024-09-10', 'AI PIC 337');
-CALL sow_new_ai_entry(342298, 1, 3, '2025-03-18', 'AI PIC 337');
+CALL sow_new_ai_entry(342298, 1, 2, '2025-03-18', 'AI PIC 337');
+CALL sow_new_ai_entry(342298, 1, 2, '2025-04-08', 'AI PIC 337');
+CALL sow_new_ai_entry(342298, 1, 2, '2025-04-28', 'AI PIC 337');
 
 
 
@@ -22,6 +24,7 @@ CALL sow_new_ai_entry(324658, 1, 2, '2025-02-24', 'AI PIC 337');
 
 
 CALL sow_update_actual_birth_date(1, '2025-01-05', 4, 3, 6);
+CALL sow_update_actual_birth_date(5, '2025-05-03', 1, 1, 2);
 
 
 
