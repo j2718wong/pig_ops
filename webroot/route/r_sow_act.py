@@ -90,14 +90,14 @@ async def sow_list(full_info: int = 0):
     
 
 @app.get("/sow/activities", response_class=PlainTextResponse)
-async def sow_activities(ai_id:str = None, full_info: int = 0):
+async def sow_activities(ins_id:str = None, full_info: int = 0):
     """
     Will get latest coming sow activities.
     
     Parameters
     ----------
-    ai_id:str
-        comma separated string of ai_id; example 1,2
+    ins_id:str
+        comma separated string of ins_id(insemination_id); example 1,2
     
     full_info:int
         0 = will return minimum info older dates not return; 
@@ -106,36 +106,36 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
         
     """
     
-    list_ai_id = []
+    list_ins_id = []
     
-    if ai_id is not None:
-        items = ai_id.split(',')
+    if ins_id is not None:
+        items = ins_id.split(',')
         
-        # reject invalid ai_id
+        # reject invalid ins_id
         for cur_entry in items:
             try:
-                cur_ai_id = int(cur_entry)
-                list_ai_id.append(str(cur_ai_id)) # need to convert back to str
+                cur_ins_id = int(cur_entry)
+                list_ins_id.append(str(cur_ins_id)) # need to convert back to str
             except:
                 test = 1
         
-        if len(list_ai_id) == 0:
+        if len(list_ins_id) == 0:
             res = model['sow_act'].get_latest_sow_activities(full_info)
         else:
             res = model['sow_act'].get_latest_sow_activities(full_info, 
-                list_ai_id)
+                list_ins_id)
         
     else:
         res = model['sow_act'].get_latest_sow_activities(full_info)
     
         
-    s = 'AI_ID       Sow   Act_ID   Date             Days_AI   Activity               Description\n'
+    s = 'INS_ID      Sow   Act_ID   Date             Num_Days  Activity               Description\n'
     
-    last_ai_id = None
+    last_ins_id = None
     
     
     for cur_entry in res:
-        cur_ai_id = cur_entry['ai_id']
+        cur_ins_id = cur_entry['ins_id']
         
         line_count = 0
         for cur_act in cur_entry['activities']:
@@ -144,7 +144,7 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
             cur_day     = cur_date.weekday()
         
             if line_count == 0:
-                s_temp      = str(cur_ai_id)
+                s_temp      = str(cur_ins_id)
                 num_chars   = len(s_temp)
                 num_space   = 5 - num_chars
                 s           += ' ' * num_space + s_temp
@@ -175,8 +175,8 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
             
             
             
-            if cur_act['days_ai'] is not None:
-                s_temp      = str(cur_act['days_ai'])
+            if cur_act['days_ins'] is not None:
+                s_temp      = str(cur_act['days_ins'])
                 num_chars   = len(s_temp)
                 num_space   = 6 - num_chars
                 s           += ' ' * num_space + s_temp
@@ -206,17 +206,17 @@ async def sow_activities(ai_id:str = None, full_info: int = 0):
     return s
     
     
-@app.get("/ai/list", response_class=PlainTextResponse)
-async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None, 
+@app.get("/pig_prod/list", response_class=PlainTextResponse)
+async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = None, 
         sow = None):
     """
-    Will get ai list.
+    Will get pig production list.
 
     Parameters
     ----------
     full_info : int
-        if 0, will include historical data per sow
-        if > 0, will return only active  AI per sow
+        if 0, will return only active  production per sow
+        if > 0, will include historical data per sow
         
     is_completed : int
         
@@ -228,7 +228,7 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
     if full_info > 0:
         is_active = 0
     
-    res = model['sow_act'].get_ai_list(is_active, is_completed, year, sow)
+    res = model['sow_act'].get_pig_prod_list(is_active, is_completed, year, sow)
     
     culled_sows = []
     
@@ -248,11 +248,13 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
     
     s  = '                                                                                      Num baktin birth  Num baktin lutas\n'
     s += '                                                                                      ----------------  ----------------\n'
-    s += '    Sow  AI_ID  Status        Date_AI     Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
+    s += '    Sow     ID  Status        Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
     
     
     last_sow_number = 0
     for cur_entry in res:
+        pprint.pprint(cur_entry)
+        
         date_birth  = cur_entry['date_actual_birth']
         
         
@@ -278,7 +280,7 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
         s           += s_temp + ' ' * num_space 
         s           += '  '
         
-        s_temp      = cur_entry['date_ai']
+        s_temp      = cur_entry['date_ins']
         s           += s_temp 
         s           += '  '
         
@@ -303,9 +305,9 @@ async def ai_list(full_info: int = 0, is_completed:int = 0, year:int = None,
         else:
             s           += ' ' * 12
         
-        cur_days_ai = cur_entry['days_ai']
-        if cur_days_ai is not None and cur_days_ai > 0:
-            s_temp      = str(cur_days_ai)
+        cur_days_actual = cur_entry['days_actual']
+        if cur_days_actual is not None and cur_days_actual > 0:
+            s_temp      = str(cur_days_actual)
             num_chars   = len(s_temp)
             num_space   = 7 - num_chars
             s           += ' ' * num_space + s_temp
@@ -489,8 +491,8 @@ async def cal_activities(num_days: int = 30):
             s           += '   '
             
             
-            if cur_act['days_ai'] is not None:
-                s_temp      = str(cur_act['days_ai'])
+            if cur_act['days_ins'] is not None:
+                s_temp      = str(cur_act['days_ins'])
                 num_chars   = len(s_temp)
                 num_space   = 7 - num_chars
                 s           += ' ' * num_space + s_temp

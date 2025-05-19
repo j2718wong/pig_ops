@@ -11,7 +11,7 @@ class SowActivity:
         self.TAG                = 'SowActivity'
     
     
-    def get_latest_sow_activities(self, full_info = 0, list_ai_id = None):
+    def get_latest_sow_activities(self, full_info = 0, list_ins_id = None):
         """
         Will get list of latest sow activities.
         
@@ -22,10 +22,10 @@ class SowActivity:
 
         """
         
-        s_list_ai_id = ''
-        if list_ai_id is not None:
-            s_list_ai_id = ','.join(list_ai_id)
-            s_list_ai_id = ' AND ai_id IN(' + s_list_ai_id + ')'
+        s_list_ins_id = ''
+        if list_ins_id is not None:
+            s_list_ins_id = ','.join(list_ins_id)
+            s_list_ins_id = ' AND insemination_id IN(' + s_list_ins_id + ')'
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -39,41 +39,41 @@ class SowActivity:
             sql =   """
                     SELECT 
                         a.id,
-                        a.ai_id,
+                        a.insemination_id,
                         a.sow_number,
                         b.description AS activity,
                         a.date,
                         a.date_2,
-                        a.days_since_ai,
+                        a.days_since_ins,
                         a.description
 
                     FROM sow_coming_activity a
-                    LEFT OUTER JOIN coming_activity b           ON a.coming_activity_id = b.id
-                    LEFT OUTER JOIN artificial_insemination c   ON a.ai_id = c.id
+                    LEFT OUTER JOIN coming_activity b  ON a.coming_activity_id = b.id
+                    LEFT OUTER JOIN pig_production c   ON a.insemination_id = c.id
                     WHERE c.status_id IN (1,4) AND (
                         (a.date >= CURRENT_DATE AND a.date_2 IS NULL) OR 
                         (a.date <= CURRENT_DATE AND CURRENT_DATE <= a.date_2)
                     ) %s
                     ORDER BY a.sow_number, a.id;
-                    """ % s_list_ai_id
+                    """ % s_list_ins_id
         else:
             sql =   """
                     SELECT 
                         a.id,
-                        a.ai_id,
+                        a.insemination_id,
                         a.sow_number,
                         b.description AS activity,
                         a.date,
                         a.date_2,
-                        a.days_since_ai,
+                        a.days_since_ins,
                         a.description
 
                     FROM sow_coming_activity a
                     LEFT OUTER JOIN coming_activity b           ON a.coming_activity_id = b.id
-                    LEFT OUTER JOIN artificial_insemination c   ON a.ai_id = c.id
+                    LEFT OUTER JOIN pig_production c   ON a.insemination_id = c.id
                     WHERE c.status_id IN (1,4) %s
                     ORDER BY a.sow_number, a.id;
-                    """ % s_list_ai_id
+                    """ % s_list_ins_id
 
         
         rows = None
@@ -102,7 +102,7 @@ class SowActivity:
             
             for row in rows:
                 cur_id                  = row[0]
-                cur_ai_id               = row[1]
+                cur_ins_id              = row[1]
                 cur_sow_number          = row[2]
                 cur_activity            = row[3]
                 cur_date                = str(row[4])
@@ -111,9 +111,9 @@ class SowActivity:
                 if row[5] is not None:
                     cur_date_2          = str(row[5])
                 
-                cur_days_since_ai       = None
+                cur_days_since_ins      = None
                 if row[6] is not None:
-                    cur_days_since_ai   = row[6]
+                    cur_days_since_ins  = row[6]
                     
                 cur_description         = ''
                 if row[7] is not None:
@@ -123,7 +123,7 @@ class SowActivity:
                 if last_sow_number is None or last_sow_number != cur_sow_number:
                 
                     cur_entry = {
-                        'ai_id':            cur_ai_id,
+                        'ins_id':           cur_ins_id,
                         'sow_number':       cur_sow_number,
                         
                         'activities':       []
@@ -138,7 +138,7 @@ class SowActivity:
                    'id':            cur_id,
                    'date':          cur_date,
                    'date_2':        cur_date_2,
-                   'days_ai':       cur_days_since_ai,
+                   'days_ins':      cur_days_since_ins,
                    'activity':      cur_activity,
                    'desc':          cur_description
                 }
@@ -173,17 +173,17 @@ class SowActivity:
         sql =   """
                 SELECT 
                     a.id,
-                    a.ai_id,
+                    a.insemination_id,
                     a.sow_number,
                     b.description AS activity,
                     a.date,
                     a.date_2,
-                    a.days_since_ai,
+                    a.days_since_ins,
                     a.description
 
                 FROM sow_coming_activity a
-                LEFT OUTER JOIN coming_activity b           ON a.coming_activity_id = b.id
-                LEFT OUTER JOIN artificial_insemination c   ON a.ai_id = c.id
+                LEFT OUTER JOIN coming_activity b  ON a.coming_activity_id = b.id
+                LEFT OUTER JOIN pig_production c   ON a.insemination_id = c.id
                 WHERE c.status_id IN (1,4) AND (
                     (a.date >= '%s' AND a.date <= '%s')
                 )
@@ -216,7 +216,7 @@ class SowActivity:
             
             for row in rows:
                 cur_id                  = row[0]
-                cur_ai_id               = row[1]
+                cur_ins_id              = row[1]
                 cur_sow_number          = row[2]
                 cur_activity            = row[3]
                 cur_date                = str(row[4])
@@ -225,9 +225,9 @@ class SowActivity:
                 if row[5] is not None:
                     cur_date_2          = str(row[5])
                 
-                cur_days_since_ai       = None
+                cur_days_since_ins       = None
                 if row[6] is not None:
-                    cur_days_since_ai   = row[6]
+                    cur_days_since_ins   = row[6]
                     
                 cur_description         = ''
                 if row[7] is not None:
@@ -248,10 +248,10 @@ class SowActivity:
                 
                 
                 cur_activity = {
-                   'ai_id':         cur_ai_id,
+                   'ins_id':        cur_ins_id,
                    'sow_number':    cur_sow_number, 
                    'id':            cur_id,
-                   'days_ai':       cur_days_since_ai,
+                   'days_ins':      cur_days_since_ins,
                    'activity':      cur_activity,
                    'desc':          cur_description
                 }
@@ -262,19 +262,19 @@ class SowActivity:
         return result
     
     
-    def get_ai_list(self, is_active = 0, is_completed = 0, year = None, 
+    def get_pig_prod_list(self, is_active = 0, is_completed = 0, year = None, 
             sow = None):
         """
-        Will get list of artificial insemination list.
+        Will get list of pig production list.
         
         Parameters
         ----------
         is_active : int
-            if > 0, AI with status On-Going and lactating will be returned
+            if > 0, pig production with status On-Going and lactating will be returned
             
   
         is_completed : int
-            if > 0, AI with status Completed will be returned
+            if > 0, pig production with status Completed will be returned
             
         
         Returns
@@ -316,10 +316,10 @@ class SowActivity:
                 SELECT 
                     a.id,
                     a.sow_number,
-                    a.date_ai,
+                    a.date_insemination,
                     a.date_expected_birth,
                     a.date_actual_birth,
-                    a.num_days_since_ai,
+                    a.num_days_actual,
                     a.status_id,
                     a.semen_desc,
                     b.name,
@@ -332,8 +332,8 @@ class SowActivity:
                     
                     a.date_weaning
 
-                FROM artificial_insemination a
-                LEFT OUTER JOIN ai_status b           ON a.status_id = b.id
+                FROM pig_production a
+                LEFT OUTER JOIN insemination_status b           ON a.status_id = b.id
                 %s
                 ORDER BY %s
                 """ % (where_clause, order_by)
@@ -349,7 +349,7 @@ class SowActivity:
             cursor.close()
 
         except Exception as e:
-            msg = 'get_ai_list(); error in executing query[] = ' + sql
+            msg = 'get_pig_prod_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -365,16 +365,16 @@ class SowActivity:
             for row in rows:
                 cur_id                  = row[0]
                 cur_sow_number          = row[1]
-                cur_date_ai             = str(row[2])
+                cur_date_insemination   = str(row[2])
                 cur_date_expected       = str(row[3])
                 
                 cur_date_actual         = None
                 if row[4] is not None:
                     cur_date_actual     = str(row[4])
                 
-                cur_days_since_ai       = None
+                cur_num_days_actual     = None
                 if row[5] is not None:
-                    cur_days_since_ai   = row[5]
+                    cur_num_days_actual = row[5]
                     
                 cur_status_id           = row[6]
                 cur_semen_desc          = row[7]
@@ -414,10 +414,10 @@ class SowActivity:
                 cur_entry = {
                     'id':               cur_id,
                     'sow_number':       cur_sow_number, 
-                    'date_ai':          cur_date_ai,
+                    'date_ins':         cur_date_insemination,
                     'date_expected':    cur_date_expected,
                     'date_actual_birth': cur_date_actual,
-                    'days_ai':          cur_days_since_ai,
+                    'days_actual':      cur_num_days_actual,
                     'status_id':        cur_status_id,
                     'status':           cur_status,
                     'semen_desc':       cur_semen_desc,
@@ -563,7 +563,7 @@ class SowActivity:
       
         sql =   """
                 SELECT 
-                    a.ai_id,
+                    a.ins_id,
                     b.sow_number,
                     b.date_actual_birth,
                     b.num_days_since_ai,
@@ -572,8 +572,8 @@ class SowActivity:
                     a.date_stop_night_support
                     
                 FROM sow_farrowing a
-                LEFT OUTER JOIN artificial_insemination b  ON a.ai_id = b.id
-                ORDER BY a.ai_id DESC
+                LEFT OUTER JOIN artificial_insemination b  ON a.ins_id = b.id
+                ORDER BY a.ins_id DESC
                 """ 
     
         rows = None
@@ -601,10 +601,10 @@ class SowActivity:
             
             
             for row in rows:
-                cur_ai_id               = row[0]
+                cur_ins_id               = row[0]
                 cur_sow_number          = row[1]
                 cur_date_actual         = str(row[2])
-                cur_days_since_ai       = row[3]
+                cur_days_since_ins       = row[3]
                     
                 cur_status              = row[5]
                     
@@ -638,7 +638,7 @@ class SowActivity:
                     'sow_number':       cur_sow_number, 
                     'date_ai':          cur_date_ai,
                     'date_actual_birth': cur_date_actual,
-                    'days_ai':          cur_days_since_ai,
+                    'days_ai':          cur_days_since_ins,
                     'status':           cur_status,
                    
                     'num_piglets_birth':{
