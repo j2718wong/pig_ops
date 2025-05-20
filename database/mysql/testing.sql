@@ -4,7 +4,7 @@ CALL sow_new_ai_entry(342298, 1, 3, '2024-09-10', 'AI PIC 337');
 CALL sow_new_ai_entry(342298, 1, 2, '2025-03-18', 'AI PIC 337');
 CALL sow_new_ai_entry(342298, 1, 2, '2025-04-08', 'AI PIC 337');
 CALL sow_new_ai_entry(342298, 1, 2, '2025-04-28', 'AI PIC 337');
-
+CALL sow_new_insemination_entry(342298, 2, 2, '2025-05-20', 'Kasta Landrace');
 
 
 
