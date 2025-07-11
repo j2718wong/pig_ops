@@ -270,13 +270,14 @@ class SowActivity:
         Parameters
         ----------
         is_active : int
-            if > 0, pig production with status On-Going and lactating will be returned
+            if > 0, pig production with status gestating, lactating and weaning 
+               will be returned
             
   
         is_completed : int
             if > 0, pig production with status Completed will be returned
             
-        
+       
         Returns
         -------
         list of dictionary
@@ -296,19 +297,20 @@ class SowActivity:
         order_by        = ' a.sow_number ASC, a.id DESC'
         
         if sow is not None:
-            where_clause = 'WHERE a.sow_number = %s' % sow
+            where_clause = "WHERE a.sow_number = '%s'" % sow
             
         else:
             if is_completed > 0:
-                where_clause = 'WHERE a.status_id = 5'
+                where_clause = 'WHERE a.status_id = 7'
                 if year is not None:
                     where_clause += ' AND YEAR(a.date_weaning) =  %s' % year
                 
             else:
+               
                 if is_active > 0:
-                    where_clause = 'WHERE status_id IN(1,4) '
+                    where_clause = 'WHERE status_id IN(1,4,5) '
                     if year is not None:
-                        where_clause += ' AND YEAR(a.date_ai) =  %s' % year
+                        where_clause += ' AND YEAR(a.date_insemination) =  %s' % year
                         
                     order_by        = 'a.date_expected_birth '
         
@@ -331,14 +333,13 @@ class SowActivity:
                     a.num_piglets_weaning_female,
                     
                     a.date_weaning
-
+         
                 FROM pig_production a
                 LEFT OUTER JOIN insemination_status b           ON a.status_id = b.id
                 %s
                 ORDER BY %s
                 """ % (where_clause, order_by)
     
-        
         rows = None
         
         try:
@@ -443,7 +444,7 @@ class SowActivity:
         return result
     
     
-    def get_sow_list(self, list_tag_numbers = None):
+    def get_sow_list(self, list_sow_numbers = None):
         """
         Will get sow list.
         
@@ -455,28 +456,30 @@ class SowActivity:
         """
         
         where_clause = ''
-        if list_tag_numbers is not None:
+        if list_sow_numbers is not None:
             s = ''
             count = 0
-            for cur_entry in list_tag_numbers:
+            for cur_entry in list_sow_numbers:
                 if count > 0: 
                     s += ','
                 
-                s += str(cur_entry)
+                s += f"'{cur_entry}'"
                 
-            where_clause = ' WHERE tag_number IN (%s) ' %s
+            where_clause = ' WHERE sow_number IN (%s) ' %s
         
         
         sql =   """
                 SELECT 
-                    tag_number,
-                    flag,
-                    date_of_birth,
-                    date_culled,
-                    comment
-                FROM sow
+                    a.sow_number,
+                    a.flag,
+                    b.name,
+                    a.date_of_birth,
+                    a.date_culled,
+                    a.comment
+                FROM sow a
+                LEFT OUTER JOIN sow_status b ON a.sow_status_id = b.id
                 %s
-                ORDER BY tag_number DESC
+                ORDER BY date_of_birth DESC
                 """ % where_clause
         
         
@@ -516,19 +519,21 @@ class SowActivity:
             for row in rows:
                 cur_sow_number          = row[0]
                 cur_flag                = row[1]
-                cur_date_of_birth       = str(row[2])
+                cur_status              = row[2]
+                cur_date_of_birth       = str(row[3])
                     
                 cur_date_culled         = None
-                if row[3] is not None:
-                    cur_date_culled     = str(row[3])
+                if row[4] is not None:
+                    cur_date_culled     = str(row[4])
                 
                 cur_comment             = None
-                if row[4] is not None:
-                    cur_comment         = row[4]
+                if row[5] is not None:
+                    cur_comment         = row[5]
                 
                 cur_entry = {
                     'sow_number':       cur_sow_number, 
                     'flag':             cur_flag,
+                    'status':           cur_status,
                     'date_of_birth':    cur_date_of_birth,
                     'date_culled':      cur_date_culled,
                     'comment':          cur_comment

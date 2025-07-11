@@ -46,11 +46,11 @@ async def sow_list(full_info: int = 0):
     """
     
     res = model['sow_act'].get_sow_list()
-    
+        
     
     
         
-    s = '    Sow   Date of Birth   Date Culled   Comment\n'
+    s = '    Sow   Date of Birth   SOW_Status   Date Culled   Comment\n'
     
    
     
@@ -60,7 +60,7 @@ async def sow_list(full_info: int = 0):
             if cur_entry['date_culled'] is not None:
                 continue
         
-        s_temp      = str(cur_entry['sow_number'])
+        s_temp      = cur_entry['sow_number']
         num_chars   = len(s_temp)
         num_space   = 7 - num_chars
         s           += ' ' * num_space + s_temp
@@ -70,6 +70,13 @@ async def sow_list(full_info: int = 0):
         s           += s_temp
         s           += '      '
         
+        
+        s_temp      = cur_entry['status']
+        num_chars   = len(s_temp)
+        num_space   = 10 - num_chars
+        s           +=  s_temp + ' ' * num_space
+        s           += '   '
+    
         
         s_temp      = '          '   
         if cur_entry['date_culled'] is not None:
@@ -207,8 +214,8 @@ async def sow_activities(ins_id:str = None, full_info: int = 0):
     
     
 @app.get("/pig_prod/list", response_class=PlainTextResponse)
-async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = None, 
-        sow = None):
+async def pig_prod_list(full_info: int = 0, is_completed:int = 0, 
+        year:int = None, sow = None):
     """
     Will get pig production list.
 
@@ -228,7 +235,10 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
     if full_info > 0:
         is_active = 0
     
-    res = model['sow_act'].get_pig_prod_list(is_active, is_completed, year, sow)
+    res = model['sow_act'].get_pig_prod_list(is_active, is_completed, 
+            year, sow)
+            
+    pprint.pprint(res)
     
     culled_sows = []
     
@@ -248,7 +258,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
     
     s  = '                                                                                      Num baktin birth  Num baktin lutas\n'
     s += '                                                                                      ----------------  ----------------\n'
-    s += '    Sow     ID  Status        Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
+    s += '    Sow     ID  INS_Status    Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
     
     
     last_sow_number = 0
@@ -290,7 +300,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
         
         
         if cur_entry['status_id'] == INS_STATUS_ID_TERMINATED:
-            s_temp = 'girasyon; date_culled: %s' % cur_entry['date_culled']
+            s_temp = 'girasyon or namatay'
             s           += s_temp 
             s           += '\n'
         
@@ -313,7 +323,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
             s           += ' ' * num_space + s_temp
             s           += '  '
         else:
-            s           += ' ' * 9
+            s           += ' ' * 10
             
             
         if date_birth is not None:
@@ -380,7 +390,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
             s           += ' ' * num_space + s_temp
             s           += '  '
         else:
-            s           += ' ' * 5
+            s           += ' ' * 3
             
         if num_male is not None:
             s_temp      = str(num_male)
@@ -389,7 +399,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
             s           += ' ' * num_space + s_temp
             s           += '  '
         else:
-            s           += ' ' * 5
+            s           += ' ' * 3
         
         if num_female is not None:
             s_temp      = str(num_female)
@@ -398,7 +408,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
             s           += ' ' * num_space + s_temp
             s           += ' '
         else:
-            s           += ' ' * 5
+            s           += ' ' * 3
             
         s           += '  '
             
@@ -407,7 +417,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
             s           += s_temp 
             s           += '  '
         else:
-            s           += ' ' * 13
+            s           += ' ' * 12
             
         
         s           += '  '
@@ -420,7 +430,7 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0, year:int = Non
             s           += '  '
         
         else:
-            s           += ' ' * 13
+            s           += ' ' * 12
         
         
         s           += cur_entry['semen_desc']

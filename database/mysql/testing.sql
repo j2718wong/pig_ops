@@ -25,7 +25,8 @@ CALL sow_new_ai_entry(324658, 1, 2, '2025-02-24', 'AI PIC 337');
 
 CALL sow_update_actual_birth_date(1, '2025-01-05', 4, 3, 6);
 CALL sow_update_actual_birth_date(5, '2025-05-03', 1, 1, 2);
-
+CALL sow_update_actual_birth_date(7, '2025-06-19', 1, 9, 5);
+CALL sow_update_actual_birth_date(9, '2025-07-06', 2, 10, 10);
 
 
 SELECT 

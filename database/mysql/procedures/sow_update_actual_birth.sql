@@ -2,7 +2,7 @@
 
 DROP PROCEDURE IF EXISTS sow_update_actual_birth_date $$
 CREATE PROCEDURE sow_update_actual_birth_date(
-    in_ai_id                    INT,
+    in_insemination_id          INT,
     
     in_date_actual_birth        VARCHAR(10),  /* in YYYY-MM-DD format*/
     in_num_piglets_dead         INT,
@@ -30,7 +30,7 @@ DECLARE COMING_ACT_ID_PIGLET_IRON_2             INT             DEFAULT 12;
 DECLARE COMING_ACT_ID_WEANING                   INT             DEFAULT 13;
 
 
-DECLARE AI_STATUS_ID_LACTATING                  INT             DEFAULT 4;
+DECLARE INS_STATUS_ID_LACTATING                 INT             DEFAULT 4;
 
 DECLARE NUM_DAYS_PIGLET_PROCESSING              INT             DEFAULT 3;
 DECLARE NUM_DAYS_PIGLET_VITAMINS                INT             DEFAULT 7;
@@ -39,7 +39,6 @@ DECLARE NUM_DAYS_WEANING                        INT             DEFAULT 45;
 
 
 
-DECLARE cur_artificial_insemination_id          INT             DEFAULT 0;
 
 DECLARE cur_sow_coming_act_id                   INT             DEFAULT 0;
 
@@ -50,28 +49,28 @@ DECLARE res_code                                VARCHAR(180)    DEFAULT '';
 SET res_num         = RES_NUM_SUCCESS;
 
 
-UPDATE artificial_insemination SET 
+UPDATE pig_production SET 
     date_actual_birth       = in_date_actual_birth,
-    num_days_since_ai       = DATEDIFF(in_date_actual_birth, date_ai),
-    status_id               = AI_STATUS_ID_LACTATING,
+    num_days_actual         = DATEDIFF(in_date_actual_birth, date_insemination),
+    status_id               = INS_STATUS_ID_LACTATING,
     num_piglets_dead_at_birth = in_num_piglets_dead,
     num_piglets_live_male   = in_num_piglets_live_male,
     num_piglets_live_female = in_num_piglets_live_female
-WHERE id = in_ai_id;
+WHERE id = in_insemination_id;
 
 
 UPDATE sow_coming_activity SET 
     date = DATE_ADD(in_date_actual_birth, INTERVAL 1 DAY),
     description = CONCAT("birth: ", in_date_actual_birth, "; + ", 1, 
         " days; 3.0 kg per day lactating")
-WHERE ai_id = in_ai_id AND coming_activity_id = COMING_ACT_ID_AFTER_BIRTH;
+WHERE insemination_id = in_insemination_id AND coming_activity_id = COMING_ACT_ID_AFTER_BIRTH;
 
 
 UPDATE sow_coming_activity SET 
     date = DATE_ADD(in_date_actual_birth, INTERVAL 1 DAY),
     description = CONCAT("birth: ", in_date_actual_birth, "; + ", 1, 
         " days; 3.0 kg per day lactating")
-WHERE ai_id = in_ai_id AND coming_activity_id = COMING_ACT_ID_SOW_PROCESSING;
+WHERE insemination_id = in_insemination_id AND coming_activity_id = COMING_ACT_ID_SOW_PROCESSING;
 
 
 
@@ -79,21 +78,21 @@ UPDATE sow_coming_activity SET
     date = DATE_ADD(in_date_actual_birth, INTERVAL NUM_DAYS_PIGLET_PROCESSING DAY),
     description = CONCAT("birth: ", in_date_actual_birth, "; + ", 
         NUM_DAYS_PIGLET_PROCESSING, " days; baktin kapon, pangil, ikog, bakuna, iron")
-WHERE ai_id = in_ai_id AND coming_activity_id = COMING_ACT_ID_PIGLET_PROCESSING;
+WHERE insemination_id = in_insemination_id AND coming_activity_id = COMING_ACT_ID_PIGLET_PROCESSING;
 
 
 UPDATE sow_coming_activity SET 
     date = DATE_ADD(in_date_actual_birth, INTERVAL NUM_DAYS_PIGLET_VITAMINS DAY),
     description = CONCAT("birth: ", in_date_actual_birth, "; + ", 
         NUM_DAYS_PIGLET_VITAMINS, " days; inject baktin vitamins after 7 days")
-WHERE ai_id = in_ai_id AND coming_activity_id = COMING_ACT_ID_PIGLET_VITAMINS;
+WHERE insemination_id = in_insemination_id AND coming_activity_id = COMING_ACT_ID_PIGLET_VITAMINS;
 
 
 UPDATE sow_coming_activity SET 
     date = DATE_ADD(in_date_actual_birth, INTERVAL NUM_DAYS_PIGLET_IRON_2 DAY),
     description = CONCAT("birth: ", in_date_actual_birth, "; + ", 
         NUM_DAYS_PIGLET_IRON_2, " days; inject baktin iron, after 14 days")
-WHERE ai_id = in_ai_id AND coming_activity_id = COMING_ACT_ID_PIGLET_IRON_2;
+WHERE insemination_id = in_insemination_id AND coming_activity_id = COMING_ACT_ID_PIGLET_IRON_2;
 
 
 
@@ -101,7 +100,7 @@ UPDATE sow_coming_activity SET
     date = DATE_ADD(in_date_actual_birth, INTERVAL NUM_DAYS_WEANING DAY),
     description = CONCAT("birth: ", in_date_actual_birth, "; + ", 
         NUM_DAYS_WEANING, " days")
-WHERE ai_id = in_ai_id AND coming_activity_id = COMING_ACT_ID_WEANING;
+WHERE insemination_id = in_insemination_id AND coming_activity_id = COMING_ACT_ID_WEANING;
 
 
 
