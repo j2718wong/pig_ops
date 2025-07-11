@@ -2,7 +2,7 @@
 
 DROP PROCEDURE IF EXISTS sow_new_insemination_entry $$
 CREATE PROCEDURE sow_new_insemination_entry(
-    in_sow_number           INT,
+    in_sow_number           VARCHAR(10),
     
     in_semen_source_id      INT,
     in_staff_id             INT,
@@ -24,7 +24,9 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
 
 
-DECLARE INSEMINATION_STATUS_ID_ON_GOING         INT             DEFAULT 1;
+DECLARE INSEMINATION_STATUS_ID_GESTATING        INT             DEFAULT 1;
+DECLARE INSEMINATION_STATUS_ID_WEANING          INT             DEFAULT 5;
+
 
 
 DECLARE COMING_ACT_ID_ARTIFICIAL_INSEMINATION   INT             DEFAULT 1;
@@ -44,6 +46,7 @@ DECLARE COMING_ACT_ID_CHECK_IF_PREGNANT         INT             DEFAULT 14;
 
 DECLARE COMING_ACT_ID_NATURAL_COUPLING          INT             DEFAULT 15;
 
+DECLARE cur_sow_id                              INT             DEFAULT 0;
 
 DECLARE cur_is_ai                               INT             DEFAULT 0;
 DECLARE cur_semen_source_name                   VARCHAR(50)     DEFAULT '';
@@ -84,6 +87,16 @@ IF cur_insemination_id > 0 THEN
 END IF;
 
 
+SELECT  id 
+INTO    cur_sow_id
+FROM    sow 
+WHERE   sow_number = in_sow_number;
+
+UPDATE pig_production SET 
+    status = INSEMINATION_STATUS_ID_GESTATING
+WHERE sow_id = cur_sow_id AND status = INSEMINATION_STATUS_ID_WEANING;
+
+
 SELECT  a.is_ai,
         a.name,
         b.name
@@ -104,7 +117,10 @@ ELSE
 END IF;
 
 
+
+
 INSERT INTO pig_production (
+    sow_id,
     sow_number,
     date_insemination,
     date_expected_birth,
@@ -113,12 +129,13 @@ INSERT INTO pig_production (
     status_id,
     staff_id
 ) VALUES (
+    cur_sow_id,
     in_sow_number,
     in_date_insemination,
     DATE_ADD(in_date_insemination, INTERVAL 115 DAY),
     in_semen_source_id,
     cur_semen_desc,
-    INSEMINATION_STATUS_ID_ON_GOING,
+    INSEMINATION_STATUS_ID_GESTATING,
     in_staff_id
 );
 

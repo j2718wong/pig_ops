@@ -214,31 +214,38 @@ async def sow_activities(ins_id:str = None, full_info: int = 0):
     
     
 @app.get("/pig_prod/list", response_class=PlainTextResponse)
-async def pig_prod_list(full_info: int = 0, is_completed:int = 0, 
-        year:int = None, sow = None):
+async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0, 
+        is_harvested =0, year:int = None, sow = None):
     """
     Will get pig production list.
 
     Parameters
     ----------
     full_info : int
-        if 0, will return only active  production per sow
         if > 0, will include historical data per sow
         
-    is_completed : int
+    is_active : int
+        if > 0, pig production with status gestating, lactating and weaning 
+           will be returned
+        
+    is_growing : int
+        if > 0, pig production with status growing, fattening, finishing will be returned
+
+    is_harvested : int
+        if > 0, pig production with status harvested will be returned
         
     
         
     """
-    is_active = 1
     
+    
+
     if full_info > 0:
         is_active = 0
     
-    res = model['sow_act'].get_pig_prod_list(is_active, is_completed, 
-            year, sow)
+    res = model['sow_act'].get_pig_prod_list(is_active, int(is_growing), 
+            int(is_harvested), year, sow)
             
-    pprint.pprint(res)
     
     culled_sows = []
     
@@ -258,17 +265,16 @@ async def pig_prod_list(full_info: int = 0, is_completed:int = 0,
     
     s  = '                                                                                      Num baktin birth  Num baktin lutas\n'
     s += '                                                                                      ----------------  ----------------\n'
-    s += '    Sow     ID  INS_Status    Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
+    s += '    Sow     ID  PROD_Status   Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
     
     
-    last_sow_number = 0
+    last_sow_number = None
     for cur_entry in res:
-        pprint.pprint(cur_entry)
         
         date_birth  = cur_entry['date_actual_birth']
         
         
-        if last_sow_number > 0 and last_sow_number != cur_entry['sow_number']:
+        if last_sow_number and last_sow_number != cur_entry['sow_number']:
             s           += '\n'
         
         s_temp      = str(cur_entry['sow_number'])

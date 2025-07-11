@@ -262,8 +262,8 @@ class SowActivity:
         return result
     
     
-    def get_pig_prod_list(self, is_active = 0, is_completed = 0, year = None, 
-            sow = None):
+    def get_pig_prod_list(self, is_active = 0, is_growing = 0, is_harvested = 0, 
+            year = None, sow = None):
         """
         Will get list of pig production list.
         
@@ -273,9 +273,11 @@ class SowActivity:
             if > 0, pig production with status gestating, lactating and weaning 
                will be returned
             
+        is_growing : int
+            if > 0, pig production with status growing, fattening, finishing will be returned
   
-        is_completed : int
-            if > 0, pig production with status Completed will be returned
+        is_harvested : int
+            if > 0, pig production with status harvested will be returned
             
        
         Returns
@@ -294,25 +296,34 @@ class SowActivity:
         conn = self.model.db_conn
         
         where_clause    = ''
-        order_by        = ' a.sow_number ASC, a.id DESC'
+        order_by        = ' a.sow_id DESC, a.id DESC'
         
         if sow is not None:
             where_clause = "WHERE a.sow_number = '%s'" % sow
             
         else:
-            if is_completed > 0:
-                where_clause = 'WHERE a.status_id = 7'
-                if year is not None:
-                    where_clause += ' AND YEAR(a.date_weaning) =  %s' % year
+            if is_harvested > 0:
+                where_clause = 'WHERE status_id = 10 '
                 
-            else:
+                if year is not None:
+                    where_clause += ' AND YEAR(a.date_weaning) =  %s ' % year
+                
+                order_by        = 'a.date_weaning DESC '
                
-                if is_active > 0:
-                    where_clause = 'WHERE status_id IN(1,4,5) '
+            else:
+            
+                if is_growing > 0:
+                    where_clause = 'WHERE a.status_id IN (5,7,8,9)'
                     if year is not None:
-                        where_clause += ' AND YEAR(a.date_insemination) =  %s' % year
+                        where_clause += ' AND YEAR(a.date_weaning) =  %s ' % year
+                else:
+                    if is_active > 0:
+                        where_clause = 'WHERE status_id IN(1,4,5) '
                         
-                    order_by        = 'a.date_expected_birth '
+                        if year is not None:
+                            where_clause += ' AND YEAR(a.date_insemination) =  %s' % year
+                            
+                        order_by        = 'a.date_expected_birth '
         
         sql =   """
                 SELECT 
@@ -335,7 +346,7 @@ class SowActivity:
                     a.date_weaning
          
                 FROM pig_production a
-                LEFT OUTER JOIN insemination_status b           ON a.status_id = b.id
+                LEFT OUTER JOIN production_status b           ON a.status_id = b.id
                 %s
                 ORDER BY %s
                 """ % (where_clause, order_by)
