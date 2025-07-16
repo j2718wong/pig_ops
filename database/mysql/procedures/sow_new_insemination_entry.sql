@@ -57,7 +57,7 @@ DECLARE cur_semen_desc                          VARCHAR(100)    DEFAULT '';
 
 DECLARE cur_coming_activity_id                  INT             DEFAULT 0;
 
-DECLARE cur_insemination_id          INT             DEFAULT 0;
+DECLARE cur_production_id                       INT             DEFAULT 0;
 
 
 DECLARE cur_sow_coming_act_id                   INT             DEFAULT 0;
@@ -70,7 +70,7 @@ SET res_num         = RES_NUM_SUCCESS;
 
 
 SELECT  id
-INTO    cur_insemination_id
+INTO    cur_production_id
 FROM    pig_production
 WHERE   sow_number          = in_sow_number     AND 
         date_insemination   = in_date_insemination 
@@ -79,7 +79,7 @@ LIMIT   1;
 
 process_user : BEGIN
 
-IF cur_insemination_id > 0 THEN
+IF cur_production_id > 0 THEN
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -139,7 +139,11 @@ INSERT INTO pig_production (
     in_staff_id
 );
 
-SELECT LAST_INSERT_ID() INTO cur_insemination_id;
+SELECT LAST_INSERT_ID() INTO cur_production_id;
+
+UPDATE sow SET
+    last_prod_id = cur_production_id
+WHERE id = cur_sow_id;
 
 
 SELECT  is_ai
@@ -163,7 +167,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
 
     in_sow_number,
     cur_coming_activity_id,
@@ -182,7 +186,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_AFTER_INSEMINATION,
@@ -202,7 +206,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
 
     in_sow_number,
     COMING_ACT_ID_BACK_NORMAL_FEEDING,
@@ -222,7 +226,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
 
     in_sow_number,
     COMING_ACT_ID_CHECK_IF_PREGNANT,
@@ -242,7 +246,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
 
     in_sow_number,
     COMING_ACT_ID_CHECK_IF_PREGNANT,
@@ -262,7 +266,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
 
     in_sow_number,
     COMING_ACT_ID_CHECK_IF_PREGNANT,
@@ -284,7 +288,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_INJECT_IRON,
@@ -304,7 +308,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_DEWORM,
@@ -324,7 +328,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_BEFORE_LABOR,
@@ -344,7 +348,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     in_sow_number,
     COMING_ACT_ID_BEFORE_LABOR,
     DATE_ADD(in_date_insemination, INTERVAL 112 DAY),
@@ -363,7 +367,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_BEFORE_LABOR,
@@ -383,7 +387,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_BEFORE_LABOR,
@@ -403,7 +407,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_EXPECTED_LABOR,
@@ -423,7 +427,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_AFTER_BIRTH,
@@ -442,7 +446,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_SOW_PROCESSING,
@@ -462,7 +466,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_PIGLET_PROCESSING,
@@ -481,7 +485,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_PIGLET_VITAMINS,
@@ -500,7 +504,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_PIGLET_IRON_2,
@@ -519,7 +523,7 @@ INSERT INTO sow_coming_activity (
     description
     
 ) VALUES(
-    cur_insemination_id,
+    cur_production_id,
     
     in_sow_number,
     COMING_ACT_ID_WEANING,
@@ -536,7 +540,7 @@ SELECT
     res_num                             AS result_number,
     res_code                            AS result_code,
     
-    cur_insemination_id      AS ai_id;
+    cur_production_id      AS ai_id;
     
 
 END $$

@@ -380,37 +380,19 @@ class SowActivity:
                 cur_date_insemination   = str(row[2])
                 cur_date_expected       = str(row[3])
                 
-                cur_date_actual         = None
-                if row[4] is not None:
-                    cur_date_actual     = str(row[4])
-                
-                cur_num_days_actual     = None
-                if row[5] is not None:
-                    cur_num_days_actual = row[5]
+                cur_date_actual         = str(row[4]) if row[4] else None
+                cur_num_days_actual     = row[5] if row[5] else None
                     
                 cur_status_id           = row[6]
                 cur_semen_desc          = row[7]
                 cur_status              = row[8]
                     
-                cur_num_b_dead          = None
-                if row[9] is not None:
-                    cur_num_b_dead      = row[9]
-                
-                cur_num_b_male          = None
-                if row[10] is not None:
-                    cur_num_b_male      = row[10]
-                
-                cur_num_b_female        = None
-                if row[11] is not None:
-                    cur_num_b_female    = row[11]
+                cur_num_b_dead          = row[9] if row[9] else None
+                cur_num_b_male          = row[10] if row[10] else None
+                cur_num_b_female        = row[11] if row[11] else None
                     
-                cur_num_w_male          = None
-                if row[12] is not None:
-                    cur_num_w_male      = row[12]
-                
-                cur_num_w_female        = None
-                if row[13] is not None:
-                    cur_num_w_female    = row[13]
+                cur_num_w_male          = row[12] if row[12] else None
+                cur_num_w_female        = row[13] if row[13] else None
                 
                 cur_num_w_dead          = None
                 if cur_num_w_male is not None and cur_num_w_female is not None:
@@ -418,9 +400,7 @@ class SowActivity:
                                         cur_num_w_male - cur_num_w_female
                                         
                                         
-                cur_date_weaning        = None
-                if row[14] is not None:
-                    cur_date_weaning    = str(row[14])
+                cur_date_weaning        = str(row[14]) if row[14] else None
                 
                 
                 cur_entry = {
@@ -454,6 +434,113 @@ class SowActivity:
         
         return result
     
+    
+    def get_pig_prod_feeding_list(self, is_growing = 0):
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        where_clause = 'WHERE a.status_id IN (4, 5,7,8,9)'
+        if is_growing > 0:
+            where_clause = 'WHERE a.status_id IN (5,7,8,9)'
+       
+        sql =   """
+                SELECT 
+                    a.id,
+                    
+                    a.status_id,
+                    b.name,
+                    
+                    a.num_piglets_weaning_male,
+                    a.num_piglets_weaning_female,
+                    
+                    a.date_actual_birth,
+                    
+                    a.date_booster,
+                    a.date_pre_starter,
+                    a.date_weaning,
+                    a.date_starter,
+                    a.date_grower,
+                    a.date_finisher
+         
+                FROM pig_production a
+                LEFT OUTER JOIN production_status b ON a.status_id = b.id
+                %s
+                ORDER BY a.date_actual_birth DESC
+                """ % where_clause 
+    
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'get_pig_prod_feeding_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_id                  = row[0]
+                cur_status_id           = row[1]
+                cur_status_name         = row[2]
+                
+                cur_num_w_male          = row[3] if row[3] else None
+                cur_num_w_female        = row[4] if row[4] else None
+               
+                cur_date_actual         = str(row[5])
+                
+               
+                cur_date_booster        = str(row[6]) if row[6] else None
+                cur_date_prestarter     = str(row[7]) if row[7] else None
+                cur_date_weaning        = str(row[8]) if row[8] else None
+                cur_date_starter        = str(row[9]) if row[9] else None
+                cur_date_grower         = str(row[10]) if row[10] else None
+                cur_date_finisher       = str(row[11]) if row[11] else None
+                
+                cur_entry = {
+                    'id':               cur_id,
+                    'status_id':        cur_status_id, 
+                    'status':           cur_status_name,
+                    
+                    'num_piglets_weaning': {
+                        'male':         cur_num_w_male,
+                        'female':       cur_num_w_female
+                    },
+                    
+                    'dates':{
+                        'birth':        cur_date_actual,
+                        'booster':      cur_date_booster,
+                        'prestarter':   cur_date_prestarter,
+                        'weaning':      cur_date_weaning,
+                        'starter':      cur_date_starter,
+                        'grower':       cur_date_grower,
+                        'finisher':     cur_date_finisher
+                    }
+                   
+                }
+                result.append(cur_entry)
+
+        
+        return result
+        
     
     def get_sow_list(self, list_sow_numbers = None):
         """

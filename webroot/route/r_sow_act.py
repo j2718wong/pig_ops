@@ -448,6 +448,104 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
     return s
     
     
+@app.get("/pig_prod/feeding", response_class=PlainTextResponse)
+async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0, 
+        is_harvested =0, year:int = None):
+    """
+    Will get pig production list.
+
+    Parameters
+    """
+        
+    res = model['sow_act'].get_pig_prod_feeding_list(int(is_growing))
+    
+    
+    s = '   ID  PROD_Status   Date_Birth  Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
+    
+    for cur_entry in res:
+        
+        s_temp      = str(cur_entry['id'])
+        num_chars   = len(s_temp)
+        num_space   = 5 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        s_temp      = cur_entry['status']
+        num_chars   = len(s_temp)
+        num_space   = 12 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        date_birth  = cur_entry['dates']['birth']
+        dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+        s_temp      = date_birth
+        s           += s_temp 
+        s           += '  '
+        
+        num_piglets_weaning = cur_entry['num_piglets_weaning']
+        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        
+        s_temp      = str(num_piglets)
+        num_chars   = len(s_temp)
+        num_space   = 6 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        date_booster  = cur_entry['dates']['booster']
+        if date_booster is not None:
+            dt_booster  = datetime.strptime(date_booster, '%Y-%m-%d')
+            numdays_delta = (dt_booster - dt_birth).days
+            
+            s_temp      = date_booster
+            s           += s_temp
+            s           += f"({numdays_delta})"
+            s           += '  '
+        else:
+            s           += ' ' * 15
+            
+        date_prestarter  = cur_entry['dates']['prestarter']
+        if date_prestarter is not None:
+            dt_prestarter  = datetime.strptime(date_prestarter, '%Y-%m-%d')
+            numdays_delta = (dt_prestarter - dt_birth).days
+            
+            s_temp      = date_prestarter
+            s           += s_temp
+            s           += f"({numdays_delta})"
+            s           += '   '
+        else:
+            s           += ' ' * 17
+            
+            
+        date_weaning    = cur_entry['dates']['weaning']
+        if date_weaning is not None:
+            dt_weaning  = datetime.strptime(date_weaning, '%Y-%m-%d')
+            numdays_delta = (dt_weaning - dt_birth).days
+            
+            s_temp      = date_weaning
+            s           += s_temp
+            s           += f"({numdays_delta})"
+            s           += '  '
+        else:
+            s           += ' ' * 12
+        
+        date_starter    = cur_entry['dates']['starter']
+        if date_starter is not None:
+            dt_starter  = datetime.strptime(date_starter, '%Y-%m-%d')
+            numdays_delta = (dt_starter - dt_birth).days
+            
+            s_temp      = date_starter
+            s           += s_temp
+            s           += f"({numdays_delta})"
+            s           += '  '
+        else:
+            s           += ' ' * 12
+        
+        s+= '\n'
+
+    return s
+    
+    
+    
 @app.get("/cal/activities", response_class=PlainTextResponse)
 async def cal_activities(num_days: int = 30):
     """
