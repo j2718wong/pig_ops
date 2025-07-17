@@ -448,6 +448,12 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
     return s
     
     
+NUMDAYS_SINCE_BIRTH_BOOSTER     = 7
+NUMDAYS_SINCE_BIRTH_PRESTARTER  = 30
+NUMDAYS_SINCE_BIRTH_WEANING     = 45
+NUMDAYS_SINCE_BIRTH_STARTER     = 50
+
+    
 @app.get("/pig_prod/feeding", response_class=PlainTextResponse)
 async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0, 
         is_harvested =0, year:int = None):
@@ -459,8 +465,16 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         
     res = model['sow_act'].get_pig_prod_feeding_list(int(is_growing))
     
+    s  = 'FEEDING GUIDE\n'
+    s += '=============\n\n'
     
-    s = '   ID  PROD_Status   Date_Birth  Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
+    s += f"Pila ka adlaw gikan panganak BOOSTER     = {NUMDAYS_SINCE_BIRTH_BOOSTER}\n"
+    s += f"Pila ka adlaw gikan panganak PRESTARTER  = {NUMDAYS_SINCE_BIRTH_PRESTARTER}\n"
+    s += f"Pila ka adlaw gikan panganak LUTAS       = {NUMDAYS_SINCE_BIRTH_WEANING}\n"
+    s += f"Pila ka adlaw gikan panganak STARTER     = {NUMDAYS_SINCE_BIRTH_STARTER}\n\n"
+    
+    
+    s += '   ID  PROD_Status   Date_Birth  Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
     
     for cur_entry in res:
         
@@ -492,16 +506,25 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         s           += '  '
         
         date_booster  = cur_entry['dates']['booster']
+        delta_d_booster = None
         if date_booster is not None:
             dt_booster  = datetime.strptime(date_booster, '%Y-%m-%d')
-            numdays_delta = (dt_booster - dt_birth).days
+            delta_d_booster = (dt_booster - dt_birth).days
             
             s_temp      = date_booster
             s           += s_temp
-            s           += f"({numdays_delta})"
-            s           += '  '
+            s           += f"({delta_d_booster})"
+            if delta_d_booster < 10:
+                s       += '  '
+            else:
+                s       += ' '
         else:
-            s           += ' ' * 15
+            dt_booster  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_BOOSTER)
+            date_booster = datetime.strftime(dt_booster, '%Y-%m-%d')
+           
+            s           += f"{date_booster}(P)"
+            s           += '  '
+            
             
         date_prestarter  = cur_entry['dates']['prestarter']
         if date_prestarter is not None:
@@ -513,7 +536,11 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
             s           += f"({numdays_delta})"
             s           += '   '
         else:
-            s           += ' ' * 17
+            dt_prestarter  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_PRESTARTER)
+            date_prestarter = datetime.strftime(dt_prestarter, '%Y-%m-%d')
+           
+            s           += f"{date_prestarter}(P)"
+            s           += '    '
             
             
         date_weaning    = cur_entry['dates']['weaning']
@@ -526,7 +553,12 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
             s           += f"({numdays_delta})"
             s           += '  '
         else:
-            s           += ' ' * 12
+            dt_weaning  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_WEANING)
+            date_weaning = datetime.strftime(dt_weaning, '%Y-%m-%d')
+           
+            s           += f"{date_weaning}(P)"
+            s           += '  '
+            
         
         date_starter    = cur_entry['dates']['starter']
         if date_starter is not None:
