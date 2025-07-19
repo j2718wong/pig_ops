@@ -30,6 +30,10 @@ SUNDAY                          = 6
 s_day_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
 
+DAY_1_STARTS_AT_BIRTH           = 1
+NUMDAYS_SINCE_BIRTH_WEANING             = 45
+
+
 @app.get("/sow/list", response_class=PlainTextResponse)
 async def sow_list(full_info: int = 0):
     """
@@ -335,7 +339,7 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
         if date_birth is not None:
             
             dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
-            dt_birth_45 = dt_birth + timedelta(days=45) 
+            dt_birth_45 = dt_birth + timedelta(days=NUMDAYS_SINCE_BIRTH_WEANING- DAY_1_STARTS_AT_BIRTH) 
             
             s_temp      = dt_birth_45.strftime('%Y-%m-%d')
             s           += s_temp 
@@ -446,12 +450,20 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
         last_sow_number = cur_entry['sow_number']
         
     return s
+
+# Day 1 starts at date of birth
+
+NUMDAYS_SINCE_BIRTH_INJECT_IRON_1       = 3
+NUMDAYS_SINCE_BIRTH_INJECT_IRON_2       = 13
+NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1   = 14
+NUMDAYS_SINCE_BIRTH_KAPON               = 15
+NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2   = 21
+NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1     = 25
+  
     
-    
-NUMDAYS_SINCE_BIRTH_BOOSTER     = 7
-NUMDAYS_SINCE_BIRTH_PRESTARTER  = 30
-NUMDAYS_SINCE_BIRTH_WEANING     = 45
-NUMDAYS_SINCE_BIRTH_STARTER     = 50
+NUMDAYS_SINCE_BIRTH_BOOSTER             = 7
+NUMDAYS_SINCE_BIRTH_PRESTARTER          = 30
+NUMDAYS_SINCE_BIRTH_STARTER             = 50
 
     
 @app.get("/pig_prod/feeding", response_class=PlainTextResponse)
@@ -465,16 +477,24 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         
     res = model['sow_act'].get_pig_prod_feeding_list(int(is_growing))
     
-    s  = 'FEEDING GUIDE\n'
-    s += '=============\n\n'
     
-    s += f"Pila ka adlaw gikan panganak BOOSTER     = {NUMDAYS_SINCE_BIRTH_BOOSTER}\n"
-    s += f"Pila ka adlaw gikan panganak PRESTARTER  = {NUMDAYS_SINCE_BIRTH_PRESTARTER}\n"
-    s += f"Pila ka adlaw gikan panganak LUTAS       = {NUMDAYS_SINCE_BIRTH_WEANING}\n"
-    s += f"Pila ka adlaw gikan panganak STARTER     = {NUMDAYS_SINCE_BIRTH_STARTER}\n\n"
+    dt_now      = datetime.now()
+    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s += '   ID  PROD_Status   Date_Birth  Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
+    s  = f'BAKTIN OPERATIONS    {dt_now_s}\n'
+    s += '=================\n\n'
+    
+    s += f"Pila ka adlaw gikan panganak INJECT IRON_1     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_1}\n"
+    s += f"Pila ka adlaw gikan panganak INJECT IRON_2     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_2}\n"
+    s += f"Pila ka adlaw gikan panganak INJECT VITAMINS_1 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1}\n"
+    s += f"Pila ka adlaw gikan panganak KAPON             = {NUMDAYS_SINCE_BIRTH_KAPON}\n"
+    s += f"Pila ka adlaw gikan panganak INJECT VITAMINS_2 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2}\n"
+    s += f"Pila ka adlaw gikan panganak INJECT PURGA_1    = {NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1}\n\n"
+    
+    
+    
+    s += '   ID  PROD_Status   Date_Birth       Baktin  Inject_IRON1   Inject_IRON2    InjVitamins1    Kapon           InjVitamins2    Purga           Date_Lutas \n'
     
     for cur_entry in res:
         
@@ -492,7 +512,213 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         
         date_birth  = cur_entry['dates']['birth']
         dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
-        s_temp      = date_birth
+        delta_d_now = (dt_now - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+        
+        if delta_d_now < 10: 
+            num_space = 2
+        elif delta_d_now < 100:
+            num_space = 1
+        else:
+            num_space = 0
+        
+        spaces = num_space * ' '
+        
+        s_temp      = f'{date_birth}({spaces}{delta_d_now})'
+        s           += s_temp 
+        s           += '  '
+        
+        num_piglets_weaning = cur_entry['num_piglets_weaning']
+        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        
+        s_temp      = str(num_piglets)
+        num_chars   = len(s_temp)
+        num_space   = 6 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        date_iron_1  = cur_entry['dates']['iron_1']
+        delta_d_iron_1 = None
+        if date_iron_1 is not None:
+            dt_iron_1  = datetime.strptime(date_iron_1, '%Y-%m-%d')
+            delta_d_iron_1 = (dt_iron_1 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_iron_1}({delta_d_iron_1})" 
+            
+        else:
+            dt_iron_1  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_IRON_1 - DAY_1_STARTS_AT_BIRTH)
+            date_iron_1 = datetime.strftime(dt_iron_1, '%Y-%m-%d')
+           
+            s_temp      = f"{date_iron_1}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 13 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        
+        date_iron_2  = cur_entry['dates']['iron_2']
+        delta_d_iron_2 = None
+        if date_iron_2 is not None:
+            dt_iron_2  = datetime.strptime(date_iron_2, '%Y-%m-%d')
+            delta_d_iron_2 = (dt_iron_2 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_iron_2}({delta_d_iron_2})" 
+            
+        else:
+            dt_iron_2  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_IRON_2 - DAY_1_STARTS_AT_BIRTH)
+            date_iron_2 = datetime.strftime(dt_iron_2, '%Y-%m-%d')
+           
+            s_temp      = f"{date_iron_2}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        
+        date_vitamins_1  = cur_entry['dates']['vitamins_1']
+        delta_d_vitamins_1 = None
+        if date_vitamins_1 is not None:
+            dt_vitamins_1  = datetime.strptime(date_vitamins_1, '%Y-%m-%d')
+            delta_d_vitamins_1 = (dt_vitamins_1 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_vitamins_1}({delta_d_vitamins_1})" 
+            
+        else:
+            dt_vitamins_1  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1 - DAY_1_STARTS_AT_BIRTH)
+            date_vitamins_1 = datetime.strftime(dt_vitamins_1, '%Y-%m-%d')
+           
+            s_temp      = f"{date_vitamins_1}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        
+        date_kapon  = cur_entry['dates']['kapon']
+        delta_d_kapon = None
+        if date_kapon is not None:
+            dt_kapon  = datetime.strptime(date_kapon, '%Y-%m-%d')
+            delta_d_kapon = (dt_kapon - dt_birth).days  + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_kapon}({delta_d_kapon})"
+            
+        else:
+            dt_kapon  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_KAPON - DAY_1_STARTS_AT_BIRTH)
+            date_kapon = datetime.strftime(dt_kapon, '%Y-%m-%d')
+           
+            s_temp      = f"{date_kapon}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        
+        date_vitamins_2  = cur_entry['dates']['vitamins_2']
+        delta_d_vitamins_2 = None
+        if date_vitamins_2 is not None:
+            dt_vitamins_2  = datetime.strptime(date_vitamins_2, '%Y-%m-%d')
+            delta_d_vitamins_2 = (dt_vitamins_2 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_vitamins_2}({delta_d_vitamins_2})" 
+            
+        else:
+            dt_vitamins_2  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2 - DAY_1_STARTS_AT_BIRTH)
+            date_vitamins_2 = datetime.strftime(dt_vitamins_2, '%Y-%m-%d')
+           
+            s_temp      = f"{date_vitamins_2}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        date_deworm_1  = cur_entry['dates']['deworm_1']
+        delta_d_deworm_1 = None
+        if date_deworm_1 is not None:
+            dt_deworm_1  = datetime.strptime(date_deworm_1, '%Y-%m-%d')
+            delta_d_deworm_1 = (dt_deworm_1 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_deworm_1}({delta_d_deworm_1})" 
+            
+        else:
+            dt_deworm_1  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1 - DAY_1_STARTS_AT_BIRTH)
+            date_deworm_1 = datetime.strftime(dt_deworm_1, '%Y-%m-%d')
+           
+            s_temp      = f"{date_deworm_1}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        
+        date_weaning  = cur_entry['dates']['weaning']
+        delta_d_weaning = None
+        if date_weaning is not None:
+            dt_weaning  = datetime.strptime(date_weaning, '%Y-%m-%d')
+            delta_d_weaning = (dt_weaning - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_weaning}({delta_d_weaning})" 
+            
+        else:
+            dt_weaning  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_WEANING - DAY_1_STARTS_AT_BIRTH)
+            date_weaning = datetime.strftime(dt_weaning, '%Y-%m-%d')
+           
+            s_temp      = f"{date_weaning}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        s+= '\n'
+        
+    
+    s+= '\n\n'
+    
+    
+    s += f'FEEDING GUIDE        {dt_now_s}\n'
+    s += '=================\n\n'
+    
+    s += f"Pila ka adlaw gikan panganak BOOSTER     = {NUMDAYS_SINCE_BIRTH_BOOSTER}\n"
+    s += f"Pila ka adlaw gikan panganak PRESTARTER  = {NUMDAYS_SINCE_BIRTH_PRESTARTER}\n"
+    s += f"Pila ka adlaw gikan panganak LUTAS       = {NUMDAYS_SINCE_BIRTH_WEANING}\n"
+    s += f"Pila ka adlaw gikan panganak STARTER     = {NUMDAYS_SINCE_BIRTH_STARTER}\n\n"
+    
+    
+    s += '   ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
+    
+    for cur_entry in res:
+        
+        s_temp      = str(cur_entry['id'])
+        num_chars   = len(s_temp)
+        num_space   = 5 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        s_temp      = cur_entry['status']
+        num_chars   = len(s_temp)
+        num_space   = 12 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        date_birth  = cur_entry['dates']['birth']
+        dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+        delta_d_now = (dt_now - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+        
+        if delta_d_now < 10: 
+            num_space = 2
+        elif delta_d_now < 100:
+            num_space = 1
+        else:
+            num_space = 0
+        
+        spaces = num_space * ' '
+        
+        s_temp      = f'{date_birth}({spaces}{delta_d_now})'
         s           += s_temp 
         s           += '  '
         
@@ -509,7 +735,7 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         delta_d_booster = None
         if date_booster is not None:
             dt_booster  = datetime.strptime(date_booster, '%Y-%m-%d')
-            delta_d_booster = (dt_booster - dt_birth).days
+            delta_d_booster = (dt_booster - dt_birth).days + DAY_1_STARTS_AT_BIRTH
             
             s_temp      = date_booster
             s           += s_temp
@@ -519,7 +745,7 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
             else:
                 s       += ' '
         else:
-            dt_booster  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_BOOSTER)
+            dt_booster  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_BOOSTER - DAY_1_STARTS_AT_BIRTH)
             date_booster = datetime.strftime(dt_booster, '%Y-%m-%d')
            
             s           += f"{date_booster}(P)"
@@ -529,14 +755,14 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         date_prestarter  = cur_entry['dates']['prestarter']
         if date_prestarter is not None:
             dt_prestarter  = datetime.strptime(date_prestarter, '%Y-%m-%d')
-            numdays_delta = (dt_prestarter - dt_birth).days
+            numdays_delta = (dt_prestarter - dt_birth).days + DAY_1_STARTS_AT_BIRTH
             
             s_temp      = date_prestarter
             s           += s_temp
             s           += f"({numdays_delta})"
             s           += '   '
         else:
-            dt_prestarter  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_PRESTARTER)
+            dt_prestarter  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_PRESTARTER - DAY_1_STARTS_AT_BIRTH)
             date_prestarter = datetime.strftime(dt_prestarter, '%Y-%m-%d')
            
             s           += f"{date_prestarter}(P)"
@@ -546,14 +772,14 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         date_weaning    = cur_entry['dates']['weaning']
         if date_weaning is not None:
             dt_weaning  = datetime.strptime(date_weaning, '%Y-%m-%d')
-            numdays_delta = (dt_weaning - dt_birth).days
+            numdays_delta = (dt_weaning - dt_birth).days + DAY_1_STARTS_AT_BIRTH
             
             s_temp      = date_weaning
             s           += s_temp
             s           += f"({numdays_delta})"
             s           += '  '
         else:
-            dt_weaning  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_WEANING)
+            dt_weaning  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_WEANING - DAY_1_STARTS_AT_BIRTH)
             date_weaning = datetime.strftime(dt_weaning, '%Y-%m-%d')
            
             s           += f"{date_weaning}(P)"
@@ -563,7 +789,7 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         date_starter    = cur_entry['dates']['starter']
         if date_starter is not None:
             dt_starter  = datetime.strptime(date_starter, '%Y-%m-%d')
-            numdays_delta = (dt_starter - dt_birth).days
+            numdays_delta = (dt_starter - dt_birth).days + DAY_1_STARTS_AT_BIRTH
             
             s_temp      = date_starter
             s           += s_temp

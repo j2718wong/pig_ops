@@ -461,6 +461,13 @@ class SowActivity:
                     
                     a.date_actual_birth,
                     
+                    a.date_iron_1,
+                    a.date_iron_2,
+                    a.date_vitamins_1,
+                    a.date_kapon,
+                    a.date_vitamins_2,
+                    a.date_deworm_1,
+                    
                     a.date_booster,
                     a.date_pre_starter,
                     a.date_weaning,
@@ -507,13 +514,20 @@ class SowActivity:
                
                 cur_date_actual         = str(row[5])
                 
-               
-                cur_date_booster        = str(row[6]) if row[6] else None
-                cur_date_prestarter     = str(row[7]) if row[7] else None
-                cur_date_weaning        = str(row[8]) if row[8] else None
-                cur_date_starter        = str(row[9]) if row[9] else None
-                cur_date_grower         = str(row[10]) if row[10] else None
-                cur_date_finisher       = str(row[11]) if row[11] else None
+                cur_date_iron_1         = str(row[6]) if row[6] else None
+                cur_date_iron_2         = str(row[7]) if row[7] else None
+                cur_date_vitamins_1     = str(row[8]) if row[8] else None
+                cur_date_kapon          = str(row[9]) if row[9] else None
+                cur_date_vitamins_2     = str(row[10]) if row[10] else None
+                cur_date_deworm_1       = str(row[11]) if row[11] else None
+                
+                
+                cur_date_booster        = str(row[12]) if row[12] else None
+                cur_date_prestarter     = str(row[13]) if row[13] else None
+                cur_date_weaning        = str(row[14]) if row[14] else None
+                cur_date_starter        = str(row[15]) if row[15] else None
+                cur_date_grower         = str(row[16]) if row[16] else None
+                cur_date_finisher       = str(row[17]) if row[17] else None
                 
                 cur_entry = {
                     'id':               cur_id,
@@ -527,6 +541,14 @@ class SowActivity:
                     
                     'dates':{
                         'birth':        cur_date_actual,
+                        
+                        'iron_1':       cur_date_iron_1,
+                        'iron_2':       cur_date_iron_2,
+                        'vitamins_1':   cur_date_vitamins_1,
+                        'kapon':        cur_date_kapon,
+                        'vitamins_2':   cur_date_vitamins_2,
+                        'deworm_1':     cur_date_deworm_1,
+                        
                         'booster':      cur_date_booster,
                         'prestarter':   cur_date_prestarter,
                         'weaning':      cur_date_weaning,
