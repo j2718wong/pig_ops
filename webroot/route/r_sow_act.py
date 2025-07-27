@@ -29,6 +29,8 @@ SUNDAY                          = 6
 
 s_day_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
+PROD_STATUS_LACTATING           = 4
+
 
 DAY_1_STARTS_AT_BIRTH           = 1
 NUMDAYS_SINCE_BIRTH_WEANING             = 45
@@ -98,6 +100,63 @@ async def sow_list(full_info: int = 0):
         s           += '\n'
         
     return s
+    
+    
+@app.get("/sow/operations", response_class=PlainTextResponse)
+async def sow_operations(format= 0):
+    res = model['sow_act'].get_sow_operations_list()
+        
+    
+    
+        
+    s = '    Sow  SOW_Status  PROD_ID  Date_TAKAL   NormalKaon   CheckBuntis1    CheckBuntis2   BalhinDako   BalhinFarrow    Inject_IRON   Inject_PURGA \n'
+    
+   
+    
+    for cur_entry in res:
+        
+        
+        s_temp      = cur_entry['sow_number']
+        num_chars   = len(s_temp)
+        num_space   = 7 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+    
+        s_temp      = cur_entry['status_name']
+        num_chars   = len(s_temp)
+        num_space   = 10 - num_chars
+        s           += s_temp
+        s           += ' ' * num_space 
+        s           += '  '
+        
+        if cur_entry['last_prod_id']: 
+            s_temp      = str(cur_entry['last_prod_id'])
+            num_chars   = len(s_temp)
+            num_space   = 7 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        else:
+            num_sapce = 7
+            s           += ' ' * num_space
+            s           += '  '
+        
+        
+        if cur_entry['date_insemination']: 
+            s_temp      = cur_entry['date_insemination']
+            num_chars   = len(s_temp)
+            num_space   = 10 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += ' '
+        else:
+            num_sapce = 10
+            s           += ' ' * num_space
+            s           += ' '
+        
+        
+        s           += '\n'
+        
+    return s
+    
     
 
 @app.get("/sow/activities", response_class=PlainTextResponse)
@@ -226,7 +285,7 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
     Parameters
     ----------
     full_info : int
-        if > 0, will include historical data per sow
+        if > 0, will include historical data per production cycle
         
     is_active : int
         if > 0, pig production with status gestating, lactating and weaning 
@@ -267,9 +326,9 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
                         cur_entry['date_culled'] = cur_sow['date_culled']
                         break
     
-    s  = '                                                                                      Num baktin birth  Num baktin lutas\n'
-    s += '                                                                                      ----------------  ----------------\n'
-    s += '    Sow     ID  PROD_Status   Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
+    s  = '       PIG PRODUCTION                                                                   Num baktin birth  Num baktin lutas\n'
+    s += '=============================                                                           ----------------  ----------------\n'
+    s += '    Sow  PROD_ID  PROD_Status   Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
     
     
     last_sow_number = None
@@ -289,7 +348,7 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
         
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
-        num_space   = 5 - num_chars
+        num_space   = 7 - num_chars
         s           += ' ' * num_space + s_temp
         s           += '  '
         
@@ -456,8 +515,8 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
 NUMDAYS_SINCE_BIRTH_INJECT_IRON_1       = 3
 NUMDAYS_SINCE_BIRTH_INJECT_IRON_2       = 13
 NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1   = 14
-NUMDAYS_SINCE_BIRTH_KAPON               = 15
 NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2   = 21
+NUMDAYS_SINCE_BIRTH_KAPON               = 22
 NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1     = 25
   
     
@@ -468,43 +527,72 @@ NUMDAYS_SINCE_BIRTH_STARTER             = 50
     
 @app.get("/pig_prod/feeding", response_class=PlainTextResponse)
 async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0, 
-        is_harvested =0, year:int = None):
+        is_harvested =0, inc_cost = 0, year:int = None):
     """
-    Will get pig production list.
+    Will get pig feeding list.
 
     Parameters
-    """
+    ==========
+    full_info : int
+        if > 0, will include historical data per production cycle
+    
+       
+    is_growing : int
+        if > 0, pig production with status growing, fattening, finishing will be returned
+    
+    inc_cost : int
+        if > 0, will include feeds cost
         
-    res = model['sow_act'].get_pig_prod_feeding_list(int(is_growing))
+     is_harvested : int
+        if > 0, pig production with status harvested will be returned
+        
+    """
+    
+    is_growing = int(is_growing)
+        
+    res = model['sow_act'].get_pig_prod_feeding_list(is_growing)
+    
+    s  = write_baktin_operations(res, is_growing)
+    s += write_feeding_guide(res)
+    s += write_feeds_consumed(res, inc_cost)
+    
+    return s
     
     
+    
+def write_baktin_operations(data, is_growing):
     dt_now      = datetime.now()
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = f'BAKTIN OPERATIONS    {dt_now_s}\n'
+    s  = f'BAKTIN OPERATIONS      {dt_now_s}\n'
     s += '=================\n\n'
     
-    s += f"Pila ka adlaw gikan panganak INJECT IRON_1     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_1}\n"
-    s += f"Pila ka adlaw gikan panganak INJECT IRON_2     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_2}\n"
-    s += f"Pila ka adlaw gikan panganak INJECT VITAMINS_1 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1}\n"
-    s += f"Pila ka adlaw gikan panganak KAPON             = {NUMDAYS_SINCE_BIRTH_KAPON}\n"
-    s += f"Pila ka adlaw gikan panganak INJECT VITAMINS_2 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2}\n"
-    s += f"Pila ka adlaw gikan panganak INJECT PURGA_1    = {NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1}\n\n"
+    s += f"   Pila ka adlaw gikan panganak INJECT IRON_1     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_1}\n"
+    s += f"   Pila ka adlaw gikan panganak INJECT IRON_2     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_2}\n"
+    s += f"   Pila ka adlaw gikan panganak INJECT VITAMINS_1 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1}\n"
+    s += f"   Pila ka adlaw gikan panganak INJECT VITAMINS_2 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2}\n"
+    s += f"   Pila ka adlaw gikan panganak KAPON             = {NUMDAYS_SINCE_BIRTH_KAPON}\n"    
+    s += f"   Pila ka adlaw gikan panganak INJECT PURGA_1    = {NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1}\n\n"
     
     
     
-    s += '   ID  PROD_Status   Date_Birth       Baktin  Inject_IRON1   Inject_IRON2    InjVitamins1    Kapon           InjVitamins2    Purga           Date_Lutas \n'
-    
-    for cur_entry in res:
+    s += 'PROD_ID  Sow           Date_Birth       Baktin  Inject_IRON1   Inject_IRON2    InjVitamins1    InjVitamins2    Kapon           Purga           Date_Lutas \n'
+     
+    for cur_entry in data:
+        if is_growing == 0:
+            if cur_entry['status_id'] != PROD_STATUS_LACTATING:
+                continue
         
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
-        num_space   = 5 - num_chars
+        num_space   = 7 - num_chars
         s           += ' ' * num_space + s_temp
         s           += '  '
         
-        s_temp      = cur_entry['status']
+        sow_number  = cur_entry['sow']['number']
+        sow_name    = cur_entry['sow']['name']
+        s_temp      = sow_name if sow_name else sow_number 
         num_chars   = len(s_temp)
         num_space   = 12 - num_chars
         s           += s_temp + ' ' * num_space 
@@ -596,6 +684,26 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         s           += '  '
         
         
+        date_vitamins_2  = cur_entry['dates']['vitamins_2']
+        delta_d_vitamins_2 = None
+        if date_vitamins_2 is not None:
+            dt_vitamins_2  = datetime.strptime(date_vitamins_2, '%Y-%m-%d')
+            delta_d_vitamins_2 = (dt_vitamins_2 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = f"{date_vitamins_2}({delta_d_vitamins_2})" 
+            
+        else:
+            dt_vitamins_2  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2 - DAY_1_STARTS_AT_BIRTH)
+            date_vitamins_2 = datetime.strftime(dt_vitamins_2, '%Y-%m-%d')
+           
+            s_temp      = f"{date_vitamins_2}(P)"
+        
+        num_chars   = len(s_temp)
+        num_space   = 14 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        
         date_kapon  = cur_entry['dates']['kapon']
         delta_d_kapon = None
         if date_kapon is not None:
@@ -615,25 +723,6 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
         s           += s_temp + ' ' * num_space 
         s           += '  '
         
-        
-        date_vitamins_2  = cur_entry['dates']['vitamins_2']
-        delta_d_vitamins_2 = None
-        if date_vitamins_2 is not None:
-            dt_vitamins_2  = datetime.strptime(date_vitamins_2, '%Y-%m-%d')
-            delta_d_vitamins_2 = (dt_vitamins_2 - dt_birth).days + DAY_1_STARTS_AT_BIRTH
-            
-            s_temp      = f"{date_vitamins_2}({delta_d_vitamins_2})" 
-            
-        else:
-            dt_vitamins_2  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2 - DAY_1_STARTS_AT_BIRTH)
-            date_vitamins_2 = datetime.strftime(dt_vitamins_2, '%Y-%m-%d')
-           
-            s_temp      = f"{date_vitamins_2}(P)"
-        
-        num_chars   = len(s_temp)
-        num_space   = 14 - num_chars
-        s           += s_temp + ' ' * num_space 
-        s           += '  '
         
         date_deworm_1  = cur_entry['dates']['deworm_1']
         delta_d_deworm_1 = None
@@ -679,23 +768,30 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
     
     s+= '\n\n'
     
+    return s
+
     
-    s += f'FEEDING GUIDE        {dt_now_s}\n'
+def write_feeding_guide(data):
+    dt_now      = datetime.now()
+    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
+    
+    
+    s  = f'FEEDING GUIDE          {dt_now_s}\n'
     s += '=================\n\n'
     
-    s += f"Pila ka adlaw gikan panganak BOOSTER     = {NUMDAYS_SINCE_BIRTH_BOOSTER}\n"
-    s += f"Pila ka adlaw gikan panganak PRESTARTER  = {NUMDAYS_SINCE_BIRTH_PRESTARTER}\n"
-    s += f"Pila ka adlaw gikan panganak LUTAS       = {NUMDAYS_SINCE_BIRTH_WEANING}\n"
-    s += f"Pila ka adlaw gikan panganak STARTER     = {NUMDAYS_SINCE_BIRTH_STARTER}\n\n"
+    s += f"   Pila ka adlaw gikan panganak BOOSTER     = {NUMDAYS_SINCE_BIRTH_BOOSTER}\n"
+    s += f"   Pila ka adlaw gikan panganak PRESTARTER  = {NUMDAYS_SINCE_BIRTH_PRESTARTER}\n"
+    s += f"   Pila ka adlaw gikan panganak LUTAS       = {NUMDAYS_SINCE_BIRTH_WEANING}\n"
+    s += f"   Pila ka adlaw gikan panganak STARTER     = {NUMDAYS_SINCE_BIRTH_STARTER}\n\n"
     
     
-    s += '   ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
     
-    for cur_entry in res:
+    for cur_entry in data:
         
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
-        num_space   = 5 - num_chars
+        num_space   = 7 - num_chars
         s           += ' ' * num_space + s_temp
         s           += '  '
         
@@ -799,9 +895,103 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
             s           += ' ' * 12
         
         s+= '\n'
+    
+    s += '\n\n'
+    
+    return s
+    
+
+def write_feeds_consumed(data, inc_cost):
+    dt_now      = datetime.now()
+    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
+    
+    
+    s  = f'FEEDS CONSUMED         {dt_now_s}\n'
+    s += '=================\n\n'
+    
+    
+    s += '                                                        NUM SACKS\n'
+    s += '                                                =======================\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN\n'
+    
+    if inc_cost > 0:
+        s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN    BOOSTER  PRE  STR  GRO  FIN \n'
+    
+    
+    for cur_entry in data:
+        
+        s_temp      = str(cur_entry['id'])
+        num_chars   = len(s_temp)
+        num_space   = 7 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        s_temp      = cur_entry['status']
+        num_chars   = len(s_temp)
+        num_space   = 12 - num_chars
+        s           += s_temp + ' ' * num_space 
+        s           += '  '
+        
+        date_birth  = cur_entry['dates']['birth']
+        dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+        delta_d_now = (dt_now - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+        
+        if delta_d_now < 10: 
+            num_space = 2
+        elif delta_d_now < 100:
+            num_space = 1
+        else:
+            num_space = 0
+        
+        spaces = num_space * ' '
+        
+        s_temp      = f'{date_birth}({spaces}{delta_d_now})'
+        s           += s_temp 
+        s           += '  '
+        
+        num_piglets_weaning = cur_entry['num_piglets_weaning']
+        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        
+        s_temp      = str(num_piglets)
+        num_chars   = len(s_temp)
+        num_space   = 6 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        num_booster  = cur_entry['num_feeds']['booster']
+        if num_booster is not None:
+                
+            s_temp      = str(num_booster)
+            num_chars   = len(s_temp)
+            num_space   = 3 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        
+        else:
+            s           += 3 * ' '
+            s           += '  '
+            
+        
+        num_pre_starter  = cur_entry['num_feeds']['prestarter']
+        if num_pre_starter is not None:
+                
+            s_temp      = str(num_pre_starter)
+            num_chars   = len(s_temp)
+            num_space   = 3 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+        
+        else:
+            s           += 3 * ' '
+            s           += '  '
+        
+        
+       
+        s+= '\n'
 
     return s
     
+
     
     
 @app.get("/cal/activities", response_class=PlainTextResponse)
