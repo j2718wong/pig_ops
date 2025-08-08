@@ -5,7 +5,7 @@ CREATE PROCEDURE user_register(
     in_username             VARCHAR(50),
     
     in_email                VARCHAR(50),
-	in_mobile_num           VARCHAR(50),
+    in_mobile_num           VARCHAR(50),
     in_password             VARCHAR(200)
 )  
 
@@ -31,16 +31,16 @@ DECLARE res_code                                VARCHAR(180)    DEFAULT '';
 
 
 SET res_num         = RES_NUM_SUCCESS;
-
+SET res_code        = "SUCCESS";
 
 
 
 SELECT  id
 INTO    cur_user_id
 FROM    user
-WHERE   UPPER(username)     = UPPER(in_username)  	OR
-        UPPER(email)        = UPPER(in_email) 		OR
-		mobile_num 			= in_mobile_num 
+WHERE   UPPER(username)     = UPPER(in_username)    OR
+        UPPER(email)        = UPPER(in_email)       OR
+        mobile_num          = in_mobile_num 
 LIMIT   1;
 
 
@@ -58,10 +58,12 @@ END IF;
 INSERT INTO user(
     username,
     email,
+    mobile_num,
     password
 ) VALUES (
     in_username,
     in_email,
+    in_mobile_num,
     in_password
 );
 

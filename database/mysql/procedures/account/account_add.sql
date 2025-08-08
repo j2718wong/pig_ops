@@ -1,33 +1,35 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_farm_add $$
-CREATE PROCEDURE pig_farm_add(
+DROP PROCEDURE IF EXISTS business_account_add $$
+CREATE PROCEDURE business_account_add(
     in_name             	VARCHAR(50),
 	
-	in_account_id			INT,
-    
-    in_adrs_level_1_id     	INT,
-	in_adrs_level_2_id     	INT,
-	in_adrs_level_3_id     	INT,
-	in_latitude				DECIMAL(10,6)
-	in_longitude			DECIMAL(10,6)
-    in_added_by_user_id     INT
+	in_user_id     			INT
 )  
 
 BEGIN
 
 /** 
- * Will add pig farm entry.
+ * Will add business account entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 8, 2025
  *
  */
 
+DECLARE LOV_ID_ACNT_NUMDAYS_TRIAL				INT             DEFAULT 0;
+
+
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
 
-DECLARE cur_farm_id                             INT             DEFAULT 0;
+
+
+
+DECLARE cur_num_days_trial						INT             DEFAULT 0;
+
+DECLARE cur_user_account_id						INT 			DEFAULT 0;
+DECLARE cur_account_id                          INT             DEFAULT 0;
 
 
 
@@ -37,10 +39,15 @@ DECLARE res_code                                VARCHAR(180)    DEFAULT '';
 
 SET res_num         = RES_NUM_SUCCESS;
 
+SELECT 	val_int 
+INTO 	cur_num_days_trial
+FROM 	a01_list_of_value
+WHERE 	id = LOV_ID_ACNT_NUMDAYS_TRIAL;
+
 
 SELECT  id
-INTO    cur_farm_id
-FROM    pig_farm
+INTO    cur_account_id
+FROM    business_account
 WHERE   UPPER(name)     	= UPPER(in_name)
 LIMIT   1;
 
@@ -48,7 +55,7 @@ LIMIT   1;
 process_user : BEGIN
 
 /* Check for duplicate farm name*/
-IF cur_farm_id > 0 THEN 
+IF cur_account_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -56,25 +63,25 @@ IF cur_farm_id > 0 THEN
 
 END IF;
 
-IF in_account_id = 0 THEN 
-	
 
+SELECT 	account_id 
+INTO 	cur_user_account_id
+FROM 	user 
+WHERE	id = in_user_id;
 
+IF 
 
-
-
-
-INSERT INTO pig_farm(
+INSERT INTO business_account(
     name,
     date_trial_start,
     date_trial_end
 ) VALUES (
-    in_username,
-    in_email,
-    in_password
+    in_name,
+    CURRENT_DATE,
+    DATE_ADD("2017-06-15", INTERVAL 10 DAY);
 );
 
-SELECT LAST_INSERT_ID() INTO cur_user_id;
+SELECT LAST_INSERT_ID() INTO cur_account_id;
 
 END process_user;
 
