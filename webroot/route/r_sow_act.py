@@ -893,6 +893,19 @@ def write_feeding_guide(data):
             s           += '  '
         else:
             s           += ' ' * 12
+            
+        
+        date_grower     = cur_entry['dates']['grower']
+        if date_grower is not None:
+            dt_grower   = datetime.strptime(date_grower, '%Y-%m-%d')
+            numdays_delta = (dt_grower - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            s_temp      = date_grower
+            s           += s_temp
+            s           += f"({numdays_delta})"
+            s           += '  '
+        else:
+            s           += ' ' * 12
         
         s+= '\n'
     
@@ -910,9 +923,10 @@ def write_feeds_consumed(data, inc_cost):
     s += '=================\n\n'
     
     
-    s += '                                                        NUM SACKS\n'
-    s += '                                                =======================\n'
-    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN\n'
+    s += '                                                                        NUM SACKS\n'
+    s += '                                                 ====================================================\n'
+    s += '                                                 BOOSTER    PSTARTER   STARTER    GROWER     FINISHER\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CON   BUY  CON   BUY  CON   BUY  CON   BUY  CON\n'
     
     if inc_cost > 0:
         s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN    BOOSTER  PRE  STR  GRO  FIN \n'
@@ -956,37 +970,135 @@ def write_feeds_consumed(data, inc_cost):
         num_chars   = len(s_temp)
         num_space   = 6 - num_chars
         s           += ' ' * num_space + s_temp
-        s           += '  '
+        s           += '   '
+        
         
         num_booster  = cur_entry['num_feeds']['booster']
         if num_booster is not None:
+            
+            num_bought  = num_booster['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
                 
-            s_temp      = str(num_booster)
-            num_chars   = len(s_temp)
-            num_space   = 3 - num_chars
-            s           += ' ' * num_space + s_temp
-            s           += '  '
-        
-        else:
-            s           += 3 * ' '
             s           += '  '
             
-        
-        num_pre_starter  = cur_entry['num_feeds']['prestarter']
-        if num_pre_starter is not None:
-                
-            s_temp      = str(num_pre_starter)
-            num_chars   = len(s_temp)
-            num_space   = 3 - num_chars
-            s           += ' ' * num_space + s_temp
-            s           += '  '
+            num_consumed  = num_booster['consumed']
+            
+            if num_consumed is not None:
+                s_temp      = str(num_consumed)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
         
         else:
-            s           += 3 * ' '
+            s           += 8 * ' '
+        
+        s           += '   '
+            
+        
+        num_prestarter  = cur_entry['num_feeds']['prestarter']
+        if num_prestarter is not None:
+                
+            num_bought  = num_prestarter['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
             s           += '  '
+            
+            num_consumed  = num_prestarter['consumed']
+            
+            if num_consumed is not None:
+                s_temp      = str(num_consumed)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
         
         
-       
+        else:
+            s           += 8 * ' '
+            
+        s           += '   '
+            
+        
+        num_starter  = cur_entry['num_feeds']['starter']
+        if num_starter is not None:
+                
+            num_bought  = num_starter['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            
+            s           += '  '
+            
+            num_consumed  = num_starter['consumed']
+            
+            if num_consumed is not None:
+                s_temp      = str(num_consumed)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+        
+        else:
+            s           += 8 * ' '
+            
+        s           += '   '
+            
+        
+        num_grower  = cur_entry['num_feeds']['grower']
+        if num_grower is not None:
+                
+            num_bought  = num_grower['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            
+            s           += '  '
+            
+            num_consumed  = num_grower['consumed']
+            
+            if num_consumed is not None:
+                s_temp      = str(num_consumed)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+        
+        else:
+            s           += 8 * ' '
+        
+        s           += '   '
+            
+        
+        
+        
         s+= '\n'
 
     return s

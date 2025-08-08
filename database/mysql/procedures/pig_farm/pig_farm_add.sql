@@ -1,0 +1,85 @@
+﻿DELIMITER $$
+
+DROP PROCEDURE IF EXISTS pig_farm_add $$
+CREATE PROCEDURE pig_farm_add(
+    in_name             	VARCHAR(50),
+    
+    in_adrs_level_1_id     	INT,
+	in_adrs_level_2_id     	INT,
+	in_adrs_level_3_id     	INT,
+	in_latitude				DECIMAL(10,6)
+	in_longitude			DECIMAL(10,6)
+    in_added_by_user_id     INT
+)  
+
+BEGIN
+
+/** 
+ * Will create user entry. This is usually used when a user registers from
+ * a mobile app or web application.
+ * 
+ * @author Jack Wong (j2718wong@gmail.com) 
+ * @since August 8, 2025
+ *
+ */
+
+DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
+DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
+
+DECLARE cur_user_id                             INT             DEFAULT 0;
+
+
+
+DECLARE cur_sow_coming_act_id                   INT             DEFAULT 0;
+
+DECLARE res_num                                 INT             DEFAULT 0;
+DECLARE res_code                                VARCHAR(180)    DEFAULT '';
+
+
+SET res_num         = RES_NUM_SUCCESS;
+
+
+SELECT  id
+INTO    cur_user_id
+FROM    user
+WHERE   UPPER(username)     = UPPER(in_username)     OR
+        UPPER(email)        = UPPER(in_email) 
+LIMIT   1;
+
+
+process_user : BEGIN
+
+IF cur_user_id > 0 THEN 
+    SET res_num     = RES_NUM_DUPLICATE_ENTRY;
+    SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
+    
+    LEAVE process_user;
+
+END IF;
+
+
+INSERT INTO user(
+    username,
+    email,
+    password
+) VALUES (
+    in_username,
+    in_email,
+    in_password
+);
+
+SELECT LAST_INSERT_ID() INTO cur_user_id;
+
+END process_user;
+
+SELECT 
+    res_num                             AS result_number,
+    res_code                            AS result_code,
+    
+    cur_user_id                         AS user_id,
+    0                                   AS user_flag;
+    
+
+END $$
+
+DELIMITER ;

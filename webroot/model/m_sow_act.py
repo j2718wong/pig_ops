@@ -477,15 +477,20 @@ class SowActivity:
                     a.date_grower,
                     a.date_finisher,
                     
-                    a.num_booster,
-                    a.num_pre_starter,
-                    a.num_starter,
-                    a.num_grower,
-                    a.num_finisher,
+                    a.num_b_booster,
+                    a.num_b_prestarter,
+                    a.num_b_starter,
+                    a.num_b_grower,
+                    a.num_b_finisher,
                     
+                    a.num_c_booster,
+                    a.num_c_prestarter,
+                    a.num_c_starter,
+                    a.num_c_grower,
+                    a.num_c_finisher,
                     
                     a.cost_booster,
-                    a.cost_pre_starter,
+                    a.cost_prestarter,
                     a.cost_starter,
                     a.cost_grower,
                     a.cost_finisher
@@ -549,17 +554,23 @@ class SowActivity:
                 cur_date_grower         = str(row[18]) if row[18] else None
                 cur_date_finisher       = str(row[19]) if row[19] else None
                 
-                cur_num_booster        = row[20]
-                cur_num_prestarter     = row[21]
-                cur_num_starter        = row[22]
-                cur_num_grower         = row[23]
-                cur_num_finisher       = row[24]
+                cur_num_b_booster       = row[20]
+                cur_num_b_prestarter    = row[21]
+                cur_num_b_starter       = row[22]
+                cur_num_b_grower        = row[23]
+                cur_num_b_finisher      = row[24]
                 
-                cur_cost_booster       = row[25]
-                cur_cost_prestarter    = row[26]
-                cur_cost_starter       = row[27]
-                cur_cost_grower        = row[28]
-                cur_cost_finisher      = row[29]
+                cur_num_c_booster       = row[25]
+                cur_num_c_prestarter    = row[26]
+                cur_num_c_starter       = row[27]
+                cur_num_c_grower        = row[28]
+                cur_num_c_finisher      = row[29]
+                
+                cur_cost_booster        = row[30]
+                cur_cost_prestarter     = row[31]
+                cur_cost_starter        = row[32]
+                cur_cost_grower         = row[33]
+                cur_cost_finisher       = row[34]
                 
                 
                 cur_entry = {
@@ -597,19 +608,38 @@ class SowActivity:
                     },
                     
                     'num_feeds': {
-                        'booster':      cur_num_booster,
-                        'prestarter':   cur_num_prestarter,
-                        'starter':      cur_num_starter,
-                        'grower':       cur_num_grower,
-                        'finisher':     cur_num_finisher
+                        'booster': {
+                            'bought':   cur_num_b_booster,
+                            'consumed': cur_num_c_booster
+                        },
+                            
+                        'prestarter': {
+                            'bought':   cur_num_b_prestarter,
+                            'consumed': cur_num_c_prestarter
+                        },
+                            
+                        'starter': {     
+                            'bought':   cur_num_b_starter,
+                            'consumed': cur_num_c_starter
+                        },
+                        
+                        'grower': {
+                            'bought':   cur_num_b_grower,
+                            'consumed': cur_num_c_grower
+                        },
+                        
+                        'finisher': {    
+                            'bought':   cur_num_b_finisher,
+                            'consumed': cur_num_c_finisher
+                        }
                     },
                     
                     'cost_feeds': {
-                        'booster':      cur_num_booster,
-                        'prestarter':   cur_num_prestarter,
-                        'starter':      cur_num_starter,
-                        'grower':       cur_num_grower,
-                        'finisher':     cur_num_finisher
+                        'booster':      cur_cost_booster,
+                        'prestarter':   cur_cost_prestarter,
+                        'starter':      cur_cost_starter,
+                        'grower':       cur_cost_grower,
+                        'finisher':     cur_cost_finisher
                     }
                    
                 }
