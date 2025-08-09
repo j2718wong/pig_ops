@@ -9,7 +9,25 @@ LOG_ERROR               = 2
 LOG_FATAL               = 3
 
 
-INS_STATUS_ID_TERMINATED             = 2
+
+BUSINESS_OBJ_ID_USER_REGISTER                       = 1
+
+
+MFA_CHANNEL_ID_EMAIL                                = 1
+MFA_CHANNEL_ID_PHONE_NUMBER                         = 2
+
+MFA_VERIFICATION_CODE_MIN                           = 100000
+MFA_VERIFICATION_CODE_MAX                           = 999999
+
+
+MFA_SEND_SUCCESS                                    = 0
+
+
+
+NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY            = 5
+
+
+INS_STATUS_ID_TERMINATED                            = 2
 
 
 ERROR_DATABASE_ERROR                                = 0x01

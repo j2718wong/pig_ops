@@ -471,7 +471,7 @@ class SowActivity:
                     a.date_deworm_1,
                     
                     a.date_booster,
-                    a.date_pre_starter,
+                    a.date_prestarter,
                     a.date_weaning,
                     a.date_starter,
                     a.date_grower,
@@ -483,11 +483,11 @@ class SowActivity:
                     a.num_b_grower,
                     a.num_b_finisher,
                     
-                    a.num_c_booster,
-                    a.num_c_prestarter,
-                    a.num_c_starter,
-                    a.num_c_grower,
-                    a.num_c_finisher,
+                    a.num_l_booster,
+                    a.num_l_prestarter,
+                    a.num_l_starter,
+                    a.num_l_grower,
+                    a.num_l_finisher,
                     
                     a.cost_booster,
                     a.cost_prestarter,
@@ -524,7 +524,6 @@ class SowActivity:
         result = []
         if rows is not None:
             
-            
             for row in rows:
                 cur_id                  = row[0]
                 
@@ -539,8 +538,8 @@ class SowActivity:
                
                 cur_date_actual         = str(row[7])
                 
-                cur_date_iron_1         = str(row[8])  if row[8] else None
-                cur_date_iron_2         = str(row[9])  if row[9] else None
+                cur_date_iron_1         = str(row[8])  if row[8]  else None
+                cur_date_iron_2         = str(row[9])  if row[9]  else None
                 cur_date_vitamins_1     = str(row[10]) if row[10] else None
                 cur_date_kapon          = str(row[11]) if row[11] else None
                 cur_date_vitamins_2     = str(row[12]) if row[12] else None
@@ -560,17 +559,40 @@ class SowActivity:
                 cur_num_b_grower        = row[23]
                 cur_num_b_finisher      = row[24]
                 
-                cur_num_c_booster       = row[25]
-                cur_num_c_prestarter    = row[26]
-                cur_num_c_starter       = row[27]
-                cur_num_c_grower        = row[28]
-                cur_num_c_finisher      = row[29]
+                cur_num_l_booster       = float(row[25]) if row[25] is not None else None
+                cur_num_l_prestarter    = float(row[26]) if row[26] is not None else None
+                cur_num_l_starter       = float(row[27]) if row[27] is not None else None
+                cur_num_l_grower        = float(row[28]) if row[28] is not None else None
+                cur_num_l_finisher      = float(row[29]) if row[29] is not None else None
                 
                 cur_cost_booster        = row[30]
                 cur_cost_prestarter     = row[31]
                 cur_cost_starter        = row[32]
                 cur_cost_grower         = row[33]
                 cur_cost_finisher       = row[34]
+                
+                
+                cur_num_c_booster       = None
+                cur_num_c_prestarter    = None
+                cur_num_c_starter       = None
+                cur_num_c_grower        = None
+                cur_num_c_finisher      = None
+            
+                
+                if cur_num_b_booster is not None and cur_num_l_booster is not None:
+                    cur_num_c_booster = float(cur_num_b_booster) - cur_num_l_booster
+                
+                if cur_num_b_prestarter is not None and cur_num_l_prestarter is not None:
+                    cur_num_c_prestarter = float(cur_num_b_prestarter) - cur_num_l_prestarter
+                
+                if cur_num_b_starter is not None and cur_num_l_starter is not None:
+                    cur_num_c_starter = float(cur_num_b_starter) - cur_num_l_starter
+                
+                if cur_num_b_grower is not None and cur_num_l_grower is not None:
+                    cur_num_c_grower = float(cur_num_b_grower) - cur_num_l_grower
+                
+                if cur_num_b_finisher is not None and cur_num_l_finisher is not None:
+                    cur_num_c_finisher = float(cur_num_b_finisher) - cur_num_l_finisher
                 
                 
                 cur_entry = {
@@ -610,27 +632,32 @@ class SowActivity:
                     'num_feeds': {
                         'booster': {
                             'bought':   cur_num_b_booster,
-                            'consumed': cur_num_c_booster
+                            'consumed': cur_num_c_booster,
+                            'left':     cur_num_l_booster
                         },
                             
                         'prestarter': {
                             'bought':   cur_num_b_prestarter,
-                            'consumed': cur_num_c_prestarter
+                            'consumed': cur_num_c_prestarter,
+                            'left':     cur_num_l_prestarter
                         },
                             
                         'starter': {     
                             'bought':   cur_num_b_starter,
-                            'consumed': cur_num_c_starter
+                            'consumed': cur_num_c_starter,
+                            'left':     cur_num_l_starter
                         },
                         
                         'grower': {
                             'bought':   cur_num_b_grower,
-                            'consumed': cur_num_c_grower
+                            'consumed': cur_num_c_grower,
+                            'left':     cur_num_l_grower
                         },
                         
                         'finisher': {    
                             'bought':   cur_num_b_finisher,
-                            'consumed': cur_num_c_finisher
+                            'consumed': cur_num_c_finisher,
+                            'left':     cur_num_l_finisher
                         }
                     },
                     

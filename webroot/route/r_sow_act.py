@@ -924,15 +924,22 @@ def write_feeds_consumed(data, inc_cost):
     
     
     s += '                                                                        NUM SACKS\n'
-    s += '                                                 ====================================================\n'
-    s += '                                                 BOOSTER    PSTARTER   STARTER    GROWER     FINISHER\n'
-    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CON   BUY  CON   BUY  CON   BUY  CON   BUY  CON\n'
+    s += '                                                 ======================================================================================\n'
+    s += '                                                      BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
+    s += '                                                 ===============   ===============   ===============   ===============  ===============\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
     
     if inc_cost > 0:
         s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN    BOOSTER  PRE  STR  GRO  FIN \n'
     
     
+    count = 0
+    
     for cur_entry in data:
+        
+        if count == 0:
+            pprint.pprint(cur_entry)
+            count = 1
         
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
@@ -991,15 +998,27 @@ def write_feeds_consumed(data, inc_cost):
             num_consumed  = num_booster['consumed']
             
             if num_consumed is not None:
-                s_temp      = str(num_consumed)
+                s_temp      = str(int(num_consumed))
                 num_chars   = len(s_temp)
-                num_space   = 3 - num_chars
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '    '
+                
+            s           += '  '
+                
+            num_left        = num_booster['left']
+            
+            if num_left is not None:
+                s_temp      = str(int(num_left))
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
                 s       += '   '
-        
+            
         else:
-            s           += 8 * ' '
+            s           += 15 * ' '
         
         s           += '   '
             
@@ -1021,16 +1040,27 @@ def write_feeds_consumed(data, inc_cost):
             num_consumed  = num_prestarter['consumed']
             
             if num_consumed is not None:
-                s_temp      = str(num_consumed)
+                s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 3 - num_chars
+                num_space   = 4 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += '   '
-        
+                s       += '    '
+            
+            s           += '  '
+                
+            num_left        = num_prestarter['left']
+            
+            if num_left is not None:
+                s_temp      = f"{num_left:.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '    '
         
         else:
-            s           += 8 * ' '
+            s           += 15 * ' '
             
         s           += '   '
             
@@ -1053,15 +1083,27 @@ def write_feeds_consumed(data, inc_cost):
             num_consumed  = num_starter['consumed']
             
             if num_consumed is not None:
-                s_temp      = str(num_consumed)
+                s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 3 - num_chars
+                num_space   = 4 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += '   '
+                s       += '    '
+                
+            s           += '  '
+                
+            num_left        = num_starter['left']
+            
+            if num_left is not None:
+                s_temp      = f"{num_left:.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '    '
         
         else:
-            s           += 8 * ' '
+            s           += 15 * ' '
             
         s           += '   '
             
@@ -1084,15 +1126,27 @@ def write_feeds_consumed(data, inc_cost):
             num_consumed  = num_grower['consumed']
             
             if num_consumed is not None:
-                s_temp      = str(num_consumed)
+                s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 3 - num_chars
+                num_space   = 4 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += '   '
+                s       += '    '
+                
+            s           += '  '
+                
+            num_left        = num_grower['left']
+            
+            if num_left is not None:
+                s_temp      = f"{num_left:.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '    '
         
         else:
-            s           += 8 * ' '
+            s           += 9 * ' '
         
         s           += '   '
             

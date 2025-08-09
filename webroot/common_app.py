@@ -34,10 +34,19 @@ logger.append(tag = 'Main', msg = s)
 
 
 from model.m_sow_act            import SowActivity
+from model.m_mfa                import Mfa
+from model.m_user               import User
+
 
 # Models for connecting to database
 model_names = [
-    ('sow_act',                 SowActivity)
+    
+    ('mfa',                     Mfa),
+    
+    ('sow_act',                 SowActivity),
+    ('user',                    User)
+    
+    
 ]
 
 

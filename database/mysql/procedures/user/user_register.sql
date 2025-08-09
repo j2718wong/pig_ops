@@ -13,7 +13,7 @@ BEGIN
 
 /** 
  * Will create user entry. This is usually used when a user registers from
- * a mobile app or web application. All parameter input cannot be null or EM 
+ * a mobile app or web application. All parameter input cannot be null or empty.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 8, 2025
@@ -27,7 +27,8 @@ DECLARE cur_user_id                             INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
-DECLARE res_code                                VARCHAR(180)    DEFAULT '';
+DECLARE res_code                                VARCHAR(80)     DEFAULT '';
+DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
 
 SET res_num         = RES_NUM_SUCCESS;
@@ -74,6 +75,7 @@ END process_user;
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
+    res_desc                            AS result_desc,
     
     cur_user_id                         AS user_id,
     0                                   AS user_flag;
