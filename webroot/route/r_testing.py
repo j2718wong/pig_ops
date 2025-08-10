@@ -21,13 +21,13 @@ async def testing_user_hashid(user_id: int):
     return hashids_user.encrypt(user_id)
     
 
-@app.get("/testing/booking/hashid/{booking_id}")
-async def testing_booking_hashid(booking_id: int):
+@app.get("/testing/account/hashid/{account_id}")
+async def testing_account_hashid(account_id: int):
     """
     Will return hashid for booking.id
     """
     
-    return hashids_booking.encrypt(booking_id)
+    return hashids_account.encrypt(account_id)
     
     
 @app.get("/testing/common/hashid/{id}")

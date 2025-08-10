@@ -28,6 +28,9 @@ DECLARE FLAG_BIT_USER_EMAIL_VERIFIED            INT             DEFAULT 2;
 DECLARE FLAG_BIT_USER_MOBILE_NUM_VERIFIED       INT             DEFAULT 4;
 DECLARE FLAG_BIT_USER_IS_DELETED                INT             DEFAULT 8;
 
+DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
+
+
 
 
 DECLARE cur_unix_timestamp                      BIGINT          DEFAULT 0;
@@ -89,7 +92,7 @@ IF cur_mfa_id > 0 THEN
             
             /* Update user*/
             UPDATE user SET
-                flag                = flag | FLAG_BIT_USER_EMAIL_VERIFIED
+                flag   = flag | FLAG_BIT_USER_EMAIL_VERIFIED | FLAG_BIT_USER_IS_ACTIVE
             WHERE id = in_user_id;
             
         END IF;

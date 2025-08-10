@@ -31,8 +31,8 @@ DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
 
-SET res_num         = RES_NUM_SUCCESS;
-SET res_code        = "SUCCESS";
+SET res_num     = RES_NUM_SUCCESS;
+SET res_code    = "SUCCESS";
 
 
 

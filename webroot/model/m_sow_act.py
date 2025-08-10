@@ -477,18 +477,21 @@ class SowActivity:
                     a.date_grower,
                     a.date_finisher,
                     
+                    a.num_b_lactating,
                     a.num_b_booster,
                     a.num_b_prestarter,
                     a.num_b_starter,
                     a.num_b_grower,
                     a.num_b_finisher,
                     
+                    a.num_l_lactating,
                     a.num_l_booster,
                     a.num_l_prestarter,
                     a.num_l_starter,
                     a.num_l_grower,
                     a.num_l_finisher,
                     
+                    a.cost_lactating,
                     a.cost_booster,
                     a.cost_prestarter,
                     a.cost_starter,
@@ -553,31 +556,38 @@ class SowActivity:
                 cur_date_grower         = str(row[18]) if row[18] else None
                 cur_date_finisher       = str(row[19]) if row[19] else None
                 
-                cur_num_b_booster       = row[20]
-                cur_num_b_prestarter    = row[21]
-                cur_num_b_starter       = row[22]
-                cur_num_b_grower        = row[23]
-                cur_num_b_finisher      = row[24]
+                cur_num_b_lactating     = row[20]
+                cur_num_b_booster       = row[21]
+                cur_num_b_prestarter    = row[22]
+                cur_num_b_starter       = row[23]
+                cur_num_b_grower        = row[24]
+                cur_num_b_finisher      = row[25]
                 
-                cur_num_l_booster       = float(row[25]) if row[25] is not None else None
-                cur_num_l_prestarter    = float(row[26]) if row[26] is not None else None
-                cur_num_l_starter       = float(row[27]) if row[27] is not None else None
-                cur_num_l_grower        = float(row[28]) if row[28] is not None else None
-                cur_num_l_finisher      = float(row[29]) if row[29] is not None else None
+                cur_num_l_lactating     = float(row[26]) if row[26] is not None else None
+                cur_num_l_booster       = float(row[27]) if row[27] is not None else None
+                cur_num_l_prestarter    = float(row[28]) if row[28] is not None else None
+                cur_num_l_starter       = float(row[29]) if row[29] is not None else None
+                cur_num_l_grower        = float(row[30]) if row[30] is not None else None
+                cur_num_l_finisher      = float(row[31]) if row[31] is not None else None
                 
-                cur_cost_booster        = row[30]
-                cur_cost_prestarter     = row[31]
-                cur_cost_starter        = row[32]
-                cur_cost_grower         = row[33]
-                cur_cost_finisher       = row[34]
+                cur_cost_lactating      = row[32]
+                cur_cost_booster        = row[33]
+                cur_cost_prestarter     = row[34]
+                cur_cost_starter        = row[35]
+                cur_cost_grower         = row[36]
+                cur_cost_finisher       = row[37]
                 
                 
+                cur_num_c_lactating     = None
                 cur_num_c_booster       = None
                 cur_num_c_prestarter    = None
                 cur_num_c_starter       = None
                 cur_num_c_grower        = None
                 cur_num_c_finisher      = None
             
+            
+                if cur_num_b_lactating is not None and cur_num_l_lactating is not None:
+                    cur_num_c_lactating = float(cur_num_b_lactating) - cur_num_l_lactating
                 
                 if cur_num_b_booster is not None and cur_num_l_booster is not None:
                     cur_num_c_booster = float(cur_num_b_booster) - cur_num_l_booster
@@ -630,6 +640,12 @@ class SowActivity:
                     },
                     
                     'num_feeds': {
+                        'lactating': {
+                            'bought':   cur_num_b_lactating,
+                            'consumed': cur_num_c_lactating,
+                            'left':     cur_num_l_lactating
+                        },
+                        
                         'booster': {
                             'bought':   cur_num_b_booster,
                             'consumed': cur_num_c_booster,
@@ -662,6 +678,7 @@ class SowActivity:
                     },
                     
                     'cost_feeds': {
+                        'lactating':    cur_cost_lactating,
                         'booster':      cur_cost_booster,
                         'prestarter':   cur_cost_prestarter,
                         'starter':      cur_cost_starter,

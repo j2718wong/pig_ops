@@ -32,16 +32,20 @@ s = '\n\nStarting Pig Operations application\n'
 logger.append(tag = 'Main', msg = s)
 
 
-
-from model.m_sow_act            import SowActivity
+from model.m_account            import Account
 from model.m_mfa                import Mfa
+
+from model.m_pig_farm           import PigFarm
+from model.m_sow_act            import SowActivity
 from model.m_user               import User
 
 
 # Models for connecting to database
 model_names = [
-    
+    ('account',                 Account),
     ('mfa',                     Mfa),
+    ('pig_farm',                PigFarm),
+    
     
     ('sow_act',                 SowActivity),
     ('user',                    User)
@@ -121,6 +125,14 @@ hashids_user    = hashids.Hashids(  salt        = HASHID_SALT_USER,
                                     min_length  = HASHID_MIN_LENGTH_USER,
                                     alphabet    = COMMON_HASH_ALPHABET)
 
+
+
+HASHID_SALT_ACCOUNT                     = '8C069A'
+HASHID_MIN_LENGTH_ACCOUNT               = 6
+
+hashids_account = hashids.Hashids(  salt        = HASHID_SALT_ACCOUNT, 
+                                    min_length  = HASHID_MIN_LENGTH_ACCOUNT,
+                                    alphabet    = COMMON_HASH_ALPHABET)
 
 
 

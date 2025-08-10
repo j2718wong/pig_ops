@@ -1,8 +1,9 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_farm_add $$
-CREATE PROCEDURE pig_farm_add(
+DROP PROCEDURE IF EXISTS pig_farm_update $$
+CREATE PROCEDURE pig_farm_update(
     in_user_id              INT,
+    in_pig_farm_id          INT,
 
     in_name                 VARCHAR(50),
     
@@ -129,53 +130,16 @@ END IF;
 
 
 
-
-SELECT  id
-INTO    cur_pig_farm_id
-FROM    pig_farm
-WHERE   account_id = cur_user_account_id AND UPPER(name)  = UPPER(in_name)
-LIMIT   1;
-
-
-/* Check for duplicate farm name*/
-IF cur_farm_id > 0 THEN 
-    SET res_num     = RES_NUM_DUPLICATE_ENTRY;
-    SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
+UPDATE pig_farm SET
+    name                = in_name,
     
-    LEAVE process_user;
-
-END IF;
-
-
-
-INSERT INTO pig_farm(
-    account_id,
-    flag,
-    name,
-    added_by_user_id,
-    
-    country_id,
-    adrs_level_1_id,
-    adrs_level_2_id,
-    adrs_level_3_id,
-    latitude,
-    longitude
-) VALUES (
-    cur_user_account_id,
-    1,    
-    in_name,
-    in_user_id,
-    
-    in_country_id,
-    in_adrs_level_1_id,
-    in_adrs_level_2_id,
-    in_adrs_level_3_id,
-    in_latitude,
-    in_longitude
-    
-);
-
-SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;
+    country_id          = in_country_id,
+    adrs_level_1_id     = in_adrs_level_1_id,
+    adrs_level_2_id     = in_adrs_level_2_id,
+    adrs_level_3_id     = in_adrs_level_3_id,
+    latitude            = in_latitude,
+    longitude           = in_longitude
+WHERE id =  in_pig_farm_id;
 
 END process_user;
 

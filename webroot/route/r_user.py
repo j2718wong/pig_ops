@@ -1,4 +1,4 @@
-# January 4, 2024
+# August 8, 2025
 # Jack Wong
 
 import os
@@ -22,6 +22,9 @@ import data_model           as dm
 FLAG_BIT_USER_IS_ACTIVE                 = 1
 FLAG_BIT_USER_EMAIL_VERIFIED            = 2
 FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
+FLAG_BIT_USER_IS_DELETED                = 8
+
+FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
 
 
 USER_REGISTER_RES_NUM_SUCCESS           = 0
@@ -46,6 +49,19 @@ def write_user_flag_bits(user, user_flag):
         user['is_mobile_num_verified'] = 1
     else:
         user['is_mobile_num_verified'] = 0
+    
+    
+    if user_flag & FLAG_BIT_USER_IS_DELETED > 0:
+        user['is_deleted'] = 1
+    else:
+        user['is_deleted'] = 0
+    
+    
+    if user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN > 0:
+        user['is_account_admin'] = 1
+    else:
+        user['is_account_admin'] = 0
+    
     
 
 @app.post("/user/register")
@@ -252,8 +268,31 @@ async def user_email_verify_resend(uhid:str):
         }
     
 
+        res_mfa_add     = model['mfa'].add(data)
+        mfa_id          = res_mfa_add['id']
+        
+        
+        # Update user.last_mfa_id_email_verify
+        data = {
+            'user_id':          user_id,
+            'mfa_id':           mfa_id
+        }
+        model['user'].update_mfa_id_email_verify(data)
 
 
-
-
+        return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': ''
+            }
+        }
+        
+    return {
+        'result':{
+            'num':  ERROR_DATABASE_ERROR,
+            'code': 'ERROR_DATABASE_ERROR',
+            'desc': ''
+        }
+    }
 

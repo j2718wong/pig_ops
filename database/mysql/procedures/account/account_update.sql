@@ -1,34 +1,28 @@
-﻿DELIMITER $$
+DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_farm_add $$
-CREATE PROCEDURE pig_farm_add(
-    in_user_id              INT,
-
-    in_name                 VARCHAR(50),
+DROP PROCEDURE IF EXISTS account_update $$
+CREATE PROCEDURE account_update(
+    in_user_id                  INT,
     
-    in_country_id           INT, 
-    in_adrs_level_1_id      INT,
-    in_adrs_level_2_id      INT,
-    in_adrs_level_3_id      INT,
-    in_latitude             DECIMAL(10,5),
-    in_longitude            DECIMAL(10,5)
+    in_name                     VARCHAR(100)
     
-)  
+)
 
 BEGIN
 
 /** 
- * Will add pig farm entry.
- * 
- * @author Jack Wong (j2718wong@gmail.com) 
+ * Will update account
+ * @author Jack Wong
  * @since August 10, 2025
  *
  */
-
+ 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_USER_IS_INACTIVE                INT             DEFAULT 1;
-DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 2;
-DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
+DECLARE RES_NUM_USER_HAS_NO_ACCOUNT             INT             DEFAULT 2;
+DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 3;
+DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 4;
+DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 5;
 
 
 /* user.flag bits*/
@@ -43,21 +37,27 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 /* account.flag bits*/
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
+
 DECLARE ACCOUNT_STATUS_ON_TRIAL                 INT             DEFAULT 1;
 DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
 DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
 
 
+DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
+DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
+DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
+
+
 DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
+
 DECLARE cur_account_flag                        INT             DEFAULT 0;
 DECLARE cur_account_status                      INT             DEFAULT 0;
+DECLARE cur_account_name                        VARCHAR(100); 
+DECLARE cur_account_date_trial_start            DATE;
+DECLARE cur_account_date_trial_end              DATE;
 
-
-DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
-DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
-DECLARE cur_pig_farm_name                       VARCHAR(50)     DEFAULT '';
 
 
 
@@ -65,8 +65,11 @@ DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
+DECLARE description                             VARCHAR(200)    DEFAULT '';
 
-SET res_num         = RES_NUM_SUCCESS;
+
+SET res_num     = RES_NUM_SUCCESS;
+SET res_code    = "SUCCESS";
 
 
 SELECT  
@@ -91,9 +94,9 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN
 END IF;
 
 
-IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN 
-    SET res_num     = RES_NUM_USER_NOT_ACCOUNT_ADMIN;
-    SET res_code    = "RES_NUM_USER_NOT_ACCOUNT_ADMIN";
+IF cur_user_account_id = 0 THEN 
+    SET res_num     = RES_NUM_USER_HAS_NO_ACCOUNT;
+    SET res_code    = "RES_NUM_USER_HAS_NO_ACCOUNT";
 
     LEAVE process_user;
     
@@ -103,10 +106,12 @@ END IF;
 /* Check account*/
 SELECT 
     flag,
-    status
+    status,
+    name
 INTO
     cur_account_flag,
-    cur_account_status
+    cur_account_status,
+    cur_account_name
     
 FROM account
 WHERE id = cur_user_account_id;
@@ -127,77 +132,59 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
+UPDATE account SET
+    name            = in_name
+WHERE id = cur_user_account_id;
 
 
+SET description = CONCAT("old_acc_name = ", cur_account_name, "; new_acc_name = ",
+    in_name);
 
-SELECT  id
-INTO    cur_pig_farm_id
-FROM    pig_farm
-WHERE   account_id = cur_user_account_id AND UPPER(name)  = UPPER(in_name)
-LIMIT   1;
-
-
-/* Check for duplicate farm name*/
-IF cur_farm_id > 0 THEN 
-    SET res_num     = RES_NUM_DUPLICATE_ENTRY;
-    SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
-    
-    LEAVE process_user;
-
-END IF;
-
-
-
-INSERT INTO pig_farm(
-    account_id,
-    flag,
-    name,
-    added_by_user_id,
-    
-    country_id,
-    adrs_level_1_id,
-    adrs_level_2_id,
-    adrs_level_3_id,
-    latitude,
-    longitude
+INSERT INTO app_audit_log(
+    user_id,
+    action,
+    description,
+    date
 ) VALUES (
-    cur_user_account_id,
-    1,    
-    in_name,
     in_user_id,
-    
-    in_country_id,
-    in_adrs_level_1_id,
-    in_adrs_level_2_id,
-    in_adrs_level_3_id,
-    in_latitude,
-    in_longitude
-    
+    AUDIT_ACTION_UPDATE,
+    description,
+    CURRENT_DATE
 );
 
-SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;
 
 END process_user;
 
 
 SELECT
     flag,
-    name
+    status,
+    name,
+    date_trial_start,
+    date_trial_end
 INTO 
-    cur_pig_farm_flag,
-    cur_pig_farm_name
-FROM pig_farm
-WHERE id = cur_pig_farm_id;
+    cur_account_flag,
+    cur_account_status,
+    cur_account_name,
+    cur_account_date_trial_start,
+    cur_account_date_trial_end
+FROM account
+WHERE id = cur_user_account_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_pig_farm_id                     AS pig_farm_id,
-    cur_pig_farm_name                   AS pig_farm_name,
-    cur_pig_farm_flag                   AS pig_farm_flag;
-    
+    cur_user_account_id                 AS acc_id,
+    cur_account_name                    AS acc_name,
+    cur_account_flag                    AS acc_flag,
+    cur_account_status                  AS acc_status,
+    cur_account_date_trial_start        AS date_trial_start,
+    cur_account_date_trial_end          AS date_trial_end;
+
+
+
 
 END $$
 

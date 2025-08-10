@@ -523,6 +523,7 @@ NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1     = 25
 NUMDAYS_SINCE_BIRTH_BOOSTER             = 7
 NUMDAYS_SINCE_BIRTH_PRESTARTER          = 30
 NUMDAYS_SINCE_BIRTH_STARTER             = 50
+NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
     
 @app.get("/pig_prod/feeding", response_class=PlainTextResponse)
@@ -566,14 +567,47 @@ def write_baktin_operations(data, is_growing):
     
     
     s  = f'BAKTIN OPERATIONS      {dt_now_s}\n'
-    s += '=================\n\n'
+    s += '=================      IRON_1   IRON_2   VITA_1   VITA_2    KAPON   PURGA_1 \n'
+    s += 'ADLAW GIKAN ANAK       '
     
-    s += f"   Pila ka adlaw gikan panganak INJECT IRON_1     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_1}\n"
-    s += f"   Pila ka adlaw gikan panganak INJECT IRON_2     = {NUMDAYS_SINCE_BIRTH_INJECT_IRON_2}\n"
-    s += f"   Pila ka adlaw gikan panganak INJECT VITAMINS_1 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1}\n"
-    s += f"   Pila ka adlaw gikan panganak INJECT VITAMINS_2 = {NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2}\n"
-    s += f"   Pila ka adlaw gikan panganak KAPON             = {NUMDAYS_SINCE_BIRTH_KAPON}\n"    
-    s += f"   Pila ka adlaw gikan panganak INJECT PURGA_1    = {NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1}\n\n"
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_IRON_1)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_IRON_2)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_KAPON)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    s           += "\n\n"
     
     
     
@@ -777,12 +811,41 @@ def write_feeding_guide(data):
     
     
     s  = f'FEEDING GUIDE          {dt_now_s}\n'
-    s += '=================\n\n'
+    s += '=================      BOOSTER   PSTARTER     LUTAS   STARTER    GROWER   FINISHER\n'
+    s += 'ADLAW GIKAN ANAK       '
     
-    s += f"   Pila ka adlaw gikan panganak BOOSTER     = {NUMDAYS_SINCE_BIRTH_BOOSTER}\n"
-    s += f"   Pila ka adlaw gikan panganak PRESTARTER  = {NUMDAYS_SINCE_BIRTH_PRESTARTER}\n"
-    s += f"   Pila ka adlaw gikan panganak LUTAS       = {NUMDAYS_SINCE_BIRTH_WEANING}\n"
-    s += f"   Pila ka adlaw gikan panganak STARTER     = {NUMDAYS_SINCE_BIRTH_STARTER}\n\n"
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_BOOSTER)
+    num_chars   = len(s_temp)
+    num_space   = 7 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_PRESTARTER)
+    num_chars   = len(s_temp)
+    num_space   = 8 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_WEANING)
+    num_chars   = len(s_temp)
+    num_space   = 7 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_STARTER)
+    num_chars   = len(s_temp)
+    num_space   = 7 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_GROWER)
+    num_chars   = len(s_temp)
+    num_space   = 7 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s           += "\n\n"
     
     
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
@@ -919,15 +982,11 @@ def write_feeds_consumed(data, inc_cost):
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = f'FEEDS CONSUMED         {dt_now_s}\n'
-    s += '=================\n\n'
-    
-    
-    s += '                                                                        NUM SACKS\n'
-    s += '                                                 ======================================================================================\n'
-    s += '                                                      BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
-    s += '                                                 ===============   ===============   ===============   ===============  ===============\n'
-    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
+    s  = 'FEEDS CONSUMED            %s                                                               NUM SACKS\n' % dt_now_s
+    s += '=================                                ========================================================================================================\n'
+    s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
+    s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
     
     if inc_cost > 0:
         s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN    BOOSTER  PRE  STR  GRO  FIN \n'
@@ -977,6 +1036,48 @@ def write_feeds_consumed(data, inc_cost):
         num_chars   = len(s_temp)
         num_space   = 6 - num_chars
         s           += ' ' * num_space + s_temp
+        s           += '   '
+        
+        
+        num_lactating  = cur_entry['num_feeds']['lactating']
+        if num_lactating is not None:
+                
+            num_bought  = num_lactating['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            s           += '  '
+            
+            num_consumed  = num_lactating['consumed']
+            
+            if num_consumed is not None:
+                s_temp      = f"{num_consumed:.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '    '
+            
+            s           += '  '
+                
+            num_left        = num_lactating['left']
+            
+            if num_left is not None:
+                s_temp      = f"{num_left:.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '    '
+        
+        else:
+            s           += 15 * ' '
+            
         s           += '   '
         
         

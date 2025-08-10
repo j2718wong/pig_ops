@@ -8,3 +8,23 @@ class DataUser(BaseModel):
     country_code:       int = 63    # default to PH
     mobile_num:         str
 
+
+
+class DataAccount(BaseModel):
+    uhid:               str
+    name:               str
+    
+
+class DataPigFarm(BaseModel):
+    uhid:               str
+    pig_farm_hid:       str = None
+    
+    name:               str
+    country_id:         int = 1     # default to PH
+    adrs_level_1_id:    int = 0
+    adrs_level_2_id:    int = 0
+    adrs_level_3_id:    int = 0
+    latitude:           float = None
+    longitude:          float = None
+    
+    
