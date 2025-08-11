@@ -139,7 +139,7 @@ END IF;
 SELECT  id 
 INTO    cur_account_req_id
 FROM    account_req_user_add
-WHERE   account_id = in_account_id and user_id = in_user_id
+WHERE   account_id = in_account_id and requesting_user_id = in_user_id
 LIMIT   1;
 
 
@@ -150,10 +150,11 @@ IF cur_account_req_id > 0 THEN
     LEAVE process_user;
 END IF;
 
+
 INSERT INTO account_req_user_add(
     account_id,
     requesting_user_id,
-    user_hashid
+    requesting_user_hashid
 ) VALUES (
     in_account_id,
     in_user_id,
@@ -182,10 +183,10 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_account_id                 AS acc_id,
+    in_account_id                       AS acc_id,
     cur_account_name                    AS acc_name,
     cur_account_flag                    AS acc_flag,
-    cur_account_status                  AS acc_status
+    cur_account_status                  AS acc_status,
     
     cur_user_email                      AS user_email;
 

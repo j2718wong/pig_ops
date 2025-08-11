@@ -334,7 +334,7 @@ async def user_request_add_to_account(uhid:str, ahid:str):
         'user_hashid':  uhid
     }
    
-    res_add = model['account'].add_request_user_to_add_to_account(data)
+    res_add = model['account'].add_account_request_add_user(data)
         
     # TODO; send an email to account admins to grant this user to be added to this 
     # account

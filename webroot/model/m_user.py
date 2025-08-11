@@ -74,7 +74,6 @@ class User:
         return None
     
     
-    
     def register(self, data = None):
         """
         PROCEDURE user_register(
@@ -97,7 +96,6 @@ class User:
         sql += '"%s",'  % email
         sql += '"%s",'  % mobile_num
         sql += '"%s");' % password
-        
         
         
         # Check if still connected to database
@@ -158,7 +156,10 @@ class User:
         return self.model.execute_sql(sql)
     
         
-        
+    
+    
+    
+    
     
     def login(self, data = None):
         """
