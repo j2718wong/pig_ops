@@ -31,12 +31,17 @@ INS_STATUS_ID_TERMINATED                            = 2
 
 
 ERROR_DATABASE_ERROR                                = 0x01
+ERROR_SERVER_ERROR                                  = 0x02
 
 
 ERROR_USER_INVALID_USER_HASHID                      = 0x20
+ERROR_USER_INVALID_USER_INACTIVE                    = 0x21
+ERROR_USER_INVALID_USER_NOT_EMAIL_VERIFIED          = 0x22
+ERROR_USER_ALREADY_CONNECTED_TO_ACCOUNT             = 0x23
 
 
 ERROR_ACCOUNT_INVALID_NAME                          = 0x30
+ERROR_ACCOUNT_INVALID_HASHID                        = 0x31
 
 
 ERROR_PIG_FARM_INVALID_NAME                         = 0x40

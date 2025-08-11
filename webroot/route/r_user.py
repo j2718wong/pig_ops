@@ -14,6 +14,7 @@ sys.path.append('..')
 from common_constants       import *
 from common_app             import *
 from common_fast_api        import *
+from server_messages        import *
 
 
 import data_model           as dm
@@ -295,4 +296,73 @@ async def user_email_verify_resend(uhid:str):
             'desc': ''
         }
     }
+    
+    
+RES_NUM_SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT = 0
+    
+@app.get("/user/request/add_to_account")
+async def user_request_add_to_account(uhid:str, ahid:str):
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    user_id = res[0]
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    account_id = res[0]
+    
+    data = {
+        'user_id':      user_id,
+        'account_id':   account_id,
+        'user_hashid':  uhid
+    }
+   
+    res_add = model['account'].add_request_user_to_add_to_account(data)
+        
+    # TODO; send an email to account admins to grant this user to be added to this 
+    # account
+    
+    res_send = RES_NUM_SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT
+    
+    if res_send == RES_NUM_SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT:
+        
+        key = SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT
+        msg = SERVER_MESSAGES[key]['en']
+        msg = msg.replace('{ACCOUNT_HID}', ahid)
+        
+        return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': '',
+                'msg':  msg
+            }
+        }
+    
+    
 
+    
+    return  {
+        'result':{
+            'num':  ERROR_SERVER_ERROR,
+            'code': 'ERROR_SERVER_ERROR',
+            'desc': ''
+        }
+    }

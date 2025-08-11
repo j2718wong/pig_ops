@@ -104,6 +104,7 @@ FROM    a01_list_of_values
 WHERE   id = LOV_ID_ACCOUNT_NUMDAYS_FREE_TRIAL;
 
 
+/* Check duplicate. */
 SELECT  id
 INTO    cur_account_id
 FROM    account
