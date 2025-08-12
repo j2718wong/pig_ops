@@ -3,16 +3,13 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS account_request_user_add $$
 CREATE PROCEDURE account_request_user_add(
     in_account_id               INT,
-    in_user_id                  INT,
-    
-    in_user_hashid              VARCHAR(10)
-    
+    in_user_id                  INT
 )
 
 BEGIN
 
 /** 
- * Will add account_req_user_add; this is initiated by the user.
+ * Will add account_request; this is initiated by the user.
  * @author Jack Wong
  * @since August 11, 2025
  *
@@ -138,7 +135,7 @@ END IF;
 /* Check duplicate. */
 SELECT  id 
 INTO    cur_account_req_id
-FROM    account_req_user_add
+FROM    account_request
 WHERE   account_id = in_account_id and requesting_user_id = in_user_id
 LIMIT   1;
 
@@ -151,14 +148,12 @@ IF cur_account_req_id > 0 THEN
 END IF;
 
 
-INSERT INTO account_req_user_add(
+INSERT INTO account_request(
     account_id,
-    requesting_user_id,
-    requesting_user_hashid
+    requesting_user_id
 ) VALUES (
     in_account_id,
-    in_user_id,
-    in_user_hashid
+    in_user_id
 );
 
 SELECT LAST_INSERT_ID() INTO cur_account_req_id;

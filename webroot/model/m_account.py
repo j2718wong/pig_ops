@@ -153,98 +153,23 @@ class Account:
             }
 
         return None
-
     
-    def add_account_request_add_user(self, data = None):
-        """
-        PROCEDURE account_request_user_add(
-            in_account_id               INT,
-            in_user_id                  INT,
-            
-            in_user_hashid              VARCHAR(10)
-            
-        )
-        """
+    
+    def get_account_admin(self, account_id):
+        user_flag = FLAG_BIT_USER_IS_ACTIVE | FLAG_BIT_USER_EMAIL_VERIFIED 
+        user_flag |= FLAG_BIT_USER_IS_ACCOUNT_ADMIN
         
-        user_id         = data['user_id']
-        account_id      = data['account_id']
-        user_hashid     = data['user_hashid']
+        values = (account_id, user_flag)
         
-        values = (user_id, account_id, user_hashid)
-        
-        sql =  'CALL account_request_user_add('
-        sql += '%s,'    % account_id
-        sql += '%s,'    % user_id
-        sql += '"%s");' % user_hashid
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'register(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'account': {
-                    'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5],
-                    'status':           row[6]
-                },
-                
-                'user': {
-                    'id':               user_id,
-                    'email':            row[7]
-                }
-            }
-
-        return None
-        
-        
-    def approve_account_request_add_user(self, data = None):
-        """
-        PROCEDURE account_request_user_add_approve(
-            in_acc_req_add_id           INT,
-            in_user_id                  INT
-            
-        )
-        """
-        
-        user_id         = data['user_id']
-        acc_req_add_id  = data['acc_req_add_id']
-        
-        values = (acc_req_add_id, user_id)
-        
-        
-        sql =  'CALL account_request_user_add_approve('
-        sql += '%s,'    % acc_req_add_id
-        sql += '%s);'   % user_id
+        sql =   """
+                SELECT 
+                    id,
+                    flag,
+                    email,
+                    mobile_num
+                FROM user 
+                WHERE account_id = %s &  flag = %s
+                """ % values
         
         
         # Check if still connected to database
@@ -255,44 +180,44 @@ class Account:
         # Get database connection
         conn = self.model.db_conn
         
-        row = None
-
+        
+        rows = None
+        
         try:
             cursor = conn.cursor()
             cursor.execute(sql)
             
-            row = cursor.fetchone()
+            rows = cursor.fetchall()
             cursor.close()
-
+            conn.close()
+            
         except Exception as e:
-            msg = 'register(); error in executing query[] = ' + sql
+            msg = 'get_account_admin(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
             self.model.logger.append(
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_user_account_id     = row[0]
+                cur_user_flag           = row[1]
+                cur_user_email          = row[2]
+                cur_user_mobile_num     = row[3]
                 
-                'account': {
-                    'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5],
-                    'status':           row[6]
-                },
-                
-                'user': {
+                cur_entry = {
                     'id':               user_id,
-                    'email':            row[7]
+                    'flag':             cur_user_flag,
+                    'email':            cur_user_email,
+                    'mobile_num':       cur_user_mobile_num
                 }
-            }
-
-        return None
-
+                    
+                result.append(cur_entry)
+        
+        return result
+    
+    

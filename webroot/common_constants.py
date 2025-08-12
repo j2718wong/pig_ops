@@ -13,6 +13,15 @@ LOG_FATAL               = 3
 BUSINESS_OBJ_ID_USER_REGISTER                       = 1
 
 
+# user.flag bits
+FLAG_BIT_USER_IS_ACTIVE                             = 1
+FLAG_BIT_USER_EMAIL_VERIFIED                        = 2
+FLAG_BIT_USER_MOBILE_NUM_VERIFIED                   = 4
+FLAG_BIT_USER_IS_DELETED                            = 8
+
+FLAG_BIT_USER_IS_ACCOUNT_ADMIN                      = 16
+
+
 MFA_CHANNEL_ID_EMAIL                                = 1
 MFA_CHANNEL_ID_PHONE_NUMBER                         = 2
 

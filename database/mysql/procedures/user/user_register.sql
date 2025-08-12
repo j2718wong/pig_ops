@@ -3,6 +3,8 @@
 DROP PROCEDURE IF EXISTS user_register $$
 CREATE PROCEDURE user_register(
     in_username             VARCHAR(50),
+    in_name_last            VARCHAR(50),
+    in_name_first           VARCHAR(50),
     
     in_email                VARCHAR(50),
     in_mobile_num           VARCHAR(50),
@@ -58,11 +60,15 @@ END IF;
 
 INSERT INTO user(
     username,
+    name_last,
+    name_first,
     email,
     mobile_num,
     password
 ) VALUES (
     in_username,
+    in_name_last,
+    in_name_first,
     in_email,
     in_mobile_num,
     in_password

@@ -33,6 +33,7 @@ logger.append(tag = 'Main', msg = s)
 
 
 from model.m_account            import Account
+from model.m_account_request    import AccountRequest
 from model.m_mfa                import Mfa
 
 from model.m_pig_farm           import PigFarm
@@ -43,6 +44,7 @@ from model.m_user               import User
 # Models for connecting to database
 model_names = [
     ('account',                 Account),
+    ('acc_req',                 AccountRequest),
     ('mfa',                     Mfa),
     ('pig_farm',                PigFarm),
     
@@ -107,8 +109,8 @@ model.append_models(model_names)
 
 
 # Create Hashids
-
-COMMON_HASH_ALPHABET                    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+# Letter O is purposely removed so that users will not confused with 0.
+COMMON_HASH_ALPHABET                    = 'ABCDEFGHIJKLMNPQRSTUVWXYZ1234567890'
 
 HASHID_SALT_COMMON                      = '68FD4C'
 HASHID_MIN_LENGTH_COMMON                = 6
@@ -127,7 +129,7 @@ hashids_user    = hashids.Hashids(  salt        = HASHID_SALT_USER,
 
 
 
-HASHID_SALT_ACCOUNT                     = '8C069A'
+HASHID_SALT_ACCOUNT                     = '9C069A'
 HASHID_MIN_LENGTH_ACCOUNT               = 6
 
 hashids_account = hashids.Hashids(  salt        = HASHID_SALT_ACCOUNT, 

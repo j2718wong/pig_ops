@@ -78,6 +78,8 @@ class User:
         """
         PROCEDURE user_register(
             in_username             VARCHAR(50),
+            in_name_last            VARCHAR(50),
+            in_name_first           VARCHAR(50),
     
             in_email                VARCHAR(50),
             in_mobile_num           VARCHAR(50),
@@ -86,6 +88,9 @@ class User:
         """
         
         username        = data['username']
+        name_last       = data['name_last'].upper()
+        name_first      = data['name_first'].upper()
+        
         email           = data['email'].lower()
         mobile_num      = data['mobile_num']
         password        = data['password']
@@ -93,6 +98,10 @@ class User:
         
         sql =  'CALL user_register('
         sql += '"%s",'  % username
+        sql += '"%s",'  % name_last
+        sql += '"%s",'  % name_first
+        
+        
         sql += '"%s",'  % email
         sql += '"%s",'  % mobile_num
         sql += '"%s");' % password

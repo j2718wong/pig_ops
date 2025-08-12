@@ -3,7 +3,7 @@
 
 import os
 import sys
-import random
+import pprint
 
 from pydantic               import BaseModel
 
@@ -24,26 +24,12 @@ FLAG_BIT_USER_EMAIL_VERIFIED            = 2
 FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
 
 
-ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
+ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS        = 0
 
     
-@app.post("/account_request/add_user")
-async def account_request_add_user(account_data: dm.DataAccount):
-    name    = account_data.name
-    uhid    = account_data.uhid
-    
-    name    = name.strip() if name else None 
-    
-    if name is None or len(name) == 0:
-        return {
-            'result':{
-                'num':  ERROR_ACCOUNT_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_INVALID_NAME',
-                'desc': ''
-            }
-        }
+@app.get("/account_request/add_user")
+async def account_request_add_user(uhid: str, ahid:str):
         
-    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -54,19 +40,32 @@ async def account_request_add_user(account_data: dm.DataAccount):
             }
         }
     
-    
     user_id = res[0]
     
     
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    account_id = res[0]
+    
+    
+    
     data = {
-        'name':             name,
+        'account_id':       account_id,
         'user_id':          user_id
     }
     
     
-    res_register    =  model['account'].register(data)
+    res_add    =  model['acc_req'].add_user(data)
     
-    if res_register is None:
+    if res_add is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
@@ -75,23 +74,26 @@ async def account_request_add_user(account_data: dm.DataAccount):
             }
         }
     
-    account_id      = res_register['account']['id']
-    account_flag    = res_register['account']['flag']
+    account_id      = res_add['account']['id']
+    account_flag    = res_add['account']['flag']
         
     account_hashid  = hashids_account.encrypt(account_id)
     
     # remove plain id
-    del res_register['account']['id']
-    res_register['account']['h_id'] = account_hashid
+    del res_add['account']['id']
+    res_add['account']['h_id'] = account_hashid
 
-    result_num      = res_register['result']['num']
+    result_num      = res_add['result']['num']
     
-    if result_num == ACCOUNT_REGISTER_RES_NUM_SUCCESS:
-        data = {
-           'account_id':    account_id,
-           'hashid':        account_hashid
-        }
-        res_update = model['account'].update_hashid(data)
+    if result_num == ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS:
+        # Get account admin emails
+        account_admins = model['account'].get_account_admin(account_id)
         
-    return res_register
+        
+        
+        # TODO send email notification to account_admins
+        
+        # TODO send email to user
+        
+    return res_add
     

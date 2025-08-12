@@ -3,6 +3,8 @@ from pydantic               import BaseModel
 
 class DataUser(BaseModel):
     username:           str
+    name_last:          str
+    name_first:         str
     email:              str
     password:           str
     country_code:       int = 63    # default to PH

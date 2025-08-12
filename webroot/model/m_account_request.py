@@ -14,23 +14,19 @@ class AccountRequest:
         """
         PROCEDURE account_request_user_add(
             in_account_id               INT,
-            in_user_id                  INT,
-            
-            in_user_hashid              VARCHAR(10)
+            in_user_id                  INT
             
         )
         """
         
         user_id         = data['user_id']
         account_id      = data['account_id']
-        user_hashid     = data['user_hashid']
-        
-        values = (user_id, account_id, user_hashid)
+                
+        values = (user_id, account_id)
         
         sql =  'CALL account_request_user_add('
         sql += '%s,'    % account_id
-        sql += '%s,'    % user_id
-        sql += '"%s");' % user_hashid
+        sql += '%s);'   % user_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
