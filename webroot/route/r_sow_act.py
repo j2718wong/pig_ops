@@ -528,7 +528,7 @@ NUMDAYS_SINCE_BIRTH_GROWER              = 90
     
 @app.get("/pig_prod/ops", response_class=PlainTextResponse)
 async def pig_prod_ops(full_info: int = 0,   is_growing:int = 0, 
-        is_harvested =0, inc_cost = 0, year:int = None):
+        is_harvested : int =0, inc_cost : int = 0, year:int = None):
     """
     Will get pig feeding list.
 
@@ -859,7 +859,7 @@ def write_feeding_guide(data):
     s           += "\n\n"
     
     
-    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower  Date_Finisher\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower    Date_Finisher   Date_Harvest\n'
     
     for cur_entry in data:
         
@@ -993,7 +993,7 @@ def write_feeds_consumed(data):
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = 'FEEDS CONSUMED            %s                                                               NUM SACKS\n' % dt_now_s
+    s  = 'FEEDS CONSUMED         %s                                                               NUM SACKS\n' % dt_now_s
     s += '=================                                ========================================================================================================\n'
     s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
     s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
@@ -1253,27 +1253,27 @@ def write_feeds_consumed(data):
         
         s           += '   '
             
-        s+= '\n'
+        s += '\n'
+    
+    s += '\n'
 
     return s
     
-
-
 
 def write_feeds_cost(data):
     dt_now      = datetime.now()
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = 'FEEDS COST            %s                                                               NUM SACKS\n' % dt_now_s
+    s  = 'FEEDS COST             %s                                                               NUM SACKS\n' % dt_now_s
     s += '=================                                ========================================================================================================\n'
-    s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
+    s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER    \n'
     s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
-    s += 'PROD_ID   Total_COST   Date_Birth       Baktin   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
+    s += 'PROD_ID   Total_COST   Date_Birth       Baktin   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY        COST  BUY        COST\n'
    
     
     for cur_entry in data:
-        
+            
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
         num_space   = 7 - num_chars
@@ -1309,9 +1309,9 @@ def write_feeds_cost(data):
         if cost_finisher is not None:
             total_cost  += cost_finisher
             
-        s_temp      = f"${total_cost:,.1f}"
+        s_temp      = f"{total_cost:,.1f}"
         num_chars   = len(s_temp)
-        num_space   = 10 - num_chars
+        num_space   = 11 - num_chars
         s           += ' ' * num_space + s_temp
         s           += '   '
         
@@ -1358,14 +1358,15 @@ def write_feeds_cost(data):
             s           += '  '
             
             if cost_lactating is not None:
-                s_temp      = f"${cost_lactating:,.1f}"
+                s_temp      = f"{cost_lactating:,.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 12 - num_chars
+                num_space   = 10 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += ' ' * 12
+                s       += ' ' * 10
         
         else:
+            print(fid={cur_entry['id']})
             s           += 15 * ' '
             
         s           += '   '
@@ -1387,12 +1388,12 @@ def write_feeds_cost(data):
             s           += '  '
             
             if cost_booster is not None:
-                s_temp      = f"${cost_booster:,.1f}"
+                s_temp      = f"{cost_booster:,.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 12 - num_chars
+                num_space   = 10 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += ' ' * 12
+                s       += ' ' * 10
             
         else:
             s           += 15 * ' '
@@ -1415,12 +1416,12 @@ def write_feeds_cost(data):
             s           += '  '
             
             if cost_prestarter is not None:
-                s_temp      = f"${cost_prestarter:,.1f}"
+                s_temp      = f"{cost_prestarter:,.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 12 - num_chars
+                num_space   = 10 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += ' ' * 12
+                s       += ' ' * 10
         
         else:
             s           += 15 * ' '
@@ -1444,12 +1445,12 @@ def write_feeds_cost(data):
             s           += '  '
             
             if cost_starter is not None:
-                s_temp      = f"${cost_starter:,.1f}"
+                s_temp      = f"{cost_starter:,.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 12 - num_chars
+                num_space   = 10 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += ' ' * 12
+                s       += ' ' * 10
         
         else:
             s           += 15 * ' '
@@ -1473,12 +1474,12 @@ def write_feeds_cost(data):
             s           += '  '
             
             if cost_grower is not None:
-                s_temp      = f"${cost_grower:,.1f}"
+                s_temp      = f"{cost_grower:,.1f}"
                 num_chars   = len(s_temp)
-                num_space   = 12 - num_chars
+                num_space   = 10 - num_chars
                 s           += ' ' * num_space + s_temp
             else:
-                s       += ' ' * 12
+                s       += ' ' * 10
         
         else:
             s           += 9 * ' '
