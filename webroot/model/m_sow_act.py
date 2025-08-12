@@ -496,7 +496,9 @@ class SowActivity:
                     a.cost_prestarter,
                     a.cost_starter,
                     a.cost_grower,
-                    a.cost_finisher
+                    a.cost_finisher,
+                    
+                    a.date_harvest
                     
                 FROM pig_production a
                 LEFT OUTER JOIN sow b ON a.sow_id = b.id
@@ -576,6 +578,8 @@ class SowActivity:
                 cur_cost_starter        = row[35]
                 cur_cost_grower         = row[36]
                 cur_cost_finisher       = row[37]
+                
+                cur_date_harvest        = row[38]
                 
                 
                 cur_num_c_lactating     = None

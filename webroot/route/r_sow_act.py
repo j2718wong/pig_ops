@@ -526,8 +526,8 @@ NUMDAYS_SINCE_BIRTH_STARTER             = 50
 NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
     
-@app.get("/pig_prod/feeding", response_class=PlainTextResponse)
-async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0, 
+@app.get("/pig_prod/ops", response_class=PlainTextResponse)
+async def pig_prod_ops(full_info: int = 0,   is_growing:int = 0, 
         is_harvested =0, inc_cost = 0, year:int = None):
     """
     Will get pig feeding list.
@@ -555,7 +555,10 @@ async def pig_prod_feeding(full_info: int = 0,   is_growing:int = 0,
     
     s  = write_baktin_operations(res, is_growing)
     s += write_feeding_guide(res)
-    s += write_feeds_consumed(res, inc_cost)
+    s += write_feeds_consumed(res)
+    
+    if inc_cost > 0:
+        s += write_feeds_cost(res)
     
     return s
     
@@ -566,8 +569,8 @@ def write_baktin_operations(data, is_growing):
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = f'BAKTIN OPERATIONS      {dt_now_s}\n'
-    s += '=================      IRON_1   IRON_2   VITA_1   VITA_2    KAPON   PURGA_1 \n'
+    s  = 'BAKTIN OPERATIONS      %s\n' % dt_now_s
+    s += '=================      IRON_1   IRON_2   VITA_1   VITA_2    KAPON    PURGA_1   LUTAS\n'
     s += 'ADLAW GIKAN ANAK       '
     
     s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_IRON_1)
@@ -603,9 +606,17 @@ def write_baktin_operations(data, is_growing):
     
     s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1)
     num_chars   = len(s_temp)
+    num_space   = 7 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    
+    s_temp      = str(NUMDAYS_SINCE_BIRTH_WEANING)
+    num_chars   = len(s_temp)
     num_space   = 6 - num_chars
     s           += ' ' * num_space + s_temp
     s           += '   '
+
     
     s           += "\n\n"
     
@@ -810,7 +821,7 @@ def write_feeding_guide(data):
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = f'FEEDING GUIDE          {dt_now_s}\n'
+    s  = 'FEEDING GUIDE          %s\n' % dt_now_s
     s += '=================      BOOSTER   PSTARTER     LUTAS   STARTER    GROWER   FINISHER\n'
     s += 'ADLAW GIKAN ANAK       '
     
@@ -977,7 +988,7 @@ def write_feeding_guide(data):
     return s
     
 
-def write_feeds_consumed(data, inc_cost):
+def write_feeds_consumed(data):
     dt_now      = datetime.now()
     dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
@@ -988,18 +999,9 @@ def write_feeds_consumed(data, inc_cost):
     s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
     
-    if inc_cost > 0:
-        s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  BOS  PRE  STR  GRO  FIN    BOOSTER  PRE  STR  GRO  FIN \n'
-    
-    
-    count = 0
     
     for cur_entry in data:
-        
-        if count == 0:
-            pprint.pprint(cur_entry)
-            count = 1
-        
+
         s_temp      = str(cur_entry['id'])
         num_chars   = len(s_temp)
         num_space   = 7 - num_chars
@@ -1251,6 +1253,238 @@ def write_feeds_consumed(data, inc_cost):
         
         s           += '   '
             
+        s+= '\n'
+
+    return s
+    
+
+
+
+def write_feeds_cost(data):
+    dt_now      = datetime.now()
+    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
+    
+    
+    s  = 'FEEDS COST            %s                                                               NUM SACKS\n' % dt_now_s
+    s += '=================                                ========================================================================================================\n'
+    s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
+    s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
+    s += 'PROD_ID   Total_COST   Date_Birth       Baktin   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
+   
+    
+    for cur_entry in data:
+        
+        s_temp      = str(cur_entry['id'])
+        num_chars   = len(s_temp)
+        num_space   = 7 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '  '
+        
+        total_cost  = 0
+        
+        cost_feeds  = cur_entry['cost_feeds']
+        
+        cost_lactating  = cost_feeds['lactating']
+        cost_booster    = cost_feeds['booster']
+        cost_prestarter = cost_feeds['prestarter']
+        cost_starter    = cost_feeds['starter']
+        cost_grower     = cost_feeds['grower']
+        cost_finisher   = cost_feeds['finisher']
+        
+        if cost_lactating is not None:
+            total_cost  += cost_lactating
+        
+        if cost_booster is not None:
+            total_cost  += cost_booster
+        
+        if cost_prestarter is not None:
+            total_cost  += cost_prestarter
+        
+        if cost_starter is not None:
+            total_cost  += cost_starter
+        
+        if cost_grower is not None:
+            total_cost  += cost_grower
+        
+        if cost_finisher is not None:
+            total_cost  += cost_finisher
+            
+        s_temp      = f"${total_cost:,.1f}"
+        num_chars   = len(s_temp)
+        num_space   = 10 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '   '
+        
+        
+        date_birth  = cur_entry['dates']['birth']
+        dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+        delta_d_now = (dt_now - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+        
+        if delta_d_now < 10: 
+            num_space = 2
+        elif delta_d_now < 100:
+            num_space = 1
+        else:
+            num_space = 0
+        
+        spaces = num_space * ' '
+        
+        s_temp      = f'{date_birth}({spaces}{delta_d_now})'
+        s           += s_temp 
+        s           += '  '
+        
+        num_piglets_weaning = cur_entry['num_piglets_weaning']
+        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        
+        s_temp      = str(num_piglets)
+        num_chars   = len(s_temp)
+        num_space   = 6 - num_chars
+        s           += ' ' * num_space + s_temp
+        s           += '   '
+        
+        
+        num_lactating  = cur_entry['num_feeds']['lactating']
+        if num_lactating is not None:
+                
+            num_bought  = num_lactating['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            s           += '  '
+            
+            if cost_lactating is not None:
+                s_temp      = f"${cost_lactating:,.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 12 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += ' ' * 12
+        
+        else:
+            s           += 15 * ' '
+            
+        s           += '   '
+        
+        
+        num_booster  = cur_entry['num_feeds']['booster']
+        if num_booster is not None:
+            
+            num_bought  = num_booster['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+                
+            s           += '  '
+            
+            if cost_booster is not None:
+                s_temp      = f"${cost_booster:,.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 12 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += ' ' * 12
+            
+        else:
+            s           += 15 * ' '
+        
+        s           += '   '
+            
+        
+        num_prestarter  = cur_entry['num_feeds']['prestarter']
+        if num_prestarter is not None:
+                
+            num_bought  = num_prestarter['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            s           += '  '
+            
+            if cost_prestarter is not None:
+                s_temp      = f"${cost_prestarter:,.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 12 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += ' ' * 12
+        
+        else:
+            s           += 15 * ' '
+            
+        s           += '   '
+            
+        
+        num_starter  = cur_entry['num_feeds']['starter']
+        if num_starter is not None:
+                
+            num_bought  = num_starter['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            
+            s           += '  '
+            
+            if cost_starter is not None:
+                s_temp      = f"${cost_starter:,.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 12 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += ' ' * 12
+        
+        else:
+            s           += 15 * ' '
+            
+        s           += '   '
+            
+        
+        num_grower  = cur_entry['num_feeds']['grower']
+        if num_grower is not None:
+                
+            num_bought  = num_grower['bought']
+            
+            if num_bought is not None:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            
+            s           += '  '
+            
+            if cost_grower is not None:
+                s_temp      = f"${cost_grower:,.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 12 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += ' ' * 12
+        
+        else:
+            s           += 9 * ' '
+        
+        s           += '   '
+            
         
         
         
@@ -1259,88 +1493,3 @@ def write_feeds_consumed(data, inc_cost):
     return s
     
 
-    
-    
-@app.get("/cal/activities", response_class=PlainTextResponse)
-async def cal_activities(num_days: int = 30):
-    """
-    Will get latest coming calendar activities.
-    
-    Parameters
-    ----------
-    num_days:int
-        number of days starting today
-
-        
-    """
-    
-    now             = datetime.now()
-    date_start_str  = now.strftime('%Y-%m-%d')
-    
-    date_end        = now + timedelta(days=num_days) 
-    date_end_str    = date_end.strftime('%Y-%m-%d')
-
-    res = model['sow_act'].get_latest_calendar_activities(date_start_str, 
-        date_end_str)
-    
-        
-    s = 'Date                  Sow   Act_ID   Days_AI   Activity               Description\n'
-    
-    
-    
-    for cur_entry in res:
-        cur_date = cur_entry['date']
-        
-        line_count = 0
-        for cur_act in cur_entry['activities']:
-        
-            if line_count == 0:
-                cur_date    = datetime.strptime(cur_entry['date'], '%Y-%m-%d')
-                cur_day     = cur_date.weekday()
-                
-                s_temp      = cur_entry['date']
-                s           += s_temp
-                s           += '(' + s_day_week[cur_day] +')'
-                s           += '    '
-            else:
-                s           += ' ' * 19
-
-                
-            s_temp      = str(cur_act['sow_number'])
-            num_chars   = len(s_temp)
-            num_space   = 6 - num_chars
-            s           += ' ' * num_space + s_temp
-            s           += '   '
-        
-            
-            s_temp      = str(cur_act['id'])
-            num_chars   = len(s_temp)
-            num_space   = 6 - num_chars
-            s           += ' ' * num_space + s_temp
-            s           += '   '
-            
-            
-            if cur_act['days_ins'] is not None:
-                s_temp      = str(cur_act['days_ins'])
-                num_chars   = len(s_temp)
-                num_space   = 7 - num_chars
-                s           += ' ' * num_space + s_temp
-                s           += '   '
-            else:
-                s           += '          '
-            
-            s_temp      = cur_act['activity']
-            num_chars   = len(s_temp)
-            num_space   = 20 - num_chars
-            s           += s_temp + ' ' * num_space
-            s           += '   '
-            
-            s_temp      = cur_act['desc']
-            s           += s_temp
-            s           += '\n'
-            
-            line_count  += 1
-        
-        s           += '\n'
-        
-    return s
