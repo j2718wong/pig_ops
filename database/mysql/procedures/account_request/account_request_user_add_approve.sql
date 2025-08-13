@@ -2,8 +2,8 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS account_request_user_add_approve $$
 CREATE PROCEDURE account_request_user_add_approve(
-    in_acc_req_add_id           INT,
-    in_user_id                  INT
+    in_account_request_id       INT,
+    in_approving_user_id        INT
     
 )
 
@@ -68,6 +68,13 @@ DECLARE cur_account_date_trial_end              DATE;
 DECLARE cur_account_req_id                      INT             DEFAULT 0;
 
 
+DECLARE cur_approving_user_username             VARCHAR(50)     DEFAULT NULL;
+DECLARE cur_approving_user_name_last            VARCHAR(50)     DEFAULT NULL;
+DECLARE cur_approving_user_name_first           VARCHAR(50)     DEFAULT NULL;
+
+
+DECLARE cur_acc_req_dt_approved                 DATETIME        DEFAULT NULL;
+
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
@@ -87,7 +94,7 @@ INTO
         cur_user_flag,
         cur_user_email
 FROM    user 
-WHERE   id = in_user_id;
+WHERE   id = in_approving_user_id;
 
 
 process_user : BEGIN
@@ -102,8 +109,8 @@ INTO
         cur_acc_req_account_id,
         cur_acc_req_requesting_user_id
         
-FROM    account_req_user_add
-WHERE   id = in_acc_req_add_id;
+FROM    account_request
+WHERE   id = in_account_request_id;
 
 
 IF cur_acc_req_status = ACC_REQ_STATUS_APPROVED THEN
@@ -114,7 +121,7 @@ IF cur_acc_req_status = ACC_REQ_STATUS_APPROVED THEN
 END IF;
 
 
-/* Check user*/
+/* Check user. */
 IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN 
     SET res_num     = RES_NUM_USER_IS_INACTIVE;
     SET res_code    = "RES_NUM_USER_IS_INACTIVE";
@@ -142,7 +149,7 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN
 END IF;
 
 
-/* Check account*/
+/* Check account. */
 SELECT 
     flag,
     status,
@@ -170,11 +177,13 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-UPDATE account_req_user_add SET
+SELECT 
+
+UPDATE account_request SET
     status              = ACC_REQ_STATUS_APPROVED,
-    approved_by_user_id = in_user_id,
+    approved_by_user_id = in_approving_user_id,
     dt_approved         = CURRENT_TIMESTAMP
-WHERE id = in_acc_req_add_id;
+WHERE id = in_account_request_id;
 
 
 /* Update approved user. */
@@ -183,7 +192,27 @@ UPDATE user SET
 WHERE id = cur_acc_req_requesting_user_id;
 
 
+
 END process_user;
+
+
+SELECT  
+        a.status,
+        b.username,
+        b.name_last,
+        b.name_first,
+        a.dt_approved
+INTO    
+        cur_acc_req_status
+        cur_approving_user_username,
+        cur_approving_user_name_last,
+        cur_approving_user_name_first,
+        cur_acc_req_dt_approved
+        
+FROM    account_request a 
+LEFT OUTER JOIN user b ON a.approved_by_user_id = b.id
+WHERE   a.id = in_account_request_id;
+
 
 
 SELECT
@@ -202,14 +231,15 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_account_id                       AS acc_id,
-    cur_account_name                    AS acc_name,
-    cur_account_flag                    AS acc_flag,
-    cur_account_status                  AS acc_status,
+    in_account_request_id               AS acc_req_id,
+    cur_acc_req_status                  AS acc_req_status,
+    cur_approving_user_username         AS approving_user_username,
+    cur_approving_user_name_last        AS approving_user_name_last,
+    cur_approving_user_name_first       AS approving_user_name_first,
+    cur_acc_req_dt_approved             AS acc_req_dt_approved,
     
-    cur_user_email                      AS user_email;
-
-
+    cur_acc_req_requesting_user_id      AS requesting_user_id,
+    cur_user_email                      AS requesting_user_email;
 
 
 END $$

@@ -3,7 +3,7 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS account_request_user_add $$
 CREATE PROCEDURE account_request_user_add(
     in_account_id               INT,
-    in_user_id                  INT
+    in_requesting_user_id       INT
 )
 
 BEGIN
@@ -80,7 +80,7 @@ INTO
         cur_user_flag,
         cur_user_email
 FROM    user 
-WHERE   id = in_user_id;
+WHERE   id = in_requesting_user_id;
 
 
 process_user : BEGIN
@@ -136,7 +136,7 @@ END IF;
 SELECT  id 
 INTO    cur_account_req_id
 FROM    account_request
-WHERE   account_id = in_account_id and requesting_user_id = in_user_id
+WHERE   account_id = in_account_id and requesting_user_id = in_requesting_user_id
 LIMIT   1;
 
 
@@ -153,7 +153,7 @@ INSERT INTO account_request(
     requesting_user_id
 ) VALUES (
     in_account_id,
-    in_user_id
+    in_requesting_user_id
 );
 
 SELECT LAST_INSERT_ID() INTO cur_account_req_id;
@@ -183,6 +183,7 @@ SELECT
     cur_account_flag                    AS acc_flag,
     cur_account_status                  AS acc_status,
     
+    cur_account_req_id                  AS acc_req_id,
     cur_user_email                      AS user_email;
 
 

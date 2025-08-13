@@ -69,9 +69,13 @@ class AccountRequest:
                     'status':           row[6]
                 },
                 
+                'account_request': {
+                    'id':               row[7]
+                },
+                
                 'user': {
                     'id':               user_id,
-                    'email':            row[7]
+                    'email':            row[8]
                 }
             }
 
@@ -81,21 +85,21 @@ class AccountRequest:
     def approve_add_user(self, data = None):
         """
         PROCEDURE account_request_user_add_approve(
-            in_acc_req_add_id           INT,
-            in_user_id                  INT
-            
+            in_account_request_id       INT,
+            in_approving_user_id        INT
         )
         """
         
-        user_id         = data['user_id']
-        acc_req_add_id  = data['acc_req_add_id']
+        acc_request_id      = data['acc_request_id']
+        approving_user_id   = data['approving_user_id']
         
-        values = (acc_req_add_id, user_id)
+        
+        values = (acc_request_id, approving_user_id)
         
         
         sql =  'CALL account_request_user_add_approve('
-        sql += '%s,'    % acc_req_add_id
-        sql += '%s);'   % user_id
+        sql += '%s,'    % acc_request_id
+        sql += '%s);'   % approving_user_id
         
         
         # Check if still connected to database
@@ -125,6 +129,9 @@ class AccountRequest:
             row = None
 
         if row is not None:
+            
+            cur_dt_approved = str(row[8]) if row[8] else None
+            
             return {
                 'result':{
                     'num':              row[0],
@@ -132,16 +139,22 @@ class AccountRequest:
                     'desc':             row[2],
                 },
                 
-                'account': {
+                'account_request': {
                     'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5],
-                    'status':           row[6]
+                    'status':           row[4],
+                    
+                    'approving_user':{
+                        'username':     row[5],
+                        'name_last':    row[6],
+                        'name_first':   row[7]
+                    },
+                    
+                    'dt_approved':      cur_dt_approved
                 },
                 
-                'user': {
-                    'id':               user_id,
-                    'email':            row[7]
+                'requesting_user': {
+                    'id':               row[8],
+                    'email':            row[9]
                 }
             }
 
