@@ -52,7 +52,7 @@ DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                      INT             DEFAULT 0;
 
 
 DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
@@ -100,13 +100,22 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN
 END IF;
 
 
+IF cur_user_account_id = 0 THEN 
+    SET res_num     = RES_NUM_USER_NO_ACCOUNT_SET;
+    SET res_code    = "RES_NUM_USER_NO_ACCOUNT_SET";
+
+    LEAVE process_user;
+END IF;
+
+
+
 /* Check account*/
 SELECT 
     flag,
-    status
+    status_id
 INTO
     cur_account_flag,
-    cur_account_status
+    cur_account_status_id
     
 FROM account
 WHERE id = cur_user_account_id;
@@ -117,7 +126,7 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status = ACCOUNT_STATUS_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -138,12 +147,11 @@ LIMIT   1;
 
 
 /* Check for duplicate farm name*/
-IF cur_farm_id > 0 THEN 
+IF cur_pig_farm_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
     LEAVE process_user;
-
 END IF;
 
 

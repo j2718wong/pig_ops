@@ -103,6 +103,8 @@ async def user_register(user_data: dm.DataUser):
     result_num      = res_register['result']['num']
 
     if result_num == USER_REGISTER_RES_NUM_SUCCESS:
+        # Update user.hashid
+        
         
         verify_code = random.randint(MFA_VERIFICATION_CODE_MIN,
                         MFA_VERIFICATION_CODE_MAX)

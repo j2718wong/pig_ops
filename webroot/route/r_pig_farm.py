@@ -26,8 +26,8 @@ PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
 @app.post("/pig_farm/add")
 async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
-    name    = account_data.name
-    uhid    = account_data.uhid
+    name    = pig_farm_data.name
+    uhid    = pig_farm_data.uhid
     
     name    = name.strip() if name else None 
     
@@ -68,7 +68,7 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     }
     
     
-    res_add    =  model['pig_farm'].register(data)
+    res_add    =  model['pig_farm'].add(data)
     
     if res_add is None:
         return {
@@ -101,7 +101,7 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     
     
 @app.post("/pig_farm/update")
-async def pig_farm_update(pig_farm_data: dm.DataAccount):
+async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     name    = pig_farm_data.name
     uhid    = pig_farm_data.uhid
     

@@ -10,7 +10,8 @@ CREATE PROCEDURE account_request_user_add_approve(
 BEGIN
 
 /** 
- * Will add account_req_user_add; this is initiated by the user.
+ * Will approve account_request to add user to account; 
+ * This is initiated by the account admin user.
  * @author Jack Wong
  * @since August 11, 2025
  *
@@ -20,11 +21,14 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_USER_IS_INACTIVE                INT             DEFAULT 1;
 DECLARE RES_NUM_USER_NOT_EMAIL_VERIFIED         INT             DEFAULT 2;
 DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 3;
+DECLARE RES_NUM_USER_NO_ACCOUNT_SET             INT             DEFAULT 4;
 
-DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 4;
-DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 5;
-DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 6;
-DECLARE RES_NUM_ACC_REQ_USER_ADD_ALREADY_APPROVED   INT         DEFAULT 7;
+DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 5;
+DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 6;
+DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 7;
+DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 8;
+
+DECLARE RES_NUM_ACC_REQ_USER_ADD_ALREADY_APPROVED   INT         DEFAULT 9;
 
 
 /* user.flag bits*/
@@ -40,9 +44,9 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
 
-DECLARE ACC_REQ_STATUS_REQUESTED                INT             DEFAULT 0;
-DECLARE ACC_REQ_STATUS_APPROVED                 INT             DEFAULT 1;
-DECLARE ACC_REQ_STATUS_REJECTED                 INT             DEFAULT 2;
+DECLARE ACCOUNT_REQUEST_STATUS_ID_PENDING       INT             DEFAULT 1;
+DECLARE ACCOUNT_REQUEST_STATUS_ID_APPROVED      INT             DEFAULT 2;
+DECLARE ACCOUNT_REQUEST_STATUS_ID_REJECTED      INT             DEFAULT 3;
 
 
 DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
@@ -50,7 +54,7 @@ DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
 DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 
 
-DECLARE cur_acc_req_status                      INT             DEFAULT 0;
+DECLARE cur_acc_req_status_id                   INT             DEFAULT 0;
 DECLARE cur_acc_req_account_id                  INT             DEFAULT 0;
 DECLARE cur_acc_req_requesting_user_id          INT             DEFAULT 0;
 
@@ -60,12 +64,13 @@ DECLARE cur_user_email                          VARCHAR(100);
 
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                   INT             DEFAULT 0;
 DECLARE cur_account_name                        VARCHAR(100); 
 DECLARE cur_account_date_trial_start            DATE;
 DECLARE cur_account_date_trial_end              DATE;
 
 DECLARE cur_account_req_id                      INT             DEFAULT 0;
+DECLARE cur_acc_req_status_name                 VARCHAR(50)     DEFAULT NULL;
 
 
 DECLARE cur_approving_user_username             VARCHAR(50)     DEFAULT NULL;
@@ -89,10 +94,12 @@ SET res_code    = "SUCCESS";
 
 SELECT  
         flag,
-        email
+        email,
+        account_id
 INTO    
         cur_user_flag,
-        cur_user_email
+        cur_user_email,
+        cur_user_account_id
 FROM    user 
 WHERE   id = in_approving_user_id;
 
@@ -101,11 +108,11 @@ process_user : BEGIN
 
 /* Check request status.*/
 SELECT  
-        status,
+        status_id,
         account_id,
         requesting_user_id
 INTO    
-        cur_acc_req_status,
+        cur_acc_req_status_id,
         cur_acc_req_account_id,
         cur_acc_req_requesting_user_id
         
@@ -113,7 +120,7 @@ FROM    account_request
 WHERE   id = in_account_request_id;
 
 
-IF cur_acc_req_status = ACC_REQ_STATUS_APPROVED THEN
+IF cur_acc_req_status_id = ACCOUNT_REQUEST_STATUS_ID_APPROVED THEN
     SET res_num     = RES_NUM_ACC_REQ_USER_ADD_ALREADY_APPROVED;
     SET res_code    = "RES_NUM_ACC_REQ_USER_ADD_ALREADY_APPROVED";
 
@@ -149,25 +156,43 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN
 END IF;
 
 
+IF cur_user_account_id = 0 THEN 
+    SET res_num     = RES_NUM_USER_NO_ACCOUNT_SET;
+    SET res_code    = "RES_NUM_USER_NO_ACCOUNT_SET";
+
+    LEAVE process_user;
+END IF;
+
+
+
 /* Check account. */
+
+IF cur_user_account_id != cur_acc_req_account_id THEN 
+    SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
+    SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
+
+    LEAVE process_user;
+END IF;
+
+
 SELECT 
     flag,
-    status,
+    status_id,
     name
 INTO
     cur_account_flag,
-    cur_account_status,
+    cur_account_status_id,
     cur_account_name
     
 FROM account
-WHERE id = in_account_id;
+WHERE id = cur_acc_req_account_id;
 
 
 IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN 
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status = ACCOUNT_STATUS_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -177,10 +202,8 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-SELECT 
-
 UPDATE account_request SET
-    status              = ACC_REQ_STATUS_APPROVED,
+    status_id           = ACCOUNT_REQUEST_STATUS_ID_APPROVED,
     approved_by_user_id = in_approving_user_id,
     dt_approved         = CURRENT_TIMESTAMP
 WHERE id = in_account_request_id;
@@ -197,34 +220,26 @@ END process_user;
 
 
 SELECT  
-        a.status,
-        b.username,
-        b.name_last,
-        b.name_first,
+        a.status_id,
+        b.name,
+        c.username,
+        c.name_last,
+        c.name_first,
         a.dt_approved
 INTO    
-        cur_acc_req_status
+        cur_acc_req_status_id,
+        cur_acc_req_status_name,
         cur_approving_user_username,
         cur_approving_user_name_last,
         cur_approving_user_name_first,
         cur_acc_req_dt_approved
         
 FROM    account_request a 
-LEFT OUTER JOIN user b ON a.approved_by_user_id = b.id
+LEFT OUTER JOIN account_request_status b ON a.status_id = b.id
+LEFT OUTER JOIN user c ON a.approved_by_user_id = c.id
 WHERE   a.id = in_account_request_id;
 
 
-
-SELECT
-    flag,
-    status,
-    name
-INTO 
-    cur_account_flag,
-    cur_account_status,
-    cur_account_name
-FROM account
-WHERE id = in_account_id;
 
 SELECT 
     res_num                             AS result_number,
@@ -232,7 +247,9 @@ SELECT
     res_desc                            AS result_desc,
     
     in_account_request_id               AS acc_req_id,
-    cur_acc_req_status                  AS acc_req_status,
+    cur_acc_req_status_id               AS acc_req_status_id,
+    cur_acc_req_status_name             AS acc_req_status_name,
+    
     cur_approving_user_username         AS approving_user_username,
     cur_approving_user_name_last        AS approving_user_name_last,
     cur_approving_user_name_first       AS approving_user_name_first,

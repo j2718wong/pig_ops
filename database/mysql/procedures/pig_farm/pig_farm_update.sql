@@ -28,8 +28,14 @@ BEGIN
 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_USER_IS_INACTIVE                INT             DEFAULT 1;
-DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 2;
-DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
+DECLARE RES_NUM_USER_NOT_EMAIL_VERIFIED         INT             DEFAULT 2;
+DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 3;
+DECLARE RES_NUM_USER_NO_ACCOUNT_SET             INT             DEFAULT 4;
+
+DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 5;
+DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 6;
+DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 7;
+DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 8;
 
 
 /* user.flag bits*/
@@ -54,6 +60,8 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
 DECLARE cur_account_status                      INT             DEFAULT 0;
+
+DECLARE cur_farm_account_id                     INT             DEFAULT 0;
 
 
 DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
@@ -101,6 +109,14 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN
 END IF;
 
 
+IF cur_user_account_id = 0 THEN 
+    SET res_num     = RES_NUM_USER_NO_ACCOUNT_SET;
+    SET res_code    = "RES_NUM_USER_NO_ACCOUNT_SET";
+
+    LEAVE process_user;
+END IF;
+
+
 /* Check account*/
 SELECT 
     flag,
@@ -128,6 +144,17 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
+SELECT  account_id
+INTO    cur_farm_account_id
+WHERE   id = in_pig_farm_id;
+
+
+IF cur_user_account_id != cur_farm_account_id THEN 
+    SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
+    SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
+
+    LEAVE process_user;
+END IF;
 
 
 UPDATE pig_farm SET

@@ -24,7 +24,8 @@ FLAG_BIT_USER_EMAIL_VERIFIED            = 2
 FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
 
 
-ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS        = 0
+ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
+ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
 
     
 @app.get("/account_request/add_user")
@@ -155,18 +156,19 @@ async def account_request_approve_add_user(arhid: str, uhid:str):
     del res_approve['account_request']['id']
     res_approve['account_request']['h_id'] = account_request_hashid
 
-    result_num      = res_approve['result']['num']
+
+    requesting_user_id      = res_approve['requesting_user']['id']
+    requesting_user_email   = res_approve['requesting_user']['email']
+    result_num              = res_approve['result']['num']
     
-    if result_num == ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS:
-        # Get account admin emails
-        account_admins = model['account'].get_account_admin(account_id)
-        
-        
-        
-        # TODO send email notification to account_admins
-        
+    del res_approve['requesting_user']
+    
+    
+    if result_num == ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS:
+
+        test = 1
         # TODO send email to user
         
-    return res_add
+    return res_approve
     
 

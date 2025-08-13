@@ -120,7 +120,7 @@ class AccountRequest:
 
         if row is not None:
             
-            cur_dt_approved = str(row[8]) if row[8] else None
+            cur_dt_approved = str(row[9]) if row[9] else None
             
             return {
                 'result':{
@@ -131,20 +131,21 @@ class AccountRequest:
                 
                 'account_request': {
                     'id':               row[3],
-                    'status':           row[4],
+                    'status_id':        row[4],
+                    'status_name':      row[5],
                     
                     'approving_user':{
-                        'username':     row[5],
-                        'name_last':    row[6],
-                        'name_first':   row[7]
+                        'username':     row[6],
+                        'name_last':    row[7],
+                        'name_first':   row[8]
                     },
                     
                     'dt_approved':      cur_dt_approved
                 },
                 
                 'requesting_user': {
-                    'id':               row[8],
-                    'email':            row[9]
+                    'id':               row[10],
+                    'email':            row[11]
                 }
             }
 

@@ -150,6 +150,21 @@ class User:
         return None
 
 
+    def update_hashid(self, data = None):
+        user_id         = data['user_id']
+        hashid          = data['hashid']
+        
+        values = (hashid, user_id)
+        
+        sql =   """
+                UPDATE user SET
+                    hashid    = "%s"
+                WHERE id = %s;
+                """ % values
+        
+        return self.model.execute_sql(sql)
+
+
     def update_mfa_id_email_verify(self, data = None):
         user_id         = data['user_id']
         mfa_id          = data['mfa_id']
