@@ -15,15 +15,18 @@ class Account:
         PROCEDURE account_register(
             in_user_id              INT,
     
+            in_country_id           INT,
             in_name                 VARCHAR(100)
         )  
         """
         
         user_id         = data['user_id']
+        country_id      = data['country_id']
         name            = data['name']
         
         sql =  'CALL account_register('
         sql += '%s,'    % user_id
+        sql += '%s,'    % country_id
         sql += '"%s");' % name
         
         

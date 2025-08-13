@@ -19,8 +19,8 @@ class AccountRequest:
         )
         """
         
-        user_id         = data['user_id']
         account_id      = data['account_id']
+        user_id         = data['user_id']
                 
         values = (user_id, account_id)
         
@@ -62,20 +62,10 @@ class AccountRequest:
                     'desc':             row[2],
                 },
                 
-                'account': {
-                    'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5],
-                    'status':           row[6]
-                },
-                
                 'account_request': {
-                    'id':               row[7]
-                },
-                
-                'user': {
-                    'id':               user_id,
-                    'email':            row[8]
+                    'id':               row[3],
+                    'status_id':        row[4],
+                    'status_name':      row[5]
                 }
             }
 

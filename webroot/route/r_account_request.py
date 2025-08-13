@@ -74,21 +74,23 @@ async def account_request_add_user(uhid: str, ahid:str):
             }
         }
     
-    account_id      = res_add['account']['id']
-    account_flag    = res_add['account']['flag']
+    acc_req_id          = res_add['account_request']['id']
+    acc_req_status_id   = res_add['account_request']['status_id']
         
-    account_hashid  = hashids_account.encrypt(account_id)
+    acc_req_hashid      = hashids_common.encrypt(acc_req_id)
     
     # remove plain id
-    del res_add['account']['id']
-    res_add['account']['h_id'] = account_hashid
+    del res_add['account_request']['id']
+    res_add['account_request']['h_id'] = acc_req_hashid
 
     result_num      = res_add['result']['num']
     
     if result_num == ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS:
         # Get account admin emails
-        account_admins = model['account'].get_account_admin(account_id)
+        account_admins = model['account'].get_list_account_admin(account_id)
         
+        print('\n\nACcount admins; account_id = %s' % account_id)
+        pprint.pprint(account_admins)
         
         
         # TODO send email notification to account_admins

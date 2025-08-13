@@ -37,9 +37,15 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
 
-DECLARE ACCOUNT_STATUS_ON_TRIAL                 INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
+DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
+DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
+DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
+
+
+DECLARE ACCOUNT_REQUEST_STATUS_ID_PENDING       INT             DEFAULT 1;
+DECLARE ACCOUNT_REQUEST_STATUS_ID_APPROVED      INT             DEFAULT 2;
+DECLARE ACCOUNT_REQUEST_STATUS_ID_REJECTED      INT             DEFAULT 3;
+
 
 
 DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
@@ -53,12 +59,14 @@ DECLARE cur_user_email                          VARCHAR(100);
 
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                   INT             DEFAULT 0;
 DECLARE cur_account_name                        VARCHAR(100); 
 DECLARE cur_account_date_trial_start            DATE;
 DECLARE cur_account_date_trial_end              DATE;
 
 DECLARE cur_account_req_id                      INT             DEFAULT 0;
+DECLARE cur_account_req_status_id               INT             DEFAULT 0;
+DECLARE cur_account_req_status_name             VARCHAR(50)     DEFAULT '';
 
 
 
@@ -107,11 +115,11 @@ END IF;
 /* Check account*/
 SELECT 
     flag,
-    status,
+    status_id,
     name
 INTO
     cur_account_flag,
-    cur_account_status,
+    cur_account_status_id,
     cur_account_name
     
 FROM account
@@ -122,7 +130,7 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status = ACCOUNT_STATUS_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_ID_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -150,10 +158,12 @@ END IF;
 
 INSERT INTO account_request(
     account_id,
-    requesting_user_id
+    requesting_user_id,
+    status_id
 ) VALUES (
     in_account_id,
-    in_requesting_user_id
+    in_requesting_user_id,
+    ACCOUNT_REQUEST_STATUS_ID_PENDING
 );
 
 SELECT LAST_INSERT_ID() INTO cur_account_req_id;
@@ -163,30 +173,23 @@ END process_user;
 
 
 SELECT
-    flag,
-    status,
-    name
+    a.status_id,
+    b.name
 INTO 
-    cur_account_flag,
-    cur_account_status,
-    cur_account_name
-FROM account
-WHERE id = in_account_id;
+    cur_account_req_status_id,
+    cur_account_req_status_name
+FROM account_request a 
+LEFT OUTER JOIN account_request_status b ON a.status_id = b.id
+WHERE a.id = in_account_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_account_id                       AS acc_id,
-    cur_account_name                    AS acc_name,
-    cur_account_flag                    AS acc_flag,
-    cur_account_status                  AS acc_status,
-    
     cur_account_req_id                  AS acc_req_id,
-    cur_user_email                      AS user_email;
-
-
+    cur_account_req_status_id           AS acc_req_status_id,
+    cur_account_req_status_name         AS acc_req_status_name;
 
 
 END $$

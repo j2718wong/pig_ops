@@ -170,7 +170,7 @@ INTO
     cur_account_date_trial_end
 FROM account a
 LEFT OUTER JOIN account_status b ON a.status_id = b.id
-WHERE id = cur_account_id;
+WHERE a.id = cur_account_id;
 
 SELECT 
     res_num                             AS result_number,

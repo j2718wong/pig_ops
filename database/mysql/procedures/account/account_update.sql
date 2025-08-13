@@ -38,9 +38,9 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
 
-DECLARE ACCOUNT_STATUS_ON_TRIAL                 INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
+DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
+DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
+DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
 DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
@@ -53,7 +53,8 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                   INT             DEFAULT 0;
+DECLARE cur_account_status_name                 VARCHAR(50);
 DECLARE cur_account_name                        VARCHAR(100); 
 DECLARE cur_account_date_trial_start            DATE;
 DECLARE cur_account_date_trial_end              DATE;
@@ -106,9 +107,11 @@ END IF;
 /* Check account. */
 SELECT 
     flag,
+    status_id,
     name
 INTO
     cur_account_flag,
+    cur_account_status_id,
     cur_account_name
     
 FROM account
@@ -120,7 +123,7 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status = ACCOUNT_STATUS_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_ID_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -157,19 +160,22 @@ END process_user;
 
 
 SELECT
-    flag,
-    status,
-    name,
-    date_trial_start,
-    date_trial_end
-INTO 
-    cur_account_flag,
-    cur_account_status,
+    a.name,
+    a.flag,
+    a.status_id,
+    b.name,
+    a.date_trial_start,
+    a.date_trial_end
+INTO
     cur_account_name,
+    cur_account_flag,
+    cur_account_status_id,
+    cur_account_status_name,
     cur_account_date_trial_start,
     cur_account_date_trial_end
-FROM account
-WHERE id = cur_user_account_id;
+FROM account a
+LEFT OUTER JOIN account_status b ON a.status_id = b.id
+WHERE a.id = cur_user_account_id;
 
 SELECT 
     res_num                             AS result_number,
@@ -179,7 +185,8 @@ SELECT
     cur_user_account_id                 AS acc_id,
     cur_account_name                    AS acc_name,
     cur_account_flag                    AS acc_flag,
-    cur_account_status                  AS acc_status,
+    cur_account_status_id               AS acc_status_id,
+    cur_account_status_name             AS acc_status_name,
     cur_account_date_trial_start        AS date_trial_start,
     cur_account_date_trial_end          AS date_trial_end;
 

@@ -70,6 +70,8 @@ def write_user_flag_bits(user, user_flag):
 async def user_register(user_data: dm.DataUser):
     data = {
         'username':         user_data.username,
+        'name_last':        user_data.name_last,
+        'name_first':       user_data.name_first,
         'email':            user_data.email,
         'password':         user_data.password,
         'mobile_num':       user_data.mobile_num
@@ -299,71 +301,3 @@ async def user_email_verify_resend(uhid:str):
     }
     
     
-RES_NUM_SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT = 0
-    
-@app.get("/user/request/add_to_account")
-async def user_request_add_to_account(uhid:str, ahid:str):
-    res = hashids_user.decrypt(uhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
-            }
-        }
-    
-    
-    user_id = res[0]
-    
-    res = hashids_account.decrypt(ahid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_ACCOUNT_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_INVALID_HASHID',
-                'desc': ''
-            }
-        }
-    
-    
-    account_id = res[0]
-    
-    data = {
-        'user_id':      user_id,
-        'account_id':   account_id,
-        'user_hashid':  uhid
-    }
-   
-    res_add = model['account'].add_account_request_add_user(data)
-        
-    # TODO; send an email to account admins to grant this user to be added to this 
-    # account
-    
-    res_send = RES_NUM_SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT
-    
-    if res_send == RES_NUM_SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT:
-        
-        key = SUCCESS_SEND_EMAIL_TO_ACCOUNT_ADMIN_TO_ADD_USER_TO_ACCOUNT
-        msg = SERVER_MESSAGES[key]['en']
-        msg = msg.replace('{ACCOUNT_HID}', ahid)
-        
-        return {
-            'result':{
-                'num':  0,
-                'code': 'SUCCESS',
-                'desc': '',
-                'msg':  msg
-            }
-        }
-    
-    
-
-    
-    return  {
-        'result':{
-            'num':  ERROR_SERVER_ERROR,
-            'code': 'ERROR_SERVER_ERROR',
-            'desc': ''
-        }
-    }
