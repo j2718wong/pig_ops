@@ -4,6 +4,7 @@ DROP PROCEDURE IF EXISTS account_register $$
 CREATE PROCEDURE account_register(
     in_user_id              INT,
     
+    in_country_id           INT,
     in_name                 VARCHAR(100)
 )  
 
@@ -38,9 +39,9 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 /* account.flag bits*/
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
-DECLARE ACCOUNT_STATUS_ON_TRIAL                 INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
+DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
+DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
+DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
 DECLARE cur_user_flag                           INT             DEFAULT 0;
@@ -52,7 +53,8 @@ DECLARE cur_num_days_trial                      INT             DEFAULT 0;
 
 DECLARE cur_account_id                          INT             DEFAULT 0;
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                   INT             DEFAULT 0;
+DECLARE cur_account_status_name                 VARCHAR(50);
 DECLARE cur_account_name                        VARCHAR(100); 
 DECLARE cur_account_date_trial_start            DATE;
 DECLARE cur_account_date_trial_end              DATE;
@@ -104,15 +106,12 @@ FROM    a01_list_of_values
 WHERE   id = LOV_ID_ACCOUNT_NUMDAYS_FREE_TRIAL;
 
 
-/* Check duplicate. */
+/* Check account duplicate. */
 SELECT  id
 INTO    cur_account_id
 FROM    account
-WHERE   UPPER(name)         = UPPER(in_name)
+WHERE   country_id = in_country_id AND UPPER(name)  = UPPER(in_name)
 LIMIT   1;
-
-
-
 
 
 IF cur_account_id > 0 THEN 
@@ -129,20 +128,24 @@ END IF;
 
 INSERT INTO account(
     name,
+    country_id,
     flag,
-    status,
+    status_id,
     date_trial_start,
     date_trial_end
 ) VALUES (
     in_name,
+    in_country_id,
     1,
-    ACCOUNT_STATUS_ON_TRIAL,
+    ACCOUNT_STATUS_ID_ON_TRIAL,
     CURRENT_DATE,
     DATE_ADD(CURRENT_DATE, INTERVAL cur_num_days_trial DAY)
 );
 
 SELECT LAST_INSERT_ID() INTO cur_account_id;
 
+
+/* The user that registers the account is an account admin. */
 UPDATE user SET
     account_id  = cur_account_id,
     flag        = flag | FLAG_BIT_USER_IS_ACCOUNT_ADMIN
@@ -150,19 +153,23 @@ WHERE id = in_user_id;
 
 END process_user;
 
+
 SELECT
-    flag,
-    status,
-    name,
-    date_trial_start,
-    date_trial_end
-INTO 
-    cur_account_flag,
-    cur_account_status,
+    a.name,
+    a.flag,
+    a.status_id,
+    b.name,
+    a.date_trial_start,
+    a.date_trial_end
+INTO
     cur_account_name,
+    cur_account_flag,
+    cur_account_status_id,
+    cur_account_status_name,
     cur_account_date_trial_start,
     cur_account_date_trial_end
-FROM account
+FROM account a
+LEFT OUTER JOIN account_status b ON a.status_id = b.id
 WHERE id = cur_account_id;
 
 SELECT 
@@ -173,7 +180,8 @@ SELECT
     cur_account_id                      AS acc_id,
     cur_account_name                    AS acc_name,
     cur_account_flag                    AS acc_flag,
-    cur_account_status                  AS acc_status,
+    cur_account_status_id               AS acc_status_id,
+    cur_account_status_name             AS acc_status_name,
     cur_account_date_trial_start        AS date_trial_start,
     cur_account_date_trial_end          AS date_trial_end;
 

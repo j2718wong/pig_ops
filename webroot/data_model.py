@@ -15,6 +15,7 @@ class DataUser(BaseModel):
 class DataAccount(BaseModel):
     uhid:               str
     name:               str
+    country_id:         int = 1     # default to PH
     
 
 class DataPigFarm(BaseModel):

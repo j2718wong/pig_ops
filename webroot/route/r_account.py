@@ -60,7 +60,8 @@ async def account_register(account_data: dm.DataAccount):
     
     data = {
         'name':             name,
-        'user_id':          user_id
+        'user_id':          user_id,
+        'country_id':       account_data.country_id
     }
     
     

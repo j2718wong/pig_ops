@@ -66,9 +66,10 @@ class Account:
                     'id':               row[3],
                     'name':             row[4],
                     'flag':             row[5],
-                    'status':           row[6],
-                    'dt_trial_start':   row[7],
-                    'dt_trial_end':     row[8]
+                    'status_id':        row[6],
+                    'status_name':      row[7],
+                    'dt_trial_start':   row[8],
+                    'dt_trial_end':     row[9]
                 }
             }
 
@@ -146,16 +147,17 @@ class Account:
                     'id':               row[3],
                     'name':             row[4],
                     'flag':             row[5],
-                    'status':           row[6],
-                    'dt_trial_start':   row[7],
-                    'dt_trial_end':     row[8]
+                    'status_id':        row[6],
+                    'status_name':      row[7],
+                    'dt_trial_start':   row[8],
+                    'dt_trial_end':     row[9]
                 }
             }
 
         return None
     
     
-    def get_account_admin(self, account_id):
+    def get_list_account_admin(self, account_id):
         user_flag = FLAG_BIT_USER_IS_ACTIVE | FLAG_BIT_USER_EMAIL_VERIFIED 
         user_flag |= FLAG_BIT_USER_IS_ACCOUNT_ADMIN
         
@@ -219,5 +221,81 @@ class Account:
                 result.append(cur_entry)
         
         return result
+    
+    
+    def get_list_pig_farm(self, account_id):
+        
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.flag,
+                    a.name,
+                    
+                    a.added_by_user_id,
+                    b.username,
+                    b.name_last,
+                    b.name_first,
+                    
+                    a.country_id,
+                    a.adrs_level_1_id,
+                    a.adrs_level_2_id,
+                    a.adrs_level_3_id,
+                    a.latitude,
+                    a.longitude
+                FROM pig_farm a
+                LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
+                WHERE a.account_id = %s &  flag = %s
+                """ % values
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            msg = 'get_account_admin(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_user_account_id     = row[0]
+                cur_user_flag           = row[1]
+                cur_user_email          = row[2]
+                cur_user_mobile_num     = row[3]
+                
+                cur_entry = {
+                    'id':               user_id,
+                    'flag':             cur_user_flag,
+                    'email':            cur_user_email,
+                    'mobile_num':       cur_user_mobile_num
+                }
+                    
+                result.append(cur_entry)
+        
+        return result
+    
+    
     
     

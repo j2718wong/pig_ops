@@ -84,7 +84,7 @@ WHERE   id = in_user_id;
 
 process_user : BEGIN
 
-/* Check user*/
+/* Check user. */
 IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN 
     SET res_num     = RES_NUM_USER_IS_INACTIVE;
     SET res_code    = "RES_NUM_USER_IS_INACTIVE";
@@ -103,14 +103,12 @@ IF cur_user_account_id = 0 THEN
 END IF;
 
 
-/* Check account*/
+/* Check account. */
 SELECT 
     flag,
-    status,
     name
 INTO
     cur_account_flag,
-    cur_account_status,
     cur_account_name
     
 FROM account
@@ -131,6 +129,8 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     LEAVE process_user;
 END IF;
 
+
+/* Check account duplicate. */
 
 UPDATE account SET
     name            = in_name

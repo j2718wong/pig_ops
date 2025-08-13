@@ -146,13 +146,14 @@ async def account_request_approve_add_user(arhid: str, uhid:str):
         }
     
     
-    account_hashid  = hashids_account.encrypt(account_id)
+    account_request_id  = res_approve['account_request']['id']
+    account_request_hashid  = hashids_account.encrypt(account_request_id)
     
     # remove plain id
     del res_approve['account_request']['id']
-    res_add['account']['h_id'] = account_hashid
+    res_approve['account_request']['h_id'] = account_request_hashid
 
-    result_num      = res_add['result']['num']
+    result_num      = res_approve['result']['num']
     
     if result_num == ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS:
         # Get account admin emails
