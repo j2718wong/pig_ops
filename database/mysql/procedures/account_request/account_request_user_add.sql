@@ -18,6 +18,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_USER_IS_INACTIVE                INT             DEFAULT 1;
 DECLARE RES_NUM_USER_NOT_EMAIL_VERIFIED         INT             DEFAULT 2;
+
 DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 3;
 DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 4;
 DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 5;
@@ -99,15 +100,13 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN
     SET res_code    = "RES_NUM_USER_IS_INACTIVE";
 
     LEAVE process_user;
-    
 END IF;
 
 IF cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED = 0 THEN 
     SET res_num     = RES_NUM_USER_NOT_EMAIL_VERIFIED;
     SET res_code    = "RES_NUM_USER_NOT_EMAIL_VERIFIED";
 
-    LEAVE process_user;
-    
+    LEAVE process_user;    
 END IF;
 
 

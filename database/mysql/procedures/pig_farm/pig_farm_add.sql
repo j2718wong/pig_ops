@@ -26,8 +26,18 @@ BEGIN
  */
 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
+
 DECLARE RES_NUM_USER_IS_INACTIVE                INT             DEFAULT 1;
-DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 2;
+DECLARE RES_NUM_USER_NOT_EMAIL_VERIFIED         INT             DEFAULT 2;
+DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 3;
+DECLARE RES_NUM_USER_NO_ACCOUNT_SET             INT             DEFAULT 4;
+
+DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 5;
+DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 6;
+DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 7;
+DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 8;
+
+
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
 
 
@@ -52,8 +62,14 @@ DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status_id                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                   INT             DEFAULT 0;
+DECLARE cur_account_farm_id_1                   INT             DEFAULT 0;
+DECLARE cur_account_farm_id_2                   INT             DEFAULT 0;
+DECLARE cur_account_farm_id_3                   INT             DEFAULT 0;
+DECLARE cur_account_farm_id_4                   INT             DEFAULT 0;
+DECLARE cur_account_farm_id_5                   INT             DEFAULT 0;
 
+DECLARE is_added_to_account                     INT             DEFAULT 0;
 
 DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
 DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
@@ -86,8 +102,15 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN
     SET res_num     = RES_NUM_USER_IS_INACTIVE;
     SET res_code    = "RES_NUM_USER_IS_INACTIVE";
 
-    LEAVE process_user;
-    
+    LEAVE process_user;    
+END IF;
+
+
+IF cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED = 0 THEN 
+    SET res_num     = RES_NUM_USER_NOT_EMAIL_VERIFIED;
+    SET res_code    = "RES_NUM_USER_NOT_EMAIL_VERIFIED";
+
+    LEAVE process_user;    
 END IF;
 
 
@@ -95,8 +118,7 @@ IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN
     SET res_num     = RES_NUM_USER_NOT_ACCOUNT_ADMIN;
     SET res_code    = "RES_NUM_USER_NOT_ACCOUNT_ADMIN";
 
-    LEAVE process_user;
-    
+    LEAVE process_user;    
 END IF;
 
 
@@ -112,10 +134,20 @@ END IF;
 /* Check account*/
 SELECT 
     flag,
-    status_id
+    status_id,
+    farm_id_1,
+    farm_id_2,
+    farm_id_3,
+    farm_id_4,
+    farm_id_5
 INTO
     cur_account_flag,
     cur_account_status_id
+    cur_account_farm_id_1,
+    cur_account_farm_id_2,
+    cur_account_farm_id_3,
+    cur_account_farm_id_4,
+    cur_account_farm_id_5
     
 FROM account
 WHERE id = cur_user_account_id;
@@ -136,7 +168,18 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-
+IF  cur_account_farm_id_1 > 0 AND 
+    cur_account_farm_id_2 > 0 AND 
+    cur_account_farm_id_3 > 0 AND 
+    cur_account_farm_id_4 > 0 AND 
+    cur_account_farm_id_5 > 0 THEN 
+    
+    
+    SET res_num     = RES_NUM_ACCOUNT_EXCEED_MAX_FARMS;
+    SET res_code    = "RES_NUM_ACCOUNT_EXCEED_MAX_FARMS";
+    
+    LEAVE process_user;
+END IF;
 
 
 SELECT  id
@@ -184,6 +227,50 @@ INSERT INTO pig_farm(
 );
 
 SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;
+
+
+
+IF is_added_to_account = 0 AND cur_account_farm_id_1 = 0 THEN
+    UPDATE account SET 
+        farm_id_1 = cur_pig_farm_id
+    WHERE id = cur_user_account_id;
+    
+    SET is_added_to_account = 1;
+END IF;
+
+IF is_added_to_account = 0 AND  cur_account_farm_id_2 = 0 THEN
+    UPDATE account SET 
+        farm_id_2 = cur_pig_farm_id
+    WHERE id = cur_user_account_id;
+
+    SET is_added_to_account = 1;
+END IF;
+
+IF is_added_to_account = 0 AND  cur_account_farm_id_3 = 0 THEN
+    UPDATE account SET 
+        farm_id_3 = cur_pig_farm_id
+    WHERE id = cur_user_account_id;
+
+    SET is_added_to_account = 1;
+END IF;
+
+IF is_added_to_account = 0 AND  cur_account_farm_id_4 = 0 THEN
+    UPDATE account SET 
+        farm_id_4 = cur_pig_farm_id
+    WHERE id = cur_user_account_id;
+
+    SET is_added_to_account = 1;
+END IF;
+
+IF is_added_to_account = 0 AND  cur_account_farm_id_5 = 0 THEN
+    UPDATE account SET 
+        farm_id_5 = cur_pig_farm_id
+    WHERE id = cur_user_account_id;
+
+    SET is_added_to_account = 1;
+END IF;
+
+
 
 END process_user;
 

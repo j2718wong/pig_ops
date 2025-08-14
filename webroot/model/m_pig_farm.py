@@ -211,7 +211,7 @@ class PigFarm:
         return None
         
     
-    def get_pig_farm_list(self, account_id = 0):
+    def get_pig_farm_list(self, account_id = 0, id_list = None):
         """
         Will get pig farm list.
         
@@ -222,6 +222,13 @@ class PigFarm:
 
         """
         
+        if account_id > 0:
+            where_clause = 'account_id = %s' % account_id
+        else:
+            
+            for cur_entry in id_list:
+                test = 1
+            
         sql =   """
                 SELECT 
                     a.hashid,
