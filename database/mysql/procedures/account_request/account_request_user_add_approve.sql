@@ -82,12 +82,13 @@ DECLARE cur_approving_user_name_first           VARCHAR(50)     DEFAULT NULL;
 
 DECLARE cur_acc_req_dt_approved                 DATETIME        DEFAULT NULL;
 
+DECLARE cur_requesting_user_username            VARCHAR(50)     DEFAULT NULL;
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
-DECLARE description                             VARCHAR(200)    DEFAULT '';
+DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
 
 
 SET res_num     = RES_NUM_SUCCESS;
@@ -213,6 +214,27 @@ UPDATE user SET
     account_id = cur_acc_req_account_id
 WHERE id = cur_acc_req_requesting_user_id;
 
+SELECT  username
+INTO    cur_requesting_user_username
+FROM    user
+WHERE   id = cur_acc_req_requesting_user_id;
+
+/* Insert app_audit_log. */
+SET s_desc = CONCAT("User added to account; username = ", cur_requesting_user_username);
+
+INSERT INTO app_audit_log(
+    user_id,
+    account_id,
+    action,
+    description,
+    date
+) VALUES (
+    in_approving_user_id,
+    cur_acc_req_account_id,
+    AUDIT_ACTION_UPDATE,
+    s_desc,
+    CURRENT_DATE
+);
 
 
 END process_user;

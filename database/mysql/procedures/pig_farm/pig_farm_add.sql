@@ -21,7 +21,7 @@ BEGIN
  * Will add pig farm entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 10, 2025
+ * @since August 15, 2025
  *
  */
 
@@ -53,9 +53,9 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 /* account.flag bits*/
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
-DECLARE ACCOUNT_STATUS_ON_TRIAL                 INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
+DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
+DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
+DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
 DECLARE cur_user_flag                           INT             DEFAULT 0;
@@ -63,11 +63,11 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
 DECLARE cur_account_status_id                   INT             DEFAULT 0;
-DECLARE cur_account_farm_id_1                   INT             DEFAULT 0;
-DECLARE cur_account_farm_id_2                   INT             DEFAULT 0;
-DECLARE cur_account_farm_id_3                   INT             DEFAULT 0;
-DECLARE cur_account_farm_id_4                   INT             DEFAULT 0;
-DECLARE cur_account_farm_id_5                   INT             DEFAULT 0;
+DECLARE cur_account_farm_01_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_02_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_03_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_04_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_05_id                  INT             DEFAULT 0;
 
 DECLARE is_added_to_account                     INT             DEFAULT 0;
 
@@ -82,7 +82,8 @@ DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
 
-SET res_num         = RES_NUM_SUCCESS;
+SET res_num     = RES_NUM_SUCCESS;
+SET res_code    = "SUCCESS";
 
 
 SELECT  
@@ -135,19 +136,19 @@ END IF;
 SELECT 
     flag,
     status_id,
-    farm_id_1,
-    farm_id_2,
-    farm_id_3,
-    farm_id_4,
-    farm_id_5
+    farm_01_id,
+    farm_02_id,
+    farm_03_id,
+    farm_04_id,
+    farm_05_id
 INTO
     cur_account_flag,
-    cur_account_status_id
-    cur_account_farm_id_1,
-    cur_account_farm_id_2,
-    cur_account_farm_id_3,
-    cur_account_farm_id_4,
-    cur_account_farm_id_5
+    cur_account_status_id,
+    cur_account_farm_01_id,
+    cur_account_farm_02_id,
+    cur_account_farm_03_id,
+    cur_account_farm_04_id,
+    cur_account_farm_05_id
     
 FROM account
 WHERE id = cur_user_account_id;
@@ -158,7 +159,7 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status_id = ACCOUNT_STATUS_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_ID_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -168,11 +169,11 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-IF  cur_account_farm_id_1 > 0 AND 
-    cur_account_farm_id_2 > 0 AND 
-    cur_account_farm_id_3 > 0 AND 
-    cur_account_farm_id_4 > 0 AND 
-    cur_account_farm_id_5 > 0 THEN 
+IF  cur_account_farm_01_id > 0 AND 
+    cur_account_farm_02_id > 0 AND 
+    cur_account_farm_03_id > 0 AND 
+    cur_account_farm_04_id > 0 AND 
+    cur_account_farm_05_id > 0 THEN 
     
     
     SET res_num     = RES_NUM_ACCOUNT_EXCEED_MAX_FARMS;
@@ -230,41 +231,41 @@ SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;
 
 
 
-IF is_added_to_account = 0 AND cur_account_farm_id_1 = 0 THEN
+IF is_added_to_account = 0 AND cur_account_farm_01_id = 0 THEN
     UPDATE account SET 
-        farm_id_1 = cur_pig_farm_id
+        farm_01_id = cur_pig_farm_id
     WHERE id = cur_user_account_id;
     
     SET is_added_to_account = 1;
 END IF;
 
-IF is_added_to_account = 0 AND  cur_account_farm_id_2 = 0 THEN
+IF is_added_to_account = 0 AND  cur_account_farm_02_id = 0 THEN
     UPDATE account SET 
-        farm_id_2 = cur_pig_farm_id
+        farm_02_id = cur_pig_farm_id
     WHERE id = cur_user_account_id;
 
     SET is_added_to_account = 1;
 END IF;
 
-IF is_added_to_account = 0 AND  cur_account_farm_id_3 = 0 THEN
+IF is_added_to_account = 0 AND  cur_account_farm_03_id = 0 THEN
     UPDATE account SET 
-        farm_id_3 = cur_pig_farm_id
+        farm_03_id = cur_pig_farm_id
     WHERE id = cur_user_account_id;
 
     SET is_added_to_account = 1;
 END IF;
 
-IF is_added_to_account = 0 AND  cur_account_farm_id_4 = 0 THEN
+IF is_added_to_account = 0 AND  cur_account_farm_04_id = 0 THEN
     UPDATE account SET 
-        farm_id_4 = cur_pig_farm_id
+        farm_04_id = cur_pig_farm_id
     WHERE id = cur_user_account_id;
 
     SET is_added_to_account = 1;
 END IF;
 
-IF is_added_to_account = 0 AND  cur_account_farm_id_5 = 0 THEN
+IF is_added_to_account = 0 AND  cur_account_farm_05_id = 0 THEN
     UPDATE account SET 
-        farm_id_5 = cur_pig_farm_id
+        farm_05_id = cur_pig_farm_id
     WHERE id = cur_user_account_id;
 
     SET is_added_to_account = 1;

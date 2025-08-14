@@ -75,7 +75,7 @@ DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
-DECLARE description                             VARCHAR(200)    DEFAULT '';
+DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
 
 
 SET res_num     = RES_NUM_SUCCESS;

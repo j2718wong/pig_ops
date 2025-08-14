@@ -66,7 +66,7 @@ DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
-DECLARE description                             VARCHAR(200)    DEFAULT '';
+DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
 
 
 SET res_num     = RES_NUM_SUCCESS;
@@ -135,23 +135,27 @@ END IF;
 
 /* Check account duplicate. */
 
+
 UPDATE account SET
     name            = in_name
 WHERE id = cur_user_account_id;
 
 
-SET description = CONCAT("old_acc_name = ", cur_account_name, "; new_acc_name = ",
+/* Insert app_audit_log. */
+SET s_desc = CONCAT("old_acc_name = ", cur_account_name, "; new_acc_name = ",
     in_name);
 
 INSERT INTO app_audit_log(
     user_id,
+    account_id,
     action,
     description,
     date
 ) VALUES (
     in_user_id,
+    cur_user_account_id,
     AUDIT_ACTION_UPDATE,
-    description,
+    s_desc,
     CURRENT_DATE
 );
 

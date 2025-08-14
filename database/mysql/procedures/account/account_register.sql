@@ -44,9 +44,14 @@ DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
 DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
+DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
+DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
+DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
+
+
+
 DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
-
 
 DECLARE cur_num_days_trial                      INT             DEFAULT 0;
 
@@ -59,6 +64,8 @@ DECLARE cur_account_name                        VARCHAR(100);
 DECLARE cur_account_date_trial_start            DATE;
 DECLARE cur_account_date_trial_end              DATE;
 
+
+DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -150,6 +157,40 @@ UPDATE user SET
     account_id  = cur_account_id,
     flag        = flag | FLAG_BIT_USER_IS_ACCOUNT_ADMIN
 WHERE id = in_user_id;
+
+
+/* Insert app_audit_log. */
+SET s_desc = CONCAT("Account registered; acc_name = ", in_name);
+INSERT INTO app_audit_log(
+    user_id,
+    account_id,
+    action,
+    description,
+    date
+) VALUES (
+    in_user_id,
+    cur_account_id,
+    AUDIT_ACTION_ADD,
+    s_desc,
+    CURRENT_DATE
+); 
+
+
+SET s_desc = "User set to ACCOUNT ADMIN";
+INSERT INTO app_audit_log(
+    user_id,
+    account_id,
+    action,
+    description,
+    date
+) VALUES (
+    in_user_id,
+    cur_account_id,
+    AUDIT_ACTION_ADD,
+    s_desc,
+    CURRENT_DATE
+); 
+
 
 END process_user;
 

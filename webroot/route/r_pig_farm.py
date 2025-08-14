@@ -84,6 +84,9 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
         
     pig_farm_hashid = hashids_common.encrypt(pig_farm_id)
     
+    if pig_farm_id == 0:
+        pig_farm_hashid = ''
+    
     # remove plain id
     del res_add['pig_farm']['id']
     res_add['pig_farm']['h_id'] = pig_farm_hashid
@@ -176,7 +179,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     
     # remove plain id
     del res_update['pig_farm']['id']
-    res_update['pig_farm']['h_id'] = pig_farm_hashid
+    res_update['pig_farm']['h_id'] = pig_farm_hid
         
     return res_update
     

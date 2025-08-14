@@ -54,9 +54,9 @@ async def sow_list(full_info: int = 0):
     res = model['sow_act'].get_sow_list()
         
     
-    
+    s = DB_INFO + '\n\n'
         
-    s = '    Sow   Date of Birth   SOW_Status   Date Culled   Comment\n'
+    s += '    Sow   Date of Birth   SOW_Status   Date Culled   Comment\n'
     
    
     
@@ -107,9 +107,9 @@ async def sow_operations(format= 0):
     res = model['sow_act'].get_sow_operations_list()
         
     
-    
+    s = DB_INFO + '\n\n'
         
-    s = '    Sow  SOW_Status  PROD_ID  Date_TAKAL   NormalKaon   CheckBuntis1    CheckBuntis2   BalhinDako   BalhinFarrow    Inject_IRON   Inject_PURGA \n'
+    s += '    Sow  SOW_Status  PROD_ID  Date_TAKAL   NormalKaon   CheckBuntis1    CheckBuntis2   BalhinDako   BalhinFarrow    Inject_IRON   Inject_PURGA \n'
     
    
     
@@ -198,8 +198,9 @@ async def sow_activities(ins_id:str = None, full_info: int = 0):
     else:
         res = model['sow_act'].get_latest_sow_activities(full_info)
     
-        
-    s = 'INS_ID      Sow   Act_ID   Date             Num_Days  Activity               Description\n'
+    s = DB_INFO + '\n\n'
+    
+    s += 'INS_ID      Sow   Act_ID   Date             Num_Days  Activity               Description\n'
     
     last_ins_id = None
     
@@ -326,7 +327,9 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
                         cur_entry['date_culled'] = cur_sow['date_culled']
                         break
     
-    s  = '       PIG PRODUCTION                                                                   Num baktin birth  Num baktin lutas\n'
+    s = DB_INFO + '\n\n'
+    
+    s += '       PIG PRODUCTION                                                                   Num baktin birth  Num baktin lutas\n'
     s += '=============================                                                           ----------------  ----------------\n'
     s += '    Sow  PROD_ID  PROD_Status   Date_TAKAL  Expected    Date_Birth  NumDays  Birth+45D   Dead    M    F    Dead    M    F   Date_Lutas  Baktin  Semilya\n'
     
@@ -553,7 +556,9 @@ async def pig_prod_ops(full_info: int = 0,   is_growing:int = 0,
         
     res = model['sow_act'].get_pig_prod_feeding_list(is_growing)
     
-    s  = write_baktin_operations(res, is_growing)
+    s = DB_INFO + '\n\n'
+    
+    s += write_baktin_operations(res, is_growing)
     s += write_feeding_guide(res)
     s += write_feeds_consumed(res)
     

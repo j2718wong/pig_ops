@@ -1,28 +1,19 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_farm_update $$
-CREATE PROCEDURE pig_farm_update(
+DROP PROCEDURE IF EXISTS account_pig_farm_delete $$
+CREATE PROCEDURE account_pig_farm_delete(
     in_user_id              INT,
-    in_pig_farm_id          INT,
-
-    in_name                 VARCHAR(50),
-    
-    in_country_id           INT, 
-    in_adrs_level_1_id      INT,
-    in_adrs_level_2_id      INT,
-    in_adrs_level_3_id      INT,
-    in_latitude             DECIMAL(10,5),
-    in_longitude            DECIMAL(10,5)
+    in_pig_farm_id          INT
     
 )  
 
 BEGIN
 
 /** 
- * Will add pig farm entry.
+ * Will delete account pig farm entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 10, 2025
+ * @since August 15, 2025
  *
  */
 
@@ -50,16 +41,21 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 /* account.flag bits*/
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
-DECLARE ACCOUNT_STATUS_ID_ON_TRIAL                 INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
+DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
+DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
+DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
 DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
+DECLARE cur_account_farm_01_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_02_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_03_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_04_id                  INT             DEFAULT 0;
+DECLARE cur_account_farm_05_id                  INT             DEFAULT 0;
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status_id                      INT             DEFAULT 0;
+DECLARE cur_account_status_id                   INT             DEFAULT 0;
 
 DECLARE cur_farm_account_id                     INT             DEFAULT 0;
 
@@ -127,13 +123,24 @@ END IF;
 /* Check account*/
 SELECT 
     flag,
-    status_id
+    status_id,
+    farm_01_id,
+    farm_02_id,
+    farm_03_id,
+    farm_04_id,
+    farm_05_id
 INTO
     cur_account_flag,
-    cur_account_status_id
+    cur_account_status_id,
+    cur_account_farm_01_id,
+    cur_account_farm_02_id,
+    cur_account_farm_03_id,
+    cur_account_farm_04_id,
+    cur_account_farm_05_id
     
 FROM account
 WHERE id = cur_user_account_id;
+
 
 
 
@@ -141,7 +148,7 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status_id = ACCOUNT_STATUS_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_ID_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -151,30 +158,39 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-SELECT  account_id
-INTO    cur_farm_account_id
-FROM    pig_farm
-WHERE   id = in_pig_farm_id;
+IF cur_account_farm_01_id = in_pig_farm_id THEN 
+	UPDATE account SET
+		farm_01_id = 0
+	WHERE id = cur_user_account_id;
+END IF;
 
+IF cur_account_farm_02_id = in_pig_farm_id THEN 
+	UPDATE account SET
+		farm_02_id = 0
+	WHERE id = cur_user_account_id;
+END IF;
 
-IF cur_user_account_id != cur_farm_account_id THEN 
-    SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
-    SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
+IF cur_account_farm_03_id = in_pig_farm_id THEN 
+	UPDATE account SET
+		farm_03_id = 0
+	WHERE id = cur_user_account_id;
+END IF;
 
-    LEAVE process_user;
+IF cur_account_farm_04_id = in_pig_farm_id THEN 
+	UPDATE account SET
+		farm_04_id = 0
+	WHERE id = cur_user_account_id;
+END IF;
+
+IF cur_account_farm_05_id = in_pig_farm_id THEN 
+	UPDATE account SET
+		farm_05_id = 0
+	WHERE id = cur_user_account_id;
 END IF;
 
 
-UPDATE pig_farm SET
-    name                = in_name,
-    
-    country_id          = in_country_id,
-    adrs_level_1_id     = in_adrs_level_1_id,
-    adrs_level_2_id     = in_adrs_level_2_id,
-    adrs_level_3_id     = in_adrs_level_3_id,
-    latitude            = in_latitude,
-    longitude           = in_longitude
-WHERE id =  in_pig_farm_id;
+
+
 
 END process_user;
 

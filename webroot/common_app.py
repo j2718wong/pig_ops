@@ -56,8 +56,16 @@ model_names = [
 ]
 
 
-DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
+USING_PRODUCTION_DB             = 0
+DB_INFO                         = ''
 
+if USING_PRODUCTION_DB > 0:
+    DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
+    db_desc     = 'Jackson Farm Production'
+
+else:
+    DATABASE_NAME_PIG_OPERATIONS = 'pig_ops_dev'
+    db_desc     = 'Jackson PigOps Development' 
 
 credentials_po = {
     'db_host':      '127.0.0.1',
@@ -66,6 +74,7 @@ credentials_po = {
     'database':     DATABASE_NAME_PIG_OPERATIONS
 }
 
+DB_INFO = f"Host: {credentials_po['db_host']}; DB_Desc: {db_desc}"
 
 
 ssh_tunnel_aws = {
