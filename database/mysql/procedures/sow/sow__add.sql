@@ -3,17 +3,16 @@
 DROP PROCEDURE IF EXISTS sow_add $$
 CREATE PROCEDURE sow_add(
     in_user_id              INT,
-	
-	in_farm_id				INT,
-	in_production_id		INT,
-	in_line_id				INT,
-	
-	in_sow_number           VARCHAR(10),
-    in_sow_name            	VARCHAR(20),
     
-    in_date_of_birth		VARCHAR(10),
-	in_comment				VARCHAR(160)
+    in_pig_farm_id          INT,
+    in_production_id        INT,
+    in_line_id          	INT,
     
+    in_sow_number           VARCHAR(10),
+    in_sow_name             VARCHAR(20),
+    
+    in_date_of_birth        VARCHAR(10),
+    in_description          VARCHAR(160)
 )  
 
 BEGIN
@@ -33,13 +32,14 @@ DECLARE RES_NUM_USER_NOT_EMAIL_VERIFIED         INT             DEFAULT 2;
 DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 3;
 DECLARE RES_NUM_USER_NO_ACCOUNT_SET             INT             DEFAULT 4;
 
-DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 5;
-DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 6;
-DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 7;
-DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 8;
+DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 11;
+DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 12;
+DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 13;
+DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 14;
+DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 15;
 
 
-DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
+DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 50;
 
 
 /* user.flag bits*/
@@ -76,7 +76,7 @@ DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
 DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
 DECLARE cur_pig_farm_name                       VARCHAR(50)     DEFAULT '';
 
-
+DECLARE cur_sow_id                              INT             DEFAULT 0;
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
@@ -116,12 +116,14 @@ IF cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED = 0 THEN
 END IF;
 
 
+/* TODO  evaluate if non- admin users can add sow entry
 IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN 
     SET res_num     = RES_NUM_USER_NOT_ACCOUNT_ADMIN;
     SET res_code    = "RES_NUM_USER_NOT_ACCOUNT_ADMIN";
 
     LEAVE process_user;    
 END IF;
+*/
 
 
 IF cur_user_account_id = 0 THEN 
@@ -155,7 +157,6 @@ FROM account
 WHERE id = cur_user_account_id;
 
 
-
 IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN 
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
@@ -170,29 +171,32 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-IF  cur_account_farm_01_id > 0 AND 
-    cur_account_farm_02_id > 0 AND 
-    cur_account_farm_03_id > 0 AND 
-    cur_account_farm_04_id > 0 AND 
-    cur_account_farm_05_id > 0 THEN 
-    
-    
-    SET res_num     = RES_NUM_ACCOUNT_EXCEED_MAX_FARMS;
-    SET res_code    = "RES_NUM_ACCOUNT_EXCEED_MAX_FARMS";
+SELECT  account_id
+INTO    cur_farm_account_id
+FROM    pig_farm
+WHERE   id = in_pig_farm_id
+LIMIT   1;
+THEN 
+
+
+IF cur_user_account_id != cur_farm_account_id THEN 
+    SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
+    SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
     
     LEAVE process_user;
 END IF;
 
 
+
+/* Check for duplicate entry. */
 SELECT  id
-INTO    cur_pig_farm_id
-FROM    pig_farm
-WHERE   account_id = cur_user_account_id AND UPPER(name)  = UPPER(in_name)
-LIMIT   1;
+INTO    cur_sow_id
+FROM    sow
+WHERE   account_id  = cur_user_account_id   AND
+        pig_farm_id = in_pig_farm_id        AND
+        sow_number  = in_sow_number;
 
-
-/* Check for duplicate farm name*/
-IF cur_pig_farm_id > 0 THEN 
+IF cur_sow_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -201,77 +205,34 @@ END IF;
 
 
 
-INSERT INTO pig_farm(
+INSERT INTO sow(
     account_id,
-    flag,
-    name,
+    pig_farm_id,
     added_by_user_id,
     
-    country_id,
-    adrs_level_1_id,
-    adrs_level_2_id,
-    adrs_level_3_id,
-    latitude,
-    longitude
+    production_id,
+    line_id,
+    sow_number,
+    name,
+    
+    date_of_birth,
+    description
 ) VALUES (
     cur_user_account_id,
-    1,    
-    in_name,
+    in_pig_farm_id,
     in_user_id,
     
-    in_country_id,
-    in_adrs_level_1_id,
-    in_adrs_level_2_id,
-    in_adrs_level_3_id,
-    in_latitude,
-    in_longitude
+    in_production_id,
+    in_line_id,
+    in_sow_number,
+    in_sow_name,
+    
+    in_date_of_birth,
+    in_comment
     
 );
 
-SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;
-
-
-
-IF is_added_to_account = 0 AND cur_account_farm_01_id = 0 THEN
-    UPDATE account SET 
-        farm_01_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-    
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_02_id = 0 THEN
-    UPDATE account SET 
-        farm_02_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_03_id = 0 THEN
-    UPDATE account SET 
-        farm_03_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_04_id = 0 THEN
-    UPDATE account SET 
-        farm_04_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_05_id = 0 THEN
-    UPDATE account SET 
-        farm_05_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
+SELECT LAST_INSERT_ID() INTO cur_sow_id;
 
 
 END process_user;
@@ -291,9 +252,7 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_pig_farm_id                     AS pig_farm_id,
-    cur_pig_farm_name                   AS pig_farm_name,
-    cur_pig_farm_flag                   AS pig_farm_flag;
+    cur_sow_id                          AS sow_id;
     
 
 END $$

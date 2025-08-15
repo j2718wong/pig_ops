@@ -31,3 +31,15 @@ class DataPigFarm(BaseModel):
     longitude:          float = None
     
     
+class DataSow(BaseModel):
+    uhid:               str,
+    pfhid:              str,
+    production_id:      int = 0
+    line_id:            int = 0
+    
+    sow_number:         str,
+    sow_name:           str = None,
+    date_of_birth:      str = None,
+    description:        str = None
+    
+    

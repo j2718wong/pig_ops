@@ -183,14 +183,13 @@ IF  cur_account_farm_01_id > 0 AND
 END IF;
 
 
+/* Check for duplicate entry */
 SELECT  id
 INTO    cur_pig_farm_id
 FROM    pig_farm
 WHERE   account_id = cur_user_account_id AND UPPER(name)  = UPPER(in_name)
 LIMIT   1;
 
-
-/* Check for duplicate farm name*/
 IF cur_pig_farm_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
