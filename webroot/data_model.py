@@ -64,6 +64,17 @@ class DataSowBoarCull(BaseModel):
     cull_notes:         str
     
     
+class DataSemenSource(BaseModel):
+    uhid:               str
+    pfhid:              str = None
+    
+    semen_source_id:    int = 0
+    is_ai:              int = 0
+    pig_race_id:        int = 0
+    boar_id:            int = 0
+    name:               str
+    description         str =  None
+    
     
 class DataPigProd(BaseModel):
     uhid:               str

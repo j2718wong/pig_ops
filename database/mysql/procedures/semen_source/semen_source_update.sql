@@ -18,10 +18,10 @@ CREATE PROCEDURE semen_source_update(
 BEGIN
 
 /** 
- * Will add pig farm entry.
+ * Will update semen_source entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 10, 2025
+ * @since August 18, 2025
  *
  */
 

@@ -38,6 +38,7 @@ from model.m_mfa                import Mfa
 
 from model.m_pig_farm           import PigFarm
 from model.m_sow_boar           import SowBoar
+from model.m_semen_source       import SemenSource
 from model.m_sow_act            import SowActivity
 from model.m_pig_production     import PigProduction
 
@@ -53,6 +54,7 @@ model_names = [
     
     ('pig_farm',                PigFarm),
     ('sow_boar',                SowBoar),
+    ('semen_source',            SemenSource),
     ('pig_prod',                PigProduction),
     
     ('sow_act',                 SowActivity),
