@@ -36,71 +36,6 @@ DAY_1_STARTS_AT_BIRTH           = 1
 NUMDAYS_SINCE_BIRTH_WEANING             = 45
 
 
-@app.get("/sow/list", response_class=PlainTextResponse)
-async def sow_list(full_info: int = 0):
-    """
-    Will get sow list.
-    
-    Parameters
-    ----------
-    
-    full_info:int
-        0 = will return active sows only; 
-        1 = will return including culled sows
-
-        
-    """
-    
-    res = model['sow_act'].get_sow_list()
-        
-    
-    s = DB_INFO + '\n\n'
-        
-    s += '    Sow   Date of Birth   SOW_Status   Date Culled   Comment\n'
-    
-   
-    
-    for cur_entry in res:
-        
-        if full_info == 0:
-            if cur_entry['date_culled'] is not None:
-                continue
-        
-        s_temp      = cur_entry['sow_number']
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-    
-        s_temp      = cur_entry['date_of_birth']
-        s           += s_temp
-        s           += '      '
-        
-        
-        s_temp      = cur_entry['status']
-        num_chars   = len(s_temp)
-        num_space   = 10 - num_chars
-        s           +=  s_temp + ' ' * num_space
-        s           += '   '
-    
-        
-        s_temp      = '          '   
-        if cur_entry['date_culled'] is not None:
-            s_temp  = cur_entry['date_culled']
-        s           += s_temp
-        s           += '    '
-        
-        s_temp      = '          '
-        if cur_entry['comment'] is not None:
-            s_temp  = cur_entry['comment']
-        s           += s_temp
-        s           += '    '
-        
-        
-        s           += '\n'
-        
-    return s
-    
     
 @app.get("/sow/operations", response_class=PlainTextResponse)
 async def sow_operations(format= 0):
@@ -864,7 +799,7 @@ def write_feeding_guide(data):
     s           += "\n\n"
     
     
-    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date Grower    Date_Finisher   Date_Harvest\n'
+    s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date_Grower    Date_Finisher   Date_Harvest\n'
     
     for cur_entry in data:
         
@@ -1000,7 +935,7 @@ def write_feeds_consumed(data):
     
     s  = 'FEEDS CONSUMED         %s                                                               NUM SACKS\n' % dt_now_s
     s += '=================                                ========================================================================================================\n'
-    s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER   \n'
+    s += '                                                      LACTA            BOOSTER         PRE_STARTER         STARTER            GROWER          FINISHER   \n'
     s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
     

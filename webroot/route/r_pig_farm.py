@@ -51,24 +51,12 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
             }
         }
     
-    
     user_id = res[0]
     
+    pig_farm_data.name      = name
+    pig_farm_data.user_id   = user_id
     
-    data = {
-        'user_id':          user_id,
-        'name':             name,
-        
-        'country_id':       pig_farm_data.country_id,
-        'adrs_level_1_id':  pig_farm_data.adrs_level_1_id,
-        'adrs_level_2_id':  pig_farm_data.adrs_level_2_id,
-        'adrs_level_3_id':  pig_farm_data.adrs_level_3_id,
-        'latitude':         pig_farm_data.latitude,
-        'longitude':        pig_farm_data.longitude
-    }
-    
-    
-    res_add    =  model['pig_farm'].add(data)
+    res_add    =  model['pig_farm'].add(pig_farm_data)
     
     if res_add is None:
         return {
@@ -151,21 +139,12 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     pig_farm_id = res[0]
     
     
-    data = {
-        'user_id':          user_id,
-        'pig_farm_id':      pig_farm_id,
-        'name':             name,
-        
-        'country_id':       pig_farm_data.country_id,
-        'adrs_level_1_id':  pig_farm_data.adrs_level_1_id,
-        'adrs_level_2_id':  pig_farm_data.adrs_level_2_id,
-        'adrs_level_3_id':  pig_farm_data.adrs_level_3_id,
-        'latitude':         pig_farm_data.latitude,
-        'longitude':        pig_farm_data.longitude
-    }
+    pig_farm_data.name      = name
+    pig_farm_data.user_id   = user_id
+    pig_farm_data.pig_farm_id = pig_farm_id
     
     
-    res_update    =  model['pig_farm'].update(data)
+    res_update    =  model['pig_farm'].update(pig_farm_data)
     
     if res_update is None:
         return {

@@ -44,6 +44,12 @@ DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
 DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
+/* Default account sow operation*/
+DECLARE SOW_OPERATION_NUM_DAYS_CHECK_PREGNANT   INT             DEFAULT 21;
+DECLARE SOW_OPERATION_NUM_DAYS_INJECT_IRON      INT             DEFAULT 80;
+DECLARE SOW_OPERATION_NUM_DAYS_DEWORM           INT             DEFAULT 100;
+
+
 DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
 DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
 DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
@@ -157,6 +163,45 @@ UPDATE user SET
     account_id  = cur_account_id,
     flag        = flag | FLAG_BIT_USER_IS_ACCOUNT_ADMIN
 WHERE id = in_user_id;
+
+
+/* Create default sow_operation for the account.*/
+INSERT INTO sow_operation (
+    account_id,
+    order_num,
+    num_days_since_insem,
+    name
+) VALUES (
+    cur_account_id,
+    1,
+    SOW_OPERATION_NUM_DAYS_CHECK_PREGNANT,
+    "Check if pregnant"
+);
+
+INSERT INTO sow_operation (
+    account_id,
+    order_num,
+    num_days_since_insem,
+    name
+) VALUES (
+    cur_account_id,
+    2,
+    SOW_OPERATION_NUM_DAYS_INJECT_IRON,
+    "Inject Iron"
+);
+
+INSERT INTO sow_operation (
+    account_id,
+    order_num,
+    num_days_since_insem,
+    name
+) VALUES (
+    cur_account_id,
+    3,
+    SOW_OPERATION_NUM_DAYS_DEWORM,
+    "Deworm"
+);
+
 
 
 /* Insert app_audit_log. */

@@ -1,3 +1,6 @@
+
+import datetime
+
 from pydantic               import BaseModel
 
 
@@ -14,6 +17,7 @@ class DataUser(BaseModel):
 
 class DataAccount(BaseModel):
     uhid:               str
+    user_id:            int = 0
     name:               str
     country_id:         int = 1     # default to PH
     
@@ -22,6 +26,8 @@ class DataPigFarm(BaseModel):
     uhid:               str
     pig_farm_hid:       str = None
     
+    user_id:            int = 0
+    pig_farm_id:        int = 0
     name:               str
     country_id:         int = 1     # default to PH
     adrs_level_1_id:    int = 0
@@ -32,14 +38,28 @@ class DataPigFarm(BaseModel):
     
     
 class DataSow(BaseModel):
-    uhid:               str,
-    pfhid:              str,
-    production_id:      int = 0
-    line_id:            int = 0
+    uhid:               str
+    pfhid:              str = None
     
-    sow_number:         str,
-    sow_name:           str = None,
-    date_of_birth:      str = None,
-    description:        str = None
+    sow_id:             int = 0
+    user_id:            int = 0
+    pig_farm_id:        int = 0
+    birth_prod_id:      int = 0
+    line_id:            int = 0
+    sow_status_id:      int = 2
+    
+    sow_number:         str
+    sow_name:           str = None
+    date_of_birth:      str = None
+    notes:              str = None
+    
+    
+class DataSowCull(BaseModel):
+    uhid:               str
+    
+    user_id:            int = 0
+    sow_id:             int
+    date_culled:        datetime.date
+    cull_notes:         str
     
     

@@ -20,15 +20,10 @@ class Account:
         )  
         """
         
-        user_id         = data['user_id']
-        country_id      = data['country_id']
-        name            = data['name']
-        
         sql =  'CALL account_register('
-        sql += '%s,'    % user_id
-        sql += '%s,'    % country_id
-        sql += '"%s");' % name
-        
+        sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.country_id
+        sql += '"%s");' % data.name
         
         
         # Check if still connected to database
@@ -103,13 +98,9 @@ class Account:
         )  
         """
         
-        user_id         = data['user_id']
-        name            = data['name']
-        
         sql =  'CALL account_update('
-        sql += '%s,'    % user_id
-        sql += '"%s");' % name
-        
+        sql += '%s,'    % data.user_id
+        sql += '"%s");' % data.name
         
         
         # Check if still connected to database

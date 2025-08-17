@@ -13,6 +13,8 @@ from route.r_account            import *
 from route.r_account_request    import *
 
 from route.r_pig_farm           import *
+from route.r_sow                import *
+from route.r_pig_production     import *
 
 from route.r_testing            import *
 

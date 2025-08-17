@@ -57,15 +57,10 @@ async def account_register(account_data: dm.DataAccount):
     
     user_id = res[0]
     
+    account_data.name       = name 
+    account_data.user_id    = user_id
     
-    data = {
-        'name':             name,
-        'user_id':          user_id,
-        'country_id':       account_data.country_id
-    }
-    
-    
-    res_register    =  model['account'].register(data)
+    res_register    =  model['account'].register(account_data)
     
     if res_register is None:
         return {
@@ -127,14 +122,10 @@ async def account_update(account_data: dm.DataAccount):
     
     user_id = res[0]
     
-    
-    data = {
-        'name':             name,
-        'user_id':          user_id
-    }
-    
-    
-    res_update      =  model['account'].update(data)
+    account_data.name       = name 
+    account_data.user_id    = user_id
+        
+    res_update      =  model['account'].update(account_data)
     
     if res_update is None:
         return {

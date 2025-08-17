@@ -1,27 +1,21 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS sow_add $$
-CREATE PROCEDURE sow_add(
+DROP PROCEDURE IF EXISTS sow_cull $$
+CREATE PROCEDURE sow_cull(
     in_user_id              INT,
     
-    in_pig_farm_id          INT,
-    in_production_id        INT,
-    in_line_id          	INT,
-    
-    in_sow_number           VARCHAR(10),
-    in_sow_name             VARCHAR(20),
-    
-    in_date_of_birth        VARCHAR(10),
-    in_description          VARCHAR(160)
+    in_sow_id               INT,
+    in_date_culled          VARCHAR(10),
+    in_cull_notes           VARCHAR(160)
 )  
 
 BEGIN
 
 /** 
- * Will add pig farm entry.
+ * Will cull sow entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 15, 2025
+ * @since August 17, 2025
  *
  */
 
@@ -70,11 +64,10 @@ DECLARE cur_account_farm_03_id                  INT             DEFAULT 0;
 DECLARE cur_account_farm_04_id                  INT             DEFAULT 0;
 DECLARE cur_account_farm_05_id                  INT             DEFAULT 0;
 
-DECLARE is_added_to_account                     INT             DEFAULT 0;
 
-DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
-DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
-DECLARE cur_pig_farm_name                       VARCHAR(50)     DEFAULT '';
+DECLARE cur_pig_farm_account_id                 INT             DEFAULT 0;
+DECLARE cur_pig_farm_last_sow_id                INT             DEFAULT 0;
+
 
 DECLARE cur_sow_id                              INT             DEFAULT 0;
 
@@ -171,15 +164,16 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-SELECT  account_id
-INTO    cur_farm_account_id
-FROM    pig_farm
-WHERE   id = in_pig_farm_id
+SELECT  
+        account_id
+INTO    
+        cur_pig_farm_account_id
+FROM    sow
+WHERE   id = in_sow_id
 LIMIT   1;
-THEN 
 
 
-IF cur_user_account_id != cur_farm_account_id THEN 
+IF cur_user_account_id != cur_pig_farm_account_id THEN 
     SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
     SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
     
@@ -188,71 +182,27 @@ END IF;
 
 
 
-/* Check for duplicate entry. */
-SELECT  id
-INTO    cur_sow_id
-FROM    sow
-WHERE   account_id  = cur_user_account_id   AND
-        pig_farm_id = in_pig_farm_id        AND
-        sow_number  = in_sow_number;
-
-IF cur_sow_id > 0 THEN 
-    SET res_num     = RES_NUM_DUPLICATE_ENTRY;
-    SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
+UPDATE sow SET
+    date_culled         = in_date_culled,
+    cull_notes          = in_cull_notes,
     
-    LEAVE process_user;
-END IF;
-
-
-
-INSERT INTO sow(
-    account_id,
-    pig_farm_id,
-    added_by_user_id,
+    last_update_user_id = in_user_id,
+    dt_last_update      = CURRENT_TIMESTAMP
     
-    production_id,
-    line_id,
-    sow_number,
-    name,
-    
-    date_of_birth,
-    description
-) VALUES (
-    cur_user_account_id,
-    in_pig_farm_id,
-    in_user_id,
-    
-    in_production_id,
-    in_line_id,
-    in_sow_number,
-    in_sow_name,
-    
-    in_date_of_birth,
-    in_comment
-    
-);
-
-SELECT LAST_INSERT_ID() INTO cur_sow_id;
+WHERE 
+    id = in_sow_id;
 
 
 END process_user;
 
 
-SELECT
-    flag,
-    name
-INTO 
-    cur_pig_farm_flag,
-    cur_pig_farm_name
-FROM pig_farm
-WHERE id = cur_pig_farm_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_sow_id                          AS sow_id;
+    in_sow_id                           AS sow_id;
     
 
 END $$

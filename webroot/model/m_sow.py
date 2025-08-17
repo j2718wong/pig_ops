@@ -10,53 +10,109 @@ class Sow:
         self.TAG                = 'Sow'
 
     
+    def get_sow_status_list(self):
+        """
+        Will get sow_status list.
+        
+        
+        Returns
+        -------
+        list of dictionary
+
+        """
+            
+        sql =   """
+                SELECT 
+                    id,
+                    name
+                FROM sow_status
+                """ 
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            msg = 'get_sow_status_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_status_id           = row[0]
+                cur_status_name         = row[1]
+                
+                cur_entry = {
+                    'id':               cur_status_id, 
+                    'name':             cur_status_name
+                }
+                
+                result.append(cur_entry)
+
+        return result
+
+    
     def add(self, data = None):
         """
         PROCEDURE sow_add(
             in_user_id              INT,
             
             in_pig_farm_id          INT,
-            in_production_id        INT,
+            in_birth_prod_id        INT,
             in_line_id              INT,
-            
+            in_sow_status_id        INT,
+                    
             in_sow_number           VARCHAR(10),
             in_sow_name             VARCHAR(20),
-            
             in_date_of_birth        VARCHAR(10),
             in_description          VARCHAR(160)
         )    
         """
         
-        user_id         = data['user_id']
+        sql =  'CALL sow_add('
+        sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.pig_farm_id
+        sql += '%s,'    % data.birth_prod_id
+        sql += '%s,'    % data.line_id
+        sql += '%s,'    % data.sow_status_id
         
-        pig_farm_id     = data['pig_farm_id']
-        production_id   = data['production_id']
-        line_id         = data['line_id']
+        sql += '"%s",'  % data.sow_number
         
-        sow_number      = data['sow_number']
-        sow_name        = data['adrs_level_1_id']
-        adrs_level_2_id = data['adrs_level_2_id']
-        adrs_level_3_id = data['adrs_level_3_id']
-        latitude        = data['latitude']
-        longitude       = data['longitude']
-        
-        
-        sql =  'CALL pig_farm_add('
-        sql += '%s,'    % user_id
-        sql += '"%s",'  % name
-        
-        sql += '%s,'    % country_id
-        sql += '%s,'    % adrs_level_1_id
-        sql += '%s,'    % adrs_level_2_id
-        sql += '%s,'    % adrs_level_3_id
-        
-        if latitude is not None:
-            sql += '%s,'    % latitude
+        if data.sow_name is not None:
+            sql += '"%s",'    % data.sow_name
         else:
             sql += 'NULL,'
             
-        if longitude is not None:
-            sql += '%s);'   % longitude
+        if data.date_of_birth is not None:
+            sql += '"%s",'    % data.date_of_birth
+        else:
+            sql += 'NULL,'            
+            
+        if data.notes is not None:
+            sql += '%s);'   % data.notes
         else:
             sql += 'NULL);'
         
@@ -95,78 +151,53 @@ class Sow:
                     'desc':             row[2],
                 },
                 
-                'pig_farm': {
+                'sow': {
                     'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5]
+                    'farm_sow_id':      row[4]
                 }
             }
 
         return None
 
     
-    def update_hashid(self, data = None):
-        pig_farm_id     = data['pig_farm_id']
-        hashid          = data['hashid']
-        
-        values = (hashid, pig_farm_id)
-        
-        sql =   """
-                UPDATE pig_farm SET
-                    hashid    = "%s"
-                WHERE id = %s;
-                """ % values
-        
-        return self.model.execute_sql(sql)
-    
-    
     def update(self, data = None):
         """
-        PROCEDURE pig_farm_update(
+        PROCEDURE sow_update(
             in_user_id              INT,
-            in_pig_farm_id          INT,
-
-            in_name                 VARCHAR(50),
             
-            in_country_id           INT, 
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
-            in_latitude             DECIMAL(10,5),
-            in_longitude            DECIMAL(10,5)
-        )
+            in_sow_id               INT,
+            in_birth_prod_id        INT,
+            in_line_id              INT,
+            in_sow_status_id        INT,
+            
+            in_sow_number           VARCHAR(10),
+            in_sow_name             VARCHAR(20),
+            in_date_of_birth        VARCHAR(10),
+            in_description          VARCHAR(160)
+        )    
         """
         
-        user_id         = data['user_id']
-        pig_farm_id     = data['pig_farm_id']
+        sql =  'CALL sow_update('
+        sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.sow_id
+        sql += '%s,'    % data.birth_prod_id
+        sql += '%s,'    % data.line_id
+        sql += '%s,'    % data.sow_status_id
         
-        name            = data['name']
+        sql += '"%s",'  % data.sow_number
         
-        country_id      = data['country_id']
-        adrs_level_1_id = data['adrs_level_1_id']
-        adrs_level_2_id = data['adrs_level_2_id']
-        adrs_level_3_id = data['adrs_level_3_id']
-        latitude        = data['latitude']
-        longitude       = data['longitude']
-        
-        
-        sql =  'CALL pig_farm_update('
-        sql += '%s,'    % user_id
-        sql += '%s,'    % pig_farm_id
-        sql += '"%s",'  % name
-        
-        sql += '%s,'    % country_id
-        sql += '%s,'    % adrs_level_1_id
-        sql += '%s,'    % adrs_level_2_id
-        sql += '%s,'    % adrs_level_3_id
-        
-        if latitude is not None:
-            sql += '%s,'    % latitude
+        if data.sow_name is not None:
+            sql += '"%s",'    % data.sow_name
         else:
             sql += 'NULL,'
             
-        if longitude is not None:
-            sql += '%s);'   % longitude
+        if data.date_of_birth is not None:
+            sql += '"%s",'    % data.date_of_birth
+        else:
+            sql += 'NULL,'            
+            
+        if data.notes is not None:
+            sql += '%s);'   % data.notes
         else:
             sql += 'NULL);'
         
@@ -189,7 +220,7 @@ class Sow:
             cursor.close()
 
         except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
+            msg = 'add(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -205,19 +236,84 @@ class Sow:
                     'desc':             row[2],
                 },
                 
-                'pig_farm': {
-                    'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5]
+                'sow': {
+                    'id':               row[3]
                 }
             }
 
         return None
-        
+
     
-    def get_pig_farm_list(self, account_id = 0, id_list = None):
+    def cull(self, data = None):
         """
-        Will get pig farm list.
+        PROCEDURE sow_cull(
+            in_user_id              INT,
+            
+            in_sow_id               INT,
+            in_date_culled          VARCHAR(10),
+            in_cull_notes           VARCHAR(160)
+        )
+        """
+        
+        sql =  'CALL sow_cull('
+        sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.sow_id
+        
+        sql += '"%s",'  % data.date_culled
+            
+        if data.cull_notes is not None:
+            sql += '%s);'   % data.cull_notes
+        else:
+            sql += 'NULL);'
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'add(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'sow': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+
+    
+    
+    
+    def get_sow_list(self, farm_id, list_sow_numbers = None):
+        """
+        Will get sow list.
         
         
         Returns
@@ -226,29 +322,55 @@ class Sow:
 
         """
         
-        if account_id > 0:
-            where_clause = 'account_id = %s' % account_id
+        where_clause = ''
+        if list_sow_numbers is not None:
+            s = ''
+            count = 0
+            for cur_entry in list_sow_numbers:
+                if count > 0: 
+                    s += ','
+                
+                s += f"'{cur_entry}'"
+                
+            values = (farm_id, s)
+            where_clause = ' WHERE a.pig_farm_id = %s AND a.sow_number  IN (%s) ' % values
+        
         else:
-            
-            for cur_entry in id_list:
-                test = 1
-            
+            where_clause = ' WHERE a.pig_farm_id = %s' % farm_id
+        
         sql =   """
                 SELECT 
-                    a.hashid,
+                    a.id,
+                    a.farm_sow_id,
+                    a.sow_number,
+                    a.sow_name,
                     a.flag,
-                    a.name,
-                    a.country_id,
-                    b.name AS country_name,
-                    a.adrs_level_1_id,
-                    a.adrs_level_2_id,
-                    a.adrs_level_3_id,
-                    a.latitude,
-                    a.longitude
-                FROM pig_farm a
-                LEFT OUTER JOIN app_country b ON a.country_id = b.id
-                WHERE account_id = %s
-                """ % account_id
+                    a.birth_prod_id,
+                    a.last_prod_id,
+                   
+                    b.name AS status_name,
+                    a.date_of_birth,
+                    a.date_culled,
+                    a.notes,
+                    
+                    c.username,
+                    c.name_last,
+                    c.name_first,
+                    
+                    d.username,
+                    d.name_last,
+                    d.name_first,
+                    a.dt_last_update,
+                    
+                    a.dt_entry
+                    
+                FROM sow a
+                LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
+                LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                %s
+                ORDER BY a.date_of_birth DESC
+                """ % where_clause
         
         
         # Check if still connected to database
@@ -271,7 +393,7 @@ class Sow:
             conn.close()
             
         except Exception as e:
-            msg = 'get_pig_farm_list(); error in executing query[] = ' + sql
+            msg = 'get_sow_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -285,46 +407,82 @@ class Sow:
             
             
             for row in rows:
-                cur_farm_hashid         = row[0]
-                cur_farm_flag           = row[1]
-                cur_farm_name           = row[2]
+                cur_id                  = row[0]
+                cur_farm_sow_id         = row[1]
+                cur_sow_number          = row[2]
+                cur_sow_name            = row[3]
+                cur_flag                = row[4]
+                cur_birth_prod_id       = row[5]
+                cur_last_prod_id        = row[6]
                 
-                cur_country_id          = row[3]
-                cur_country_name        = row[4]
+                cur_status              = row[7]
                 
-                cur_farm_adrs_level_1_id= row[5]
-                cur_farm_adrs_level_2_id= row[6]
-                cur_farm_adrs_level_3_id= row[7]
-                cur_farm_latitude       = float(row[8]) if row[8] else None
-                cur_farm_longitude      = float(row[9]) if row[9] else None
-                
-               
-                cur_entry = {
-                    'hashid':           cur_farm_hashid, 
-                    'flag':             cur_farm_flag,
-                    'name':             cur_farm_name,
+                cur_date_of_birth       = None
+                if row[8] is not None:
+                    cur_date_of_birth   = str(row[8])
                     
-                    'location':{
-                        'country_id':   cur_country_id,
-                        'country_name': cur_country_name,
-                        
-                        'address':{
-                            'level_1_id': cur_farm_adrs_level_1_id,
-                            'level_2_id': cur_farm_adrs_level_2_id,
-                            'level_3_id': cur_farm_adrs_level_3_id
-                        },
-                        
-                        'geoloc':{
-                            'latitude':  cur_farm_latitude,
-                            'longitude': cur_farm_longitude,
-                        }
+                cur_date_culled         = None
+                if row[9] is not None:
+                    cur_date_culled     = str(row[9])
+                
+                cur_notes               = None
+                if row[10] is not None:
+                    cur_notes           = row[10]
+                    
+                cur_user_username       = row[11]
+                cur_user_name_last      = row[12]
+                cur_user_name_first     = row[13]
+                
+                cur_upd_user_username   = row[14]
+                cur_upd_user_name_last  = row[15]
+                cur_upd_user_name_first = row[16]
+                
+                cur_dt_last_update      = None
+                if row[17] is not None:
+                    cur_dt_last_update  = str(row[17])
+                
+                cur_dt_entry            = str(row[18])
+                
+                
+                cur_entry = {
+                    'id':               cur_id,
+                    'farm_sow_id':      cur_farm_sow_id,
+                    'sow_number':       cur_sow_number, 
+                    'sow_name':         cur_sow_name,
+                    'flag':             cur_flag,
+                    'birth_prod_id':    cur_birth_prod_id,
+                    'last_prod_id':     cur_last_prod_id,
+                    
+                    'status':           cur_status,
+                    'date_of_birth':    cur_date_of_birth,
+                    'date_culled':      cur_date_culled,
+                    'notes':            cur_notes,
+                    
+                    'added_by': {
+                        'username':     cur_user_username,
+                        'name_last':    cur_user_name_last,
+                        'name_first':   cur_user_name_first
+                    },
+                    
+                    'dt_entry':         cur_dt_entry
+                }
+                
+                if cur_upd_user_username is not None:
+                    last_update = {
+                        'username':     cur_upd_user_username,
+                        'name_last':    cur_upd_user_name_last,
+                        'name_first':   cur_upd_user_name_first,
+                        'dt_update':    cur_dt_last_update
                     }
                     
-                }
+                    cur_entry['last_update'] = last_update
+                else:
+                    cur_entry['last_update'] = {}
                 
                 result.append(cur_entry)
 
         
         return result
-    
+
+
     
