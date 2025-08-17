@@ -1,45 +1,40 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS sow_update $$
-CREATE PROCEDURE sow_update(
+DROP PROCEDURE IF EXISTS semen_source_update $$
+CREATE PROCEDURE semen_source_update(
     in_user_id              INT,
+	in_semen_source_id      INT,
+	
+    in_pig_farm_id          INT,
+	in_is_ai                INT,
+    in_pig_race_id          INT,
+    in_boar_id              INT,
     
-    in_sow_id               INT,
-    in_birth_prod_id        INT,
-    in_line_id              INT,
-    in_sow_status_id        INT,
+    in_name                 VARCHAR(50),
+    in_description          VARCHAR(160)
     
-    in_sow_number           VARCHAR(10),
-    in_sow_name             VARCHAR(20),
-    in_date_of_birth        VARCHAR(10),
-    in_notes                VARCHAR(160)
 )  
 
 BEGIN
 
 /** 
- * Will update sow entry.
+ * Will add pig farm entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 16, 2025
+ * @since August 10, 2025
  *
  */
 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
-
 DECLARE RES_NUM_USER_IS_INACTIVE                INT             DEFAULT 1;
 DECLARE RES_NUM_USER_NOT_EMAIL_VERIFIED         INT             DEFAULT 2;
 DECLARE RES_NUM_USER_NOT_ACCOUNT_ADMIN          INT             DEFAULT 3;
 DECLARE RES_NUM_USER_NO_ACCOUNT_SET             INT             DEFAULT 4;
 
-DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 11;
-DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 12;
-DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 13;
-DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 14;
-DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 15;
-
-
-DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 50;
+DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 5;
+DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 6;
+DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 7;
+DECLARE RES_NUM_ACCOUNT_STATUS_UNPAID_BILL      INT             DEFAULT 8;
 
 
 /* user.flag bits*/
@@ -54,28 +49,25 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 /* account.flag bits*/
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
-DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
+DECLARE ACCOUNT_STATUS_ID_ON_TRIAL                 INT             DEFAULT 1;
+DECLARE ACCOUNT_STATUS_TRIAL_EXPIRED            INT             DEFAULT 2;
+DECLARE ACCOUNT_STATUS_UNPAID_BILL              INT             DEFAULT 3;
 
 
 DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
-DECLARE cur_account_status_id                   INT             DEFAULT 0;
-DECLARE cur_account_farm_01_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_02_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_03_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_04_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_05_id                  INT             DEFAULT 0;
+DECLARE cur_account_status_id                      INT             DEFAULT 0;
+
+DECLARE cur_farm_account_id                     INT             DEFAULT 0;
 
 
-DECLARE cur_pig_farm_account_id                 INT             DEFAULT 0;
-DECLARE cur_pig_farm_last_sow_id                INT             DEFAULT 0;
+DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
+DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
+DECLARE cur_pig_farm_name                       VARCHAR(50)     DEFAULT '';
 
 
-DECLARE cur_sow_id                              INT             DEFAULT 0;
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
@@ -115,14 +107,12 @@ IF cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED = 0 THEN
 END IF;
 
 
-/* TODO  evaluate if non- admin users can add sow entry
 IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN 
     SET res_num     = RES_NUM_USER_NOT_ACCOUNT_ADMIN;
     SET res_code    = "RES_NUM_USER_NOT_ACCOUNT_ADMIN";
 
     LEAVE process_user;    
 END IF;
-*/
 
 
 IF cur_user_account_id = 0 THEN 
@@ -133,34 +123,24 @@ IF cur_user_account_id = 0 THEN
 END IF;
 
 
-
 /* Check account*/
 SELECT 
     flag,
-    status_id,
-    farm_01_id,
-    farm_02_id,
-    farm_03_id,
-    farm_04_id,
-    farm_05_id
+    status_id
 INTO
     cur_account_flag,
-    cur_account_status_id,
-    cur_account_farm_01_id,
-    cur_account_farm_02_id,
-    cur_account_farm_03_id,
-    cur_account_farm_04_id,
-    cur_account_farm_05_id
+    cur_account_status_id
     
 FROM account
 WHERE id = cur_user_account_id;
+
 
 
 IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN 
     SET res_num     = RES_NUM_ACCOUNT_DISABLED;
     SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
     
-    IF cur_account_status_id = ACCOUNT_STATUS_ID_UNPAID_BILL THEN
+    IF cur_account_status_id = ACCOUNT_STATUS_UNPAID_BILL THEN
         SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
         SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
     
@@ -170,51 +150,51 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
 END IF;
 
 
-SELECT  
-        account_id
-INTO    
-        cur_pig_farm_account_id
-FROM    sow
-WHERE   id = in_sow_id
-LIMIT   1;
+SELECT  account_id
+INTO    cur_farm_account_id
+FROM    pig_farm
+WHERE   id = in_pig_farm_id;
 
 
-IF cur_user_account_id != cur_pig_farm_account_id THEN 
+IF cur_user_account_id != cur_farm_account_id THEN 
     SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
     SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
-    
+
     LEAVE process_user;
 END IF;
 
 
-
-UPDATE sow SET
-    birth_prod_id       = in_birth_prod_id,
-    line_id             = in_line_id,
-    sow_status_id       = sow_status_id,
+UPDATE pig_farm SET
+    name                = in_name,
     
-    sow_number          = in_sow_number,
-    sow_name            = in_sow_name,
-    date_of_birth       = in_date_of_birth,
-    notes               = in_notes,
-    
-    last_update_user_id = in_user_id,
-    dt_last_update      = CURRENT_TIMESTAMP
-    
-WHERE 
-    id = in_sow_id;
-
+    country_id          = in_country_id,
+    adrs_level_1_id     = in_adrs_level_1_id,
+    adrs_level_2_id     = in_adrs_level_2_id,
+    adrs_level_3_id     = in_adrs_level_3_id,
+    latitude            = in_latitude,
+    longitude           = in_longitude
+WHERE id =  in_pig_farm_id;
 
 END process_user;
 
 
+SELECT
+    flag,
+    name
+INTO 
+    cur_pig_farm_flag,
+    cur_pig_farm_name
+FROM pig_farm
+WHERE id = in_pig_farm_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_sow_id                           AS sow_id;
+    cur_pig_farm_id                     AS pig_farm_id,
+    cur_pig_farm_flag                   AS pig_farm_flag,
+    cur_pig_farm_name                   AS pig_farm_name;
     
 
 END $$

@@ -2,9 +2,7 @@
 
 DROP PROCEDURE IF EXISTS pig_production_add $$
 CREATE PROCEDURE pig_production_add(
-	in_user_id				INT,
-	
-    in_sow_id           	INT,
+	in_sow_id           	INT,
     
     in_semen_source_id      INT,
     in_staff_id             INT,

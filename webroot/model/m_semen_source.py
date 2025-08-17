@@ -1,47 +1,41 @@
-# January 3, 2024
+# August 17, 2025
 # Jack Wong
 
 from common_constants       import *
 
 
-class PigFarm:
+class SemenSource:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'PigFarm'
+        self.TAG                = 'SemenSource'
 
     
     def add(self, data = None):
         """
-        PROCEDURE pig_farm_add(
+        PROCEDURE semen_source_add(
             in_user_id              INT,
 
-            in_name                 VARCHAR(50),
+            in_farm_id              INT,
+            in_is_ai                INT,
+            in_pig_race_id          INT,
+            in_boar_id              INT,
             
-            in_country_id           INT, 
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
-            in_latitude             DECIMAL(10,5),
-            in_longitude            DECIMAL(10,5)
+            in_name                 VARCHAR(50),
+            in_description          VARCHAR(160)
         )  
         """
         
-        sql =  'CALL pig_farm_add('
+        sql =  'CALL semen_source_add('
         sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.farm_id
+        sql += '%s,'    % data.is_ai
+        sql += '%s,'    % data.pig_race_id
+        sql += '%s,'    % data.boar_id
+        
         sql += '"%s",'  % data.name
         
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
-        
-        if data.latitude is not None:
-            sql += '%s,'    % data.latitude
-        else:
-            sql += 'NULL,'
-            
-        if data.longitude is not None:
-            sql += '%s);'   % data.longitude
+        if data.description is not None:
+            sql += "'%s");'   % data.description
         else:
             sql += 'NULL);'
         
@@ -80,7 +74,7 @@ class PigFarm:
                     'desc':             row[2],
                 },
                 
-                'pig_farm': {
+                'semen_source': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -89,21 +83,6 @@ class PigFarm:
 
         return None
 
-    
-    def update_hashid(self, data = None):
-        pig_farm_id     = data['pig_farm_id']
-        hashid          = data['hashid']
-        
-        values = (hashid, pig_farm_id)
-        
-        sql =   """
-                UPDATE pig_farm SET
-                    hashid    = "%s"
-                WHERE id = %s;
-                """ % values
-        
-        return self.model.execute_sql(sql)
-    
     
     def update(self, data = None):
         """

@@ -37,7 +37,7 @@ from model.m_account_request    import AccountRequest
 from model.m_mfa                import Mfa
 
 from model.m_pig_farm           import PigFarm
-from model.m_sow                import Sow
+from model.m_sow_boar           import SowBoar
 from model.m_sow_act            import SowActivity
 from model.m_pig_production     import PigProduction
 
@@ -52,7 +52,7 @@ model_names = [
     ('mfa',                     Mfa),
     
     ('pig_farm',                PigFarm),
-    ('sow',                     Sow),
+    ('sow_boar',                SowBoar),
     ('pig_prod',                PigProduction),
     
     ('sow_act',                 SowActivity),

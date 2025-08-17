@@ -14,7 +14,6 @@ class DataUser(BaseModel):
     mobile_num:         str
 
 
-
 class DataAccount(BaseModel):
     uhid:               str
     user_id:            int = 0
@@ -37,24 +36,26 @@ class DataPigFarm(BaseModel):
     longitude:          float = None
     
     
-class DataSow(BaseModel):
+class DataSowBoar(BaseModel):
     uhid:               str
     pfhid:              str = None
     
-    sow_id:             int = 0
+    sow_boar_id:        int = 0
     user_id:            int = 0
     pig_farm_id:        int = 0
     birth_prod_id:      int = 0
     line_id:            int = 0
     sow_status_id:      int = 2
     
-    sow_number:         str
-    sow_name:           str = None
+    sex:                str = 'F' # Sow = 'F';  Boar = 'M'  
+    
+    number:             str
+    name:               str = None
     date_of_birth:      str = None
     notes:              str = None
     
     
-class DataSowCull(BaseModel):
+class DataSowBoarCull(BaseModel):
     uhid:               str
     
     user_id:            int = 0
@@ -63,3 +64,6 @@ class DataSowCull(BaseModel):
     cull_notes:         str
     
     
+    
+class DataPigProd(BaseModel):
+    uhid:               str

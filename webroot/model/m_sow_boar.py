@@ -4,10 +4,10 @@
 from common_constants       import *
 
 
-class Sow:
+class SowBoar:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'Sow'
+        self.TAG                = 'SowBoar'
 
     
     def get_sow_status_list(self):
@@ -77,32 +77,36 @@ class Sow:
     
     def add(self, data = None):
         """
-        PROCEDURE sow_add(
+        PROCEDURE sow_boar_add(
             in_user_id              INT,
             
             in_pig_farm_id          INT,
             in_birth_prod_id        INT,
             in_line_id              INT,
             in_sow_status_id        INT,
+            
+            in_sex                  CHAR(1),
                     
-            in_sow_number           VARCHAR(10),
-            in_sow_name             VARCHAR(20),
+            in_number               VARCHAR(10),
+            in_name                 VARCHAR(20),
             in_date_of_birth        VARCHAR(10),
             in_description          VARCHAR(160)
         )    
         """
         
-        sql =  'CALL sow_add('
+        sql =  'CALL sow_boar_add('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_farm_id
         sql += '%s,'    % data.birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
         
-        sql += '"%s",'  % data.sow_number
+        sql += '"%s",'  % data.sex
         
-        if data.sow_name is not None:
-            sql += '"%s",'    % data.sow_name
+        sql += '"%s",'  % data.number
+        
+        if data.name is not None:
+            sql += '"%s",'    % data.name
         else:
             sql += 'NULL,'
             
@@ -151,9 +155,10 @@ class Sow:
                     'desc':             row[2],
                 },
                 
-                'sow': {
+                'sow_boar': {
                     'id':               row[3],
-                    'farm_sow_id':      row[4]
+                    'farm_sow_id':      row[4],
+                    'farm_boar_id':     row[5]
                 }
             }
 
@@ -309,11 +314,9 @@ class Sow:
         return None
 
     
-    
-    
-    def get_sow_list(self, farm_id, list_sow_numbers = None):
+    def get_sow_boar_list(self, farm_id, sex, list_sow_numbers = None):
         """
-        Will get sow list.
+        Will get sow_boar list.
         
         
         Returns
@@ -332,46 +335,82 @@ class Sow:
                 
                 s += f"'{cur_entry}'"
                 
-            values = (farm_id, s)
-            where_clause = ' WHERE a.pig_farm_id = %s AND a.sow_number  IN (%s) ' % values
+            values = (farm_id, sex, s)
+            where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND a.sow_number  IN (%s) ' % values
         
         else:
-            where_clause = ' WHERE a.pig_farm_id = %s' % farm_id
+            values = (farm_id, sex)
+            where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
         
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.farm_sow_id,
-                    a.sow_number,
-                    a.sow_name,
-                    a.flag,
-                    a.birth_prod_id,
-                    a.last_prod_id,
-                   
-                    b.name AS status_name,
-                    a.date_of_birth,
-                    a.date_culled,
-                    a.notes,
-                    
-                    c.username,
-                    c.name_last,
-                    c.name_first,
-                    
-                    d.username,
-                    d.name_last,
-                    d.name_first,
-                    a.dt_last_update,
-                    
-                    a.dt_entry
-                    
-                FROM sow a
-                LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
-                LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
-                %s
-                ORDER BY a.date_of_birth DESC
-                """ % where_clause
-        
+        if sex == 'F':
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.farm_sow_id,
+                        a.number,
+                        a.name,
+                        a.flag,
+                        a.birth_prod_id,
+                        a.last_prod_id,
+                       
+                        b.name AS status_name,
+                        a.date_of_birth,
+                        a.date_culled,
+                        a.notes,
+                        
+                        c.username,
+                        c.name_last,
+                        c.name_first,
+                        
+                        d.username,
+                        d.name_last,
+                        d.name_first,
+                        a.dt_last_update,
+                        
+                        a.dt_entry
+                        
+                    FROM sow_boar a
+                    LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
+                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                    %s
+                    ORDER BY a.date_of_birth DESC
+                    """ % where_clause
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.farm_boar_id,
+                        a.number,
+                        a.name,
+                        a.flag,
+                        a.birth_prod_id,
+                        a.last_prod_id,
+                       
+                        b.name AS status_name,
+                        a.date_of_birth,
+                        a.date_culled,
+                        a.notes,
+                        
+                        c.username,
+                        c.name_last,
+                        c.name_first,
+                        
+                        d.username,
+                        d.name_last,
+                        d.name_first,
+                        a.dt_last_update,
+                        
+                        a.dt_entry
+                        
+                    FROM sow_boar a
+                    LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
+                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                    %s
+                    ORDER BY a.date_of_birth DESC
+                    """ % where_clause
+            
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -393,7 +432,7 @@ class Sow:
             conn.close()
             
         except Exception as e:
-            msg = 'get_sow_list(); error in executing query[] = ' + sql
+            msg = 'get_sow_boar_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -408,9 +447,9 @@ class Sow:
             
             for row in rows:
                 cur_id                  = row[0]
-                cur_farm_sow_id         = row[1]
-                cur_sow_number          = row[2]
-                cur_sow_name            = row[3]
+                cur_farm_sow_boar_id    = row[1]
+                cur_number              = row[2]
+                cur_name                = row[3]
                 cur_flag                = row[4]
                 cur_birth_prod_id       = row[5]
                 cur_last_prod_id        = row[6]
@@ -443,29 +482,54 @@ class Sow:
                 
                 cur_dt_entry            = str(row[18])
                 
+                if sex == 'F':
+                    cur_entry = {
+                        'id':               cur_id,
+                        'farm_sow_id':      cur_farm_sow_boar_id,
+                        'number':           cur_number, 
+                        'name':             cur_name,
+                        'flag':             cur_flag,
+                        'birth_prod_id':    cur_birth_prod_id,
+                        'last_prod_id':     cur_last_prod_id,
+                        
+                        'status':           cur_status,
+                        'date_of_birth':    cur_date_of_birth,
+                        'date_culled':      cur_date_culled,
+                        'notes':            cur_notes,
+                        
+                        'added_by': {
+                            'username':     cur_user_username,
+                            'name_last':    cur_user_name_last,
+                            'name_first':   cur_user_name_first
+                        },
+                        
+                        'dt_entry':         cur_dt_entry
+                    }
                 
-                cur_entry = {
-                    'id':               cur_id,
-                    'farm_sow_id':      cur_farm_sow_id,
-                    'sow_number':       cur_sow_number, 
-                    'sow_name':         cur_sow_name,
-                    'flag':             cur_flag,
-                    'birth_prod_id':    cur_birth_prod_id,
-                    'last_prod_id':     cur_last_prod_id,
+                else:
+                    cur_entry = {
+                        'id':               cur_id,
+                        'farm_boar_id':      cur_farm_sow_boar_id,
+                        'number':           cur_number, 
+                        'name':             cur_name,
+                        'flag':             cur_flag,
+                        'birth_prod_id':    cur_birth_prod_id,
+                        'last_prod_id':     cur_last_prod_id,
+                        
+                        'status':           cur_status,
+                        'date_of_birth':    cur_date_of_birth,
+                        'date_culled':      cur_date_culled,
+                        'notes':            cur_notes,
+                        
+                        'added_by': {
+                            'username':     cur_user_username,
+                            'name_last':    cur_user_name_last,
+                            'name_first':   cur_user_name_first
+                        },
+                        
+                        'dt_entry':         cur_dt_entry
+                    }
                     
-                    'status':           cur_status,
-                    'date_of_birth':    cur_date_of_birth,
-                    'date_culled':      cur_date_culled,
-                    'notes':            cur_notes,
-                    
-                    'added_by': {
-                        'username':     cur_user_username,
-                        'name_last':    cur_user_name_last,
-                        'name_first':   cur_user_name_first
-                    },
-                    
-                    'dt_entry':         cur_dt_entry
-                }
                 
                 if cur_upd_user_username is not None:
                     last_update = {

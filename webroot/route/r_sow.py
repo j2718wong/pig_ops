@@ -32,12 +32,12 @@ async def sow_status_list():
 
     """
     
-    return model['sow'].get_sow_status_list()
+    return model['sow_boar'].get_sow_status_list()
     
     
-@app.post("/sow/add")
-async def sow_add(sow_data: dm.DataSow):
-    uhid        = sow_data.uhid
+@app.post("/sow_boar/add")
+async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
+    uhid        = sow_boar_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -52,7 +52,7 @@ async def sow_add(sow_data: dm.DataSow):
     user_id = res[0]
     
     
-    pfhid       = sow_data.pfhid
+    pfhid       = sow_boar_data.pfhid
     
     res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
@@ -67,8 +67,8 @@ async def sow_add(sow_data: dm.DataSow):
     pig_farm_id = res[0]
     
     
-    sow_number   = sow_data.sow_number.strip()
-    if len(sow_number) == 0:        
+    number   = sow_boar_data.number.strip()
+    if len(number) == 0:
         return {
             'result':{
                 'num':  ERROR_SOW_INVALID_SOW_NUMBER,
@@ -77,11 +77,11 @@ async def sow_add(sow_data: dm.DataSow):
             }
         }
     
-    sow_data.sow_number     = sow_number
-    sow_data.user_id        = user_id
-    sow_data.pig_farm_id    = pig_farm_id
+    sow_boar_data.number         = number
+    sow_boar_data.user_id        = user_id
+    sow_boar_data.pig_farm_id    = pig_farm_id
     
-    res_add    =  model['sow'].add(sow_data)
+    res_add    =  model['sow_boar'].add(sow_boar_data)
     
     if res_add is None:
         return {
@@ -95,9 +95,9 @@ async def sow_add(sow_data: dm.DataSow):
     return res_add
     
 
-@app.post("/sow/update")
-async def sow_update(sow_data: dm.DataSow):
-    uhid        = sow_data.uhid
+@app.post("/sow_boar/update")
+async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
+    uhid        = sow_boar_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -112,7 +112,7 @@ async def sow_update(sow_data: dm.DataSow):
     user_id = res[0]
     
         
-    sow_number   = sow_data.sow_number.strip()
+    sow_number   = sow_boar_data.sow_number.strip()
     if len(sow_number) == 0:
         return {
             'result':{
@@ -122,10 +122,10 @@ async def sow_update(sow_data: dm.DataSow):
             }
         }
     
-    sow_data.sow_number     = sow_number
-    sow_data.user_id        = user_id
+    sow_boar_data.sow_number     = sow_number
+    sow_boar_data.user_id        = user_id
     
-    res_update  =  model['sow'].update(sow_data)
+    res_update  =  model['sow_boar'].update(sow_boar_data)
     
     if res_update is None:
         return {
@@ -139,9 +139,9 @@ async def sow_update(sow_data: dm.DataSow):
     return res_update
     
 
-@app.post("/sow/cull")
-async def sow_update(sow_data: dm.DataSowCull):
-    uhid        = sow_data.uhid
+@app.post("/sow_boar/cull")
+async def sow_boar_cull(sow_boar_data: dm.DataSowBoarCull):
+    uhid        = sow_boar_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -156,9 +156,9 @@ async def sow_update(sow_data: dm.DataSowCull):
     user_id = res[0]
     
     
-    sow_data.user_id        = user_id
+    sow_boar_data.user_id        = user_id
     
-    res_cull    =  model['sow'].cull(sow_data)
+    res_cull    =  model['sow_boar'].cull(sow_boar_data)
     
     if res_cull is None:
         return {
@@ -170,7 +170,6 @@ async def sow_update(sow_data: dm.DataSowCull):
         }
         
     return res_cull
-
 
 
 @app.get("/sow/pt_list", response_class=PlainTextResponse)
@@ -201,7 +200,7 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     
     pig_farm_id = res[0]
     
-    res = model['sow'].get_sow_list(pig_farm_id)
+    res = model['sow_boar'].get_sow_list(pig_farm_id)
     
     if res is None:
         return {
@@ -269,8 +268,8 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     return s
     
 
-@app.get("/sow/list")
-async def sow_list(pfhid:str, full_info: int = 0):
+@app.get("/sow_boar/list")
+async def sow_boar_list(pfhid:str, sex:str = 'F', full_info: int = 0):
     """
     Will get sow list.
     
@@ -298,7 +297,7 @@ async def sow_list(pfhid:str, full_info: int = 0):
     pig_farm_id = res[0]
     
     
-    res = model['sow'].get_sow_list(pig_farm_id)
+    res = model['sow_boar'].get_sow_boar_list(pig_farm_id, sex)
     
     if res is None:
         return {
