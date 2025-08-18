@@ -9,8 +9,8 @@ CREATE PROCEDURE sow_boar_update(
     in_line_id              INT,
     in_sow_status_id        INT,
     
-    in_sow_number           VARCHAR(10),
-    in_sow_name             VARCHAR(20),
+    in_number               VARCHAR(10),
+    in_name                 VARCHAR(20),
     in_date_of_birth        VARCHAR(10),
     in_notes                VARCHAR(160)
 )  
@@ -32,7 +32,7 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_sow_boar_id                        	INT             DEFAULT 0;
+DECLARE cur_sow_boar_id                         INT             DEFAULT 0;
 DECLARE cur_sow_boar_account_id                 INT             DEFAULT 0
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -72,8 +72,8 @@ UPDATE sow_boar SET
     line_id             = in_line_id,
     sow_status_id       = in_sow_status_id,
     
-    sow_number          = in_sow_number,
-    sow_name            = in_sow_name,
+    number              = in_number,
+    name                = in_name,
     date_of_birth       = in_date_of_birth,
     notes               = in_notes,
     

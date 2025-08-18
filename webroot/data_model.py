@@ -68,6 +68,8 @@ class DataSemenSource(BaseModel):
     uhid:               str
     pfhid:              str = None
     
+    user_id:            int = 0
+    pig_farm_id:        int = 0
     semen_source_id:    int = 0
     is_ai:              int = 0
     pig_race_id:        int = 0

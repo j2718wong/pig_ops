@@ -167,7 +167,7 @@ class SowBoar:
     
     def update(self, data = None):
         """
-        PROCEDURE sow_update(
+        PROCEDURE sow_boar_update(
             in_user_id              INT,
             
             in_sow_id               INT,
@@ -182,9 +182,9 @@ class SowBoar:
         )    
         """
         
-        sql =  'CALL sow_update('
+        sql =  'CALL sow_boar_update('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.sow_id
+        sql += '%s,'    % data.sow_boar_id
         sql += '%s,'    % data.birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
@@ -241,7 +241,7 @@ class SowBoar:
                     'desc':             row[2],
                 },
                 
-                'sow': {
+                'sow_boar': {
                     'id':               row[3]
                 }
             }
