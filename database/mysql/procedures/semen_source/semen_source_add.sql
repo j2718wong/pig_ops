@@ -37,6 +37,9 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
+DECLARE cur_pig_farm_account_id                 INT             DEFAULT 0;
+
+
 DECLARE cur_semen_source_id                     INT             DEFAULT 0;
 DECLARE cur_semen_source_flag                   INT             DEFAULT 0;
 DECLARE cur_semen_source_name                   VARCHAR(50)     DEFAULT '';
@@ -52,8 +55,19 @@ SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-CALL basic_user_check(in_user_id, cur_user_account_id, cur_user_group_id,
-    res_num, res_code, res_desc);
+SELECT  account_id
+INTO    cur_pig_farm_account_id
+FROM    pig_farm
+WHERE   id = in_pig_farm_id
+LIMIT   1;
+
+
+CALL basic_user_check(in_user_id, 0, cur_pig_farm_account_id,
+    cur_user_account_id, 
+    cur_user_group_id,
+    res_num, 
+    res_code, 
+    res_desc);
 
 
 process_user : BEGIN

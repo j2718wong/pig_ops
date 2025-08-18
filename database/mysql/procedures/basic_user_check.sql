@@ -3,6 +3,8 @@
 DROP PROCEDURE IF EXISTS basic_user_check $$
 CREATE PROCEDURE basic_user_check(
     in_user_id                  INT,
+    in_user_must_be_admin       INT,
+    in_check_account_id         INT,
     
     OUT out_user_account_id     INT,
     OUT out_user_group_id       INT,
@@ -16,7 +18,7 @@ BEGIN
 
 /** 
  * 
- * @author Jack Wong (neoaspilet11@gmail.com, zhaoshan99@gmail.com) 
+ * @author Jack Wong (j2718wong@gmail.com) 
  * @since January 5, 2025
  *
  */
@@ -32,6 +34,8 @@ DECLARE RES_NUM_USER_NO_USER_GROUP_SET          INT             DEFAULT 5;
 
 DECLARE RES_NUM_ACCOUNT_DISABLED                INT             DEFAULT 6;
 DECLARE RES_NUM_ACCOUNT_STATUS_TRIAL_EXPIRED    INT             DEFAULT 7;
+DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 8;
+
 
 
 /* user.flag bits*/
@@ -94,11 +98,13 @@ IF cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED = 0 THEN
 END IF;
 
 
-IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN 
-    SET res_num     = RES_NUM_USER_NOT_ACCOUNT_ADMIN;
-    SET res_code    = "RES_NUM_USER_NOT_ACCOUNT_ADMIN";
+IF in_user_must_be_admin > 0 THEN 
+    IF cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN = 0 THEN 
+        SET res_num     = RES_NUM_USER_NOT_ACCOUNT_ADMIN;
+        SET res_code    = "RES_NUM_USER_NOT_ACCOUNT_ADMIN";
 
-    LEAVE process_user;    
+        LEAVE process_user;
+    END IF;
 END IF;
 
 
@@ -129,7 +135,7 @@ INTO
     cur_account_status_id
     
 FROM account
-WHERE id = cur_user_account_id;
+WHERE id = out_user_account_id;
 
 
 
@@ -146,6 +152,16 @@ IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN
     LEAVE process_user;
 END IF;
 
+
+IF in_check_account_id > 0 THEN 
+    IF out_user_account_id != in_check_account_id THEN 
+        SET res_num     = RES_NUM_ACCOUNT_MISMATCH;
+        SET res_code    = "RES_NUM_ACCOUNT_MISMATCH";
+
+        LEAVE process_user;
+    END IF;
+
+END IF;
 
 
 END process_user;
