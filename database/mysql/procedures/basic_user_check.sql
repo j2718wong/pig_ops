@@ -3,7 +3,7 @@
 DROP PROCEDURE IF EXISTS basic_user_check $$
 CREATE PROCEDURE basic_user_check(
     in_user_id                  INT,
-    in_user_must_have_account  	INT,
+    in_user_must_have_account   INT,
     in_compare_to_account_id    INT,
     
     in_business_obj_to_access   INT, /* This must be a FLAG_BIT_BIZ value*/

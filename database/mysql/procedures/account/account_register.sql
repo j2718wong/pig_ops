@@ -27,6 +27,13 @@ DECLARE RES_NUM_ACCOUNT_ALREADY_REGISTERED_FOR_USER INT         DEFAULT 21;
 DECLARE RES_NUM_DUPLICATE_ENTRY                     INT         DEFAULT 22;
 
 
+DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT                INT             DEFAULT 2;
+
+DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+
+
 
 
 /* account.flag bits*/
@@ -37,10 +44,6 @@ DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
 DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 
-/* Default account sow operation*/
-DECLARE SOW_OPERATION_NUM_DAYS_CHECK_PREGNANT   INT             DEFAULT 21;
-DECLARE SOW_OPERATION_NUM_DAYS_INJECT_IRON      INT             DEFAULT 80;
-DECLARE SOW_OPERATION_NUM_DAYS_DEWORM           INT             DEFAULT 100;
 
 
 DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
@@ -78,7 +81,14 @@ SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-CALL basic_user_check(in_user_id, 1, 0,
+CALL basic_user_check(
+    in_user_id, 
+    0, /* user has no account yet*/
+    0,
+    
+    FLAG_BIT_BIZ_OBJ_ACCOUNT,
+    FLAG_BIT_OPERATION_ADD,
+    
     cur_user_account_id, 
     cur_user_group_id,
     res_num, 
@@ -159,43 +169,7 @@ UPDATE user SET
 WHERE id = in_user_id;
 
 
-/* Create default sow_operation for the account.*/
-INSERT INTO sow_operation (
-    account_id,
-    order_num,
-    num_days_since_insem,
-    name
-) VALUES (
-    cur_account_id,
-    1,
-    SOW_OPERATION_NUM_DAYS_CHECK_PREGNANT,
-    "Check if pregnant"
-);
-
-INSERT INTO sow_operation (
-    account_id,
-    order_num,
-    num_days_since_insem,
-    name
-) VALUES (
-    cur_account_id,
-    2,
-    SOW_OPERATION_NUM_DAYS_INJECT_IRON,
-    "Inject Iron"
-);
-
-INSERT INTO sow_operation (
-    account_id,
-    order_num,
-    num_days_since_insem,
-    name
-) VALUES (
-    cur_account_id,
-    3,
-    SOW_OPERATION_NUM_DAYS_DEWORM,
-    "Deworm"
-);
-
+CALL account_create_sow_operations(cur_account_id);
 
 
 /* Insert app_audit_log. */
