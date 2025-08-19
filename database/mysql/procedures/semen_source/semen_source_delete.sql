@@ -35,7 +35,7 @@ DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
 DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
 DECLARE cur_pig_farm_name                       VARCHAR(50)     DEFAULT '';
 
-
+DECLARE is_to_delete							INT             DEFAULT 0;
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
@@ -65,6 +65,9 @@ CALL basic_user_check(in_user_id, 0, cur_semen_source_account_id,
 
 
 process_user : BEGIN
+
+
+
 
 
 UPDATE semen_source SET

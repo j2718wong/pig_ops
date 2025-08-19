@@ -70,6 +70,8 @@ DECLARE cur_account_name                        VARCHAR(100);
 DECLARE cur_account_date_trial_start            DATE;
 DECLARE cur_account_date_trial_end              DATE;
 
+DECLARE cur_user_group_id                       INT             DEFAULT 0;
+
 
 DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
 
@@ -158,10 +160,52 @@ INSERT INTO account(
 SELECT LAST_INSERT_ID() INTO cur_account_id;
 
 
+/* Create account default user_groups. Each account will have a fix 
+number of user groups*/
+INSERT INTO user_group(
+    account_id,
+    group_num,
+    name
+) VALUES (
+    cur_account_id,
+    1,
+    'Admin'
+);
+
+
+INSERT INTO user_group(
+    account_id,
+    group_num,
+    name
+) VALUES (
+    cur_account_id,
+    2,
+    'Operations'
+);
+
+
+INSERT INTO user_group(
+    account_id,
+    group_num,
+    name
+) VALUES (
+    cur_account_id,
+    3,
+    'Farm Staff'
+);
+
+
+SELECT  id 
+INTO    cur_user_group_id
+FROM    user_group
+WHERE   account_id = cur_account_id AND group_num = 1;
+
+
 /* The user that registers the account is an account admin. */
 UPDATE user SET
-    account_id  = cur_account_id,
-    flag        = flag | FLAG_BIT_USER_IS_ACCOUNT_ADMIN
+    account_id      = cur_account_id,
+    user_group_id   = cur_user_group_id,
+    flag            = flag | FLAG_BIT_USER_IS_ACCOUNT_ADMIN
 WHERE id = in_user_id;
 
 
