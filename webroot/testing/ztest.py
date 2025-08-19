@@ -69,17 +69,26 @@ class TestAPIAccount:
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+        
+            print(f"\n\nResult; status_code = {r.status_code}; result =")
+            pprint.pprint(res_json)
             
-            print(f"\n\nResult; status_code = {r.status_code}")
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
             
-            result = str(r.text)
-            print(result)
-            
-            res = json.loads(result)
-            
-            
-            if res['result']['num'] != 0:
+            if result_num != 0:
                 return
+            
+            
+            account_h_id    = res_json['account']['h_id']
+            res_decrypt     = hashids_account.decrypt(account_h_id)
+            account_id      = res_decrypt[0]
+        
+            print(f"created account_id = {account_id}")
+            
+            assert(account_id > 0)
             
         
         # Test account register duplicate
@@ -95,20 +104,15 @@ class TestAPIAccount:
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
-        print(f"\n\nResult; status_code = {r.status_code}")
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
         
-        result = str(r.text)
-        print(result)
-        
-        res = json.loads(result)
         
         
         # Test account update
-        account_h_id    = res['account']['h_id']
-        res             = hashids_account.decrypt(account_h_id)
-        account_id      = res[0]
-        
         now             = datetime.now()
         now_ts          = now.strftime('%Y%m%d_%H%M%S')
         
@@ -124,11 +128,11 @@ class TestAPIAccount:
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
-        print(f"\n\nResult; status_code = {r.status_code}")
-        
-        result = str(r.text)
-        print(result)
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
         
         
         print(f'\n\nTesting get account user groups; account_id = {account_id}')
@@ -155,15 +159,13 @@ class TestAPIAccount:
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
             
-            print(f"\n\nResult; status_code = {r.status_code}")
+            print(f"\n\nResult; status_code = {r.status_code}; result")
+            pprint.pprint(res_json)
             
-            result = str(r.text)
-            print(result)
-            
-            res = json.loads(result)
-            
-            
+
             if res['result']['num'] != 0:
                 return
             
@@ -180,13 +182,12 @@ class TestAPIAccount:
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
-        print(f"\n\nResult; status_code = {r.status_code}")
-        
-        result = str(r.text)
-        print(result)
-        
-        res = json.loads(result)
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
         
     
     def testing_sow_boar_add(self, user_id, pig_farm_id, sex= 'F'):
