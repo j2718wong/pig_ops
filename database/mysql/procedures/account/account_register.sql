@@ -22,18 +22,11 @@ DECLARE LOV_ID_ACCOUNT_NUMDAYS_FREE_TRIAL       INT             DEFAULT 1;
 
 
 DECLARE RES_NUM_SUCCESS                             INT         DEFAULT 0;
-DECLARE RES_NUM_USER_IS_INACTIVE                    INT         DEFAULT 1;
-DECLARE RES_NUM_ACCOUNT_ALREADY_REGISTERED_FOR_USER INT         DEFAULT 2;
-DECLARE RES_NUM_DUPLICATE_ENTRY                     INT         DEFAULT 3;
+
+DECLARE RES_NUM_ACCOUNT_ALREADY_REGISTERED_FOR_USER INT         DEFAULT 21;
+DECLARE RES_NUM_DUPLICATE_ENTRY                     INT         DEFAULT 22;
 
 
-/* user.flag bits*/
-DECLARE FLAG_BIT_USER_IS_ACTIVE                 INT             DEFAULT 1;
-DECLARE FLAG_BIT_USER_EMAIL_VERIFIED            INT             DEFAULT 2;
-DECLARE FLAG_BIT_USER_MOBILE_NUM_VERIFIED       INT             DEFAULT 4;
-DECLARE FLAG_BIT_USER_IS_DELETED                INT             DEFAULT 8;
-
-DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 
 
 /* account.flag bits*/
@@ -85,26 +78,15 @@ SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-SELECT  
-        flag,
-        account_id
-INTO    
-        cur_user_flag,
-        cur_user_account_id
-FROM    user 
-WHERE   id = in_user_id;
+CALL basic_user_check(in_user_id, 1, 0,
+    cur_user_account_id, 
+    cur_user_group_id,
+    res_num, 
+    res_code, 
+    res_desc);
 
 
 process_user : BEGIN
-
-/* Check user*/
-IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN 
-    SET res_num     = RES_NUM_USER_IS_INACTIVE;
-    SET res_code    = "RES_NUM_USER_IS_INACTIVE";
-
-    LEAVE process_user;
-    
-END IF;
 
 
 IF cur_user_account_id > 0 THEN
@@ -160,39 +142,7 @@ INSERT INTO account(
 SELECT LAST_INSERT_ID() INTO cur_account_id;
 
 
-/* Create account default user_groups. Each account will have a fix 
-number of user groups*/
-INSERT INTO user_group(
-    account_id,
-    group_num,
-    name
-) VALUES (
-    cur_account_id,
-    1,
-    'Admin'
-);
-
-
-INSERT INTO user_group(
-    account_id,
-    group_num,
-    name
-) VALUES (
-    cur_account_id,
-    2,
-    'Operations'
-);
-
-
-INSERT INTO user_group(
-    account_id,
-    group_num,
-    name
-) VALUES (
-    cur_account_id,
-    3,
-    'Farm Staff'
-);
+CALL account_create_user_groups(cur_account_id);
 
 
 SELECT  id 

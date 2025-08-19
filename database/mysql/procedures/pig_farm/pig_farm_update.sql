@@ -28,7 +28,12 @@ BEGIN
 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
-DECLARE RES_NUM_ACCOUNT_MISMATCH                INT             DEFAULT 20;
+
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
+
+DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
@@ -59,7 +64,14 @@ FROM    pig_farm
 WHERE   id = in_pig_farm_id;
 
 
-CALL basic_user_check(in_user_id, 1, cur_farm_account_id,
+CALL basic_user_check(
+    in_user_id, 
+    1, /* user must have an account*/
+    cur_farm_account_id, /* compare user.account_id to this account_id*/
+    
+    FLAG_BIT_BIZ_OBJ_PIG_FARM,
+    FLAG_BIT_OPERATION_UPDATE,
+    
     cur_user_account_id, 
     cur_user_group_id,
     res_num, 

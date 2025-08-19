@@ -32,6 +32,14 @@ DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 21;
 
 
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
+
+DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+
+
+
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
@@ -59,13 +67,20 @@ SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-CALL basic_user_check(in_user_id, 1, 0,
+CALL basic_user_check(
+    in_user_id, 
+    1, /* user must have an account*/
+    0,
+    
+    FLAG_BIT_BIZ_OBJ_PIG_FARM,
+    FLAG_BIT_OPERATION_ADD,
+    
     cur_user_account_id, 
     cur_user_group_id,
-    res_num, 
-    res_code, 
+    res_num,
+    res_code,
     res_desc);
-    
+
 
 process_user : BEGIN
 
