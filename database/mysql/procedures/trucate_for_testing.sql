@@ -16,11 +16,13 @@ BEGIN
 
 TRUNCATE TABLE account;
 TRUNCATE TABLE pig_farm;
-TRUNCATE TABLE sow;
+TRUNCATE TABLE sow_boar;
 TRUNCATE TABLE sow_operation;
+TRUNCATE TABLE semen_source;
+TRUNCATE TABLE user_group;
 TRUNCATE TABLE pig_production;
 
-UPDATE user SET account_id = 0;
+UPDATE user SET account_id = 0, user_group_id = 0;
 
 
 END $$

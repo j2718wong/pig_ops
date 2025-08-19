@@ -105,7 +105,9 @@ class TestAPIAccount:
         
         
         # Test account update
-        account_h_id = res['account']['h_id']
+        account_h_id    = res['account']['h_id']
+        res             = hashids_account.decrypt(account_h_id)
+        account_id      = res[0]
         
         now             = datetime.now()
         now_ts          = now.strftime('%Y%m%d_%H%M%S')
@@ -127,6 +129,13 @@ class TestAPIAccount:
         
         result = str(r.text)
         print(result)
+        
+        
+        print(f'\n\nTesting get account user groups; account_id = {account_id}')
+        res = model['user_group'].get_user_group_by_account(account_id)
+        
+        print('\n\nAccount usergroups')
+        pprint.pprint(res)
         
         
     def testing_pig_farm(self, user_id, farm_name, skip_step = 0):

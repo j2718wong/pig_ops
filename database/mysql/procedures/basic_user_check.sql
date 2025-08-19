@@ -63,9 +63,9 @@ DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
 
 /* user_group.flag_business_obj bits; new business objects add at the bottom*/
 DECLARE FLAG_BIT_BIZ_OBJ_USER                   INT             DEFAULT 1;
-DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT                INT             DEFAULT 2;
-DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT_REQUEST        INT             DEFAULT 4;
-DECLARE FLAG_BIT_BIZ_OBJ_USER_GROUP             INT             DEFAULT 8;
+DECLARE FLAG_BIT_BIZ_OBJ_USER_GROUP             INT             DEFAULT 2;
+DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT                INT             DEFAULT 4;
+DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT_REQUEST        INT             DEFAULT 8;
 
 DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
 DECLARE FLAG_BIT_BIZ_OBJ_SOW_BOAR               INT             DEFAULT 32;
@@ -74,9 +74,9 @@ DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 128;
 
 
 
-DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
-DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
-DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
 
@@ -87,9 +87,10 @@ DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_business_obj          INT             DEFAULT 0;
         
 DECLARE cur_user_grp_flag_priv_user             INT             DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_user_group       INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_account          INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_account_request  INT             DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_user_group       INT             DEFAULT 0;
+
     
 DECLARE cur_user_grp_flag_priv_pig_farm         INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_sow_boar         INT             DEFAULT 0;
@@ -113,9 +114,9 @@ SELECT
     b.flag_business_obj,
     
     b.flag_priv_user,
+    b.flag_priv_user_group,
     b.flag_priv_account,
     b.flag_priv_account_request,
-    b.flag_priv_user_group,
     
     b.flag_priv_pig_farm,
     b.flag_priv_sow_boar,
@@ -130,9 +131,9 @@ INTO
     cur_user_grp_flag_business_obj,
         
     cur_user_grp_flag_priv_user,
+    cur_user_grp_flag_priv_user_group,
     cur_user_grp_flag_priv_account,
     cur_user_grp_flag_priv_account_request,
-    cur_user_grp_flag_priv_user_group,
     
     cur_user_grp_flag_priv_pig_farm,
     cur_user_grp_flag_priv_sow_boar,
@@ -268,6 +269,45 @@ IF in_business_obj_to_access = FLAG_BIT_BIZ_OBJ_USER THEN
 END IF;
 
 
+IF in_business_obj_to_access = FLAG_BIT_BIZ_OBJ_USER_GROUP THEN 
+
+    IF cur_user_grp_flag_business_obj & FLAG_BIT_BIZ_OBJ_USER_GROUP =  0 THEN
+        SET res_num     = RES_NUM_USER_GROUP_HAS_NO_ACCESS;
+        SET res_code    = "RES_NUM_USER_GROUP_HAS_NO_ACCESS";
+
+        LEAVE process_user;
+    END IF;
+    
+    IF in_business_obj_operation = FLAG_BIT_OPERATION_ADD THEN 
+        IF cur_user_grp_flag_priv_user_group & FLAG_BIT_OPERATION_ADD = 0 THEN 
+            SET res_num     = RES_NUM_USER_GROUP_NO_ADD_PRIVILEGE;
+            SET res_code    = "RES_NUM_USER_GROUP_NO_ADD_PRIVILEGE";
+        
+            LEAVE process_user;
+        END IF;
+    END IF;
+    
+    IF in_business_obj_operation = FLAG_BIT_OPERATION_UPDATE THEN 
+        IF cur_user_grp_flag_priv_user_group & FLAG_BIT_OPERATION_UPDATE = 0 THEN 
+            SET res_num     = RES_NUM_USER_GROUP_NO_UPDATE_PRIVILEGE;
+            SET res_code    = "RES_NUM_USER_GROUP_NO_UPDATE_PRIVILEGE";
+        
+            LEAVE process_user;
+        END IF;
+    END IF;
+    
+    IF in_business_obj_operation = FLAG_BIT_OPERATION_DELETE THEN 
+        IF cur_user_grp_flag_priv_user_group & FLAG_BIT_OPERATION_DELETE = 0 THEN 
+            SET res_num     = RES_NUM_USER_GROUP_NO_DELETE_PRIVILEGE;
+            SET res_code    = "RES_NUM_USER_GROUP_NO_DELETE_PRIVILEGE";
+        
+            LEAVE process_user;
+        END IF;
+    END IF;
+    
+END IF;
+
+
 IF in_business_obj_to_access = FLAG_BIT_BIZ_OBJ_ACCOUNT THEN 
 
     IF cur_user_grp_flag_business_obj & FLAG_BIT_BIZ_OBJ_ACCOUNT =  0 THEN
@@ -336,45 +376,6 @@ IF in_business_obj_to_access = FLAG_BIT_BIZ_OBJ_ACCOUNT_REQUEST THEN
     
     IF in_business_obj_operation = FLAG_BIT_OPERATION_DELETE THEN 
         IF cur_user_grp_flag_priv_account_request & FLAG_BIT_OPERATION_DELETE = 0 THEN 
-            SET res_num     = RES_NUM_USER_GROUP_NO_DELETE_PRIVILEGE;
-            SET res_code    = "RES_NUM_USER_GROUP_NO_DELETE_PRIVILEGE";
-        
-            LEAVE process_user;
-        END IF;
-    END IF;
-    
-END IF;
-
-
-IF in_business_obj_to_access = FLAG_BIT_BIZ_OBJ_USER_GROUP THEN 
-
-    IF cur_user_grp_flag_business_obj & FLAG_BIT_BIZ_OBJ_USER_GROUP =  0 THEN
-        SET res_num     = RES_NUM_USER_GROUP_HAS_NO_ACCESS;
-        SET res_code    = "RES_NUM_USER_GROUP_HAS_NO_ACCESS";
-
-        LEAVE process_user;
-    END IF;
-    
-    IF in_business_obj_operation = FLAG_BIT_OPERATION_ADD THEN 
-        IF cur_user_grp_flag_priv_user_group & FLAG_BIT_OPERATION_ADD = 0 THEN 
-            SET res_num     = RES_NUM_USER_GROUP_NO_ADD_PRIVILEGE;
-            SET res_code    = "RES_NUM_USER_GROUP_NO_ADD_PRIVILEGE";
-        
-            LEAVE process_user;
-        END IF;
-    END IF;
-    
-    IF in_business_obj_operation = FLAG_BIT_OPERATION_UPDATE THEN 
-        IF cur_user_grp_flag_priv_user_group & FLAG_BIT_OPERATION_UPDATE = 0 THEN 
-            SET res_num     = RES_NUM_USER_GROUP_NO_UPDATE_PRIVILEGE;
-            SET res_code    = "RES_NUM_USER_GROUP_NO_UPDATE_PRIVILEGE";
-        
-            LEAVE process_user;
-        END IF;
-    END IF;
-    
-    IF in_business_obj_operation = FLAG_BIT_OPERATION_DELETE THEN 
-        IF cur_user_grp_flag_priv_user_group & FLAG_BIT_OPERATION_DELETE = 0 THEN 
             SET res_num     = RES_NUM_USER_GROUP_NO_DELETE_PRIVILEGE;
             SET res_code    = "RES_NUM_USER_GROUP_NO_DELETE_PRIVILEGE";
         

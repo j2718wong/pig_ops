@@ -36,6 +36,10 @@ from model.m_account            import Account
 from model.m_account_request    import AccountRequest
 from model.m_mfa                import Mfa
 
+from model.m_user               import User
+from model.m_user_group         import UserGroup
+
+
 from model.m_pig_farm           import PigFarm
 from model.m_sow_boar           import SowBoar
 from model.m_semen_source       import SemenSource
@@ -43,7 +47,6 @@ from model.m_sow_act            import SowActivity
 from model.m_pig_production     import PigProduction
 
 
-from model.m_user               import User
 
 
 # Models for connecting to database
@@ -52,13 +55,16 @@ model_names = [
     ('acc_req',                 AccountRequest),
     ('mfa',                     Mfa),
     
+    ('user',                    User),
+    ('user_group',              UserGroup),
+    
     ('pig_farm',                PigFarm),
     ('sow_boar',                SowBoar),
     ('semen_source',            SemenSource),
     ('pig_prod',                PigProduction),
     
-    ('sow_act',                 SowActivity),
-    ('user',                    User)
+    ('sow_act',                 SowActivity)
+    
     
     
 ]

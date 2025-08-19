@@ -29,9 +29,9 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 DECLARE FLAG_BIT_BIZ_OBJ_SOW_BOAR               INT             DEFAULT 32;
 
-DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
-DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
-DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
@@ -39,7 +39,7 @@ DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
 DECLARE cur_sow_boar_id                         INT             DEFAULT 0;
-DECLARE cur_sow_boar_account_id                 INT             DEFAULT 0
+DECLARE cur_sow_boar_account_id                 INT             DEFAULT 0;
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';

@@ -25,7 +25,20 @@ import data_model           as dm
 ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
 
 
-  
+
+@app.get("/account/info")
+async def user_account_info(ahid: str):
+    """
+    Will get account info
+
+    Parameters
+    ----------
+    ahid : str
+        account hashid
+    
+    
+    """
+
 
 @app.post("/account/register")
 async def account_register(account_data: dm.DataAccount):

@@ -35,7 +35,7 @@ class SemenSource:
         sql += '"%s",'  % data.name
         
         if data.description is not None:
-            sql += "'%s");'   % data.description
+            sql += '"%s");'   % data.description
         else:
             sql += 'NULL);'
         

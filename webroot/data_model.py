@@ -75,7 +75,7 @@ class DataSemenSource(BaseModel):
     pig_race_id:        int = 0
     boar_id:            int = 0
     name:               str
-    description         str =  None
+    description:        str =  None
     
     
 class DataPigProd(BaseModel):

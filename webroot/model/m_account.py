@@ -10,6 +10,82 @@ class Account:
         self.TAG                = 'Account'
 
     
+    def get_info(self, id):
+        
+        sql =   """
+                SELECT 
+                    a.id,,
+                    a.flag,
+                    a.status_id, 
+                    b.name AS status_name,
+                    a.hashid,
+                    a.name,
+                    a.date_trial_start,
+                    a.date_trial_end,
+                    a.num_bills_paid,
+                    a.farm_id_01,
+                    a.farm_id_02,
+                    a.farm_id_03,
+                    a.farm_id_04,
+                    a.farm_id_05,
+                    a.last_acc_paid_bill_id,
+                    a.dt_entry
+                FROM account a
+                LEFT OUTER JOIN account_status b ON a.status_id = b.id
+                WHERE a.id = 
+                """ % values
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            msg = 'get_account_admin(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_user_account_id     = row[0]
+                cur_user_flag           = row[1]
+                cur_user_email          = row[2]
+                cur_user_mobile_num     = row[3]
+                
+                cur_entry = {
+                    'id':               user_id,
+                    'flag':             cur_user_flag,
+                    'email':            cur_user_email,
+                    'mobile_num':       cur_user_mobile_num
+                }
+                    
+                result.append(cur_entry)
+        
+        return result
+    
+    
+    
     def register(self, data = None):
         """
         PROCEDURE account_register(

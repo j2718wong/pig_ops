@@ -28,11 +28,20 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
+DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 64;
+
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+
+
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
+DECLARE cur_semen_source_flag                   INT             DEFAULT 0;
 DECLARE cur_semen_source_account_id             INT             DEFAULT 0;
+DECLARE cur_semen_source_name                   VARCHAR(50)     DEFAULT '';
 
 
 DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
@@ -57,7 +66,14 @@ WHERE   id = in_semen_source_id
 LIMIT   1;
 
 
-CALL basic_user_check(in_user_id, 0, cur_semen_source_account_id,
+CALL basic_user_check(
+    in_user_id, 
+    1, 
+    cur_semen_source_account_id,
+    
+    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE,
+    FLAG_BIT_OPERATION_UPDATE,
+    
     cur_user_account_id, 
     cur_user_group_id,
     res_num, 

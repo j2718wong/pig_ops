@@ -33,27 +33,25 @@ DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 64;
 DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 128;
 
 
-/* Admin users can access all business objects, 2^32 -1*/
-DEFAULT FLAG_BUSINESS_OBJ_ADMIN                 INT             DEFAULT 4294967295;
-DEFAULT FLAG_BUSINESS_OBJ_MANAGEMENT            INT             DEFAULT 0;
-DEFAULT FLAG_BUSINESS_OBJ_OPERATIONS            INT             DEFAULT 0;
-DEFAULT FLAG_BUSINESS_OBJ_FARM_STAFF            INT             DEFAULT 0;
+/* Admin users can access all business objects, 2^31 -1*/
+DECLARE FLAG_BUSINESS_OBJ_ADMIN                 BIGINT          DEFAULT 2147483647;
+DECLARE FLAG_BUSINESS_OBJ_MANAGEMENT            INT             DEFAULT 0;
+DECLARE FLAG_BUSINESS_OBJ_OPERATIONS            INT             DEFAULT 0;
+DECLARE FLAG_BUSINESS_OBJ_FARM_STAFF            INT             DEFAULT 0;
 
 
 
-DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
-DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
-DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
 DECLARE OPERATION_ADD_UPDATE_DELETE             INT             DEFAULT 7;
 DECLARE OPERATION_ADD_UPDATE_ONLY               INT             DEFAULT 3;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 128;
 
-
-SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER
+SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER +
                                     FLAG_BIT_BIZ_OBJ_ACCOUNT_REQUEST +
                                     
                                     FLAG_BIT_BIZ_OBJ_PIG_FARM + 
@@ -89,7 +87,7 @@ INSERT INTO user_group(
     flag_priv_semen_source,
     flag_priv_pig_prod
 ) VALUES (
-    cur_account_id,
+    in_account_id,
     ACCOUNT_USER_GROUP_ADMIN,
     FLAG_BUSINESS_OBJ_ADMIN,
     'Admin',
@@ -124,7 +122,7 @@ INSERT INTO user_group(
     flag_priv_pig_prod
     
 ) VALUES (
-    cur_account_id,
+    in_account_id,
     ACCOUNT_USER_GROUP_MANAGEMENT,
     FLAG_BUSINESS_OBJ_MANAGEMENT,
     'Management',
@@ -158,7 +156,7 @@ INSERT INTO user_group(
     flag_priv_pig_prod
     
 ) VALUES (
-    cur_account_id,
+    in_account_id,
     ACCOUNT_USER_GROUP_OPERATIONS,
     FLAG_BUSINESS_OBJ_OPERATIONS,
     'Operations',
@@ -192,9 +190,9 @@ INSERT INTO user_group(
     flag_priv_pig_prod
     
 ) VALUES (
-    cur_account_id,
+    in_account_id,
     ACCOUNT_USER_GROUP_FARM_STAFF,
-    FLAG_BUSINESS_OBJ_FARM_STAFF
+    FLAG_BUSINESS_OBJ_FARM_STAFF,
     'Farm Staff',
     
     0,

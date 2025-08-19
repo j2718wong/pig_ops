@@ -164,7 +164,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     
     
 @app.get("/pig_farm/list")
-async def pig_farm_list(ahid : str):
+async def pig_farm_list(ahid: str):
     """
     Will get pig farm list.
     

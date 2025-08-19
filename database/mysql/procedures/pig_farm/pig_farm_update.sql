@@ -31,9 +31,9 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
 
-DEFAULT FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
-DEFAULT FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
-DEFAULT FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
