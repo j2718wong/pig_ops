@@ -67,8 +67,7 @@ ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID               = 0x42
 
 
 
-ERROR_SOW_INVALID_PIG_FARM_HASHID                   = 0x51
-ERROR_SOW_INVALID_SOW_NUMBER                        = 0x52
+ERROR_SOW_BOAR_INVALID_SOW_NUMBER                   = 0x51
 
 
 ERROR_CONTACT_INVALID_USER_HASHID                   = 0x60

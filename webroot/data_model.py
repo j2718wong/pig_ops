@@ -49,7 +49,7 @@ class DataSowBoar(BaseModel):
     
     sex:                str = 'F' # Sow = 'F';  Boar = 'M'  
     
-    number:             str
+    number:             str = None
     name:               str = None
     date_of_birth:      str = None
     notes:              str = None

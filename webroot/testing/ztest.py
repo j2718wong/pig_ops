@@ -39,8 +39,8 @@ RANDOM_SOW_NAMES = [
 
 ]
 
-RANDOM_BOAR_NAMES = ['Berto', 'Kurdapyo', 'KiKoY', 'Didoy', 'Gorio', 'Desidido'
-'Ondo', 'Juaning', 'Kokoy'
+RANDOM_BOAR_NAMES = ['Berto', 'Kurdapyo', 'KiKoY', 'Didoy', 'Gorio', 'Desidido',
+'Ondo', 'Juaning', 'Kokoy', 'Dodo'
 ]
 
 
@@ -86,8 +86,7 @@ class TestAPIAccount:
             res_decrypt     = hashids_account.decrypt(account_h_id)
             account_id      = res_decrypt[0]
         
-            print(f"created account_id = {account_id}")
-            
+            print(f"created account_id = {account_id}")            
             assert(account_id > 0)
             
         
@@ -100,7 +99,7 @@ class TestAPIAccount:
             "country_id":   1
         }
 
-        print(f'\n\nTesting duplicate adding account_register; url = {url} ; data')
+        print(f'\n\nTesting duplicate account_register; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -109,6 +108,8 @@ class TestAPIAccount:
         
         print(f"\n\nResult; status_code = {r.status_code}; result = ")
         pprint.pprint(res_json)
+        
+        assert(res_json['result']['code'] == 'RES_NUM_ACCOUNT_ALREADY_REGISTERED_FOR_USER')
         
         
         
@@ -134,12 +135,17 @@ class TestAPIAccount:
         print(f"\n\nResult; status_code = {r.status_code}; result = ")
         pprint.pprint(res_json)
         
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
         
         print(f'\n\nTesting get account user groups; account_id = {account_id}')
         res = model['user_group'].get_user_group_list_by_account(account_id)
         
         print(f'\n\nAccount usergroups; len = {len(res)}')
         pprint.pprint(res)
+        assert(len(res) == 4)
         
         
         print(f'\n\nTesting get account gestating_ops; account_id = {account_id}')
@@ -147,7 +153,11 @@ class TestAPIAccount:
         
         print(f'\n\nAccount gestating_ops; len = {len(res)}')
         pprint.pprint(res)
+        assert(len(res) >= 3)
         
+        return {
+            'account_id': account_id
+        }
         
         
     def testing_pig_farm(self, user_id, farm_name, skip_step = 0):
@@ -173,9 +183,18 @@ class TestAPIAccount:
             print(f"\n\nResult; status_code = {r.status_code}; result")
             pprint.pprint(res_json)
             
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
 
-            if res_json['result']['num'] != 0:
+            if result_num != 0:
                 return
+            
+            farm_h_id       = res_json['pig_farm']['h_id']
+            res_decrypt     = hashids_common.decrypt(farm_h_id)
+            pig_farm_id     = res_decrypt[0]
+            
+            print(f"created pig_farm_id = {pig_farm_id}")            
+            assert(pig_farm_id > 0)
             
         
         # Test account register duplicate
@@ -202,10 +221,11 @@ class TestAPIAccount:
         now             = datetime.now()
         now_ts          = now.strftime('%Y%m%d_%H%M%S')
         
-        url = BASE_URL + 'account/update'
+        url = BASE_URL + 'pig_farm/update'
         
         data = {
             "uhid":         user_uhid,
+            "pig_farm_hid": farm_h_id,
             "name":         farm_name + now_ts,
             "adrs_level_1_id": 1,
             "adrs_level_2_id": 2,
@@ -214,7 +234,7 @@ class TestAPIAccount:
         }
         
         
-        print(f'\n\nTesting account_update; url = {url} ; data')
+        print(f'\n\nTesting farm_update; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -224,6 +244,21 @@ class TestAPIAccount:
         print(f"\n\nResult; status_code = {r.status_code}; result = ")
         pprint.pprint(res_json)
         
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        return {
+            'pig_farm_id': pig_farm_id
+        }
+        
+    
+    def testing_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
+        count = 0
+        
+        while count < num:
+            self.testing_sow_boar_add(user_id, pig_farm_id, sex)
+            count += 1
+    
     
     def testing_sow_boar_add(self, user_id, pig_farm_id, sex= 'F'):
         user_uhid   = hashids_user.encrypt(user_id)
@@ -238,21 +273,21 @@ class TestAPIAccount:
             url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M'
         
         r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
-        print(f"\n\nResult; status_code = {r.status_code}")
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
         
-        result = str(r.text)
-        print(result)
         
-        res = json.loads(result)
         
         len_random_sow_boar_names = len(sow_boar_names)
         
-        sow_boar_list = res['data']
+        sow_boar_list = res_json['data']
         len_items = len(sow_boar_list)
         
         if len_items == 0:
-            number = random.randint(10000, 20000)
+            sow_boar_number = random.randint(10000, 20000)
             
             index           = random.randint(0, len_random_sow_boar_names-1)
             sow_boar_name   = sow_boar_names[index]
@@ -267,7 +302,7 @@ class TestAPIAccount:
             last_entry = sow_boar_list[len_items -1]
             last_number = int(last_entry['number'])
             
-            number = last_number + random.randint(1, 20)
+            sow_boar_number = last_number + random.randint(1, 20)
             
             
             len_taken_sow_boar_names = len(taken_sow_boar_names)
@@ -298,7 +333,7 @@ class TestAPIAccount:
           
           "sow_status_id": 2,
           "sex": sex,
-          "number": str(number),
+          "number": str(sow_boar_number),
           "name": sow_boar_name,
           "date_of_birth": dt_dob_s
         }
@@ -309,12 +344,58 @@ class TestAPIAccount:
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
-        print(f"\n\nResult; status_code = {r.status_code}")
+        print(f"\n\nResult; status_code = {r.status_code} ")
+        pprint.pprint(res_json)
         
-        result = str(r.text)
-        print(result)
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
         
         
+        sow_boar_id = res_json['sow_boar']['id']
         
-  
+        
+        # Test sow boar update
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'sow_boar/update'
+        
+        new_name        = sow_boar_name + now_ts
+        new_name        = new_name[0:20]
+        
+        data = {
+            "uhid": user_uhid,
+            "sow_boar_id": sow_boar_id,
+            
+            
+            "number":   str(sow_boar_number),
+            "name":     new_name,
+            "notes":    "Updated sow boar"
+            
+        }
+        
+        
+        print(f'\n\nTesting sow_boar_update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
+    def test_auto_clean_data(self, user_id, acc_name, farm_name):
+        self.test_account_register(user_id, acc_name)
+        res_pig_farm = self.testing_pig_farm(user_id, farm_name)
+        
+        pig_farm_id = res_pig_farm['pig_farm_id']
+        self.testing_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
+        self.testing_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 2)

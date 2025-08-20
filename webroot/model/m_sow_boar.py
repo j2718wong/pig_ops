@@ -116,7 +116,7 @@ class SowBoar:
             sql += 'NULL,'            
             
         if data.notes is not None:
-            sql += '%s);'   % data.notes
+            sql += '"%s");'   % data.notes
         else:
             sql += 'NULL);'
         
@@ -170,15 +170,15 @@ class SowBoar:
         PROCEDURE sow_boar_update(
             in_user_id              INT,
             
-            in_sow_id               INT,
+            in_sow_boar_id          INT,
             in_birth_prod_id        INT,
             in_line_id              INT,
             in_sow_status_id        INT,
             
-            in_sow_number           VARCHAR(10),
-            in_sow_name             VARCHAR(20),
+            in_number               VARCHAR(10),
+            in_name                 VARCHAR(20),
             in_date_of_birth        VARCHAR(10),
-            in_description          VARCHAR(160)
+            in_notes                VARCHAR(160)
         )    
         """
         
@@ -189,10 +189,10 @@ class SowBoar:
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
         
-        sql += '"%s",'  % data.sow_number
+        sql += '"%s",'  % data.number
         
-        if data.sow_name is not None:
-            sql += '"%s",'    % data.sow_name
+        if data.name is not None:
+            sql += '"%s",'    % data.name
         else:
             sql += 'NULL,'
             
@@ -202,7 +202,7 @@ class SowBoar:
             sql += 'NULL,'            
             
         if data.notes is not None:
-            sql += '%s);'   % data.notes
+            sql += '"%s");'   % data.notes
         else:
             sql += 'NULL);'
         

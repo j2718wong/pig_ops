@@ -112,18 +112,18 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     user_id = res[0]
     
         
-    sow_number   = sow_boar_data.sow_number.strip()
-    if len(sow_number) == 0:
+    sow_boar_number   = sow_boar_data.number.strip()
+    if len(sow_boar_number) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_SOW_NUMBER,
-                'code': 'ERROR_SOW_INVALID_SOW_NUMBER',
+                'num':  ERROR_SOW_BOAR_INVALID_SOW_NUMBER,
+                'code': 'ERROR_SOW_BOAR_INVALID_SOW_NUMBER',
                 'desc': ''
             }
         }
     
-    sow_boar_data.sow_number     = sow_number
-    sow_boar_data.user_id        = user_id
+    sow_boar_data.number        = sow_boar_number
+    sow_boar_data.user_id       = user_id
     
     res_update  =  model['sow_boar'].update(sow_boar_data)
     
