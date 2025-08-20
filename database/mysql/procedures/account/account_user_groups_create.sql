@@ -1,7 +1,7 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS account_create_user_groups $$
-CREATE PROCEDURE account_create_user_groups(
+DROP PROCEDURE IF EXISTS account_user_groups_create $$
+CREATE PROCEDURE account_user_groups_create(
     in_account_id               INT
 )  
 
@@ -32,6 +32,10 @@ DECLARE FLAG_BIT_BIZ_OBJ_SOW_BOAR               INT             DEFAULT 32;
 DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 64;
 DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 128;
 
+DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 256;
+DECLARE FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS     INT             DEFAULT 512;
+
+
 
 /* Admin users can access all business objects, 2^31 -1*/
 DECLARE FLAG_BUSINESS_OBJ_ADMIN                 BIGINT          DEFAULT 2147483647;
@@ -57,7 +61,9 @@ SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER +
                                     FLAG_BIT_BIZ_OBJ_PIG_FARM + 
                                     FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD;
+                                    FLAG_BIT_BIZ_OBJ_PIG_PROD +
+                                    
+                                    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS;
 
 SET FLAG_BUSINESS_OBJ_OPERATIONS =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
