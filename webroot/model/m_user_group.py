@@ -10,7 +10,7 @@ class UserGroup:
         self.TAG                = 'UserGroup'
     
     
-    def get_user_group_by_account(self, account_id):
+    def get_user_group_list_by_account(self, account_id):
         sql =   """
                 SELECT 
                     id,
@@ -55,7 +55,7 @@ class UserGroup:
             conn.close()
             
         except Exception as e:
-            msg = 'get_user_group_by_account(); error in executing query[] = ' + sql
+            msg = 'get_user_group_list_by_account(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'

@@ -63,7 +63,8 @@ SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER +
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
                                     FLAG_BIT_BIZ_OBJ_PIG_PROD +
                                     
-                                    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS;
+                                    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS +
+                                    FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS;
 
 SET FLAG_BUSINESS_OBJ_OPERATIONS =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
@@ -72,7 +73,9 @@ SET FLAG_BUSINESS_OBJ_OPERATIONS =  FLAG_BIT_BIZ_OBJ_SOW_BOAR +
 
 SET FLAG_BUSINESS_OBJ_FARM_STAFF =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD;
+                                    FLAG_BIT_BIZ_OBJ_PIG_PROD +
+                                    
+                                    FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS;
 
 
 /* Create account default user_groups. Each account will have a fix 

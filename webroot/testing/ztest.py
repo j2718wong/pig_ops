@@ -136,10 +136,18 @@ class TestAPIAccount:
         
         
         print(f'\n\nTesting get account user groups; account_id = {account_id}')
-        res = model['user_group'].get_user_group_by_account(account_id)
+        res = model['user_group'].get_user_group_list_by_account(account_id)
         
-        print('\n\nAccount usergroups')
+        print(f'\n\nAccount usergroups; len = {len(res)}')
         pprint.pprint(res)
+        
+        
+        print(f'\n\nTesting get account gestating_ops; account_id = {account_id}')
+        res = model['acc_gestating_ops'].get_account_gestating_ops_list(account_id)
+        
+        print(f'\n\nAccount gestating_ops; len = {len(res)}')
+        pprint.pprint(res)
+        
         
         
     def testing_pig_farm(self, user_id, farm_name, skip_step = 0):
@@ -166,7 +174,7 @@ class TestAPIAccount:
             pprint.pprint(res_json)
             
 
-            if res['result']['num'] != 0:
+            if res_json['result']['num'] != 0:
                 return
             
         
@@ -188,6 +196,33 @@ class TestAPIAccount:
         print(f"\n\nResult; status_code = {r.status_code}; result")
         pprint.pprint(res_json)
  
+        
+        
+        # Test farm update
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'account/update'
+        
+        data = {
+            "uhid":         user_uhid,
+            "name":         farm_name + now_ts,
+            "adrs_level_1_id": 1,
+            "adrs_level_2_id": 2,
+            "latitude":     10.262995, 
+            "longitude":    123.686722
+        }
+        
+        
+        print(f'\n\nTesting account_update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
         
     
     def testing_sow_boar_add(self, user_id, pig_farm_id, sex= 'F'):

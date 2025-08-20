@@ -172,7 +172,7 @@ UPDATE user SET
 WHERE id = in_user_id;
 
 
-CALL account_create_gestating_ops(cur_account_id);
+CALL account_gestating_ops_create(cur_account_id);
 
 
 /* Insert app_audit_log. */
