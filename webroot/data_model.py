@@ -23,9 +23,10 @@ class DataAccount(BaseModel):
 
 class DataAccGestatingOps(BaseModel):
     uhid:               str
+    acc_gest_ops_hid:   str = None
     
     user_id:            int = 0
-    acc_gest_ops_id     int = 0
+    acc_gest_ops_id:    int = 0
     num_days_since_insem: int
     name:               str
     description:        str = None 

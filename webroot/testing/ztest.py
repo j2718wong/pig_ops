@@ -189,11 +189,16 @@ class TestAPIAccount:
             if result_num != 0:
                 return
             
+            
+            is_id_visible = True if 'id' in res_json['pig_farm'] else False
+            assert(is_id_visible == False)
+            
+            
             farm_h_id       = res_json['pig_farm']['h_id']
             res_decrypt     = hashids_common.decrypt(farm_h_id)
             pig_farm_id     = res_decrypt[0]
             
-            print(f"created pig_farm_id = {pig_farm_id}")            
+            print(f"created pig_farm_id = {pig_farm_id}")
             assert(pig_farm_id > 0)
             
         
@@ -250,6 +255,10 @@ class TestAPIAccount:
         return {
             'pig_farm_id': pig_farm_id
         }
+        
+        
+    def testing_acc_gestating_ops(self, user_id):
+        
         
     
     def testing_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):

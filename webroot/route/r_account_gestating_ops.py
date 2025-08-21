@@ -28,15 +28,28 @@ ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
 ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
 
     
-@app.get("/account_request/add_user")
-async def account_request_add_user(uhid: str, ahid:str):
+@app.post("/acc_gestating_ops/add")
+async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
+    name    = acc_gestating_ops_data.name
+    uhid    = acc_gestating_ops_data.uhid
+    
+    name    = name.strip() if name else None 
+    
+    if name is None or len(name) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NAME,
+                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NAME',
+                'desc': ''
+            }
+        }
         
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_REQUEST_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_REQUEST_INVALID_USER_HASHID',
+                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -44,27 +57,8 @@ async def account_request_add_user(uhid: str, ahid:str):
     user_id = res[0]
     
     
-    res = hashids_account.decrypt(ahid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_ACCOUNT_REQUEST_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACCOUNT_REQUEST_INVALID_ACCOUNT_HASHID',
-                'desc': ''
-            }
-        }
     
-    account_id = res[0]
-    
-    
-    
-    data = {
-        'account_id':       account_id,
-        'user_id':          user_id
-    }
-    
-    
-    res_add    =  model['acc_req'].add_user(data)
+    res_add    =  model['acc_gestating_ops'].add_user(data)
     
     if res_add is None:
         return {

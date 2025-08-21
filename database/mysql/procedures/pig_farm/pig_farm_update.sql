@@ -95,7 +95,10 @@ UPDATE pig_farm SET
     adrs_level_2_id     = in_adrs_level_2_id,
     adrs_level_3_id     = in_adrs_level_3_id,
     latitude            = in_latitude,
-    longitude           = in_longitude
+    longitude           = in_longitude,
+    
+    last_update_user_id = in_user_id,
+    dt_last_update      = CURRENT_TIMESTAMP
 WHERE id =  in_pig_farm_id;
 
 

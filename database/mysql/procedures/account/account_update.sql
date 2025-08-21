@@ -137,7 +137,10 @@ END IF;
 
 
 UPDATE account SET
-    name            = in_name
+    name                = in_name,
+    
+    last_update_user_id = in_user_id,
+    dt_last_update      = CURRENT_TIMESTAMP
 WHERE id = cur_user_account_id;
 
 
