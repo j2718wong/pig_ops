@@ -44,6 +44,12 @@ RANDOM_BOAR_NAMES = ['Berto', 'Kurdapyo', 'KiKoY', 'Didoy', 'Gorio', 'Desidido',
 ]
 
 
+SAMPLE_CUSTOMIZED_GESTATING_OPS = {
+    "name":         "Inject Vitamins",
+    "description":  "Inject vitamin Z",
+    "num_days_since_insem": 50    
+}
+
 
 class TestAPIUser:
     def test_register(self):
@@ -148,12 +154,16 @@ class TestAPIAccount:
         assert(len(res) == 4)
         
         
+        self.testing_acc_gestating_ops(user_id)
+        
         print(f'\n\nTesting get account gestating_ops; account_id = {account_id}')
-        res = model['acc_gestating_ops'].get_account_gestating_ops_list(account_id)
+        res = model['acc_gestating_ops'].get_acc_gestating_ops_list(account_id)
         
         print(f'\n\nAccount gestating_ops; len = {len(res)}')
         pprint.pprint(res)
         assert(len(res) >= 3)
+        
+        
         
         return {
             'account_id': account_id
@@ -257,10 +267,106 @@ class TestAPIAccount:
         }
         
         
-    def testing_acc_gestating_ops(self, user_id):
+    def testing_acc_gestating_ops(self, user_id, skip_step = 0):
+        user_uhid   = hashids_user.encrypt(user_id)
+        
+        if skip_step & 0x01 == 0: 
+        
+            url = BASE_URL + 'acc_gestating_ops/add'
+            
+            data = {
+                "uhid":         user_uhid,
+                "name":                 SAMPLE_CUSTOMIZED_GESTATING_OPS['name'],
+                "num_days_since_insem": SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since_insem'],
+                "description":          SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
+            }
+            
+            
+            print(f'\n\nTesting adding acc_gestating_ops; url = {url} ; data')
+            pprint.pprint(data)
+            
+            r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
+            print(f"\n\nResult; status_code = {r.status_code}; result")
+            pprint.pprint(res_json)
+            
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
+
+            if result_num != 0:
+                return
+            
+            
+            is_id_visible = True if 'id' in res_json['acc_gestating_ops'] else False
+            assert(is_id_visible == False)
+            
+            
+            acc_gestating_ops_h_id  = res_json['acc_gestating_ops']['h_id']
+            res_decrypt             = hashids_common.decrypt(acc_gestating_ops_h_id)
+            acc_gestating_ops_id    = res_decrypt[0]
+            
+            print(f"acc_gestating_ops_id = {acc_gestating_ops_id}")
+            assert(acc_gestating_ops_id > 0)
+            
+        
+        # Test acc_gestating_ops add duplicate
+        url = BASE_URL + 'acc_gestating_ops/add'
+            
+        data = {
+            "uhid":                 user_uhid,
+            "name":                 SAMPLE_CUSTOMIZED_GESTATING_OPS['name'],
+            "num_days_since_insem": SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since_insem'],
+            "description":          SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
+        }
+            
+
+        print(f'\n\nTesting duplicate adding acc_gestating_ops; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
         
         
-    
+        # Test acc_gestating_ops update
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'acc_gestating_ops/update'
+        
+        data = {
+            "uhid":                 user_uhid,
+            "acc_gest_ops_hid":     acc_gestating_ops_h_id,
+            "name":                 SAMPLE_CUSTOMIZED_GESTATING_OPS['name'] + now_ts,
+            "num_days_since_insem": SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since_insem'],
+            "description":          SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
+        }
+        
+        
+        print(f'\n\nTesting acc_gestating_ops update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        return {
+            'acc_gestating_ops_id': acc_gestating_ops_id
+        }
+        
+        
     def testing_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
         count = 0
         
@@ -403,6 +509,8 @@ class TestAPIAccount:
         
     def test_auto_clean_data(self, user_id, acc_name, farm_name):
         self.test_account_register(user_id, acc_name)
+        
+       
         res_pig_farm = self.testing_pig_farm(user_id, farm_name)
         
         pig_farm_id = res_pig_farm['pig_farm_id']

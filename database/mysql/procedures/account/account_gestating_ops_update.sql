@@ -36,10 +36,13 @@ DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
 DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 
 
-DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
+DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
-
+        
+DECLARE cur_acc_gestating_ops_account_id        INT             DEFAULT 0;
+DECLARE cur_acc_gestating_ops_flag              INT             DEFAULT 0;
+DECLARE cur_acc_gestating_ops_name              VARCHAR(50)     DEFAULT NULL;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -82,7 +85,7 @@ END IF;
 
 
 
-UPDATE acc_gestating_ops SET
+UPDATE account_gestating_ops SET
     num_days_since_insem = in_num_days_since_insem,
     
     name                = in_name,
@@ -102,7 +105,7 @@ SELECT
 INTO 
     cur_acc_gestating_ops_flag,
     cur_acc_gestating_ops_name
-FROM acc_gestating_ops
+FROM account_gestating_ops
 WHERE id = in_acc_gestating_ops_id;
 
 SELECT 

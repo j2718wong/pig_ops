@@ -2,9 +2,9 @@
 
 DROP PROCEDURE IF EXISTS account_gestating_ops_delete $$
 CREATE PROCEDURE account_gestating_ops_delete(
-    in_user_id              	INT,
+    in_user_id                  INT,
     
-    in_acc_gestating_ops_id     INT,
+    in_acc_gestating_ops_id     INT
 )  
 
 BEGIN
@@ -20,7 +20,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE APP_BIZ_OBJ_ID_ACC_GESTATING_OPS		INT				DEFAULT 9;
+DECLARE APP_BIZ_OBJ_ID_ACC_GESTATING_OPS        INT             DEFAULT 9;
 DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 256;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
@@ -33,7 +33,7 @@ DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
 DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 
 /* acc_gestating_ops.flag bits*/
-DECLARE FLAG_BIT_ACC_GESTATING_OPS_IS_DELETED   INT       		DEFAULT 1;
+DECLARE FLAG_BIT_ACC_GESTATING_OPS_IS_DELETED   INT             DEFAULT 1;
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
@@ -41,6 +41,8 @@ DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
 DECLARE cur_acc_gestating_ops_account_id        INT             DEFAULT 0;
+DECLARE cur_acc_gestating_ops_flag              INT             DEFAULT 0;
+DECLARE cur_acc_gestating_ops_name              VARCHAR(50)     DEFAULT NULL;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -63,13 +65,13 @@ LIMIT   1;
 
 
 CALL basic_user_check(
-	in_user_id, 
-	1, /* user must have an account*/
-	cur_acc_gestating_ops_account_id,
-	
-	FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
-	AUDIT_ACTION_DELETE,
-	
+    in_user_id, 
+    1, /* user must have an account*/
+    cur_acc_gestating_ops_account_id,
+    
+    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
+    AUDIT_ACTION_DELETE,
+    
     cur_user_account_id, 
     cur_user_group_id,
     res_num, 
@@ -86,31 +88,13 @@ END IF;
 
 
 UPDATE account_gestating_ops SET
-    flag         		= flag | FLAG_BIT_ACC_GESTATING_OPS_IS_DELETED
-	
-	last_update_user_id = in_user_id,
+    flag                = flag | FLAG_BIT_ACC_GESTATING_OPS_IS_DELETED,
+    
+    last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP
 WHERE id =  in_acc_gestating_ops_id;
 
 
-/* Insert app_audit_log. */
-SET s_desc = CONCAT("old_acc_name = ", cur_account_name, "; new_acc_name = ",
-    in_name);
-
-
-INSERT INTO app_audit_log(
-    user_id,
-    account_id,
-    action,
-    description,
-    date
-) VALUES (
-    in_user_id,
-    cur_user_account_id,
-    AUDIT_ACTION_UPDATE,
-    s_desc,
-    CURRENT_DATE
-);
 
 
 END process_user;
@@ -120,8 +104,8 @@ SELECT
     flag,
     name
 INTO 
-    cur_account_gestating_ops_flag,
-    cur_account_gestating_ops_name
+    cur_acc_gestating_ops_flag,
+    cur_acc_gestating_ops_name
 FROM account_gestating_ops
 WHERE id = in_account_gestating_ops_id;
 
@@ -130,9 +114,9 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_account_gestating_ops_id         AS account_gestating_ops_id,
-    cur_account_gestating_ops_flag      AS account_gestating_ops_flag,
-    cur_account_gestating_ops_name      AS account_gestating_ops_name;
+    in_acc_gestating_ops_id             AS account_gestating_ops_id,
+    cur_acc_gestating_ops_flag          AS account_gestating_ops_flag,
+    cur_acc_gestating_ops_name          AS account_gestating_ops_name;
     
 
 END $$

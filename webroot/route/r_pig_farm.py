@@ -70,21 +70,21 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     pig_farm_id     = res_add['pig_farm']['id']
     pig_farm_flag   = res_add['pig_farm']['flag']
         
-    pig_farm_hashid = hashids_common.encrypt(pig_farm_id)
+    pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
     
     if pig_farm_id == 0:
-        pig_farm_hashid = ''
+        pig_farm_hid = ''
     
     # remove plain id
     del res_add['pig_farm']['id']
-    res_add['pig_farm']['h_id'] = pig_farm_hashid
+    res_add['pig_farm']['h_id'] = pig_farm_hid
 
     result_num      = res_add['result']['num']
     
     if result_num == PIG_FARM_ADD_RES_NUM_SUCCESS:
         data = {
            'pig_farm_id':   pig_farm_id,
-           'hashid':        pig_farm_hashid
+           'hashid':        pig_farm_hid
         }
         res_update = model['pig_farm'].update_hashid(data)
         
@@ -191,9 +191,9 @@ async def pig_farm_list(ahid: str):
     
     account_id = res[0]
         
-    res_get  = model['pig_farm'].get_pig_farm_list(account_id)
+    res     = model['pig_farm'].get_pig_farm_list(account_id)
     
-    if res_get is None:
+    if res is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
@@ -202,7 +202,13 @@ async def pig_farm_list(ahid: str):
             }
         }
             
-    return res_get
-    
-
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
     

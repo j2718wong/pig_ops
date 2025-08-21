@@ -53,7 +53,6 @@ SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-
 CALL basic_user_check(
     in_user_id, 
     1, /* user must have an account*/
@@ -119,7 +118,7 @@ SELECT
 INTO 
     cur_acc_gestating_ops_flag,
     cur_acc_gestating_ops_name
-FROM acc_gestating_ops
+FROM account_gestating_ops
 WHERE id = cur_acc_gestating_ops_id;
 
 SELECT 

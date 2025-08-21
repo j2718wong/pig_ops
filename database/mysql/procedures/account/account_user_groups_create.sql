@@ -94,7 +94,10 @@ INSERT INTO user_group(
     flag_priv_pig_farm,
     flag_priv_sow_boar,
     flag_priv_semen_source,
-    flag_priv_pig_prod
+    flag_priv_pig_prod,
+    
+    flag_priv_acc_gestating_ops
+    
 ) VALUES (
     in_account_id,
     ACCOUNT_USER_GROUP_ADMIN,
@@ -109,8 +112,9 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE
+    OPERATION_ADD_UPDATE_DELETE,
     
+    OPERATION_ADD_UPDATE_DELETE
 );
 
 
@@ -128,7 +132,9 @@ INSERT INTO user_group(
     flag_priv_pig_farm,
     flag_priv_sow_boar,
     flag_priv_semen_source,
-    flag_priv_pig_prod
+    flag_priv_pig_prod,
+    
+    flag_priv_acc_gestating_ops
     
 ) VALUES (
     in_account_id,
@@ -144,7 +150,9 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE  
+    OPERATION_ADD_UPDATE_DELETE,
+
+    OPERATION_ADD_UPDATE_DELETE
 );
 
 
@@ -162,7 +170,9 @@ INSERT INTO user_group(
     flag_priv_pig_farm,
     flag_priv_sow_boar,
     flag_priv_semen_source,
-    flag_priv_pig_prod
+    flag_priv_pig_prod,
+    
+    flag_priv_acc_gestating_ops
     
 ) VALUES (
     in_account_id,
@@ -178,7 +188,9 @@ INSERT INTO user_group(
     0,
     OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_ONLY,
-    OPERATION_ADD_UPDATE_ONLY
+    OPERATION_ADD_UPDATE_ONLY,
+    
+    0
 );
 
 
@@ -196,7 +208,9 @@ INSERT INTO user_group(
     flag_priv_pig_farm,
     flag_priv_sow_boar,
     flag_priv_semen_source,
-    flag_priv_pig_prod
+    flag_priv_pig_prod,
+    
+    flag_priv_acc_gestating_ops
     
 ) VALUES (
     in_account_id,
@@ -212,7 +226,9 @@ INSERT INTO user_group(
     0,
     OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_ONLY,
-    OPERATION_ADD_UPDATE_ONLY
+    OPERATION_ADD_UPDATE_ONLY,
+    
+    0
 );
 
 
