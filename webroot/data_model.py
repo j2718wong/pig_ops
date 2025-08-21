@@ -21,6 +21,17 @@ class DataAccount(BaseModel):
     country_id:         int = 1     # default to PH
     
 
+class DataAccGestatingOps(BaseModel):
+    uhid:               str
+    
+    user_id:            int = 0
+    acc_gest_ops_id     int = 0
+    num_days_since_insem: int
+    name:               str
+    description:        str = None 
+    
+    
+
 class DataPigFarm(BaseModel):
     uhid:               str
     pig_farm_hid:       str = None
