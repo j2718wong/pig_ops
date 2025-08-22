@@ -23,7 +23,7 @@ import data_model           as dm
 
 
 @app.get("/sow_status/list")
-async def sow_status_list():
+async def sow_status_list(is_dispose: int = 0):
     """
     Will get sow status list.
     
@@ -32,7 +32,28 @@ async def sow_status_list():
 
     """
     
-    return model['sow_boar'].get_sow_status_list()
+    res = model['sow_boar'].get_sow_status_list()
+    
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+        
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
     
     
 @app.post("/sow_boar/add")
@@ -139,8 +160,8 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     return res_update
     
 
-@app.post("/sow_boar/cull")
-async def sow_boar_cull(sow_boar_data: dm.DataSowBoarCull):
+@app.post("/sow_boar/dispose")
+async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     uhid        = sow_boar_data.uhid
     
     res = hashids_user.decrypt(uhid)
@@ -158,9 +179,9 @@ async def sow_boar_cull(sow_boar_data: dm.DataSowBoarCull):
     
     sow_boar_data.user_id        = user_id
     
-    res_cull    =  model['sow_boar'].cull(sow_boar_data)
+    res_dispose     =  model['sow_boar'].dispose(sow_boar_data)
     
-    if res_cull is None:
+    if res_dispose is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
@@ -169,7 +190,7 @@ async def sow_boar_cull(sow_boar_data: dm.DataSowBoarCull):
             }
         }
         
-    return res_cull
+    return res_dispose
 
 
 @app.get("/sow/pt_list", response_class=PlainTextResponse)
@@ -269,16 +290,24 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     
 
 @app.get("/sow_boar/list")
-async def sow_boar_list(pfhid:str, sex:str = 'F', full_info: int = 0):
+async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0, 
+        order_by:int = 0):
     """
     Will get sow list.
     
     Parameters
     ----------
+    sex: str
+        F = sow entries
+        M = boar entries
     
     full_info:int
-        0 = will return active sows only; 
-        1 = will return including culled sows
+        0 = will return active sows, boars only; 
+        1 = will return including disposed sows, boars
+    
+    order_by : int
+            0 = ORDER BY date_of_birth DESC
+            1 = ORDER BY id ASC
 
         
     """
@@ -297,7 +326,12 @@ async def sow_boar_list(pfhid:str, sex:str = 'F', full_info: int = 0):
     pig_farm_id = res[0]
     
     
-    res = model['sow_boar'].get_sow_boar_list(pig_farm_id, sex)
+    inc_disposed = 0
+    if full_info > 0:
+        inc_disposed = 1
+    
+    res = model['sow_boar'].get_sow_boar_list(pig_farm_id, sex, 
+            inc_disposed = inc_disposed, order_by = order_by)
     
     if res is None:
         return {

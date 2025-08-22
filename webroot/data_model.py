@@ -67,13 +67,14 @@ class DataSowBoar(BaseModel):
     notes:              str = None
     
     
-class DataSowBoarCull(BaseModel):
+class DataSowBoarDispose(BaseModel):
     uhid:               str
     
     user_id:            int = 0
-    sow_id:             int
-    date_culled:        datetime.date
-    cull_notes:         str
+    sow_boar_id:        int
+    dispose_status_id:  int
+    date_dispose:       datetime.date
+    dispose_notes:      str
     
     
 class DataSemenSource(BaseModel):

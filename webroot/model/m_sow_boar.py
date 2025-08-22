@@ -10,7 +10,7 @@ class SowBoar:
         self.TAG                = 'SowBoar'
 
     
-    def get_sow_status_list(self):
+    def get_sow_status_list(self, is_dispose = 0):
         """
         Will get sow_status list.
         
@@ -20,13 +20,18 @@ class SowBoar:
         list of dictionary
 
         """
-            
+        
+        where_clause = ''
+        if is_dispose > 0:
+            where_clause = 'WHERE flag = 1'
+        
         sql =   """
                 SELECT 
                     id,
                     name
                 FROM sow_status
-                """ 
+                %s
+                """ % where_clause 
         
         
         # Check if still connected to database
@@ -249,25 +254,29 @@ class SowBoar:
         return None
 
     
-    def cull(self, data = None):
+    def dispose(self, data = None):
         """
-        PROCEDURE sow_cull(
+        PROCEDURE sow_boar_dispose(
             in_user_id              INT,
             
-            in_sow_id               INT,
-            in_date_culled          VARCHAR(10),
-            in_cull_notes           VARCHAR(160)
+            in_sow_boar_id          INT,
+            in_dispose_status_id    INT,
+            
+            in_date_dispose         VARCHAR(10),
+            in_dispose_notes        VARCHAR(160)
         )
         """
         
-        sql =  'CALL sow_cull('
+        sql =  'CALL sow_boar_dispose('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.sow_id
+        sql += '%s,'    % data.sow_boar_id
+        sql += '%s,'    % data.dispose_status_id
         
-        sql += '"%s",'  % data.date_culled
+        
+        sql += '"%s",'  % data.date_dispose
             
-        if data.cull_notes is not None:
-            sql += '%s);'   % data.cull_notes
+        if data.dispose_notes is not None:
+            sql += '"%s");'   % data.dispose_notes
         else:
             sql += 'NULL);'
         
@@ -290,7 +299,7 @@ class SowBoar:
             cursor.close()
 
         except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
+            msg = 'dispose(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -306,7 +315,7 @@ class SowBoar:
                     'desc':             row[2],
                 },
                 
-                'sow': {
+                'sow_boar': {
                     'id':               row[3]
                 }
             }
@@ -314,7 +323,8 @@ class SowBoar:
         return None
 
     
-    def get_sow_boar_list(self, farm_id, sex, list_sow_numbers = None):
+    def get_sow_boar_list(self, farm_id, sex, inc_disposed = 0, 
+                list_sow_numbers = None, order_by = 0):
         """
         Will get sow_boar list.
         
@@ -322,6 +332,10 @@ class SowBoar:
         Returns
         -------
         list of dictionary
+        
+        order_by : int
+            0 = ORDER BY date_of_birth DESC
+            1 = ORDER BY id ASC
 
         """
         
@@ -335,81 +349,75 @@ class SowBoar:
                 
                 s += f"'{cur_entry}'"
                 
-            values = (farm_id, sex, s)
-            where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND a.sow_number  IN (%s) ' % values
-        
+            if sex is not None:
+                values = (farm_id, sex, s)
+                where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND a.sow_number  IN (%s) ' % values
+            else:
+                where_clause = ' WHERE a.pig_farm_id = %s AND a.sow_number  IN (%s) '
+            
         else:
-            values = (farm_id, sex)
-            where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
+            if sex is not None:
+                if inc_disposed == 0:
+                    values = (farm_id, sex)
+                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
+                
+                else:
+                    values = (farm_id, sex)
+                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
+                
+            else:
+                
+                if inc_disposed == 0:
+                    values = (farm_id, sex)
+                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
+                
+                else:
+                    values = (farm_id, sex)
+                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
+                
         
-        if sex == 'F':
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.farm_sow_id,
-                        a.number,
-                        a.name,
-                        a.flag,
-                        a.birth_prod_id,
-                        a.last_prod_id,
-                       
-                        b.name AS status_name,
-                        a.date_of_birth,
-                        a.date_culled,
-                        a.notes,
-                        
-                        c.username,
-                        c.name_last,
-                        c.name_first,
-                        
-                        d.username,
-                        d.name_last,
-                        d.name_first,
-                        a.dt_last_update,
-                        
-                        a.dt_entry
-                        
-                    FROM sow_boar a
-                    LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
-                    %s
-                    ORDER BY a.date_of_birth DESC
-                    """ % where_clause
+        if order_by == 0:
+            order_clause = ' ORDER BY a.date_of_birth DESC '
         else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.farm_boar_id,
-                        a.number,
-                        a.name,
-                        a.flag,
-                        a.birth_prod_id,
-                        a.last_prod_id,
-                       
-                        b.name AS status_name,
-                        a.date_of_birth,
-                        a.date_culled,
-                        a.notes,
-                        
-                        c.username,
-                        c.name_last,
-                        c.name_first,
-                        
-                        d.username,
-                        d.name_last,
-                        d.name_first,
-                        a.dt_last_update,
-                        
-                        a.dt_entry
-                        
-                    FROM sow_boar a
-                    LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
-                    %s
-                    ORDER BY a.date_of_birth DESC
-                    """ % where_clause
+            order_clause = ' ORDER BY a.id ASC '
+                
+        
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.farm_sow_id,
+                    a.farm_boar_id,
+                    a.number,
+                    a.name,
+                    a.flag,
+                    a.birth_prod_id,
+                    a.last_prod_id,
+                   
+                    b.name AS status_name,
+                    a.date_of_birth,
+                    a.date_dispose,
+                    a.notes,
+                    a.dispose_notes,
+                    
+                    c.username,
+                    c.name_last,
+                    c.name_first,
+                    
+                    d.username,
+                    d.name_last,
+                    d.name_first,
+                    a.dt_last_update,
+                    
+                    a.dt_entry
+                    
+                FROM sow_boar a
+                LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
+                LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                %s
+                %s 
+                """ % (where_clause, order_clause)
+   
             
         
         # Check if still connected to database
@@ -447,101 +455,79 @@ class SowBoar:
             
             for row in rows:
                 cur_id                  = row[0]
-                cur_farm_sow_boar_id    = row[1]
-                cur_number              = row[2]
-                cur_name                = row[3]
-                cur_flag                = row[4]
-                cur_birth_prod_id       = row[5]
-                cur_last_prod_id        = row[6]
+                cur_farm_sow_id         = row[1]
+                cur_farm_boar_id        = row[2]
+                cur_number              = row[3]
+                cur_name                = row[4]
+                cur_flag                = row[5]
+                cur_birth_prod_id       = row[6]
+                cur_last_prod_id        = row[7]
                 
-                cur_status              = row[7]
+                cur_status              = row[8]
                 
                 cur_date_of_birth       = None
-                if row[8] is not None:
-                    cur_date_of_birth   = str(row[8])
-                    
-                cur_date_culled         = None
                 if row[9] is not None:
-                    cur_date_culled     = str(row[9])
-                
-                cur_notes               = None
-                if row[10] is not None:
-                    cur_notes           = row[10]
+                    cur_date_of_birth   = str(row[9])
                     
-                cur_user_username       = row[11]
-                cur_user_name_last      = row[12]
-                cur_user_name_first     = row[13]
+                cur_date_dispose        = None
+                if row[10] is not None:
+                    cur_date_dispose    = str(row[10])
                 
-                cur_upd_user_username   = row[14]
-                cur_upd_user_name_last  = row[15]
-                cur_upd_user_name_first = row[16]
+                cur_notes               = row[11]
+                cur_dispose_notes       = row[12]
+                    
+                cur_user_username       = row[13]
+                cur_user_name_last      = row[14]
+                cur_user_name_first     = row[15]
+                
+                cur_upd_user_username   = row[16]
+                cur_upd_user_name_last  = row[17]
+                cur_upd_user_name_first = row[18]
                 
                 cur_dt_last_update      = None
-                if row[17] is not None:
-                    cur_dt_last_update  = str(row[17])
+                if row[19] is not None:
+                    cur_dt_last_update  = str(row[19])
                 
-                cur_dt_entry            = str(row[18])
+                cur_dt_entry            = str(row[20])
                 
-                if sex == 'F':
-                    cur_entry = {
-                        'id':               cur_id,
-                        'farm_sow_id':      cur_farm_sow_boar_id,
-                        'number':           cur_number, 
-                        'name':             cur_name,
-                        'flag':             cur_flag,
-                        'birth_prod_id':    cur_birth_prod_id,
-                        'last_prod_id':     cur_last_prod_id,
-                        
-                        'status':           cur_status,
-                        'date_of_birth':    cur_date_of_birth,
-                        'date_culled':      cur_date_culled,
-                        'notes':            cur_notes,
-                        
-                        'added_by': {
-                            'username':     cur_user_username,
-                            'name_last':    cur_user_name_last,
-                            'name_first':   cur_user_name_first
-                        },
-                        
-                        'dt_entry':         cur_dt_entry
-                    }
-                
-                else:
-                    cur_entry = {
-                        'id':               cur_id,
-                        'farm_boar_id':     cur_farm_sow_boar_id,
-                        'number':           cur_number, 
-                        'name':             cur_name,
-                        'flag':             cur_flag,
-                        'birth_prod_id':    cur_birth_prod_id,
-                        'last_prod_id':     cur_last_prod_id,
-                        
-                        'status':           cur_status,
-                        'date_of_birth':    cur_date_of_birth,
-                        'date_culled':      cur_date_culled,
-                        'notes':            cur_notes,
-                        
-                        'added_by': {
-                            'username':     cur_user_username,
-                            'name_last':    cur_user_name_last,
-                            'name_first':   cur_user_name_first
-                        },
-                        
-                        'dt_entry':         cur_dt_entry
-                    }
+                cur_entry = {
+                    'id':               cur_id,
+                    'farm_sow_id':      cur_farm_sow_id,
+                    'farm_boar_id':     cur_farm_boar_id,
+                    'number':           cur_number, 
+                    'name':             cur_name,
+                    'flag':             cur_flag,
+                    'birth_prod_id':    cur_birth_prod_id,
+                    'last_prod_id':     cur_last_prod_id,
                     
-                
-                if cur_upd_user_username is not None:
-                    last_update = {
+                    'status':           cur_status,
+                    'date_of_birth':    cur_date_of_birth,
+                    'date_dispose':     cur_date_dispose,
+                    'notes':            cur_notes,
+                    'dispose_notes':    cur_dispose_notes,
+                    
+                    'added_by': {
+                        'username':     cur_user_username,
+                        'name_last':    cur_user_name_last,
+                        'name_first':   cur_user_name_first,
+                        'dt_entry':     cur_dt_entry
+                    },
+                    
+                    'last_update':{
                         'username':     cur_upd_user_username,
                         'name_last':    cur_upd_user_name_last,
                         'name_first':   cur_upd_user_name_first,
-                        'dt_update':    cur_dt_last_update
+                        'dt_entry':     cur_dt_last_update
                     }
                     
-                    cur_entry['last_update'] = last_update
-                else:
-                    cur_entry['last_update'] = {}
+                }
+            
+                if sex is not None:
+                    if sex == 'F':
+                        del cur_entry['farm_boar_id']
+                    else:
+                        del cur_entry['farm_sow_id']
+
                 
                 result.append(cur_entry)
 

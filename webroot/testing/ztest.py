@@ -34,7 +34,7 @@ RANDOM_NAMES = [
 
 RANDOM_SOW_NAMES = [
 'Soling', 'Sita', 'Kurdapya', 'Imyat', 'Tasing', 'Narsing', 'Medi', 
-'Segunda', 'Berta', 'Osang', 'Petra',  'Nitang'  'Menang', 'Adela',
+'Segunda', 'Berta', 'Osang', 'Petra',  'Nitang',  'Menang', 'Adela',
 'Linda', 'Kikay', 'Diday'
 
 ]
@@ -55,13 +55,19 @@ class TestAPIUser:
     def test_register(self):
         test = 1
 
+
+
 class TestAPIAccount:
     
     def test_account_register(self, user_id, acc_name, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        if skip_step & 0x01 == 0: 
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n#################  {now_ts}  #####################################################################')
         
+        
+        if skip_step & 0x01 == 0: 
             url = BASE_URL + 'account/register'
             
             data = {
@@ -71,7 +77,7 @@ class TestAPIAccount:
             }
             
             
-            print(f'\n\nTesting adding account_register; url = {url} ; data')
+            print(f'1.1) Testing adding account_register; url = {url} ; data')
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
@@ -105,7 +111,7 @@ class TestAPIAccount:
             "country_id":   1
         }
 
-        print(f'\n\nTesting duplicate account_register; url = {url} ; data')
+        print(f'\n\n1.2) Testing duplicate account_register; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -131,7 +137,7 @@ class TestAPIAccount:
         }
         
         
-        print(f'\n\nTesting account_update; url = {url} ; data')
+        print(f'\n\n1.3) Testing account_update; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -146,7 +152,7 @@ class TestAPIAccount:
         
         
         
-        print(f'\n\nTesting get account user groups; account_id = {account_id}')
+        print(f'\n\n1.4) Testing get account user groups; account_id = {account_id}')
         res = model['user_group'].get_user_group_list_by_account(account_id)
         
         print(f'\n\nAccount usergroups; len = {len(res)}')
@@ -156,7 +162,7 @@ class TestAPIAccount:
         
         self.test_acc_gestating_ops(user_id)
         
-        print(f'\n\nTesting get account gestating_ops; account_id = {account_id}')
+        print(f'\n\n1.5) Testing get account gestating_ops; account_id = {account_id}')
         res = model['acc_gestating_ops'].get_acc_gestating_ops_list(account_id)
         
         print(f'\n\nAccount gestating_ops; len = {len(res)}')
@@ -173,6 +179,11 @@ class TestAPIAccount:
     def test_pig_farm(self, user_id, farm_name, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n#################  {now_ts}  #####################################################################')
+        
+        
         if skip_step & 0x01 == 0: 
         
             url = BASE_URL + 'pig_farm/add'
@@ -183,7 +194,7 @@ class TestAPIAccount:
             }
             
             
-            print(f'\n\nTesting adding pig_farm; url = {url} ; data')
+            print(f'2.1) Testing adding pig_farm; url = {url} ; data')
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
@@ -220,7 +231,7 @@ class TestAPIAccount:
             "name":         farm_name
         }
 
-        print(f'\n\nTesting duplicate adding pig_farm; url = {url} ; data')
+        print(f'\n\n2.2) Testing duplicate adding pig_farm; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -249,7 +260,7 @@ class TestAPIAccount:
         }
         
         
-        print(f'\n\nTesting farm_update; url = {url} ; data')
+        print(f'\n\n2.3) Testing farm_update; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -270,6 +281,11 @@ class TestAPIAccount:
     def test_acc_gestating_ops(self, user_id, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n#################  {now_ts}  #####################################################################')
+        
+        
         if skip_step & 0x01 == 0: 
         
             url = BASE_URL + 'acc_gestating_ops/add'
@@ -281,8 +297,8 @@ class TestAPIAccount:
                 "description":          SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
             }
             
-            
-            print(f'\n\nTesting adding acc_gestating_ops; url = {url} ; data')
+
+            print(f'3.1) Testing adding acc_gestating_ops; url = {url} ; data')
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
@@ -322,7 +338,7 @@ class TestAPIAccount:
         }
             
 
-        print(f'\n\nTesting duplicate adding acc_gestating_ops; url = {url} ; data')
+        print(f'\n\n3.2) Testing duplicate adding acc_gestating_ops; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -349,7 +365,7 @@ class TestAPIAccount:
         }
         
         
-        print(f'\n\nTesting acc_gestating_ops update; url = {url} ; data')
+        print(f'\n\n3.3) Testing acc_gestating_ops update; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -370,29 +386,52 @@ class TestAPIAccount:
     def test_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
         count = 0
         
+        
         while count < num:
-            self.test_sow_boar_add(user_id, pig_farm_id, sex)
+            s = f"Adding {count+1} of {num} "
+            if sex == 'F': 
+                s += "sows"
+            else:
+                s += "boars"
+            
+            if count == 0:
+                self.test_sow_boar_add(user_id, pig_farm_id, sex, opt_msg = s)
+            else:
+                self.test_sow_boar_add(user_id, pig_farm_id, sex, 
+                        skip_flag = 1, opt_msg = s)
+                
             count += 1
     
     
-    def test_sow_boar_add(self, user_id, pig_farm_id, sex= 'F'):
+    def test_sow_boar_add(self, user_id, pig_farm_id, sex= 'F', skip_flag = 0, 
+            opt_msg = None):
+        """
+        skip_flag:
+        bit_0: if > 0, skip update
+        """
+        
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n#################  {now_ts}  #####################################################################')
+        
+        
         user_uhid   = hashids_user.encrypt(user_id)
         pfhid       = hashids_common.encrypt(pig_farm_id)
         
         # Get sow list first for pig farm_name
         if sex =='F':
             sow_boar_names = RANDOM_SOW_NAMES
-            url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=F'
+            url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=F&order_by=1' 
         else:
             sow_boar_names = RANDOM_BOAR_NAMES
-            url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M'
+            url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M&order_by=1'
         
         r = requests.get(url)
         res_text = str(r.text)
         res_json = json.loads(res_text)
         
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
+        #print(f"\n\nResult; status_code = {r.status_code}; result")
+        #pprint.pprint(res_json)
         
         
         
@@ -455,7 +494,8 @@ class TestAPIAccount:
         
         url = BASE_URL + 'sow_boar/add'
         
-        print(f'\n\nTesting adding sow_boar entry; url = {url} ; data')
+        if opt_msg is not None: print(opt_msg)
+        print(f'4.1) Testing adding sow_boar entry; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -472,28 +512,93 @@ class TestAPIAccount:
         sow_boar_id = res_json['sow_boar']['id']
         
         
-        # Test sow boar update
+        if skip_flag & 0x01 == 0:
+        
+            # Test sow boar update
+            now             = datetime.now()
+            now_ts          = now.strftime('%Y%m%d_%H%M%S')
+            
+            new_name        = sow_boar_name + now_ts
+            new_name        = new_name[0:20]
+            
+            
+            url = BASE_URL + 'sow_boar/update'
+            
+            data = {
+                "uhid": user_uhid,
+                "sow_boar_id": sow_boar_id,
+                
+                
+                "number":   str(sow_boar_number),
+                "name":     new_name,
+                "notes":    "Updated sow boar"
+                
+            }
+            
+            
+            print(f'\n\n4.2) Testing sow_boar_update; url = {url} ; data')
+            pprint.pprint(data)
+            
+            r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
+            print(f"\n\nResult; status_code = {r.status_code}; result = ")
+            pprint.pprint(res_json)
+            
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
+            
+        
+    def test_sow_boar_dispose(self, user_id, pig_farm_id, sex):
         now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n###############################  {now_ts}  ####################################################')
+        
+        
+        user_uhid   = hashids_user.encrypt(user_id)
+        pfhid       = hashids_common.encrypt(pig_farm_id)
+        
+        url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid  + '&sex=' + sex
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        sow_boar_list = res_json['data']
+        
+        len_items   = len(sow_boar_list)
+        assert(len_items > 0)
+        
+        index       = random.randint(0, len_items-1)
+        sow_boar    = sow_boar_list[index]
+        sow_boar_id = sow_boar['id'] 
+        
+            
+        dispose_status_ids = [5,6,7,8]
+        len_items   = len(dispose_status_ids)
+        index       = random.randint(0, len_items-1)
+        dispose_status_id    = dispose_status_ids[index]
+        
+        
+        now             = datetime.now()
+        now_dt_s        = now.strftime('%Y-%m-%d')
         now_ts          = now.strftime('%Y%m%d_%H%M%S')
         
-        url = BASE_URL + 'sow_boar/update'
         
-        new_name        = sow_boar_name + now_ts
-        new_name        = new_name[0:20]
-        
+        url = BASE_URL + 'sow_boar/dispose'
+            
         data = {
-            "uhid": user_uhid,
-            "sow_boar_id": sow_boar_id,
+            "uhid":             user_uhid,
+            "sow_boar_id":      sow_boar_id,
             
-            
-            "number":   str(sow_boar_number),
-            "name":     new_name,
-            "notes":    "Updated sow boar"
+            "dispose_status_id":dispose_status_id,
+            "date_dispose":     now_dt_s,
+            "dispose_notes":    "disposed sow boar " + now_ts
             
         }
         
-        
-        print(f'\n\nTesting sow_boar_update; url = {url} ; data')
+        print(f'\n\n4.3) Testing sow_boar_dispose; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -505,6 +610,9 @@ class TestAPIAccount:
         
         result_num  = res_json['result']['num']
         assert(result_num == 0)
+        
+        
+        
         
         
     def test_semen_source_add(self, user_id, pig_farm_id):
@@ -612,4 +720,13 @@ class TestAPIAccount:
         
         pig_farm_id = res_pig_farm['pig_farm_id']
         self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
-        self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 2)
+        self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
+        
+        self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
+        self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
+        
+        
+if __name__ == '__main__':
+    t = TestAPIAccount()
+    
+    t.test_auto_clean_data(1, "Jackson Farm", "Punod Farm")
