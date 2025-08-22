@@ -2,13 +2,12 @@
 
 DROP PROCEDURE IF EXISTS pig_production_add $$
 CREATE PROCEDURE pig_production_add(
-	in_user_id				INT,
-	in_sow_id           	INT,
+    in_user_id              INT,
     
+    in_sow_boar_id          INT,
     in_semen_source_id      INT,
     in_staff_id             INT,
-    in_date_insemination    VARCHAR(10),  /* in YYYY-MM-DD format*/
-    in_description          VARCHAR(200)
+    in_date_insemination    VARCHAR(10)  /* in YYYY-MM-DD format*/
 )  
 
 BEGIN
@@ -16,21 +15,41 @@ BEGIN
 /** 
  * Will create sow_coming_activity entries from a given sow insemination entry.
  * 
- * @author Jack Wong (neoaspilet11@gmail.com, zhaoshan99@gmail.com) 
+ * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 17, 2025
  *
  */
 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
-DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
 
 
-DECLARE INSEMINATION_STATUS_ID_GESTATING        INT             DEFAULT 1;
-DECLARE INSEMINATION_STATUS_ID_WEANING          INT             DEFAULT 5;
+DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE cur_sow_account_id						INT             DEFAULT 0;
-DECLARE cur_sow_id                              INT             DEFAULT 0;
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 128;
+
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
+
+
+
+DECLARE PRODUCTION_STATUS_ID_GESTATING          INT             DEFAULT 1;
+DECLARE PRODUCTION_STATUS_ID_NOT_PREGNANT       INT             DEFAULT 90;
+
+
+
+DECLARE cur_user_account_id                     INT             DEFAULT 0;
+DECLARE cur_user_group_id                       INT             DEFAULT 0;
+
+
+DECLARE cur_sow_boar_account_id                 INT             DEFAULT 0;
+DECLARE cur_sow_boar_pig_farm_id                INT             DEFAULT 0;
+DECLARE cur_sow_boar_farm_sow_id                INT             DEFAULT 0;
+DECLARE cur_sow_boar_last_prod_id               INT             DEFAULT 0;
+
+
+
 
 DECLARE cur_is_ai                               INT             DEFAULT 0;
 DECLARE cur_semen_source_name                   VARCHAR(50)     DEFAULT '';
@@ -49,23 +68,32 @@ DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
 
-SET res_num    	= RES_NUM_SUCCESS;
+SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-SELECT  account_id
-INTO    cur_sow_account_id
-FROM    pig_farm
-WHERE   id = in_pig_farm_id
+SELECT  a.account_id,
+        a.pig_farm_id,
+        a.farm_sow_id,
+        a.last_prod_id,
+        b.status_id
+INTO    cur_sow_boar_account_id,
+        cur_sow_boar_pig_farm_id,
+        cur_sow_boar_farm_sow_id,
+        cur_sow_boar_last_prod_id
+        cur_last_production_status
+FROM    sow_boar a
+LEFT OUTER JOIN pig_production b ON a.last_prod_id = b.id
+WHERE   id = in_sow_boar_id
 LIMIT   1;
 
 
 CALL basic_user_check(
     in_user_id, 
     1, /* user must have an account*/
-    cur_pig_farm_account_id,
+    cur_sow_boar_account_id,
     
-    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE,
+    FLAG_BIT_BIZ_OBJ_PIG_PROD,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
@@ -75,15 +103,21 @@ CALL basic_user_check(
     res_desc);
 
 
+process_user : BEGIN
+
+
+IF res_num != RES_NUM_SUCCESS THEN 
+    LEAVE process_user;
+END IF;
+
+
 SELECT  id
 INTO    cur_production_id
 FROM    pig_production
-WHERE   sow_number          = in_sow_number     AND 
+WHERE   sow_id              = in_sow_boar_id     AND 
         date_insemination   = in_date_insemination 
 LIMIT   1;
 
-
-process_user : BEGIN
 
 IF cur_production_id > 0 THEN
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
@@ -93,75 +127,44 @@ IF cur_production_id > 0 THEN
 END IF;
 
 
-SELECT  id 
-INTO    cur_sow_id
-FROM    sow 
-WHERE   sow_number = in_sow_number;
-
-UPDATE pig_production SET 
-    status = INSEMINATION_STATUS_ID_GESTATING
-WHERE sow_id = cur_sow_id AND status = INSEMINATION_STATUS_ID_WEANING;
-
-
-SELECT  a.is_ai,
-        a.name,
-        b.name
-
-INTO    cur_is_ai,
-        cur_semen_source_name,
-        cur_pig_race_name
-FROM    semen_source a 
-LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
-WHERE   a.id = in_semen_source_id;
-
-IF cur_is_ai > 0 THEN 
-    SET cur_semen_desc = CONCAT(cur_pig_race_name, ' FROM ');
-    SET cur_semen_desc = CONCAT(cur_semen_desc, cur_semen_source_name);
-ELSE
-    SET cur_semen_desc = CONCAT(cur_pig_race_name, ' TAKAL FROM ');
-    SET cur_semen_desc = CONCAT(cur_semen_desc, cur_semen_source_name);
+/* Set previous pig_production of this sow to not pregnant, if status is gestating*/
+IF cur_last_production_status = PRODUCTION_STATUS_ID_GESTATING THEN 
+    UPDATE pig_production SET 
+        prod_status_id = PRODUCTION_STATUS_ID_NOT_PREGNANT
+    WHERE id = cur_sow_boar_last_prod_id;
 END IF;
 
 
-
-
 INSERT INTO pig_production (
+    account_id,
+    pig_farm_id,
+    
     sow_id,
-    sow_number,
     date_insemination,
     date_expected_birth,
     semen_source_id,
-    semen_desc,
-    status_id,
+    prod_status_id,
     staff_id
 ) VALUES (
-    cur_sow_id,
-    in_sow_number,
+    cur_user_account_id,
+    cur_sow_boar_pig_farm_id,
+    
+    in_sow_boar_id,
     in_date_insemination,
     DATE_ADD(in_date_insemination, INTERVAL 115 DAY),
     in_semen_source_id,
-    cur_semen_desc,
-    INSEMINATION_STATUS_ID_GESTATING,
+    PRODUCTION_STATUS_ID_GESTATING,
     in_staff_id
 );
 
 SELECT LAST_INSERT_ID() INTO cur_production_id;
 
-UPDATE sow SET
-    last_prod_id = cur_production_id
-WHERE id = cur_sow_id;
+UPDATE sow_boar SET
+    last_prod_id    = cur_production_id,
+    sow_status_id   = ?
+WHERE id = in_sow_boar_id;
 
 
-SELECT  is_ai
-INTO    cur_is_ai
-FROM    semen_source
-WHERE   id = in_semen_source_id;
-
-IF cur_is_ai > 0 THEN 
-    SET cur_coming_activity_id  = COMING_ACT_ID_ARTIFICIAL_INSEMINATION;
-ELSE
-    SET cur_coming_activity_id  = COMING_ACT_ID_NATURAL_COUPLING;
-END IF;
 
 
 
@@ -171,8 +174,11 @@ END process_user;
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
+    res_desc                            AS result_desc,
     
-    cur_production_id      AS ai_id;
+    cur_production_id                   AS pig_prod_id,
+    is_sow_boar_id                      AS sow_boar_id,
+    cur_sow_boar_farm_sow_id            AS farm_sow_id;
     
 
 END $$

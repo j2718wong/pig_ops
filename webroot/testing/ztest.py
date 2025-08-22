@@ -154,7 +154,7 @@ class TestAPIAccount:
         assert(len(res) == 4)
         
         
-        self.testing_acc_gestating_ops(user_id)
+        self.test_acc_gestating_ops(user_id)
         
         print(f'\n\nTesting get account gestating_ops; account_id = {account_id}')
         res = model['acc_gestating_ops'].get_acc_gestating_ops_list(account_id)
@@ -170,7 +170,7 @@ class TestAPIAccount:
         }
         
         
-    def testing_pig_farm(self, user_id, farm_name, skip_step = 0):
+    def test_pig_farm(self, user_id, farm_name, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
         if skip_step & 0x01 == 0: 
@@ -267,7 +267,7 @@ class TestAPIAccount:
         }
         
         
-    def testing_acc_gestating_ops(self, user_id, skip_step = 0):
+    def test_acc_gestating_ops(self, user_id, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
         if skip_step & 0x01 == 0: 
@@ -367,15 +367,15 @@ class TestAPIAccount:
         }
         
         
-    def testing_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
+    def test_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
         count = 0
         
         while count < num:
-            self.testing_sow_boar_add(user_id, pig_farm_id, sex)
+            self.test_sow_boar_add(user_id, pig_farm_id, sex)
             count += 1
     
     
-    def testing_sow_boar_add(self, user_id, pig_farm_id, sex= 'F'):
+    def test_sow_boar_add(self, user_id, pig_farm_id, sex= 'F'):
         user_uhid   = hashids_user.encrypt(user_id)
         pfhid       = hashids_common.encrypt(pig_farm_id)
         
@@ -507,12 +507,109 @@ class TestAPIAccount:
         assert(result_num == 0)
         
         
+    def test_semen_source_add(self, user_id, pig_farm_id):
+        user_uhid   = hashids_user.encrypt(user_id)
+        pfhid       = hashids_common.encrypt(pig_farm_id)
+        
+        # Get boar list of the farm
+        
+        url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M'
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        boar_id     = 0
+        boar_list   = res_json['data']
+        len_boar    = len(boar_list)
+        
+        if len_boar > 0:
+            index_boar  = random.randint(0, len_boar-1)
+            cur_boar    = boar_list[index_boar]
+            boar_name   = cur_boar['name']
+        
+       
+        # add semen_source by boar_id 
+        
+        url = BASE_URL + 'semen_source/add'
+       
+        
+        data = {
+          "uhid": user_uhid,
+          "pfhid": pfhid,
+          
+          "is_ai": 0,
+          "pig_race_id": 1,
+          "boar_id": boar_id,
+          "name": boar_name
+        }
+        
+        print(f'\n\nTesting adding semen_source entry; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code} ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
+        
+        
+        
+        
+        
+        
+        sow_boar_id = res_json['sow_boar']['id']
+        
+        
+        # Test sow boar update
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'sow_boar/update'
+        
+        new_name        = sow_boar_name + now_ts
+        new_name        = new_name[0:20]
+        
+        data = {
+            "uhid": user_uhid,
+            "sow_boar_id": sow_boar_id,
+            
+            
+            "number":   str(sow_boar_number),
+            "name":     new_name,
+            "notes":    "Updated sow boar"
+            
+        }
+        
+        
+        print(f'\n\nTesting sow_boar_update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+    
+        
+        
+        
     def test_auto_clean_data(self, user_id, acc_name, farm_name):
         self.test_account_register(user_id, acc_name)
         
        
-        res_pig_farm = self.testing_pig_farm(user_id, farm_name)
+        res_pig_farm = self.test_pig_farm(user_id, farm_name)
         
         pig_farm_id = res_pig_farm['pig_farm_id']
-        self.testing_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
-        self.testing_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 2)
+        self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
+        self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 2)

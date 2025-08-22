@@ -509,7 +509,7 @@ class SowBoar:
                 else:
                     cur_entry = {
                         'id':               cur_id,
-                        'farm_boar_id':      cur_farm_sow_boar_id,
+                        'farm_boar_id':     cur_farm_sow_boar_id,
                         'number':           cur_number, 
                         'name':             cur_name,
                         'flag':             cur_flag,

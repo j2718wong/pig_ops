@@ -92,3 +92,10 @@ class DataSemenSource(BaseModel):
     
 class DataPigProd(BaseModel):
     uhid:               str
+    pfhid:              str = None
+    
+    sow_id:             int
+    date_insem:         str
+    
+    
+    
