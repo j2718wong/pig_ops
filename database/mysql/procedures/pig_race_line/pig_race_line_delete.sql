@@ -1,27 +1,26 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS account_gestating_ops_delete $$
-CREATE PROCEDURE account_gestating_ops_delete(
+DROP PROCEDURE IF EXISTS pig_race_line_delete $$
+CREATE PROCEDURE pig_race_line_delete(
     in_user_id                  INT,
     
-    in_account_gestating_ops_id INT
+    in_pig_race_line_id         INT
 )  
 
 BEGIN
 
 /** 
- * Will delete account_gestating_ops entry.
+ * Will delete pig_race_line entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 21, 2025
+ * @since August 23, 2025
  *
  */
 
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE APP_BIZ_OBJ_ID_ACC_GESTATING_OPS        INT             DEFAULT 9;
-DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 256;
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE          INT             DEFAULT 256;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -32,17 +31,17 @@ DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
 DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
 DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 
-/* account_gestating_ops.flag bits*/
-DECLARE FLAG_BIT_ACC_GESTATING_OPS_IS_DELETED   INT             DEFAULT 1;
+/* pig_race_line.flag bits*/
+DECLARE FLAG_BIT_PIG_RACE_LINE_IS_DELETED       INT             DEFAULT 1;
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_account_gestating_ops_account_id    INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_flag          INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_name          VARCHAR(50)     DEFAULT NULL;
+DECLARE cur_pig_race_line_account_id            INT             DEFAULT 0;
+DECLARE cur_pig_race_line_flag                  INT             DEFAULT 0;
+DECLARE cur_pig_race_line_name                  VARCHAR(50)     DEFAULT NULL;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -50,26 +49,23 @@ DECLARE res_code                                VARCHAR(80)     DEFAULT '';
 DECLARE res_desc                                VARCHAR(180)    DEFAULT '';
 
 
-DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
-
-
 SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
 SELECT  account_id
-INTO    cur_account_gestating_ops_account_id
-FROM    account_gestating_ops
-WHERE   id = in_account_gestating_ops_id
+INTO    cur_pig_race_line_account_id
+FROM    pig_race_line
+WHERE   id = in_pig_race_line_id
 LIMIT   1;
 
 
 CALL basic_user_check(
     in_user_id, 
     1, /* user must have an account*/
-    cur_account_gestating_ops_account_id,
+    cur_pig_race_line_account_id,
     
-    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
+    FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE,
     AUDIT_ACTION_DELETE,
     
     cur_user_account_id, 
@@ -87,14 +83,12 @@ END IF;
 
 
 
-UPDATE account_gestating_ops SET
-    flag                = flag | FLAG_BIT_ACC_GESTATING_OPS_IS_DELETED,
+UPDATE pig_race_line SET
+    flag                = flag | FLAG_BIT_PIG_RACE_LINE_IS_DELETED,
     
     last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP
-WHERE id =  in_account_gestating_ops_id;
-
-
+WHERE id =  in_pig_race_line_id;
 
 
 END process_user;
@@ -104,19 +98,19 @@ SELECT
     flag,
     name
 INTO 
-    cur_account_gestating_ops_flag,
-    cur_account_gestating_ops_name
-FROM account_gestating_ops
-WHERE id = in_account_gestating_ops_id;
+    cur_pig_race_line_flag,
+    cur_pig_race_line_name
+FROM pig_race_line
+WHERE id = in_pig_race_line_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_account_gestating_ops_id         AS account_gestating_ops_id,
-    cur_account_gestating_ops_flag      AS account_gestating_ops_flag,
-    cur_account_gestating_ops_name      AS account_gestating_ops_name;
+    in_pig_race_line_id                 AS pig_race_line_id,
+    cur_pig_race_line_flag              AS pig_race_line_flag,
+    cur_pig_race_line_name              AS pig_race_line_name;
     
 
 END $$

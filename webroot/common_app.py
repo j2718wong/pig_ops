@@ -39,13 +39,17 @@ from model.m_mfa                import Mfa
 from model.m_user               import User
 from model.m_user_group         import UserGroup
 
+from model.m_acc_gestating_ops  import AccountGestatingOps
+
+from model.m_pig_race           import PigRace
+from model.m_pig_race_line      import PigRaceLine
 
 from model.m_pig_farm           import PigFarm
 from model.m_sow_boar           import SowBoar
 from model.m_semen_source       import SemenSource
 from model.m_sow_act            import SowActivity
 
-from model.m_acc_gestating_ops  import AccountGestatingOps
+
 from model.m_pig_production     import PigProduction
 
 
@@ -60,11 +64,15 @@ model_names = [
     ('user',                    User),
     ('user_group',              UserGroup),
     
+    ('acc_gestating_ops',       AccountGestatingOps),
+    ('pig_race',                PigRace),
+    ('pig_race_line',           PigRaceLine),
+    
     ('pig_farm',                PigFarm),
     ('sow_boar',                SowBoar),
     ('semen_source',            SemenSource),
     
-    ('acc_gestating_ops',       AccountGestatingOps),
+    
     ('pig_prod',                PigProduction),
     
     ('sow_act',                 SowActivity)

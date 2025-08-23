@@ -13,6 +13,9 @@ from route.r_account            import *
 from route.r_account_request    import *
 from route.r_acc_gestating_ops  import *
 
+from route.r_pig_race           import *
+from route.r_pig_race_line      import *
+
 
 from route.r_pig_farm           import *
 from route.r_sow_boar           import *

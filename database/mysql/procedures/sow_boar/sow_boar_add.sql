@@ -124,7 +124,7 @@ INSERT INTO sow_boar(
     pig_farm_id,
     farm_sow_id,
     farm_boar_id,
-    added_by_user_id,
+    
     birth_prod_id,
     line_id,
     sow_status_id,
@@ -134,13 +134,15 @@ INSERT INTO sow_boar(
     number,
     name,
     date_of_birth,
-    notes
+    notes,
+    
+    added_by_user_id
 ) VALUES (
     cur_user_account_id,
     in_pig_farm_id,
     cur_pig_farm_last_sow_id,
     cur_pig_farm_last_boar_id,
-    in_user_id,
+    
     in_birth_prod_id,
     in_line_id,
     in_sow_status_id,
@@ -150,7 +152,9 @@ INSERT INTO sow_boar(
     in_number,
     in_name,
     in_date_of_birth,
-    in_notes
+    in_notes,
+    
+    in_user_id
 );
 
 SELECT LAST_INSERT_ID() INTO cur_sow_boar_id;

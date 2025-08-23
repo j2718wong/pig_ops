@@ -1,10 +1,10 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS account_gestating_ops_add $$
-CREATE PROCEDURE account_gestating_ops_add(
+DROP PROCEDURE IF EXISTS pig_race_line_add $$
+CREATE PROCEDURE pig_race_line_add(
     in_user_id              INT,
 
-    in_num_days_since_insem INT,
+    in_pig_race_id          INT,
     
     in_name                 VARCHAR(50),
     in_description          VARCHAR(160)
@@ -13,10 +13,10 @@ CREATE PROCEDURE account_gestating_ops_add(
 BEGIN
 
 /** 
- * Will add account_gestating_ops entry.
+ * Will add pig_race_line entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 15, 2025
+ * @since August 23, 2025
  *
  */
 
@@ -26,7 +26,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 256;
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE          INT             DEFAULT 2048;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -37,9 +37,9 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_account_gestating_ops_id            INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_flag          INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_name          VARCHAR(50)     DEFAULT '';
+DECLARE cur_pig_race_line_id                    INT             DEFAULT 0;
+DECLARE cur_pig_race_line_flag                  INT             DEFAULT 0;
+DECLARE cur_pig_race_line_name                  VARCHAR(50)     DEFAULT '';
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -56,7 +56,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
+    FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
@@ -75,13 +75,13 @@ END IF;
 
 /* Check for duplicate entry */
 SELECT  id
-INTO    cur_account_gestating_ops_id
-FROM    account_gestating_ops
-WHERE   account_id  = cur_user_account_id   AND 
+INTO    cur_pig_race_line_id
+FROM    pig_race_line
+WHERE   account_id  = cur_user_account_id   AND
         UPPER(name) = UPPER(in_name)
 LIMIT   1;
 
-IF cur_account_gestating_ops_id > 0 THEN 
+IF cur_pig_race_line_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -90,25 +90,24 @@ END IF;
 
 
 
-INSERT INTO account_gestating_ops(
+INSERT INTO pig_race_line(
     account_id,
-    num_days_since_insem,
+    pig_race_id,
     
     name,
     description,
-    
-    added_by_user_id
+	
+	added_by_user_id
 ) VALUES (
     cur_user_account_id,
-    in_num_days_since_insem,
+    in_pig_race_id,
     
     in_name,
     in_description,
-    
-    in_user_id
+	in_user_id
 );
 
-SELECT LAST_INSERT_ID() INTO cur_account_gestating_ops_id;
+SELECT LAST_INSERT_ID() INTO cur_pig_race_line_id;
 
 
 END process_user;
@@ -118,19 +117,19 @@ SELECT
     flag,
     name
 INTO 
-    cur_account_gestating_ops_flag,
-    cur_account_gestating_ops_name
-FROM account_gestating_ops
-WHERE id = cur_account_gestating_ops_id;
+    cur_pig_race_line_flag,
+    cur_pig_race_line_name
+FROM pig_race_line
+WHERE id = cur_pig_race_line_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_account_gestating_ops_id        AS account_gestating_ops_id,
-    cur_account_gestating_ops_flag      AS account_gestating_ops_flag,
-    cur_account_gestating_ops_name      AS account_gestating_ops_name;
+    cur_pig_race_line_id                AS pig_race_line_id,
+    cur_pig_race_line_flag              AS pig_race_line_flag,
+    cur_pig_race_line_name              AS pig_race_line_name;
 
 END $$
 

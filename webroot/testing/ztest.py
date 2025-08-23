@@ -50,6 +50,12 @@ SAMPLE_CUSTOMIZED_GESTATING_OPS = {
     "num_days_since_insem": 50    
 }
 
+SAMPLE_PIG_RACE_LINE = {
+    "name":         "Camborough 48",
+    "description":  "PIC camborough 48"
+}
+
+
 
 class TestAPIUser:
     def test_register(self):
@@ -170,6 +176,7 @@ class TestAPIAccount:
         assert(len(res) >= 3)
         
         
+        self.test_pig_race_line(user_id)
         
         return {
             'account_id': account_id
@@ -382,7 +389,112 @@ class TestAPIAccount:
             'acc_gestating_ops_id': acc_gestating_ops_id
         }
         
+       
+    def test_pig_race_line(self, user_id, skip_step = 0):
+        user_uhid   = hashids_user.encrypt(user_id)
         
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n#################  {now_ts}  #####################################################################')
+        
+        
+        if skip_step & 0x01 == 0: 
+        
+            url = BASE_URL + 'pig_race_line/add'
+            
+            data = {
+                "uhid":                 user_uhid,
+                "pig_race_id":          1,
+                "name":                 SAMPLE_PIG_RACE_LINE['name'],
+                "description":          SAMPLE_PIG_RACE_LINE['description']
+            }
+            
+
+            print(f'3.1) Testing adding pig_race_line; url = {url} ; data')
+            pprint.pprint(data)
+            
+            r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
+            print(f"\n\nResult; status_code = {r.status_code}; result")
+            pprint.pprint(res_json)
+            
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
+
+            if result_num != 0:
+                return
+            
+            
+            is_id_visible = True if 'id' in res_json['pig_race_line'] else False
+            assert(is_id_visible == False)
+            
+            
+            pig_race_line_h_id  = res_json['pig_race_line']['h_id']
+            res_decrypt         = hashids_common.decrypt(pig_race_line_h_id)
+            pig_race_line_id    = res_decrypt[0]
+            
+            print(f"pig_race_line_id = {pig_race_line_id}")
+            assert(pig_race_line_id > 0)
+            
+        
+        # Test pig_race_line add duplicate
+        url = BASE_URL + 'pig_race_line/add'
+            
+        data = {
+            "uhid":                 user_uhid,
+            "pig_race_id":          1,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'],
+            "description":          SAMPLE_PIG_RACE_LINE['description']
+        }
+            
+
+        print(f'\n\n3.2) Testing duplicate adding pig_race_line; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        
+        
+        # Test pig_race_line update
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'pig_race_line/update'
+        
+        data = {
+            "uhid":                 user_uhid,
+            "pig_race_line_hid":    pig_race_line_h_id,
+            "pig_race_id":          1,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'] + now_ts,
+            "description":          SAMPLE_PIG_RACE_LINE['description']
+        }
+        
+        
+        print(f'\n\n3.3) Testing pig_race_line update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        return {
+            'pig_race_line_id': pig_race_line_id
+        }
+        
+       
     def test_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
         count = 0
         

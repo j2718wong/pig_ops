@@ -34,7 +34,8 @@ DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 128;
 
 DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 256;
 DECLARE FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS     INT             DEFAULT 512;
-
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE               INT             DEFAULT 1024;
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE          INT             DEFAULT 2048;
 
 
 /* Admin users can access all business objects, 2^31 -1*/
@@ -64,7 +65,10 @@ SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER +
                                     FLAG_BIT_BIZ_OBJ_PIG_PROD +
                                     
                                     FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS +
-                                    FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS;
+                                    FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS +
+                                    FLAG_BIT_BIZ_OBJ_PIG_RACE +
+                                    FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE;
+
 
 SET FLAG_BUSINESS_OBJ_OPERATIONS =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
@@ -96,7 +100,10 @@ INSERT INTO user_group(
     flag_priv_semen_source,
     flag_priv_pig_prod,
     
-    flag_priv_acc_gestating_ops
+    flag_priv_account_gestating_ops,
+    flag_priv_prod_gestating_ops,
+    flag_priv_pig_race,
+    flag_priv_pig_race_line
     
 ) VALUES (
     in_account_id,
@@ -114,6 +121,9 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE
 );
 
@@ -134,7 +144,10 @@ INSERT INTO user_group(
     flag_priv_semen_source,
     flag_priv_pig_prod,
     
-    flag_priv_acc_gestating_ops
+    flag_priv_account_gestating_ops,
+    flag_priv_prod_gestating_ops,
+    flag_priv_pig_race,
+    flag_priv_pig_race_line
     
 ) VALUES (
     in_account_id,
@@ -152,7 +165,11 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
 
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE
+    
 );
 
 
@@ -172,7 +189,7 @@ INSERT INTO user_group(
     flag_priv_semen_source,
     flag_priv_pig_prod,
     
-    flag_priv_acc_gestating_ops
+    flag_priv_account_gestating_ops
     
 ) VALUES (
     in_account_id,
@@ -210,7 +227,7 @@ INSERT INTO user_group(
     flag_priv_semen_source,
     flag_priv_pig_prod,
     
-    flag_priv_acc_gestating_ops
+    flag_priv_account_gestating_ops
     
 ) VALUES (
     in_account_id,

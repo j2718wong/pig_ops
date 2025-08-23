@@ -4,7 +4,7 @@ DROP PROCEDURE IF EXISTS account_gestating_ops_update $$
 CREATE PROCEDURE account_gestating_ops_update(
     in_user_id                  INT,
     
-    in_acc_gestating_ops_id     INT,
+    in_account_gestating_ops_id INT,
     in_num_days_since_insem     INT,
     
     in_name                     VARCHAR(50),
@@ -40,9 +40,9 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
         
-DECLARE cur_acc_gestating_ops_account_id        INT             DEFAULT 0;
-DECLARE cur_acc_gestating_ops_flag              INT             DEFAULT 0;
-DECLARE cur_acc_gestating_ops_name              VARCHAR(50)     DEFAULT NULL;
+DECLARE cur_account_gestating_ops_account_id    INT             DEFAULT 0;
+DECLARE cur_account_gestating_ops_flag          INT             DEFAULT 0;
+DECLARE cur_account_gestating_ops_name          VARCHAR(50)     DEFAULT NULL;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -56,16 +56,16 @@ SET res_code    = "SUCCESS";
 
 
 SELECT  account_id
-INTO    cur_acc_gestating_ops_account_id
+INTO    cur_account_gestating_ops_account_id
 FROM    account_gestating_ops
-WHERE   id = in_acc_gestating_ops_id
+WHERE   id = in_account_gestating_ops_id
 LIMIT   1;
 
 
 CALL basic_user_check(
     in_user_id, 
     1, 
-    cur_acc_gestating_ops_account_id,
+    cur_account_gestating_ops_account_id,
     
     FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
     FLAG_BIT_OPERATION_UPDATE,
@@ -94,7 +94,7 @@ UPDATE account_gestating_ops SET
     last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP
     
-WHERE id =  in_acc_gestating_ops_id;
+WHERE id =  in_account_gestating_ops_id;
 
 END process_user;
 
@@ -103,19 +103,19 @@ SELECT
     flag,
     name
 INTO 
-    cur_acc_gestating_ops_flag,
-    cur_acc_gestating_ops_name
+    cur_account_gestating_ops_flag,
+    cur_account_gestating_ops_name
 FROM account_gestating_ops
-WHERE id = in_acc_gestating_ops_id;
+WHERE id = in_account_gestating_ops_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_acc_gestating_ops_id             AS acc_gestating_ops_id,
-    cur_acc_gestating_ops_flag          AS acc_gestating_ops_flag,
-    cur_acc_gestating_ops_name          AS acc_gestating_ops_name;
+    in_account_gestating_ops_id         AS account_gestating_ops_id,
+    cur_account_gestating_ops_flag      AS account_gestating_ops_flag,
+    cur_account_gestating_ops_name      AS account_gestating_ops_name;
     
 
 

@@ -77,6 +77,17 @@ class DataSowBoarDispose(BaseModel):
     dispose_notes:      str
     
     
+class DataPigRaceLine(BaseModel):
+    uhid:               str
+    pig_race_line_hid:  str = None
+    
+    user_id:            int = 0
+    pig_race_line_id:   int = 0
+    pig_race_id:        int
+    name:               str
+    description:        str =  None
+    
+    
 class DataSemenSource(BaseModel):
     uhid:               str
     pfhid:              str = None

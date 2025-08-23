@@ -940,6 +940,17 @@ def write_feeds_consumed(data):
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT  BUY  CONS  LEFT\n'
     
     
+    total_num_piglets       = 0
+    
+    feeds_left_lactating    = 0.0
+    feeds_left_booster      = 0 
+    feeds_left_prestarter   = 0.0
+    feeds_left_starter      = 0.0
+    feeds_left_grower       = 0.0
+    feeds_left_finisher     = 0.0
+    
+    
+    
     for cur_entry in data:
 
         s_temp      = str(cur_entry['id'])
@@ -973,6 +984,8 @@ def write_feeds_consumed(data):
         
         num_piglets_weaning = cur_entry['num_piglets_weaning']
         num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        
+        total_num_piglets += num_piglets
         
         s_temp      = str(num_piglets)
         num_chars   = len(s_temp)
@@ -1010,6 +1023,8 @@ def write_feeds_consumed(data):
             num_left        = num_lactating['left']
             
             if num_left is not None:
+                feeds_left_lactating    += num_left
+                
                 s_temp      = f"{num_left:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1053,6 +1068,7 @@ def write_feeds_consumed(data):
             num_left        = num_booster['left']
             
             if num_left is not None:
+                feeds_left_booster  += num_left
                 s_temp      = str(int(num_left))
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1095,6 +1111,8 @@ def write_feeds_consumed(data):
             num_left        = num_prestarter['left']
             
             if num_left is not None:
+                feeds_left_prestarter   += num_left
+                
                 s_temp      = f"{num_left:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1138,6 +1156,7 @@ def write_feeds_consumed(data):
             num_left        = num_starter['left']
             
             if num_left is not None:
+                feeds_left_starter      += num_left
                 s_temp      = f"{num_left:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1181,6 +1200,7 @@ def write_feeds_consumed(data):
             num_left        = num_grower['left']
             
             if num_left is not None:
+                feeds_left_grower       += num_left
                 s_temp      = f"{num_left:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1196,6 +1216,51 @@ def write_feeds_consumed(data):
         s += '\n'
     
     s += '\n'
+    
+    
+    s += '                              Nabilin'
+    s += '   '
+    
+    s_temp      = str(total_num_piglets)
+    num_chars   = len(s_temp)
+    num_space   = 6 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    
+    s_temp      = f"{feeds_left_lactating:.1f}"
+    num_chars   = len(s_temp)
+    num_space   = 15 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    # Skip booster
+    s_temp      = str(int(feeds_left_booster))
+    num_chars   = len(s_temp)
+    num_space   = 15 - num_chars
+    s           += ' ' * num_space + s_temp
+    
+    s           += '   '
+
+    s_temp      = f"{feeds_left_prestarter:.1f}"
+    num_chars   = len(s_temp)
+    num_space   = 15 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s_temp      = f"{feeds_left_starter:.1f}"
+    num_chars   = len(s_temp)
+    num_space   = 15 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s_temp      = f"{feeds_left_grower:.1f}"
+    num_chars   = len(s_temp)
+    num_space   = 15 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+
+    s += '\n\n'
 
     return s
     

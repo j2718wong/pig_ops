@@ -141,27 +141,28 @@ INSERT INTO pig_farm(
     account_id,
     flag,
     name,
-    added_by_user_id,
     
     country_id,
     adrs_level_1_id,
     adrs_level_2_id,
     adrs_level_3_id,
     latitude,
-    longitude
+    longitude,
+    
+    added_by_user_id
 ) VALUES (
     cur_user_account_id,
     1,    
     in_name,
-    in_user_id,
     
     in_country_id,
     in_adrs_level_1_id,
     in_adrs_level_2_id,
     in_adrs_level_3_id,
     in_latitude,
-    in_longitude
+    in_longitude,
     
+    in_user_id
 );
 
 SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;

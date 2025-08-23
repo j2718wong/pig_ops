@@ -3,10 +3,10 @@
 DROP PROCEDURE IF EXISTS acc_gestating_ops_add $$
 CREATE PROCEDURE acc_gestating_ops_add(
     in_user_id              INT,
-	
-	in_num_days_insem       INT,
+    
+    in_num_days_insem       INT,
     in_name                 VARCHAR(50),
-    in_description			VARCHAR(180)
+    in_description          VARCHAR(180)
     
 )  
 
