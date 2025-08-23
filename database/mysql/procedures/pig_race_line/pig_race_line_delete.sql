@@ -66,7 +66,7 @@ CALL basic_user_check(
     cur_pig_race_line_account_id,
     
     FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE,
-    AUDIT_ACTION_DELETE,
+    FLAG_BIT_OPERATION_DELETE,
     
     cur_user_account_id, 
     cur_user_group_id,

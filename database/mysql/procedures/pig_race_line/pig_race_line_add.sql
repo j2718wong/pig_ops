@@ -77,8 +77,8 @@ END IF;
 SELECT  id
 INTO    cur_pig_race_line_id
 FROM    pig_race_line
-WHERE   account_id  = cur_user_account_id   AND
-        UPPER(name) = UPPER(in_name)
+WHERE   account_id          = cur_user_account_id   AND
+        UPPER(name)         = UPPER(in_name)
 LIMIT   1;
 
 IF cur_pig_race_line_id > 0 THEN 
@@ -96,15 +96,15 @@ INSERT INTO pig_race_line(
     
     name,
     description,
-	
-	added_by_user_id
+    
+    added_by_user_id
 ) VALUES (
     cur_user_account_id,
     in_pig_race_id,
     
     in_name,
     in_description,
-	in_user_id
+    in_user_id
 );
 
 SELECT LAST_INSERT_ID() INTO cur_pig_race_line_id;

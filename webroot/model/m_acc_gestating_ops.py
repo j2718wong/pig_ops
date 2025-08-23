@@ -148,20 +148,56 @@ class AccountGestatingOps:
         return None
     
     
-    def get_acc_gestating_ops_list(self, account_id):
-        sql =   """
-                SELECT 
-                    id,
-                    num_days_since_insem,
-                    
-                    name,
-                    description,
-                    dt_entry
-                FROM account_gestating_ops
-                WHERE account_id = %s
-                ORDER BY num_days_since_insem
-                """ % account_id
+    def get_acc_gestating_ops_list(self, account_id, inc_deleted = 0,
+            inc_user_audit = 0):
+                
+        if inc_deleted > 0:
+            where_clause = 'WHERE a.account_id = %s' % account_id 
+        else:
+            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
         
+        
+        if inc_user_audit == 0:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.num_days_since_insem,
+                        
+                        a.name,
+                        a.description,
+                        a.dt_entry
+                    FROM account_gestating_ops a
+                    %s
+                    ORDER BY a.num_days_since_insem
+                    """ % where_clause
+        else:
+            
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.num_days_since_insem,
+                        
+                        a.name,
+                        a.description,
+                        
+                        c.username,
+                        c.name_last,
+                        c.name_first,
+                        a.dt_entry,
+                        
+                        d.username,
+                        d.name_last,
+                        d.name_first,
+                        a.dt_last_update
+                        
+                    FROM account_gestating_ops a
+                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                    %s
+                    ORDER BY a.num_days_since_insem
+                    """ % where_clause
+
+            
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -195,15 +231,37 @@ class AccountGestatingOps:
         if rows is not None:
             
             for row in rows:
-                cur_entry = {
-                    'id':                   row[0],
-                    'num_days_since_insem': row[1],
-                    'name':                 row[2],
-                    'desc':                 row[3],
-                    
-                    'dt_entry':             row[4]
-                    
-                }
+                if inc_user_audit == 0:
+                    cur_entry = {
+                        'id':                   row[0],
+                        'num_days_since_insem': row[1],
+                        'name':                 row[2],
+                        'desc':                 row[3],
+                        
+                        'dt_entry':             str(row[4])
+                    }
+                
+                else:
+                    cur_entry = {
+                        'id':                   row[0],
+                        'num_days_since_insem': row[1],
+                        'name':                 row[2],
+                        'desc':                 row[3],
+                        
+                        'added_by': {
+                            'username':         row[4],
+                            'name_last':        row[5],
+                            'name_first':       row[6],
+                            'dt_entry':         row[7]
+                        },
+                        
+                        'last_update':{
+                            'username':         row[8],
+                            'name_last':        row[9],
+                            'name_first':       row[10],
+                            'dt_update':        str(row[11]) if row[11] else None
+                        }
+                    }
                     
                 result.append(cur_entry)
         

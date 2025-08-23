@@ -209,20 +209,58 @@ class PigRaceLine:
     
     
     
-    def get_acc_gestating_ops_list(self, account_id):
-        sql =   """
-                SELECT 
-                    id,
-                    num_days_since_insem,
-                    
-                    name,
-                    description,
-                    dt_entry
-                FROM account_gestating_ops
-                WHERE account_id = %s
-                ORDER BY num_days_since_insem
-                """ % account_id
+    def get_pig_race_line_list(self, account_id, inc_deleted = 0,
+            inc_user_audit = 0):
         
+        if inc_deleted > 0:
+            where_clause = 'WHERE a.account_id = %s' % account_id 
+        else:
+            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
+        
+        
+        if inc_user_audit == 0:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.pig_race_id,
+                        b.name AS pig_race_name
+                        
+                        a.name,
+                        a.description,
+                        a.dt_entry
+                    FROM pig_race_line a 
+                    LEFT OUTER JOIN pig_race ON a.pig_race_id = b.id
+                    %s
+                    ORDER BY a.name
+                    """ % where_clause
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.pig_race_id,
+                        b.name AS pig_race_name
+                        
+                        a.name,
+                        a.description,
+                        
+                        c.username,
+                        c.name_last,
+                        c.name_first,
+                        a.dt_entry,
+                        
+                        d.username,
+                        d.name_last,
+                        d.name_first,
+                        a.dt_last_update
+                        
+                    FROM pig_race_line a 
+                    LEFT OUTER JOIN pig_race        ON a.pig_race_id = b.id
+                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                
+                    %s
+                    ORDER BY a.name
+                    """ % where_clause
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -244,7 +282,7 @@ class PigRaceLine:
             conn.close()
             
         except Exception as e:
-            msg = 'get_acc_gestating_ops_list(); error in executing query[] = ' + sql
+            msg = 'get_pig_race_line_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -256,15 +294,48 @@ class PigRaceLine:
         if rows is not None:
             
             for row in rows:
-                cur_entry = {
-                    'id':                   row[0],
-                    'num_days_since_insem': row[1],
-                    'name':                 row[2],
-                    'desc':                 row[3],
+                if inc_user_audit == 0:
+                    cur_entry = {
+                        'id':                   row[0],
+                        
+                        'pig_race':{
+                            'id':               row[1],
+                            'name':             row[2],
+                        },
+                        
+                        'name':                 row[3],
+                        'desc':                 row[4],
+                        
+                        'dt_entry':             str(row[5])
+                    }
                     
-                    'dt_entry':             row[4]
-                    
-                }
+                else:
+                    cur_entry = {
+                        'id':                   row[0],
+                        
+                        'pig_race':{
+                            'id':               row[1],
+                            'name':             row[2],
+                        },
+                        
+                        'name':                 row[3],
+                        'desc':                 row[4],
+                        
+                        'added_by': {
+                            'username':         row[5],
+                            'name_last':        row[6],
+                            'name_first':       row[7],
+                            'dt_entry':         row[8]
+                        },
+                        
+                        'last_update':{
+                            'username':         row[9],
+                            'name_last':        row[10],
+                            'name_first':       row[11],
+                            'dt_update':        str(row[12]) if row[12] else None
+                        }
+                    }
+                
                     
                 result.append(cur_entry)
         

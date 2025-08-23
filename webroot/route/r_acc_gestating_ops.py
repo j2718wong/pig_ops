@@ -143,8 +143,8 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_HASHID',
+                'num':  ERROR_ACC_GESTATING_OPS_INVALID_HASHID,
+                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_HASHID',
                 'desc': ''
             }
         }
@@ -177,7 +177,7 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
     
     
 @app.get("/acc_gestating_ops/list")
-async def acc_gestating_ops_list(ahid: str):
+async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get acc_gestating_ops list.
     
@@ -186,7 +186,12 @@ async def acc_gestating_ops_list(ahid: str):
     
     ahid:str
         account hashid
-
+    
+    inc_deleted: int
+        if > 0, will include deleted entries
+    
+    inc_user_audit:
+        if > 0, will include added_by and last_update info
         
     """
     
@@ -204,7 +209,8 @@ async def acc_gestating_ops_list(ahid: str):
     
     account_id = res[0]
         
-    res = model['acc_gestating_ops'].get_acc_gestating_ops_list(account_id)
+    res = model['acc_gestating_ops'].get_acc_gestating_ops_list(account_id,
+            inc_deleted, inc_user_audit)
     
     if res is None:
         return {

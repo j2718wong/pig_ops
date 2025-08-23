@@ -176,10 +176,11 @@ class TestAPIAccount:
         assert(len(res) >= 3)
         
         
-        self.test_pig_race_line(user_id)
+        self.test_pig_race_line(user_id, account_h_id)
         
         return {
-            'account_id': account_id
+            'account_id':       account_id,
+            'account_h_id':     account_h_id,
         }
         
         
@@ -390,7 +391,7 @@ class TestAPIAccount:
         }
         
        
-    def test_pig_race_line(self, user_id, skip_step = 0):
+    def test_pig_race_line(self, user_id, account_h_id, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
         now             = datetime.now()
@@ -489,6 +490,69 @@ class TestAPIAccount:
         
         result_num  = res_json['result']['num']
         assert(result_num == 0)
+        
+        
+        # Add new pig_race_line
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'pig_race_line/add'
+            
+        data = {
+            "uhid":                 user_uhid,
+            "pig_race_id":          1,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'] + now_ts,
+            "description":          SAMPLE_PIG_RACE_LINE['description']
+        }
+        
+
+        print(f'3.1) Testing adding pig_race_line; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+
+        if result_num != 0:
+            return
+        
+        
+        is_id_visible = True if 'id' in res_json['pig_race_line'] else False
+        assert(is_id_visible == False)
+        
+        new_pig_race_line_hid = res_json['pig_race_line']['h_id']
+        
+        
+        # Test delete pig_race_line
+        url = BASE_URL + 'pig_race_line/delete?uhid=' + user_uhid + '&pig_race_line_hid=' + new_pig_race_line_hid
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f'\n\n3.3) Testing pig_race_line delete; url = {url} ')
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
+        # Test get_list pig_race_line
+        url = BASE_URL + 'pig_race_line/list?ahid=' + account_h_id + '&inc_deleted=1&inc_user_audit=1'
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f'\n\n3.3) Testing pig_race_line get_list; url = {url} ')
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
         
         return {
             'pig_race_line_id': pig_race_line_id
@@ -825,8 +889,9 @@ class TestAPIAccount:
         
         
     def test_auto_clean_data(self, user_id, acc_name, farm_name):
-        self.test_account_register(user_id, acc_name)
-        
+        res_register = self.test_account_register(user_id, acc_name)
+        account_id  = res_register['account_id']
+        account_h_id  = res_register['account_h_id']
        
         res_pig_farm = self.test_pig_farm(user_id, farm_name)
         
@@ -836,6 +901,8 @@ class TestAPIAccount:
         
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
+        
+        
         
         
 if __name__ == '__main__':

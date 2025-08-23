@@ -153,9 +153,63 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
         
     return res_update
     
+
+@app.get("/pig_race_line/delete")
+async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_RACE_LINE_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_RACE_LINE_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    res = hashids_common.decrypt(pig_race_line_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_RACE_LINE_INVALID_HASHID,
+                'code': 'ERROR_PIG_RACE_LINE_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    pig_race_line_id = res[0]
+    
+    
+    
+    data = {
+        'user_id':              user_id,
+        'pig_race_line_id':     pig_race_line_id
+    }
+    
+    
+    res_delete    =  model['pig_race_line'].delete(data)
+    
+    if res_delete is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    # remove plain id
+    del res_delete['pig_race_line']['id']
+    res_delete['pig_race_line']['h_id'] = pig_race_line_hid
+        
+    return res_delete
+    
     
 @app.get("/pig_race_line/list")
-async def pig_race_line_list(ahid: str):
+async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get pig_race_line list.
     
@@ -165,7 +219,12 @@ async def pig_race_line_list(ahid: str):
     ahid:str
         account hashid
 
-        
+    inc_deleted: int
+        if > 0, will include deleted entries
+    
+    inc_user_audit:
+        if > 0, will include added_by and last_update info
+    
     """
     
     
@@ -182,7 +241,8 @@ async def pig_race_line_list(ahid: str):
     
     account_id = res[0]
         
-    res = model['pig_race_line'].get_pig_race_line_list(account_id)
+    res = model['pig_race_line'].get_pig_race_line_list(account_id, 
+            inc_deleted, inc_user_audit)
     
     if res is None:
         return {
