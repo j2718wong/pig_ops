@@ -272,7 +272,7 @@ class PigFarm:
                 
                
                 cur_entry = {
-                    'h_id':             cur_farm_hashid, 
+                    'hid':             cur_farm_hashid, 
                     'flag':             cur_farm_flag,
                     'name':             cur_farm_name,
                     

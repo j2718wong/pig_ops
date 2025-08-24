@@ -149,11 +149,11 @@ class AccountGestatingOps:
     
     
     def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0):
-                
-        if inc_deleted > 0:
-            where_clause = 'WHERE a.account_id = %s' % account_id 
-        else:
-            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
+        
+        where_clause = 'WHERE a.account_id = %s' % account_id 
+        
+        if inc_deleted == 0:
+            where_clause += ' AND (a.flag & 1) = 0' 
         
         
         if inc_user_audit == 0:

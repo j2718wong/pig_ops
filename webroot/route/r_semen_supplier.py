@@ -69,7 +69,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     
     # remove plain id
     del res_add['semen_supplier']['id']
-    res_add['semen_supplier']['h_id'] = semen_supplier_hid
+    res_add['semen_supplier']['hid'] = semen_supplier_hid
 
         
     return res_add
@@ -107,7 +107,17 @@ async def semen_supplier_list(country_id: int = 1, adrs_level_1_id: int = None,
                 'desc': ''
             }
         }
-            
+    
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+    
     return {
         'result':{
             'num':  0,

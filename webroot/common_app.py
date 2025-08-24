@@ -39,6 +39,8 @@ from model.m_mfa                import Mfa
 from model.m_user               import User
 from model.m_user_group         import UserGroup
 
+from model.m_pig_farm           import PigFarm
+
 from model.m_acc_gestating_ops  import AccountGestatingOps
 
 from model.m_pig_race           import PigRace
@@ -48,9 +50,9 @@ from model.m_semen_supplier     import SemenSupplier
 from model.m_feed_brand         import FeedBrand
 from model.m_feed_supplier      import FeedSupplier
 
-from model.m_pig_farm           import PigFarm
 from model.m_sow_boar           import SowBoar
 from model.m_semen_source       import SemenSource
+
 from model.m_sow_act            import SowActivity
 
 
@@ -68,6 +70,8 @@ model_names = [
     ('user',                    User),
     ('user_group',              UserGroup),
     
+    ('pig_farm',                PigFarm),
+    
     ('acc_gestating_ops',       AccountGestatingOps),
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),
@@ -77,7 +81,6 @@ model_names = [
     ('feed_brand',              FeedBrand),
     ('feed_supplier',           FeedSupplier),
     
-    ('pig_farm',                PigFarm),
     ('sow_boar',                SowBoar),
     ('semen_source',            SemenSource),
     

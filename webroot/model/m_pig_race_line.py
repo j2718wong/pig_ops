@@ -228,7 +228,7 @@ class PigRaceLine:
                         a.description,
                         a.dt_entry
                     FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race ON a.pig_race_id = b.id
+                    LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
                     %s
                     ORDER BY a.name
                     """ % where_clause
@@ -318,7 +318,7 @@ class PigRaceLine:
                         },
                         
                         'name':                 row[3],
-                        'desc':                 row[4],
+                        'desccription':         row[4],
                         
                         'added_by': {
                             'username':         row[5],

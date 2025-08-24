@@ -88,7 +88,7 @@ async def pig_prod_add(pig_farm_data: dm.DataPigFarm):
     
     # remove plain id
     del res_add['pig_farm']['id']
-    res_add['pig_farm']['h_id'] = pig_farm_hashid
+    res_add['pig_farm']['hid'] = pig_farm_hashid
 
     result_num      = res_add['result']['num']
     

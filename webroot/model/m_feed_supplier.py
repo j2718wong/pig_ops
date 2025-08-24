@@ -82,7 +82,7 @@ class FeedSupplier:
         
         where_clause = 'WHERE a.country_id = %s ' % country_id
         if address_level_1_id is not None:
-            where_clause += ' AND address_level_1_id = %s ' %  address_level_1_id
+            where_clause += ' AND a.address_level_1_id = %s ' %  address_level_1_id
                 
         if inc_deleted == 0:
             where_clause += 'AND (a.flag & 1) = 0'  
@@ -93,12 +93,14 @@ class FeedSupplier:
                     SELECT 
                         a.id,
                         a.country_id,
+                        b.name AS country_name,
                         a.address_level_1_id,
                         a.address_level_2_id,
                         
                         a.name,
                         a.dt_entry
                     FROM feed_supplier a 
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                     %s
                     ORDER BY a.name
                     """ % where_clause

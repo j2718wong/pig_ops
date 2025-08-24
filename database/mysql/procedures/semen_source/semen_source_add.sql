@@ -5,9 +5,11 @@ CREATE PROCEDURE semen_source_add(
     in_user_id              INT,
 
     in_pig_farm_id          INT,
-    in_is_ai                INT,
-    in_pig_race_id          INT,
+    
     in_boar_id              INT,
+    
+    in_semen_supplier_id    INT,
+    in_pig_race_line_id     INT,    
     
     in_name                 VARCHAR(50),
     in_description          VARCHAR(160)
@@ -16,10 +18,18 @@ CREATE PROCEDURE semen_source_add(
 BEGIN
 
 /** 
- * Will add semen_source entry.
+ * Will add semen_source entry. This is a record for artificial insemination 
+ * semen sources.
+ *
+ * Notes:
+ * 1.) If the semen is coming from a boar in the farm (semen is extracted),
+ *      in_boar_id should be filled up.
+ *
+ * 2.) If the semen is bought from a supplier, in_semen_supplier_id and 
+ *      in_pig_race_line_id must be filled in.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 15, 2025
+ * @since August 24, 2025
  *
  */
 
@@ -32,7 +42,7 @@ DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 /* semen_source.flag bits*/
 DECLARE FLAG_BIT_SEMEN_SOURCE_IS_DELETED        INT             DEFAULT 1;
 
-DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 64;
+DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 4096;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -91,13 +101,23 @@ END IF;
 
 
 /* Check for duplicate entry */
-SELECT  id
-INTO    cur_semen_source_id
-FROM    semen_source
-WHERE   account_id  = cur_user_account_id   AND 
-        pig_farm_id = in_pig_farm_id        AND 
-        UPPER(name) = UPPER(in_name)
-LIMIT   1;
+IF in_boar_id > 0 THEN 
+    SELECT  id
+    INTO    cur_semen_source_id
+    FROM    semen_source
+    WHERE   account_id  = cur_user_account_id   AND 
+            boar_id     = in_boar_id
+    LIMIT   1;
+    
+ELSE
+    SELECT  id
+    INTO    cur_semen_source_id
+    FROM    semen_source
+    WHERE   account_id  = cur_user_account_id   AND 
+            UPPER(name) = UPPER(in_name)
+    LIMIT   1;
+
+END IF;
 
 IF cur_semen_source_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
@@ -111,23 +131,28 @@ END IF;
 INSERT INTO semen_source(
     account_id,
     pig_farm_id,
-    is_ai,
-    pig_race_id,
     boar_id,
+    
+    semen_supplier_id,
+    pig_race_line_id,
+    
     added_by_user_id,
     
     name,
     description
+    
 ) VALUES (
     cur_user_account_id,
     in_pig_farm_id,
-    in_is_ai,
-    in_pig_race_id,
     in_boar_id,
+    
+    in_semen_supplier_id,
+    in_pig_race_line_id,
+    
     in_user_id,
     
     in_name,
-    in_description    
+    in_description
 );
 
 SELECT LAST_INSERT_ID() INTO cur_semen_source_id;

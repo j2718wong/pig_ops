@@ -39,7 +39,8 @@ DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
-        
+
+DECLARE cur_pig_race_line_id                    INT             DEFAULT 0;
 DECLARE cur_pig_race_line_account_id            INT             DEFAULT 0;
 DECLARE cur_pig_race_line_flag                  INT             DEFAULT 0;
 DECLARE cur_pig_race_line_name                  VARCHAR(50)     DEFAULT NULL;
@@ -80,6 +81,23 @@ CALL basic_user_check(
 process_user : BEGIN
 
 IF res_num != RES_NUM_SUCCESS THEN 
+    LEAVE process_user;
+END IF;
+
+
+/* Check for duplicate entry */
+SELECT  id
+INTO    cur_pig_race_line_id
+FROM    pig_race_line
+WHERE   id                  != in_pig_race_line_id  AND
+        account_id          = cur_user_account_id   AND
+        UPPER(name)         = UPPER(in_name)
+LIMIT   1;
+
+IF cur_pig_race_line_id > 0 THEN 
+    SET res_num     = RES_NUM_DUPLICATE_ENTRY;
+    SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
+    
     LEAVE process_user;
 END IF;
 

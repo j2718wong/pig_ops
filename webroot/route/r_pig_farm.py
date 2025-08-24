@@ -77,7 +77,7 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     
     # remove plain id
     del res_add['pig_farm']['id']
-    res_add['pig_farm']['h_id'] = pig_farm_hid
+    res_add['pig_farm']['hid'] = pig_farm_hid
 
     result_num      = res_add['result']['num']
     
@@ -158,7 +158,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     
     # remove plain id
     del res_update['pig_farm']['id']
-    res_update['pig_farm']['h_id'] = pig_farm_hid
+    res_update['pig_farm']['hid'] = pig_farm_hid
         
     return res_update
     

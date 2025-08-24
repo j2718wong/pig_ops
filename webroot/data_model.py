@@ -117,7 +117,7 @@ class DataFeedSupplier(BaseModel):
     semen_supplier_hid: str = None
     
     user_id:            int = 0
-    semen_supplier_id:  int = 0
+    feed_supplier_id:   int = 0
     country_id:         int = COUNTRY_ID_PHILIPPINES
     address_level_1_id: int
     address_level_2_id: int
@@ -127,13 +127,17 @@ class DataFeedSupplier(BaseModel):
 class DataSemenSource(BaseModel):
     uhid:               str
     pfhid:              str = None
+    semen_supplier_hid: str = None
+    pig_race_line_hid:  str = None
     
     user_id:            int = 0
     pig_farm_id:        int = 0
     semen_source_id:    int = 0
-    is_ai:              int = 0
-    pig_race_id:        int = 0
-    boar_id:            int = 0
+    
+    boar_id:            int = None
+    semen_supplier_id:  int = None
+    pig_race_line_id:   int = None
+    
     name:               str
     description:        str =  None
     

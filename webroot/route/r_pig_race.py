@@ -43,6 +43,16 @@ async def pig_race_list():
                 'desc': ''
             }
         }
+     
+     
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
             
     return {
         'result':{

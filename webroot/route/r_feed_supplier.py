@@ -69,7 +69,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     
     # remove plain id
     del res_add['feed_supplier']['id']
-    res_add['feed_supplier']['h_id'] = feed_supplier_hid
+    res_add['feed_supplier']['hid'] = feed_supplier_hid
 
         
     return res_add
@@ -107,6 +107,16 @@ async def feed_supplier_list(country_id: int = 1, adrs_level_1_id: int = None,
                 'desc': ''
             }
         }
+            
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
             
     return {
         'result':{

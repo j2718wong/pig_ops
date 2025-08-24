@@ -69,7 +69,7 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
     
     # remove plain id
     del res_add['feed_brand']['id']
-    res_add['feed_brand']['h_id'] = feed_brand_hid
+    res_add['feed_brand']['hid'] = feed_brand_hid
 
         
     return res_add
@@ -107,6 +107,16 @@ async def feed_brand_list(country_id: int = 1, inc_deleted: int = 0,
                 'desc': ''
             }
         }
+            
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
             
     return {
         'result':{

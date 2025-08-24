@@ -69,7 +69,7 @@ async def pig_race_line(pig_race_line_data: dm.DataPigRaceLine):
     
     # remove plain id
     del res_add['pig_race_line']['id']
-    res_add['pig_race_line']['h_id'] = pig_race_line_hid
+    res_add['pig_race_line']['hid'] = pig_race_line_hid
 
         
     return res_add
@@ -140,7 +140,7 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
         
     # remove plain id
     del res_update['pig_race_line']['id']
-    res_update['pig_race_line']['h_id'] = pig_race_line_hid
+    res_update['pig_race_line']['hid'] = pig_race_line_hid
         
     return res_update
     
@@ -194,7 +194,7 @@ async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
     
     # remove plain id
     del res_delete['pig_race_line']['id']
-    res_delete['pig_race_line']['h_id'] = pig_race_line_hid
+    res_delete['pig_race_line']['hid'] = pig_race_line_hid
         
     return res_delete
     
@@ -243,7 +243,23 @@ async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
                 'desc': ''
             }
         }
-            
+    
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+        cur_pig_race_id  = cur_entry['pig_race']['id']
+        cur_pig_race_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_race']['id']
+        cur_entry['pig_race']['hid']   = cur_hid
+        
+    
     return {
         'result':{
             'num':  0,

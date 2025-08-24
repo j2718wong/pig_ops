@@ -98,7 +98,7 @@ async def user_register(user_data: dm.DataUser):
     
     # remove plain id
     del res_register['user']['id']
-    res_register['user']['h_id'] = user_hashid
+    res_register['user']['hid'] = user_hashid
 
     result_num      = res_register['result']['num']
 
@@ -152,7 +152,7 @@ async def user_register(user_data: dm.DataUser):
             
             mfa_hashid      = hashids_common.encrypt(mfa_id)
             
-            res_register['mfa']['h_id'] = mfa_hashid
+            res_register['mfa']['hid'] = mfa_hashid
 
         
         write_user_flag_bits(res_register['user'], user_flag)
@@ -215,7 +215,7 @@ async def user_email_verify_code(uhid:str, code: int):
     
     # remove plain id
     del res_verify['user']['id']
-    res_verify['user']['h_id'] = uhid
+    res_verify['user']['hid'] = uhid
     
     user_flag = res_verify['user']['flag']
     

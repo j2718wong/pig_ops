@@ -86,10 +86,12 @@ class FeedBrand:
                     SELECT 
                         a.id,
                         a.country_id,
+                        b.name AS country_name,
 
                         a.name,
                         a.dt_entry
-                    FROM semen_supplier a 
+                    FROM feed_brand a 
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                     %s
                     ORDER BY a.name
                     """ % where_clause

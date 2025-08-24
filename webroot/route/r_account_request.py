@@ -82,7 +82,7 @@ async def account_request_add_user(uhid: str, ahid:str):
     
     # remove plain id
     del res_add['account_request']['id']
-    res_add['account_request']['h_id'] = acc_req_hashid
+    res_add['account_request']['hid'] = acc_req_hashid
 
     result_num      = res_add['result']['num']
     
@@ -154,7 +154,7 @@ async def account_request_approve_add_user(arhid: str, uhid:str):
     
     # remove plain id
     del res_approve['account_request']['id']
-    res_approve['account_request']['h_id'] = account_request_hashid
+    res_approve['account_request']['hid'] = account_request_hashid
 
 
     requesting_user_id      = res_approve['requesting_user']['id']

@@ -22,52 +22,6 @@ from fastapi.responses      import PlainTextResponse
 import data_model           as dm
 
 
-@app.get("/semen_source/list")
-async def semen_source_list(pfhid):
-    """
-    Will get semen_source list.
-    
-    Parameters
-    ----------
-
-    """
-    
-    res = hashids_common.decrypt(pfhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_FARM_INVALID_HASHID,
-                'code': 'ERROR_PIG_FARM_INVALID_HASHID',
-                'desc': ''
-            }
-        }
-    
-    
-    pig_farm_id = res[0]
-    
-    
-    if res is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
-            }
-        }
-    
-    res = model['semen_source'].get_semen_source_list(pig_farm_id)
-    
-    return {
-        'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
-        },
-        
-        'data': res
-    }
-
-    
 @app.post("/semen_source/add")
 async def semen_source_add(semen_source_data: dm.DataSemenSource):
     uhid        = semen_source_data.uhid
@@ -91,17 +45,17 @@ async def semen_source_add(semen_source_data: dm.DataSemenSource):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_INVALID_PIG_FARM_HASHID',
+                'num':  ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID,
+                'code': 'ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID',
                 'desc': ''
             }
         }
     
-    pig_farm_id = res[0]
+    semen_source_id = res[0]
     
     
     semen_source_data.user_id        = user_id
-    semen_source_data.pig_farm_id    = pig_farm_id
+    semen_source_data.semen_source_id    = semen_source_id
     
     res_add    =  model['semen_source'].add(semen_source_data)
     
@@ -140,17 +94,17 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_INVALID_PIG_FARM_HASHID',
+                'num':  ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID,
+                'code': 'ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID',
                 'desc': ''
             }
         }
     
-    pig_farm_id = res[0]
+    semen_source_id = res[0]
     
     
     semen_source_data.user_id        = user_id
-    semen_source_data.pig_farm_id    = pig_farm_id
+    semen_source_data.semen_source_id    = semen_source_id
     
     res_update  =  model['semen_source'].update(semen_source_data)
     
@@ -197,132 +151,42 @@ async def semen_source_delete(uhid:str, id:int):
     return res_cull
 
 
-@app.get("/sow/pt_list", response_class=PlainTextResponse)
-async def sow_pt_list(pfhid, full_info: int = 0):
-    """
-    Will get sow list.
-    
-    Parameters
-    ----------
-    
-    full_info:int
-        0 = will return active sows only; 
-        1 = will return including culled sows
-
-        
-    """
-    
-    
-    res = hashids_common.decrypt(pfhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_INVALID_PIG_FARM_HASHID',
-                'desc': ''
-            }
-        }
-    
-    pig_farm_id = res[0]
-    
-    res = model['semen_source'].get_sow_list(pig_farm_id)
-    
-    if res is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
-            }
-        }
-        
-        
-    s = DB_INFO + '\n\n'
-        
-    s += 'Sow_Num   Sow_Name     Date of Birth   SOW_Status   Date Culled   Notes\n'
-    
-   
-    
-    for cur_entry in res:
-        
-        if full_info == 0:
-            if cur_entry['date_culled'] is not None:
-                continue
-        
-        s_temp      = cur_entry['sow_number']
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-    
-    
-        s_temp      = cur_entry['sow_name']
-        num_chars   = len(s_temp)
-        num_space   = 10 - num_chars
-        s           += s_temp + ' ' * num_space
-        s           += '   '
-    
-    
-        s_temp      = cur_entry['date_of_birth']
-        s           += s_temp
-        s           += '      '
-        
-        
-        s_temp      = cur_entry['status']
-        num_chars   = len(s_temp)
-        num_space   = 10 - num_chars
-        s           +=  s_temp + ' ' * num_space
-        s           += '   '
-    
-        
-        s_temp      = '          '   
-        if cur_entry['date_culled'] is not None:
-            s_temp  = cur_entry['date_culled']
-        s           += s_temp
-        s           += '    '
-        
-        s_temp      = '          '
-        if cur_entry['notes'] is not None:
-            s_temp  = cur_entry['notes']
-        s           += s_temp
-        s           += '    '
-        
-        
-        s           += '\n'
-        
-    return s
-    
-
 @app.get("/semen_source/list")
-async def semen_source_list(pfhid:str, sex:str = 'F', full_info: int = 0):
+async def semen_source_list(ahid:str, inc_deleted: int = 0, 
+        inc_user_audit:int = 0):
     """
-    Will get sow list.
+    Will get semen_source list.
     
     Parameters
     ----------
     
-    full_info:int
-        0 = will return active sows only; 
-        1 = will return including culled sows
-
+    ahid:str
+        account hashid
+        
+    inc_deleted: int
+        if > 0, will include deleted entries
+    
+    inc_user_audit:
+        if > 0, will include added_by and last_update info
         
     """
     
-    
-    res = hashids_common.decrypt(pfhid)
+    res = hashids_account.decrypt(pfhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_INVALID_PIG_FARM_HASHID',
+                'num':  ERROR_SEMEN_SOURCE_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_SEMEN_SOURCE_INVALID_ACCOUNT_HASHID',
                 'desc': ''
             }
         }
     
-    pig_farm_id = res[0]
     
+    account_id = res[0]
     
-    res = model['semen_source'].get_semen_source_list(pig_farm_id, sex)
+    res = model['semen_source'].get_list(account_id,
+            inc_deleted, inc_user_audit)
+    
     
     if res is None:
         return {
@@ -332,8 +196,8 @@ async def semen_source_list(pfhid:str, sex:str = 'F', full_info: int = 0):
                 'desc': ''
             }
         }
-        
-        
+    
+    
     return {
         'result':{
             'num':  0,

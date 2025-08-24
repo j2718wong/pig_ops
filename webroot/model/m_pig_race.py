@@ -24,7 +24,7 @@ class PigRace:
                    
         sql =   """
                 SELECT 
-                    id
+                    id,
                     name
                 FROM pig_race
                 """ 
@@ -64,12 +64,9 @@ class PigRace:
             
             
             for row in rows:
-                cur_pig_race_id         = row[0]
-                cur_pig_race_name       = row[1]
-               
                 cur_entry = {
-                    'id':               cur_pig_race_id, 
-                    'name':             cur_pig_race_name
+                    'id':               row[0], 
+                    'name':             row[1]
                 }
                 
                 result.append(cur_entry)

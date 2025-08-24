@@ -91,7 +91,7 @@ async def account_register(account_data: dm.DataAccount):
     
     # remove plain id
     del res_register['account']['id']
-    res_register['account']['h_id'] = account_hashid
+    res_register['account']['hid'] = account_hashid
 
     result_num      = res_register['result']['num']
     
@@ -156,7 +156,7 @@ async def account_update(account_data: dm.DataAccount):
     
     # remove plain id
     del res_update['account']['id']
-    res_update['account']['h_id'] = account_hashid
+    res_update['account']['hid'] = account_hashid
 
         
     return res_update

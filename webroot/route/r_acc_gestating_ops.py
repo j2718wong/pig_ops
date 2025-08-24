@@ -89,7 +89,7 @@ async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
     
     # remove plain id
     del res_add['acc_gestating_ops']['id']
-    res_add['acc_gestating_ops']['h_id'] = acc_gest_ops_hid
+    res_add['acc_gestating_ops']['hid'] = acc_gest_ops_hid
 
         
     return res_add
@@ -171,13 +171,14 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
         
     # remove plain id
     del res_update['acc_gestating_ops']['id']
-    res_update['acc_gestating_ops']['h_id'] = acc_gest_ops_hid
+    res_update['acc_gestating_ops']['hid'] = acc_gest_ops_hid
         
     return res_update
     
     
 @app.get("/acc_gestating_ops/list")
-async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, 
+        inc_user_audit:int = 0):
     """
     Will get acc_gestating_ops list.
     
@@ -194,7 +195,6 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, inc_user_audit
         if > 0, will include added_by and last_update info
         
     """
-    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:
@@ -220,6 +220,16 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, inc_user_audit
                 'desc': ''
             }
         }
+            
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
             
     return {
         'result':{

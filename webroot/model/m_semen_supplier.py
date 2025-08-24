@@ -93,12 +93,14 @@ class SemenSupplier:
                     SELECT 
                         a.id,
                         a.country_id,
+                        b.name AS country_name,
                         a.address_level_1_id,
                         a.address_level_2_id,
                         
-                        a.name
+                        a.name,
                         a.dt_entry
                     FROM semen_supplier a 
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                     %s
                     ORDER BY a.name
                     """ % where_clause
@@ -139,7 +141,6 @@ class SemenSupplier:
 
         # Get database connection
         conn = self.model.db_conn
-        
         
         rows = None
         
