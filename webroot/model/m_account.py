@@ -53,7 +53,7 @@ class Account:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_account_admin(); error in executing query[] = ' + sql
@@ -261,7 +261,7 @@ class Account:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_account_admin(); error in executing query[] = ' + sql
@@ -335,7 +335,7 @@ class Account:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_account_admin(); error in executing query[] = ' + sql

@@ -253,7 +253,7 @@ class PigRaceLine:
                         a.dt_last_update
                         
                     FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race        ON a.pig_race_id = b.id
+                    LEFT OUTER JOIN pig_race b      ON a.pig_race_id = b.id
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                 
@@ -278,7 +278,7 @@ class PigRaceLine:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql

@@ -149,7 +149,7 @@ class FeedSupplier:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql

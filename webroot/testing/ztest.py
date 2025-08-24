@@ -158,7 +158,7 @@ class TestAPIAccount:
         
         
         
-        print(f'\n\n***** esting get account user groups; account_id = {account_id}')
+        print(f'\n\n***** Testing get account user groups; account_id = {account_id}')
         res = model['user_group'].get_user_group_list_by_account(account_id)
         
         print(f'\n\nAccount usergroups; len = {len(res)}')
@@ -731,6 +731,9 @@ class TestAPIAccount:
         print(f'\n\n3.3) Testing pig_race_line get_list; url = {url} ')
         print(f"\n\nResult; status_code = {r.status_code}; result")
         pprint.pprint(res_json)
+        
+        len_items = len(res_json['data'])
+        assert(len_items > 0)
         
         return {
             'pig_race_line_id': pig_race_line_id

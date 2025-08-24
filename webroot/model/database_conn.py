@@ -398,7 +398,7 @@ class Model:
 
 
     def disconnect_db(self):
-        self.db_conn.close()
+        self.db_#conn.close()
         
         if self.ssh_tunnel is not None:
             try:
@@ -604,7 +604,7 @@ class Model:
             
             row_id = cursor.lastrowid
             cursor.close()
-            #conn.close()  # do not close connection here
+            ##conn.close()  # do not close connection here
             
         except Exception as e:
             msg = 'update_table_row(); error in executing query[] = ' + sql

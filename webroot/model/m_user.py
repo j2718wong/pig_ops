@@ -39,7 +39,7 @@ class User:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_user_info(); error in executing query[] = ' + sql

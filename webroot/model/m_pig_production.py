@@ -46,7 +46,7 @@ class PigProduction:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_production_status_list(); error in executing query[] = ' + sql
@@ -305,7 +305,7 @@ class PigProduction:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql

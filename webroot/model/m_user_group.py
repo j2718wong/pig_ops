@@ -52,7 +52,7 @@ class UserGroup:
             
             rows = cursor.fetchall()
             cursor.close()
-            conn.close()
+            #conn.close()
             
         except Exception as e:
             msg = 'get_user_group_list_by_account(); error in executing query[] = ' + sql
