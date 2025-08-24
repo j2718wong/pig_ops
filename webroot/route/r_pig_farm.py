@@ -191,7 +191,7 @@ async def pig_farm_list(ahid: str):
     
     account_id = res[0]
         
-    res     = model['pig_farm'].get_pig_farm_list(account_id)
+    res     = model['pig_farm'].get_list(account_id)
     
     if res is None:
         return {

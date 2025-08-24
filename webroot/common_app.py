@@ -43,6 +43,10 @@ from model.m_acc_gestating_ops  import AccountGestatingOps
 
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
+from model.m_semen_supplier     import SemenSupplier
+
+from model.m_feed_brand         import FeedBrand
+from model.m_feed_supplier      import FeedSupplier
 
 from model.m_pig_farm           import PigFarm
 from model.m_sow_boar           import SowBoar
@@ -67,6 +71,11 @@ model_names = [
     ('acc_gestating_ops',       AccountGestatingOps),
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),
+    
+    ('semen_supplier',          SemenSupplier),
+    
+    ('feed_brand',              FeedBrand),
+    ('feed_supplier',           FeedSupplier),
     
     ('pig_farm',                PigFarm),
     ('sow_boar',                SowBoar),

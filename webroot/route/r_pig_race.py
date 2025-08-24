@@ -33,7 +33,7 @@ async def pig_race_list():
     
 
         
-    res     = model['pig_race'].get_pig_race_list()
+    res     = model['pig_race'].get_list()
     
     if res is None:
         return {

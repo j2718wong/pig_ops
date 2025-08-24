@@ -208,8 +208,7 @@ class PigRaceLine:
         return None
     
     
-    
-    def get_pig_race_line_list(self, account_id, inc_deleted = 0,
+    def get_list(self, account_id, inc_deleted = 0,
             inc_user_audit = 0):
         
         if inc_deleted > 0:
@@ -223,7 +222,7 @@ class PigRaceLine:
                     SELECT 
                         a.id,
                         a.pig_race_id,
-                        b.name AS pig_race_name
+                        b.name AS pig_race_name,
                         
                         a.name,
                         a.description,
@@ -238,7 +237,7 @@ class PigRaceLine:
                     SELECT 
                         a.id,
                         a.pig_race_id,
-                        b.name AS pig_race_name
+                        b.name AS pig_race_name,
                         
                         a.name,
                         a.description,
@@ -282,7 +281,7 @@ class PigRaceLine:
             conn.close()
             
         except Exception as e:
-            msg = 'get_pig_race_line_list(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'

@@ -10,7 +10,7 @@ class PigRace:
         self.TAG                = 'PigRace'
 
 
-    def get_pig_race_list(self):
+    def get_list(self):
         """
         Will get pig_race list.
         
@@ -50,7 +50,7 @@ class PigRace:
             conn.close()
             
         except Exception as e:
-            msg = 'get_pig_race_list(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'

@@ -1,22 +1,24 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS account_gestating_ops_add $$
-CREATE PROCEDURE account_gestating_ops_add(
+DROP PROCEDURE IF EXISTS semen_supplier_add $$
+CREATE PROCEDURE semen_supplier_add(
     in_user_id              INT,
 
-    in_num_days_since_insem INT,
+    in_country_id           INT,
+    in_address_level_1_id   INT,
+    in_address_level_2_id   INT,
     
-    in_name                 VARCHAR(50),
-    in_description          VARCHAR(160)
+    in_name                 VARCHAR(50)
 )  
 
 BEGIN
 
 /** 
- * Will add account_gestating_ops entry.
+ * Will add semen_supplier entry to the system.
+ * 
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
- * @since August 15, 2025
+ * @since August 24, 2025
  *
  */
 
@@ -26,20 +28,24 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 32;
+DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SUPPLIER         INT             DEFAULT 256;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
 DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
+/* semen_supplier.flag bits*/
+DECLARE FLAG_BIT_SEMEN_SUPPLIER_IS_DELETED      INT             DEFAULT 1;
+
+
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_account_gestating_ops_id            INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_flag          INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_name          VARCHAR(50)     DEFAULT '';
+DECLARE cur_semen_supplier_id                   INT             DEFAULT 0;
+DECLARE cur_semen_supplier_flag                 INT             DEFAULT 0;
+DECLARE cur_semen_supplier_name                 VARCHAR(50)     DEFAULT '';
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -56,7 +62,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
+    FLAG_BIT_BIZ_OBJ_SEMEN_SUPPLIER,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
@@ -75,13 +81,15 @@ END IF;
 
 /* Check for duplicate entry */
 SELECT  id
-INTO    cur_account_gestating_ops_id
-FROM    account_gestating_ops
-WHERE   account_id  = cur_user_account_id   AND 
-        UPPER(name) = UPPER(in_name)
+INTO    cur_semen_supplier_id
+FROM    semen_supplier
+WHERE   country_id          = in_country_id   AND
+        address_level_1_id  = in_address_level_1_id   AND
+        address_level_2_id  = in_address_level_2_id   AND
+        UPPER(name)         = UPPER(in_name)
 LIMIT   1;
 
-IF cur_account_gestating_ops_id > 0 THEN 
+IF cur_semen_supplier_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -90,25 +98,25 @@ END IF;
 
 
 
-INSERT INTO account_gestating_ops(
-    account_id,
-    num_days_since_insem,
+INSERT INTO semen_supplier(
+    country_id,
+    address_level_1_id,
+    address_level_2_id,
     
     name,
-    description,
-    
     added_by_user_id
+    
 ) VALUES (
-    cur_user_account_id,
-    in_num_days_since_insem,
-    
-    in_name,
-    in_description,
-    
-    in_user_id
+   in_country_id,
+   in_address_level_1_id,
+   in_address_level_2_id,
+   
+   in_name,
+   in_user_id
 );
 
-SELECT LAST_INSERT_ID() INTO cur_account_gestating_ops_id;
+SELECT LAST_INSERT_ID() INTO cur_semen_supplier_id;
+
 
 
 END process_user;
@@ -118,19 +126,19 @@ SELECT
     flag,
     name
 INTO 
-    cur_account_gestating_ops_flag,
-    cur_account_gestating_ops_name
-FROM account_gestating_ops
-WHERE id = cur_account_gestating_ops_id;
+    cur_semen_supplier_flag,
+    cur_semen_supplier_name
+FROM semen_supplier
+WHERE id = cur_semen_supplier_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_account_gestating_ops_id        AS account_gestating_ops_id,
-    cur_account_gestating_ops_flag      AS account_gestating_ops_flag,
-    cur_account_gestating_ops_name      AS account_gestating_ops_name;
+    cur_semen_supplier_id               AS semen_supplier_id,
+    cur_semen_supplier_flag             AS semen_supplier_flag,
+    cur_semen_supplier_name             AS semen_supplier_name;
 
 END $$
 

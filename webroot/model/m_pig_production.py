@@ -75,7 +75,6 @@ class PigProduction:
         return result
 
     
-    
     def add(self, data = None):
         """
         PROCEDURE pig_farm_add(
@@ -253,7 +252,7 @@ class PigProduction:
         return None
         
     
-    def get_pig_farm_list(self, account_id = 0, id_list = None):
+    def get_list(self, account_id = 0, id_list = None):
         """
         Will get pig farm list.
         
@@ -309,7 +308,7 @@ class PigProduction:
             conn.close()
             
         except Exception as e:
-            msg = 'get_pig_farm_list(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'

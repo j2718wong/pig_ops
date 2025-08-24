@@ -18,16 +18,7 @@ from common_fast_api        import *
 
 import data_model           as dm
 
-
-FLAG_BIT_USER_IS_ACTIVE                 = 1
-FLAG_BIT_USER_EMAIL_VERIFIED            = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
-
-
-ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
-ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
-
-    
+   
 @app.post("/pig_race_line/add")
 async def pig_race_line(pig_race_line_data: dm.DataPigRaceLine):
     name    = pig_race_line_data.name
@@ -49,8 +40,8 @@ async def pig_race_line(pig_race_line_data: dm.DataPigRaceLine):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_RACE_LINE_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_RACE_LINE_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -105,8 +96,8 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_RACE_LINE_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_RACE_LINE_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -232,8 +223,8 @@ async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_PIG_RACE_LINE_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_PIG_RACE_LINE_INVALID_ACCOUNT_HASHID',
                 'desc': ''
             }
         }
@@ -241,7 +232,7 @@ async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
     
     account_id = res[0]
         
-    res = model['pig_race_line'].get_pig_race_line_list(account_id, 
+    res = model['pig_race_line'].get_list(account_id, 
             inc_deleted, inc_user_audit)
     
     if res is None:

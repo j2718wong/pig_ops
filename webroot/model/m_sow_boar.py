@@ -323,7 +323,7 @@ class SowBoar:
         return None
 
     
-    def get_sow_boar_list(self, farm_id, sex, inc_disposed = 0, 
+    def get_list(self, farm_id, sex, inc_disposed = 0, 
             inc_user_audit = 0, list_sow_numbers = None, order_by = 0):
         """
         Will get sow_boar list.
@@ -466,7 +466,7 @@ class SowBoar:
             conn.close()
             
         except Exception as e:
-            msg = 'get_sow_boar_list(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'

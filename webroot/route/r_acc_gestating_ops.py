@@ -209,7 +209,7 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, inc_user_audit
     
     account_id = res[0]
         
-    res = model['acc_gestating_ops'].get_acc_gestating_ops_list(account_id,
+    res = model['acc_gestating_ops'].get_list(account_id,
             inc_deleted, inc_user_audit)
     
     if res is None:

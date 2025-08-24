@@ -187,7 +187,7 @@ class PigFarm:
         return None
         
     
-    def get_pig_farm_list(self, account_id = 0):
+    def get_list(self, account_id = 0):
         """
         Will get pig farm list.
         
@@ -243,7 +243,7 @@ class PigFarm:
             conn.close()
             
         except Exception as e:
-            msg = 'get_pig_farm_list(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -277,13 +277,23 @@ class PigFarm:
                     'name':             cur_farm_name,
                     
                     'location':{
-                        'country_id':   cur_country_id,
-                        'country_name': cur_country_name,
+                        'country': {
+                            'id':       cur_country_id,
+                            'name':     cur_country_name,
+                        },
                         
                         'address':{
-                            'level_1_id': cur_farm_adrs_level_1_id,
-                            'level_2_id': cur_farm_adrs_level_2_id,
-                            'level_3_id': cur_farm_adrs_level_3_id
+                            'level_1':  {
+                                'id':   cur_farm_adrs_level_1_id
+                            },
+                            
+                            'level_2':  {
+                                'id':   cur_farm_adrs_level_2_id
+                            },
+                            
+                            'level_3_id': {
+                                'id':   cur_farm_adrs_level_3_id
+                            }
                         },
                         
                         'geoloc':{

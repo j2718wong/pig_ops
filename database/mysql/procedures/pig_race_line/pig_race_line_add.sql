@@ -26,7 +26,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE          INT             DEFAULT 2048;
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE          INT             DEFAULT 128;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;

@@ -4,6 +4,8 @@ import datetime
 from pydantic               import BaseModel
 
 
+COUNTRY_ID_PHILIPPINES      = 1
+
 class DataUser(BaseModel):
     username:           str
     name_last:          str
@@ -18,7 +20,7 @@ class DataAccount(BaseModel):
     uhid:               str
     user_id:            int = 0
     name:               str
-    country_id:         int = 1     # default to PH
+    country_id:         int = COUNTRY_ID_PHILIPPINES
     
 
 class DataAccGestatingOps(BaseModel):
@@ -86,8 +88,42 @@ class DataPigRaceLine(BaseModel):
     pig_race_id:        int
     name:               str
     description:        str =  None
+
+
+class DataSemenSupplier(BaseModel):
+    uhid:               str
+    semen_supplier_hid: str = None
     
+    user_id:            int = 0
+    semen_supplier_id:  int = 0
+    country_id:         int = COUNTRY_ID_PHILIPPINES
+    address_level_1_id: int
+    address_level_2_id: int
+    name:               str
+
+
+class DataFeedBrand(BaseModel):
+    uhid:               str
+    feed_brand_hid:     str = None
     
+    user_id:            int = 0
+    feed_brand_id:      int = 0
+    country_id:         int = COUNTRY_ID_PHILIPPINES
+    name:               str
+
+
+class DataFeedSupplier(BaseModel):
+    uhid:               str
+    semen_supplier_hid: str = None
+    
+    user_id:            int = 0
+    semen_supplier_id:  int = 0
+    country_id:         int = COUNTRY_ID_PHILIPPINES
+    address_level_1_id: int
+    address_level_2_id: int
+    name:               str
+
+
 class DataSemenSource(BaseModel):
     uhid:               str
     pfhid:              str = None

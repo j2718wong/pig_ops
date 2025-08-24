@@ -332,7 +332,7 @@ async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0,
     if full_info > 0:
         inc_disposed = 1
     
-    res = model['sow_boar'].get_sow_boar_list(pig_farm_id, sex, 
+    res = model['sow_boar'].get_list(pig_farm_id, sex, 
             inc_disposed    = inc_disposed, 
             inc_user_audit  = inc_user_audit,
             order_by        = order_by)

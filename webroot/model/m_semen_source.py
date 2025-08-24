@@ -166,7 +166,7 @@ class SemenSource:
         return None
         
     
-    def get_pig_farm_list(self, account_id = 0):
+    def get_list(self, account_id = 0):
         """
         Will get pig farm list.
         
@@ -222,7 +222,7 @@ class SemenSource:
             conn.close()
             
         except Exception as e:
-            msg = 'get_pig_farm_list(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
