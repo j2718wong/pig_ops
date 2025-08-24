@@ -430,6 +430,7 @@ class TestAPIAccount:
         print(f"\n\nResult; status_code = {r.status_code}; result")
         pprint.pprint(res_json)
  
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
         
         
         # Test farm update
@@ -537,6 +538,7 @@ class TestAPIAccount:
         print(f"\n\nResult; status_code = {r.status_code}; result")
         pprint.pprint(res_json)
  
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
         
         
         # Test acc_gestating_ops update
@@ -642,6 +644,7 @@ class TestAPIAccount:
         print(f"\n\nResult; status_code = {r.status_code}; result")
         pprint.pprint(res_json)
  
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
         
         
         # Test pig_race_line update
@@ -1010,13 +1013,14 @@ class TestAPIAccount:
         url = BASE_URL + 'semen_source/add'
        
         
-        data = {
+        data_semen_source_1 = {
           "uhid": user_uhid,
           "pfhid": pfhid,
           
           "boar_hid": boar_hid,
           "name":   'Semen from Butakal - ' + boar_name
         }
+        data = data_semen_source_1
         
         print(f'\n\nTesting adding semen_source entry; url = {url} ; data')
         pprint.pprint(data)
@@ -1030,6 +1034,28 @@ class TestAPIAccount:
         
         result_num  = res_json['result']['num']
         assert(result_num == 0)
+        
+        
+        semen_source_hid_1 = res_json['semen_source']['hid']
+        
+        
+        # Test semen_source add duplicate
+        url = BASE_URL + 'semen_source/add'
+            
+        data = data_semen_source_1
+
+        print(f'\n\n***** Testing duplicate adding semen_source; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
+        
         
         
         
@@ -1062,7 +1088,7 @@ class TestAPIAccount:
         url = BASE_URL + 'semen_source/add'
        
         
-        data = {
+        data_semen_source_2 = {
           "uhid": user_uhid,
           "pfhid": pfhid,
           "semen_supplier_hid": semen_supplier_hid,
@@ -1070,7 +1096,7 @@ class TestAPIAccount:
               
           "name":   'PIC 337'
         }
-        
+        data = data_semen_source_2
         
         print(f'\n\nTesting adding semen_source entry; url = {url} ; data')
         pprint.pprint(data)
@@ -1084,6 +1110,27 @@ class TestAPIAccount:
         
         result_num  = res_json['result']['num']
         assert(result_num == 0)
+        
+        
+        
+        # Test semen_source add duplicate
+        url = BASE_URL + 'semen_source/add'
+            
+        data = data_semen_source_2
+
+        print(f'\n\n***** Testing duplicate adding semen_source; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
+        
+        
         
         
     def test_auto_clean_data(self, user_id, acc_name, farm_name):

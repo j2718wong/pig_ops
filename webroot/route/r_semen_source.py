@@ -145,6 +145,14 @@ async def semen_source_add(semen_source_data: dm.DataSemenSource):
             }
         }
         
+        
+    semen_source_id    = res_add['semen_source']['id']
+    semen_source_hid   = hashids_common.encrypt(semen_source_id)
+        
+    # remove plain id
+    del res_add['semen_source']['id']
+    res_add['semen_source']['hid'] = semen_source_hid
+        
     return res_add
     
 
@@ -166,7 +174,7 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
     
     
     semen_source_hid    = semen_source_data.semen_source_hid
-    res = hashids_user.decrypt(semen_source_hid)
+    res = hashids_common.decrypt(semen_source_hid)
     if len(res) == 0:
         return {
             'result':{
@@ -286,13 +294,17 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
             }
         }
         
+    
+    # remove plain id
+    del res_update['semen_source']['id']
+    res_update['semen_source']['hid'] = semen_source_hid
+        
     return res_update
     
 
 @app.get("/semen_source/delete")
-async def semen_source_delete(uhid:str, id:int):
-    uhid        = semen_source_data.uhid
-    
+async def semen_source_delete(uhid:str, semen_source_hid: str):
+   
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -305,8 +317,25 @@ async def semen_source_delete(uhid:str, id:int):
     
     user_id = res[0]
     
-   
-    res_delete      =  model['semen_source'].delete(user_id, id)
+    
+    res = hashids_common.decrypt(semen_source_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SOURCE_INVALID_HASHID,
+                'code': 'ERROR_SEMEN_SOURCE_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    semen_source_id = res[0]
+    
+    data = {
+        'user_id':          user_id,
+        'semen_source_id':  semen_source_id
+    }
+    
+    res_delete      =  model['semen_source'].delete(data)
     
     if res_delete is None:
         return {
@@ -317,7 +346,12 @@ async def semen_source_delete(uhid:str, id:int):
             }
         }
         
-    return res_cull
+    
+    # remove plain id
+    del res_delete['semen_source']['id']
+    res_delete['semen_source']['hid'] = semen_source_hid
+        
+    return res_delete
 
 
 @app.get("/semen_source/list")
@@ -340,7 +374,7 @@ async def semen_source_list(ahid:str, inc_deleted: int = 0,
         
     """
     
-    res = hashids_account.decrypt(pfhid)
+    res = hashids_account.decrypt(ahid)
     if len(res) == 0:
         return {
             'result':{
@@ -367,6 +401,46 @@ async def semen_source_list(ahid:str, inc_deleted: int = 0,
         }
     
     
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+        
+        cur_pig_farm_id  = cur_entry['pig_farm']['id']
+        cur_pig_farm_hid = hashids_common.encrypt(cur_pig_farm_id)
+        
+        del cur_entry['pig_farm']['id']
+        cur_entry['pig_farm']['hid']   = cur_pig_farm_hid
+        
+        
+        if 'boar' in cur_entry:
+            cur_boar_id     = cur_entry['boar']['id']
+            cur_boar_hid    = hashids_common.encrypt(cur_boar_id)
+        
+            del cur_entry['boar']['id']
+            cur_entry['boar']['hid']   = cur_boar_hid
+            
+            
+        if 'external_semen' in cur_entry:
+            cur_supplier_id     = cur_entry['external_semen']['supplier_id']
+            cur_supplier_hid    = hashids_common.encrypt(cur_supplier_id)
+        
+            del cur_entry['external_semen']['supplier_id']
+            cur_entry['external_semen']['supplier_hid']   = cur_supplier_hid
+    
+            
+            cur_pig_race_line_id  = cur_entry['external_semen']['pig_race_line']['id']
+            cur_pig_race_line_hid = hashids_common.encrypt(cur_pig_race_line_id)
+        
+            del cur_entry['external_semen']['pig_race_line']['id']
+            cur_entry['external_semen']['pig_race_line']['hid'] = cur_pig_race_line_hid
+    
+            
+            
     return {
         'result':{
             'num':  0,

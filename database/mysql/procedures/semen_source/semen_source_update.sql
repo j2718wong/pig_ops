@@ -121,7 +121,7 @@ UPDATE semen_source SET
     boar_id             = in_boar_id,
     
     semen_supplier_id   = in_semen_supplier_id,
-    pig_race_id         = in_pig_race_id,
+    pig_race_line_id    = in_pig_race_line_id,
     
     name                = in_name,
     description         = in_description,

@@ -337,11 +337,11 @@ class SemenSource:
                         c.number,
                         c.name AS boar_name,
                         
-                        a.semen_supplier_id
+                        a.semen_supplier_id,
                         d.name AS semen_supplier_name,
                         
                         a.pig_race_line_id,
-                        e.name AS pig_race_line_name
+                        e.name AS pig_race_line_name,
                         
                         a.name,
                         a.description,
@@ -371,11 +371,11 @@ class SemenSource:
                         c.number,
                         c.name AS boar_name,
                         
-                        a.semen_supplier_id
+                        a.semen_supplier_id,
                         d.name AS semen_supplier_name,
                         
                         a.pig_race_line_id,
-                        e.name AS pig_race_line_name
+                        e.name AS pig_race_line_name,
                         
                         a.name,
                         a.description,
@@ -396,8 +396,8 @@ class SemenSource:
                     LEFT OUTER JOIN semen_supplier d    ON a.semen_supplier_id = d.id
                     LEFT OUTER JOIN pig_race_line e     ON a.pig_race_line_id = e.id
                     
-                    LEFT OUTER JOIN user f              ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user g              ON a.last_update_user_id = d.id
+                    LEFT OUTER JOIN user f              ON a.added_by_user_id   = f.id
+                    LEFT OUTER JOIN user g              ON a.last_update_user_id = g.id
                 
                     %s
                     """ % where_clause
@@ -506,17 +506,17 @@ class SemenSource:
                         'description':          row[12],
                         
                         'added_by': {
-                            'username':         row[5],
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_entry':         row[8]
+                            'username':         row[13],
+                            'name_last':        row[14],
+                            'name_first':       row[15],
+                            'dt_entry':         row[16]
                         },
                         
                         'last_update':{
-                            'username':         row[9],
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_update':        str(row[12]) if row[12] else None
+                            'username':         row[17],
+                            'name_last':        row[18],
+                            'name_first':       row[19],
+                            'dt_update':        str(row[20]) if row[20] else None
                         }
                         
                     }
