@@ -149,10 +149,34 @@ class DataSemenSource(BaseModel):
     
 class DataPigProd(BaseModel):
     uhid:               str
-    pfhid:              str = None
     
-    sow_id:             int
-    date_insem:         str
+    pig_prod_hid:       str = None
+    sow_hid:            str
+    boar_hid:           str = None
+    semen_source_hid:   str = None
+    
+    semen_cost:         float = None
+    insemination_cost:  float = None
+    insem_cost_comments: str = None
+    
+    staff_id:           int = None
+    date_insemination:  str
     
     
+class DataPigProdAI(BaseModel):
+    uhid:               str
     
+    pig_prod_ai_hid:    str = None
+    pig_prod_hid:       str = None
+    
+    sow_hid:            str
+    boar_hid:           str = None
+    semen_source_hid:   str = None
+    
+    date_extracted:     str = None
+    date_expiry:        str
+    date_insemination:  str = None
+    hour_insemination
+    
+    staff_id:           int = None
+    date_insemination:  str
