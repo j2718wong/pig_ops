@@ -108,7 +108,10 @@ class SowBoar:
         
         sql += '"%s",'  % data.sex
         
-        sql += '"%s",'  % data.number
+        if data.number is not None:
+            sql += '"%s",'  % data.number
+        else:
+            sql += 'NULL,'
         
         if data.name is not None:
             sql += '"%s",'    % data.name

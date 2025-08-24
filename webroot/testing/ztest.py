@@ -870,7 +870,7 @@ class TestAPIAccount:
         assert(result_num == 0)
         
         
-        sow_boar_id = res_json['sow_boar']['id']
+        sow_boar_hid = res_json['sow_boar']['hid']
         
         
         if skip_flag & 0x01 == 0:
@@ -887,7 +887,7 @@ class TestAPIAccount:
             
             data = {
                 "uhid": user_uhid,
-                "sow_boar_id": sow_boar_id,
+                "sow_boar_hid": sow_boar_hid,
                 
                 
                 "number":   str(sow_boar_number),
@@ -928,12 +928,12 @@ class TestAPIAccount:
         
         sow_boar_list = res_json['data']
         
-        len_items   = len(sow_boar_list)
+        len_items       = len(sow_boar_list)
         assert(len_items > 0)
         
-        index       = random.randint(0, len_items-1)
-        sow_boar    = sow_boar_list[index]
-        sow_boar_id = sow_boar['id'] 
+        index           = random.randint(0, len_items-1)
+        sow_boar        = sow_boar_list[index]
+        sow_boar_hid    = sow_boar['hid'] 
         
             
         dispose_status_ids = [5,6,7,8]
@@ -951,7 +951,7 @@ class TestAPIAccount:
             
         data = {
             "uhid":             user_uhid,
-            "sow_boar_id":      sow_boar_id,
+            "sow_boar_hid":     sow_boar_hid,
             
             "dispose_status_id":dispose_status_id,
             "date_dispose":     now_dt_s,
@@ -974,6 +974,11 @@ class TestAPIAccount:
         
         
     def test_semen_source(self, user_id, pig_farm_id):
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'\n\n###############################  {now_ts}  ####################################################')
+        
+        
         user_uhid   = hashids_user.encrypt(user_id)
         pfhid       = hashids_common.encrypt(pig_farm_id)
         
@@ -989,13 +994,18 @@ class TestAPIAccount:
         boar_list   = res_json['data']
         len_boar    = len(boar_list)
         
-        if len_boar > 0:
+        if len_boar > 1:
             index_boar  = random.randint(0, len_boar-1)
             cur_boar    = boar_list[index_boar]
-            boar_name   = cur_boar['name']
-        
+            
+        else:
+            cur_boar    = boar_list[0]
+            
+        boar_name   = cur_boar['name']
+        boar_hid    = cur_boar['hid']
+    
        
-        # add semen_source by boar_id 
+        # add semen_source by boar_hid 
         
         url = BASE_URL + 'semen_source/add'
        
@@ -1004,7 +1014,7 @@ class TestAPIAccount:
           "uhid": user_uhid,
           "pfhid": pfhid,
           
-          "boar_id": boar_id,
+          "boar_hid": boar_hid,
           "name":   'Semen from Butakal - ' + boar_name
         }
         
@@ -1046,7 +1056,7 @@ class TestAPIAccount:
         
         semen_supplier = semen_supplier_list[index] 
         
-        semen_supplier_hid 
+        semen_supplier_hid = semen_supplier['hid']
         
         
         url = BASE_URL + 'semen_source/add'
@@ -1055,11 +1065,25 @@ class TestAPIAccount:
         data = {
           "uhid": user_uhid,
           "pfhid": pfhid,
-          
-          "boar_id": boar_id,
-          "name":   'Semen from Butakal - ' + boar_name
+          "semen_supplier_hid": semen_supplier_hid,
+          "pig_race_line_hid": 'Q92W83',
+              
+          "name":   'PIC 337'
         }
         
+        
+        print(f'\n\nTesting adding semen_source entry; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code} ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
         
         
     def test_auto_clean_data(self, user_id, acc_name, farm_name):
@@ -1076,6 +1100,7 @@ class TestAPIAccount:
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         
+        self.test_semen_source(user_id, pig_farm_id)
         
         
         

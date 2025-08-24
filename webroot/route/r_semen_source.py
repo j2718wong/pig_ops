@@ -30,8 +30,8 @@ async def semen_source_add(semen_source_data: dm.DataSemenSource):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'num':  ERROR_SEMEN_SOURCE_INVALID_USER_HASHID,
+                'code': 'ERROR_SEMEN_SOURCE_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -39,24 +39,101 @@ async def semen_source_add(semen_source_data: dm.DataSemenSource):
     user_id = res[0]
     
     
-    pfhid       = semen_source_data.pfhid
+    pfhid           = semen_source_data.pfhid
+    pig_farm_id     = 0
     
-    res = hashids_common.decrypt(pfhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID,
-                'code': 'ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID',
-                'desc': ''
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
             }
-        }
-    
-    semen_source_id = res[0]
-    
+        
+        pig_farm_id     = res[0]
+        
     
     semen_source_data.user_id        = user_id
-    semen_source_data.semen_source_id    = semen_source_id
+    semen_source_data.pig_farm_id    = pig_farm_id
     
+    
+    boar_hid        = semen_source_data.boar_hid
+    boar_id         = None
+    if boar_hid is not None:
+        res = hashids_common.decrypt(boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_BOAR_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_BOAR_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        boar_id     = res[0]
+        
+        
+    semen_supplier_hid  = semen_source_data.semen_supplier_hid
+    semen_supplier_id   = None
+    if semen_supplier_hid is not None:
+        res = hashids_common.decrypt(semen_supplier_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_supplier_id   = res[0]
+        
+    
+    pig_race_line_hid   = semen_source_data.pig_race_line_hid
+    pig_race_line_id    = None
+    if pig_race_line_hid is not None:
+        res = hashids_common.decrypt(pig_race_line_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        pig_race_line_id   = res[0]
+        
+    
+    if boar_id is not None:
+        semen_source_data.boar_id   = boar_id
+    
+    else:
+        if semen_supplier_id is None:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID',
+                    'desc': ''
+                }
+            }
+            
+        if pig_race_line_id is None:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_source_data.semen_supplier_id = semen_supplier_id
+        semen_source_data.pig_race_line_id  = pig_race_line_id
+        
+
     res_add    =  model['semen_source'].add(semen_source_data)
     
     if res_add is None:
@@ -79,8 +156,8 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'num':  ERROR_SEMEN_SOURCE_INVALID_USER_HASHID,
+                'code': 'ERROR_SEMEN_SOURCE_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -88,23 +165,115 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
     user_id = res[0]
     
     
-    pfhid       = semen_source_data.pfhid
-    
-    res = hashids_common.decrypt(pfhid)
+    semen_source_hid    = semen_source_data.semen_source_hid
+    res = hashids_user.decrypt(semen_source_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID,
-                'code': 'ERROR_SOW_INVALID_SEMEN_SOURCE_HASHID',
+                'num':  ERROR_SEMEN_SOURCE_INVALID_HASHID,
+                'code': 'ERROR_SEMEN_SOURCE_INVALID_HASHID',
                 'desc': ''
             }
         }
     
     semen_source_id = res[0]
     
+        
+    pfhid           = semen_source_data.pfhid
+    pig_farm_id     = 0
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        pig_farm_id     = res[0]
+        
     
     semen_source_data.user_id        = user_id
-    semen_source_data.semen_source_id    = semen_source_id
+    semen_source_data.pig_farm_id    = pig_farm_id
+    semen_source_data.semen_source_id = semen_source_id
+    
+    
+    boar_hid        = semen_source_data.boar_hid
+    boar_id         = None
+    if boar_hid is not None:
+        res = hashids_common.decrypt(boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_BOAR_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_BOAR_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        boar_id     = res[0]
+        
+        
+    semen_supplier_hid  = semen_source_data.semen_supplier_hid
+    semen_supplier_id   = None
+    if semen_supplier_hid is not None:
+        res = hashids_common.decrypt(semen_supplier_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID',
+                    'desc': 'Cannot be decrypted'
+                }
+            }
+        
+        semen_supplier_id   = res[0]
+        
+    
+    pig_race_line_hid   = semen_source_data.pig_race_line_hid
+    pig_race_line_id    = None
+    if pig_race_line_hid is not None:
+        res = hashids_common.decrypt(pig_race_line_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        pig_race_line_id   = res[0]
+        
+    
+    if boar_id is not None:
+        semen_source_data.boar_id   = boar_id
+    
+    else:
+        if semen_supplier_id is None:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_SEMEN_SUPPLIER_HASHID',
+                    'desc': 'Semen Supplier cannot be empty'
+                }
+            }
+            
+        if pig_race_line_id is None:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID,
+                    'code': 'ERROR_SEMEN_SOURCE_INVALID_PIG_RACE_LINE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_source_data.semen_supplier_id = semen_supplier_id
+        semen_source_data.pig_race_line_id  = pig_race_line_id
+    
     
     res_update  =  model['semen_source'].update(semen_source_data)
     

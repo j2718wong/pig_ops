@@ -53,6 +53,7 @@ class DataPigFarm(BaseModel):
 class DataSowBoar(BaseModel):
     uhid:               str
     pfhid:              str = None
+    sow_boar_hid:       str = None
     
     sow_boar_id:        int = 0
     user_id:            int = 0
@@ -71,9 +72,10 @@ class DataSowBoar(BaseModel):
     
 class DataSowBoarDispose(BaseModel):
     uhid:               str
+    sow_boar_hid:       str
     
     user_id:            int = 0
-    sow_boar_id:        int
+    sow_boar_id:        int = 0
     dispose_status_id:  int
     date_dispose:       datetime.date
     dispose_notes:      str
@@ -126,7 +128,10 @@ class DataFeedSupplier(BaseModel):
 
 class DataSemenSource(BaseModel):
     uhid:               str
+    
+    semen_source_hid:   str = None
     pfhid:              str = None
+    boar_hid:           str = None
     semen_supplier_hid: str = None
     pig_race_line_hid:  str = None
     

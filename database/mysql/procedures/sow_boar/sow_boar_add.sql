@@ -96,14 +96,31 @@ END IF;
 
 
 
-/* Check for duplicate entry. */
-SELECT  id
-INTO    cur_sow_boar_id
-FROM    sow_boar
-WHERE   account_id  = cur_user_account_id   AND
-        pig_farm_id = in_pig_farm_id        AND
-        sex         = in_sex                AND
-        number      = in_number;
+/* Check for duplicate entry. */ 
+IF in_number IS NOT NULL THEN 
+    /* If sow_boar.number is given, will be check as one of unique keys. */
+
+    SELECT  id
+    INTO    cur_sow_boar_id
+    FROM    sow_boar
+    WHERE   account_id  = cur_user_account_id   AND
+            pig_farm_id = in_pig_farm_id        AND
+            sex         = in_sex                AND
+            number      = in_number;
+
+ELSE
+    /* If sow_boar.name is given, will be check as one of unique keys. */
+    
+    SELECT  id
+    INTO    cur_sow_boar_id
+    FROM    sow_boar
+    WHERE   account_id  = cur_user_account_id   AND
+            pig_farm_id = in_pig_farm_id        AND
+            sex         = in_sex                AND
+            name        = in_name;
+
+END IF;
+
 
 IF cur_sow_boar_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
