@@ -30,7 +30,7 @@ DECLARE RES_NUM_DUPLICATE_ENTRY                     INT         DEFAULT 22;
 DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT                INT             DEFAULT 2;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT                	INT             DEFAULT 2;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -89,7 +89,7 @@ CALL basic_user_check(
     0, /* user has no account yet*/
     0,
     
-    FLAG_BIT_BIZ_OBJ_ACCOUNT,
+    BUSINESS_OBJ_ID_ACCOUNT,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 

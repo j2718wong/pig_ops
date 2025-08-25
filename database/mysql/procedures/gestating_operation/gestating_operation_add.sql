@@ -26,7 +26,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_GESTATING_OPERATION    INT             DEFAULT 256;
+DECLARE BUSINESS_OBJ_ID_GESTATING_OPERATION    INT             DEFAULT 256;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -59,7 +59,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    FLAG_BIT_BIZ_OBJ_GESTATING_OPERATION,
+    BUSINESS_OBJ_ID_GESTATING_OPERATION,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 

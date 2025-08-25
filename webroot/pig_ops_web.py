@@ -9,6 +9,7 @@ from common_app                 import *
 from route.r_sow_act            import *
 
 from route.r_user               import *
+from route.r_user_group         import *
 from route.r_account            import *
 from route.r_account_request    import *
 

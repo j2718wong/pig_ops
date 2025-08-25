@@ -31,7 +31,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 4096;
+DECLARE BUSINESS_OBJ_ID_SEMEN_SOURCE            INT             DEFAULT 16;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -66,10 +66,10 @@ LIMIT   1;
 
 CALL basic_user_check(
     in_user_id, 
-    1, 
+    1, /* user must have an account*/
     cur_semen_source_account_id, /* compare user.account_id to this account_id*/
     
-    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE,
+    BUSINESS_OBJ_ID_SEMEN_SOURCE,
     FLAG_BIT_OPERATION_UPDATE,
     
     cur_user_account_id, 

@@ -23,7 +23,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 /* semen_source.flag bits*/
 DECLARE FLAG_BIT_SEMEN_SOURCE_IS_DELETED        INT             DEFAULT 1;
 
-DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 4096;
+DECLARE BUSINESS_OBJ_ID_SEMEN_SOURCE            INT             DEFAULT 16;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -62,7 +62,7 @@ CALL basic_user_check(
     1, 
     cur_semen_source_account_id,
     
-    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE,
+    BUSINESS_OBJ_ID_SEMEN_SOURCE,
     FLAG_BIT_OPERATION_DELETE,
     
     cur_user_account_id, 

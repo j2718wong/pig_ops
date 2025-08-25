@@ -10,7 +10,7 @@ class UserGroup:
         self.TAG                = 'UserGroup'
     
     
-    def get_user_group_list_by_account(self, account_id):
+    def get_list(self, account_id):
         sql =   """
                 SELECT 
                     id,
@@ -22,11 +22,30 @@ class UserGroup:
                     flag_priv_user,
                     flag_priv_account,
                     flag_priv_account_request,
+                    flag_priv_user_group,
+                    
                     flag_priv_pig_farm,
+                    flag_priv_pig_farm_staff,
+                    flag_priv_pig_race,
+                    flag_priv_pig_race_line,
+                    
+                    flag_priv_acc_gestating_ops,
+                    flag_priv_acc_lactating_ops,
+                    
+                    flag_priv_semen_supplier,
+                    flag_priv_feed_supplier,
+                    flag_priv_feed_brand,
+                    flag_priv_feed_type,
                     
                     flag_priv_sow_boar,
                     flag_priv_semen_source,
-                    flag_priv_pig_prod,
+                    flag_priv_pig_production,
+                    flag_priv_pig_prod_ai,
+                    
+                    flag_priv_pig_prod_feed_buy,
+                    flag_priv_pig_prod_feed_bal,
+                    
+                    flag_priv_prod_gestating_ops,
                     
                     dt_entry
                 FROM user_group
@@ -55,7 +74,7 @@ class UserGroup:
             #conn.close()
             
         except Exception as e:
-            msg = 'get_user_group_list_by_account(); error in executing query[] = ' + sql
+            msg = 'get_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -68,36 +87,43 @@ class UserGroup:
             
             for row in rows:
                 cur_entry = {
-                    'id':                   row[0],
-                    'account_id':           row[1],
-                    'group_num':            row[2],
-                    'flag_business_obj':    row[3],
-                    'flag_business_obj_h':  f"0x{row[3]:08x}",
-                    'name':                 row[4],
+                    'id':                       row[0],
+                    'account_id':               row[1],
+                    'group_num':                row[2],
+                    'flag_business_obj':        row[3],
+                    'flag_business_obj_h':      f"0x{row[3]:08x}",
+                    'name':                     row[4],
                     
-                    'flag_priv_user':       row[5],
-                    'flag_priv_user_h':     f"0x{row[5]:02x}",
+                    'flag_priv_user':           row[5],
+                    'flag_priv_account':        row[6],
+                    'flag_priv_acc_req':        row[7],
+                    'flag_priv_user_group':     row[8],
                     
-                    'flag_priv_account':    row[6],
-                    'flag_priv_account_h':  f"0x{row[6]:02x}",
+                    'flag_priv_pig_farm':       row[9],
+                    'flag_priv_pig_farm_staff': row[10], 
+                    'flag_priv_pig_race':       row[11],
+                    'flag_priv_pig_race_line':  row[12],
                     
-                    'flag_priv_acc_req':    row[7],
-                    'flag_priv_acc_req_h':  f"0x{row[7]:02x}",
+                    'flag_priv_acc_gestating_ops':  row[13],
+                    'flag_priv_acc_lactating_ops':  row[14],
+                    
+                    'flag_priv_semen_supplier': row[15],
+                    'flag_priv_feed_supplier':  row[16],
+                    'flag_priv_feed_brand':     row[17],
+                    'flag_priv_feed_type':      row[18],
                     
                     
-                    'flag_priv_pig_farm':   row[8],
-                    'flag_priv_pig_farm_h': f"0x{row[8]:02x}",
+                    'flag_priv_sow_boar':       row[19],
+                    'flag_priv_semen_source':   row[20],
+                    'flag_priv_pig_production': row[21],
+                    'flag_priv_pig_prod_ai':    row[22],
                     
-                    'flag_priv_sow_boar':   row[9],
-                    'flag_priv_sow_boar_h': f"0x{row[9]:02x}",
+                    'flag_priv_pig_prod_feed_buy':  row[23],
+                    'flag_priv_pig_prod_feed_bal':  row[24],
                     
-                    'flag_priv_semen_source':   row[10],
-                    'flag_priv_semen_source_h': f"0x{row[10]:02x}",
+                    'flag_priv_prod_gestating_ops': row[25],
                     
-                    'flag_priv_pig_prod':   row[11],
-                    'flag_priv_pig_prod_h': f"0x{row[11]:02x}",
-                    
-                    'dt_entry':             row[12]
+                    'dt_entry':                 row[26]
                     
                 }
                     

@@ -24,7 +24,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 32;
+DECLARE BUSINESS_OBJ_ID_ACC_GESTATING_OPS       INT             DEFAULT 9;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -67,7 +67,7 @@ CALL basic_user_check(
     1, 
     cur_account_gestating_ops_account_id,
     
-    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS,
+    BUSINESS_OBJ_ID_ACC_GESTATING_OPS,
     FLAG_BIT_OPERATION_UPDATE,
     
     cur_user_account_id, 

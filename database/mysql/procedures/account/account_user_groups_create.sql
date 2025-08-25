@@ -21,31 +21,38 @@ DECLARE ACCOUNT_USER_GROUP_OPERATIONS           INT             DEFAULT 3;
 DECLARE ACCOUNT_USER_GROUP_FARM_STAFF           INT             DEFAULT 4;
 
 
-/* user_group.flag_business_obj bits; new business objects add at the bottom*/
-DECLARE FLAG_BIT_BIZ_OBJ_USER                   INT             DEFAULT 1;
-DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT                INT             DEFAULT 2;
-DECLARE FLAG_BIT_BIZ_OBJ_ACCOUNT_REQUEST        INT             DEFAULT 4;
-DECLARE FLAG_BIT_BIZ_OBJ_USER_GROUP             INT             DEFAULT 8;
+/* This is read from a02_business_object table. */
+DECLARE BUSINESS_OBJ_ID_USER                    INT             DEFAULT 1;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT                 INT             DEFAULT 2;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_REQUEST         INT             DEFAULT 3;
+DECLARE BUSINESS_OBJ_ID_USER_GROUP              INT             DEFAULT 4;
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM_STAFF               INT             DEFAULT 16;
-DECLARE FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS      INT             DEFAULT 32;
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE               INT             DEFAULT 64;
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE          INT             DEFAULT 128;
 
-DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SUPPLIER         INT             DEFAULT 256;
-DECLARE FLAG_BIT_BIZ_OBJ_FEED_SUPPLIER          INT             DEFAULT 512;
-DECLARE FLAG_BIT_BIZ_OBJ_FEED_BRAND             INT             DEFAULT 1024;
+DECLARE BUSINESS_OBJ_ID_PIG_FARM                INT             DEFAULT 5;
+DECLARE BUSINESS_OBJ_ID_PIG_FARM_STAFF          INT             DEFAULT 6;
+DECLARE BUSINESS_OBJ_ID_PIG_RACE                INT             DEFAULT 7;
+DECLARE BUSINESS_OBJ_ID_PIG_RACE_LINE           INT             DEFAULT 8;
 
-DECLARE FLAG_BIT_BIZ_OBJ_SOW_BOAR               INT             DEFAULT 2048;
-DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 4096;
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 8192;
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD_AI            INT             DEFAULT 16384;
 
-DECLARE FLAG_BIT_BIZ_OBJ_PROD_FEED_BUY          INT             DEFAULT 32768;
-DECLARE FLAG_BIT_BIZ_OBJ_PROD_FEED_BAL          INT             DEFAULT 65536;
+DECLARE BUSINESS_OBJ_ID_ACC_GESTATING_OPS       INT             DEFAULT 9;
+DECLARE BUSINESS_OBJ_ID_ACC_LACTATING_OPS       INT             DEFAULT 10;
 
-DECLARE FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS     INT             DEFAULT 131072;
+
+DECLARE BUSINESS_OBJ_ID_SEMEN_SUPPLIER          INT             DEFAULT 11;
+DECLARE BUSINESS_OBJ_ID_FEED_SUPPLIER           INT             DEFAULT 12;
+DECLARE BUSINESS_OBJ_ID_FEED_BRAND              INT             DEFAULT 13;
+DECLARE BUSINESS_OBJ_ID_FEED_TYPE               INT             DEFAULT 14;
+
+
+DECLARE BUSINESS_OBJ_ID_SOW_BOAR                INT             DEFAULT 15;
+DECLARE BUSINESS_OBJ_ID_SEMEN_SOURCE            INT             DEFAULT 16;
+DECLARE BUSINESS_OBJ_ID_PIG_PRODUCTION          INT             DEFAULT 17;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_AI             INT             DEFAULT 18;
+
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY       INT             DEFAULT 19;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL       INT             DEFAULT 20;
+
+DECLARE BUSINESS_OBJ_ID_PROD_GESTATING_OPS      INT             DEFAULT 21;
 
 
 
@@ -53,7 +60,6 @@ DECLARE FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS     INT             DEFAULT 131072;
 DECLARE FLAG_BUSINESS_OBJ_ADMIN                 BIGINT          DEFAULT 2147483647;
 DECLARE FLAG_BUSINESS_OBJ_MANAGEMENT            INT             DEFAULT 0;
 DECLARE FLAG_BUSINESS_OBJ_OPERATIONS            INT             DEFAULT 0;
-DECLARE FLAG_BUSINESS_OBJ_FARM_STAFF            INT             DEFAULT 0;
 
 
 
@@ -65,41 +71,64 @@ DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 DECLARE OPERATION_ADD_UPDATE_DELETE             INT             DEFAULT 7;
 DECLARE OPERATION_ADD_UPDATE_ONLY               INT             DEFAULT 3;
 
+        
+
+DECLARE cur_flag_business_obj_management        INT             DEFAULT 0;
 
 
-SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER +
-                                    FLAG_BIT_BIZ_OBJ_ACCOUNT_REQUEST +
-                                    
-                                    FLAG_BIT_BIZ_OBJ_PIG_FARM +
-                                    FLAG_BIT_BIZ_OBJ_ACC_GESTATING_OPS +
-                                    FLAG_BIT_BIZ_OBJ_PIG_RACE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_RACE_LINE + 
-                                    
-                                    FLAG_BIT_BIZ_OBJ_SEMEN_SUPPLIER +
-                                    FLAG_BIT_BIZ_OBJ_FEED_SUPPLIER +
-                                    FLAG_BIT_BIZ_OBJ_FEED_BRAND +
-                                    
-                                    FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
-                                    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD +
-                                    
-                                    FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS;
+SELECT SUM(a.flag_val)
+INTO FLAG_BUSINESS_OBJ_MANAGEMENT
+FROM (
+    SELECT  POWER(2, bit_num) AS flag_val
+    FROM    a02_business_object
+    WHERE   id IN ( BUSINESS_OBJ_ID_USER,
+                    BUSINESS_OBJ_ID_ACCOUNT_REQUEST,
+                                        
+                    BUSINESS_OBJ_ID_PIG_FARM,
+                    BUSINESS_OBJ_ID_PIG_FARM_STAFF,
+                    BUSINESS_OBJ_ID_PIG_RACE,
+                    BUSINESS_OBJ_ID_PIG_RACE_LINE, 
+                    
+                    BUSINESS_OBJ_ID_ACC_GESTATING_OPS,
+                    BUSINESS_OBJ_ID_ACC_LACTATING_OPS,
+                    
+                    BUSINESS_OBJ_ID_SEMEN_SUPPLIER,
+                    BUSINESS_OBJ_ID_FEED_SUPPLIER,
+                    BUSINESS_OBJ_ID_FEED_BRAND,
+                    BUSINESS_OBJ_ID_FEED_TYPE,
+                    
+                    BUSINESS_OBJ_ID_SOW_BOAR, 
+                    BUSINESS_OBJ_ID_SEMEN_SOURCE,
+                    BUSINESS_OBJ_ID_PIG_PRODUCTION,
+                    BUSINESS_OBJ_ID_PIG_PROD_AI,
+                    
+                    BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY,
+                    BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
+                    
+                    BUSINESS_OBJ_ID_PROD_GESTATING_OPS
+                )
+    ) a;
+    
+    
+    
+SELECT SUM(a.flag_val)
+INTO FLAG_BUSINESS_OBJ_OPERATIONS
+FROM (
+    SELECT  POWER(2, bit_num) AS flag_val
+    FROM    a02_business_object
+    WHERE   id IN ( BUSINESS_OBJ_ID_SOW_BOAR,
+                    BUSINESS_OBJ_ID_PIG_PRODUCTION, 
+                    
+                    BUSINESS_OBJ_ID_PIG_PROD_AI,
+                    
+                    BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY,
+                    BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
+                    
+                    BUSINESS_OBJ_ID_PROD_GESTATING_OPS
+                )
+    ) a;
 
 
-SET FLAG_BUSINESS_OBJ_OPERATIONS =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
-                                    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD + 
-                                    
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD_AI;
-
-
-SET FLAG_BUSINESS_OBJ_FARM_STAFF =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
-                                    FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD +
-                                    
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD_AI +
-                                    
-                                    FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS;
 
 
 /* Create account default user_groups. Each account will have a fix 
@@ -116,17 +145,26 @@ INSERT INTO user_group(
     flag_priv_user_group,
     
     flag_priv_pig_farm,
-    flag_priv_account_gestating_ops,
+    flag_priv_pig_farm_staff,
     flag_priv_pig_race,
     flag_priv_pig_race_line,
+    
+    flag_priv_acc_gestating_ops,
+    flag_priv_acc_lactating_ops,
     
     flag_priv_semen_supplier,
     flag_priv_feed_supplier,
     flag_priv_feed_brand,
+    flag_priv_feed_type,
     
     flag_priv_sow_boar,
     flag_priv_semen_source,
-    flag_priv_pig_prod,    
+    flag_priv_pig_production,
+    flag_priv_pig_prod_ai,
+    
+    flag_priv_pig_prod_feed_buy,
+    flag_priv_pig_prod_feed_bal,
+    
     flag_priv_prod_gestating_ops
 
 ) VALUES (
@@ -146,13 +184,23 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     
     OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,    
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
     OPERATION_ADD_UPDATE_DELETE
+    
 );
 
 
@@ -168,19 +216,28 @@ INSERT INTO user_group(
     flag_priv_user_group,
     
     flag_priv_pig_farm,
-    flag_priv_account_gestating_ops,
+    flag_priv_pig_farm_staff,
     flag_priv_pig_race,
     flag_priv_pig_race_line,
+    
+    flag_priv_acc_gestating_ops,
+    flag_priv_acc_lactating_ops,
     
     flag_priv_semen_supplier,
     flag_priv_feed_supplier,
     flag_priv_feed_brand,
+    flag_priv_feed_type,
     
     flag_priv_sow_boar,
     flag_priv_semen_source,
-    flag_priv_pig_prod,    
-    flag_priv_prod_gestating_ops
+    flag_priv_pig_production,
+    flag_priv_pig_prod_ai,
     
+    flag_priv_pig_prod_feed_buy,
+    flag_priv_pig_prod_feed_bal,
+    
+    flag_priv_prod_gestating_ops
+
 ) VALUES (
     in_account_id,
     ACCOUNT_USER_GROUP_MANAGEMENT,
@@ -192,11 +249,15 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     0,
     
-    OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
-
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,    
+    
+    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
@@ -204,12 +265,12 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
     
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
+    
     OPERATION_ADD_UPDATE_DELETE
-    
     
     
 );
@@ -221,17 +282,13 @@ INSERT INTO user_group(
     flag_business_obj,
     name,
     
-    flag_priv_user,
-    flag_priv_account,
-    flag_priv_account_request,
-    flag_priv_user_group,
     
-    flag_priv_pig_farm,
     flag_priv_sow_boar,
-    flag_priv_semen_source,
-    flag_priv_pig_prod,
+    flag_priv_pig_production,
     
-    flag_priv_account_gestating_ops
+    flag_priv_pig_prod_feed_bal,
+    
+    flag_priv_prod_gestating_ops
     
 ) VALUES (
     in_account_id,
@@ -239,55 +296,13 @@ INSERT INTO user_group(
     FLAG_BUSINESS_OBJ_OPERATIONS,
     'Operations',
     
-    0,
-    0,
-    0,
-    0,
-    
-    0,
-    OPERATION_ADD_UPDATE_ONLY,
+   
     OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_ONLY,
     
-    0
-);
-
-
-INSERT INTO user_group(
-    account_id,
-    group_num,
-    flag_business_obj,
-    name,
-    
-    flag_priv_user,
-    flag_priv_account,
-    flag_priv_account_request,
-    flag_priv_user_group,
-    
-    flag_priv_pig_farm,
-    flag_priv_sow_boar,
-    flag_priv_semen_source,
-    flag_priv_pig_prod,
-    
-    flag_priv_account_gestating_ops
-    
-) VALUES (
-    in_account_id,
-    ACCOUNT_USER_GROUP_FARM_STAFF,
-    FLAG_BUSINESS_OBJ_FARM_STAFF,
-    'Farm Staff',
-    
-    0,
-    0,
-    0,
-    0,
-    
-    0,
-    OPERATION_ADD_UPDATE_ONLY,
-    OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_ONLY,
     
-    0
+    OPERATION_ADD_UPDATE_ONLY
 );
 
 

@@ -32,7 +32,7 @@ DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 21;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
+DECLARE BUSINESS_OBJ_ID_PIG_FARM                INT             DEFAULT 5;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -72,7 +72,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    FLAG_BIT_BIZ_OBJ_PIG_FARM,
+    BUSINESS_OBJ_ID_PIG_FARM,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 

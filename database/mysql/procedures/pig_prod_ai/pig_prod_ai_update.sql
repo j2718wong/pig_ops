@@ -27,7 +27,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD_AI          INT             DEFAULT 128;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_AI             INT             DEFAULT 18;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -76,7 +76,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_pig_prod_account_id,
     
-    FLAG_BIT_BIZ_OBJ_PIG_PROD_AI,
+    BUSINESS_OBJ_ID_PIG_PROD_AI,
     FLAG_BIT_OPERATION_UPDATE,
     
     cur_user_account_id, 

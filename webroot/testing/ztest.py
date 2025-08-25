@@ -159,11 +159,17 @@ class TestAPIAccount:
         
         
         print(f'\n\n***** Testing get account user groups; account_id = {account_id}')
-        res = model['user_group'].get_user_group_list_by_account(account_id)
+        url = BASE_URL + 'user_group/list?ahid=' + account_hid
         
-        print(f'\n\nAccount usergroups; len = {len(res)}')
-        pprint.pprint(res)
-        assert(len(res) == 4)
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        len_items = len(res_json['data'])
+        assert(len_items == 3)
         
         
         self.test_acc_gestating_ops(user_id)

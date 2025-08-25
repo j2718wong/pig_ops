@@ -32,7 +32,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD_BUY_FEED      INT             DEFAULT 128;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_BUY_FEED      INT             DEFAULT 128;
 
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
@@ -104,7 +104,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_pig_prod_account_id, /* compare user.account_id to this account_id*/
     
-    FLAG_BIT_BIZ_OBJ_PIG_PROD_FEED_BAL,
+    BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 

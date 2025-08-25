@@ -38,9 +38,11 @@ DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
 DECLARE FLAG_BIT_ACCOUNT_ENABLE                 INT             DEFAULT 1;
 
 
-DECLARE ACCOUNT_STATUS_ID_ON_TRIAL              INT             DEFAULT 1;
-DECLARE ACCOUNT_STATUS_ID_TRIAL_EXPIRED         INT             DEFAULT 2;
-DECLARE ACCOUNT_STATUS_ID_UNPAID_BILL           INT             DEFAULT 3;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT                	INT             DEFAULT 2;
+
+DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
+DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
+DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
 DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
@@ -48,8 +50,9 @@ DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
 DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 
 
-DECLARE cur_user_flag                           INT             DEFAULT 0;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
+DECLARE cur_user_group_id                       INT             DEFAULT 0;
+
 
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;
@@ -72,68 +75,29 @@ DECLARE s_desc                                  VARCHAR(200)    DEFAULT '';
 SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
+CALL basic_user_check(
+    in_user_id, 
+    1, /* user must have an account*/
+    0, 
+    
+    BUSINESS_OBJ_ID_ACCOUNT,
+    FLAG_BIT_OPERATION_UPDATE,
+    
+    cur_user_account_id, 
+    cur_user_group_id,
+    res_num, 
+    res_code, 
+    res_desc);
 
-SELECT  
-        flag,
-        account_id
-INTO    
-        cur_user_flag,
-        cur_user_account_id
-FROM    user 
-WHERE   id = in_user_id;
+
 
 
 process_user : BEGIN
 
-/* Check user. */
-IF cur_user_flag & FLAG_BIT_USER_IS_ACTIVE = 0 THEN 
-    SET res_num     = RES_NUM_USER_IS_INACTIVE;
-    SET res_code    = "RES_NUM_USER_IS_INACTIVE";
-
-    LEAVE process_user;
-    
-END IF;
-
-
-IF cur_user_account_id = 0 THEN 
-    SET res_num     = RES_NUM_USER_HAS_NO_ACCOUNT;
-    SET res_code    = "RES_NUM_USER_HAS_NO_ACCOUNT";
-
-    LEAVE process_user;
-    
-END IF;
-
-
-/* Check account. */
-SELECT 
-    flag,
-    status_id,
-    name
-INTO
-    cur_account_flag,
-    cur_account_status_id,
-    cur_account_name
-    
-FROM account
-WHERE id = cur_user_account_id;
-
-
-
-IF cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE = 0 THEN 
-    SET res_num     = RES_NUM_ACCOUNT_DISABLED;
-    SET res_code    = "RES_NUM_ACCOUNT_DISABLED";
-    
-    IF cur_account_status_id = ACCOUNT_STATUS_ID_UNPAID_BILL THEN
-        SET res_num     = RES_NUM_ACCOUNT_STATUS_UNPAID_BILL;
-        SET res_code    = "RES_NUM_ACCOUNT_STATUS_UNPAID_BILL";
-    
-    END IF;
-    
+IF res_num != RES_NUM_SUCCESS THEN 
     LEAVE process_user;
 END IF;
 
-
-/* Check account duplicate. */
 
 
 UPDATE account SET

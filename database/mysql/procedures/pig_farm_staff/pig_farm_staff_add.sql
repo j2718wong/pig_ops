@@ -4,7 +4,7 @@ DROP PROCEDURE IF EXISTS pig_farm_staff_add $$
 CREATE PROCEDURE pig_farm_staff_add(
     in_user_id              INT,
 
-	in_farm_id				INT,
+    in_farm_id              INT,
     in_name                 VARCHAR(50)
     
     
@@ -13,7 +13,7 @@ CREATE PROCEDURE pig_farm_staff_add(
 BEGIN
 
 /** 
- * Will add pig_farm entry.
+ * Will add pig_farm_staff entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 15, 2025
@@ -24,10 +24,9 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
-DECLARE RES_NUM_ACCOUNT_EXCEED_MAX_FARMS        INT             DEFAULT 21;
 
 
-DECLARE FLAG_BIT_BIZ_OBJ_PIG_FARM               INT             DEFAULT 16;
+DECLARE BUSINESS_OBJ_ID_PIG_FARM_STAFF          INT             DEFAULT 6;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -39,17 +38,9 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_account_farm_01_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_02_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_03_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_04_id                  INT             DEFAULT 0;
-DECLARE cur_account_farm_05_id                  INT             DEFAULT 0;
-
-DECLARE is_added_to_account                     INT             DEFAULT 0;
-
-DECLARE cur_pig_farm_id                         INT             DEFAULT 0;
-DECLARE cur_pig_farm_flag                       INT             DEFAULT 0;
-DECLARE cur_pig_farm_name                       VARCHAR(50)     DEFAULT '';
+DECLARE cur_pig_farm_staff_id                   INT             DEFAULT 0;
+DECLARE cur_pig_farm_staff_flag                 INT             DEFAULT 0;
+DECLARE cur_pig_farm_staff_name                 VARCHAR(50)     DEFAULT '';
 
 
 
@@ -67,7 +58,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    FLAG_BIT_BIZ_OBJ_PIG_FARM,
+    BUSINESS_OBJ_ID_PIG_FARM_STAFF,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
@@ -84,46 +75,16 @@ IF res_num != RES_NUM_SUCCESS THEN
 END IF;
 
 
-/* Check account*/
-SELECT 
-    farm_01_id,
-    farm_02_id,
-    farm_03_id,
-    farm_04_id,
-    farm_05_id
-INTO
-    cur_account_farm_01_id,
-    cur_account_farm_02_id,
-    cur_account_farm_03_id,
-    cur_account_farm_04_id,
-    cur_account_farm_05_id
-    
-FROM account
-WHERE id = cur_user_account_id;
-
-
-IF  cur_account_farm_01_id > 0 AND 
-    cur_account_farm_02_id > 0 AND 
-    cur_account_farm_03_id > 0 AND 
-    cur_account_farm_04_id > 0 AND 
-    cur_account_farm_05_id > 0 THEN 
-    
-    
-    SET res_num     = RES_NUM_ACCOUNT_EXCEED_MAX_FARMS;
-    SET res_code    = "RES_NUM_ACCOUNT_EXCEED_MAX_FARMS";
-    
-    LEAVE process_user;
-END IF;
-
-
 /* Check for duplicate entry */
 SELECT  id
-INTO    cur_pig_farm_id
-FROM    pig_farm
-WHERE   account_id = cur_user_account_id AND UPPER(name)  = UPPER(in_name)
+INTO    cur_pig_farm_staff_id
+FROM    pig_farm_staff
+WHERE   account_id = cur_user_account_id    AND
+        pig_farm_id = in_pig_farm_id        AND
+        UPPER(name)  = UPPER(in_name)
 LIMIT   1;
 
-IF cur_pig_farm_id > 0 THEN 
+IF cur_pig_farm_staff_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -132,78 +93,21 @@ END IF;
 
 
 
-INSERT INTO pig_farm(
+INSERT INTO pig_farm_staff(
     account_id,
-    flag,
+    pig_farm_id,
     name,
-    
-    country_id,
-    adrs_level_1_id,
-    adrs_level_2_id,
-    adrs_level_3_id,
-    latitude,
-    longitude,
     
     added_by_user_id
 ) VALUES (
     cur_user_account_id,
-    1,    
+    in_farm_id,
     in_name,
-    
-    in_country_id,
-    in_adrs_level_1_id,
-    in_adrs_level_2_id,
-    in_adrs_level_3_id,
-    in_latitude,
-    in_longitude,
     
     in_user_id
 );
 
-SELECT LAST_INSERT_ID() INTO cur_pig_farm_id;
-
-
-
-IF is_added_to_account = 0 AND cur_account_farm_01_id = 0 THEN
-    UPDATE account SET 
-        farm_01_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-    
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_02_id = 0 THEN
-    UPDATE account SET 
-        farm_02_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_03_id = 0 THEN
-    UPDATE account SET 
-        farm_03_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_04_id = 0 THEN
-    UPDATE account SET 
-        farm_04_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
-IF is_added_to_account = 0 AND  cur_account_farm_05_id = 0 THEN
-    UPDATE account SET 
-        farm_05_id = cur_pig_farm_id
-    WHERE id = cur_user_account_id;
-
-    SET is_added_to_account = 1;
-END IF;
-
+SELECT LAST_INSERT_ID() INTO cur_pig_farm_staff_id;
 
 
 END process_user;
@@ -213,19 +117,19 @@ SELECT
     flag,
     name
 INTO 
-    cur_pig_farm_flag,
-    cur_pig_farm_name
-FROM pig_farm
-WHERE id = cur_pig_farm_id;
+    cur_pig_farm_staff_flag,
+    cur_pig_farm_staff_name
+FROM pig_farm_staff
+WHERE id = cur_pig_farm_staff_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_pig_farm_id                     AS pig_farm_id,
-    cur_pig_farm_flag                   AS pig_farm_flag,
-    cur_pig_farm_name                   AS pig_farm_name;
+    cur_pig_farm_staff_id               AS pig_farm_id,
+    cur_pig_farm_staff_flag             AS pig_farm_flag,
+    cur_pig_farm_staff_name             AS pig_farm_name;
     
 
 END $$
