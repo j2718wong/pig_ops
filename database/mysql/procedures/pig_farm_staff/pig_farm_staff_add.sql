@@ -4,21 +4,16 @@ DROP PROCEDURE IF EXISTS pig_farm_staff_add $$
 CREATE PROCEDURE pig_farm_staff_add(
     in_user_id              INT,
 
-    in_name                 VARCHAR(50),
+	in_farm_id				INT,
+    in_name                 VARCHAR(50)
     
-    in_country_id           INT, 
-    in_adrs_level_1_id      INT,
-    in_adrs_level_2_id      INT,
-    in_adrs_level_3_id      INT,
-    in_latitude             DECIMAL(10,5),
-    in_longitude            DECIMAL(10,5)
     
 )  
 
 BEGIN
 
 /** 
- * Will add pig farm entry.
+ * Will add pig_farm entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 15, 2025
