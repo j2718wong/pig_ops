@@ -39,9 +39,12 @@ DECLARE FLAG_BIT_BIZ_OBJ_FEED_BRAND             INT             DEFAULT 1024;
 DECLARE FLAG_BIT_BIZ_OBJ_SOW_BOAR               INT             DEFAULT 2048;
 DECLARE FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE           INT             DEFAULT 4096;
 DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD               INT             DEFAULT 8192;
+DECLARE FLAG_BIT_BIZ_OBJ_PIG_PROD_AI            INT             DEFAULT 16384;
 
-DECLARE FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS     INT             DEFAULT 16384;
+DECLARE FLAG_BIT_BIZ_OBJ_PROD_FEED_BUY          INT             DEFAULT 32768;
+DECLARE FLAG_BIT_BIZ_OBJ_PROD_FEED_BAL          INT             DEFAULT 65536;
 
+DECLARE FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS     INT             DEFAULT 131072;
 
 
 
@@ -84,12 +87,16 @@ SET FLAG_BUSINESS_OBJ_MANAGEMENT =  FLAG_BIT_BIZ_OBJ_USER +
 
 SET FLAG_BUSINESS_OBJ_OPERATIONS =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
-                                    FLAG_BIT_BIZ_OBJ_PIG_PROD;
+                                    FLAG_BIT_BIZ_OBJ_PIG_PROD + 
+                                    
+                                    FLAG_BIT_BIZ_OBJ_PIG_PROD_AI;
 
 
 SET FLAG_BUSINESS_OBJ_FARM_STAFF =  FLAG_BIT_BIZ_OBJ_SOW_BOAR + 
                                     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE +
                                     FLAG_BIT_BIZ_OBJ_PIG_PROD +
+                                    
+                                    FLAG_BIT_BIZ_OBJ_PIG_PROD_AI +
                                     
                                     FLAG_BIT_BIZ_OBJ_PROD_GESTATING_OPS;
 

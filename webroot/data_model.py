@@ -168,15 +168,12 @@ class DataPigProdAI(BaseModel):
     
     pig_prod_ai_hid:    str = None
     pig_prod_hid:       str = None
-    
-    sow_hid:            str
-    boar_hid:           str = None
     semen_source_hid:   str = None
     
     date_extracted:     str = None
     date_expiry:        str
     date_insemination:  str = None
-    hour_insemination
+    hour_insemination:  int
     
     staff_id:           int = None
     date_insemination:  str

@@ -67,7 +67,7 @@ LIMIT   1;
 CALL basic_user_check(
     in_user_id, 
     1, 
-    cur_semen_source_account_id,
+    cur_semen_source_account_id, /* compare user.account_id to this account_id*/
     
     FLAG_BIT_BIZ_OBJ_SEMEN_SOURCE,
     FLAG_BIT_OPERATION_UPDATE,

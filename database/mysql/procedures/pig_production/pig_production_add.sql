@@ -19,7 +19,7 @@ CREATE PROCEDURE pig_production_add(
 BEGIN
 
 /** 
- * Will create sow_coming_activity entries from a given sow insemination entry.
+ * Will create pig_production entriy.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 17, 2025
@@ -68,7 +68,7 @@ DECLARE cur_semen_desc                          VARCHAR(100)    DEFAULT '';
 
 DECLARE cur_coming_activity_id                  INT             DEFAULT 0;
 
-DECLARE cur_pig_production_id                       INT             DEFAULT 0;
+DECLARE cur_pig_production_id                   INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
