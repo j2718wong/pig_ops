@@ -36,38 +36,102 @@ async def pig_prod_status_list():
     
 
 @app.post("/pig_prod/add")
-async def pig_prod_add(pig_farm_data: dm.DataPigFarm):
-    name    = pig_farm_data.name
-    uhid    = pig_farm_data.uhid
-    
-    name    = name.strip() if name else None 
-    
-    if name is None or len(name) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_FARM_INVALID_NAME,
-                'code': 'ERROR_PIG_FARM_INVALID_NAME',
-                'desc': ''
-            }
-        }
-        
+async def pig_prod_add(pig_prod_data: dm.DataPigProd):
+    uhid    = pig_prod_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
     
     user_id = res[0]
     
-    pig_farm_data.name      = name
-    pig_farm_data.user_id   = user_id
+
+    sow_hid    = pig_prod_data.sow_hid
     
-    res_add    =  model['pig_farm'].add(pig_farm_data)
+    res = hashids_common.decrypt(sow_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_SOW_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_SOW_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    boar_hid        = pig_prod_data.boar_hid
+    boar_id         = None
+    semen_source_id = None
+    
+    if boar_hid is not None:
+        
+        res = hashids_common.decrypt(boar_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_BOAR_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_BOAR_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        boar_id = res[0]
+        
+    
+    else:
+        
+        semen_source_hid = pig_prod_data.semen_source_hid
+        
+        res = hashids_common.decrypt(semen_source_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_source_id = res[0]
+        
+    
+    insem_staff_hid = pig_prod_data.insem_staff_hid
+    insem_staff_id  = None
+    
+    if insem_staff_hid is not None:
+        
+        res = hashids_common.decrypt(insem_staff_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        insem_staff_id = res[0]
+    
+    
+
+    pig_prod_data.user_id           = user_id
+    pig_prod_data.sow_id            = sow_id
+    pig_prod_data.boar_id           = boar_id
+    pig_prod_data.semen_source_id   = semen_source_id
+    
+    
+    res_add    =  model['pig_prod'].add(pig_prod_data)
     
     if res_add is None:
         return {
@@ -78,27 +142,23 @@ async def pig_prod_add(pig_farm_data: dm.DataPigFarm):
             }
         }
     
-    pig_farm_id     = res_add['pig_farm']['id']
-    pig_farm_flag   = res_add['pig_farm']['flag']
-        
-    pig_farm_hashid = hashids_common.encrypt(pig_farm_id)
+    pig_prod_id     = res_add['pig_prod']['id']        
+    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
     
-    if pig_farm_id == 0:
-        pig_farm_hashid = ''
-    
+   
     # remove plain id
-    del res_add['pig_farm']['id']
-    res_add['pig_farm']['hid'] = pig_farm_hashid
+    del res_add['pig_prod']['id']
+    res_add['pig_prod']['hid'] = pig_prod_hashid
 
-    result_num      = res_add['result']['num']
     
-    if result_num == PIG_FARM_ADD_RES_NUM_SUCCESS:
-        data = {
-           'pig_farm_id':   pig_farm_id,
-           'hashid':        pig_farm_hashid
-        }
-        res_update = model['pig_farm'].update_hashid(data)
-        
+    pig_prod_ai_id = res_add['pig_prod_ai']['id']
+    if pig_prod_ai_id > 0:
+        pig_prod_ai_hashid = hashids_common.encrypt(pig_prod_ai_id)
+        res_add['pig_prod_ai']['hid'] = pig_prod_ai_hashid
+    else:
+        del res_add['pig_prod_ai']
+  
+  
     return res_add
     
     

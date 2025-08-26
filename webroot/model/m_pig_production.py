@@ -77,38 +77,50 @@ class PigProduction:
     
     def add(self, data = None):
         """
-        PROCEDURE pig_farm_add(
+        PROCEDURE pig_production_add(
             in_user_id              INT,
-
-            in_name                 VARCHAR(50),
+           
+            in_sow_id               INT,
+            in_boar_id              INT,
+            in_semen_source_id      INT,
             
-            in_country_id           INT, 
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
-            in_latitude             DECIMAL(10,5),
-            in_longitude            DECIMAL(10,5)
+            in_semen_cost           DECIMAL(6,2),
+            in_insemination_cost    DECIMAL(6,2),
+            in_insem_cost_comments  VARCHAR(200),
+            
+            in_insem_staff_id       INT,
+            in_date_insemination    VARCHAR(10)  /* in YYYY-MM-DD format*/
         )  
         """
         
-        sql =  'CALL pig_farm_add('
+        sql =  'CALL pig_production_add('
         sql += '%s,'    % data.user_id
-        sql += '"%s",'  % data.name
         
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
+        sql += '%s,'    % data.sow_id
         
-        if data.latitude is not None:
-            sql += '%s,'    % data.latitude
+        if data.boar_id is not None:
+            sql += '%s,'    % data.boar_id
+            sql += 'NULL,'
+            sql += '0.0,'
+        else:
+            sql += 'NULL,'
+            sql += '%s,'    % data.semen_source_id
+            sql += '%s,'    % data.semen_cost
+            
+        sql += '%s,'    % data.insemination_cost
+            
+               
+        if data.insem_cost_comments is not None:
+            sql += '"%s",'    % data.insem_cost_comments
         else:
             sql += 'NULL,'
             
-        if data.longitude is not None:
-            sql += '%s);'   % data.longitude
+        if data.insem_staff_id is not None:
+            sql += '%s,'   % data.insem_staff_id
         else:
-            sql += 'NULL);'
+            sql += 'NULL,'
+        
+        sql += '"%s");'    % data.date_insemination
         
         
         # Check if still connected to database
@@ -145,30 +157,18 @@ class PigProduction:
                     'desc':             row[2],
                 },
                 
-                'pig_farm': {
-                    'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5]
+                'pig_prod': {
+                    'id':               row[3]
+                },
+                
+                'pig_prod_ai' :{
+                    'id':               row[4]
                 }
             }
 
         return None
 
-    
-    def update_hashid(self, data = None):
-        pig_farm_id     = data['pig_farm_id']
-        hashid          = data['hashid']
-        
-        values = (hashid, pig_farm_id)
-        
-        sql =   """
-                UPDATE pig_farm SET
-                    hashid    = "%s"
-                WHERE id = %s;
-                """ % values
-        
-        return self.model.execute_sql(sql)
-    
+   
     
     def update(self, data = None):
         """
