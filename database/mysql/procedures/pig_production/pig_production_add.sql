@@ -32,7 +32,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE BUSINESS_OBJ_ID_PIG_PROD               INT             DEFAULT 8192;
+DECLARE BUSINESS_OBJ_ID_PIG_PRODUCTION          INT             DEFAULT 17;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -101,7 +101,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_sow_boar_account_id,
     
-    BUSINESS_OBJ_ID_PIG_PROD,
+    BUSINESS_OBJ_ID_PIG_PRODUCTION,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
@@ -117,6 +117,8 @@ process_user : BEGIN
 IF res_num != RES_NUM_SUCCESS THEN 
     LEAVE process_user;
 END IF;
+
+
 
 
 /* Check for duplicate entry */
@@ -144,10 +146,18 @@ IF cur_sow_boar_last_prod_status_id = PRODUCTION_STATUS_ID_GESTATING THEN
 END IF;
 
 
+SELECT 	farm_production_id
+INTO 	cur_pig_farm_farm_production_id
+FROM 	pig_farm`
+WHERE 	id = cur_sow_boar_pig_farm_id
+
+SET cur_pig_farm_farm_production_id = cur_pig_farm_farm_production_id + 1;
+
 IF in_boar_id IS NOT NULL THEN 
     INSERT INTO pig_production (
         account_id,
         pig_farm_id,
+		farm_production_id,
         
         sow_id,
         insemination_type,
@@ -166,6 +176,7 @@ IF in_boar_id IS NOT NULL THEN
     ) VALUES (
         cur_user_account_id,
         cur_sow_boar_pig_farm_id,
+		cur_pig_farm_farm_production_id,
         
         in_sow_id,
         INSEMINATION_TYPE_BOAR,
@@ -191,6 +202,7 @@ ELSE
     INSERT INTO pig_production (
         account_id,
         pig_farm_id,
+		farm_production_id,
         
         sow_id,
         insemination_type,
@@ -208,6 +220,7 @@ ELSE
     ) VALUES (
         cur_user_account_id,
         cur_sow_boar_pig_farm_id,
+		cur_pig_farm_farm_production_id
         
         in_sow_id,
         INSEMINATION_TYPE_ARTIFICIAL,
@@ -245,6 +258,9 @@ ELSE
 END IF; 
     
     
+UPDATE pig_farm SET 
+	farm_production_id = cur_pig_farm_farm_production_id
+WHERE id = cur_sow_boar_pig_farm_id;
 
 
 UPDATE sow_boar SET
@@ -262,8 +278,7 @@ SELECT
     
     cur_pig_production_id               AS pig_prod_id,
     cur_pig_prod_ai_id                  AS pig_prod_ai_id,
-    in_sow_id                           AS sow_id,
-    cur_sow_boar_farm_sow_id            AS farm_sow_id;
+    cur_pig_farm_farm_production_id		AS farm_prod_id;
     
 
 END $$
