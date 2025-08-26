@@ -40,6 +40,7 @@ from model.m_user               import User
 from model.m_user_group         import UserGroup
 
 from model.m_pig_farm           import PigFarm
+from model.m_pig_farm_staff     import PigFarmStaff
 
 from model.m_acc_gestating_ops  import AccountGestatingOps
 
@@ -71,6 +72,7 @@ model_names = [
     ('user_group',              UserGroup),
     
     ('pig_farm',                PigFarm),
+    ('pig_farm_staff',          PigFarmStaff),
     
     ('acc_gestating_ops',       AccountGestatingOps),
     ('pig_race',                PigRace),

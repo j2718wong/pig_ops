@@ -1,37 +1,31 @@
-# August 23, 2025
+# August 26, 2025
 # Jack Wong
 
 from common_constants       import *
 
 
-class PigRaceLine:
+class PigFarmStaff:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'PigRaceLine'
+        self.TAG                = 'PigFarmStaff'
 
 
     def add(self, data = None):
         """
-        PROCEDURE pig_race_line_add(
+        PROCEDURE pig_farm_staff_add(
             in_user_id              INT,
 
-            in_pig_race_id          INT,
+            in_pig_farm_id          INT,
             
-            in_name                 VARCHAR(50),
-            in_description          VARCHAR(160)
+            in_name                 VARCHAR(50)
         )  
         """
         
-        sql =  'CALL pig_race_line_add('
+        sql =  'CALL pig_farm_staff_add('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.pig_race_id
-        sql += '"%s",'  % data.name
-        
-        if data.description is not None:
-            sql += '"%s");'   % data.description
-        else:
-            sql += 'NULL);'
+        sql += '%s,'    % data.pig_farm_id
+        sql += '"%s");' % data.name
         
         
         # Check if still connected to database
@@ -68,7 +62,7 @@ class PigRaceLine:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
+                'pig_farm_staff': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -80,30 +74,22 @@ class PigRaceLine:
     
     def update(self, data = None):
         """
-        PROCEDURE pig_race_line_update(
+        PROCEDURE pig_farm_staff_update(
             in_user_id                  INT,
             
-            in_pig_race_line_id         INT,
-            in_pig_race_id              INT,
+            in_pig_farm_staff_id        INT
             
-            in_name                     VARCHAR(50),
-            in_description              VARCHAR(160)
+            in_name                     VARCHAR(50)
         )
         """
        
-        sql =  'CALL pig_race_line_update('
+        sql =  'CALL pig_farm_staff_update('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_race_line_id
-        sql += '%s,'    % data.pig_race_id
+        sql += '%s,'    % data.pig_farm_staff_id
         
-        sql += '"%s",'  % data.name
+        sql += '"%s");' % data.name
         
-        if data.description is not None:
-            sql += '"%s");'   % data.description
-        else:
-            sql += 'NULL);'
-        
-        
+                
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -138,7 +124,7 @@ class PigRaceLine:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
+                'pig_farm_staff': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -150,19 +136,19 @@ class PigRaceLine:
     
     def delete(self, data = None):
         user_id             = data['user_id']
-        pig_race_line_id    = data['pig_race_line_id']
+        pig_farm_staff_id    = data['pig_farm_staff_id']
         
         """
-        PROCEDURE pig_race_line_delete(
+        PROCEDURE pig_farm_staff_delete(
             in_user_id                  INT,
             
-            in_pig_race_line_id         INT
+            in_pig_farm_staff_id        INT
         )
         """
        
-        sql =  'CALL pig_race_line_delete('
+        sql =  'CALL pig_farm_staff_delete('
         sql += '%s,'    % user_id
-        sql += '%s);'   % pig_race_line_id
+        sql += '%s);'   % pig_farm_staff_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -198,7 +184,7 @@ class PigRaceLine:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
+                'pig_farm_staff': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -208,27 +194,22 @@ class PigRaceLine:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0,
+    def get_list(self, pig_farm_id, inc_deleted = 0,
             inc_user_audit = 0):
         
         if inc_deleted > 0:
-            where_clause = 'WHERE a.account_id = %s' % account_id 
+            where_clause = 'WHERE a.pig_farm_id = %s' % pig_farm_id 
         else:
-            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
+            where_clause = 'WHERE a.pig_farm_id = %s AND (a.flag & 1) = 0' % pig_farm_id 
         
         
         if inc_user_audit == 0:
             sql =   """
                     SELECT 
                         a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
                         a.name,
-                        a.description,
                         a.dt_entry
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
+                    FROM pig_farm_staff a 
                     %s
                     ORDER BY a.name
                     """ % where_clause
@@ -236,11 +217,7 @@ class PigRaceLine:
             sql =   """
                     SELECT 
                         a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
                         a.name,
-                        a.description,
                         
                         c.username,
                         c.name_last,
@@ -252,8 +229,7 @@ class PigRaceLine:
                         d.name_first,
                         a.dt_last_update
                         
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b      ON a.pig_race_id = b.id
+                    FROM pig_farm_staff a 
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                 
@@ -296,42 +272,27 @@ class PigRaceLine:
                 if inc_user_audit == 0:
                     cur_entry = {
                         'id':                   row[0],
-                        
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'desc':                 row[4],
-                        
-                        'dt_entry':             str(row[5])
+                        'name':                 row[1],
+                        'dt_entry':             str(row[2])
                     }
                     
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'description':         row[4],
+                        'name':                 row[1],
                         
                         'added_by': {
-                            'username':         row[5],
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_entry':         row[8]
+                            'username':         row[2],
+                            'name_last':        row[3],
+                            'name_first':       row[4],
+                            'dt_entry':         row[5]
                         },
                         
                         'last_update':{
-                            'username':         row[9],
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_update':        str(row[12]) if row[12] else None
+                            'username':         row[6],
+                            'name_last':        row[7],
+                            'name_first':       row[8],
+                            'dt_update':        str(row[9]) if row[9] else None
                         }
                     }
                 

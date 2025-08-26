@@ -63,7 +63,7 @@ LIMIT   1;
 CALL basic_user_check(
     in_user_id, 
     1, /* user must have an account*/
-    cur_pig_race_line_account_id,
+    cur_pig_race_line_account_id, /* compare user.account_id to this account_id*/
     
     BUSINESS_OBJ_ID_PIG_RACE_LINE,
     FLAG_BIT_OPERATION_DELETE,

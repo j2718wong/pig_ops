@@ -50,6 +50,19 @@ class DataPigFarm(BaseModel):
     longitude:          float = None
     
     
+class DataPigStaff(BaseModel):
+    uhid:               str
+    
+    pig_farm_hid:       str
+    pig_farm_staff_hid: str = None
+    
+    user_id:            int = 0
+    pig_farm_id:        int = 0
+    pig_farm_staff_id:  int = 0
+    name:               str
+    
+
+    
 class DataSowBoar(BaseModel):
     uhid:               str
     pfhid:              str = None
