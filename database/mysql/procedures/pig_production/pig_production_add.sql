@@ -146,18 +146,18 @@ IF cur_sow_boar_last_prod_status_id = PRODUCTION_STATUS_ID_GESTATING THEN
 END IF;
 
 
-SELECT 	farm_production_id
-INTO 	cur_pig_farm_farm_production_id
-FROM 	pig_farm`
-WHERE 	id = cur_sow_boar_pig_farm_id
+SELECT  last_prod_id
+INTO    cur_pig_farm_last_prod_id
+FROM    pig_farm
+WHERE   id = cur_sow_boar_pig_farm_id
 
-SET cur_pig_farm_farm_production_id = cur_pig_farm_farm_production_id + 1;
+SET cur_pig_farm_last_prod_id = cur_pig_farm_last_prod_id + 1;
 
 IF in_boar_id IS NOT NULL THEN 
     INSERT INTO pig_production (
         account_id,
         pig_farm_id,
-		farm_production_id,
+        farm_prod_id,
         
         sow_id,
         insemination_type,
@@ -176,7 +176,7 @@ IF in_boar_id IS NOT NULL THEN
     ) VALUES (
         cur_user_account_id,
         cur_sow_boar_pig_farm_id,
-		cur_pig_farm_farm_production_id,
+        farm_prod_id,
         
         in_sow_id,
         INSEMINATION_TYPE_BOAR,
@@ -202,7 +202,7 @@ ELSE
     INSERT INTO pig_production (
         account_id,
         pig_farm_id,
-		farm_production_id,
+        farm_production_id,
         
         sow_id,
         insemination_type,
@@ -220,7 +220,7 @@ ELSE
     ) VALUES (
         cur_user_account_id,
         cur_sow_boar_pig_farm_id,
-		cur_pig_farm_farm_production_id
+        cur_pig_farm_last_prod_id
         
         in_sow_id,
         INSEMINATION_TYPE_ARTIFICIAL,
@@ -259,7 +259,7 @@ END IF;
     
     
 UPDATE pig_farm SET 
-	farm_production_id = cur_pig_farm_farm_production_id
+    farm_production_id = cur_pig_farm_last_prod_id
 WHERE id = cur_sow_boar_pig_farm_id;
 
 
@@ -278,7 +278,7 @@ SELECT
     
     cur_pig_production_id               AS pig_prod_id,
     cur_pig_prod_ai_id                  AS pig_prod_ai_id,
-    cur_pig_farm_farm_production_id		AS farm_prod_id;
+    cur_pig_farm_last_prod_id       AS farm_prod_id;
     
 
 END $$

@@ -65,10 +65,34 @@ class TestAPIUser:
         test = 1
 
 
+summary = {}
 
 class TestAPIAccount:
     def __init__(self):
-        self.summary    = {}
+        self.summary    = {
+            'account':          {},
+            'account_request':  {},
+            'user_group':       {},
+            
+            'pig_farm':         {},
+            'pig_farm_staff':   {},
+            'pig_race':         {},
+            'pig_race_line':    {},
+            
+            'acc_gestating_ops':{},
+            'acc_lactating_ops':{},
+   
+            'semen_supplier':   {},
+            'feed_supplier':    {},
+            'feed_brand':       {},
+            'feed_type':        {},
+            
+            'sow_boar':         {},
+            'semen_source':     {},
+   
+            'pig_production':   {}
+        }
+    
     
     def test_account_register(self, user_id, acc_name, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
@@ -286,6 +310,7 @@ class TestAPIAccount:
         result_num  = res_json['result']['num']
         assert(result_num == 0)
 
+        self.summary['feed_brand'] = {}
         self.summary['feed_brand']['add'] = 'OK'
         
         
@@ -364,6 +389,7 @@ class TestAPIAccount:
         result_num  = res_json['result']['num']
         assert(result_num == 0)
 
+
         self.summary['feed_supplier']['add'] = 'OK'
         
     
@@ -415,6 +441,7 @@ class TestAPIAccount:
             
             result_num  = res_json['result']['num']
             assert(result_num == 0)
+
 
             self.summary['pig_farm']['add'] = 'OK'
             
@@ -529,6 +556,7 @@ class TestAPIAccount:
             result_num  = res_json['result']['num']
             assert(result_num == 0)
 
+
             self.summary['pig_farm_staff']['add'] = 'OK'
             
             
@@ -578,6 +606,7 @@ class TestAPIAccount:
         data = {
             "uhid":                 user_uhid,
             "pig_farm_hid":         pig_farm_hid,
+            "pig_farm_staff_hid":   pig_farm_staff_hid,
             "name":                 staff_name + now_ts
         }
         
@@ -650,7 +679,7 @@ class TestAPIAccount:
         
         
         # Test get_list pig_farm_staff
-        url = BASE_URL + 'pig_farm_staff/list?ahid=' + account_hid + '&inc_deleted=1&inc_user_audit=1'
+        url = BASE_URL + 'pig_farm_staff/list?pfhid=' + pig_farm_hid + '&inc_deleted=1&inc_user_audit=1'
         
         print(f'\n\nTesting pig_farm_staff get_list; url = {url} ')
         
@@ -938,7 +967,7 @@ class TestAPIAccount:
         result_num  = res_json['result']['num']
         assert(result_num == 0)
         
-        self.summary['pig_race_line']['update'] = 'OK'
+        self.summary['pig_race_line']['delete'] = 'OK'
         
         
         
@@ -1260,6 +1289,8 @@ class TestAPIAccount:
         result_num  = res_json['result']['num']
         assert(result_num == 0)
         
+        
+        self.summary['semen_source']['by_boar'] = {}
         self.summary['semen_source']['by_boar']['add'] = 'OK'
         
         
@@ -1338,6 +1369,8 @@ class TestAPIAccount:
         result_num  = res_json['result']['num']
         assert(result_num == 0)
         
+        
+        self.summary['semen_source']['by_semen_supplier'] = {}
         self.summary['semen_source']['by_semen_supplier']['add'] = 'OK'
         
         

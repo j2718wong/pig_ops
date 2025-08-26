@@ -4,7 +4,7 @@ DROP PROCEDURE IF EXISTS pig_farm_staff_add $$
 CREATE PROCEDURE pig_farm_staff_add(
     in_user_id              INT,
 
-    in_farm_id              INT,
+    in_pig_farm_id          INT,
     in_name                 VARCHAR(50)
 
 )  
@@ -100,7 +100,7 @@ INSERT INTO pig_farm_staff(
     added_by_user_id
 ) VALUES (
     cur_user_account_id,
-    in_farm_id,
+    in_pig_farm_id,
     in_name,
     
     in_user_id

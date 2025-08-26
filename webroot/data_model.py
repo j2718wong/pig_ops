@@ -50,7 +50,7 @@ class DataPigFarm(BaseModel):
     longitude:          float = None
     
     
-class DataPigStaff(BaseModel):
+class DataPigFarmStaff(BaseModel):
     uhid:               str
     
     pig_farm_hid:       str

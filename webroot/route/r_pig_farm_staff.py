@@ -128,12 +128,14 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_FARM_STAFF_PIG_FARM_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_PIG_FARM_HASHID',
+                'num':  ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID',
                 'desc': ''
             }
         }
         
+    pig_farm_id = res[0]
+    
     
     pig_farm_staff_hid = pig_farm_staff_data.pig_farm_staff_hid
     
@@ -141,8 +143,8 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_FARM_STAFF_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_HASHID',
+                'num':  ERROR_PIG_FARM_STAFF_INVALID_HASHID,
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_HASHID',
                 'desc': ''
             }
         }

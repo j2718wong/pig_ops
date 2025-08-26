@@ -24,8 +24,9 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 1;
 
 
-DECLARE INSEMINATION_STATUS_ID_GESTATING        INT             DEFAULT 1;
-DECLARE INSEMINATION_STATUS_ID_WEANING          INT             DEFAULT 5;
+DECLARE PRODUCTION_STATUS_ID_GESTATING          INT             DEFAULT 1;
+DECLARE PRODUCTION_STATUS_ID_WEANING            INT             DEFAULT 5;
+DECLARE PRODUCTION_STATUS_ID_GROWING            INT             DEFAULT 7;
 
 
 
@@ -93,8 +94,8 @@ FROM    sow
 WHERE   sow_number = in_sow_number;
 
 UPDATE pig_production SET 
-    status = INSEMINATION_STATUS_ID_GESTATING
-WHERE sow_id = cur_sow_id AND status = INSEMINATION_STATUS_ID_WEANING;
+    status_id = PRODUCTION_STATUS_ID_GROWING
+WHERE sow_id = cur_sow_id AND status_id = PRODUCTION_STATUS_ID_WEANING;
 
 
 SELECT  a.is_ai,
@@ -135,7 +136,7 @@ INSERT INTO pig_production (
     DATE_ADD(in_date_insemination, INTERVAL 115 DAY),
     in_semen_source_id,
     cur_semen_desc,
-    INSEMINATION_STATUS_ID_GESTATING,
+    PRODUCTION_STATUS_ID_GESTATING,
     in_staff_id
 );
 
