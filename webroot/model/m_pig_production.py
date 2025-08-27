@@ -77,7 +77,7 @@ class PigProduction:
     
     def add(self, data = None):
         """
-        PROCEDURE pig_production_add(
+        PROCEDURE pig_prod_add(
             in_user_id              INT,
            
             in_sow_id               INT,
@@ -93,7 +93,7 @@ class PigProduction:
         )  
         """
         
-        sql =  'CALL pig_production_add('
+        sql =  'CALL pig_prod_add('
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.sow_id
@@ -168,45 +168,35 @@ class PigProduction:
 
         return None
 
-   
     
-    def update(self, data = None):
+    def update_birth(self, data = None):
         """
-        PROCEDURE pig_farm_update(
-            in_user_id              INT,
-            in_pig_farm_id          INT,
-
-            in_name                 VARCHAR(50),
+        PROCEDURE pig_prod_update_birth(
+            in_user_id                  INT,
             
-            in_country_id           INT, 
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
-            in_latitude             DECIMAL(10,5),
-            in_longitude            DECIMAL(10,5)
-        )
+            in_pig_production_id        INT,
+            
+            in_date_actual_birth        VARCHAR(10),  /* in YYYY-MM-DD format*/
+            in_num_pigs_dead_at_birth   INT,
+            in_num_pigs_live_male       INT,
+            in_num_pigs_live_female     INT,
+            
+            in_birth_staff_id           INT
+        )  
         """
-       
-        sql =  'CALL pig_farm_update('
+        
+        sql =  'CALL pig_production_update_birth('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_farm_id
-        sql += '"%s",'  % data.name
         
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
+        sql += '%s,'    % data.pig_prod_id
         
-        if data.latitude is not None:
-            sql += '%s,'    % data.latitude
-        else:
-            sql += 'NULL,'
+        sql += '"%s",'  % data.date_actual_birth
+        sql += '%s,'    % data.num_pigs_dead
             
-        if data.longitude is not None:
-            sql += '%s);'   % data.longitude
-        else:
-            sql += 'NULL);'
-        
+        sql += '%s,'    % data.num_pigs_male
+        sql += '%s,'    % data.num_pigs_female
+        sql += '%s);'   % data.birth_staff_id
+       
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -226,7 +216,7 @@ class PigProduction:
             cursor.close()
 
         except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
+            msg = 'update_birth(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -242,15 +232,76 @@ class PigProduction:
                     'desc':             row[2],
                 },
                 
-                'pig_farm': {
-                    'id':               row[3],
-                    'name':             row[4],
-                    'flag':             row[5]
+                'pig_prod': {
+                    'id':               row[3]
                 }
             }
 
         return None
+
+    
+    def update_current_count(self, data = None):
+        """
+        PROCEDURE pig_prod_update_current_count(
+            in_user_id              INT,
+           
+            in_pig_prod_id          INT,
+            
+            in_num_pigs_female      INT,
+            in_num_pigs_male        INT
+        )  
+        """
         
+        sql =  'CALL pig_production_update_birth('
+        sql += '%s,'    % data.user_id
+        
+        sql += '%s,'    % data.pig_prod_id
+        
+        sql += '%s,'    % data.num_pigs_female
+        sql += '%s);'   % data.num_pigs_male
+       
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update_birth(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+
     
     def get_list(self, account_id = 0, id_list = None):
         """

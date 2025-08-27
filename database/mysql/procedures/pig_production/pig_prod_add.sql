@@ -1,7 +1,7 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_production_add $$
-CREATE PROCEDURE pig_production_add(
+DROP PROCEDURE IF EXISTS pig_prod_add $$
+CREATE PROCEDURE pig_prod_add(
     in_user_id              INT,
    
     in_sow_id               INT,    /* Cannot be updated*/
@@ -44,7 +44,12 @@ DECLARE INSEMINATION_TYPE_ARTIFICIAL            VARCHAR(2)      DEFAULT 'AI';
 
 
 DECLARE PRODUCTION_STATUS_ID_GESTATING          INT             DEFAULT 1;
+DECLARE PRODUCTION_STATUS_ID_TERMINATED         INT             DEFAULT 2;
 DECLARE PRODUCTION_STATUS_ID_NOT_PREGNANT       INT             DEFAULT 3;
+DECLARE PRODUCTION_STATUS_ID_LACTATING          INT             DEFAULT 4;
+DECLARE PRODUCTION_STATUS_ID_WEANING            INT             DEFAULT 5;
+DECLARE PRODUCTION_STATUS_ID_HARVESTED          INT             DEFAULT 10;
+
 
 
 DECLARE SOW_STATUS_ID_GESTATING                 INT             DEFAULT 2;
@@ -95,7 +100,7 @@ LIMIT   1;
 CALL basic_user_check(
     in_user_id, 
     1, /* user must have an account*/
-    cur_sow_boar_account_id,
+    cur_sow_boar_account_id, /* compare user.account_id to this account_id*/
     
     BUSINESS_OBJ_ID_PIG_PRODUCTION,
     FLAG_BIT_OPERATION_ADD,

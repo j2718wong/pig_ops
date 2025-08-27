@@ -1,10 +1,10 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_production_update $$
-CREATE PROCEDURE pig_production_update(
+DROP PROCEDURE IF EXISTS pig_prod_update $$
+CREATE PROCEDURE pig_prod_update(
     in_user_id              INT,
     
-    in_pig_production_id    INT,
+    in_pig_prod_id          INT,
     
     in_semen_cost           DECIMAL(6,2),
     in_insemination_cost    DECIMAL(6,2),
@@ -42,11 +42,11 @@ DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_pig_prod_id                    		INT             DEFAULT 0;
-DECLARE cur_pig_prod_account_id            		INT             DEFAULT 0;
-DECLARE cur_pig_prod_flag                  		INT             DEFAULT 0;
+DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
+DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
+DECLARE cur_pig_prod_flag                       INT             DEFAULT 0;
 
-DECLARE cur_pig_prod_date_actual_birth			DATE;
+DECLARE cur_pig_prod_date_actual_birth          DATE;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -62,7 +62,7 @@ SET res_code    = "SUCCESS";
 SELECT  account_id
 INTO    cur_pig_prod_account_id
 FROM    pig_production
-WHERE   id = in_pig_production_id
+WHERE   id = in_pig_prod_id
 LIMIT   1;
 
 
@@ -88,19 +88,19 @@ IF res_num != RES_NUM_SUCCESS THEN
 END IF;
 
 
-SELECT 	date_actual_birth
-INTO 	cur_pig_prod_date_actual_birth
-FROM 	pig_production
-WHERE 	id = in_pig_production_id;
+SELECT  date_actual_birth
+INTO    cur_pig_prod_date_actual_birth
+FROM    pig_production
+WHERE   id = in_pig_prod_id;
 
 
 IF cur_pig_prod_date_actual_birth IS NOT NULL THEN 
 
     SET res_num     = RES_NUM_CANNOT_UPDATE_INSEMINATION_DATA;
     SET res_code    = "RES_NUM_CANNOT_UPDATE_INSEMINATION_DATA";
-    SET res_desc	= "Cannot update insemination data after birth."
+    SET res_desc    = "Cannot update insemination data after birth."
     
-	LEAVE process_user;
+    LEAVE process_user;
 
 END IF;
 
@@ -116,7 +116,7 @@ UPDATE pig_production SET
     last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP
     
-WHERE id =  in_pig_production_id;
+WHERE id =  in_pig_prod_id;
 
 END process_user;
 
@@ -128,14 +128,14 @@ INTO
     cur_pig_prod_flag,
     cur_pig_prod_name
 FROM pig_production
-WHERE id = in_pig_production_id;
+WHERE id = in_pig_prod_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_pig_production_id                 AS pig_production_id,
+    in_pig_prod_id                 AS pig_production_id,
     cur_pig_prod_flag              AS pig_production_flag,
     cur_pig_prod_name              AS pig_production_name;
     

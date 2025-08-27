@@ -227,3 +227,34 @@ class DataPigProdAI(BaseModel):
     
     staff_id:           int = None
     date_insemination:  str
+    
+
+class DataPigProdBirth(BaseModel):
+    uhid:               str
+    
+    pig_prod_hid:       str
+    
+    
+    pig_prod_id:        int = 0  
+    date_actual_birth:  str
+    num_pigs_dead:      int = 0
+    
+    num_pigs_male:      int = 0
+    num_pigs_female:    int = 0
+    
+    birth_staff_id:     int
+    
+    
+class DataPigProdDeadPig(BaseModel):
+    uhid:               str
+    
+    pig_prod_hid:       str = None
+    
+    
+    pig_prod_id:        int = 0
+    date_dead:          str
+    dead_type_id:       int = 0
+    sex:                str = 'F'
+    comments:           str = None
+    
+    
