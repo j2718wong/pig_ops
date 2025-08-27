@@ -194,7 +194,7 @@ class DataPigProd(BaseModel):
     uhid:               str
     
     pig_prod_hid:       str = None
-    sow_hid:            str
+    sow_hid:            str = None
     boar_hid:           str = None
     semen_source_hid:   str = None
     insem_staff_hid:    str = None
@@ -205,8 +205,8 @@ class DataPigProd(BaseModel):
     boar_id:            int = None
     semen_source_id:    int = None
     
-    semen_cost:         float = None
-    insemination_cost:  float = None
+    semen_cost:         float = 0.0
+    insemination_cost:  float = 0.0
     insem_cost_comments: str = None
     
     insem_staff_id:     int = None
@@ -243,6 +243,33 @@ class DataPigProdBirth(BaseModel):
     num_pigs_female:    int = 0
     
     birth_staff_id:     int
+    
+    
+class DataPigProdWeaning(BaseModel):
+    uhid:               str
+    
+    pig_prod_hid:       str
+    
+    
+    pig_prod_id:        int = 0  
+    date_weaning:       str
+    
+    num_pigs_male:      int = 0
+    num_pigs_female:    int = 0
+    
+    total_weight:       int = None
+    
+
+class DataPigProdPigCount(BaseModel):
+    uhid:               str
+    
+    pig_prod_hid:       str
+    
+    
+    pig_prod_id:        int = 0  
+    
+    num_pigs_male:      int = 0
+    num_pigs_female:    int = 0
     
     
 class DataPigProdDeadPig(BaseModel):

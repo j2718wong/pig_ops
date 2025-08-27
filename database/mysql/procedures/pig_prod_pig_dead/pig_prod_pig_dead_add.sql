@@ -53,8 +53,10 @@ DECLARE cur_pig_prod_ai_id                      INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_farm_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
-DECLARE cur_pig_prod_num_piglets_current_male   INT             DEFAULT NULL;
-DECLARE cur_pig_prod_num_piglets_current_female INT             DEFAULT NULL;
+DECLARE cur_pig_prod_num_pigs_current_m         INT             DEFAULT 0;
+DECLARE cur_pig_prod_num_pigs_current_f         INT             DEFAULT 0;
+
+DECLARE cur_pig_prod_pig_dead_id                INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -71,15 +73,15 @@ SELECT
         pig_farm_id,
         status_id,
         
-        num_piglets_current_male,
-        num_piglets_current_female
+        num_pigs_current_m,
+        num_pigs_current_f
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_pig_farm_id,
         cur_pig_prod_status_id,
         
-        cur_pig_prod_num_piglets_current_male,
-        cur_pig_prod_num_piglets_current_female
+        cur_pig_prod_num_pigs_current_m,
+        cur_pig_prod_num_pigs_current_f
         
 FROM    pig_production 
 WHERE   id = in_pig_prod_id
@@ -148,17 +150,17 @@ INSERT INTO pig_prod_pig_dead (
 SELECT LAST_INSERT_ID() INTO cur_pig_prod_pig_dead_id;
 
 IF in_sex = 'F' THEN
-    IF cur_pig_prod_num_piglets_current_female > 0 THEN 
+    IF cur_pig_prod_num_pigs_current_f > 0 THEN 
         UPDATE pig_production SET
-            num_pigs_current_female = num_piglets_current_female -1
+            num_pigs_current_f = num_piglets_current_f -1
         WHERE id = in_pig_prod_id;
     END IF;
 
 ELSE 
     
-    IF cur_pig_prod_num_piglets_current_male > 0 THEN 
+    IF cur_pig_prod_num_pigs_current_m > 0 THEN 
         UPDATE pig_production SET
-            num_pigs_current_male = num_piglets_current_male -1
+            num_pigs_current_m = num_piglets_current_m -1
         WHERE id = in_pig_prod_id;
     END IF;
 

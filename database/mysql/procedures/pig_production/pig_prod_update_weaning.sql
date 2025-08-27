@@ -1,14 +1,14 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_production_update_weaning $$
-CREATE PROCEDURE pig_production_update_weaning(
+DROP PROCEDURE IF EXISTS pig_prod_update_weaning $$
+CREATE PROCEDURE pig_prod_update_weaning(
     in_user_id              INT,
    
     in_pig_prod_id          INT,
     in_date_weaning         VARCHAR(10),
     
-    in_num_pigs_female   INT,
-    in_num_pigs_male     INT,
+    in_num_pigs_female      INT,
+    in_num_pigs_male        INT,
     
     in_total_weight         INT
 )  
@@ -50,15 +50,10 @@ DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
 
-
 DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
-DECLARE cur_pig_prod_ai_id                      INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_farm_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
-
-DECLARE cur_pig_prod_num_pigs_current_male   INT             DEFAULT NULL;
-DECLARE cur_pig_prod_num_pigs_current_female INT             DEFAULT NULL;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -73,17 +68,11 @@ SET res_code    = "SUCCESS";
 SELECT  
         account_id,
         pig_farm_id,
-        status_id,
-        
-        num_pigs_current_male,
-        num_pigs_current_female
+        status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_pig_farm_id,
-        cur_pig_prod_status_id,
-        
-        cur_pig_prod_num_pigs_current_male,
-        cur_pig_prod_num_pigs_current_female
+        cur_pig_prod_status_id
         
 FROM    pig_production 
 WHERE   id = in_pig_prod_id
@@ -120,8 +109,8 @@ END IF;
 
 
 UPDATE pig_production SET
-    date_weaning                = in_date_weaning
-    status_id                   = PRODUCTION_STATUS_ID_WEANING
+    date_weaning                = in_date_weaning,
+    status_id                   = PRODUCTION_STATUS_ID_WEANING,
 
     num_pigs_weaning_m          = in_num_pigs_male,
     num_pigs_weaning_f          = in_num_pigs_female,
@@ -129,7 +118,7 @@ UPDATE pig_production SET
     num_pigs_current_m          = in_num_pigs_male, 
     num_pigs_current_f          = in_num_pigs_female,
     
-    total_pigs_weight_weaning   = in_total_weight
+    total_pigs_weight_weaning   = in_total_weight,
     
     last_update_user_id         = in_user_id,
     dt_last_update              = CURRENT_TIMESTAMP

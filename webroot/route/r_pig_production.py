@@ -163,3 +163,200 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
     
 
+@app.post("/pig_prod/update_insem")
+async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
+    uhid    = pig_prod_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+
+    pig_prod_hid    = pig_prod_data.pig_prod_hid
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+
+
+    insem_staff_hid = pig_prod_data.insem_staff_hid
+    insem_staff_id  = None
+    
+    if insem_staff_hid is not None:
+        
+        res = hashids_common.decrypt(insem_staff_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        insem_staff_id = res[0]
+    
+    
+
+    pig_prod_data.user_id           = user_id
+    
+    
+    res_update    =  model['pig_prod'].update_insemination(pig_prod_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id     = res_update['pig_prod']['id']        
+    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
+    
+   
+    # remove plain id
+    del res_update['pig_prod']['id']
+    res_update['pig_prod']['hid'] = pig_prod_hashid
+
+
+    return res_update
+    
+    
+@app.post("/pig_prod/update_birth")
+async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
+    uhid    = pig_birth_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+
+    pig_prod_hid    = pig_birth_data.pig_prod_hid
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+   
+    
+    pig_birth_data.user_id          = user_id
+    
+    
+    res_update    =  model['pig_prod'].update_birth(pig_birth_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id     = res_update['pig_prod']['id']        
+    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
+    
+   
+    # remove plain id
+    del res_update['pig_prod']['id']
+    res_update['pig_prod']['hid'] = pig_prod_hashid
+
+
+    return res_update
+    
+    
+@app.post("/pig_prod/update_weaning")
+async def pig_prod_update_weaningh(pig_weaning_data: dm.DataPigProdWeaning):
+    uhid    = pig_weaning_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+
+    pig_prod_hid    = pig_weaning_data.pig_prod_hid
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+   
+    
+    pig_weaning_data.user_id          = user_id
+    
+    
+    res_update    =  model['pig_prod'].update_weaning(pig_weaning_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id     = res_update['pig_prod']['id']        
+    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
+    
+   
+    # remove plain id
+    del res_update['pig_prod']['id']
+    res_update['pig_prod']['hid'] = pig_prod_hashid
+
+
+    return res_update
+    
+
+

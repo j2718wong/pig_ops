@@ -27,14 +27,13 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 DECLARE RES_NUM_PIG_PROD_CANNOT_ADD_PIG_DEAD    INT             DEFAULT 22;
 
+
+DECLARE BUSINESS_OBJ_ID_PROD_PIG_DEAD           INT             DEFAULT 23;
+
+
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
 DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
-
-
-DECLARE AUDIT_ACTION_ADD                        VARCHAR(3)      DEFAULT "ADD";
-DECLARE AUDIT_ACTION_UPDATE                     VARCHAR(3)      DEFAULT "UPD";
-DECLARE AUDIT_ACTION_DELETE                     VARCHAR(3)      DEFAULT "DEL";
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
@@ -43,8 +42,7 @@ DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 DECLARE cur_pig_prod_pig_dead_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_dead_account_id        INT             DEFAULT 0;
-DECLARE cur_pig_prod_pig_dead_sex               VARCHAR(2);
-DECLARE cur_pig_prod_pig_dead_flag              INT             DEFAULT 0;
+
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -57,12 +55,8 @@ SET res_num     = RES_NUM_SUCCESS;
 SET res_code    = "SUCCESS";
 
 
-SELECT  
-        a.account_id,
-        a.pig_prod_id
-INTO    
-        cur_pig_prod_pig_dead_account_id,
-        cur_pig_prod_pig_prod_id
+SELECT  account_id
+INTO    cur_pig_prod_pig_dead_account_id
 FROM    pig_prod_pig_dead
 WHERE   id = in_pig_prod_pig_dead_id
 LIMIT   1;
@@ -73,7 +67,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_pig_prod_pig_dead_account_id, /* compare user.account_id to this account_id*/
     
-    BUSINESS_OBJ_ID_PIG_RACE_LINE,
+    BUSINESS_OBJ_ID_PROD_PIG_DEAD,
     FLAG_BIT_OPERATION_UPDATE,
     
     cur_user_account_id, 
@@ -108,21 +102,11 @@ WHERE id =  in_pig_prod_pig_dead_id;
 END process_user;
 
 
-SELECT
-    flag,
-    name
-INTO 
-    cur_pig_prod_pig_dead_flag,
-    cur_pig_prod_pig_dead_name
-FROM pig_prod_pig_dead
-WHERE id = in_pig_prod_pig_dead_id;
-
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_pig_prod_pig_prod_id            AS pig_prod_id,
     in_pig_prod_pig_dead_id             AS pig_prod_pig_dead_id;
     
 

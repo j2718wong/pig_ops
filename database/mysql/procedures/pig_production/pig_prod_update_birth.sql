@@ -51,7 +51,7 @@ DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
-
+DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -66,10 +66,10 @@ SET res_code    = "SUCCESS";
 
 SELECT  
         account_id,
-        status_id,
+        status_id
 INTO    
         cur_pig_prod_account_id,
-        cur_pig_prod_status_id,
+        cur_pig_prod_status_id
         
 FROM    pig_production
 WHERE   id = in_pig_prod_id
@@ -126,21 +126,12 @@ WHERE id =  in_pig_prod_id;
 END process_user;
 
 
-SELECT
-    flag,
-    name
-INTO 
-    cur_pig_prod_flag,
-    cur_pig_prod_name
-FROM pig_production
-WHERE id = in_pig_prod_id;
-
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_pig_prod_id                AS pig_production_id;
+    in_pig_prod_id                      AS pig_production_id;
 
 
 END $$

@@ -49,13 +49,10 @@ DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
 DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
-DECLARE cur_pig_prod_ai_id                      INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_farm_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
-DECLARE cur_pig_prod_num_pigs_current_male   INT             DEFAULT NULL;
-DECLARE cur_pig_prod_num_pigs_current_female INT             DEFAULT NULL;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -70,18 +67,12 @@ SET res_code    = "SUCCESS";
 SELECT  
         account_id,
         pig_farm_id,
-        status_id,
-        
-        num_pigs_current_male,
-        num_pigs_current_female
+        status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_pig_farm_id,
-        cur_pig_prod_status_id,
-        
-        cur_pig_prod_num_pigs_current_male,
-        cur_pig_prod_num_pigs_current_female
-        
+        cur_pig_prod_status_id
+
 FROM    pig_production 
 WHERE   id = in_pig_prod_id
 LIMIT   1;

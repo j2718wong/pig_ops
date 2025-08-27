@@ -378,10 +378,10 @@ async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0,
             s           += ' ' * 5
         
         
-        num_piglets_weaning = cur_entry['num_piglets_weaning']
-        num_dead        = num_piglets_weaning['dead']
-        num_male        = num_piglets_weaning['male']
-        num_female      = num_piglets_weaning['female']
+        num_piglets_birth = cur_entry['num_piglets_birth']
+        num_dead        = num_piglets_birth['dead']
+        num_male        = num_piglets_birth['male']
+        num_female      = num_piglets_birth['female']
         
         num_piglets     = None
         if num_male is not None and num_female is not None:
@@ -600,8 +600,8 @@ def write_baktin_operations(data, is_growing):
         s           += s_temp 
         s           += '  '
         
-        num_piglets_weaning = cur_entry['num_piglets_weaning']
-        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        num_pigs_current = cur_entry['num_pigs_current']
+        num_piglets = num_pigs_current['male'] + num_pigs_current['female']
         
         s_temp      = str(num_piglets)
         num_chars   = len(s_temp)
@@ -832,8 +832,8 @@ def write_feeding_guide(data):
         s           += s_temp 
         s           += '  '
         
-        num_piglets_weaning = cur_entry['num_piglets_weaning']
-        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        num_pigs_current = cur_entry['num_pigs_current']
+        num_piglets = num_pigs_current['male'] + num_pigs_current['female']
         
         s_temp      = str(num_piglets)
         num_chars   = len(s_temp)
@@ -982,8 +982,8 @@ def write_feeds_consumed(data):
         s           += s_temp 
         s           += '  '
         
-        num_piglets_weaning = cur_entry['num_piglets_weaning']
-        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        num_pigs_current = cur_entry['num_pigs_current']
+        num_piglets = num_pigs_current['male'] + num_pigs_current['female']
         
         total_num_piglets += num_piglets
         
@@ -1338,8 +1338,8 @@ def write_feeds_cost(data):
         s           += s_temp 
         s           += '  '
         
-        num_piglets_weaning = cur_entry['num_piglets_weaning']
-        num_piglets = num_piglets_weaning['male'] + num_piglets_weaning['female']
+        num_pigs_current = cur_entry['num_pigs_current']
+        num_piglets = num_pigs_current['male'] + num_pigs_current['female']
         
         s_temp      = str(num_piglets)
         num_chars   = len(s_temp)

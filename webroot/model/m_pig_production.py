@@ -107,20 +107,16 @@ class PigProduction:
             sql += '%s,'    % data.semen_source_id
             sql += '%s,'    % data.semen_cost
             
+            
         sql += '%s,'    % data.insemination_cost
             
-               
         if data.insem_cost_comments is not None:
             sql += '"%s",'    % data.insem_cost_comments
         else:
             sql += 'NULL,'
             
-        if data.insem_staff_id is not None:
-            sql += '%s,'   % data.insem_staff_id
-        else:
-            sql += 'NULL,'
-        
-        sql += '"%s");'    % data.date_insemination
+        sql += '%s,'    % data.insem_staff_id
+        sql += '"%s");' % data.date_insemination
         
         
         # Check if still connected to database
@@ -163,6 +159,80 @@ class PigProduction:
                 
                 'pig_prod_ai' :{
                     'id':               row[4]
+                }
+            }
+
+        return None
+
+    
+    def update_insemination(self, data = None):
+        """
+        PROCEDURE pig_prod_update_insem(
+            in_user_id              INT,
+            
+            in_pig_prod_id          INT,
+            
+            in_semen_cost           DECIMAL(6,2),
+            in_insemination_cost    DECIMAL(6,2),
+            in_insem_cost_comments  VARCHAR(200),
+            
+            in_insem_staff_id       INT,
+            in_date_insemination    VARCHAR(10)  /* in YYYY-MM-DD format*/
+        )  
+        """
+        
+        sql =  'CALL pig_prod_update_insem('
+        sql += '%s,'    % data.user_id
+        
+        sql += '%s,'    % data.pig_prod_id
+        
+        sql += '%s,'    % data.insemination_cost
+        
+        if data.insem_cost_comments is not None:
+            sql += '"%s",'    % data.insem_cost_comments
+        else:
+            sql += 'NULL,'
+            
+        sql += '%s,'    % data.insem_staff_id
+        sql += '"%s");' % data.date_insemination
+       
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update_birth(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod': {
+                    'id':               row[3]
                 }
             }
 
@@ -240,6 +310,79 @@ class PigProduction:
         return None
 
     
+    def update_weaning(self, data = None):
+        """
+        PROCEDURE pig_prod_update_weaning(
+            in_user_id              INT,
+           
+            in_pig_prod_id          INT,
+            in_date_weaning         VARCHAR(10),
+            
+            in_num_pigs_female      INT,
+            in_num_pigs_male        INT,
+            
+            in_total_weight         INT
+        )  
+        """
+        
+        sql =  'CALL pig_prod_update_weaning('
+        sql += '%s,'    % data.user_id
+        
+        sql += '%s,'    % data.pig_prod_id
+        
+        sql += '"%s",'  % data.date_weaning
+            
+        sql += '%s,'    % data.num_pigs_male
+        sql += '%s,'    % data.num_pigs_female
+        
+        if data.total_weight is not None:
+            sql += '%s);'    % data.total_weight
+        else:
+            sql += 'NULL);'
+      
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update_weaning(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
+    
     def update_current_count(self, data = None):
         """
         PROCEDURE pig_prod_update_current_count(
@@ -252,7 +395,7 @@ class PigProduction:
         )  
         """
         
-        sql =  'CALL pig_production_update_birth('
+        sql =  'CALL pig_prod_update_current_count('
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id
@@ -279,7 +422,7 @@ class PigProduction:
             cursor.close()
 
         except Exception as e:
-            msg = 'update_birth(); error in executing query[] = ' + sql
+            msg = 'update_current_count(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'

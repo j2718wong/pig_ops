@@ -1,7 +1,7 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_prod_update $$
-CREATE PROCEDURE pig_prod_update(
+DROP PROCEDURE IF EXISTS pig_prod_update_insem $$
+CREATE PROCEDURE pig_prod_update_insem(
     in_user_id              INT,
     
     in_pig_prod_id          INT,
@@ -12,8 +12,7 @@ CREATE PROCEDURE pig_prod_update(
     
     in_insem_staff_id       INT,
     in_date_insemination    VARCHAR(10)  /* in YYYY-MM-DD format*/
-    
-    
+
 )
 
 BEGIN
@@ -98,7 +97,7 @@ IF cur_pig_prod_date_actual_birth IS NOT NULL THEN
 
     SET res_num     = RES_NUM_CANNOT_UPDATE_INSEMINATION_DATA;
     SET res_code    = "RES_NUM_CANNOT_UPDATE_INSEMINATION_DATA";
-    SET res_desc    = "Cannot update insemination data after birth."
+    SET res_desc    = "Cannot update insemination data after birth.";
     
     LEAVE process_user;
 
@@ -121,23 +120,12 @@ WHERE id =  in_pig_prod_id;
 END process_user;
 
 
-SELECT
-    flag,
-    name
-INTO 
-    cur_pig_prod_flag,
-    cur_pig_prod_name
-FROM pig_production
-WHERE id = in_pig_prod_id;
-
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_pig_prod_id                 AS pig_production_id,
-    cur_pig_prod_flag              AS pig_production_flag,
-    cur_pig_prod_name              AS pig_production_name;
+    in_pig_prod_id                      AS pig_production_id;
     
 
 

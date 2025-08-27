@@ -165,8 +165,8 @@ SELECT
     a.account_id,
     a.user_group_id,
     
-	b.flag_business_obj,
-	
+    b.flag_business_obj,
+    
     b.flag_priv_user,
     b.flag_priv_account,
     b.flag_priv_account_request,

@@ -337,11 +337,11 @@ class SowActivity:
                     a.semen_desc,
                     b.name,
                     
-                    a.num_piglets_dead_at_birth,
-                    a.num_piglets_live_male,
-                    a.num_piglets_live_female,
-                    a.num_piglets_weaning_male,
-                    a.num_piglets_weaning_female,
+                    a.num_pigs_dead_at_birth,
+                    a.num_pigs_live_m,
+                    a.num_pigs_live_f,
+                    a.num_pigs_weaning_m,
+                    a.num_pigs_weaning_f,
                     
                     a.date_weaning
          
@@ -458,8 +458,8 @@ class SowActivity:
                     a.status_id,
                     c.name AS prod_status,
                     
-                    a.num_piglets_weaning_male,
-                    a.num_piglets_weaning_female,
+                    a.num_pigs_current_m,
+                    a.num_pigs_current_f,
                     
                     a.date_actual_birth,
                     
@@ -538,8 +538,8 @@ class SowActivity:
                 cur_status_id           = row[3]
                 cur_status_name         = row[4]
                 
-                cur_num_w_male          = row[5] if row[5] else None
-                cur_num_w_female        = row[6] if row[6] else None
+                cur_num_c_male          = row[5] if row[5] else None
+                cur_num_c_female        = row[6] if row[6] else None
                
                 cur_date_actual         = str(row[7])
                 
@@ -620,9 +620,9 @@ class SowActivity:
                     'status_id':        cur_status_id, 
                     'status':           cur_status_name,
                     
-                    'num_piglets_weaning': {
-                        'male':         cur_num_w_male,
-                        'female':       cur_num_w_female
+                    'num_pigs_current': {
+                        'male':         cur_num_c_male,
+                        'female':       cur_num_c_female
                     },
                     
                     'dates':{
