@@ -60,13 +60,6 @@ SAMPLE_PIG_RACE_LINE = {
 
 
 
-class TestAPIUser:
-    def test_register(self):
-        test = 1
-
-
-summary = {}
-
 class TestAPIAccount:
     def __init__(self):
         self.summary    = {
@@ -1415,6 +1408,7 @@ class TestAPIAccount:
         print('\n\nTest Summary')
         pprint.pprint(self.summary)
         
+  
         
 if __name__ == '__main__':
     t = TestAPIAccount()

@@ -13,12 +13,20 @@ class User:
     def get_user_info(self, user_id):
         sql =   """
                 SELECT 
+                    a.id,
                     a.account_id,
                     a.flag,
                     a.email,
+                    a.username,
                     a.mobile_num
+                    
+                    a.user_group_id,
+                    b.group_num,
+                    b.flag_business_obj,
+                    b.name AS group_name
                 FROM user a
-                WHERE id = %s
+                LEFT OUTER JOIN user_group b ON a.user_group_id = b.id
+                WHERE a.id = %s
                 """ % user_id
         
         
@@ -54,17 +62,23 @@ class User:
         if rows is not None:
             
             for row in rows:
-                cur_user_account_id     = row[0]
-                cur_user_flag           = row[1]
-                cur_user_email          = row[2]
-                cur_user_mobile_num     = row[3]
-                
+                                
                 cur_entry = {
-                    'id':               user_id,
-                    'account_id':       cur_user_account_id,
-                    'flag':             cur_user_flag,
-                    'email':            cur_user_email,
-                    'mobile_num':       cur_user_mobile_num
+                    user = {
+                        'id':               row[0],
+                        'account_id':       row[1],
+                        'flag':             row[2],
+                        'email':            row[3],
+                        'username':         row[4],
+                        'mobile_num':       row[5],
+                    },
+                    
+                    'user_group': {
+                        'id':               row[6],
+                        'group_num':        row[7],
+                        'flag_business_obj': row[8],
+                        'name':             row[9]
+                    }
                 }
                     
                 return cur_entry

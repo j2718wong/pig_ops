@@ -303,3 +303,67 @@ async def user_email_verify_resend(uhid:str):
     }
     
     
+@app.get("/user/info")
+async def user_info(uhid:str):
+    """
+    
+    Parameters
+    ----------
+    uhid : str
+        user hashid
+    
+    """
+
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    user_id = res[0]
+    
+        
+    res_get = model['user'].get_user_info(user_id)
+    
+    if res_get is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    # remove plain id
+    del res_get['user']['id']
+    res_get['user']['hid'] = uhid
+    
+    account_id          = res_get['user']['account_id']
+    account_hashid      = hashids_account.encrypt(account_id)
+    
+    del res_get['user']['account_id']
+    res_get['user']['account_hid'] = account_hashid
+    
+    user_group_id       = res_get['user_group']['id']
+    user_group_hashid   = hashids_common.encrypt(user_group_id)
+    res_get['user_group']['hid'] = user_group_hashid
+    
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res_get
+    }
+    
+
+

@@ -83,7 +83,7 @@ class DataSowBoar(BaseModel):
     pig_farm_id:        int = 0
     
     
-    birth_prod_id:      int = 0
+    farm_birth_prod_id: int = 0
     line_id:            int = 0
     sow_status_id:      int = 2
     

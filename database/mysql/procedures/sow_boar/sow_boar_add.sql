@@ -5,7 +5,7 @@ CREATE PROCEDURE sow_boar_add(
     in_user_id              INT,
     
     in_pig_farm_id          INT,
-    in_birth_prod_id        INT,
+    in_farm_birth_prod_id   INT,
     in_line_id              INT,
     in_sow_status_id        INT,
     
@@ -142,7 +142,7 @@ INSERT INTO sow_boar(
     farm_sow_id,
     farm_boar_id,
     
-    birth_prod_id,
+    farm_birth_prod_id,
     line_id,
     sow_status_id,
     
@@ -160,7 +160,7 @@ INSERT INTO sow_boar(
     cur_pig_farm_last_sow_id,
     cur_pig_farm_last_boar_id,
     
-    in_birth_prod_id,
+    in_farm_birth_prod_id,
     in_line_id,
     in_sow_status_id,
     
