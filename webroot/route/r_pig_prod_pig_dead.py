@@ -19,29 +19,17 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.post("/pig_race_line/add")
-async def pig_race_line_add(pig_race_line_data: dm.DataPigRaceLine):
-    name    = pig_race_line_data.name
-    uhid    = pig_race_line_data.uhid
-    
-    name    = name.strip() if name else None 
-    
-    if name is None or len(name) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_NAME,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_NAME',
-                'desc': ''
-            }
-        }
+@app.post("/pig_prod_pig_dead/add")
+async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
+    uhid    = pig_prod_pig_dead_data.uhid
     
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -49,10 +37,10 @@ async def pig_race_line_add(pig_race_line_data: dm.DataPigRaceLine):
     user_id = res[0]
     
     
-    pig_race_line_data.name      = name
-    pig_race_line_data.user_id   = user_id
+    pig_prod_pig_dead_data.name      = name
+    pig_prod_pig_dead_data.user_id   = user_id
     
-    res_add    =  model['pig_race_line'].add(pig_race_line_data)
+    res_add    =  model['pig_prod_pig_dead'].add(pig_prod_pig_dead_data)
     
     if res_add is None:
         return {
@@ -64,29 +52,29 @@ async def pig_race_line_add(pig_race_line_data: dm.DataPigRaceLine):
         }
     
     
-    pig_race_line_id    = res_add['pig_race_line']['id']
-    pig_race_line_hid   = hashids_common.encrypt(pig_race_line_id)
+    pig_prod_pig_dead_id    = res_add['pig_prod_pig_dead']['id']
+    pig_prod_pig_dead_hid   = hashids_common.encrypt(pig_prod_pig_dead_id)
     
     # remove plain id
-    del res_add['pig_race_line']['id']
-    res_add['pig_race_line']['hid'] = pig_race_line_hid
+    del res_add['pig_prod_pig_dead']['id']
+    res_add['pig_prod_pig_dead']['hid'] = pig_prod_pig_dead_hid
 
         
     return res_add
     
 
-@app.post("/pig_race_line/update")
-async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
-    name    = pig_race_line_data.name
-    uhid    = pig_race_line_data.uhid
+@app.post("/pig_prod_pig_dead/update")
+async def pig_prod_pig_dead_update(pig_prod_pig_dead_data: dm.DataPigRaceLine):
+    name    = pig_prod_pig_dead_data.name
+    uhid    = pig_prod_pig_dead_data.uhid
     
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_NAME,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_NAME',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_NAME,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_NAME',
                 'desc': ''
             }
         }
@@ -96,8 +84,8 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -105,28 +93,28 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     user_id = res[0]
     
     
-    pig_race_line_hid = pig_race_line_data.pig_race_line_hid
+    pig_prod_pig_dead_hid = pig_prod_pig_dead_data.pig_prod_pig_dead_hid
     
     
-    res = hashids_common.decrypt(pig_race_line_hid)
+    res = hashids_common.decrypt(pig_prod_pig_dead_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_HASHID,
-                'code': 'ERROR_PIG_RACE_LINE_HASHID',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_HASHID',
                 'desc': ''
             }
         }
     
     
-    pig_race_line_id = res[0]
+    pig_prod_pig_dead_id = res[0]
     
     
-    pig_race_line_data.name      = name
-    pig_race_line_data.user_id   = user_id
-    pig_race_line_data.pig_race_line_id = pig_race_line_id
+    pig_prod_pig_dead_data.name      = name
+    pig_prod_pig_dead_data.user_id   = user_id
+    pig_prod_pig_dead_data.pig_prod_pig_dead_id = pig_prod_pig_dead_id
     
-    res_update    =  model['pig_race_line'].update(pig_race_line_data)
+    res_update    =  model['pig_prod_pig_dead'].update(pig_prod_pig_dead_data)
     
     if res_update is None:
         return {
@@ -139,20 +127,20 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
         
         
     # remove plain id
-    del res_update['pig_race_line']['id']
-    res_update['pig_race_line']['hid'] = pig_race_line_hid
+    del res_update['pig_prod_pig_dead']['id']
+    res_update['pig_prod_pig_dead']['hid'] = pig_prod_pig_dead_hid
         
     return res_update
     
 
-@app.get("/pig_race_line/delete")
-async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
+@app.get("/pig_prod_pig_dead/delete")
+async def pig_prod_pig_dead_delete(uhid:str, pig_prod_pig_dead_hid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -160,27 +148,27 @@ async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(pig_race_line_hid)
+    res = hashids_common.decrypt(pig_prod_pig_dead_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_HASHID,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_HASHID',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_HASHID',
                 'desc': ''
             }
         }
     
-    pig_race_line_id = res[0]
+    pig_prod_pig_dead_id = res[0]
     
     
     
     data = {
         'user_id':              user_id,
-        'pig_race_line_id':     pig_race_line_id
+        'pig_prod_pig_dead_id':     pig_prod_pig_dead_id
     }
     
     
-    res_delete    =  model['pig_race_line'].delete(data)
+    res_delete    =  model['pig_prod_pig_dead'].delete(data)
     
     if res_delete is None:
         return {
@@ -193,16 +181,16 @@ async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
     
     
     # remove plain id
-    del res_delete['pig_race_line']['id']
-    res_delete['pig_race_line']['hid'] = pig_race_line_hid
+    del res_delete['pig_prod_pig_dead']['id']
+    res_delete['pig_prod_pig_dead']['hid'] = pig_prod_pig_dead_hid
         
     return res_delete
     
     
-@app.get("/pig_race_line/list")
-async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+@app.get("/pig_prod_pig_dead/list")
+async def pig_prod_pig_dead_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
-    Will get pig_race_line list.
+    Will get pig_prod_pig_dead list.
     
     Parameters
     ----------
@@ -223,8 +211,8 @@ async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_RACE_LINE_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_PIG_RACE_LINE_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_ACCOUNT_HASHID',
                 'desc': ''
             }
         }
@@ -232,7 +220,7 @@ async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
     
     account_id = res[0]
         
-    res = model['pig_race_line'].get_list(account_id, 
+    res = model['pig_prod_pig_dead'].get_list(account_id, 
             inc_deleted, inc_user_audit)
     
     if res is None:
