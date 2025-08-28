@@ -64,7 +64,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
             }
         }
     
-    user_id = res[0]
+    sow_id = res[0]
     
     
     boar_hid        = pig_prod_data.boar_hid
@@ -129,6 +129,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     pig_prod_data.sow_id            = sow_id
     pig_prod_data.boar_id           = boar_id
     pig_prod_data.semen_source_id   = semen_source_id
+    pig_prod_data.insem_staff_id    = insem_staff_id
     
     
     res_add    =  model['pig_prod'].add(pig_prod_data)
@@ -192,31 +193,29 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
             }
         }
     
-    user_id = res[0]
+    pig_prod_id = res[0]
 
 
     insem_staff_hid = pig_prod_data.insem_staff_hid
-    insem_staff_id  = None
+        
+    res = hashids_common.decrypt(insem_staff_hid)
+    if len(res) == 0:
     
-    if insem_staff_hid is not None:
-        
-        res = hashids_common.decrypt(insem_staff_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
-                    'desc': ''
-                }
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
+                'desc': ''
             }
-        
-        insem_staff_id = res[0]
+        }
+    
+    insem_staff_id = res[0]
     
     
 
     pig_prod_data.user_id           = user_id
-    
+    pig_prod_data.pig_prod_id       = pig_prod_id
+    pig_prod_data.insem_staff_id    = insem_staff_id
     
     res_update    =  model['pig_prod'].update_insemination(pig_prod_data)
     
@@ -270,12 +269,29 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
             }
         }
     
-    user_id = res[0]
+    pig_prod_id = res[0]
     
-   
+    
+    birth_staff_hid = pig_birth_data.birth_staff_hid
+        
+    res = hashids_common.decrypt(birth_staff_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID',
+                'desc': ''
+            }
+        }
+    
+    birth_staff_id = res[0]
+
+    
     
     pig_birth_data.user_id          = user_id
-    
+    pig_birth_data.pig_prod_id      = pig_prod_id
+    pig_birth_data.birth_staff_id   = birth_staff_id
     
     res_update    =  model['pig_prod'].update_birth(pig_birth_data)
     
@@ -288,7 +304,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
             }
         }
     
-    pig_prod_id     = res_update['pig_prod']['id']        
+    pig_prod_id     = res_update['pig_prod']['id']
     pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
     
    
@@ -329,11 +345,12 @@ async def pig_prod_update_weaningh(pig_weaning_data: dm.DataPigProdWeaning):
             }
         }
     
-    user_id = res[0]
+    pig_prod_id = res[0]
     
    
     
     pig_weaning_data.user_id          = user_id
+    pig_weaning_data.pig_prod_id      = pig_prod_id
     
     
     res_update    =  model['pig_prod'].update_weaning(pig_weaning_data)

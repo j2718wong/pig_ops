@@ -235,6 +235,7 @@ class DataPigProdBirth(BaseModel):
     pig_prod_hid:       str
     birth_staff_hid:    str
     
+    user_id:            int = 0
     pig_prod_id:        int = 0  
     date_actual_birth:  str
     num_pigs_dead:      int = 0
@@ -242,7 +243,7 @@ class DataPigProdBirth(BaseModel):
     num_pigs_male:      int = 0
     num_pigs_female:    int = 0
     
-    birth_staff_id:     int
+    birth_staff_id:     int = 0
     
     
 class DataPigProdWeaning(BaseModel):
@@ -251,6 +252,7 @@ class DataPigProdWeaning(BaseModel):
     pig_prod_hid:       str
     
     
+    user_id:            int = 0
     pig_prod_id:        int = 0  
     date_weaning:       str
     

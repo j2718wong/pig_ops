@@ -143,6 +143,11 @@ DECLARE cur_user_grp_flag_priv_pig_prod_feed_buy    INT         DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_pig_prod_feed_bal    INT         DEFAULT 0;
 
 DECLARE cur_user_grp_flag_priv_prod_gestating_ops   INT         DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_prod_lactating_ops   INT         DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_prod_pig_dead        INT         DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_prod_pig_harvest     INT         DEFAULT 0;
+    
+DECLARE cur_user_grp_flag_priv_prod_notes       INT             DEFAULT 0;
 
 
 DECLARE cur_account_flag                        INT             DEFAULT 0;

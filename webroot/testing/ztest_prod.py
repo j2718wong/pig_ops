@@ -46,7 +46,7 @@ class TestAPIPigProd:
         print(f"\n\nResult; status_code = {r.status_code}; result")
      
     
-        data            = res_json_data
+        data            = res_json['data']
         
         account_hid     = data['user']['account_hid']
         res             = hashids_account.decrypt(account_hid)
@@ -55,17 +55,27 @@ class TestAPIPigProd:
         
         self.summary['pig_prod'] = {}
         
+        # Get the pig_farm where the sow is located
+        list_ids = [sow_id]
+        sow_info_list = model['sow_boar'].get_list(None, None, inc_disposed = 0, 
+            inc_user_audit = 0, list_ids = list_ids, order_by = 0)
+            
+        len_items       = len(sow_info_list)
+        
+        if len_items == 0:
+            print('\n\nCannot continue; check if sow is disposed.\n\n')
+        
+        assert(len_items > 0)
+        
+        sow_info        = sow_info_list[0]
+        
+        sow_farm_id     = sow_info['pig_farm_id']
+        pfhid           = hashids_common.encrypt(sow_farm_id)
+    
+        
+        
         if insem_type == 'B':
-            list_ids = [user_id]
             
-            # Get the pig_farm where the sow is located
-            sow_info_list = model['sow_boar'].get_list(None, None, inc_disposed = 0, 
-                inc_user_audit = 0, list_ids = list_ids, order_by = 0)
-            
-            sow_info        = sow_info_list[0]
-            
-            sow_farm_id     = sow_info['pig_farm_id']
-            pfhid           = hashids_common.encrypt(sow_farm_id)
             
             
             # Get the list of boars available in the pig_farm
@@ -101,15 +111,15 @@ class TestAPIPigProd:
             
             index           = random.randint(0, len_items-1)
             cur_staff       = staff_list[index]
-            staff_id        = cur_staff
-            staff_hid       = hashids_common.encrypt(staff_id)
+            staff_hid       = cur_staff['hid']
+
             
             
             now             = datetime.now()
         
             random_num_days = random.randint(0, 30)
             dt_insem        = now - timedelta(days = (30 + random_num_days))
-            dt_insem_s      = now.strftime('%Y-%m-%d')
+            dt_insem_s      = dt_insem.strftime('%Y-%m-%d')
             
         
             now             = datetime.now()
@@ -123,14 +133,14 @@ class TestAPIPigProd:
                 "uhid":                 user_uhid,
                 
                 "sow_hid":              sow_hid,
-                "boar_hid":             cur_boar,
+                "boar_hid":             boar_hid,
                 "insem_cost_comments":  "Takal from " + cur_boar["name"],
                 "insem_staff_hid":      staff_hid,
                 "date_insemination":    dt_insem_s
             }
             
 
-            print(f'***** Testing adding pig_production via boar; url = {url} ; data')
+            print(f'***** Testing adding pig_production via boar insemination; url = {url} ; data')
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
@@ -163,7 +173,7 @@ class TestAPIPigProd:
             
             data_birth = self._test_prod_update_birth(data)
             
-            self._test_prod_update_weaning(data)
+            self._test_prod_update_weaning(data_birth)
     
     
     def _test_pig_prod_update_insem(self, data_add):
@@ -188,7 +198,7 @@ class TestAPIPigProd:
         result_num = res_json['result']['num']
         assert(result_num == 0)
         
-        if 'boar_id' in data_add:
+        if 'boar_hid' in data_add:
             self.summary['pig_prod']['by_boar']['update_insem'] = 'OK'
         else:
             self.summary['pig_prod']['by_ai']['update_insem'] = 'OK'
@@ -211,7 +221,7 @@ class TestAPIPigProd:
         
         remaining_pigs  = total_pigs - num_pigs_dead
         
-        num_pigs_male   = remaining_pigs > 1 - random.randint(0, 2)
+        num_pigs_male   = int(remaining_pigs/2 - random.randint(0, 2))
         num_pigs_female = remaining_pigs - num_pigs_male
     
         
@@ -221,7 +231,7 @@ class TestAPIPigProd:
         data_birth = {
             "uhid":                 data_insem['uhid'],
             "pig_prod_hid":         data_insem['pig_prod_hid'],
-            "birth_staff_hid":      data_insem['insem_staff_hid']
+            "birth_staff_hid":      data_insem['insem_staff_hid'],
             
             "date_actual_birth":    dt_birth_s,
             "num_pigs_dead":        num_pigs_dead,
@@ -257,16 +267,16 @@ class TestAPIPigProd:
         
          
         
-        url = BASE_URL + 'pig_prod/update_birth'
+        url = BASE_URL + 'pig_prod/update_weaning'
         
         
         data_weaning = {
             "uhid":                 data_birth['uhid'],
             "pig_prod_hid":         data_birth['pig_prod_hid'],
                        
-            "date_weaning":         dt_birth_s,
-            "num_pigs_male":        num_pigs_male,
-            "num_pigs_female":      num_pigs_female
+            "date_weaning":         dt_weaning_s,
+            "num_pigs_male":        data_birth['num_pigs_male'],
+            "num_pigs_female":      data_birth['num_pigs_female']
         }
         
         
@@ -287,6 +297,6 @@ class TestAPIPigProd:
     
         
 if __name__ == '__main__':
-    t = TestAPIAccount()
+    t = TestAPIPigProd()
     
-    t.test_auto_clean_data(1, "Jackson Farm", "Punod Farm")
+    t.test_pig_prod_add(1, 2)

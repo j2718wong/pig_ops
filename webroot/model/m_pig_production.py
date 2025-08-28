@@ -373,6 +373,7 @@ class PigProduction:
         
         sql += '%s,'    % data.pig_prod_id
         
+        sql += '%s,'    % data.semen_cost
         sql += '%s,'    % data.insemination_cost
         
         if data.insem_cost_comments is not None:
@@ -402,7 +403,7 @@ class PigProduction:
             cursor.close()
 
         except Exception as e:
-            msg = 'update_birth(); error in executing query[] = ' + sql
+            msg = 'update_insemination(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -442,7 +443,7 @@ class PigProduction:
         )  
         """
         
-        sql =  'CALL pig_production_update_birth('
+        sql =  'CALL pig_prod_update_birth('
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id

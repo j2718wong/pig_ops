@@ -18,7 +18,7 @@ class User:
                     a.flag,
                     a.email,
                     a.username,
-                    a.mobile_num
+                    a.mobile_num,
                     
                     a.user_group_id,
                     b.group_num,
@@ -64,7 +64,7 @@ class User:
             for row in rows:
                                 
                 cur_entry = {
-                    user = {
+                    'user': {
                         'id':               row[0],
                         'account_id':       row[1],
                         'flag':             row[2],

@@ -86,7 +86,7 @@ class SowBoar:
             in_user_id              INT,
             
             in_pig_farm_id          INT,
-            in_birth_prod_id        INT,
+            in_farm_birth_prod_id   INT,
             in_line_id              INT,
             in_sow_status_id        INT,
             
@@ -102,7 +102,7 @@ class SowBoar:
         sql =  'CALL sow_boar_add('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_farm_id
-        sql += '%s,'    % data.birth_prod_id
+        sql += '%s,'    % data.farm_birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
         
@@ -179,7 +179,7 @@ class SowBoar:
             in_user_id              INT,
             
             in_sow_boar_id          INT,
-            in_birth_prod_id        INT,
+            in_farm_birth_prod_id   INT,
             in_line_id              INT,
             in_sow_status_id        INT,
             
@@ -193,7 +193,7 @@ class SowBoar:
         sql =  'CALL sow_boar_update('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.sow_boar_id
-        sql += '%s,'    % data.birth_prod_id
+        sql += '%s,'    % data.farm_birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
         
@@ -346,11 +346,11 @@ class SowBoar:
         if list_ids is not None:
             s = ''
             count = 0
-            for cur_entry in list_sow_numbers:
-                if count > 0: 
-                    s += ','
+            for cur_entry in list_ids:
+                if count > 0: s += ','
                 
-                s += f"'{cur_entry}'"
+                s += str(cur_entry)
+                count += 1
             
             if inc_disposed == 0:
                 where_clause = ' WHERE a.id IN (%s) AND (a.flag & 1) = 0 ' % s
@@ -395,7 +395,7 @@ class SowBoar:
                         a.number,
                         a.name,
                         a.flag,
-                        a.birth_prod_id,
+                        a.farm_birth_prod_id,
                         a.last_prod_id,
                        
                         b.name AS status_name,
@@ -423,7 +423,7 @@ class SowBoar:
                         a.number,
                         a.name,
                         a.flag,
-                        a.birth_prod_id,
+                        a.farm_birth_prod_id,
                         a.last_prod_id,
                        
                         b.name AS status_name,
@@ -495,7 +495,7 @@ class SowBoar:
                         'number':               row[4], 
                         'name':                 row[5],
                         'flag':                 row[6],
-                        'birth_prod_id':        row[7],
+                        'farm_birth_prod_id':   row[7],
                         'last_prod_id':         row[8],
                         
                         'status':               row[9],
@@ -516,7 +516,7 @@ class SowBoar:
                         'number':               row[4], 
                         'name':                 row[5],
                         'flag':                 row[6],
-                        'birth_prod_id':        row[7],
+                        'farm_birth_prod_id':   row[7],
                         'last_prod_id':         row[8],
                         
                         'status':               row[9],

@@ -68,7 +68,7 @@ SET res_code    = "SUCCESS";
 SELECT  
         account_id,
         pig_farm_id,
-        status_id
+        prod_status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_pig_farm_id,
@@ -110,7 +110,7 @@ END IF;
 
 UPDATE pig_production SET
     date_weaning                = in_date_weaning,
-    status_id                   = PRODUCTION_STATUS_ID_WEANING,
+    prod_status_id              = PRODUCTION_STATUS_ID_WEANING,
 
     num_pigs_weaning_m          = in_num_pigs_male,
     num_pigs_weaning_f          = in_num_pigs_female,

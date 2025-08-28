@@ -85,7 +85,7 @@ SELECT  a.account_id,
         a.pig_farm_id,
         a.farm_sow_id,
         a.last_prod_id,
-        b.status_id
+        b.prod_status_id
 INTO    cur_sow_boar_account_id,
         cur_sow_boar_pig_farm_id,
         cur_sow_boar_farm_sow_id,
@@ -93,7 +93,7 @@ INTO    cur_sow_boar_account_id,
         cur_sow_boar_last_prod_status_id
 FROM    sow_boar a
 LEFT OUTER JOIN pig_production b ON a.last_prod_id = b.id
-WHERE   id = in_sow_id
+WHERE   a.id = in_sow_id
 LIMIT   1;
 
 
@@ -177,7 +177,7 @@ IF in_boar_id IS NOT NULL THEN
     ) VALUES (
         cur_user_account_id,
         cur_sow_boar_pig_farm_id,
-        farm_prod_id,
+        cur_pig_farm_last_prod_id,
         
         in_sow_id,
         INSEMINATION_TYPE_BOAR,
@@ -266,7 +266,7 @@ END IF;
     
     
 UPDATE pig_farm SET 
-    farm_production_id = cur_pig_farm_last_prod_id
+    last_prod_id 	= cur_pig_farm_last_prod_id
 WHERE id = cur_sow_boar_pig_farm_id;
 
 

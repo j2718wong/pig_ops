@@ -8,8 +8,8 @@ CREATE PROCEDURE pig_prod_update_birth(
     
     in_date_actual_birth        VARCHAR(10),  /* in YYYY-MM-DD format*/
     in_num_pigs_dead_at_birth   INT,
-    in_num_pigs_live_male       INT,
-    in_num_pigs_live_female     INT,
+    in_num_pigs_live_m          INT,
+    in_num_pigs_live_f          INT,
     
     in_birth_staff_id           INT
     
@@ -66,7 +66,7 @@ SET res_code    = "SUCCESS";
 
 SELECT  
         account_id,
-        status_id
+        prod_status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_status_id
@@ -107,7 +107,7 @@ END IF;
 UPDATE pig_production SET 
     date_actual_birth           = in_date_actual_birth,
     num_days_actual             = DATEDIFF(in_date_actual_birth, date_insemination),
-    status_id                   = PRODUCTION_STATUS_ID_LACTATING,
+    prod_status_id              = PRODUCTION_STATUS_ID_LACTATING,
     
     num_pigs_dead_at_birth      = in_num_pigs_dead_at_birth,
     num_pigs_live_m             = in_num_pigs_live_m,

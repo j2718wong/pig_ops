@@ -5,7 +5,7 @@ CREATE PROCEDURE sow_boar_update(
     in_user_id              INT,
     
     in_sow_boar_id          INT,
-    in_birth_prod_id        INT,
+    in_farm_birth_prod_id   INT,
     in_line_id              INT,
     in_sow_status_id        INT,
     
@@ -81,7 +81,7 @@ END IF;
 
 
 UPDATE sow_boar SET
-    birth_prod_id       = in_birth_prod_id,
+    farm_birth_prod_id  = in_farm_birth_prod_id,
     line_id             = in_line_id,
     sow_status_id       = in_sow_status_id,
     
