@@ -75,6 +75,193 @@ class PigProduction:
         return result
 
     
+    def get_by_id(self, prod_id):
+        sql =   """
+                SELECT 
+                    id,
+                    account_id,
+                    pig_farm_id,
+                    farm_prod_id,
+                    sow_id,
+                    insemination_type,
+                    
+                    semen_boar_id,
+                    semen_source_id,
+                    semen_cost,
+                    insemination_cost,
+                    insem_cost_comments,
+                    insem_staff_id,
+                    date_insemination,
+                    date_expected_birth,
+                    date_actual_birth,
+                    num_days_actual,
+                    status_id,
+                    num_pigs_dead_at_birth,
+                    num_pigs_live_m',
+                    num_pigs_live_f,
+                    birth_staff_id,
+                    
+                    num_pigs_weaning_m',
+                    num_pigs_weaning_f',
+                    total_pigs_weight_weaning
+                    num_pigs_current_m,
+                    num_pigs_current_f,
+                    
+                    date_iron_1,
+                    date_iron_2,
+                    date_vitamins_1,
+                    date_vitamins_2,
+                    date_kapon,
+                    date_deworm,
+                    
+                    date_booster,
+                    date_prestarter,
+                    date_weaning,
+                    date_starter,
+                    date_grower,
+                    date_finisher,
+                    date_harvest,
+                    
+                    num_b_lactating,
+                    num_b_booster,
+                    num_b_prestarter,
+                    num_b_starter,
+                    num_b_grower,
+                    num_b_finisher,
+                    
+                    num_l_lactating,
+                    num_l_booster,
+                    num_l_prestarter,
+                    num_l_starter,
+                    num_l_grower,
+                    num_l_finisher,
+                    
+                    cost_lactating,
+                    cost_booster,
+                    cost_prestarter,
+                    cost_starter,
+                    cost_grower,
+                    cost_finisher
+
+                FROM pig_production
+                WHERE id = %s
+                """ % prod_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            """
+            
+            for row in rows:
+                       
+               
+                cur_entry = {
+                    'id':,
+                    'account_id':,
+                    'pig_farm_id':,
+                    'farm_prod_id':,
+                    'sow_id':,
+                    'insemination_type':,
+                    
+                    'semen_boar_id':,
+                    'semen_source_id':,
+                    'semen_cost':,
+                    'insemination_cost':,
+                    'insem_cost_comments':,
+                    'insem_staff_id':,
+                    'date_insemination':,
+                    'date_expected_birth':,
+                    'date_actual_birth':,
+                    'num_days_actual':,
+                    'status_id':,
+                    'num_pigs_dead_at_birth':,
+                    'num_pigs_live_m':,
+                    'num_pigs_live_f':,
+                    'birth_staff_id':,
+                    
+                    'num_pigs_weaning_m':,
+                    'num_pigs_weaning_f':,
+                    'total_pigs_weight_weaning':
+                    'num_pigs_current_m':,
+                    'num_pigs_current_f':,
+                    
+                    'date_iron_1':,
+                    'date_iron_2':,
+                    'date_vitamins_1':,
+                    'date_vitamins_2':,
+                    'date_kapon':,
+                    'date_deworm':,
+                    
+                    'date_booster':,
+                    'date_prestarter':,
+                    'date_weaning':,
+                    'date_starter':,
+                    'date_grower':,
+                    'date_finisher':,
+                    'date_harvest':,
+                    
+                    'feed_buy':
+                    'num_b_lactating':,
+                    'num_b_booster':,
+                    'num_b_prestarter':,
+                    'num_b_starter':,
+                    'num_b_grower':,
+                    'num_b_finisher':,
+                    
+                    'num_l_lactating':,
+                    'num_l_booster':,
+                    'num_l_prestarter':,
+                    'num_l_starter':,
+                    'num_l_grower':,
+                    'num_l_finisher':,
+                    
+                    'cost_lactating':,
+                    'cost_booster':,
+                    'cost_prestarter':,
+                    'cost_starter':,
+                    'cost_grower':,
+                    'cost_finisher':
+                    
+                }
+                
+                return cur_entry
+            """
+        
+        return result
+    
+    
+        
+        
+    
     def add(self, data = None):
         """
         PROCEDURE pig_prod_add(

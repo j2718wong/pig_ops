@@ -233,7 +233,7 @@ class DataPigProdBirth(BaseModel):
     uhid:               str
     
     pig_prod_hid:       str
-    
+    birth_staff_hid:    str
     
     pig_prod_id:        int = 0  
     date_actual_birth:  str

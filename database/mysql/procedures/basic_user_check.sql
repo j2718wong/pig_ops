@@ -97,6 +97,8 @@ DECLARE BUSINESS_OBJ_ID_PROD_LACTATING_OPS      INT             DEFAULT 22;
 DECLARE BUSINESS_OBJ_ID_PROD_PIG_DEAD           INT             DEFAULT 23;
 DECLARE BUSINESS_OBJ_ID_PROD_PIG_HARVEST        INT             DEFAULT 24;
 
+DECLARE BUSINESS_OBJ_ID_PROD_NOTES              INT             DEFAULT 25;
+
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -193,9 +195,13 @@ SELECT
     b.flag_priv_pig_prod_feed_buy,
     b.flag_priv_pig_prod_feed_bal,
     
-    b.flag_priv_prod_gestating_ops
+    b.flag_priv_prod_gestating_ops,
+    b.flag_priv_prod_lactating_ops,
+    b.flag_priv_prod_pig_dead,
+    b.flag_priv_prod_pig_harvest,
+    
+    b.flag_priv_prod_notes
 
-        
 INTO    
     cur_user_flag,
     out_user_account_id,
@@ -229,7 +235,13 @@ INTO
     cur_user_grp_flag_priv_pig_prod_feed_buy,
     cur_user_grp_flag_priv_pig_prod_feed_bal,
     
-    cur_user_grp_flag_priv_prod_gestating_ops
+    cur_user_grp_flag_priv_prod_gestating_ops,
+    cur_user_grp_flag_priv_prod_lactating_ops,
+    cur_user_grp_flag_priv_prod_pig_dead,
+    cur_user_grp_flag_priv_prod_pig_harvest,
+    
+    cur_user_grp_flag_priv_prod_notes
+    
 FROM  user a 
 LEFT OUTER JOIN  user_group b ON  a.user_group_id = b.id
 WHERE   a.id = in_user_id;
@@ -337,14 +349,14 @@ CASE in_business_obj_id_to_access
 WHEN BUSINESS_OBJ_ID_USER THEN 
     SET cur_group_flag = cur_user_grp_flag_priv_user;
 
-WHEN BUSINESS_OBJ_ID_USER_GROUP THEN
-    SET cur_group_flag = cur_user_grp_flag_priv_user_group;
-    
 WHEN BUSINESS_OBJ_ID_ACCOUNT THEN
     SET cur_group_flag = cur_user_grp_flag_priv_account;
 
 WHEN BUSINESS_OBJ_ID_ACCOUNT_REQUEST THEN
     SET cur_group_flag = cur_user_grp_flag_priv_account_request;
+
+WHEN BUSINESS_OBJ_ID_USER_GROUP THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_user_group;
     
     
 WHEN BUSINESS_OBJ_ID_PIG_FARM THEN
@@ -400,6 +412,23 @@ WHEN BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL THEN
     SET cur_group_flag = cur_user_grp_flag_priv_pig_prod_feed_bal;
            
     
+WHEN BUSINESS_OBJ_ID_PROD_GESTATING_OPS THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_prod_gestating_ops;
+        
+WHEN BUSINESS_OBJ_ID_PROD_LACTATING_OPS THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_prod_lactating_ops;
+    
+WHEN BUSINESS_OBJ_ID_PROD_PIG_DEAD THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_prod_pig_dead;
+        
+WHEN BUSINESS_OBJ_ID_PROD_PIG_HARVEST THEN
+    SET cur_group_flag = flag_priv_prod_pig_harvest;
+    
+
+WHEN BUSINESS_OBJ_ID_PROD_NOTES THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_prod_notes;
+
+
 END CASE;
 
 

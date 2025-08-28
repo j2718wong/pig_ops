@@ -174,7 +174,6 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_pig_prod_id                      AS pig_prod_id,
     cur_pig_prod_pig_dead_id            AS pig_prod_pig_dead_id;
     
 

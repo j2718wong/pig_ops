@@ -327,7 +327,7 @@ class SowBoar:
 
     
     def get_list(self, farm_id, sex, inc_disposed = 0, 
-            inc_user_audit = 0, list_sow_numbers = None, order_by = 0):
+            inc_user_audit = 0, list_ids = None, order_by = 0):
         """
         Will get sow_boar list.
         
@@ -343,7 +343,7 @@ class SowBoar:
         """
         
         where_clause = ''
-        if list_sow_numbers is not None:
+        if list_ids is not None:
             s = ''
             count = 0
             for cur_entry in list_sow_numbers:
@@ -351,12 +351,12 @@ class SowBoar:
                     s += ','
                 
                 s += f"'{cur_entry}'"
-                
-            if sex is not None:
-                values = (farm_id, sex, s)
-                where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND a.sow_number  IN (%s) ' % values
+            
+            if inc_disposed == 0:
+                where_clause = ' WHERE a.id IN (%s) AND (a.flag & 1) = 0 ' % s
+            
             else:
-                where_clause = ' WHERE a.pig_farm_id = %s AND a.sow_number  IN (%s) '
+                where_clause = ' WHERE a.id IN (%s) ' % s
             
         else:
             if sex is not None:
@@ -389,6 +389,7 @@ class SowBoar:
             sql =   """
                     SELECT 
                         a.id,
+                        a.pig_farm_id,
                         a.farm_sow_id,
                         a.farm_boar_id,
                         a.number,
@@ -416,6 +417,7 @@ class SowBoar:
             sql =   """
                     SELECT 
                         a.id,
+                        a.pig_farm_id,
                         a.farm_sow_id,
                         a.farm_boar_id,
                         a.number,
@@ -433,7 +435,7 @@ class SowBoar:
                         c.username,
                         c.name_last,
                         c.name_first,
-                         a.dt_entry,
+                        a.dt_entry,
                         
                         d.username,
                         d.name_last,
@@ -487,52 +489,54 @@ class SowBoar:
                 if inc_user_audit == 0:
                     cur_entry = {
                         'id':                   row[0],
-                        'farm_sow_id':          row[1],
-                        'farm_boar_id':         row[2],
-                        'number':               row[3], 
-                        'name':                 row[4],
-                        'flag':                 row[5],
-                        'birth_prod_id':        row[6],
-                        'last_prod_id':         row[7],
+                        'pig_farm_id':          row[1],
+                        'farm_sow_id':          row[2],
+                        'farm_boar_id':         row[3],
+                        'number':               row[4], 
+                        'name':                 row[5],
+                        'flag':                 row[6],
+                        'birth_prod_id':        row[7],
+                        'last_prod_id':         row[8],
                         
-                        'status':               row[8],
-                        'date_of_birth':        str(row[9]) if row[9] else None,
-                        'date_dispose':         str(row[10]) if row[10] else None,
-                        'notes':                row[11],
-                        'dispose_notes':        row[12],
+                        'status':               row[9],
+                        'date_of_birth':        str(row[10]) if row[10] else None,
+                        'date_dispose':         str(row[11]) if row[11] else None,
+                        'notes':                row[12],
+                        'dispose_notes':        row[13],
                     
-                        'dt_entry':             str(row[13])
+                        'dt_entry':             str(row[14])
                     }
                      
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        'farm_sow_id':          row[1],
-                        'farm_boar_id':         row[2],
-                        'number':               row[3], 
-                        'name':                 row[4],
-                        'flag':                 row[5],
-                        'birth_prod_id':        row[6],
-                        'last_prod_id':         row[7],
+                        'pig_farm_id':          row[1],
+                        'farm_sow_id':          row[2],
+                        'farm_boar_id':         row[3],
+                        'number':               row[4], 
+                        'name':                 row[5],
+                        'flag':                 row[6],
+                        'birth_prod_id':        row[7],
+                        'last_prod_id':         row[8],
                         
-                        'status':               row[8],
-                        'date_of_birth':        str(row[9]) if row[9] else None,
-                        'date_dispose':         str(row[10]) if row[10] else None,
-                        'notes':                row[11],
-                        'dispose_notes':        row[12],
+                        'status':               row[9],
+                        'date_of_birth':        str(row[10]) if row[10] else None,
+                        'date_dispose':         str(row[11]) if row[11] else None,
+                        'notes':                row[12],
+                        'dispose_notes':        row[13],
                         
                         'added_by': {
-                            'username':         row[13],
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_entry':         str(row[16])
+                            'username':         row[14],
+                            'name_last':        row[15],
+                            'name_first':       row[16],
+                            'dt_entry':         str(row[17])
                         },
                         
                         'last_update':{
-                            'username':         row[17],
-                            'name_last':        row[18],
-                            'name_first':       row[19],
-                            'dt_update':        row[20]
+                            'username':         row[18],
+                            'name_last':        row[19],
+                            'name_first':       row[20],
+                            'dt_update':        row[21]
                         }                    
                     }
                     
