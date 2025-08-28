@@ -28,13 +28,11 @@ class TestAPIPigProd:
         self.summary    ={}
     
     
-    def test_pig_prod_add(self, user_id, sow_id, insem_type = 'B'):
+    def test_pig_prod_add(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        sow_hid     = hashids_common.encrypt(sow_id)
-        
-        
-        # Test user_info
+         
+        # Get user_info
         url = BASE_URL + 'user/info?uhid=' + user_uhid
         
         print(f'\n\n****** GET user_info; url = {url} ')
@@ -53,128 +51,273 @@ class TestAPIPigProd:
         account_id      = res[0]
         
         
-        self.summary['pig_prod'] = {}
+        # Get farm list of user account
+        url = BASE_URL + 'pig_farm/list?ahid=' + account_hid
         
-        # Get the pig_farm where the sow is located
-        list_ids = [sow_id]
-        sow_info_list = model['sow_boar'].get_list(None, None, inc_disposed = 0, 
-            inc_user_audit = 0, list_ids = list_ids, order_by = 0)
-            
-        len_items       = len(sow_info_list)
+        print(f'\n\n****** GET user.account farm_list; url = {url} ')
         
-        if len_items == 0:
-            print('\n\nCannot continue; check if sow is disposed.\n\n')
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+
         
+        list_pig_farm   = res_json['data']
+        len_items       = len(list_pig_farm)
         assert(len_items > 0)
         
-        sow_info        = sow_info_list[0]
         
-        sow_farm_id     = sow_info['pig_farm_id']
-        pfhid           = hashids_common.encrypt(sow_farm_id)
+        # Select pig_farm
+        cur_pig_farm    = list_pig_farm[0]
+        
+        
+        # Get list of sows in cur_pig_farm
+        pfhid           = cur_pig_farm['hid']
+        url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=F&order_by=1'
+        
     
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
         
-        if insem_type == 'B':
-            
-            
-            
-            # Get the list of boars available in the pig_farm
-            url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M&order_by=1'
-            
+        list_sow        = res_json['data']
+        len_items       = len(list_sow)
+        assert(len_items > 0)
         
-            r = requests.get(url)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
+        print(f"\n\nNumber of sows in {cur_pig_farm['name']} = {len_items}\n\n")
+        
+        # Get staff_list of the farm
+        url = BASE_URL + 'pig_farm_staff/list?pfhid=' + pfhid 
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        
+        staff_list      = res_json['data']
+        len_staff_list  = len(staff_list)
+        assert(len_items > 0)
+        
+        
+        self.summary['pig_prod'] = {}
+        
+        count_sow = 0
+        
+        INSEM_TYPE_BOAR = 0
+        INSEM_TYPE_AI   = 1
+        
+        cur_insem_type  = INSEM_TYPE_BOAR
+        
+        for cur_sow in list_sow:
             
+            sow_hid     = cur_sow['hid']
             
-            boar_list       = res_json['data']
-            len_items       = len(boar_list)
-            assert(len_items > 0)
-            
-            
-            index           = random.randint(0, len_items-1)
-            cur_boar        = boar_list[index]
-            boar_hid        = cur_boar['hid']
-            
-            # Get staff_list of the farm
-            url = BASE_URL + 'pig_farm_staff/list?pfhid=' + pfhid 
-            
-            r = requests.get(url)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
-            
-            
-            staff_list      = res_json['data']
-            len_items       = len(staff_list)
-            assert(len_items > 0)
-            
-            
-            index           = random.randint(0, len_items-1)
+            # Get random staff
+            index           = random.randint(0, len_staff_list-1)
             cur_staff       = staff_list[index]
             staff_hid       = cur_staff['hid']
 
-            
-            
+        
+        
+            # random insemenation date
             now             = datetime.now()
         
             random_num_days = random.randint(0, 30)
             dt_insem        = now - timedelta(days = (30 + random_num_days))
             dt_insem_s      = dt_insem.strftime('%Y-%m-%d')
-            
         
-            now             = datetime.now()
-            now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
-            print(f"\n\n#################  {now_ts}  ###########################")
-            
         
-            url = BASE_URL + 'pig_prod/add'
-            
-            data = {
-                "uhid":                 user_uhid,
+        
+            if cur_insem_type == INSEM_TYPE_BOAR:
+                data_add = self._test_pig_prod_add_by_boar(user_uhid, pfhid, 
+                        cur_sow, staff_hid, dt_insem_s)
+                cur_insem_type = INSEM_TYPE_AI
                 
-                "sow_hid":              sow_hid,
-                "boar_hid":             boar_hid,
-                "insem_cost_comments":  "Takal from " + cur_boar["name"],
-                "insem_staff_hid":      staff_hid,
-                "date_insemination":    dt_insem_s
-            }
+            else:
+                data_add = self._test_pig_prod_add_by_ai(user_uhid, account_id, 
+                        cur_sow, staff_hid, dt_insem_s)
+                cur_insem_type = INSEM_TYPE_BOAR
+                        
             
-
-            print(f'***** Testing adding pig_production via boar insemination; url = {url} ; data')
-            pprint.pprint(data)
-            
-            r = requests.post(url, json = data)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
-            
-            print(f"\n\nResult; status_code = {r.status_code}; result")
-            pprint.pprint(res_json)
-            
-            result_num  = res_json['result']['num']
-            assert(result_num == 0)
-            
-            self.summary['pig_prod']['by_boar']    = {}
-            self.summary['pig_prod']['by_boar']['add'] = 'OK'
-            
-            
-            
-            pig_prod_hid        = res_json['pig_prod']['hid']
-            res_decrypt         = hashids_common.decrypt(pig_prod_hid)
-            pig_prod_id    = res_decrypt[0]
-            
-            print(f"pig_prod_id = {pig_prod_id}")
-            assert(pig_prod_id > 0)
-            
-            
-            data['pig_prod_hid']    = pig_prod_hid
-            
-            
-            data_insem = self._test_pig_prod_update_insem(data)
-            
-            data_birth = self._test_prod_update_birth(data)
-            
+            data_insem = self._test_pig_prod_update_insem(data_add)
+            data_birth = self._test_prod_update_birth(data_add)
             self._test_prod_update_weaning(data_birth)
+        
+            
+    def _test_pig_prod_add_by_boar(self, user_uhid, pfhid, sow, 
+            staff_hid, dt_insem_s):
+        
+        # Get the list of boars available in the pig_farm
+        url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M&order_by=1'
+        
     
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        
+        list_boar       = res_json['data']
+        len_items       = len(list_boar)
+        assert(len_items > 0)
+        
+        
+        index           = random.randint(0, len_items-1)
+        cur_boar        = list_boar[index]
+        boar_hid        = cur_boar['hid']
+        
+        sow_hid         = sow['hid']
+        
+        
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"\n\n#################  {now_ts}  ###########################")
+        
+    
+        url = BASE_URL + 'pig_prod/add'
+        
+        data = {
+            "uhid":                 user_uhid,
+            
+            "sow_hid":              sow_hid,
+            "boar_hid":             boar_hid,
+            "insem_cost_comments":  "Takal from " + cur_boar["name"],
+            "insem_staff_hid":      staff_hid,
+            "date_insemination":    dt_insem_s
+        }
+        
+
+        print(f'***** Testing adding pig_production via boar insemination; url = {url} ')
+        print(f'sow = {sow['name']}; boar = {cur_boar['name']}')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['pig_prod']['by_boar']    = {}
+        self.summary['pig_prod']['by_boar']['add'] = 'OK'
+        
+        
+        
+        pig_prod_hid        = res_json['pig_prod']['hid']
+        res_decrypt         = hashids_common.decrypt(pig_prod_hid)
+        pig_prod_id    = res_decrypt[0]
+        
+        print(f"pig_prod_id = {pig_prod_id}")
+        assert(pig_prod_id > 0)
+        
+        
+        data['pig_prod_hid']    = pig_prod_hid
+        
+        
+        return data
+        
+    
+    def _test_pig_prod_add_by_ai(self, user_uhid, account_id, sow,
+            staff_hid, dt_insem_s, use_internal_semen = 0):
+        
+        account_hid = hashids_account.encrypt(account_id)
+        
+        url = BASE_URL + 'semen_source/list?ahid=' + account_hid
+        
+        print(f'\n\n****** GET Semen source list; url = {url} ')
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+     
+    
+        data            = res_json['data']
+        
+        list_internal_semen = []
+        list_external_semen = []
+        
+        for cur_entry in data:
+            if 'boar' in cur_entry:
+                list_internal_semen.append(cur_entry)
+                
+            if 'external_semen' in cur_entry:
+                list_external_semen.append(cur_entry)
+                
+        
+        len_items_internal = len(list_internal_semen)
+        len_items_external = len(list_external_semen)
+        
+        if use_internal_semen > 0:
+            assert(len_items_internal > 0)
+            list_semen_source = list_internal_semen
+        else:
+            assert(len_items_external > 0)
+            list_semen_source = list_external_semen
+        
+        
+        len_items       = len(list_semen_source)
+        
+        index           = random.randint(0, len_items-1)
+        cur_semen_source = list_semen_source[index]
+        semen_source_hid = cur_semen_source['hid']
+        
+        sow_hid         = sow['hid']
+        
+        
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"\n\n#################  {now_ts}  ###########################")
+        
+    
+        url = BASE_URL + 'pig_prod/add'
+        
+        data = {
+            "uhid":                 user_uhid,
+            
+            "sow_hid":              sow_hid,
+            "semen_source_hid":     semen_source_hid,
+            "insem_cost_comments":  "AI from " + cur_semen_source["name"],
+            "insem_staff_hid":      staff_hid,
+            "date_insemination":    dt_insem_s
+        }
+        
+
+        print(f'***** Testing adding pig_production via artificial insemination; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['pig_prod']['by_ai']    = {}
+        self.summary['pig_prod']['by_ai']['add'] = 'OK'
+        
+        
+        
+        pig_prod_hid        = res_json['pig_prod']['hid']
+        res_decrypt         = hashids_common.decrypt(pig_prod_hid)
+        pig_prod_id    = res_decrypt[0]
+        
+        print(f"pig_prod_id = {pig_prod_id}")
+        assert(pig_prod_id > 0)
+        
+        
+        data['pig_prod_hid']    = pig_prod_hid
+        
+        
+        return data
+        
+        
     
     def _test_pig_prod_update_insem(self, data_add):
         
@@ -299,4 +442,4 @@ class TestAPIPigProd:
 if __name__ == '__main__':
     t = TestAPIPigProd()
     
-    t.test_pig_prod_add(1, 2)
+    t.test_pig_prod_add(1)

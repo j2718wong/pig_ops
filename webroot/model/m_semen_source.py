@@ -246,66 +246,6 @@ class SemenSource:
         return None
     
     
-    def delete(self, data = None):
-        user_id             = data['user_id']
-        semen_source_id     = data['semen_source_id']
-        
-        """
-        PROCEDURE semen_source_delete(
-            in_user_id                  INT,
-            
-            in_semen_source_id          INT
-        )
-        """
-       
-        sql =  'CALL semen_source_delete('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % semen_source_id
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'delete(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'semen_source': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
-                }
-            }
-
-        return None
-    
-    
     def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0):
         """
         Will get semen_source list.

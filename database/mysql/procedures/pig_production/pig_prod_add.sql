@@ -203,13 +203,14 @@ ELSE
     INSERT INTO pig_production (
         account_id,
         pig_farm_id,
-        farm_production_id,
+        farm_prod_id,
         
         sow_id,
         insemination_type,
         semen_boar_id,
         semen_source_id,
         
+        semen_cost,
         insemination_cost,
         insem_cost_comments,
         
@@ -266,7 +267,7 @@ END IF;
     
     
 UPDATE pig_farm SET 
-    last_prod_id 	= cur_pig_farm_last_prod_id
+    last_prod_id    = cur_pig_farm_last_prod_id
 WHERE id = cur_sow_boar_pig_farm_id;
 
 
