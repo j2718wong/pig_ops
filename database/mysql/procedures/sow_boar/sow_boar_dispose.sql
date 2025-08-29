@@ -24,7 +24,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE BUSINESS_OBJ_ID_SOW_BOAR                INT             DEFAULT 15;
+DECLARE BUSINESS_OBJ_ID_SOW_BOAR                INT             DEFAULT 16;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;

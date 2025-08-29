@@ -8,7 +8,7 @@ CREATE PROCEDURE pig_prod_feed_buy_add(
     
     in_date                 VARCHAR(10),
     
-    in_feed_type_id         INT
+    in_feed_type_id         INT,
     
     in_quantity             INT,
     in_feed_brand_id        INT,
@@ -35,7 +35,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE BUSINESS_OBJ_ID_PIG_PROD_BUY_FEED      INT             DEFAULT 128;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY      INT             	DEFAULT 20;
 
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
@@ -108,7 +108,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_pig_prod_account_id, /* compare user.account_id to this account_id*/
     
-    BUSINESS_OBJ_ID_PIG_PROD_BUY_FEED,
+    BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 

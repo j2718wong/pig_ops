@@ -29,6 +29,7 @@ from route.r_semen_source       import *
 from route.r_sow_boar           import *
 
 from route.r_pig_production     import *
+from route.r_pig_prod_notes     import *
 
 from route.r_testing            import *
 

@@ -7,13 +7,13 @@ CREATE PROCEDURE pig_prod_feed_bal_add(
     in_pig_prod_id          INT,
     
     in_date                 VARCHAR(10),
-	
+    
     in_num_lactating        DECIMAL(5,1),
-    in_num_booster        	INT,
-	in_num_prestarter       DECIMAL(5,1),
-	in_num_starter       	DECIMAL(5,1),
-	in_num_grower       	DECIMAL(5,1),
-	in_num_finisher       	DECIMAL(5,1)
+    in_num_booster          INT,
+    in_num_prestarter       DECIMAL(5,1),
+    in_num_starter          DECIMAL(5,1),
+    in_num_grower           DECIMAL(5,1),
+    in_num_finisher         DECIMAL(5,1)
 )  
 
 BEGIN
@@ -53,7 +53,8 @@ DECLARE FEED_TYPE_ID_FINISHER                   INT             DEFAULT 7;
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
-DECLARE cur_pig_prod_status_id,
+DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
+DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
 DECLARE cur_pig_prod_num_b_lactating            INT             DEFAULT NULL;
 DECLARE cur_pig_prod_num_b_booster              INT             DEFAULT NULL;
@@ -196,11 +197,11 @@ INSERT INTO pig_prod_feed_bal(
     date,
     
     num_lactating,
-	num_booster,
-	num_prestarter,
-	num_starter,
-	num_grower,
-	num_finisher,
+    num_booster,
+    num_prestarter,
+    num_starter,
+    num_grower,
+    num_finisher,
 
     added_by_user_id
 ) VALUES (
@@ -208,12 +209,12 @@ INSERT INTO pig_prod_feed_bal(
     
     in_date,
     
-	in_num_lactating,
-	in_num_booster,
-	in_num_prestarter,
-	in_num_starter,
-	in_num_grower,
-	in_num_finisher,
+    in_num_lactating,
+    in_num_booster,
+    in_num_prestarter,
+    in_num_starter,
+    in_num_grower,
+    in_num_finisher,
 
     in_user_id
 );
@@ -223,14 +224,14 @@ SELECT LAST_INSERT_ID() INTO cur_pig_prod_feed_bal_id;
 
 
 UPDATE pig_production SET
-	num_l_lactating		= in_num_lactating,
-	num_l_booster		= in_num_booster,
-	num_l_prestarter	= in_num_prestarter,
-	num_l_starter		= in_num_starter,
-	num_l_grower		= in_num_grower,
-	num_l_finisher		= in_num_finisher,
-	
-	date_last_feed_balance = CURRENT_DATE
+    num_l_lactating     = in_num_lactating,
+    num_l_booster       = in_num_booster,
+    num_l_prestarter    = in_num_prestarter,
+    num_l_starter       = in_num_starter,
+    num_l_grower        = in_num_grower,
+    num_l_finisher      = in_num_finisher,
+    
+    date_last_feed_balance = CURRENT_DATE
 WHERE id = in_pig_prod_id;
 
 

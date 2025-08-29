@@ -287,3 +287,14 @@ class DataPigProdDeadPig(BaseModel):
     comments:           str = None
     
     
+class DataPigProdNotes(BaseModel):
+    uhid:               str
+    
+    pig_prod_hid:       str = None
+    pig_prod_notes_hid: str = None
+    
+    
+    user_id:            int = 0
+    pig_prod_id:        int = 0
+    pig_prod_notes_id:  int = 0
+    notes:              str

@@ -139,9 +139,65 @@ class TestAPIPigProd:
                 cur_insem_type = INSEM_TYPE_BOAR
                         
             
+            pig_prod_hid    = data_add['pig_prod_hid']
+            
             data_insem = self._test_pig_prod_update_insem(data_add)
             data_birth = self._test_prod_update_birth(data_add)
+            
+            notes = "Nanganak anay " + cur_sow['name']
+            self._test_pig_prod_notes_add(user_uhid, pig_prod_hid, notes)
+            
             self._test_prod_update_weaning(data_birth)
+            
+            notes = "Lutas anay " + cur_sow['name']
+            res = self._test_pig_prod_notes_add(user_uhid, pig_prod_hid, notes)
+            
+            print('adding prod_notes')
+            pprint.pprint(res)
+        
+            pig_prod_notes_hid = res['pig_prod_notes']['hid']
+            notes = notes + " updated"
+            self._test_pig_prod_notes_update(user_uhid, pig_prod_notes_hid, notes)
+        
+        
+    def _test_pig_prod_notes_add(self, user_uhid, pig_prod_hid, notes):
+        url = BASE_URL + 'pig_prod_notes/add'
+        
+        data = {
+            "uhid":                 user_uhid,
+            
+            "pig_prod_hid":         pig_prod_hid,
+            "notes":                notes
+        }
+
+        print(f'***** Testing adding pig_prod_notes; url = {url} ')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        return res_json
+        
+            
+    def _test_pig_prod_notes_update(self, user_uhid, pig_prod_notes_hid, notes):
+        url = BASE_URL + 'pig_prod_notes/update'
+        
+        data = {
+            "uhid":                 user_uhid,
+            
+            "pig_prod_notes_hid":   pig_prod_notes_hid,
+            "notes":                notes
+        }
+
+        print(f'***** Testing updating pig_prod_notes; url = {url} ')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        return res_json
         
             
     def _test_pig_prod_add_by_boar(self, user_uhid, pfhid, sow, 

@@ -22,7 +22,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
 
-DECLARE BUSINESS_OBJ_ID_PROD_NOTES              INT             DEFAULT 25;
+DECLARE BUSINESS_OBJ_ID_PROD_NOTES              INT             DEFAULT 26;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -53,7 +53,7 @@ SET res_code    = "SUCCESS";
 SELECT  
         account_id,
         pig_farm_id,
-        status_id
+        prod_status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_pig_farm_id,
@@ -88,18 +88,19 @@ END IF;
 
 
 INSERT INTO pig_prod_notes (
-    pig_prod_id,
     account_id,
     pig_farm_id,
-
+    pig_prod_id,
+    
     notes,
     
     added_by_user_id
     
 ) VALUES (
-    in_pig_prod_id,
     cur_pig_prod_account_id,
     cur_pig_prod_pig_farm_id,
+    in_pig_prod_id,
+    
     in_notes,
     
     in_user_id

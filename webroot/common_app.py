@@ -58,6 +58,8 @@ from model.m_sow_act            import SowActivity
 
 
 from model.m_pig_production     import PigProduction
+from model.m_pig_prod_notes     import PigProdNotes
+from model.m_pig_prod_pig_dead  import PigProdPigDead
 
 
 
@@ -88,6 +90,7 @@ model_names = [
     
     
     ('pig_prod',                PigProduction),
+    ('prod_notes',              PigProdNotes),
     
     ('sow_act',                 SowActivity)
     
