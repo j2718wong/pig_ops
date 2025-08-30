@@ -278,9 +278,12 @@ class DataPigProdDeadPig(BaseModel):
     uhid:               str
     
     pig_prod_hid:       str = None
+    pig_prod_pig_dead_hid:  str = None
     
     
-    pig_prod_id:        int = 0
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    pig_prod_pig_dead_id:   int = 0
     date_dead:          str
     dead_type_id:       int = 0
     sex:                str = 'F'
@@ -298,3 +301,16 @@ class DataPigProdNotes(BaseModel):
     pig_prod_id:        int = 0
     pig_prod_notes_id:  int = 0
     notes:              str
+    
+    
+class DataProdGestatingOps(BaseModel):
+    uhid:               str
+    
+    prod_gestating_ops_hid: str = None
+    staff_hid:          str
+    
+    user_id:            int = 0
+    prod_gestating_ops_id:  int = 0
+    staff_id:           int = 0
+    date:               str
+    notes:              str = None

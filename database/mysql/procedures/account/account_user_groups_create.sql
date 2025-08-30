@@ -27,7 +27,7 @@ DECLARE BUSINESS_OBJ_ID_ACCOUNT                 INT             DEFAULT 2;
 DECLARE BUSINESS_OBJ_ID_ACCOUNT_REQUEST         INT             DEFAULT 3;
 DECLARE BUSINESS_OBJ_ID_USER_GROUP              INT             DEFAULT 4;
 
-DECLARE BUSINESS_OBJ_ID_ACC_TRANSLATION        	INT             DEFAULT 5;
+DECLARE BUSINESS_OBJ_ID_ACC_TRANSLATION         INT             DEFAULT 5;
 
 
 DECLARE BUSINESS_OBJ_ID_PIG_FARM                INT             DEFAULT 6;
@@ -90,8 +90,8 @@ FROM (
     FROM    a02_business_object
     WHERE   id IN ( BUSINESS_OBJ_ID_USER,
                     BUSINESS_OBJ_ID_ACCOUNT_REQUEST,
-					
-					BUSINESS_OBJ_ID_ACC_TRANSLATION,
+                    
+                    BUSINESS_OBJ_ID_ACC_TRANSLATION,
                                         
                     BUSINESS_OBJ_ID_PIG_FARM,
                     BUSINESS_OBJ_ID_PIG_FARM_STAFF,

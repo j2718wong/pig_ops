@@ -100,8 +100,8 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_NOTES_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_HASHID',
+                'num':  ERROR_PIG_PROD_NOTES_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_HASHID',
                 'desc': ''
             }
         }

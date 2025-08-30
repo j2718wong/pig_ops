@@ -120,10 +120,8 @@ class PigProdNotes:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                'pig_prod_notes': {
+                    'id':               row[3]
                 }
             }
 

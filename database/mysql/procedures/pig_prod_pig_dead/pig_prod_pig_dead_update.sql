@@ -88,10 +88,8 @@ END IF;
 UPDATE pig_prod_pig_dead SET
     date_dead           = in_date_dead,
     dead_type_id        = in_dead_type_id,
-    sex                 = in_sex,
-    
+
     comments            = in_comments,
-    description         = in_description,
     
     last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP

@@ -265,16 +265,26 @@ ELSE
     
 END IF; 
     
-    
+
+/* Increment pig_farm.last_prod_id*/
 UPDATE pig_farm SET 
     last_prod_id    = cur_pig_farm_last_prod_id
 WHERE id = cur_sow_boar_pig_farm_id;
 
 
+/* Update sow status*/
 UPDATE sow_boar SET
     last_prod_id    = cur_pig_prod_id,
     sow_status_id   = SOW_STATUS_ID_GESTATING
 WHERE id = in_sow_id;
+
+
+/* Create prod_gestating_ops*/
+CALL pig_prod_gestating_ops_add(
+    in_user_id, 
+    cur_sow_boar_account_id,
+    cur_pig_prod_id, 
+    in_date_insemination);
 
 
 END process_user;
@@ -284,7 +294,7 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_pig_prod_id               AS pig_prod_id,
+    cur_pig_prod_id                     AS pig_prod_id,
     cur_pig_prod_ai_id                  AS pig_prod_ai_id;
     
 

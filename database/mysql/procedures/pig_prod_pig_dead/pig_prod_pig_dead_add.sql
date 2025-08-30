@@ -71,7 +71,7 @@ SET res_code    = "SUCCESS";
 SELECT  
         account_id,
         pig_farm_id,
-        status_id,
+        prod_status_id,
         
         num_pigs_current_m,
         num_pigs_current_f
@@ -152,7 +152,7 @@ SELECT LAST_INSERT_ID() INTO cur_pig_prod_pig_dead_id;
 IF in_sex = 'F' THEN
     IF cur_pig_prod_num_pigs_current_f > 0 THEN 
         UPDATE pig_production SET
-            num_pigs_current_f = num_piglets_current_f -1
+            num_pigs_current_f = num_pigs_current_f -1
         WHERE id = in_pig_prod_id;
     END IF;
 
@@ -160,7 +160,7 @@ ELSE
     
     IF cur_pig_prod_num_pigs_current_m > 0 THEN 
         UPDATE pig_production SET
-            num_pigs_current_m = num_piglets_current_m -1
+            num_pigs_current_m = num_pigs_current_m -1
         WHERE id = in_pig_prod_id;
     END IF;
 

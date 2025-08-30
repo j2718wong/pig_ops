@@ -71,12 +71,8 @@ class PigProdPigDead:
                     'desc':             row[2],
                 },
                 
-                'pig_prod': {
-                    'id':               row[3]
-                },
-                
                 'pig_prod_pig_dead': {
-                    'id':               row[4]
+                    'id':               row[3]
                 }
             }
 
@@ -100,11 +96,10 @@ class PigProdPigDead:
         sql =  'CALL pig_prod_pig_dead_update('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.pig_prod_id
+        sql += '%s,'    % data.pig_prod_pig_dead_id
         sql += '"%s",'  % data.date_dead
         sql += '%s,'    % data.dead_type_id
-        sql += '"%s",'  % data.sex
-        
+                
         if data.comments is not None:
             sql += '"%s");'   % data.comments
         else:
@@ -146,10 +141,8 @@ class PigProdPigDead:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                'pig_prod_pig_dead': {
+                    'id':               row[3]
                 }
             }
 

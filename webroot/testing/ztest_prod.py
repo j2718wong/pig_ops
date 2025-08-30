@@ -108,6 +108,7 @@ class TestAPIPigProd:
         
         cur_insem_type  = INSEM_TYPE_BOAR
         
+ 
         for cur_sow in list_sow:
             
             sow_hid     = cur_sow['hid']
@@ -142,10 +143,43 @@ class TestAPIPigProd:
             pig_prod_hid    = data_add['pig_prod_hid']
             
             data_insem = self._test_pig_prod_update_insem(data_add)
+            
+            
             data_birth = self._test_prod_update_birth(data_add)
             
             notes = "Nanganak anay " + cur_sow['name']
             self._test_pig_prod_notes_add(user_uhid, pig_prod_hid, notes)
+            
+            
+            if count_sow < 2:
+                # This is a datetime object
+                dt_birth    = data_birth['dt_birth']
+                
+                num_days_random = random.randint(2, 25)
+                dt_dead     = dt_birth + timedelta(days = num_days_random)
+                dt_dead_s   = dt_dead.strftime('%Y-%m-%d')
+                
+                index_sex   = random.randint(0, 1)
+                sex         = 'M' if index_sex == 0 else 'F'
+                
+                data_pig_dead = {
+                    "uhid":                 user_uhid,
+                    "pig_prod_hid":         pig_prod_hid,
+                               
+                    "date_dead":            dt_dead_s,
+                    "dead_type_id":         1,
+                    "sex":                  sex,
+                    "comments":             "Namatay baktin"
+                }
+                
+                res_add = self._test_prod_pig_dead_add(data_pig_dead)
+                
+                
+                data_pig_dead['comments'] =  data_pig_dead['comments'] + ' updated'
+                
+                self._test_prod_pig_dead_update(data_pig_dead)
+                
+                
             
             self._test_prod_update_weaning(data_birth)
             
@@ -158,6 +192,10 @@ class TestAPIPigProd:
             pig_prod_notes_hid = res['pig_prod_notes']['hid']
             notes = notes + " updated"
             self._test_pig_prod_notes_update(user_uhid, pig_prod_notes_hid, notes)
+            
+           
+            count_sow = count_sow + 1
+        
         
         
     def _test_pig_prod_notes_add(self, user_uhid, pig_prod_hid, notes):
@@ -170,12 +208,15 @@ class TestAPIPigProd:
             "notes":                notes
         }
 
-        print(f'***** Testing adding pig_prod_notes; url = {url} ')
+        print(f'\n\n***** Testing adding pig_prod_notes; url = {url} ')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
         res_text = str(r.text)
         res_json = json.loads(res_text)
+        
+        self.summary['pig_prod']['prod_notes'] = {}
+        self.summary['pig_prod']['prod_notes']['add'] = 'OK'
         
         return res_json
         
@@ -190,12 +231,14 @@ class TestAPIPigProd:
             "notes":                notes
         }
 
-        print(f'***** Testing updating pig_prod_notes; url = {url} ')
+        print(f'\n\n***** Testing updating pig_prod_notes; url = {url} ')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
         res_text = str(r.text)
         res_json = json.loads(res_text)
+        
+        self.summary['pig_prod']['prod_notes']['update'] = 'OK'
         
         return res_json
         
@@ -373,7 +416,6 @@ class TestAPIPigProd:
         
         return data
         
-        
     
     def _test_pig_prod_update_insem(self, data_add):
         
@@ -451,6 +493,11 @@ class TestAPIPigProd:
  
         result_num = res_json['result']['num']
         assert(result_num == 0)
+        
+        self.summary['pig_prod']['update_birth'] = 'OK'
+        
+        
+        data_birth['dt_birth'] = dt_birth
     
         return data_birth
         
@@ -491,8 +538,65 @@ class TestAPIPigProd:
  
         result_num = res_json['result']['num']
         assert(result_num == 0)
+        
+        self.summary['pig_prod']['update_weaning'] = 'OK'
+        
     
+    def _test_prod_pig_dead_add(self, data):
+        url = BASE_URL + 'prod_pig_dead/add'
+        
+        print(f'\n\n***** Testing pig_prod_pig_dead add; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        pig_prod_pig_dead_hid = res_json['pig_prod_pig_dead']['hid']
+        
+        
+        
+        
+        data['pig_prod_pig_dead_hid'] = pig_prod_pig_dead_hid
+        
+        self.summary['pig_prod']['pig_dead'] = {}
+        self.summary['pig_prod']['pig_dead']['add'] = 'OK'
+        
+        return data
+        
     
+    def _test_prod_pig_dead_update(self, data):
+        url = BASE_URL + 'prod_pig_dead/update'
+        
+        print(f'\n\n***** Testing pig_prod_pig_dead update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        pig_prod_pig_dead_hid  = res_json['pig_prod_pig_dead']['hid']
+        
+        data['pig_prod_pig_dead_hid'] = pig_prod_pig_dead_hid
+        
+        self.summary['pig_prod']['pig_dead'] = {}
+        self.summary['pig_prod']['pig_dead']['add'] = 'OK'
+        
+        return data
+    
+
     
         
 if __name__ == '__main__':
