@@ -30,6 +30,7 @@ class DataAccountPigOps(BaseModel):
     
     user_id:            int = 0
     account_pig_ops_id: int = 0
+    operation_type:     int
     
     
     num_days_since:     int

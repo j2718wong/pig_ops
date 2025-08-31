@@ -19,49 +19,88 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-FLAG_BIT_USER_IS_ACTIVE                 = 1
-FLAG_BIT_USER_EMAIL_VERIFIED            = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
+ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING    = 1
+ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING    = 2
+ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING      = 3
 
+ACCOUNT_PIG_OPS_OPERATION_TYPES = [
+    ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING,
+    ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING,
+    ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING
+]
 
-ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
-ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
 
     
-@app.post("/acc_gestating_ops/add")
-async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
-    name    = acc_gestating_ops_data.name
-    uhid    = acc_gestating_ops_data.uhid
+@app.post("/account_pig_ops/add")
+async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
+    name    = account_pig_ops_data.name
+    uhid    = account_pig_ops_data.uhid
     
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NAME,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NAME',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NAME,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NAME',
                 'desc': ''
             }
         }
         
     
-    num_days_since_insem = acc_gestating_ops_data.num_days_since_insem
-    if num_days_since_insem < 0 and num_days_since_insem > 115:
+    operation_type  = account_pig_ops_data.operation_type
+    
+    if operation_type not in ACCOUNT_PIG_OPS_OPERATION_TYPES:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE',
                 'desc': ''
             }
         }
+        
+
+    num_days_since = account_pig_ops_data.num_days_since
+    
+    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING:
+        if num_days_since < 0 and num_days_since > 115:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                    'desc': ''
+                }
+            }
+            
+    
+    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING:
+        if num_days_since < 0 and num_days_since > 45:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                    'desc': ''
+                }
+            }
+    
+    
+    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING:
+        if num_days_since < 0 and num_days_since > 300:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                    'desc': ''
+                }
+            }
     
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -69,10 +108,10 @@ async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
     user_id = res[0]
     
     
-    acc_gestating_ops_data.name      = name
-    acc_gestating_ops_data.user_id   = user_id
+    account_pig_ops_data.name      = name
+    account_pig_ops_data.user_id   = user_id
     
-    res_add    =  model['acc_gestating_ops'].add(acc_gestating_ops_data)
+    res_add    =  model['account_pig_ops'].add(account_pig_ops_data)
     
     if res_add is None:
         return {
@@ -84,40 +123,40 @@ async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
         }
     
     
-    acc_gest_ops_id     = res_add['acc_gestating_ops']['id']
+    acc_gest_ops_id     = res_add['account_pig_ops']['id']
     acc_gest_ops_hid    = hashids_common.encrypt(acc_gest_ops_id)
     
     # remove plain id
-    del res_add['acc_gestating_ops']['id']
-    res_add['acc_gestating_ops']['hid'] = acc_gest_ops_hid
+    del res_add['account_pig_ops']['id']
+    res_add['account_pig_ops']['hid'] = acc_gest_ops_hid
 
         
     return res_add
     
 
-@app.post("/acc_gestating_ops/update")
-async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOps):
-    name    = acc_gestating_ops_data.name
-    uhid    = acc_gestating_ops_data.uhid
+@app.post("/account_pig_ops/update")
+async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
+    name    = account_pig_ops_data.name
+    uhid    = account_pig_ops_data.uhid
     
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NAME,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NAME',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NAME,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NAME',
                 'desc': ''
             }
         }
         
     
-    num_days_since_insem = acc_gestating_ops_data.num_days_since_insem
-    if num_days_since_insem < 0 and num_days_since_insem > 115:
+    num_days_since = account_pig_ops_data.num_days_since
+    if num_days_since < 0 and num_days_since > 115:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
                 'desc': ''
             }
         }
@@ -127,8 +166,8 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -136,28 +175,25 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
     user_id = res[0]
     
     
-    acc_gest_ops_hid = acc_gestating_ops_data.acc_gest_ops_hid
-    
-    
-    res = hashids_common.decrypt(acc_gest_ops_hid)
+    account_pig_ops_hid = account_pig_ops_data.account_pig_ops_hid
+    res = hashids_common.decrypt(account_pig_ops_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_HASHID',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID',
                 'desc': ''
             }
         }
     
+    account_pig_ops_id = res[0]
     
-    acc_gest_ops_id = res[0]
     
+    account_pig_ops_data.name      = name
+    account_pig_ops_data.user_id   = user_id
+    account_pig_ops_data.account_pig_ops_id = account_pig_ops_id
     
-    acc_gestating_ops_data.name      = name
-    acc_gestating_ops_data.user_id   = user_id
-    acc_gestating_ops_data.acc_gest_ops_id = acc_gest_ops_id
-    
-    res_update    =  model['acc_gestating_ops'].update(acc_gestating_ops_data)
+    res_update    =  model['account_pig_ops'].update(account_pig_ops_data)
     
     if res_update is None:
         return {
@@ -170,20 +206,20 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
         
         
     # remove plain id
-    del res_update['acc_gestating_ops']['id']
-    res_update['acc_gestating_ops']['hid'] = acc_gest_ops_hid
+    del res_update['account_pig_ops']['id']
+    res_update['account_pig_ops']['hid'] = acc_gest_ops_hid
         
     return res_update
     
 
-@app.get("/acc_gestating_ops/delete")
-async def acc_gestating_ops_delete(uhid:str, acc_gestating_ops_hid: str):
+@app.get("/account_pig_ops/delete")
+async def account_pig_ops_delete(uhid:str, account_pig_ops_hid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -191,27 +227,27 @@ async def acc_gestating_ops_delete(uhid:str, acc_gestating_ops_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(acc_gestating_ops_hid)
+    res = hashids_common.decrypt(account_pig_ops_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_HASHID',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID',
                 'desc': ''
             }
         }
     
-    acc_gestating_ops_id = res[0]
+    account_pig_ops_id = res[0]
     
     
     
     data = {
         'user_id':              user_id,
-        'acc_gestating_ops_id': acc_gestating_ops_id
+        'account_pig_ops_id':   account_pig_ops_id
     }
     
     
-    res_delete    =  model['acc_gestating_ops'].delete(data)
+    res_delete    =  model['account_pig_ops'].delete(data)
     
     if res_delete is None:
         return {
@@ -224,17 +260,17 @@ async def acc_gestating_ops_delete(uhid:str, acc_gestating_ops_hid: str):
     
     
     # remove plain id
-    del res_delete['acc_gestating_ops']['id']
-    res_delete['acc_gestating_ops']['hid'] = acc_gestating_ops_hid
+    del res_delete['account_pig_ops']['id']
+    res_delete['account_pig_ops']['hid'] = account_pig_ops_hid
         
     return res_delete
     
 
-@app.get("/acc_gestating_ops/list")
-async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, 
+@app.get("/account_pig_ops/list")
+async def account_pig_ops_list(ahid: str, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
-    Will get acc_gestating_ops list.
+    Will get account_pig_ops list.
     
     Parameters
     ----------
@@ -254,8 +290,8 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0,
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_ACCOUNT_HASHID',
                 'desc': ''
             }
         }
@@ -263,7 +299,7 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0,
     
     account_id = res[0]
         
-    res = model['acc_gestating_ops'].get_list(account_id,
+    res = model['account_pig_ops'].get_list(account_id,
             inc_deleted, inc_user_audit)
     
     if res is None:
