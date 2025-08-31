@@ -69,10 +69,9 @@ async def prod_gestating_ops_update(prod_gestating_ops_data: dm.DataProdGestatin
     staff_id = res[0]
     
     
-    
-    
-    prod_gestating_ops_data.user_id   = user_id
+    prod_gestating_ops_data.user_id     = user_id
     prod_gestating_ops_data.prod_gestating_ops_id = prod_gestating_ops_id
+    prod_gestating_ops_data.staff_id    = staff_id
     
     res_update    =  model['prod_gestating_ops'].update(prod_gestating_ops_data)
     
