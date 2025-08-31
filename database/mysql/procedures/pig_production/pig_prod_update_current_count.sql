@@ -23,7 +23,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE BUSINESS_OBJ_ID_PIG_PRODUCTION          INT             DEFAULT 18;
+DECLARE BUSINESS_OBJ_ID_PIG_PRODUCTION          INT             DEFAULT 19;
 
 
 

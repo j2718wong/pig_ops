@@ -1,10 +1,10 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS account_gestating_ops_add $$
-CREATE PROCEDURE account_gestating_ops_add(
+DROP PROCEDURE IF EXISTS account_pig_ops_add $$
+CREATE PROCEDURE account_pig_ops_add(
     in_user_id              INT,
-
-    in_num_days_since_insem INT,
+    in_operation_type       INT,
+    in_num_days_since       INT,
     
     in_name                 VARCHAR(50),
     in_description          VARCHAR(160)
@@ -13,7 +13,7 @@ CREATE PROCEDURE account_gestating_ops_add(
 BEGIN
 
 /** 
- * Will add account_gestating_ops entry.
+ * Will add account_pig_ops entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 15, 2025
@@ -26,20 +26,27 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE BUSINESS_OBJ_ID_ACC_GESTATING_OPS       INT             DEFAULT 10;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION   INT             DEFAULT 10;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
 DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
+
+DECLARE ACCOUNT_PIG_OPS_TYPE_GESTATING          INT             DEFAULT 1;
+DECLARE ACCOUNT_PIG_OPS_TYPE_LACTATING          INT             DEFAULT 2;
+DECLARE ACCOUNT_PIG_OPS_TYPE_GROWING            INT             DEFAULT 3;
+
+
+
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
 
 
-DECLARE cur_account_gestating_ops_id            INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_flag          INT             DEFAULT 0;
-DECLARE cur_account_gestating_ops_name          VARCHAR(50)     DEFAULT '';
+DECLARE cur_account_pig_ops_id                  INT             DEFAULT 0;
+DECLARE cur_account_pig_ops_flag                INT             DEFAULT 0;
+DECLARE cur_account_pig_ops_name                VARCHAR(50)     DEFAULT '';
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -56,7 +63,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    BUSINESS_OBJ_ID_ACC_GESTATING_OPS,
+    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
@@ -75,13 +82,14 @@ END IF;
 
 /* Check for duplicate entry */
 SELECT  id
-INTO    cur_account_gestating_ops_id
-FROM    account_gestating_ops
-WHERE   account_id  = cur_user_account_id   AND 
-        UPPER(name) = UPPER(in_name)
+INTO    cur_account_pig_ops_id
+FROM    account_pig_ops
+WHERE   account_id      = cur_user_account_id   AND 
+        operation_type  = in_operation_type     AND
+        UPPER(name)     = UPPER(in_name)
 LIMIT   1;
 
-IF cur_account_gestating_ops_id > 0 THEN 
+IF cur_account_pig_ops_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -90,9 +98,10 @@ END IF;
 
 
 
-INSERT INTO account_gestating_ops(
+INSERT INTO account_pig_ops(
     account_id,
-    num_days_since_insem,
+    operation_type,
+    num_days_since,
     
     name,
     description,
@@ -100,7 +109,8 @@ INSERT INTO account_gestating_ops(
     added_by_user_id
 ) VALUES (
     cur_user_account_id,
-    in_num_days_since_insem,
+    in_operation_type,
+    in_num_days_since,
     
     in_name,
     in_description,
@@ -108,7 +118,7 @@ INSERT INTO account_gestating_ops(
     in_user_id
 );
 
-SELECT LAST_INSERT_ID() INTO cur_account_gestating_ops_id;
+SELECT LAST_INSERT_ID() INTO cur_account_pig_ops_id;
 
 
 END process_user;
@@ -118,19 +128,19 @@ SELECT
     flag,
     name
 INTO 
-    cur_account_gestating_ops_flag,
-    cur_account_gestating_ops_name
-FROM account_gestating_ops
-WHERE id = cur_account_gestating_ops_id;
+    cur_account_pig_ops_flag,
+    cur_account_pig_ops_name
+FROM account_pig_ops
+WHERE id = cur_account_pig_ops_id;
 
 SELECT 
     res_num                             AS result_number,
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_account_gestating_ops_id        AS account_gestating_ops_id,
-    cur_account_gestating_ops_flag      AS account_gestating_ops_flag,
-    cur_account_gestating_ops_name      AS account_gestating_ops_name;
+    cur_account_pig_ops_id              AS account_pig_ops_id,
+    cur_account_pig_ops_flag            AS account_pig_ops_flag,
+    cur_account_pig_ops_name            AS account_pig_ops_name;
 
 END $$
 

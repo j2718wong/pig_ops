@@ -15,8 +15,12 @@ BEGIN
  */
 
 
+DECLARE ACCOUNT_PIG_OPS_TYPE_GESTATING          INT             DEFAULT 1;
+DECLARE ACCOUNT_PIG_OPS_TYPE_LACTATING          INT             DEFAULT 2;
+DECLARE ACCOUNT_PIG_OPS_TYPE_GROWING            INT             DEFAULT 3;
 
-/* Default account gestating operation*/
+
+/* Default account gestating operation; numdays since insemination*/
 DECLARE GESTATING_OPS_NUM_DAYS_CHECK_PREGNANT   INT             DEFAULT 21;
 DECLARE GESTATING_OPS_NUM_DAYS_INJECT_IRON      INT             DEFAULT 80;
 DECLARE GESTATING_OPS_NUM_DAYS_DEWORM           INT             DEFAULT 100;
@@ -24,32 +28,38 @@ DECLARE GESTATING_OPS_NUM_DAYS_DEWORM           INT             DEFAULT 100;
 
 
 /* Create default gestating_operation for the account.*/
-INSERT INTO account_gestating_ops (
+INSERT INTO account_pig_ops (
     account_id,
-    num_days_since_insem,
+    operation_type,
+    num_days_since,
     name
 ) VALUES (
     in_account_id,
+    ACCOUNT_PIG_OPS_TYPE_GESTATING,
     GESTATING_OPS_NUM_DAYS_CHECK_PREGNANT,
     "Check if pregnant"
 );
 
-INSERT INTO account_gestating_ops (
+INSERT INTO account_pig_ops (
     account_id,
-    num_days_since_insem,
+    operation_type,
+    num_days_since,
     name
 ) VALUES (
     in_account_id,
+    ACCOUNT_PIG_OPS_TYPE_GESTATING,
     GESTATING_OPS_NUM_DAYS_INJECT_IRON,
     "Inject Iron"
 );
 
-INSERT INTO account_gestating_ops (
+INSERT INTO account_pig_ops (
     account_id,
-    num_days_since_insem,
+    operation_type,
+    num_days_since,
     name
 ) VALUES (
     in_account_id,
+    ACCOUNT_PIG_OPS_TYPE_GESTATING,
     GESTATING_OPS_NUM_DAYS_DEWORM,
     "Deworm"
 );

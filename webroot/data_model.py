@@ -23,30 +23,16 @@ class DataAccount(BaseModel):
     country_id:         int = COUNTRY_ID_PHILIPPINES
     
 
-class DataAccGestatingOps(BaseModel):
+class DataAccountPigOps(BaseModel):
     uhid:               str
-    acc_gest_ops_hid:   str = None
+    account_pig_ops_hid: str = None
     
     
     user_id:            int = 0
-    acc_gest_ops_id:    int = 0
+    account_pig_ops_id: int = 0
     
     
-    num_days_since_insem: int
-    name:               str
-    description:        str = None 
-    
-    
-class DataAccLactatingOps(BaseModel):
-    uhid:               str
-    acc_lact_ops_hid:   str = None
-    
-    
-    user_id:            int = 0
-    acc_lact_ops_id:    int = 0
-    
-    
-    num_days_since_birth: int
+    num_days_since:     int
     name:               str
     description:        str = None 
     
