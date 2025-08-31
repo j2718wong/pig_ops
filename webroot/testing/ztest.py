@@ -48,10 +48,18 @@ RANDOM_STAFF_NAMES = ['Arnel', 'Kevin', 'Michael', 'Hilmero', 'Bogart']
 
 
 SAMPLE_CUSTOMIZED_GESTATING_OPS = {
-    "name":         "Inject Vitamins",
+    "name":         "Inject Vitamin Z",
     "description":  "Inject vitamin Z",
     "num_days_since_insem": 50    
 }
+
+
+SAMPLE_CUSTOMIZED_LACTATING_OPS = {
+    "name":         "Inject Vitamin Q",
+    "description":  "Inject vitamin Q",
+    "num_days_since_birth": 24
+}
+
 
 SAMPLE_PIG_RACE_LINE = {
     "name":         "Camborough 48",
@@ -209,6 +217,17 @@ class TestAPIAccount:
         self.summary['account']['gestating_ops_list'] = 'OK'
         
         
+        self.test_acc_lactating_ops(user_id)
+        print(f'\n\n***** Testing get account lactating_ops; account_id = {account_id}')
+        res = model['acc_lactating_ops'].get_list(account_id)
+        
+        print(f'\n\nAccount lactating_ops; len = {len(res)}')
+        pprint.pprint(res)
+        assert(len(res) >= 4)
+        
+        self.summary['account']['lactating_ops_list'] = 'OK'
+        
+        
         self.test_pig_race_line(user_id, account_hid)
         
         self.test_semen_supplier(user_id)
@@ -273,8 +292,7 @@ class TestAPIAccount:
         
         self.summary['semen_supplier']['list'] = 'OK'
         
-        
-    
+
     def test_feed_brand(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)
         
@@ -767,6 +785,8 @@ class TestAPIAccount:
         self.summary['acc_gestating_ops']['add_duplicate_check'] = 'OK'
             
         
+        acc_gestating_ops_hid = res_json['acc_gestating_ops']['hid']
+        
         
         # Test acc_gestating_ops update
         now             = datetime.now()
@@ -799,11 +819,146 @@ class TestAPIAccount:
         self.summary['acc_gestating_ops']['update'] = 'OK'
         
         
-        return {
-            'acc_gestating_ops_id': acc_gestating_ops_id
+        # Test delete acc_gestating_ops
+        url = BASE_URL + 'acc_gestating_ops/delete?uhid=' + user_uhid + '&acc_gestating_ops_hid=' + acc_gestating_ops_hid
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\n***** Testing acc_gestating_ops delete; url = {url} ")
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['acc_gestating_ops']['delete'] = 'OK'
+        
+        
+    def test_acc_lactating_ops(self, user_id, skip_step = 0):
+        user_uhid   = hashids_user.encrypt(user_id)
+        
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"\n\n#################  {now_ts}  ###########################")
+        
+        
+        if skip_step & 0x01 == 0: 
+        
+            url = BASE_URL + 'acc_lactating_ops/add'
+            
+            data = {
+                "uhid":                 user_uhid,
+                "name":                 SAMPLE_CUSTOMIZED_LACTATING_OPS['name'],
+                "num_days_since_birth": SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since_birth'],
+                "description":          SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
+            }
+            
+
+            print(f'*****  Testing adding acc_lactating_ops; url = {url} ; data')
+            pprint.pprint(data)
+            
+            r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
+            print(f"\n\nResult; status_code = {r.status_code}; result")
+            pprint.pprint(res_json)
+            
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
+
+            self.summary['acc_lactating_ops']['add'] = 'OK'
+            
+            
+            is_id_visible = True if 'id' in res_json['acc_lactating_ops'] else False
+            assert(is_id_visible == False)
+            
+            
+            acc_lactating_ops_hid  = res_json['acc_lactating_ops']['hid']
+            res_decrypt             = hashids_common.decrypt(acc_lactating_ops_hid)
+            acc_lactating_ops_id    = res_decrypt[0]
+            
+            print(f"acc_lactating_ops_id = {acc_lactating_ops_id}")
+            assert(acc_lactating_ops_id > 0)
+            
+        
+        # Test acc_lactating_ops add duplicate
+        url = BASE_URL + 'acc_lactating_ops/add'
+            
+        data = {
+            "uhid":                 user_uhid,
+            "name":                 SAMPLE_CUSTOMIZED_LACTATING_OPS['name'],
+            "num_days_since_birth": SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since_birth'],
+            "description":          SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
+        }
+            
+
+        print(f'\n\n***** Testing duplicate adding acc_lactating_ops; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
+        
+        self.summary['acc_lactating_ops']['add_duplicate_check'] = 'OK'
+            
+        
+        acc_lactating_ops_hid = res_json['acc_lactating_ops']['hid']
+        
+        
+        # Test acc_lactating_ops update
+        now             = datetime.now()
+        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'acc_lactating_ops/update'
+        
+        data = {
+            "uhid":                 user_uhid,
+            "acc_lact_ops_hid":     acc_lactating_ops_hid,
+            "name":                 SAMPLE_CUSTOMIZED_LACTATING_OPS['name'] + now_ts,
+            "num_days_since_birth": SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since_birth'],
+            "description":          SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
         }
         
-       
+        
+        print(f'\n\n*****  Testing acc_lactating_ops update; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['acc_lactating_ops']['update'] = 'OK'
+        
+        
+        # Test delete acc_lactating_ops
+        url = BASE_URL + 'acc_lactating_ops/delete?uhid=' + user_uhid + '&acc_lactating_ops_hid=' + acc_lactating_ops_hid
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\n***** Testing acc_lactating_ops delete; url = {url} ")
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['acc_lactating_ops']['delete'] = 'OK'
+        
+    
     def test_pig_race_line(self, user_id, account_hid, skip_step = 0):
         user_uhid   = hashids_user.encrypt(user_id)
         
@@ -824,7 +979,7 @@ class TestAPIAccount:
             }
             
 
-            print(f'***** Testing adding pig_race_line; url = {url} ; data')
+            print(f"***** Testing adding pig_race_line; url = {url} ; data")
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
@@ -863,7 +1018,7 @@ class TestAPIAccount:
         }
             
 
-        print(f'\n\n***** Testing duplicate adding pig_race_line; url = {url} ; data')
+        print(f"\n\n***** Testing duplicate adding pig_race_line; url = {url} ; data")
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -894,7 +1049,7 @@ class TestAPIAccount:
         }
         
         
-        print(f'\n\n***** Testing pig_race_line update; url = {url} ; data')
+        print(f"\n\n***** Testing pig_race_line update; url = {url} ; data")
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -924,7 +1079,7 @@ class TestAPIAccount:
         }
         
 
-        print(f'\n\n***** Testing adding pig_race_line; url = {url} ; data')
+        print(f"\n\n***** Testing adding pig_race_line; url = {url} ; data")
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -954,7 +1109,7 @@ class TestAPIAccount:
         res_text = str(r.text)
         res_json = json.loads(res_text)
         
-        print(f'\n\n***** Testing pig_race_line delete; url = {url} ')
+        print(f"\n\n***** Testing pig_race_line delete; url = {url} ")
         print(f"\n\nResult; status_code = {r.status_code}; result")
         
         result_num  = res_json['result']['num']
@@ -967,7 +1122,7 @@ class TestAPIAccount:
         # Test get_list pig_race_line
         url = BASE_URL + 'pig_race_line/list?ahid=' + account_hid + '&inc_deleted=1&inc_user_audit=1'
         
-        print(f'\n\nTesting pig_race_line get_list; url = {url} ')
+        print(f"\n\nTesting pig_race_line get_list; url = {url} ")
         
         r = requests.get(url)
         res_text = str(r.text)
@@ -1099,7 +1254,7 @@ class TestAPIAccount:
         url = BASE_URL + 'sow_boar/add'
         
         if opt_msg is not None: print(opt_msg)
-        print(f'***** Testing adding sow_boar entry; url = {url} ; data')
+        print(f"***** Testing adding sow_boar entry; url = {url} ; data")
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -1142,7 +1297,7 @@ class TestAPIAccount:
             }
             
             
-            print(f'\n\n***** Testing sow_boar_update; url = {url} ; data')
+            print(f"\n\n***** Testing sow_boar_update; url = {url} ; data")
             pprint.pprint(data)
             
             r = requests.post(url, json = data)
@@ -1162,7 +1317,7 @@ class TestAPIAccount:
     def test_sow_boar_dispose(self, user_id, pig_farm_id, sex):
         now             = datetime.now()
         now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f'\n\n###############################  {now_ts}  ####################################################')
+        print(f"\n\n###############################  {now_ts}  ####################################################")
         
         
         user_uhid   = hashids_user.encrypt(user_id)
@@ -1207,7 +1362,7 @@ class TestAPIAccount:
             
         }
         
-        print(f'\n\n***** Testing sow_boar_dispose; url = {url} ; data')
+        print(f"\n\n***** Testing sow_boar_dispose; url = {url} ; data")
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -1226,7 +1381,7 @@ class TestAPIAccount:
     def test_semen_source(self, user_id, pig_farm_id):
         now             = datetime.now()
         now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f'\n\n###############################  {now_ts}  ####################################################')
+        print(f"\n\n###############################  {now_ts}  ####################################################")
         
         
         user_uhid   = hashids_user.encrypt(user_id)
@@ -1314,7 +1469,7 @@ class TestAPIAccount:
         
         url = BASE_URL + 'semen_supplier/list?inc_deleted=0&inc_user_audit=0'
         
-        print(f'\n\n****** Testing semen_supplier get_list; url = {url} ')
+        print(f"\n\n****** Testing semen_supplier get_list; url = {url} ")
         
         r = requests.get(url)
         res_text = str(r.text)
@@ -1349,7 +1504,7 @@ class TestAPIAccount:
         }
         data = data_semen_source_2
         
-        print(f'\n\nTesting adding semen_source entry; url = {url} ; data')
+        print(f"\n\nTesting adding semen_source entry; url = {url} ; data")
         pprint.pprint(data)
         
         r = requests.post(url, json = data)

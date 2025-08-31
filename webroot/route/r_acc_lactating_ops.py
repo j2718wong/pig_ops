@@ -1,4 +1,4 @@
-# August 9, 2025
+# August 31, 2025
 # Jack Wong
 
 import os
@@ -19,38 +19,29 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-FLAG_BIT_USER_IS_ACTIVE                 = 1
-FLAG_BIT_USER_EMAIL_VERIFIED            = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
-
-
-ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
-ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
-
-    
-@app.post("/acc_gestating_ops/add")
-async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
-    name    = acc_gestating_ops_data.name
-    uhid    = acc_gestating_ops_data.uhid
+@app.post("/acc_lactating_ops/add")
+async def acc_lactating_ops_add(acc_lactating_ops_data: dm.DataAccLactatingOps):
+    name    = acc_lactating_ops_data.name
+    uhid    = acc_lactating_ops_data.uhid
     
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NAME,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NAME',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_NAME,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_NAME',
                 'desc': ''
             }
         }
         
     
-    num_days_since_insem = acc_gestating_ops_data.num_days_since_insem
-    if num_days_since_insem < 0 and num_days_since_insem > 115:
+    num_days_since_birth = acc_lactating_ops_data.num_days_since_birth
+    if num_days_since_birth < 0 and num_days_since_birth > 115:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_NUMDAYS,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_NUMDAYS',
                 'desc': ''
             }
         }
@@ -60,8 +51,8 @@ async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -69,10 +60,10 @@ async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
     user_id = res[0]
     
     
-    acc_gestating_ops_data.name      = name
-    acc_gestating_ops_data.user_id   = user_id
+    acc_lactating_ops_data.name      = name
+    acc_lactating_ops_data.user_id   = user_id
     
-    res_add    =  model['acc_gestating_ops'].add(acc_gestating_ops_data)
+    res_add    =  model['acc_lactating_ops'].add(acc_lactating_ops_data)
     
     if res_add is None:
         return {
@@ -84,40 +75,40 @@ async def acc_gestating_ops_add(acc_gestating_ops_data: dm.DataAccGestatingOps):
         }
     
     
-    acc_gest_ops_id     = res_add['acc_gestating_ops']['id']
+    acc_gest_ops_id     = res_add['acc_lactating_ops']['id']
     acc_gest_ops_hid    = hashids_common.encrypt(acc_gest_ops_id)
     
     # remove plain id
-    del res_add['acc_gestating_ops']['id']
-    res_add['acc_gestating_ops']['hid'] = acc_gest_ops_hid
+    del res_add['acc_lactating_ops']['id']
+    res_add['acc_lactating_ops']['hid'] = acc_gest_ops_hid
 
         
     return res_add
     
 
-@app.post("/acc_gestating_ops/update")
-async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOps):
-    name    = acc_gestating_ops_data.name
-    uhid    = acc_gestating_ops_data.uhid
+@app.post("/acc_lactating_ops/update")
+async def acc_lactating_ops_update(acc_lactating_ops_data: dm.DataAccLactatingOps):
+    name    = acc_lactating_ops_data.name
+    uhid    = acc_lactating_ops_data.uhid
     
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NAME,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NAME',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_NAME,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_NAME',
                 'desc': ''
             }
         }
         
     
-    num_days_since_insem = acc_gestating_ops_data.num_days_since_insem
-    if num_days_since_insem < 0 and num_days_since_insem > 115:
+    num_days_since_birth = acc_lactating_ops_data.num_days_since_birth
+    if num_days_since_birth < 0 and num_days_since_birth > 115:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_NUMDAYS',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_NUMDAYS,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_NUMDAYS',
                 'desc': ''
             }
         }
@@ -127,8 +118,8 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -136,28 +127,28 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
     user_id = res[0]
     
     
-    acc_gest_ops_hid = acc_gestating_ops_data.acc_gest_ops_hid
+    acc_lact_ops_hid = acc_lactating_ops_data.acc_lact_ops_hid
     
     
-    res = hashids_common.decrypt(acc_gest_ops_hid)
+    res = hashids_common.decrypt(acc_lact_ops_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_HASHID',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_HASHID,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_HASHID',
                 'desc': ''
             }
         }
     
     
-    acc_gest_ops_id = res[0]
+    acc_lact_ops_id = res[0]
     
     
-    acc_gestating_ops_data.name      = name
-    acc_gestating_ops_data.user_id   = user_id
-    acc_gestating_ops_data.acc_gest_ops_id = acc_gest_ops_id
+    acc_lactating_ops_data.name      = name
+    acc_lactating_ops_data.user_id   = user_id
+    acc_lactating_ops_data.acc_lact_ops_id = acc_lact_ops_id
     
-    res_update    =  model['acc_gestating_ops'].update(acc_gestating_ops_data)
+    res_update    =  model['acc_lactating_ops'].update(acc_lactating_ops_data)
     
     if res_update is None:
         return {
@@ -170,20 +161,20 @@ async def acc_gestating_ops_update(acc_gestating_ops_data: dm.DataAccGestatingOp
         
         
     # remove plain id
-    del res_update['acc_gestating_ops']['id']
-    res_update['acc_gestating_ops']['hid'] = acc_gest_ops_hid
+    del res_update['acc_lactating_ops']['id']
+    res_update['acc_lactating_ops']['hid'] = acc_lact_ops_hid
         
     return res_update
     
-
-@app.get("/acc_gestating_ops/delete")
-async def acc_gestating_ops_delete(uhid:str, acc_gestating_ops_hid: str):
+    
+@app.get("/acc_lactating_ops/delete")
+async def acc_lactating_ops_delete(uhid:str, acc_lactating_ops_hid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -191,27 +182,27 @@ async def acc_gestating_ops_delete(uhid:str, acc_gestating_ops_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(acc_gestating_ops_hid)
+    res = hashids_common.decrypt(acc_lactating_ops_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_HASHID',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_HASHID,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_HASHID',
                 'desc': ''
             }
         }
     
-    acc_gestating_ops_id = res[0]
+    acc_lactating_ops_id = res[0]
     
     
     
     data = {
         'user_id':              user_id,
-        'acc_gestating_ops_id': acc_gestating_ops_id
+        'acc_lactating_ops_id': acc_lactating_ops_id
     }
     
     
-    res_delete    =  model['acc_gestating_ops'].delete(data)
+    res_delete    =  model['acc_lactating_ops'].delete(data)
     
     if res_delete is None:
         return {
@@ -224,17 +215,17 @@ async def acc_gestating_ops_delete(uhid:str, acc_gestating_ops_hid: str):
     
     
     # remove plain id
-    del res_delete['acc_gestating_ops']['id']
-    res_delete['acc_gestating_ops']['hid'] = acc_gestating_ops_hid
+    del res_delete['acc_lactating_ops']['id']
+    res_delete['acc_lactating_ops']['hid'] = acc_lactating_ops_hid
         
     return res_delete
     
-
-@app.get("/acc_gestating_ops/list")
-async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0, 
+    
+@app.get("/acc_lactating_ops/list")
+async def acc_lactating_ops_list(ahid: str, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
-    Will get acc_gestating_ops list.
+    Will get acc_lactating_ops list.
     
     Parameters
     ----------
@@ -254,8 +245,8 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0,
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACC_GESTATING_OPS_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACC_GESTATING_OPS_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_ACC_LACTATING_OPS_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_ACC_LACTATING_OPS_INVALID_ACCOUNT_HASHID',
                 'desc': ''
             }
         }
@@ -263,7 +254,7 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0,
     
     account_id = res[0]
         
-    res = model['acc_gestating_ops'].get_list(account_id,
+    res = model['acc_lactating_ops'].get_list(account_id,
             inc_deleted, inc_user_audit)
     
     if res is None:
@@ -295,4 +286,6 @@ async def acc_gestating_ops_list(ahid: str, inc_deleted: int = 0,
         'data': res
     }
     
+    
+
     

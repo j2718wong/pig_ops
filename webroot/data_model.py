@@ -37,6 +37,19 @@ class DataAccGestatingOps(BaseModel):
     description:        str = None 
     
     
+class DataAccLactatingOps(BaseModel):
+    uhid:               str
+    acc_lact_ops_hid:   str = None
+    
+    
+    user_id:            int = 0
+    acc_lact_ops_id:    int = 0
+    
+    
+    num_days_since_birth: int
+    name:               str
+    description:        str = None 
+    
 
 class DataPigFarm(BaseModel):
     uhid:               str

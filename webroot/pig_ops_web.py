@@ -17,6 +17,7 @@ from route.r_pig_farm           import *
 from route.r_pig_farm_staff     import *
 
 from route.r_acc_gestating_ops  import *
+from route.r_acc_lactating_ops  import *
 
 from route.r_pig_race           import *
 from route.r_pig_race_line      import *

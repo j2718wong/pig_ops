@@ -43,6 +43,7 @@ from model.m_pig_farm           import PigFarm
 from model.m_pig_farm_staff     import PigFarmStaff
 
 from model.m_acc_gestating_ops  import AccountGestatingOps
+from model.m_acc_lactating_ops  import AccountLactatingOps
 
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
@@ -79,6 +80,8 @@ model_names = [
     ('pig_farm_staff',          PigFarmStaff),
     
     ('acc_gestating_ops',       AccountGestatingOps),
+    ('acc_lactating_ops',       AccountLactatingOps),
+    
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),
     

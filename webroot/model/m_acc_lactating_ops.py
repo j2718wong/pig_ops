@@ -4,28 +4,28 @@
 from common_constants       import *
 
 
-class AccountGestatingOps:
+class AccountLactatingOps:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'AccountGestatingOps'
+        self.TAG                = 'AccountLactatingOps'
 
 
     def add(self, data = None):
         """
-        PROCEDURE account_gestating_ops_add(
+        PROCEDURE account_lactating_ops_add(
             in_user_id              INT,
 
-            in_num_days_since_insem INT,
+            in_num_days_since_birth INT,
             
             in_name                 VARCHAR(50),
             in_description          VARCHAR(160)
         )  
         """
         
-        sql =  'CALL account_gestating_ops_add('
+        sql =  'CALL account_lactating_ops_add('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.num_days_since_insem
+        sql += '%s,'    % data.num_days_since_birth
         sql += '"%s",'  % data.name
         
         if data.description is not None:
@@ -68,7 +68,7 @@ class AccountGestatingOps:
                     'desc':             row[2],
                 },
                 
-                'acc_gestating_ops': {
+                'acc_lactating_ops': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -80,21 +80,21 @@ class AccountGestatingOps:
     
     def update(self, data = None):
         """
-        PROCEDURE account_gestating_ops_update(
+        PROCEDURE account_lactating_ops_update(
             in_user_id                  INT,
     
-            in_acc_gestating_ops_id     INT,
-            in_num_days_since_insem     INT,
+            in_acc_lactating_ops_id     INT,
+            in_num_days_since_birth     INT,
             
             in_name                     VARCHAR(50),
             in_description              VARCHAR(160)
         )
         """
        
-        sql =  'CALL account_gestating_ops_update('
+        sql =  'CALL account_lactating_ops_update('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.acc_gest_ops_id
-        sql += '%s,'    % data.num_days_since_insem
+        sql += '%s,'    % data.acc_lact_ops_id
+        sql += '%s,'    % data.num_days_since_birth
         
         sql += '"%s",'  % data.name
         
@@ -138,7 +138,7 @@ class AccountGestatingOps:
                     'desc':             row[2],
                 },
                 
-                'acc_gestating_ops': {
+                'acc_lactating_ops': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -150,19 +150,19 @@ class AccountGestatingOps:
     
     def delete(self, data = None):
         user_id             = data['user_id']
-        acc_gestating_ops_id  = data['acc_gestating_ops_id']
+        acc_lactating_ops_id  = data['acc_lactating_ops_id']
         
         """
-        PROCEDURE account_gestating_ops_delete(
+        PROCEDURE account_lactating_ops_delete(
             in_user_id                  INT,
             
-            in_acc_gestating_ops_id     INT
+            in_acc_lactating_ops_id     INT
         )
         """
        
-        sql =  'CALL account_gestating_ops_delete('
+        sql =  'CALL account_lactating_ops_delete('
         sql += '%s,'    % user_id
-        sql += '%s);'   % acc_gestating_ops_id
+        sql += '%s);'   % acc_lactating_ops_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -198,7 +198,7 @@ class AccountGestatingOps:
                     'desc':             row[2],
                 },
                 
-                'acc_gestating_ops': {
+                'acc_lactating_ops': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -220,21 +220,21 @@ class AccountGestatingOps:
             sql =   """
                     SELECT 
                         a.id,
-                        a.num_days_since_insem,
+                        a.num_days_since_birth,
                         
                         a.name,
                         a.description,
                         a.dt_entry
-                    FROM account_gestating_ops a
+                    FROM account_lactating_ops a
                     %s
-                    ORDER BY a.num_days_since_insem
+                    ORDER BY a.num_days_since_birth
                     """ % where_clause
         else:
             
             sql =   """
                     SELECT 
                         a.id,
-                        a.num_days_since_insem,
+                        a.num_days_since_birth,
                         
                         a.name,
                         a.description,
@@ -249,11 +249,11 @@ class AccountGestatingOps:
                         d.name_first,
                         a.dt_last_update
                         
-                    FROM account_gestating_ops a
+                    FROM account_lactating_ops a
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                     %s
-                    ORDER BY a.num_days_since_insem
+                    ORDER BY a.num_days_since_birth
                     """ % where_clause
 
             
@@ -293,7 +293,7 @@ class AccountGestatingOps:
                 if inc_user_audit == 0:
                     cur_entry = {
                         'id':                   row[0],
-                        'num_days_since_insem': row[1],
+                        'num_days_since_birth': row[1],
                         'name':                 row[2],
                         'desc':                 row[3],
                         
@@ -303,7 +303,7 @@ class AccountGestatingOps:
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        'num_days_since_insem': row[1],
+                        'num_days_since_birth': row[1],
                         'name':                 row[2],
                         'desc':                 row[3],
                         
