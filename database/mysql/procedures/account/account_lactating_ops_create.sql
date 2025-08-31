@@ -17,6 +17,7 @@ BEGIN
 
 
 /* Default account gestating operation*/
+DECLARE LACTATING_OPS_NUM_DAYS_CUT_TEETH_AND_TAIL INT           DEFAULT 2;
 DECLARE LACTATING_OPS_NUM_DAYS_INJECT_IRON_1    INT             DEFAULT 2;
 DECLARE LACTATING_OPS_NUM_DAYS_INJECT_IRON_2    INT             DEFAULT 12;
 DECLARE LACTATING_OPS_NUM_DAYS_INJECT_VITA_1    INT             DEFAULT 13;
@@ -27,6 +28,16 @@ DECLARE LACTATING_OPS_NUM_DAYS_DEWORM           INT             DEFAULT 24;
 
 
 /* Create default gestating_operation for the account.*/
+INSERT INTO account_lactating_ops (
+    account_id,
+    num_days_since_birth,
+    name
+) VALUES (
+    in_account_id,
+    LACTATING_OPS_NUM_DAYS_CUT_TEETH_AND_TAIL,
+    "Cut teeth and tail"
+);
+
 INSERT INTO account_lactating_ops (
     account_id,
     num_days_since_birth,

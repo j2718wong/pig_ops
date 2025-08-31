@@ -327,3 +327,39 @@ class DataProdGestatingOps(BaseModel):
     staff_id:           int = 0
     date:               str
     notes:              str = None
+    
+    
+class DataProdLactatingOps(BaseModel):
+    uhid:               str
+    
+    prod_lactating_ops_hid: str = None
+    staff_hid:          str
+    
+    user_id:            int = 0
+    prod_lactating_ops_id:  int = 0
+    staff_id:           int = 0
+    date:               str
+    notes:              str = None
+    
+    
+class DataProdFeedBuy(BaseModel):
+    uhid:               str
+    
+    pig_prod_hid:       str = None
+    prod_feed_buy_hid:  str = None
+    
+    
+    user_id:            int = 0
+    pig_prod_id:        int = 0
+    prod_feed_buy_id:   int = 0
+    
+    
+    date_buy:           str
+    feed_type_id:       int
+    feed_brand_id:      int
+    feed_supplier_id:   int
+    kg_per_quantity:    float
+    
+    unit_cost:          float
+    total_cost:         float
+    

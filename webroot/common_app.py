@@ -62,6 +62,10 @@ from model.m_pig_production     import PigProduction
 from model.m_pig_prod_notes     import PigProdNotes
 from model.m_pig_prod_pig_dead  import PigProdPigDead
 from model.m_prod_gestating_ops import ProdGestatingOps
+from model.m_prod_lactating_ops import ProdLactatingOps
+
+from model.m_prod_feed_buy      import ProdFeedBuy
+
 
 
 
@@ -98,7 +102,9 @@ model_names = [
     ('prod_notes',              PigProdNotes),
     ('prod_pig_dead',           PigProdPigDead),
     ('prod_gestating_ops',      ProdGestatingOps),
+    ('prod_lactating_ops',      ProdLactatingOps),
     
+    ('prod_feed_buy',           ProdFeedBuy),
     
     ('sow_act',                 SowActivity)
     

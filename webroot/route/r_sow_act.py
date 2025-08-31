@@ -999,7 +999,7 @@ def write_feeds_consumed(data):
                 
             num_bought  = num_lactating['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1010,7 +1010,7 @@ def write_feeds_consumed(data):
             
             num_consumed  = num_lactating['consumed']
             
-            if num_consumed is not None:
+            if num_consumed is not None and num_consumed > 0:
                 s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1022,7 +1022,7 @@ def write_feeds_consumed(data):
                 
             num_left        = num_lactating['left']
             
-            if num_left is not None:
+            if num_left is not None and num_left > 0:
                 feeds_left_lactating    += num_left
                 
                 s_temp      = f"{num_left:.1f}"
@@ -1043,7 +1043,7 @@ def write_feeds_consumed(data):
             
             num_bought  = num_booster['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1055,7 +1055,7 @@ def write_feeds_consumed(data):
             
             num_consumed  = num_booster['consumed']
             
-            if num_consumed is not None:
+            if num_consumed is not None and num_consumed > 0:
                 s_temp      = str(int(num_consumed))
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1067,7 +1067,7 @@ def write_feeds_consumed(data):
                 
             num_left        = num_booster['left']
             
-            if num_left is not None:
+            if num_left is not None and num_left > 0:
                 feeds_left_booster  += num_left
                 s_temp      = str(int(num_left))
                 num_chars   = len(s_temp)
@@ -1087,7 +1087,7 @@ def write_feeds_consumed(data):
                 
             num_bought  = num_prestarter['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1098,7 +1098,7 @@ def write_feeds_consumed(data):
             
             num_consumed  = num_prestarter['consumed']
             
-            if num_consumed is not None:
+            if num_consumed is not None and num_consumed > 0:
                 s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1110,7 +1110,7 @@ def write_feeds_consumed(data):
                 
             num_left        = num_prestarter['left']
             
-            if num_left is not None:
+            if num_left is not None and num_left > 0:
                 feeds_left_prestarter   += num_left
                 
                 s_temp      = f"{num_left:.1f}"
@@ -1131,7 +1131,7 @@ def write_feeds_consumed(data):
                 
             num_bought  = num_starter['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1143,7 +1143,7 @@ def write_feeds_consumed(data):
             
             num_consumed  = num_starter['consumed']
             
-            if num_consumed is not None:
+            if num_consumed is not None and num_consumed > 0:
                 s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1155,7 +1155,7 @@ def write_feeds_consumed(data):
                 
             num_left        = num_starter['left']
             
-            if num_left is not None:
+            if num_left is not None and num_left > 0:
                 feeds_left_starter      += num_left
                 s_temp      = f"{num_left:.1f}"
                 num_chars   = len(s_temp)
@@ -1175,7 +1175,7 @@ def write_feeds_consumed(data):
                 
             num_bought  = num_grower['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1187,7 +1187,7 @@ def write_feeds_consumed(data):
             
             num_consumed  = num_grower['consumed']
             
-            if num_consumed is not None:
+            if num_consumed is not None and num_consumed > 0:
                 s_temp      = f"{num_consumed:.1f}"
                 num_chars   = len(s_temp)
                 num_space   = 4 - num_chars
@@ -1199,7 +1199,7 @@ def write_feeds_consumed(data):
                 
             num_left        = num_grower['left']
             
-            if num_left is not None:
+            if num_left is not None and num_left > 0:
                 feeds_left_grower       += num_left
                 s_temp      = f"{num_left:.1f}"
                 num_chars   = len(s_temp)
@@ -1353,7 +1353,7 @@ def write_feeds_cost(data):
                 
             num_bought  = num_lactating['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1382,7 +1382,7 @@ def write_feeds_cost(data):
             
             num_bought  = num_booster['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1411,7 +1411,7 @@ def write_feeds_cost(data):
                 
             num_bought  = num_prestarter['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1439,7 +1439,7 @@ def write_feeds_cost(data):
                 
             num_bought  = num_starter['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars
@@ -1468,7 +1468,7 @@ def write_feeds_cost(data):
                 
             num_bought  = num_grower['bought']
             
-            if num_bought is not None:
+            if num_bought is not None and num_bought > 0:
                 s_temp      = str(num_bought)
                 num_chars   = len(s_temp)
                 num_space   = 3 - num_chars

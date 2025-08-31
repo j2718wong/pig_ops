@@ -144,12 +144,20 @@ class TestAPIPigProd:
             
             data_insem = self._test_pig_prod_update_insem(data_add)
             
+            if count_sow < 2:
+                self._test_prod_gestating_ops(user_uhid, pig_prod_hid, staff_hid,
+                    before_birth = 1)
+                    
+                self._test_prod_lactating_ops(user_uhid, pig_prod_hid, staff_hid, 
+                    after_birth = 0)
+                
             
+            # update birth
             data_birth = self._test_prod_update_birth(data_add)
             
             notes = "Nanganak anay " + cur_sow['name']
             self._test_pig_prod_notes_add(user_uhid, pig_prod_hid, notes)
-            
+                
             
             if count_sow < 2:
                 # This is a datetime object
@@ -180,6 +188,14 @@ class TestAPIPigProd:
                 self._test_prod_pig_dead_update(data_pig_dead)
                 
                 
+                # Test again if it will give correct error message
+                self._test_prod_gestating_ops(user_uhid, pig_prod_hid, staff_hid,
+                    before_birth = 0)
+                
+                self._test_prod_lactating_ops(user_uhid, pig_prod_hid, staff_hid, 
+                    after_birth = 1)
+                
+            
             
             self._test_prod_update_weaning(data_birth)
             
@@ -526,7 +542,7 @@ class TestAPIPigProd:
         }
         
         
-        print(f'\n\n***** Testing pig_prod_update_weaning; url = {url} ; data')
+        print(f"\n\n***** Testing pig_prod_update_weaning; url = {url} ; data")
         pprint.pprint(data_weaning)
         
         r = requests.post(url, json = data_weaning)
@@ -596,7 +612,144 @@ class TestAPIPigProd:
         
         return data
     
-
+    
+    def _test_prod_gestating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
+            before_birth = 1):
+        
+        url = BASE_URL + 'prod_gestating_ops/list?prod_hid=' + pig_prod_hid
+        
+        print(f'\n\n****** GET prod_gestating_ops list; url = {url} ')
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+     
+    
+        list_gestating_ops          = res_json['data']
+        
+        
+        gest_ops_to_update = None
+        # Find the gestating_ops that has a name of 'Inject Iron'
+        for cur_entry in list_gestating_ops:
+            if cur_entry['acc_gestating_ops']['name'] == 'Inject Iron':
+                gest_ops_to_update = cur_entry
+                break
+                
+        if gest_ops_to_update is None:
+            return
+            
+            
+        self.summary['pig_prod']['gestating_ops'] = {}
+        self.summary['pig_prod']['gestating_ops']['list'] = 'OK' 
+        
+            
+        prod_gestating_ops_hid  = gest_ops_to_update['prod_gestating_ops']['hid']
+        date_update = gest_ops_to_update['prod_gestating_ops']['date_target']
+        
+        
+        url = BASE_URL + 'prod_gestating_ops/update'
+        
+        data = {
+            "uhid":                 user_uhid,
+            "prod_gestating_ops_hid": prod_gestating_ops_hid,
+            "staff_hid":            staff_hid,
+            
+            "date":     date_update,
+            "notes":    "updated gestating ops"
+            
+        }
+            
+            
+        print(f"\n\n***** Testing prod_gestating_ops update; before_birth = {before_birth}; url = {url} ; data")
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        
+        if before_birth > 0:
+            assert(result_num == 0)
+        else:
+            assert(result_num > 0)
+        
+        self.summary['pig_prod']['gestating_ops']['update'] = 'OK'
+        
+        
+    def _test_prod_lactating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
+            after_birth = 1):
+        
+        url = BASE_URL + 'prod_lactating_ops/list?prod_hid=' + pig_prod_hid
+        
+        print(f'\n\n****** GET prod_lactating_ops list; url = {url} ')
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+     
+    
+        list_lactating_ops          = res_json['data']
+        
+        
+        lact_ops_to_update = None
+        # Find the lactating_ops that has a name of 'Inject Iron_2'
+        for cur_entry in list_lactating_ops:
+            if cur_entry['acc_lactating_ops']['name'] == 'Inject Iron_2':
+                lact_ops_to_update = cur_entry
+                break
+                
+        if lact_ops_to_update is None:
+            return
+            
+            
+        self.summary['pig_prod']['lactating_ops'] = {}
+        self.summary['pig_prod']['lactating_ops']['list'] = 'OK' 
+        
+            
+        prod_lactating_ops_hid  = lact_ops_to_update['prod_lactating_ops']['hid']
+        date_update = lact_ops_to_update['prod_lactating_ops']['date_target']
+        
+        
+        url = BASE_URL + 'prod_lactating_ops/update'
+        
+        data = {
+            "uhid":                 user_uhid,
+            "prod_lactating_ops_hid": prod_lactating_ops_hid,
+            "staff_hid":            staff_hid,
+            
+            "date":     date_update,
+            "notes":    "updated lactating ops"
+            
+        }
+            
+            
+        print(f"\n\n***** Testing prod_lactating_ops update; after_birth = {after_birth}; url = {url} ; data")
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        
+        if after_birth > 0:
+            assert(result_num == 0)
+        else:
+            assert(result_num > 0)
+        
+        self.summary['pig_prod']['lactating_ops']['update'] = 'OK'
+        
     
         
 if __name__ == '__main__':

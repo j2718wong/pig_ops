@@ -1,6 +1,7 @@
 # December 13, 2024
 # Jack Wong (zhaoshan99@gmail.com)
 
+from fastapi_offline            import FastAPIOffline
 from fastapi                    import FastAPI, Depends, HTTPException, status
 from fastapi.security           import HTTPBasicCredentials, HTTPBearer
 from jose                       import jwt, JWTError
@@ -18,7 +19,7 @@ release_mode                = RELEASE_MODE_PRODUCTION
 
 
 
-app = FastAPI()
+app = FastAPIOffline()
 
 
 JWT_TOKEN_AUTHENTICATED             = 0

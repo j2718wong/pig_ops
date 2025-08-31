@@ -12,7 +12,7 @@ CREATE PROCEDURE pig_prod_gestating_ops_add(
 BEGIN
 
 /** 
- * A sub procedure to create production_gestating_notes entries.
+ * A sub procedure to create prod_gestating_ops entries.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 30, 2025

@@ -53,6 +53,8 @@ DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
+DECLARE cur_count_prod_lactating_ops            INT             DEFAULT 0;
+
 
 DECLARE res_num                                 INT             DEFAULT 0;
 DECLARE res_code                                VARCHAR(80)     DEFAULT '';
@@ -122,6 +124,23 @@ UPDATE pig_production SET
     dt_last_update              = CURRENT_TIMESTAMP
     
 WHERE id =  in_pig_prod_id;
+
+
+SELECT  COUNT(*)
+INTO    cur_count_prod_lactating_ops
+FROM    prod_lactating_ops
+WHERE pig_prod_id = in_pig_prod_id;
+
+IF cur_count_prod_lactating_ops = 0 THEN 
+    CALL pig_prod_lactating_ops_add(
+        in_user_id,
+        
+        cur_pig_prod_account_id, 
+        in_pig_prod_id,
+        in_date_actual_birth
+    );
+
+END IF;
 
 END process_user;
 

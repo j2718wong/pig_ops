@@ -1,0 +1,416 @@
+# August 31, 2025
+# Jack Wong
+
+from common_constants       import *
+
+
+class ProdFeedBuy:
+    def __init__(self, model):
+        self.model              = model
+        self.TAG                = 'ProdFeedBuy'
+
+
+    def add(self, data = None):
+        """
+        PROCEDURE prod_feed_buy_add(
+            in_user_id              INT,
+            in_pig_prod_id          INT,
+            
+            in_date_buy             VARCHAR(10),
+            in_feed_type_id         INT,
+            in_feed_brand_id        INT,
+            in_feed_vendor_id       INT,
+            quantity                INT,
+            kg_per_qty              DECIMAL(5,1),
+            
+            unit_cost               DECIMAL(8,2),
+            total_cost              DECIMAL(8,2)
+
+        )  
+        """
+        
+        sql =  'CALL prod_feed_buy_add('
+        sql += '%s,'    % data.user_id
+        
+        sql += '%s,'    % data.pig_prod_id
+        sql += '"%s",'  % data.date_buy
+        
+        sql += '%s,'    % data.feed_type_id
+        sql += '%s,'    % data.feed_brand_id
+        sql += '%s,'    % data.feed_vendor_id
+        sql += '%s,'    % data.kg_per_quantity
+       
+        sql += '%s,'    % data.unit_cost
+        sql += '%s)'    % data.total_cost
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'add(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'prod_feed_buy': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
+    
+    def update(self, data = None):
+        """
+        PROCEDURE prod_feed_buy_update(
+            in_user_id              INT,
+            in_prod_feed_buy_id     INT,
+            
+            in_date_buy             VARCHAR(10),
+            in_feed_type_id         INT,
+            in_feed_brand_id        INT,
+            in_feed_vendor_id       INT,
+            quantity                INT,
+            kg_per_qty              DECIMAL(5,1),
+            
+            unit_cost               DECIMAL(8,2),
+            total_cost              DECIMAL(8,2)
+
+        )  
+        """
+        
+        sql =  'CALL prod_feed_buy_update('
+        sql += '%s,'    % data.user_id
+        
+        sql += '%s,'    % data.prod_feed_buy_id
+        sql += '"%s",'  % data.date_buy
+        
+        sql += '%s,'    % data.feed_type_id
+        sql += '%s,'    % data.feed_brand_id
+        sql += '%s,'    % data.feed_vendor_id
+        sql += '%s,'    % data.kg_per_quantity
+       
+        sql += '%s,'    % data.unit_cost
+        sql += '%s)'    % data.total_cost
+        
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'prod_feed_buy': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
+    
+    def delete(self, data = None):
+        user_id             = data['user_id']
+        prod_feed_buy_id    = data['prod_feed_buy_id']
+        
+        """
+        PROCEDURE prod_feed_buy_delete(
+            in_user_id                  INT,
+            
+            in_prod_feed_buy_id         INT
+        )
+        """
+       
+        sql =  'CALL prod_feed_buy_delete('
+        sql += '%s,'    % user_id
+        sql += '%s);'   % prod_feed_buy_id
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'delete(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'prod_feed_buy': {
+                    'id':               row[3],
+                    'flag':             row[4],
+                    'name':             row[5]
+                }
+            }
+
+        return None
+    
+    
+    def get_list(self, pig_prod_id, inc_user_audit = 0):
+        
+       
+        
+        if inc_user_audit == 0:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        
+                        a.date_buy,
+                        a.quantity,
+                        a.kg_per_qty,
+                        a.kg_total,
+                        
+                        a.unit_cost,
+                        a.feed_cost,
+                        
+                        a.dt_entry,
+                        
+                        a.feed_type_id,
+                        b.name AS feed_type_name,
+                        
+                        a.feed_brand_id,
+                        c.name AS feed_brand_name,
+                        
+                        a.feed_vendor_id,
+                        d.name AS vendor name
+                        
+                    FROM prod_feed_buy a 
+                    LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                    LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                    LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                    WHERE a.pig_prod_id = %s
+                    ORDER BY a.id
+                    """ % pig_prod_id
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        
+                        a.date_buy,
+                        a.quantity,
+                        a.kg_per_qty,
+                        a.kg_total,
+                        
+                        a.unit_cost,
+                        a.feed_cost,
+                        
+                        a.dt_entry,
+                        
+                        a.feed_type_id,
+                        b.name AS feed_type_name,
+                        
+                        a.feed_brand_id,
+                        c.name AS feed_brand_name,
+                        
+                        a.feed_vendor_id,
+                        d.name AS vendor name,
+                        
+                        
+                        e.username,
+                        e.name_last,
+                        e.name_first,
+                        a.dt_entry,
+                        
+                        
+                        f.username,
+                        f.name_last,
+                        f.name_first,
+                        a.dt_last_update
+                        
+                    FROM prod_feed_buy a 
+                    LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                    LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                    LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                    LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
+                    LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
+                    WHERE a.pig_prod_id = %s
+                    ORDER BY a.id
+                    """ % pig_prod_id
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                if inc_user_audit == 0:
+                    cur_entry = {
+                        'feed_buy': {
+                            'id':               row[0],
+                            'date_buy':         str(row[1]),
+                            'quantity':         row[2],
+                            'kg_per_qty':       float(row[3]),
+                            'kg_total':         float(row[4]),
+                            'unit_cost':        float(row[5]),
+                            'feed_cost':        float(row[6]),
+                            'dt_entry':         str(row[7])
+                        },
+                        
+                        'feed_type':{
+                            'id':               row[8],
+                            'name':             row[9],
+                        },
+                        
+                        'feed_brand':{
+                            'id':               row[10],
+                            'name':             row[11],
+                        },
+                        
+                        'feed_supplier':{
+                            'id':               row[12],
+                            'name':             row[13],
+                        }
+                    }
+                    
+                else:
+                    cur_entry = {
+                        'feed_buy': {
+                            'id':               row[0],
+                            'date_buy':         str(row[1]),
+                            'quantity':         row[2],
+                            'kg_per_qty':       float(row[3]),
+                            'kg_total':         float(row[4]),
+                            'unit_cost':        float(row[5]),
+                            'feed_cost':        float(row[6]),
+                            'dt_entry':         str(row[7])
+                        },
+                        
+                        'feed_type':{
+                            'id':               row[8],
+                            'name':             row[9],
+                        },
+                        
+                        'feed_brand':{
+                            'id':               row[10],
+                            'name':             row[11],
+                        },
+                        
+                        'feed_supplier':{
+                            'id':               row[12],
+                            'name':             row[13],
+                        },
+                        
+                        'added_by': {
+                            'username':         row[14],
+                            'name_last':        row[15],
+                            'name_first':       row[16],
+                            'dt_entry':         row[17]
+                        },
+                        
+                        'last_update':{
+                            'username':         row[18],
+                            'name_last':        row[19],
+                            'name_first':       row[20],
+                            'dt_update':        str(row[21]) if row[21] else None
+                        }
+                    }
+                
+                    
+                result.append(cur_entry)
+        
+        return result
+    
+    

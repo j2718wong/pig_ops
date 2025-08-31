@@ -33,6 +33,10 @@ from route.r_pig_production     import *
 from route.r_pig_prod_notes     import *
 from route.r_pig_prod_pig_dead  import *
 from route.r_prod_gestating_ops import *
+from route.r_prod_lactating_ops import *
+
+from route.r_prod_feed_buy      import *
+
 
 from route.r_testing            import *
 
