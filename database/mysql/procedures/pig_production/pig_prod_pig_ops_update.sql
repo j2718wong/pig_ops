@@ -26,7 +26,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_CANNOT_BE_UDPATED               INT             DEFAULT 20;
 
 
-DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS      	INT             DEFAULT 23;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS        INT             DEFAULT 23;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -51,7 +51,7 @@ DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_farm_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
-DECLARE cur_prod_pig_ops_id                   	INT             DEFAULT 0;
+DECLARE cur_prod_pig_ops_id                     INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -66,12 +66,12 @@ SET res_code    = "SUCCESS";
 SELECT  
         b.account_id,
         a.pig_prod_id,
-		a.operation_type,
+        a.operation_type,
         b.prod_status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_id,
-		cur_pig_prod_pig_ops_operation_type,
+        cur_pig_prod_pig_ops_operation_type,
         cur_pig_prod_status_id
         
 FROM    pig_prod_pig_ops a
@@ -104,12 +104,12 @@ END IF;
 
 
 IF cur_pig_prod_pig_ops_operation_type = PIG_OPERATION_TYPE_GESTATING THEN 
-	IF cur_pig_prod_status_id != PRODUCTION_STATUS_ID_GESTATING THEN 
-		SET res_num     = RES_NUM_CANNOT_BE_UDPATED;
-		SET res_code    = "RES_NUM_CANNOT_BE_UDPATED";
-		
-		LEAVE process_user;
-	END IF;
+    IF cur_pig_prod_status_id != PRODUCTION_STATUS_ID_GESTATING THEN 
+        SET res_num     = RES_NUM_CANNOT_BE_UDPATED;
+        SET res_code    = "RES_NUM_CANNOT_BE_UDPATED";
+        
+        LEAVE process_user;
+    END IF;
 END IF;
 
 

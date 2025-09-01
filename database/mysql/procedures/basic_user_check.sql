@@ -115,17 +115,23 @@ DECLARE cur_biz_obj_flag_bit_num                INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_business_obj          INT             DEFAULT 0;
         
 DECLARE cur_user_grp_flag_priv_user             INT             DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_user_group       INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_account          INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_account_request  INT             DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_user_group       INT             DEFAULT 0;
+
+
+DECLARE cur_user_grp_flag_priv_account_translation INT          DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_account_billing  INT             DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_account_reserved INT             DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_account_pig_ops INT              DEFAULT 0;
+
 
 DECLARE cur_user_grp_flag_priv_pig_farm         INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_pig_farm_staff   INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_pig_race         INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_pig_race_line    INT             DEFAULT 0;
 
-DECLARE cur_user_grp_flag_priv_acc_gestating_ops INT            DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_acc_lactating_ops INT            DEFAULT 0;
+
 
 
 DECLARE cur_user_grp_flag_priv_semen_supplier   INT             DEFAULT 0;
@@ -140,13 +146,13 @@ DECLARE cur_user_grp_flag_priv_semen_source     INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_pig_production   INT             DEFAULT 0;
 DECLARE cur_user_grp_flag_priv_pig_prod_ai      INT             DEFAULT 0;
 
-DECLARE cur_user_grp_flag_priv_pig_prod_feed_buy    INT         DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_pig_prod_feed_bal    INT         DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_pig_prod_feed_buy INT            DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_pig_prod_feed_bal INT            DEFAULT 0;
 
-DECLARE cur_user_grp_flag_priv_prod_gestating_ops   INT         DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_prod_lactating_ops   INT         DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_prod_pig_dead        INT         DEFAULT 0;
-DECLARE cur_user_grp_flag_priv_prod_pig_harvest     INT         DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_pig_prod_pig_ops INT             DEFAULT 0;
+
+DECLARE cur_user_grp_flag_priv_pig_prod_pig_dead    INT         DEFAULT 0;
+DECLARE cur_user_grp_flag_priv_pig_prod_pig_harvest INT         DEFAULT 0;
     
 DECLARE cur_user_grp_flag_priv_prod_notes       INT             DEFAULT 0;
 
@@ -180,13 +186,15 @@ SELECT
     b.flag_priv_account_request,
     b.flag_priv_user_group,
     
+    b.flag_priv_account_translation,
+    b.flag_priv_account_billing,
+    b.flag_priv_account_reserved,
+    b.flag_priv_account_pig_ops,
+    
     b.flag_priv_pig_farm,
     b.flag_priv_pig_farm_staff,
     b.flag_priv_pig_race,
     b.flag_priv_pig_race_line,
-    
-    b.flag_priv_acc_gestating_ops,
-    b.flag_priv_acc_lactating_ops,
     
     b.flag_priv_semen_supplier,
     b.flag_priv_feed_supplier,
@@ -201,12 +209,12 @@ SELECT
     b.flag_priv_pig_prod_feed_buy,
     b.flag_priv_pig_prod_feed_bal,
     
-    b.flag_priv_prod_gestating_ops,
-    b.flag_priv_prod_lactating_ops,
-    b.flag_priv_prod_pig_dead,
-    b.flag_priv_prod_pig_harvest,
+    b.flag_priv_pig_prod_pig_ops,
+
+    b.flag_priv_pig_prod_pig_dead,
+    b.flag_priv_pig_prod_pig_harvest,
     
-    b.flag_priv_prod_notes
+    b.flag_priv_pig_prod_notes
 
 INTO    
     cur_user_flag,
@@ -216,17 +224,20 @@ INTO
     cur_user_grp_flag_business_obj,
         
     cur_user_grp_flag_priv_user,
-    cur_user_grp_flag_priv_user_group,
     cur_user_grp_flag_priv_account,
     cur_user_grp_flag_priv_account_request,
+    cur_user_grp_flag_priv_user_group,
+    
+    cur_user_grp_flag_priv_account_translation,
+    cur_user_grp_flag_priv_account_billing,
+    cur_user_grp_flag_priv_account_reserved,
+    cur_user_grp_flag_priv_account_pig_ops,
     
     cur_user_grp_flag_priv_pig_farm,
     cur_user_grp_flag_priv_pig_farm_staff,
     cur_user_grp_flag_priv_pig_race,
     cur_user_grp_flag_priv_pig_race_line,
     
-    cur_user_grp_flag_priv_acc_gestating_ops,
-    cur_user_grp_flag_priv_acc_lactating_ops,
     
     cur_user_grp_flag_priv_semen_supplier,
     cur_user_grp_flag_priv_feed_supplier,
@@ -241,12 +252,12 @@ INTO
     cur_user_grp_flag_priv_pig_prod_feed_buy,
     cur_user_grp_flag_priv_pig_prod_feed_bal,
     
-    cur_user_grp_flag_priv_prod_gestating_ops,
-    cur_user_grp_flag_priv_prod_lactating_ops,
-    cur_user_grp_flag_priv_prod_pig_dead,
-    cur_user_grp_flag_priv_prod_pig_harvest,
+    cur_user_grp_flag_priv_pig_prod_pig_ops,
+
+    cur_user_grp_flag_priv_pig_prod_pig_dead,
+    cur_user_grp_flag_priv_pig_prod_pig_harvest,
     
-    cur_user_grp_flag_priv_prod_notes
+    cur_user_grp_flag_priv_pig_prod_notes
     
 FROM  user a 
 LEFT OUTER JOIN  user_group b ON  a.user_group_id = b.id
@@ -365,6 +376,18 @@ WHEN BUSINESS_OBJ_ID_USER_GROUP THEN
     SET cur_group_flag = cur_user_grp_flag_priv_user_group;
     
     
+    
+WHEN BUSINESS_OBJ_ID_ACCOUNT_TRANSLATION THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_account_translation;
+    
+WHEN BUSINESS_OBJ_ID_ACCOUNT_BILLING THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_account_billing;
+    
+    
+WHEN BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS THEN
+    SET cur_group_flag = cur_user_grp_flag_priv_account_pig_ops;
+    
+    
 WHEN BUSINESS_OBJ_ID_PIG_FARM THEN
     SET cur_group_flag = cur_user_grp_flag_priv_pig_farm;
     
@@ -377,12 +400,7 @@ WHEN BUSINESS_OBJ_ID_PIG_RACE THEN
 WHEN BUSINESS_OBJ_ID_PIG_RACE_LINE THEN
     SET cur_group_flag = cur_user_grp_flag_priv_pig_race_line;
 
-    
-WHEN BUSINESS_OBJ_ID_ACC_GESTATING_OPS THEN
-    SET cur_group_flag = cur_user_grp_flag_priv_acc_gestating_ops;
-    
-WHEN BUSINESS_OBJ_ID_ACC_LACTATING_OPS THEN
-    SET cur_group_flag = cur_user_grp_flag_priv_acc_lactating_ops;
+
 
     
 WHEN BUSINESS_OBJ_ID_SEMEN_SUPPLIER THEN
@@ -421,8 +439,7 @@ WHEN BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL THEN
 WHEN BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS THEN
     SET cur_group_flag = cur_user_grp_flag_priv_prod_gestating_ops;
         
-WHEN BUSINESS_OBJ_ID_PROD_LACTATING_OPS THEN
-    SET cur_group_flag = cur_user_grp_flag_priv_prod_lactating_ops;
+    
     
 WHEN BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD THEN
     SET cur_group_flag = cur_user_grp_flag_priv_prod_pig_dead;
