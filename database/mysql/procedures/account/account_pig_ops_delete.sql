@@ -20,7 +20,7 @@ BEGIN
 DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 
 
-DECLARE BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION   INT             DEFAULT 10;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS   INT             DEFAULT 10;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -64,7 +64,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_account_pig_ops_account_id, /* compare user.account_id to this account_id*/
     
-    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION,
+    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS,
     FLAG_BIT_OPERATION_DELETE,
     
     cur_user_account_id, 

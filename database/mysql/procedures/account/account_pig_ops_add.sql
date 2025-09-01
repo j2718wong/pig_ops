@@ -26,18 +26,11 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_DUPLICATE_ENTRY                 INT             DEFAULT 20;
 
 
-DECLARE BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION   INT             DEFAULT 10;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS       INT             DEFAULT 8;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
 DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
-
-
-
-DECLARE ACCOUNT_PIG_OPS_TYPE_GESTATING          INT             DEFAULT 1;
-DECLARE ACCOUNT_PIG_OPS_TYPE_LACTATING          INT             DEFAULT 2;
-DECLARE ACCOUNT_PIG_OPS_TYPE_GROWING            INT             DEFAULT 3;
-
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
@@ -63,7 +56,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     0,
     
-    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION,
+    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 

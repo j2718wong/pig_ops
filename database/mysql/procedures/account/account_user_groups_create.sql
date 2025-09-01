@@ -27,18 +27,17 @@ DECLARE BUSINESS_OBJ_ID_ACCOUNT                 INT             DEFAULT 2;
 DECLARE BUSINESS_OBJ_ID_ACCOUNT_REQUEST         INT             DEFAULT 3;
 DECLARE BUSINESS_OBJ_ID_USER_GROUP              INT             DEFAULT 4;
 
-DECLARE BUSINESS_OBJ_ID_ACC_TRANSLATION         INT             DEFAULT 5;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_TRANSLATION     INT             DEFAULT 5;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_BILLING         INT             DEFAULT 6;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_RESERVE         INT             DEFAULT 7;
+DECLARE BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS         INT             DEFAULT 8;
 
 
-DECLARE BUSINESS_OBJ_ID_PIG_FARM                INT             DEFAULT 6;
-DECLARE BUSINESS_OBJ_ID_PIG_FARM_STAFF          INT             DEFAULT 7;
-DECLARE BUSINESS_OBJ_ID_PIG_RACE                INT             DEFAULT 8;
-DECLARE BUSINESS_OBJ_ID_PIG_RACE_LINE           INT             DEFAULT 9;
+DECLARE BUSINESS_OBJ_ID_PIG_FARM                INT             DEFAULT 9;
+DECLARE BUSINESS_OBJ_ID_PIG_FARM_STAFF          INT             DEFAULT 10;
+DECLARE BUSINESS_OBJ_ID_PIG_RACE                INT             DEFAULT 11;
+DECLARE BUSINESS_OBJ_ID_PIG_RACE_LINE           INT             DEFAULT 12;
 
-
-DECLARE BUSINESS_OBJ_ID_ACC_PIG_OPERATION       INT             DEFAULT 10;
-/*reserver 11*/
-/*reserver 12*/
 
 DECLARE BUSINESS_OBJ_ID_SEMEN_SUPPLIER          INT             DEFAULT 13;
 DECLARE BUSINESS_OBJ_ID_FEED_SUPPLIER           INT             DEFAULT 14;
@@ -54,12 +53,12 @@ DECLARE BUSINESS_OBJ_ID_PIG_PROD_AI             INT             DEFAULT 20;
 DECLARE BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY       INT             DEFAULT 21;
 DECLARE BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL       INT             DEFAULT 22;
 
-DECLARE BUSINESS_OBJ_ID_PROD_GESTATING_OPS      INT             DEFAULT 23;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS        INT             DEFAULT 23;
 
-DECLARE BUSINESS_OBJ_ID_PROD_PIG_DEAD           INT             DEFAULT 26;
-DECLARE BUSINESS_OBJ_ID_PROD_PIG_HARVEST        INT             DEFAULT 27;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD       INT             DEFAULT 26;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_HARVEST    INT             DEFAULT 27;
 
-DECLARE BUSINESS_OBJ_ID_PROD_NOTES              INT             DEFAULT 28;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_NOTES          INT             DEFAULT 28;
 
 
 
@@ -91,15 +90,19 @@ FROM (
     WHERE   id IN ( BUSINESS_OBJ_ID_USER,
                     BUSINESS_OBJ_ID_ACCOUNT_REQUEST,
                     
-                    BUSINESS_OBJ_ID_ACC_TRANSLATION,
+                    BUSINESS_OBJ_ID_ACCOUNT_TRANSLATION,
+                    BUSINESS_OBJ_ID_ACCOUNT_BILLING,
+                    
+                    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPS,
+                    
                                         
                     BUSINESS_OBJ_ID_PIG_FARM,
                     BUSINESS_OBJ_ID_PIG_FARM_STAFF,
                     BUSINESS_OBJ_ID_PIG_RACE,
                     BUSINESS_OBJ_ID_PIG_RACE_LINE, 
                     
-                    BUSINESS_OBJ_ID_ACCOUNT_PIG_OPERATION,
-                    BUSINESS_OBJ_ID_ACC_LACTATING_OPS,
+                    
+
                     
                     BUSINESS_OBJ_ID_SEMEN_SUPPLIER,
                     BUSINESS_OBJ_ID_FEED_SUPPLIER,
@@ -114,12 +117,12 @@ FROM (
                     BUSINESS_OBJ_ID_PIG_PROD_FEED_BUY,
                     BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
                     
-                    BUSINESS_OBJ_ID_PROD_GESTATING_OPS,
-                    BUSINESS_OBJ_ID_PROD_LACTATING_OPS,
-                    BUSINESS_OBJ_ID_PROD_PIG_DEAD,
+                    BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS,
+
+                    BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD,
                     BUSINESS_OBJ_ID_PROD_PIG_HARVEST,
                     
-                    BUSINESS_OBJ_ID_PROD_NOTES
+                    BUSINESS_OBJ_ID_PIG_PROD_NOTES
                     
                 )
     ) a;
@@ -137,12 +140,12 @@ FROM (
                     
                     BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
                     
-                    BUSINESS_OBJ_ID_PROD_GESTATING_OPS,
-                    BUSINESS_OBJ_ID_PROD_LACTATING_OPS,
-                    BUSINESS_OBJ_ID_PROD_PIG_DEAD,
+                    BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS,
+
+                    BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD,
                     BUSINESS_OBJ_ID_PROD_PIG_HARVEST,
                     
-                    BUSINESS_OBJ_ID_PROD_NOTES
+                    BUSINESS_OBJ_ID_PIG_PROD_NOTES
                 )
     ) a;
 
@@ -162,13 +165,17 @@ INSERT INTO user_group(
     flag_priv_account_request,
     flag_priv_user_group,
     
+    flag_priv_acc_translation,
+    flag_priv_acc_billing,
+    flag_priv_acc_reserve,
+    flag_priv_acc_pig_operation,
+    
     flag_priv_pig_farm,
     flag_priv_pig_farm_staff,
     flag_priv_pig_race,
     flag_priv_pig_race_line,
     
-    flag_priv_acc_gestating_ops,
-    flag_priv_acc_lactating_ops,
+    
     
     flag_priv_semen_supplier,
     flag_priv_feed_supplier,

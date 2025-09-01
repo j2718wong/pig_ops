@@ -1,10 +1,10 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pig_prod_lactating_ops_update $$
-CREATE PROCEDURE pig_prod_lactating_ops_update(
+DROP PROCEDURE IF EXISTS pig_prod_pig_ops_update $$
+CREATE PROCEDURE pig_prod_pig_ops_update(
     in_user_id                  INT,
    
-    in_prod_lactating_ops_id    INT,
+    in_pig_prod_pig_ops_id      INT,
     in_staff_id                 INT,
     in_date                     VARCHAR(10),
     in_notes                    VARCHAR(160)
@@ -13,7 +13,7 @@ CREATE PROCEDURE pig_prod_lactating_ops_update(
 BEGIN
 
 /** 
- * Will update prod_lactating_ops entry.
+ * Will update pig_prod_pig_ops entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 28, 2025
@@ -26,14 +26,20 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_CANNOT_BE_UDPATED               INT             DEFAULT 20;
 
 
-DECLARE BUSINESS_OBJ_ID_PROD_LACTATING_OPS      INT             DEFAULT 24;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS      	INT             DEFAULT 23;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
 DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 
 
-DECLARE PRODUCTION_STATUS_ID_LACTATING          INT             DEFAULT 4;
+DECLARE PIG_OPERATION_TYPE_GESTATING            INT             DEFAULT 1;
+DECLARE PIG_OPERATION_TYPE_LACTATING            INT             DEFAULT 2;
+DECLARE PIG_OPERATION_TYPE_GROWING              INT             DEFAULT 3;
+
+
+
+DECLARE PRODUCTION_STATUS_ID_GESTATING          INT             DEFAULT 1;
 
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
@@ -45,7 +51,7 @@ DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_farm_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
-DECLARE cur_prod_lactating_ops_id                   INT             DEFAULT 0;
+DECLARE cur_prod_pig_ops_id                   	INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -60,15 +66,17 @@ SET res_code    = "SUCCESS";
 SELECT  
         b.account_id,
         a.pig_prod_id,
+		a.operation_type,
         b.prod_status_id
 INTO    
         cur_pig_prod_account_id,
         cur_pig_prod_id,
+		cur_pig_prod_pig_ops_operation_type,
         cur_pig_prod_status_id
         
-FROM    prod_lactating_ops a
+FROM    pig_prod_pig_ops a
 LEFT OUTER JOIN pig_production b ON a.pig_prod_id = b.id
-WHERE   a.id = in_prod_lactating_ops_id
+WHERE   a.id = in_pig_prod_pig_ops_id
 LIMIT   1;
 
 
@@ -77,7 +85,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_pig_prod_account_id, /* compare user.account_id to this account_id*/
     
-    BUSINESS_OBJ_ID_PROD_LACTATING_OPS,
+    BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS,
     FLAG_BIT_OPERATION_UPDATE,
     
     cur_user_account_id, 
@@ -95,15 +103,17 @@ IF res_num != RES_NUM_SUCCESS THEN
 END IF;
 
 
-IF cur_pig_prod_status_id != PRODUCTION_STATUS_ID_LACTATING THEN 
-    SET res_num     = RES_NUM_CANNOT_BE_UDPATED;
-    SET res_code    = "RES_NUM_CANNOT_BE_UDPATED";
-    
-    LEAVE process_user;
+IF cur_pig_prod_pig_ops_operation_type = PIG_OPERATION_TYPE_GESTATING THEN 
+	IF cur_pig_prod_status_id != PRODUCTION_STATUS_ID_GESTATING THEN 
+		SET res_num     = RES_NUM_CANNOT_BE_UDPATED;
+		SET res_code    = "RES_NUM_CANNOT_BE_UDPATED";
+		
+		LEAVE process_user;
+	END IF;
 END IF;
 
 
-UPDATE prod_lactating_ops SET
+UPDATE pig_prod_pig_ops SET
     date_actual         = in_date,
     notes               = in_notes,
     staff_id            = in_staff_id,
@@ -111,7 +121,7 @@ UPDATE prod_lactating_ops SET
     last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP
 
-WHERE id = in_prod_lactating_ops_id;
+WHERE id = in_pig_prod_pig_ops_id;
 
 
 END process_user;
@@ -121,7 +131,7 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_prod_lactating_ops_id            AS prod_lactating_ops_id;
+    in_pig_prod_pig_ops_id              AS pig_prod_pig_ops_id;
     
 
 END $$

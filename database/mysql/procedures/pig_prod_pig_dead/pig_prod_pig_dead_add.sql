@@ -27,7 +27,7 @@ DECLARE RES_NUM_SUCCESS                         INT             DEFAULT 0;
 DECLARE RES_NUM_PIG_PROD_CANNOT_ADD_PIG_DEAD    INT             DEFAULT 22;
 
 
-DECLARE BUSINESS_OBJ_ID_PROD_PIG_DEAD           INT             DEFAULT 26;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD           INT             DEFAULT 26;
 
 DECLARE FLAG_BIT_OPERATION_ADD                  INT             DEFAULT 1;
 DECLARE FLAG_BIT_OPERATION_UPDATE               INT             DEFAULT 2;
@@ -93,7 +93,7 @@ CALL basic_user_check(
     1, /* user must have an account*/
     cur_pig_prod_account_id, /* compare user.account_id to this account_id*/
     
-    BUSINESS_OBJ_ID_PROD_PIG_DEAD,
+    BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD,
     FLAG_BIT_OPERATION_ADD,
     
     cur_user_account_id, 
