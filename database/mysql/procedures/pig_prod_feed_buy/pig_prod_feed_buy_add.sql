@@ -1,7 +1,7 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS prod_feed_buy_add $$
-CREATE PROCEDURE prod_feed_buy_add(
+DROP PROCEDURE IF EXISTS pig_prod_feed_buy_add $$
+CREATE PROCEDURE pig_prod_feed_buy_add(
     in_user_id              INT,
     in_pig_prod_id          INT,
     
@@ -19,7 +19,7 @@ CREATE PROCEDURE prod_feed_buy_add(
 BEGIN
 
 /** 
- * Will add prod_feed_buy entry.
+ * Will add pig_prod_feed_buy entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 31, 2025
@@ -59,7 +59,7 @@ DECLARE cur_feed_cost                           DECIMAL(8,2)    DEFAULT 0;
 
 
 
-DECLARE cur_prod_feed_buy_id                    INT             DEFAULT 0;
+DECLARE cur_pig_prod_feed_buy_id                    INT             DEFAULT 0;
 DECLARE cur_prod_feed_buy_flag                  INT             DEFAULT 0;
 DECLARE cur_prod_feed_buy_name                  VARCHAR(50)     DEFAULT '';
 
@@ -109,14 +109,14 @@ END IF;
 
 /* Check for duplicate entry */
 SELECT  id
-INTO    cur_prod_feed_buy_id
-FROM    prod_feed_buy
+INTO    cur_pig_prod_feed_buy_id
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id         = in_pig_prod_id    AND
         date_buy            = in_date_buy       AND
         feed_type_id        = in_feed_type_id
 LIMIT   1;
 
-IF cur_prod_feed_buy_id > 0 THEN 
+IF cur_pig_prod_feed_buy_id > 0 THEN 
     SET res_num     = RES_NUM_DUPLICATE_ENTRY;
     SET res_code    = "RES_NUM_DUPLICATE_ENTRY";
     
@@ -125,7 +125,7 @@ END IF;
 
 
 
-INSERT INTO prod_feed_buy(
+INSERT INTO pig_prod_feed_buy(
     pig_prod_id,
     
     date_buy,
@@ -159,7 +159,7 @@ INSERT INTO prod_feed_buy(
     in_total_cost
 );
 
-SELECT LAST_INSERT_ID() INTO cur_prod_feed_buy_id;
+SELECT LAST_INSERT_ID() INTO cur_pig_prod_feed_buy_id;
 
 
 IF in_feed_type_id = FEED_TYPE_ID_LACTATING THEN 
@@ -167,7 +167,7 @@ IF in_feed_type_id = FEED_TYPE_ID_LACTATING THEN
             SUM(feed_cost)
     INTO    cur_feed_quantity,
             cur_feed_cost
-    FROM    prod_feed_buy
+    FROM    pig_prod_feed_buy
     WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = in_feed_type_id;
     
     
@@ -184,7 +184,7 @@ IF in_feed_type_id = FEED_TYPE_ID_BOOSTER THEN
             SUM(feed_cost)
     INTO    cur_feed_quantity,
             cur_feed_cost
-    FROM    prod_feed_buy
+    FROM    pig_prod_feed_buy
     WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = in_feed_type_id;
     
     UPDATE pig_production SET 
@@ -199,7 +199,7 @@ IF in_feed_type_id = FEED_TYPE_ID_PRESTARTER THEN
             SUM(feed_cost)
     INTO    cur_feed_quantity,
             cur_feed_cost
-    FROM    prod_feed_buy
+    FROM    pig_prod_feed_buy
     WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = in_feed_type_id;
     
     UPDATE pig_production SET 
@@ -214,7 +214,7 @@ IF in_feed_type_id = FEED_TYPE_ID_STARTER THEN
             SUM(feed_cost)
     INTO    cur_feed_quantity,
             cur_feed_cost
-    FROM    prod_feed_buy
+    FROM    pig_prod_feed_buy
     WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = in_feed_type_id;
     
     UPDATE pig_production SET 
@@ -229,7 +229,7 @@ IF in_feed_type_id = FEED_TYPE_ID_GROWER THEN
             SUM(feed_cost)
     INTO    cur_feed_quantity,
             cur_feed_cost
-    FROM    prod_feed_buy
+    FROM    pig_prod_feed_buy
     WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = in_feed_type_id;
     
     UPDATE pig_production SET 
@@ -244,7 +244,7 @@ IF in_feed_type_id = FEED_TYPE_ID_FINISHER THEN
             SUM(feed_cost)
     INTO    cur_feed_quantity,
             cur_feed_cost
-    FROM    prod_feed_buy
+    FROM    pig_prod_feed_buy
     WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = in_feed_type_id;
     
     UPDATE pig_production SET 
@@ -265,7 +265,7 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    cur_prod_feed_buy_id                AS prod_feed_buy_id;
+    cur_pig_prod_feed_buy_id            AS prod_feed_buy_id;
 
 END $$
 

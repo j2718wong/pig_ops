@@ -1,9 +1,9 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS prod_feed_buy_update $$
-CREATE PROCEDURE prod_feed_buy_update(
+DROP PROCEDURE IF EXISTS pig_prod_feed_buy_update $$
+CREATE PROCEDURE pig_prod_feed_buy_update(
     in_user_id              INT,
-    in_prod_feed_buy_id     INT,
+    in_pig_prod_feed_buy_id INT,
     
     in_date_buy             VARCHAR(10),
     in_feed_type_id         INT,
@@ -19,7 +19,7 @@ CREATE PROCEDURE prod_feed_buy_update(
 BEGIN
 
 /** 
- * Will update prod_feed_buy entry.
+ * Will update pig_prod_feed_buy entry.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 31, 2025
@@ -72,9 +72,9 @@ DECLARE cur_feed_cost_finisher                  DECIMAL(8,2)    DEFAULT 0;
 
 
 
-DECLARE cur_prod_feed_buy_id                    INT             DEFAULT 0;
-DECLARE cur_prod_feed_buy_flag                  INT             DEFAULT 0;
-DECLARE cur_prod_feed_buy_name                  VARCHAR(50)     DEFAULT '';
+DECLARE cur_pig_prod_feed_buy_id                    INT             DEFAULT 0;
+DECLARE cur_pig_prod_feed_buy_flag                  INT             DEFAULT 0;
+DECLARE cur_pig_prod_feed_buy_name                  VARCHAR(50)     DEFAULT '';
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -94,9 +94,9 @@ INTO
     cur_pig_prod_account_id,
     cur_pig_prod_status
 
-FROM prod_feed_buy a 
+FROM pig_prod_feed_buy a 
 LEFT OUTER JOIN pig_production b ON a.pig_prod_id = b.id 
-WHERE a.id = in_prod_feed_buy_id;
+WHERE a.id = in_pig_prod_feed_buy_id;
 
 
 CALL basic_user_check(
@@ -122,7 +122,7 @@ END IF;
 
 
 
-UPDATE prod_feed_buy  SET
+UPDATE pig_prod_feed_buy  SET
     date_buy            = in_date_buy,
     
     feed_type_id        = in_feed_type_id,
@@ -138,7 +138,7 @@ UPDATE prod_feed_buy  SET
     
     last_update_user_id = in_user_id,
     dt_last_update      = CURRENT_TIMESTAMP
-WHERE id = in_prod_feed_buy_id;
+WHERE id = in_pig_prod_feed_buy_id;
 
 
 
@@ -147,7 +147,7 @@ SELECT  SUM(quantity),
         SUM(feed_cost)
 INTO    cur_feed_quantity_lactating,
         cur_feed_cost_lactating
-FROM    prod_feed_buy
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = FEED_TYPE_ID_LACTATING;
     
     
@@ -155,7 +155,7 @@ SELECT  SUM(quantity),
         SUM(feed_cost)
 INTO    cur_feed_quantity_booster,
         cur_feed_cost_booster
-FROM    prod_feed_buy
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = FEED_TYPE_ID_BOOSTER;
     
     
@@ -163,7 +163,7 @@ SELECT  SUM(quantity),
         SUM(feed_cost)
 INTO    cur_feed_quantity_prestarter,
         cur_feed_cost_prestarter
-FROM    prod_feed_buy
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = FEED_TYPE_ID_PRESTARTER;
     
 
@@ -171,7 +171,7 @@ SELECT  SUM(quantity),
         SUM(feed_cost)
 INTO    cur_feed_quantity_starter,
         cur_feed_cost_starter
-FROM    prod_feed_buy
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = FEED_TYPE_ID_STARTER;
 
 
@@ -179,7 +179,7 @@ SELECT  SUM(quantity),
         SUM(feed_cost)
 INTO    cur_feed_quantity_grower,
         cur_feed_cost_grower
-FROM    prod_feed_buy
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = FEED_TYPE_ID_GROWER;
 
 
@@ -187,7 +187,7 @@ SELECT  SUM(quantity),
         SUM(feed_cost)
 INTO    cur_feed_quantity_finisher,
         cur_feed_cost_finisher
-FROM    prod_feed_buy
+FROM    pig_prod_feed_buy
 WHERE   pig_prod_id = in_pig_prod_id AND feed_type_id = FEED_TYPE_ID_FINISHER;
 
     
@@ -223,7 +223,7 @@ SELECT
     res_code                            AS result_code,
     res_desc                            AS result_desc,
     
-    in_prod_feed_buy_id                 AS prod_feed_buy_id;
+    in_pig_prod_feed_buy_id                 AS pig_prod_feed_buy_id;
 
 END $$
 
