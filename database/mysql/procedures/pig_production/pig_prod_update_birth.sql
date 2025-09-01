@@ -44,6 +44,10 @@ DECLARE PRODUCTION_STATUS_ID_WEANING            INT             DEFAULT 5;
 DECLARE PRODUCTION_STATUS_ID_HARVESTED          INT             DEFAULT 10;
 
 
+DECLARE PIG_OPERATION_TYPE_GESTATING            INT             DEFAULT 1;
+DECLARE PIG_OPERATION_TYPE_LACTATING            INT             DEFAULT 2;
+DECLARE PIG_OPERATION_TYPE_GROWING              INT             DEFAULT 3;
+
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
@@ -53,7 +57,7 @@ DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
 
-DECLARE cur_count_prod_lactating_ops            INT             DEFAULT 0;
+DECLARE cur_count_pig_prod_pig_ops            INT             DEFAULT 0;
 
 
 DECLARE res_num                                 INT             DEFAULT 0;
@@ -127,15 +131,17 @@ WHERE id =  in_pig_prod_id;
 
 
 SELECT  COUNT(*)
-INTO    cur_count_prod_lactating_ops
-FROM    prod_lactating_ops
-WHERE pig_prod_id = in_pig_prod_id;
+INTO    cur_count_pig_prod_pig_ops
+FROM    pig_prod_pig_ops
+WHERE   pig_prod_id = in_pig_prod_id AND operation_type = PIG_OPERATION_TYPE_LACTATING;
 
-IF cur_count_prod_lactating_ops = 0 THEN 
-    CALL pig_prod_lactating_ops_add(
+IF cur_count_pig_prod_pig_ops = 0 THEN 
+    /* Create pig_prod_pig_ops entry*/
+    CALL pig_prod_pig_ops_add(
         in_user_id,
         
         cur_pig_prod_account_id, 
+        PIG_OPERATION_TYPE_LACTATING,
         in_pig_prod_id,
         in_date_actual_birth
     );

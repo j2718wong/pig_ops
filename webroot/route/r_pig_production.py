@@ -32,7 +32,7 @@ async def pig_prod_status_list():
 
     """
     
-    return model['pig_prod'].get_production_status_list()
+    return model['pig_prod'].get_pig_prod_status_list()
     
 
 @app.post("/pig_prod/add")

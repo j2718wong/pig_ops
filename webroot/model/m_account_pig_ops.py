@@ -24,7 +24,7 @@ class AccountPigOps:
         
         sql =  'CALL account_pig_ops_add('
         sql += '%s,'    % data.user_id
-        
+        sql += '%s,'    % data.operation_type
         sql += '%s,'    % data.num_days_since
         sql += '"%s",'  % data.name
         
@@ -208,9 +208,10 @@ class AccountPigOps:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self, account_id, operation_type, inc_deleted = 0, inc_user_audit = 0):
         
-        where_clause = 'WHERE a.account_id = %s' % account_id 
+        values= (account_id, operation_type)
+        where_clause = 'WHERE a.account_id = %s AND a.operation_type =%s' % values
         
         if inc_deleted == 0:
             where_clause += ' AND (a.flag & 1) = 0' 

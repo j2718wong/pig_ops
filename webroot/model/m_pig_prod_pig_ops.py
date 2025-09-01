@@ -4,27 +4,27 @@
 from common_constants       import *
 
 
-class ProdGestatingOps:
+class PigProdPigOps:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'ProdGestatingOps'
+        self.TAG                = 'PigProdPigOps'
 
     
     def update(self, data = None):
         """
-        PROCEDURE pig_prod_gestating_ops_update(
+        PROCEDURE pig_prod_pig_ops_update(
             in_user_id                  INT,
            
-            in_prod_gestating_ops_id    INT,
+            in_pig_prod_pig_ops_id      INT,
             in_staff_id                 INT,
             in_date                     VARCHAR(10),
             in_notes                    VARCHAR(160)
         )
         """
        
-        sql =  'CALL pig_prod_gestating_ops_update('
+        sql =  'CALL pig_prod_pig_ops_update('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.prod_gestating_ops_id
+        sql += '%s,'    % data.pig_prod_pig_ops_id
         sql += '%s,'    % data.staff_id
         sql += '"%s",'  % data.date
     
@@ -73,7 +73,7 @@ class ProdGestatingOps:
         return None
     
     
-    def get_list(self, pig_prod_id, inc_user_audit = 0):
+    def get_list(self, pig_prod_id, operation_type, inc_user_audit = 0):
         
                
         if inc_user_audit == 0:
@@ -84,21 +84,21 @@ class ProdGestatingOps:
                         a.date_actual,
                         a.dt_entry,
                         
-                        a.acc_gestating_ops_id,
+                        a.account_pig_ops_id,
                         b.name,
-                        b.num_days_since_insem,
-                        b.flag AS acc_gestating_ops_flag,
+                        b.num_days_since,
+                        b.flag AS account_pig_ops_flag,
                         b.description,
                         
                         c.name  AS staff_name
                         
                         
-                    FROM prod_gestating_ops a 
-                    LEFT OUTER JOIN account_gestating_ops b ON a.acc_gestating_ops_id = b.id
-                    LEFT OUTER JOIN staff c                 ON a.staff_id = c.id
-                    WHERE a.pig_prod_id = %s
-                    ORDER BY b.num_days_since_insem
-                    """ % pig_prod_id
+                    FROM pig_prod_pig_ops a 
+                    LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
+                    LEFT OUTER JOIN staff c             ON a.staff_id = c.id
+                    WHERE a.pig_prod_id = %s AND a.operation_type = %s
+                    ORDER BY b.num_days_since
+                    """ % (pig_prod_id, operation_type)
         else:
             sql =   """
                     SELECT 
@@ -107,10 +107,10 @@ class ProdGestatingOps:
                         a.date_actual,
                         a.dt_entry,
                         
-                        a.acc_gestating_ops_id,
+                        a.account_pig_ops_id,
                         b.name,
-                        b.num_days_since_insem,
-                        b.flag AS acc_gestating_ops_flag,
+                        b.num_days_since,
+                        b.flag AS account_pig_ops_flag,
                         b.description,
                         
                         c.name  AS staff_name,
@@ -120,13 +120,13 @@ class ProdGestatingOps:
                         d.name_first,
                         a.dt_last_update
                         
-                    FROM prod_gestating_ops a 
-                    LEFT OUTER JOIN account_gestating_ops b ON a.acc_gestating_ops_id = b.id
-                    LEFT OUTER JOIN staff c                 ON a.staff_id = c.id
-                    LEFT OUTER JOIN user d                  ON a.last_update_user_id = d.id
-                    WHERE a.pig_prod_id = %s
-                    ORDER BY b.num_days_since_insem
-                    """ % pig_prod_id
+                    FROM pig_prod_pig_ops a 
+                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
+                    LEFT OUTER JOIN staff c              ON a.staff_id = c.id
+                    LEFT OUTER JOIN user d               ON a.last_update_user_id = d.id
+                    WHERE a.pig_prod_id = %s AND a.operation_type =%s
+                    ORDER BY b.num_days_since
+                    """ % (pig_prod_id, operation_type)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -163,17 +163,17 @@ class ProdGestatingOps:
                 if inc_user_audit == 0:
                     cur_entry = {
                     
-                        'prod_gestating_ops': {
+                        'pig_prod_pig_ops': {
                             'id':               row[0],
                             'date_target':      str(row[1]),
                             'date_actual':      str(row[2]) if row[2] else None,
                             'dt_entry':         str(row[3])
                         },
                         
-                        'acc_gestating_ops':{
+                        'account_pig_ops':{
                             'id':               row[4],
                             'name':             row[5],
-                            'num_days_since_insem': row[6],
+                            'num_days_since':   row[6],
                             'flag':             row[7],
                             'description':      row[8]
                         },
@@ -185,17 +185,17 @@ class ProdGestatingOps:
                     
                 else:
                     cur_entry = {
-                        'prod_gestatating_ops': {
+                        'pig_prod_pig_ops': {
                             'id':               row[0],
                             'date_target':      str(row[1]),
                             'date_actual':      str(row[2]) if row[2] else None,
                             'dt_entry':         str(row[3])
                         },
                         
-                        'acc_gestating_ops': {
+                        'account_pig_ops': {
                             'id':               row[4],
                             'name':             row[5],
-                            'num_days_since_insem': row[6],
+                            'num_days_since':   row[6],
                             'flag':             row[7],
                             'description':      row[8]
                         },

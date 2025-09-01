@@ -1,7 +1,7 @@
 ﻿DELIMITER $$
 
-DROP PROCEDURE IF EXISTS account_lactating_ops_create $$
-CREATE PROCEDURE account_lactating_ops_create(
+DROP PROCEDURE IF EXISTS account_growing_ops_create $$
+CREATE PROCEDURE account_growing_ops_create(
     in_account_id               INT
 )  
 

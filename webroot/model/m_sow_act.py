@@ -346,7 +346,7 @@ class SowActivity:
                     a.date_weaning
          
                 FROM pig_production a
-                LEFT OUTER JOIN production_status b           ON a.status_id = b.id
+                LEFT OUTER JOIN pig_prod_status b           ON a.prod_status_id = b.id
                 %s
                 ORDER BY %s
                 """ % (where_clause, order_by)
@@ -502,7 +502,7 @@ class SowActivity:
                     
                 FROM pig_production a
                 LEFT OUTER JOIN sow b ON a.sow_id = b.id
-                LEFT OUTER JOIN production_status c ON a.status_id = c.id
+                LEFT OUTER JOIN pig_prod_status c ON a.prod_status_id = c.id
                 %s
                 ORDER BY a.date_actual_birth DESC
                 """ % where_clause 

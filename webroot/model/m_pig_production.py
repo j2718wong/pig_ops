@@ -10,9 +10,9 @@ class PigProduction:
         self.TAG                = 'PigProduction'
 
     
-    def get_production_status_list(self):
+    def get_pig_prod_status_list(self):
         """
-        Will get production_status list.
+        Will get pig_prod_status list.
         
         
         Returns
@@ -25,7 +25,7 @@ class PigProduction:
                 SELECT 
                     id,
                     name
-                FROM production_status
+                FROM pig_prod_status
                 """ 
         
         
@@ -49,7 +49,7 @@ class PigProduction:
             #conn.close()
             
         except Exception as e:
-            msg = 'get_production_status_list(); error in executing query[] = ' + sql
+            msg = 'get_pig_prod_status_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -636,7 +636,7 @@ class PigProduction:
     
     def get_list(self, account_id = 0, id_list = None):
         """
-        Will get pig farm list.
+        Will get pig_production list.
         
         
         Returns

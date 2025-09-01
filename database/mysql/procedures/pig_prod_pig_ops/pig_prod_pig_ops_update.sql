@@ -50,6 +50,7 @@ DECLARE cur_pig_prod_id                         INT             DEFAULT 0;
 DECLARE cur_pig_prod_account_id                 INT             DEFAULT 0;
 DECLARE cur_pig_prod_pig_farm_id                INT             DEFAULT 0;
 DECLARE cur_pig_prod_status_id                  INT             DEFAULT 0;
+DECLARE cur_pig_prod_pig_ops_operation_type     INT             DEFAULT 0;
 
 DECLARE cur_prod_pig_ops_id                     INT             DEFAULT 0;
 

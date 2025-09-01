@@ -42,8 +42,7 @@ from model.m_user_group         import UserGroup
 from model.m_pig_farm           import PigFarm
 from model.m_pig_farm_staff     import PigFarmStaff
 
-from model.m_acc_gestating_ops  import AccountGestatingOps
-from model.m_acc_lactating_ops  import AccountLactatingOps
+from model.m_account_pig_ops    import AccountPigOps
 
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
@@ -61,10 +60,10 @@ from model.m_sow_act            import SowActivity
 from model.m_pig_production     import PigProduction
 from model.m_pig_prod_notes     import PigProdNotes
 from model.m_pig_prod_pig_dead  import PigProdPigDead
-from model.m_prod_gestating_ops import ProdGestatingOps
-from model.m_prod_lactating_ops import ProdLactatingOps
+from model.m_pig_prod_pig_ops   import PigProdPigOps
 
-from model.m_prod_feed_buy      import ProdFeedBuy
+
+from model.m_pig_prod_feed_buy  import PigProdFeedBuy
 
 
 
@@ -83,8 +82,7 @@ model_names = [
     ('pig_farm',                PigFarm),
     ('pig_farm_staff',          PigFarmStaff),
     
-    ('acc_gestating_ops',       AccountGestatingOps),
-    ('acc_lactating_ops',       AccountLactatingOps),
+    ('account_pig_ops',         AccountPigOps),
     
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),
@@ -101,10 +99,9 @@ model_names = [
     ('pig_prod',                PigProduction),
     ('prod_notes',              PigProdNotes),
     ('prod_pig_dead',           PigProdPigDead),
-    ('prod_gestating_ops',      ProdGestatingOps),
-    ('prod_lactating_ops',      ProdLactatingOps),
+    ('prod_pig_ops',            PigProdPigOps),
     
-    ('prod_feed_buy',           ProdFeedBuy),
+    ('prod_feed_buy',           PigProdFeedBuy),
     
     ('sow_act',                 SowActivity)
     

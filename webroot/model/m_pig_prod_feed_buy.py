@@ -4,10 +4,10 @@
 from common_constants       import *
 
 
-class ProdFeedBuy:
+class PigProdFeedBuy:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'ProdFeedBuy'
+        self.TAG                = 'PigProdFeedBuy'
 
 
     def add(self, data = None):

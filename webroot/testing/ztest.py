@@ -57,7 +57,7 @@ SAMPLE_CUSTOMIZED_GESTATING_OPS = {
 SAMPLE_CUSTOMIZED_LACTATING_OPS = {
     "name":         "Inject Vitamin Q",
     "description":  "Inject vitamin Q",
-    "num_days_since_birth": 24
+    "num_days_since": 24
 }
 
 
@@ -68,9 +68,9 @@ SAMPLE_PIG_RACE_LINE = {
 
 
 
-ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING    = 1
-ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING    = 2
-ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING      = 3
+PIG_OPERATION_TYPE_GESTATING        = 1
+PIG_OPERATION_TYPE_LACTATING        = 2
+PIG_OPERATION_TYPE_GROWING          = 3
 
 
 class TestAPIAccount:
@@ -209,25 +209,28 @@ class TestAPIAccount:
         self.summary['account']['user_groups_list'] = 'OK'
         
         
-        self.test_acc_gestating_ops(user_id)
+        self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_GESTATING)
         
-        print(f'\n\n***** Testing get account gestating_ops; account_id = {account_id}')
-        res = model['acc_gestating_ops'].get_list(account_id)
+        print(f'\n\n***** Testing get account_pig_ops list; account_id = {account_id}')
+        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_GESTATING)
+        len_items = len(res)
         
-        print(f'\n\nAccount gestating_ops; len = {len(res)}')
+        print(f'\n\nAccount gestating_ops; len = {len_items}')
         pprint.pprint(res)
-        assert(len(res) >= 3)
+        assert(len_items>= 3)
         
         self.summary['account']['gestating_ops_list'] = 'OK'
         
         
-        self.test_acc_lactating_ops(user_id)
-        print(f'\n\n***** Testing get account lactating_ops; account_id = {account_id}')
-        res = model['acc_lactating_ops'].get_list(account_id)
+        self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_LACTATING)
         
-        print(f'\n\nAccount lactating_ops; len = {len(res)}')
+        print(f'\n\n***** Testing get account_pig_ops; account_id = {account_id}')
+        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_LACTATING)
+        len_items = len(res)
+        
+        print(f'\n\nAccount lactating_ops; len = {len_items}')
         pprint.pprint(res)
-        assert(len(res) >= 4)
+        assert(len_items >= 4)
         
         self.summary['account']['lactating_ops_list'] = 'OK'
         
@@ -725,27 +728,38 @@ class TestAPIAccount:
         
         url = BASE_URL + 'account_pig_ops/add'
         
-        if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING:
+        if operation_type == PIG_OPERATION_TYPE_GESTATING:
             data = {
                 "uhid":             user_uhid,
-                "operation_type":   opeartion_type,
+                "operation_type":   operation_type,
                 "name":             SAMPLE_CUSTOMIZED_GESTATING_OPS['name'],
                 "num_days_since":   SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since'],
                 "description":      SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
             }
         
-        if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING:
+        if operation_type == PIG_OPERATION_TYPE_LACTATING:
             data = {
                 "uhid":             user_uhid,
-                "operation_type":   opeartion_type,
+                "operation_type":   operation_type,
                 "name":             SAMPLE_CUSTOMIZED_LACTATING_OPS['name'],
                 "num_days_since":   SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since'],
                 "description":      SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
             }
         
         
+        s_type = ''
+        
+        if operation_type == PIG_OPERATION_TYPE_GESTATING:
+            s_type = 'PIG_OPERATION_TYPE_GESTATING'
+            
+        elif operation_type == PIG_OPERATION_TYPE_LACTATING:
+            s_type = 'PIG_OPERATION_TYPE_LACTATING'
+            
+        else:
+            s_type = 'PIG_OPERATION_TYPE_GROWING'
 
-        print(f'*****  Testing adding account_pig_ops; url = {url} ; data')
+
+        print(f'*****  Testing adding account_pig_ops; operation_type ={s_type}; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -770,10 +784,11 @@ class TestAPIAccount:
         assert(account_pig_ops_id > 0)
         
         
+        
         # Test account_pig_ops add duplicate
         url = BASE_URL + 'account_pig_ops/add'
         
-        print(f'\n\n***** Testing duplicate adding acc_gestating_ops; url = {url} ; data')
+        print(f'\n\n***** Testing duplicate adding account_pig_ops; url = {url} ; data')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -787,9 +802,7 @@ class TestAPIAccount:
         
         self.summary['account_pig_ops']['add_duplicate_check'] = 'OK'
             
-        
-        
-        
+
         
         # Test account_pig_ops update
         now             = datetime.now()
@@ -797,13 +810,25 @@ class TestAPIAccount:
         
         url = BASE_URL + 'account_pig_ops/update'
         
-        if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING:
+        if operation_type == PIG_OPERATION_TYPE_GESTATING:
             data = {
                 "uhid":                     user_uhid,
                 "account_pig_ops_hid":      account_pig_ops_hid,
+                "operation_type":           operation_type,
                 "name":                     SAMPLE_CUSTOMIZED_GESTATING_OPS['name'] + now_ts,
                 "num_days_since":           SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since'],
                 "description":              SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
+            }
+        
+        
+        if operation_type == PIG_OPERATION_TYPE_LACTATING:
+            data = {
+                "uhid":                     user_uhid,
+                "account_pig_ops_hid":      account_pig_ops_hid,
+                "operation_type":           operation_type,
+                "name":                     SAMPLE_CUSTOMIZED_LACTATING_OPS['name'] + now_ts,
+                "num_days_since":           SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since'],
+                "description":              SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
             }
         
         
@@ -830,7 +855,7 @@ class TestAPIAccount:
         res_text = str(r.text)
         res_json = json.loads(res_text)
         
-        print(f"\n\n***** Testing acc_gestating_ops delete; url = {url} ")
+        print(f"\n\n***** Testing account_pig_ops delete; url = {url} ")
         print(f"\n\nResult; status_code = {r.status_code}; result")
         
         result_num  = res_json['result']['num']

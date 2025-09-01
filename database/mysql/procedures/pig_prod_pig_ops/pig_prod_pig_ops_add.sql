@@ -13,7 +13,7 @@ CREATE PROCEDURE pig_prod_pig_ops_add(
 BEGIN
 
 /** 
- * A sub procedure to create prod_gestating_ops entries.
+ * A sub procedure to create pig_prod_pig_ops entries.
  * 
  * @author Jack Wong (j2718wong@gmail.com) 
  * @since August 30, 2025
@@ -49,7 +49,7 @@ loop_here: LOOP
         
     IF l_last_row_fetched=1 THEN LEAVE loop_here; END IF;
 
-    INSERT INTO pig_production_pig_ops(
+    INSERT INTO pig_prod_pig_ops(
         pig_prod_id,
         account_pig_ops_id,
         operation_type,

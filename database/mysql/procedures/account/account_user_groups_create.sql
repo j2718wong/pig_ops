@@ -56,12 +56,12 @@ DECLARE BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL       INT             DEFAULT 22;
 DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS        INT             DEFAULT 23;
 DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD       INT             DEFAULT 24;
 DECLARE BUSINESS_OBJ_ID_PIG_PROD_NOTES          INT             DEFAULT 25;
-DECLARE BUSINESS_OBJ_ID_PIG_PROD_PIG_HARVEST    INT             DEFAULT 26;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_HARVEST        INT             DEFAULT 26;
 
-DECLARE BUSINESS_OBJ_ID_PIG_PROD_RESERVED_1    	INT             DEFAULT 27;
-DECLARE BUSINESS_OBJ_ID_PIG_PROD_RESERVED_2    	INT             DEFAULT 28;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_RESERVED_1     INT             DEFAULT 27;
+DECLARE BUSINESS_OBJ_ID_PIG_PROD_RESERVED_2     INT             DEFAULT 28;
 
-DECLARE BUSINESS_OBJ_ID_PRODUCTION_GROUP    	INT             DEFAULT 29;
+DECLARE BUSINESS_OBJ_ID_PRODUCTION_GROUP        INT             DEFAULT 29;
 
 
 
@@ -81,9 +81,7 @@ DECLARE FLAG_BIT_OPERATION_DELETE               INT             DEFAULT 4;
 DECLARE OPERATION_ADD_UPDATE_DELETE             INT             DEFAULT 7;
 DECLARE OPERATION_ADD_UPDATE_ONLY               INT             DEFAULT 3;
 
-        
 
-DECLARE cur_flag_business_obj_management        INT             DEFAULT 0;
 
 
 SELECT SUM(a.flag_val)
@@ -106,8 +104,6 @@ FROM (
                     BUSINESS_OBJ_ID_PIG_RACE_LINE, 
                     
                     
-
-                    
                     BUSINESS_OBJ_ID_SEMEN_SUPPLIER,
                     BUSINESS_OBJ_ID_FEED_SUPPLIER,
                     BUSINESS_OBJ_ID_FEED_BRAND,
@@ -122,10 +118,8 @@ FROM (
                     BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
                     
                     BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS,
-
                     BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD,
-                    BUSINESS_OBJ_ID_PROD_PIG_HARVEST,
-                    
+                    BUSINESS_OBJ_ID_PIG_PROD_HARVEST,
                     BUSINESS_OBJ_ID_PIG_PROD_NOTES
                     
                 )
@@ -142,12 +136,12 @@ FROM (
                     BUSINESS_OBJ_ID_PIG_PRODUCTION,
                     BUSINESS_OBJ_ID_PIG_PROD_AI,
                     
-                    BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL,
-                    
+                    BUSINESS_OBJ_ID_PIG_PROD_FEED_BAL, 
+
                     BUSINESS_OBJ_ID_PIG_PROD_PIG_OPS,
 
                     BUSINESS_OBJ_ID_PIG_PROD_PIG_DEAD,
-                    BUSINESS_OBJ_ID_PROD_PIG_HARVEST,
+                    BUSINESS_OBJ_ID_PIG_PROD_HARVEST,
                     
                     BUSINESS_OBJ_ID_PIG_PROD_NOTES
                 )
@@ -166,20 +160,18 @@ INSERT INTO user_group(
     
     flag_priv_user,
     flag_priv_account,
-    flag_priv_account_request,
+    flag_priv_acc_request,
     flag_priv_user_group,
     
     flag_priv_acc_translation,
     flag_priv_acc_billing,
     flag_priv_acc_reserve,
-    flag_priv_acc_pig_operation,
+    flag_priv_acc_pig_ops,
     
     flag_priv_pig_farm,
     flag_priv_pig_farm_staff,
     flag_priv_pig_race,
     flag_priv_pig_race_line,
-    
-    
     
     flag_priv_semen_supplier,
     flag_priv_feed_supplier,
@@ -194,12 +186,10 @@ INSERT INTO user_group(
     flag_priv_pig_prod_feed_buy,
     flag_priv_pig_prod_feed_bal,
     
-    flag_priv_prod_gestating_ops,
-    flag_priv_prod_lactating_ops,
-    flag_priv_prod_pig_dead,
-    flag_priv_prod_pig_harvest,
-    
-    flag_priv_prod_notes
+    flag_priv_pig_prod_pig_ops,
+    flag_priv_pig_prod_pig_dead,
+    flag_priv_pig_prod_harvest,
+    flag_priv_pig_prod_notes
 
 ) VALUES (
     in_account_id,
@@ -219,9 +209,6 @@ INSERT INTO user_group(
     
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
-    
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     
@@ -232,12 +219,15 @@ INSERT INTO user_group(
     
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
-    
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,
     
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,    
     OPERATION_ADD_UPDATE_DELETE
 );
 
@@ -250,16 +240,18 @@ INSERT INTO user_group(
     
     flag_priv_user,
     flag_priv_account,
-    flag_priv_account_request,
+    flag_priv_acc_request,
     flag_priv_user_group,
+    
+    flag_priv_acc_translation,
+    flag_priv_acc_billing,
+    flag_priv_acc_reserve,
+    flag_priv_acc_pig_ops,
     
     flag_priv_pig_farm,
     flag_priv_pig_farm_staff,
     flag_priv_pig_race,
     flag_priv_pig_race_line,
-    
-    flag_priv_acc_gestating_ops,
-    flag_priv_acc_lactating_ops,
     
     flag_priv_semen_supplier,
     flag_priv_feed_supplier,
@@ -274,14 +266,11 @@ INSERT INTO user_group(
     flag_priv_pig_prod_feed_buy,
     flag_priv_pig_prod_feed_bal,
     
-    flag_priv_prod_gestating_ops,
-    flag_priv_prod_lactating_ops,
-    flag_priv_prod_pig_dead,
-    flag_priv_prod_pig_harvest,
+    flag_priv_pig_prod_pig_ops,
+    flag_priv_pig_prod_pig_dead,
+    flag_priv_pig_prod_harvest,
+    flag_priv_pig_prod_notes
     
-    flag_priv_prod_notes
-
-
 ) VALUES (
     in_account_id,
     ACCOUNT_USER_GROUP_MANAGEMENT,
@@ -299,28 +288,27 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_DELETE,
     
     OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
+    
+    OPERATION_ADD_UPDATE_DELETE,
+    OPERATION_ADD_UPDATE_DELETE,
     OPERATION_ADD_UPDATE_DELETE,    
-    
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    OPERATION_ADD_UPDATE_DELETE,
-    
     OPERATION_ADD_UPDATE_DELETE
-    
 );
 
 
@@ -336,12 +324,10 @@ INSERT INTO user_group(
     
     flag_priv_pig_prod_feed_bal,
     
-    flag_priv_prod_gestating_ops,
-    flag_priv_prod_lactating_ops,
-    flag_priv_prod_pig_dead,
-    flag_priv_prod_pig_harvest,
-    
-    flag_priv_prod_notes
+    flag_priv_pig_prod_pig_ops,
+    flag_priv_pig_prod_pig_dead,
+    flag_priv_pig_prod_harvest,
+    flag_priv_pig_prod_notes
     
 ) VALUES (
     in_account_id,
@@ -358,8 +344,6 @@ INSERT INTO user_group(
     OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_ONLY,
     OPERATION_ADD_UPDATE_ONLY,
-    OPERATION_ADD_UPDATE_ONLY,
-    
     OPERATION_ADD_UPDATE_ONLY
 );
 

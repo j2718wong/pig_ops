@@ -123,14 +123,13 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
         }
     
     
-    acc_gest_ops_id     = res_add['account_pig_ops']['id']
-    acc_gest_ops_hid    = hashids_common.encrypt(acc_gest_ops_id)
+    account_pig_ops_id  = res_add['account_pig_ops']['id']
+    account_pig_ops_hid = hashids_common.encrypt(account_pig_ops_id)
     
     # remove plain id
     del res_add['account_pig_ops']['id']
-    res_add['account_pig_ops']['hid'] = acc_gest_ops_hid
+    res_add['account_pig_ops']['hid'] = account_pig_ops_hid
 
-        
     return res_add
     
 
@@ -151,15 +150,52 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         }
         
     
-    num_days_since = account_pig_ops_data.num_days_since
-    if num_days_since < 0 and num_days_since > 115:
+    operation_type  = account_pig_ops_data.operation_type
+    
+    if operation_type not in ACCOUNT_PIG_OPS_OPERATION_TYPES:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE',
                 'desc': ''
             }
         }
+        
+
+    num_days_since = account_pig_ops_data.num_days_since
+    
+    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING:
+        if num_days_since < 0 and num_days_since > 115:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                    'desc': ''
+                }
+            }
+            
+    
+    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING:
+        if num_days_since < 0 and num_days_since > 45:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                    'desc': ''
+                }
+            }
+    
+    
+    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING:
+        if num_days_since < 0 and num_days_since > 300:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
+                    'desc': ''
+                }
+            }
+    
     
     
     res = hashids_user.decrypt(uhid)
@@ -207,7 +243,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         
     # remove plain id
     del res_update['account_pig_ops']['id']
-    res_update['account_pig_ops']['hid'] = acc_gest_ops_hid
+    res_update['account_pig_ops']['hid'] = account_pig_ops_hid
         
     return res_update
     
@@ -267,7 +303,7 @@ async def account_pig_ops_delete(uhid:str, account_pig_ops_hid: str):
     
 
 @app.get("/account_pig_ops/list")
-async def account_pig_ops_list(ahid: str, inc_deleted: int = 0, 
+async def account_pig_ops_list(ahid: str, operation_type, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
     Will get account_pig_ops list.
@@ -277,6 +313,9 @@ async def account_pig_ops_list(ahid: str, inc_deleted: int = 0,
     
     ahid:str
         account hashid
+        
+    operation_type :int
+        1 = GESTATING; 2 = LACTATING; 3 = GROWING
     
     inc_deleted: int
         if > 0, will include deleted entries
@@ -299,7 +338,7 @@ async def account_pig_ops_list(ahid: str, inc_deleted: int = 0,
     
     account_id = res[0]
         
-    res = model['account_pig_ops'].get_list(account_id,
+    res = model['account_pig_ops'].get_list(account_id, operation_type,
             inc_deleted, inc_user_audit)
     
     if res is None:

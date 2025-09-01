@@ -22,6 +22,11 @@ BASE_URL = 'http://localhost:8080/'
     
 
 
+PIG_OPERATION_TYPE_GESTATING        = 1
+PIG_OPERATION_TYPE_LACTATING        = 2
+PIG_OPERATION_TYPE_GROWING          = 3
+
+
         
 class TestAPIPigProd:
     def __init__(self):
@@ -145,7 +150,7 @@ class TestAPIPigProd:
             data_insem = self._test_pig_prod_update_insem(data_add)
             
             if count_sow < 2:
-                self._test_prod_gestating_ops(user_uhid, pig_prod_hid, staff_hid,
+                self._test_pig_prod_gestating_ops(user_uhid, pig_prod_hid, staff_hid,
                     before_birth = 1)
                     
                 self._test_prod_lactating_ops(user_uhid, pig_prod_hid, staff_hid, 
@@ -189,7 +194,7 @@ class TestAPIPigProd:
                 
                 
                 # Test again if it will give correct error message
-                self._test_prod_gestating_ops(user_uhid, pig_prod_hid, staff_hid,
+                self._test_pig_prod_gestating_ops(user_uhid, pig_prod_hid, staff_hid,
                     before_birth = 0)
                 
                 self._test_prod_lactating_ops(user_uhid, pig_prod_hid, staff_hid, 
@@ -613,10 +618,11 @@ class TestAPIPigProd:
         return data
     
     
-    def _test_prod_gestating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
+    def _test_pig_prod_gestating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
             before_birth = 1):
         
-        url = BASE_URL + 'prod_gestating_ops/list?prod_hid=' + pig_prod_hid
+        values = (pig_prod_hid, PIG_OPERATION_TYPE_GESTATING)
+        url = BASE_URL + 'pig_prod_pig_ops/list?prod_hid=%s&operation_type=%s' %(values)
         
         print(f'\n\n****** GET prod_gestating_ops list; url = {url} ')
         
@@ -633,7 +639,7 @@ class TestAPIPigProd:
         gest_ops_to_update = None
         # Find the gestating_ops that has a name of 'Inject Iron'
         for cur_entry in list_gestating_ops:
-            if cur_entry['acc_gestating_ops']['name'] == 'Inject Iron':
+            if cur_entry['account_pig_ops']['name'] == 'Inject Iron':
                 gest_ops_to_update = cur_entry
                 break
                 
@@ -645,15 +651,15 @@ class TestAPIPigProd:
         self.summary['pig_prod']['gestating_ops']['list'] = 'OK' 
         
             
-        prod_gestating_ops_hid  = gest_ops_to_update['prod_gestating_ops']['hid']
-        date_update = gest_ops_to_update['prod_gestating_ops']['date_target']
+        pig_prod_pig_ops_hid  = gest_ops_to_update['pig_prod_pig_ops']['hid']
+        date_update = gest_ops_to_update['pig_prod_pig_ops']['date_target']
         
         
-        url = BASE_URL + 'prod_gestating_ops/update'
+        url = BASE_URL + 'pig_prod_pig_ops/update'
         
         data = {
             "uhid":                 user_uhid,
-            "prod_gestating_ops_hid": prod_gestating_ops_hid,
+            "pig_prod_pig_ops_hid": pig_prod_pig_ops_hid,
             "staff_hid":            staff_hid,
             
             "date":     date_update,
@@ -685,7 +691,8 @@ class TestAPIPigProd:
     def _test_prod_lactating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
             after_birth = 1):
         
-        url = BASE_URL + 'prod_lactating_ops/list?prod_hid=' + pig_prod_hid
+        values = (pig_prod_hid, PIG_OPERATION_TYPE_LACTATING)
+        url = BASE_URL + 'pig_prod_pig_ops/list?prod_hid=%s&operation_type=' % values
         
         print(f'\n\n****** GET prod_lactating_ops list; url = {url} ')
         
@@ -702,7 +709,7 @@ class TestAPIPigProd:
         lact_ops_to_update = None
         # Find the lactating_ops that has a name of 'Inject Iron_2'
         for cur_entry in list_lactating_ops:
-            if cur_entry['acc_lactating_ops']['name'] == 'Inject Iron_2':
+            if cur_entry['account_pig_ops']['name'] == 'Inject Iron_2':
                 lact_ops_to_update = cur_entry
                 break
                 

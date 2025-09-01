@@ -50,9 +50,14 @@ DECLARE PRODUCTION_STATUS_ID_LACTATING          INT             DEFAULT 4;
 DECLARE PRODUCTION_STATUS_ID_WEANING            INT             DEFAULT 5;
 DECLARE PRODUCTION_STATUS_ID_HARVESTED          INT             DEFAULT 10;
 
-
-
 DECLARE SOW_STATUS_ID_GESTATING                 INT             DEFAULT 2;
+
+
+DECLARE PIG_OPERATION_TYPE_GESTATING            INT             DEFAULT 1;
+DECLARE PIG_OPERATION_TYPE_LACTATING            INT             DEFAULT 2;
+DECLARE PIG_OPERATION_TYPE_GROWING              INT             DEFAULT 3;
+
+
 
 DECLARE cur_user_account_id                     INT             DEFAULT 0;
 DECLARE cur_user_group_id                       INT             DEFAULT 0;
@@ -279,10 +284,12 @@ UPDATE sow_boar SET
 WHERE id = in_sow_id;
 
 
-/* Create prod_gestating_ops*/
-CALL pig_prod_gestating_ops_add(
+/* Create pig_prod_pig_ops entry*/
+CALL pig_prod_pig_ops_add(
     in_user_id, 
+    
     cur_sow_boar_account_id,
+    PIG_OPERATION_TYPE_GESTATING,
     cur_pig_prod_id, 
     in_date_insemination);
 

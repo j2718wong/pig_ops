@@ -19,16 +19,16 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-@app.post("/prod_lactating_ops/update")
-async def prod_lactating_ops_update(prod_lactating_ops_data: dm.DataProdLactatingOps):
-    uhid    = prod_lactating_ops_data.uhid
+@app.post("/pig_prod_pig_ops/update")
+async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
+    uhid    = pig_prod_pig_ops_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_LACTATING_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_PROD_LACTATING_OPS_INVALID_USER_HASHID',
+                'num':  ERROR_pig_prod_pig_ops_INVALID_USER_HASHID,
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -36,23 +36,23 @@ async def prod_lactating_ops_update(prod_lactating_ops_data: dm.DataProdLactatin
     user_id = res[0]
     
     
-    prod_lactating_ops_hid = prod_lactating_ops_data.prod_lactating_ops_hid
+    pig_prod_pig_ops_hid = pig_prod_pig_ops_data.pig_prod_pig_ops_hid
     
-    res = hashids_common.decrypt(prod_lactating_ops_hid)
+    res = hashids_common.decrypt(pig_prod_pig_ops_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_LACTATING_OPS_INVALID_HASHID,
-                'code': 'ERROR_PROD_LACTATING_OPS_INVALID_HASHID',
+                'num':  ERROR_pig_prod_pig_ops_INVALID_HASHID,
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_HASHID',
                 'desc': ''
             }
         }
     
     
-    prod_lactating_ops_id = res[0]
+    pig_prod_pig_ops_id = res[0]
     
     
-    staff_hid = prod_lactating_ops_data.staff_hid
+    staff_hid = pig_prod_pig_ops_data.staff_hid
     staff_id  = None
         
     res = hashids_common.decrypt(staff_hid)
@@ -60,8 +60,8 @@ async def prod_lactating_ops_update(prod_lactating_ops_data: dm.DataProdLactatin
     
         return {
             'result':{
-                'num':  ERROR_PROD_LACTATING_OPS_INVALID_STAFF_HASHID,
-                'code': 'ERROR_PROD_LACTATING_OPS_INVALID_STAFF_HASHID',
+                'num':  ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID,
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID',
                 'desc': ''
             }
         }
@@ -69,11 +69,11 @@ async def prod_lactating_ops_update(prod_lactating_ops_data: dm.DataProdLactatin
     staff_id = res[0]
     
     
-    prod_lactating_ops_data.user_id     = user_id
-    prod_lactating_ops_data.prod_lactating_ops_id = prod_lactating_ops_id
-    prod_lactating_ops_data.staff_id    = staff_id
+    pig_prod_pig_ops_data.user_id               = user_id
+    pig_prod_pig_ops_data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
+    pig_prod_pig_ops_data.staff_id              = staff_id
     
-    res_update    =  model['prod_lactating_ops'].update(prod_lactating_ops_data)
+    res_update    =  model['pig_prod_pig_ops'].update(pig_prod_pig_ops_data)
     
     if res_update is None:
         return {
@@ -86,16 +86,16 @@ async def prod_lactating_ops_update(prod_lactating_ops_data: dm.DataProdLactatin
         
         
     # remove plain id
-    del res_update['prod_lactating_ops']['id']
-    res_update['prod_lactating_ops']['hid'] = prod_lactating_ops_hid
+    del res_update['pig_prod_pig_ops']['id']
+    res_update['pig_prod_pig_ops']['hid'] = pig_prod_pig_ops_hid
         
     return res_update
     
 
-@app.get("/prod_lactating_ops/list")
-async def prod_lactating_ops_list(prod_hid: str, inc_user_audit:int = 0):
+@app.get("/pig_prod_pig_ops/list")
+async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int, inc_user_audit:int = 0):
     """
-    Will get prod_lactating_ops list.
+    Will get pig_prod_pig_ops list.
     
     Parameters
     ----------
@@ -103,7 +103,9 @@ async def prod_lactating_ops_list(prod_hid: str, inc_user_audit:int = 0):
     prod_hid:str
         pig_production hashid
 
-    
+    operation_type :int
+        1 = GESTATING; 2 = LACTATING; 3 = GROWING
+        
     inc_user_audit:
         if > 0, will include added_by and last_update info
     
@@ -114,8 +116,8 @@ async def prod_lactating_ops_list(prod_hid: str, inc_user_audit:int = 0):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_LACTATING_OPS_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PROD_LACTATING_OPS_INVALID_PIG_PROD_HASHID',
+                'num':  ERROR_pig_prod_pig_ops_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_PIG_PROD_HASHID',
                 'desc': ''
             }
         }
@@ -123,7 +125,8 @@ async def prod_lactating_ops_list(prod_hid: str, inc_user_audit:int = 0):
     
     pig_prod_id = res[0]
         
-    res = model['prod_lactating_ops'].get_list(pig_prod_id, inc_user_audit)
+    res = model['pig_prod_pig_ops'].get_list(pig_prod_id, operation_type, 
+        inc_user_audit)
     
     if res is None:
         return {
@@ -137,17 +140,17 @@ async def prod_lactating_ops_list(prod_hid: str, inc_user_audit:int = 0):
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['prod_lactating_ops']['id']
+        cur_id  = cur_entry['pig_prod_pig_ops']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['prod_lactating_ops']['id']
-        cur_entry['prod_lactating_ops']['hid']   = cur_hid
+        del cur_entry['pig_prod_pig_ops']['id']
+        cur_entry['pig_prod_pig_ops']['hid']   = cur_hid
         
-        acc_lactating_ops_id  = cur_entry['acc_lactating_ops']['id']
-        acc_lactating_ops_hid = hashids_common.encrypt(acc_lactating_ops_id)
+        acc_gestating_ops_id  = cur_entry['account_pig_ops']['id']
+        acc_gestating_ops_hid = hashids_common.encrypt(acc_gestating_ops_id)
         
-        del cur_entry['acc_lactating_ops']['id']
-        cur_entry['acc_lactating_ops']['hid']   = acc_lactating_ops_hid
+        del cur_entry['account_pig_ops']['id']
+        cur_entry['account_pig_ops']['hid']   = acc_gestating_ops_hid
         
     
     return {
