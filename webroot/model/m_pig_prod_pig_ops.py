@@ -65,7 +65,7 @@ class PigProdPigOps:
                     'desc':             row[2],
                 },
                 
-                'prod_gestating_ops': {
+                'pig_prod_pig_ops': {
                     'id':               row[3]
                 }
             }

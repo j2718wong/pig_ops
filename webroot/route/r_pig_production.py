@@ -376,4 +376,38 @@ async def pig_prod_update_weaningh(pig_weaning_data: dm.DataPigProdWeaning):
     return res_update
     
 
+@app.get("/pig_prod/list")
+async def pig_prod_list(pfhid):
+    """
+    Will get pig_production list.
+    
+    Parameters
+    ----------
+    
+    pfhid:str
+        pig_farm hashid
+
+
+    """
+    
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+    
+    
+    
+    res = model['pig_prod'].get_list(pig_farm_id)
+    
+    
+    return res
+
 

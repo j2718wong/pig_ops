@@ -624,7 +624,7 @@ class TestAPIPigProd:
         values = (pig_prod_hid, PIG_OPERATION_TYPE_GESTATING)
         url = BASE_URL + 'pig_prod_pig_ops/list?prod_hid=%s&operation_type=%s' %(values)
         
-        print(f'\n\n****** GET prod_gestating_ops list; url = {url} ')
+        print(f'\n\n****** GET pig_prod_pig_ops list; url = {url} ')
         
         r = requests.get(url)
         res_text = str(r.text)
@@ -692,7 +692,7 @@ class TestAPIPigProd:
             after_birth = 1):
         
         values = (pig_prod_hid, PIG_OPERATION_TYPE_LACTATING)
-        url = BASE_URL + 'pig_prod_pig_ops/list?prod_hid=%s&operation_type=' % values
+        url = BASE_URL + 'pig_prod_pig_ops/list?prod_hid=%s&operation_type=%s' % values
         
         print(f'\n\n****** GET prod_lactating_ops list; url = {url} ')
         
@@ -721,15 +721,15 @@ class TestAPIPigProd:
         self.summary['pig_prod']['lactating_ops']['list'] = 'OK' 
         
             
-        prod_lactating_ops_hid  = lact_ops_to_update['prod_lactating_ops']['hid']
-        date_update = lact_ops_to_update['prod_lactating_ops']['date_target']
+        pig_prod_pig_ops_hid  = lact_ops_to_update['pig_prod_pig_ops']['hid']
+        date_update = lact_ops_to_update['pig_prod_pig_ops']['date_target']
         
         
-        url = BASE_URL + 'prod_lactating_ops/update'
+        url = BASE_URL + 'pig_prod_pig_ops/update'
         
         data = {
             "uhid":                 user_uhid,
-            "prod_lactating_ops_hid": prod_lactating_ops_hid,
+            "pig_prod_pig_ops_hid": pig_prod_pig_ops_hid,
             "staff_hid":            staff_hid,
             
             "date":     date_update,

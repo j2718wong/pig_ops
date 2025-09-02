@@ -36,65 +36,7 @@ DAY_1_STARTS_AT_BIRTH           = 1
 NUMDAYS_SINCE_BIRTH_WEANING             = 45
 
 
-    
-@app.get("/sow/operations", response_class=PlainTextResponse)
-async def sow_operations(format= 0):
-    res = model['sow_act'].get_sow_operations_list()
-        
-    
-    s = DB_INFO + '\n\n'
-        
-    s += '    Sow  SOW_Status  PROD_ID  Date_TAKAL   NormalKaon   CheckBuntis1    CheckBuntis2   BalhinDako   BalhinFarrow    Inject_IRON   Inject_PURGA \n'
-    
-   
-    
-    for cur_entry in res:
-        
-        
-        s_temp      = cur_entry['sow_number']
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '  '
-    
-        s_temp      = cur_entry['status_name']
-        num_chars   = len(s_temp)
-        num_space   = 10 - num_chars
-        s           += s_temp
-        s           += ' ' * num_space 
-        s           += '  '
-        
-        if cur_entry['last_prod_id']: 
-            s_temp      = str(cur_entry['last_prod_id'])
-            num_chars   = len(s_temp)
-            num_space   = 7 - num_chars
-            s           += ' ' * num_space + s_temp
-            s           += '  '
-        else:
-            num_sapce = 7
-            s           += ' ' * num_space
-            s           += '  '
-        
-        
-        if cur_entry['date_insemination']: 
-            s_temp      = cur_entry['date_insemination']
-            num_chars   = len(s_temp)
-            num_space   = 10 - num_chars
-            s           += ' ' * num_space + s_temp
-            s           += ' '
-        else:
-            num_sapce = 10
-            s           += ' ' * num_space
-            s           += ' '
-        
-        
-        s           += '\n'
-        
-    return s
-    
-    
-
-@app.get("/sow/activities", response_class=PlainTextResponse)
+@app.get("/sow_act/activities", response_class=PlainTextResponse)
 async def sow_activities(ins_id:str = None, full_info: int = 0):
     """
     Will get latest coming sow activities.
@@ -212,8 +154,8 @@ async def sow_activities(ins_id:str = None, full_info: int = 0):
     return s
     
     
-@app.get("/pig_prod/list", response_class=PlainTextResponse)
-async def pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0, 
+@app.get("/sow_act/pig_prod/list", response_class=PlainTextResponse)
+async def sow_act_pig_prod_list(full_info: int = 0, is_active = 1, is_growing:int = 0, 
         is_harvested =0, year:int = None, sow = None):
     """
     Will get pig production list.
@@ -464,8 +406,8 @@ NUMDAYS_SINCE_BIRTH_STARTER             = 50
 NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
     
-@app.get("/pig_prod/ops", response_class=PlainTextResponse)
-async def pig_prod_ops(full_info: int = 0,   is_growing:int = 0, 
+@app.get("/sow_act/pig_prod/ops", response_class=PlainTextResponse)
+async def sow_act_pig_prod_ops(full_info: int = 0,   is_growing:int = 0, 
         is_harvested : int =0, inc_cost : int = 0, year:int = None):
     """
     Will get pig feeding list.

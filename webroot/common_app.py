@@ -99,7 +99,7 @@ model_names = [
     ('pig_prod',                PigProduction),
     ('prod_notes',              PigProdNotes),
     ('prod_pig_dead',           PigProdPigDead),
-    ('prod_pig_ops',            PigProdPigOps),
+    ('pig_prod_pig_ops',        PigProdPigOps),
     
     ('prod_feed_buy',           PigProdFeedBuy),
     

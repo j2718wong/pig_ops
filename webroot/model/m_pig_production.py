@@ -75,193 +75,6 @@ class PigProduction:
         return result
 
     
-    def get_by_id(self, prod_id):
-        sql =   """
-                SELECT 
-                    id,
-                    account_id,
-                    pig_farm_id,
-                    farm_prod_id,
-                    sow_id,
-                    insemination_type,
-                    
-                    semen_boar_id,
-                    semen_source_id,
-                    semen_cost,
-                    insemination_cost,
-                    insem_cost_comments,
-                    insem_staff_id,
-                    date_insemination,
-                    date_expected_birth,
-                    date_actual_birth,
-                    num_days_actual,
-                    status_id,
-                    num_pigs_dead_at_birth,
-                    num_pigs_live_m',
-                    num_pigs_live_f,
-                    birth_staff_id,
-                    
-                    num_pigs_weaning_m',
-                    num_pigs_weaning_f',
-                    total_pigs_weight_weaning
-                    num_pigs_current_m,
-                    num_pigs_current_f,
-                    
-                    date_iron_1,
-                    date_iron_2,
-                    date_vitamins_1,
-                    date_vitamins_2,
-                    date_kapon,
-                    date_deworm,
-                    
-                    date_booster,
-                    date_prestarter,
-                    date_weaning,
-                    date_starter,
-                    date_grower,
-                    date_finisher,
-                    date_harvest,
-                    
-                    num_b_lactating,
-                    num_b_booster,
-                    num_b_prestarter,
-                    num_b_starter,
-                    num_b_grower,
-                    num_b_finisher,
-                    
-                    num_l_lactating,
-                    num_l_booster,
-                    num_l_prestarter,
-                    num_l_starter,
-                    num_l_grower,
-                    num_l_finisher,
-                    
-                    cost_lactating,
-                    cost_booster,
-                    cost_prestarter,
-                    cost_starter,
-                    cost_grower,
-                    cost_finisher
-
-                FROM pig_production
-                WHERE id = %s
-                """ % prod_id
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-        result = []
-        if rows is not None:
-            """
-            
-            for row in rows:
-                       
-               
-                cur_entry = {
-                    'id':,
-                    'account_id':,
-                    'pig_farm_id':,
-                    'farm_prod_id':,
-                    'sow_id':,
-                    'insemination_type':,
-                    
-                    'semen_boar_id':,
-                    'semen_source_id':,
-                    'semen_cost':,
-                    'insemination_cost':,
-                    'insem_cost_comments':,
-                    'insem_staff_id':,
-                    'date_insemination':,
-                    'date_expected_birth':,
-                    'date_actual_birth':,
-                    'num_days_actual':,
-                    'status_id':,
-                    'num_pigs_dead_at_birth':,
-                    'num_pigs_live_m':,
-                    'num_pigs_live_f':,
-                    'birth_staff_id':,
-                    
-                    'num_pigs_weaning_m':,
-                    'num_pigs_weaning_f':,
-                    'total_pigs_weight_weaning':
-                    'num_pigs_current_m':,
-                    'num_pigs_current_f':,
-                    
-                    'date_iron_1':,
-                    'date_iron_2':,
-                    'date_vitamins_1':,
-                    'date_vitamins_2':,
-                    'date_kapon':,
-                    'date_deworm':,
-                    
-                    'date_booster':,
-                    'date_prestarter':,
-                    'date_weaning':,
-                    'date_starter':,
-                    'date_grower':,
-                    'date_finisher':,
-                    'date_harvest':,
-                    
-                    'feed_buy':
-                    'num_b_lactating':,
-                    'num_b_booster':,
-                    'num_b_prestarter':,
-                    'num_b_starter':,
-                    'num_b_grower':,
-                    'num_b_finisher':,
-                    
-                    'num_l_lactating':,
-                    'num_l_booster':,
-                    'num_l_prestarter':,
-                    'num_l_starter':,
-                    'num_l_grower':,
-                    'num_l_finisher':,
-                    
-                    'cost_lactating':,
-                    'cost_booster':,
-                    'cost_prestarter':,
-                    'cost_starter':,
-                    'cost_grower':,
-                    'cost_finisher':
-                    
-                }
-                
-                return cur_entry
-            """
-        
-        return result
-    
-    
-        
-        
-    
     def add(self, data = None):
         """
         PROCEDURE pig_prod_add(
@@ -634,7 +447,7 @@ class PigProduction:
         return None
 
     
-    def get_list(self, account_id = 0, id_list = None):
+    def get_list(self, pig_farm_id = 0, list_ids = None):
         """
         Will get pig_production list.
         
@@ -645,29 +458,81 @@ class PigProduction:
 
         """
         
-        if account_id > 0:
-            where_clause = 'account_id = %s' % account_id
-        else:
+        where_clause = ''
+        
+        if pig_farm_id > 0:
+            where_clause = ' WHERE a.pig_farm_id = %s' % pig_farm_id
             
-            for cur_entry in id_list:
-                test = 1
+        else:
+            count = 0
+            s = ''
+            for cur_entry in list_ids:
+                if count > 0 : s += ','
+                
+                s += str(cur_entry)
+            
+            where_clause = ' WHERE a.id IN (%s)' % s
             
         sql =   """
                 SELECT 
-                    a.hashid,
-                    a.flag,
-                    a.name,
-                    a.country_id,
-                    b.name AS country_name,
-                    a.adrs_level_1_id,
-                    a.adrs_level_2_id,
-                    a.adrs_level_3_id,
-                    a.latitude,
-                    a.longitude
-                FROM pig_farm a
-                LEFT OUTER JOIN app_country b ON a.country_id = b.id
-                WHERE account_id = %s
-                """ % account_id
+                    a.id,
+                    a.farm_prod_id,
+                    
+                    a.insemination_type,
+                    
+                    a.sow_id,
+                    b.farm_sow_id,
+                    b.number,
+                    b.name,
+                    
+                    a.boar_id,
+                    c.farm_boar_id,
+                    c.number,
+                    c.name,
+                    
+                    a.semen_source_id,
+                    d.name AS semen_source_name,
+                    d.description,
+                    
+                    a.semen_cost,
+                    a.insemination_cost,
+                    a.insem_cost_comments,
+                    a.insem_staff_id,
+                    a.date_insemination,
+                    
+                    e.name AS insem_staff_name,
+                    
+                    a.prod_status_id,
+                    f.name AS prod_status_name,
+                    
+                    a.date_expected_birth,
+                    a.date_actual_birth,
+                    a.num_days_actual,
+                    a.num_pigs_dead_at_birth,
+                    a.num_pigs_live_m,
+                    a.num_pigs_live_f,
+                    
+                    g.name AS birth_staff_name,
+                    
+                    a.date_weaning,
+                    a.num_pigs_weaning_m,
+                    a.num_pigs_weaning_f,
+                    a.total_pigs_weight_weaning,
+                    
+                    a.num_pigs_current_m,
+                    a.num_pigs_current_f
+                    
+                   
+                FROM pig_production a
+                LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
+                LEFT OUTER JOIN sow_boar c          ON a.boar_id = c.id
+                LEFT OUTER JOIN semen_source d      ON a.semen_source_id = d.id
+                LEFT OUTER JOIN staff e             ON a.insem_staff_id = e.id
+                LEFT OUTER JOIN pig_prod_status f   ON a.prod_status_id = f.id
+                LEFT OUTER JOIN staff g             ON a.insem_staff_id = g.id
+                
+                %s
+                """ % where_clause
         
         
         # Check if still connected to database
@@ -701,42 +566,117 @@ class PigProduction:
 
         result = []
         if rows is not None:
-            
+    
+     
             
             for row in rows:
-                cur_farm_hashid         = row[0]
-                cur_farm_flag           = row[1]
-                cur_farm_name           = row[2]
+                cur_prod_id                 = row[0]
+                cur_prod_farm_prod_id       = row[1]
+                cur_prod_insemination_type  = row[2]
                 
-                cur_country_id          = row[3]
-                cur_country_name        = row[4]
+                cur_sow_id                  = row[3]
+                cur_sow_farm_sow_id         = row[4]
+                cur_sow_number              = row[5]
+                cur_sow_name                = row[6]
                 
-                cur_farm_adrs_level_1_id= row[5]
-                cur_farm_adrs_level_2_id= row[6]
-                cur_farm_adrs_level_3_id= row[7]
-                cur_farm_latitude       = float(row[8]) if row[8] else None
-                cur_farm_longitude      = float(row[9]) if row[9] else None
+                cur_boar_id                 = row[7]
+                cur_boar_farm_boar_id       = row[8]
+                cur_boar_number             = row[9]
+                cur_boar_name               = row[10]
                 
-               
-                cur_entry = {
-                    'hid':             cur_farm_hashid, 
-                    'flag':             cur_farm_flag,
-                    'name':             cur_farm_name,
+                cur_semen_source_id         = row[11]
+                cur_semen_source_name       = row[12]
+                cur_semen_source_description = row[13]
+                
+                
+                cur_insem_semen_cost        = row[14]
+                cur_insem_insemination_cost = float(row[15])
+                cur_insem_cost_comments     = row[16]
                     
-                    'location':{
-                        'country_id':   cur_country_id,
-                        'country_name': cur_country_name,
+                cur_insem_staff_id          = row[17]
+                cur_insem_date_insemination = row[18]
+                cur_insem_staff_name        = row[19]
+                
+                cur_prod_status_id          = row[20]
+                cur_prod_status_name        = row[21]
+                
+                cur_prod_date_expected_birth    = row[22]
+                cur_prod_date_actual_birth      = str(row[23]) if row[23] else None
+                cur_prod_num_days_actual        = row[24] 
+                cur_prod_num_pigs_dead_at_birth = row[25]
+                cur_prod_num_pigs_live_m    = row[26]
+                cur_prod_num_pigs_live_f    = row[27]
+                cur_prod_birth_staff_name   = row[28]
+                
+                cur_weaning_date            = row[29]
+                cur_weaning_num_pigs_m      = row[30]
+                cur_weaning_num_pigs_f      = row[31]
+                cur_weaning_weight          = row[32]
+                
+                
+                cur_pig_count_m             = row[33]
+                cur_pig_count_f             = row[34]
+                
+                
+                cur_entry = {
+                    'pig_production' :{
+                        'id':               cur_prod_id, 
+                        'farm_prod_id':     cur_prod_farm_prod_id,
+                        'prod_status_id':   cur_prod_status_id,
+                        'prod_status_name': cur_prod_status_name
+                    },
+                    
+                    'sow': {
+                        'id':               cur_sow_id,
+                        'farm_sow_id':      cur_sow_farm_sow_id,
+                        'number':           cur_sow_number,
+                        'name':             cur_sow_name,
+                    },
+                    
+                    'insemination': {
+                        'insem_type':       cur_prod_insemination_type,
                         
-                        'address':{
-                            'level_1_id': cur_farm_adrs_level_1_id,
-                            'level_2_id': cur_farm_adrs_level_2_id,
-                            'level_3_id': cur_farm_adrs_level_3_id
+                        'boar': {
+                            'id':           cur_sow_id,
+                            'farm_sow_id':  cur_sow_farm_sow_id,
+                            'number':       cur_sow_number,
+                            'name':         cur_sow_name
                         },
                         
-                        'geoloc':{
-                            'latitude':  cur_farm_latitude,
-                            'longitude': cur_farm_longitude,
-                        }
+                        'semen_source': {
+                            'id':           cur_semen_source_id,
+                            'name':         cur_semen_source_name,
+                            'description':  cur_semen_source_description,
+                            'semen_cost':   cur_insem_semen_cost
+                        },
+                        
+                        'insem_cost':       cur_insem_insemination_cost,
+                        'cost_comments':    cur_insem_cost_comments,
+                        'insem_date':       cur_insem_date_insemination,
+                        'insem_staff_name': cur_insem_staff_name
+                    },
+                    
+                    'birth': {
+                        'date_expected':    cur_prod_date_expected_birth,
+                        'date_actual':      cur_prod_date_actual_birth,
+                        'num_days_actual':  cur_prod_num_days_actual,
+                        'num_dead_at_birth':cur_prod_num_pigs_dead_at_birth,
+                        
+                        'pigs_live_m':      cur_prod_num_pigs_live_m,
+                        'pigs_live_f':      cur_prod_num_pigs_live_f,
+                        'birth_staff_name': cur_prod_birth_staff_name
+                    },
+                    
+                    'weaning': {
+                        'date_weaning':     cur_weaning_date,
+                        'num_pigs_m':       cur_weaning_num_pigs_m,
+                        'num_pigs_f':       cur_weaning_num_pigs_f,
+                        'weight':           cur_weaning_weight    
+                    },
+                    
+                    'current_pig_count': {
+                        'm':                cur_pig_count_m,
+                        'f':                cur_pig_count_f
                     }
                     
                 }
