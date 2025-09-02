@@ -321,6 +321,9 @@ class DataProdFeedBuy(BaseModel):
     
     pig_prod_hid:           str = None
     prod_feed_buy_hid:      str = None
+    feed_type_hid:          str = None
+    feed_brand_hid :        str = None
+    feed_supplier_hid:      str = None
     
     
     user_id:                int = 0

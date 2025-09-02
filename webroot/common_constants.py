@@ -11,6 +11,9 @@ LOG_FATAL               = 3
 
 
 BUSINESS_OBJ_ID_USER_REGISTER                       = 1
+BUSINESS_OBJ_ID_SEMEN_SUPPLIER                      = 13
+BUSINESS_OBJ_ID_FEED_SUPPLIER                       = 14
+
 
 
 # user.flag bits
@@ -37,6 +40,12 @@ NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY            = 5
 
 
 INS_STATUS_ID_TERMINATED                            = 2
+
+
+PIG_OPERATION_TYPE_GESTATING                        = 1
+PIG_OPERATION_TYPE_LACTATING                        = 2
+PIG_OPERATION_TYPE_GROWING                          = 3
+
 
 
 ERROR_DATABASE_ERROR                                = 0x01

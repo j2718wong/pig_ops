@@ -188,59 +188,24 @@ class PigProdNotes:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0,
-            inc_user_audit = 0):
+    def get_list(self, pig_prod_id):
         
-        if inc_deleted > 0:
-            where_clause = 'WHERE a.account_id = %s' % account_id 
-        else:
-            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
-        
-        
-        if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
-                        a.name,
-                        a.description,
-                        a.dt_entry
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
-        else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
-                        a.name,
-                        a.description,
-                        
-                        c.username,
-                        c.name_last,
-                        c.name_first,
-                        a.dt_entry,
-                        
-                        d.username,
-                        d.name_last,
-                        d.name_first,
-                        a.dt_last_update
-                        
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b      ON a.pig_race_id = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.notes,
+                    a.dt_entry
+                    
+                    b.username,
+                    b.name_last,
+                    b.name_first
                 
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
-        
+                FROM pig_prod_notes a 
+                LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
+                WHERE a.pig_prod_id = %s
+                ORDER BY a.id DESC
+                """ % pig_prod_id
+       
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -273,49 +238,20 @@ class PigProdNotes:
         if rows is not None:
             
             for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'id':                   row[0],
-                        
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'desc':                 row[4],
-                        
-                        'dt_entry':             str(row[5])
-                    }
+                cur_entry = {
+                    'prod_notes': {
+                        'id':               row[0],
+                        'notes':            row[1],
+                        'dt_entry':         str(row[2])
+                    },
                     
-                else:
-                    cur_entry = {
-                        'id':                   row[0],
-                        
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'description':         row[4],
-                        
-                        'added_by': {
-                            'username':         row[5],
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_entry':         row[8]
-                        },
-                        
-                        'last_update':{
-                            'username':         row[9],
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_update':        str(row[12]) if row[12] else None
-                        }
+                    'added_by_user':{
+                        'username':         row[3],
+                        'name_first':       row[4],
+                        'name_last':        row[5]
                     }
+                }
                 
-                    
                 result.append(cur_entry)
         
         return result

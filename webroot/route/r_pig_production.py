@@ -407,7 +407,27 @@ async def pig_prod_list(pfhid):
     
     res = model['pig_prod'].get_list(pig_farm_id)
     
+    """
+    for cur_entry in res:
+        pig_prod_id     = cur_entry['pig_production']['id']
+        operation_type  = PIG_OPERATION_TYPE_GESTATING
+        
+        gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+            operation_type, inc_user_audit = 1)
+        
+        cur_entry['gestating_ops'] = gestating_ops
+
     
+        operation_type  = PIG_OPERATION_TYPE_LACTATING
+        lactating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+            operation_type, inc_user_audit = 1)
+        
+        cur_entry['lactating_ops'] = lactating_ops
+        
+        prod_notes =  model['prod_notes'].get_list(pig_prod_id)
+        
+        cur_entry['prod_notes'] = prod_notes
+    """
     return res
 
 

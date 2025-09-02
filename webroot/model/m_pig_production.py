@@ -637,10 +637,10 @@ class PigProduction:
                         'insem_type':       cur_prod_insemination_type,
                         
                         'boar': {
-                            'id':           cur_sow_id,
-                            'farm_sow_id':  cur_sow_farm_sow_id,
-                            'number':       cur_sow_number,
-                            'name':         cur_sow_name
+                            'id':           cur_boar_id,
+                            'farm_sow_id':  cur_boar_farm_boar_id,
+                            'number':       cur_boar_number,
+                            'name':         cur_boar_name
                         },
                         
                         'semen_source': {

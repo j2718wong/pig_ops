@@ -367,5 +367,57 @@ class Account:
         return result
     
     
+    def get_business_obj_selection(self, account_id, business_obj_id):
+        
+        if business_obj_id == BUSINESS_OBJ_SEMEN_SUPPLIER:
+            sql =   """
+                    SELECT semen_supplier_id
+                    FROM account_selection
+                    WHERE account_id = %s
+                    """ % account_id
+                    
+        if business_obj_id == BUSINESS_OBJ_FEED_SUPPLIER:
+            sql =   """
+                    SELECT feed_supplier_id
+                    FROM account_selection
+                    WHERE account_id = %s
+                    """ % account_id
+            
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_business_obj_selection(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                result.append(row)
+        
+        return result
     
     

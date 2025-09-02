@@ -19,14 +19,12 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING    = 1
-ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING    = 2
-ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING      = 3
 
-ACCOUNT_PIG_OPS_OPERATION_TYPES = [
-    ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING,
-    ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING,
-    ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING
+
+PIG_OPERATION_TYPES = [
+    PIG_OPERATION_TYPE_GESTATING,
+    PIG_OPERATION_TYPE_LACTATING,
+    PIG_OPERATION_TYPE_GROWING
 ]
 
 
@@ -50,7 +48,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
     
     operation_type  = account_pig_ops_data.operation_type
     
-    if operation_type not in ACCOUNT_PIG_OPS_OPERATION_TYPES:
+    if operation_type not in PIG_OPERATION_TYPES:
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
@@ -62,7 +60,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
 
     num_days_since = account_pig_ops_data.num_days_since
     
-    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING:
+    if operation_type == PIG_OPERATION_TYPE_GESTATING:
         if num_days_since < 0 and num_days_since > 115:
             return {
                 'result':{
@@ -73,7 +71,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
             }
             
     
-    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING:
+    if operation_type == PIG_OPERATION_TYPE_LACTATING:
         if num_days_since < 0 and num_days_since > 45:
             return {
                 'result':{
@@ -84,7 +82,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
             }
     
     
-    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING:
+    if operation_type == PIG_OPERATION_TYPE_GROWING:
         if num_days_since < 0 and num_days_since > 300:
             return {
                 'result':{
@@ -152,7 +150,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     
     operation_type  = account_pig_ops_data.operation_type
     
-    if operation_type not in ACCOUNT_PIG_OPS_OPERATION_TYPES:
+    if operation_type not in PIG_OPERATION_TYPES:
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
@@ -164,7 +162,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
 
     num_days_since = account_pig_ops_data.num_days_since
     
-    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GESTATING:
+    if operation_type == PIG_OPERATION_TYPE_GESTATING:
         if num_days_since < 0 and num_days_since > 115:
             return {
                 'result':{
@@ -175,7 +173,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
             }
             
     
-    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_LACTATING:
+    if operation_type == PIG_OPERATION_TYPE_LACTATING:
         if num_days_since < 0 and num_days_since > 45:
             return {
                 'result':{
@@ -186,7 +184,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
             }
     
     
-    if operation_type == ACCOUNT_PIG_OPS_OPERATION_TYPE_GROWING:
+    if operation_type == PIG_OPERATION_TYPE_GROWING:
         if num_days_since < 0 and num_days_since > 300:
             return {
                 'result':{

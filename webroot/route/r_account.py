@@ -126,8 +126,8 @@ async def account_update(account_data: dm.DataAccount):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'num':  ERROR_ACCOUNT_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -162,3 +162,44 @@ async def account_update(account_data: dm.DataAccount):
     return res_update
     
  
+ @app.get("/account/selection")
+async def user_account_info(ahid: str, biz_obj_id: int):
+    """
+    Will get account info
+
+    Parameters
+    ----------
+    ahid : str
+        account hashid
+    
+    
+    """
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    account_id = res[0]
+    
+    res = model['account'].get_business_obj_selection(account_id, biz_obj_id)
+    
+    res = [hashids_common.encrypt(id) for id in res]
+    
+    
+    return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': ''
+            },
+            
+            'data': res
+        }
+    

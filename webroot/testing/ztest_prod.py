@@ -758,7 +758,63 @@ class TestAPIPigProd:
         self.summary['pig_prod']['lactating_ops']['update'] = 'OK'
         
     
+    
+    def _test_prod_feed_buy_add(self, data, ):
+            data_pig_prod_feed_buy = {
+            'uhid':            
+            
+            'pig_prod_hid':    
+            'feed_type_hid':          str = None
+            'feed_brand_hid' :        str = None
+            'feed_supplier_hid:      str = None
+            
+            
+            'date_buy:        
+            'feed_type_id:    
+            'feed_brand_id:   
+            'feed_supplier_id:
+            'kg_per_quantity: 
+            
+            'unit_cost:       
+            'total_cost:      
+            
+            
+            
+        }
         
+    
+        
+        
+        
+        url = BASE_URL + 'pig_prod_feed_buy/add'
+        
+        print(f'\n\n***** Testing pig_prod_feed_buy add; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        pig_prod_feed_buy_hid = res_json['pig_prod_feed_buy']['hid']
+        
+        
+        
+        
+        data['pig_prod_feed_buy_id'] = pig_prod_feed_buy_hid
+        
+        self.summary['pig_prod']['pig_prod_feed_buy'] = {}
+        self.summary['pig_prod']['pig_prod_feed_buy']['add'] = 'OK'
+        
+        return data
+        
+    
+    
 if __name__ == '__main__':
     t = TestAPIPigProd()
     
