@@ -60,14 +60,32 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
                 'desc': ''
             }
         }
-    
-    
+       
     pig_farm_id = res[0]
+   
+    
+    staff_user_hid  = pig_farm_staff_data.staff_user_hid
+    staff_user_id   = 0
+    
+    if staff_user_hid is not None:
+        res = hashids_user.decrypt(uhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
+                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        staff_user_id = res[0]
     
     
-    pig_farm_staff_data.name        = name
-    pig_farm_staff_data.user_id     = user_id
-    pig_farm_staff_data.pig_farm_id = pig_farm_id
+    
+    pig_farm_staff_data.name            = name
+    pig_farm_staff_data.user_id         = user_id
+    pig_farm_staff_data.pig_farm_id     = pig_farm_id
+    pig_farm_staff_data.staff_user_id   = staff_user_id
     
     res_add    =  model['pig_farm_staff'].add(pig_farm_staff_data)
     
@@ -149,14 +167,32 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
             }
         }
     
-    
     pig_farm_staff_id = res[0]
     
     
-    pig_farm_staff_data.name        = name
-    pig_farm_staff_data.user_id     = user_id
-    pig_farm_staff_data.pig_farm_id = pig_farm_id
-    pig_farm_staff_data.pig_farm_staff_id = pig_farm_staff_id
+    staff_user_hid  = pig_farm_staff_data.staff_user_hid
+    staff_user_id   = 0
+    
+    if staff_user_hid is not None:
+        res = hashids_user.decrypt(uhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
+                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        staff_user_id = res[0]
+    
+    
+
+    pig_farm_staff_data.name                = name
+    pig_farm_staff_data.user_id             = user_id
+    pig_farm_staff_data.pig_farm_id         = pig_farm_id
+    pig_farm_staff_data.pig_farm_staff_id   = pig_farm_staff_id
+    pig_farm_staff_data.staff_user_id       = staff_user_id
     
     res_update    =  model['pig_farm_staff'].update(pig_farm_staff_data)
     

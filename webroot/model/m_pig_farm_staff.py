@@ -13,11 +13,11 @@ class PigFarmStaff:
     def add(self, data = None):
         """
         PROCEDURE pig_farm_staff_add(
-            in_user_id              INT,
+            in_user_id                  INT,
 
-            in_pig_farm_id          INT,
-            
-            in_name                 VARCHAR(50)
+            in_pig_farm_id              INT,
+            in_staff_user_id            INT,
+            in_name                     VARCHAR(50)
         )  
         """
         
@@ -25,6 +25,7 @@ class PigFarmStaff:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_farm_id
+        sql += '%s,'    % data.staff_user_id
         sql += '"%s");' % data.name
         
         
@@ -77,7 +78,8 @@ class PigFarmStaff:
         PROCEDURE pig_farm_staff_update(
             in_user_id                  INT,
             
-            in_pig_farm_staff_id        INT
+            in_pig_farm_staff_id        INT,
+            in_staff_user_id            INT,
             
             in_name                     VARCHAR(50)
         )
@@ -86,6 +88,7 @@ class PigFarmStaff:
         sql =  'CALL pig_farm_staff_update('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_farm_staff_id
+        sql += '%s,'    % data.staff_user_id
         
         sql += '"%s");' % data.name
         

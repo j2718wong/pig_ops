@@ -61,7 +61,10 @@ class DataPigFarmStaff(BaseModel):
         
     pig_farm_hid:           str
     pig_farm_staff_hid:     str = None
-        
+    staff_user_hid:         str = None
+
+    
+    staff_user_id:          int = 0
         
     user_id:                int = 0
     pig_farm_staff_id:      int = 0
