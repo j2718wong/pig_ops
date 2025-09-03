@@ -303,6 +303,20 @@ class DataPigProdNotes(BaseModel):
     notes:                  str
     
     
+class DataPigProdFeedType(BaseModel):
+    uhid:                   str
+        
+    pig_prod_hid:           str
+    feed_type_hid:          str
+        
+        
+    user_id:                int = 0
+    pig_prod_id:            int = 0  
+    feed_type_id:           int = 0
+    
+    date:                   str
+    
+    
 class DataPigProdPigOps(BaseModel):
     uhid:                   str
     
@@ -332,9 +346,9 @@ class DataProdFeedBuy(BaseModel):
     
     
     date_buy:               str
-    feed_type_id:           int
-    feed_brand_id:          int
-    feed_supplier_id:       int
+    feed_type_id:           int = 0
+    feed_brand_id:          int = 0
+    feed_supplier_id:       int = 0
     kg_per_quantity:        float
     
     unit_cost:              float

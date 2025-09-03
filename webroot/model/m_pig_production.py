@@ -447,6 +447,69 @@ class PigProduction:
         return None
 
     
+    def update_feed_type(self, data = None):
+        """
+        PROCEDURE pig_prod_update_feed_type(
+            in_user_id              INT,
+           
+            in_pig_prod_id          INT,
+            in_feed_type_id         INT,
+            in_date                 VARCHAR(10)
+        )
+        """
+        
+        sql =  'CALL pig_prod_update_feed_type('
+        sql += '%s,'    % data.user_id
+        
+        sql += '%s,'    % data.pig_prod_id
+        
+        sql += '%s,'    % data.feed_type_id
+        sql += '"%s");' % data.date
+        
+      
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update_weaning(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
+    
     def get_list(self, pig_farm_id = 0, list_ids = None):
         """
         Will get pig_production list.

@@ -369,16 +369,23 @@ class Account:
     
     def get_business_obj_selection(self, account_id, business_obj_id):
         
-        if business_obj_id == BUSINESS_OBJ_SEMEN_SUPPLIER:
+        if business_obj_id == BUSINESS_OBJ_ID_SEMEN_SUPPLIER:
             sql =   """
                     SELECT semen_supplier_id
                     FROM account_selection
                     WHERE account_id = %s
                     """ % account_id
                     
-        if business_obj_id == BUSINESS_OBJ_FEED_SUPPLIER:
+        if business_obj_id == BUSINESS_OBJ_ID_FEED_SUPPLIER:
             sql =   """
                     SELECT feed_supplier_id
+                    FROM account_selection
+                    WHERE account_id = %s
+                    """ % account_id
+            
+        if business_obj_id == BUSINESS_OBJ_ID_FEED_BRAND:
+            sql =   """
+                    SELECT feed_brand_id
                     FROM account_selection
                     WHERE account_id = %s
                     """ % account_id

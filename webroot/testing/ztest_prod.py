@@ -22,9 +22,11 @@ BASE_URL = 'http://localhost:8080/'
     
 
 
-PIG_OPERATION_TYPE_GESTATING        = 1
-PIG_OPERATION_TYPE_LACTATING        = 2
-PIG_OPERATION_TYPE_GROWING          = 3
+
+
+
+
+
 
 
         
@@ -759,7 +761,84 @@ class TestAPIPigProd:
         
     
     
-    def _test_prod_feed_buy_add(self, data, ):
+    def _test_prod_feed_buy_add(self, account_id, feed_type_id, data, ):
+        
+        feed_type_hid = hashids_common.encrypt(feed_type_id)
+        
+        # Get feed_supplier selection of account
+        
+        account_hid = hashids_account.encrypt(account_id)
+        
+        values = (account_hid, BUSINESS_OBJ_ID_FEED_SUPPLIER)
+        url = BASE_URL + 'account/selection?ahid=%s&biz_obj_id=%s' %values
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        
+        list_hids  = res_json['data']
+        
+        if len(list_hids) == 0:
+            # randomize feed_supplier
+            
+            url = BASE_URL + 'feed_supplier/list'
+        
+            r = requests.get(url)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
+            
+            list_feed_suppliers  = res_json['data']
+            len_items = len(list_feed_suppliers)
+            
+            index   = random.randint(0, len_items-1)
+            cur_suplier  = list_feed_suppliers[index]
+            cur_feed_supplier_hid = cur_suplier['hid']
+        
+        else:
+            index   = random.randint(0, list_hids-1)
+            cur_feed_supplier_hid = list_hids[index]
+        
+        
+        
+        # Get feed_brand selection of account
+        
+        values = (account_hid, BUSINESS_OBJ_ID_FEED_BRAND)
+        url = BASE_URL + 'account/selection?ahid=%s&biz_obj_id=%s' %values
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        
+        list_hids  = res_json['data']
+        
+        if len(list_hids) == 0:
+            # randomize feed_brand
+            
+            url = BASE_URL + 'feed_brand/list'
+        
+            r = requests.get(url)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
+            
+            list_feed_brands  = res_json['data']
+            len_items = len(list_feed_brands)
+            
+            index   = random.randint(0, len_items-1)
+            cur_feed_brand  = list_feed_brands[index]
+            cur_feed_brand_hid = cur_feed_brand['hid']
+        
+        else:
+            index   = random.randint(0, list_hids-1)
+            cur_feed_brand_hid = list_hids[index]
+        
+  
+        
+            
+            
             data_pig_prod_feed_buy = {
             'uhid':            
             

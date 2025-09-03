@@ -162,10 +162,10 @@ async def account_update(account_data: dm.DataAccount):
     return res_update
     
  
- @app.get("/account/selection")
-async def user_account_info(ahid: str, biz_obj_id: int):
+@app.get("/account/selection")
+async def account_selection(ahid: str, biz_obj_id: int):
     """
-    Will get account info
+    Will get account_selection
 
     Parameters
     ----------

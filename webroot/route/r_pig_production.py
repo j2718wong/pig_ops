@@ -317,7 +317,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     
     
 @app.post("/pig_prod/update_weaning")
-async def pig_prod_update_weaningh(pig_weaning_data: dm.DataPigProdWeaning):
+async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     uhid    = pig_weaning_data.uhid
     
     res = hashids_user.decrypt(uhid)
@@ -375,6 +375,81 @@ async def pig_prod_update_weaningh(pig_weaning_data: dm.DataPigProdWeaning):
 
     return res_update
     
+
+@app.post("/pig_prod/update_feed_type")
+async def pig_prod_update_feed_type(pig_prod_feed_type_data: dm.DataPigProdFeedType):
+    uhid    = pig_prod_feed_type_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+
+    pig_prod_hid    = pig_prod_feed_type_data.pig_prod_hid
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id = res[0]
+    
+    
+    feed_type_hid    = pig_prod_feed_type_data.feed_type_hid
+    
+    res = hashids_common.decrypt(feed_type_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_FEED_TYPE_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_FEED_TYPE_HASHID',
+                'desc': ''
+            }
+        }
+    
+    feed_type_id = res[0]
+    
+    
+    pig_prod_feed_type_data.user_id         = user_id
+    pig_prod_feed_type_data.pig_prod_id     = pig_prod_id
+    pig_prod_feed_type_data.feed_type_id    = feed_type_id
+    
+    res_update    =  model['pig_prod'].update_weaning(pig_weaning_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id     = res_update['pig_prod']['id']        
+    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
+    
+   
+    # remove plain id
+    del res_update['pig_prod']['id']
+    res_update['pig_prod']['hid'] = pig_prod_hashid
+
+
+    return res_update
+    
+
 
 @app.get("/pig_prod/list")
 async def pig_prod_list(pfhid):

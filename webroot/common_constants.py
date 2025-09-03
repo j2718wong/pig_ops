@@ -13,6 +13,7 @@ LOG_FATAL               = 3
 BUSINESS_OBJ_ID_USER_REGISTER                       = 1
 BUSINESS_OBJ_ID_SEMEN_SUPPLIER                      = 13
 BUSINESS_OBJ_ID_FEED_SUPPLIER                       = 14
+BUSINESS_OBJ_ID_FEED_BRAND                          = 15
 
 
 
@@ -45,6 +46,17 @@ INS_STATUS_ID_TERMINATED                            = 2
 PIG_OPERATION_TYPE_GESTATING                        = 1
 PIG_OPERATION_TYPE_LACTATING                        = 2
 PIG_OPERATION_TYPE_GROWING                          = 3
+
+
+
+FEED_TYPE_ID_GESTATING                              = 1
+FEED_TYPE_ID_LACTATING                              = 2
+FEED_TYPE_ID_BOOSTER                                = 3
+FEED_TYPE_ID_PRESTARTER                             = 4
+FEED_TYPE_ID_STARTER                                = 5
+FEED_TYPE_ID_GROWER                                 = 6
+FEED_TYPE_ID_FINISHER                               = 6
+
 
 
 
@@ -158,3 +170,6 @@ ERROR_PROD_FEED_BUY_INVALID_USER_HASHID             = 0xC8
 ERROR_PROD_FEED_BUY_INVALID_HASHID                  = 0xC9
 
 ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID         = 0xCA
+ERROR_PROD_FEED_BUY_INVALID_FEED_TYPE_HASHID        = 0xCB
+ERROR_PROD_FEED_BUY_INVALID_FEED_BRAND_HASHID       = 0xCC
+
