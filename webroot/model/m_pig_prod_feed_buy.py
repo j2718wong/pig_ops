@@ -15,17 +15,17 @@ class PigProdFeedBuy:
         PROCEDURE prod_feed_buy_add(
             in_user_id              INT,
             in_pig_prod_id          INT,
-            
+            in_pig_prod_group_id    INT,
+    
             in_date_buy             VARCHAR(10),
             in_feed_type_id         INT,
             in_feed_brand_id        INT,
-            in_feed_vendor_id       INT,
-            quantity                INT,
-            kg_per_qty              DECIMAL(5,1),
+            in_feed_supplier_id     INT,
+            in_quantity             INT,
+            in_kg_per_unit          DECIMAL(5,1),
             
-            unit_cost               DECIMAL(8,2),
-            total_cost              DECIMAL(8,2)
-
+            in_unit_cost            DECIMAL(8,2),
+            in_total_cost           DECIMAL(8,2)
         )  
         """
         
@@ -33,12 +33,14 @@ class PigProdFeedBuy:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id
+        sql += '%s,'    % data.pig_prod_group_id
+        
         sql += '"%s",'  % data.date_buy
         
         sql += '%s,'    % data.feed_type_id
         sql += '%s,'    % data.feed_brand_id
-        sql += '%s,'    % data.feed_vendor_id
-        sql += '%s,'    % data.kg_per_quantity
+        sql += '%s,'    % data.feed_supplier_id
+        sql += '%s,'    % data.kg_per_unit
        
         sql += '%s,'    % data.unit_cost
         sql += '%s)'    % data.total_cost
@@ -95,13 +97,12 @@ class PigProdFeedBuy:
             in_date_buy             VARCHAR(10),
             in_feed_type_id         INT,
             in_feed_brand_id        INT,
-            in_feed_vendor_id       INT,
-            quantity                INT,
-            kg_per_qty              DECIMAL(5,1),
+            in_feed_supplier_id     INT,
+            in_quantity             INT,
+            in_kg_per_unit          DECIMAL(5,1),
             
-            unit_cost               DECIMAL(8,2),
-            total_cost              DECIMAL(8,2)
-
+            in_unit_cost            DECIMAL(8,2),
+            in_total_cost           DECIMAL(8,2)
         )  
         """
         
@@ -223,87 +224,172 @@ class PigProdFeedBuy:
         return None
     
     
-    def get_list(self, pig_prod_id, inc_user_audit = 0):
+    def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
         
-       
-        
-        if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
+
+        if inc_user_audit == 0: 
+            if pig_prod_id > 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            
+                            a.date_buy,
+                            a.quantity,
+                            a.kg_per_unit,
+                            a.kg_total,
+                            
+                            a.unit_cost,
+                            a.total_cost,
+                            
+                            a.dt_entry,
+                            
+                            a.feed_type_id,
+                            b.name AS feed_type_name,
+                            
+                            a.feed_brand_id,
+                            c.name AS feed_brand_name,
+                            
+                            a.feed_vendor_id,
+                            d.name AS vendor name
+                            
+                        FROM prod_feed_buy a 
+                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                        WHERE a.pig_prod_id = %s
+                        ORDER BY a.id
+                        """ % pig_prod_id
                         
-                        a.date_buy,
-                        a.quantity,
-                        a.kg_per_qty,
-                        a.kg_total,
-                        
-                        a.unit_cost,
-                        a.feed_cost,
-                        
-                        a.dt_entry,
-                        
-                        a.feed_type_id,
-                        b.name AS feed_type_name,
-                        
-                        a.feed_brand_id,
-                        c.name AS feed_brand_name,
-                        
-                        a.feed_vendor_id,
-                        d.name AS vendor name
-                        
-                    FROM prod_feed_buy a 
-                    LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                    LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                    LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                    WHERE a.pig_prod_id = %s
-                    ORDER BY a.id
-                    """ % pig_prod_id
+            else:
+                
+                sql =   """
+                        SELECT 
+                            a.id,
+                            
+                            a.date_buy,
+                            a.quantity,
+                            a.kg_per_unit,
+                            a.kg_total,
+                            
+                            a.unit_cost,
+                            a.total_cost,
+                            
+                            a.dt_entry,
+                            
+                            a.feed_type_id,
+                            b.name AS feed_type_name,
+                            
+                            a.feed_brand_id,
+                            c.name AS feed_brand_name,
+                            
+                            a.feed_vendor_id,
+                            d.name AS vendor name
+                            
+                        FROM prod_feed_buy a 
+                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                        WHERE a.pig_prod_group_id = %s
+                        ORDER BY a.id
+                        """ % pig_prod_group_id
+                
+                
         else:
-            sql =   """
-                    SELECT 
-                        a.id,
+            
+            if pig_prod_id > 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            
+                            a.date_buy,
+                            a.quantity,
+                            a.kg_per_unit,
+                            a.kg_total,
+                            
+                            a.unit_cost,
+                            a.total_cost,
+                            
+                            a.dt_entry,
+                            
+                            a.feed_type_id,
+                            b.name AS feed_type_name,
+                            
+                            a.feed_brand_id,
+                            c.name AS feed_brand_name,
+                            
+                            a.feed_supplier_id,
+                            d.name AS feed_supplier_name,
+                            
+                            
+                            e.username,
+                            e.name_last,
+                            e.name_first,
+                            a.dt_entry,
+                            
+                            
+                            f.username,
+                            f.name_last,
+                            f.name_first,
+                            a.dt_last_update
+                            
+                        FROM prod_feed_buy a 
+                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                        LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
+                        LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
+                        WHERE a.pig_prod_id = %s
+                        ORDER BY a.id
+                        """ % pig_prod_id
                         
-                        a.date_buy,
-                        a.quantity,
-                        a.kg_per_qty,
-                        a.kg_total,
-                        
-                        a.unit_cost,
-                        a.feed_cost,
-                        
-                        a.dt_entry,
-                        
-                        a.feed_type_id,
-                        b.name AS feed_type_name,
-                        
-                        a.feed_brand_id,
-                        c.name AS feed_brand_name,
-                        
-                        a.feed_vendor_id,
-                        d.name AS vendor name,
-                        
-                        
-                        e.username,
-                        e.name_last,
-                        e.name_first,
-                        a.dt_entry,
-                        
-                        
-                        f.username,
-                        f.name_last,
-                        f.name_first,
-                        a.dt_last_update
-                        
-                    FROM prod_feed_buy a 
-                    LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                    LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                    LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                    LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
-                    LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
-                    WHERE a.pig_prod_id = %s
-                    ORDER BY a.id
-                    """ % pig_prod_id
-        
+            else:
+                
+                sql =   """
+                        SELECT 
+                            a.id,
+                            
+                            a.date_buy,
+                            a.quantity,
+                            a.kg_per_unit,
+                            a.kg_total,
+                            
+                            a.unit_cost,
+                            a.total_cost,
+                            
+                            a.dt_entry,
+                            
+                            a.feed_type_id,
+                            b.name AS feed_type_name,
+                            
+                            a.feed_brand_id,
+                            c.name AS feed_brand_name,
+                            
+                            a.feed_supplier_id,
+                            d.name AS feed_supplier_name,
+                            
+                            
+                            e.username,
+                            e.name_last,
+                            e.name_first,
+                            a.dt_entry,
+                            
+                            
+                            f.username,
+                            f.name_last,
+                            f.name_first,
+                            a.dt_last_update
+                            
+                        FROM prod_feed_buy a 
+                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                        LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
+                        LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
+                        WHERE a.pig_prod_group_id = %s
+                        ORDER BY a.id
+                        """ % pig_prod_group_id
+            
+            
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -342,10 +428,10 @@ class PigProdFeedBuy:
                             'id':               row[0],
                             'date_buy':         str(row[1]),
                             'quantity':         row[2],
-                            'kg_per_qty':       float(row[3]),
+                            'kg_per_unit':      float(row[3]),
                             'kg_total':         float(row[4]),
                             'unit_cost':        float(row[5]),
-                            'feed_cost':        float(row[6]),
+                            'total_cost':       float(row[6]),
                             'dt_entry':         str(row[7])
                         },
                         
@@ -371,10 +457,10 @@ class PigProdFeedBuy:
                             'id':               row[0],
                             'date_buy':         str(row[1]),
                             'quantity':         row[2],
-                            'kg_per_qty':       float(row[3]),
+                            'kg_per_unit':      float(row[3]),
                             'kg_total':         float(row[4]),
                             'unit_cost':        float(row[5]),
-                            'feed_cost':        float(row[6]),
+                            'total_cost':       float(row[6]),
                             'dt_entry':         str(row[7])
                         },
                         

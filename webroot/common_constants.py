@@ -58,6 +58,15 @@ FEED_TYPE_ID_GROWER                                 = 6
 FEED_TYPE_ID_FINISHER                               = 6
 
 
+DEFAULT_KG_PER_FEED_QTY = {
+    'GESTATING':    50,
+    'LACTATING':    50,
+    'PRESTARTER':   25,
+    'STARTER':      50,
+    'GROWER':       50,
+    'FINISHER':     50
+}
+
 
 
 ERROR_DATABASE_ERROR                                = 0x01

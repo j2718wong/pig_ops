@@ -36,21 +36,40 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     user_id = res[0]
     
     
-    pig_prod_hid    = prod_feed_buy_data.pig_prod_hid
+    pig_prod_hid        = prod_feed_buy_data.pig_prod_hid
+    pig_prod_id         = 0
     
-    res = hashids_common.decrypt(pig_prod_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+    if pig_prod_hid is not None:
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
             }
-        }
+        
+        pig_prod_id = res[0]
+        
     
-    pig_prod_id = res[0]
+    pig_prod_group_hid  = prod_feed_buy_data.pig_prod_group_hid
+    pig_prod_group_id   = 0
     
+    if pig_prod_group_hid is not None:
+        res = hashids_common.decrypt(pig_prod_group_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        pig_prod_group_hid = res[0]
     
+        
     feed_type_hid    = prod_feed_buy_data.feed_type_hid
     
     res = hashids_common.decrypt(feed_type_hid)
@@ -99,6 +118,7 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     
     prod_feed_buy_data.user_id          = user_id
     prod_feed_buy_data.pig_prod_id      = pig_prod_id
+    prod_feed_buy_data.pig_prod_group_id= prod_feed_buy_data
     prod_feed_buy_data.feed_type_id     = feed_type_id
     prod_feed_buy_data.feed_brand_id    = feed_brand_id
     prod_feed_buy_data.feed_supplier_id = feed_supplier_id

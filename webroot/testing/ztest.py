@@ -44,7 +44,7 @@ RANDOM_BOAR_NAMES = ['Berto', 'Kurdapyo', 'KiKoY', 'Didoy', 'Gorio', 'Desidido',
 ]
 
 
-RANDOM_STAFF_NAMES = ['Arnel', 'Kevin', 'Michael', 'Hilmero', 'Bogart']
+RANDOM_STAFF_NAMES = ['Arnel', 'Kevin', 'Michael', 'Hilmero', 'Bogart', 'Ruben']
 
 
 SAMPLE_CUSTOMIZED_GESTATING_OPS = {
@@ -99,7 +99,7 @@ class TestAPIAccount:
         }
     
     
-    def test_account_register(self, user_id, acc_name, skip_step = 0):
+    def test_account_register(self, user_id, acc_name):
         user_uhid   = hashids_user.encrypt(user_id)
         
         now             = datetime.now()
@@ -107,39 +107,39 @@ class TestAPIAccount:
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
-        if skip_step & 0x01 == 0: 
-            url = BASE_URL + 'account/register'
-            
-            data = {
-                "uhid":         user_uhid,
-                "name":         acc_name,
-                "country_id":   1
-            }
-            
-            
-            print(f"***** Testing adding account_register; url = {url} ; data")
-            pprint.pprint(data)
-            
-            r = requests.post(url, json = data)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
         
-            print(f"\n\nResult; status_code = {r.status_code}; result =")
-            pprint.pprint(res_json)
-            
-            result_num  = res_json['result']['num']
-            assert(result_num == 0)
-            
-            self.summary['account']['register'] = 'OK'
-            
-            
-            account_hid    = res_json['account']['hid']
-            res_decrypt     = hashids_account.decrypt(account_hid)
-            account_id      = res_decrypt[0]
+        url = BASE_URL + 'account/register'
         
-            print(f"created account_id = {account_id}")            
-            assert(account_id > 0)
-            
+        data = {
+            "uhid":         user_uhid,
+            "name":         acc_name,
+            "country_id":   1
+        }
+        
+        
+        print(f"***** Testing adding account_register; url = {url} ; data")
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+    
+        print(f"\n\nResult; status_code = {r.status_code}; result =")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['account']['register'] = 'OK'
+        
+        
+        account_hid    = res_json['account']['hid']
+        res_decrypt     = hashids_account.decrypt(account_hid)
+        account_id      = res_decrypt[0]
+    
+        print(f"created account_id = {account_id}")            
+        assert(account_id > 0)
+        
         
         # Test account register duplicate
         url = BASE_URL + 'account/register'
@@ -429,7 +429,7 @@ class TestAPIAccount:
         self.summary['feed_supplier']['list'] = 'OK'
     
         
-    def test_pig_farm(self, user_id, farm_name, skip_step = 0):
+    def test_pig_farm(self, user_id, farm_name):
         user_uhid   = hashids_user.encrypt(user_id)
         
         now             = datetime.now()
@@ -437,44 +437,42 @@ class TestAPIAccount:
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
-        if skip_step & 0x01 == 0: 
+        url = BASE_URL + 'pig_farm/add'
         
-            url = BASE_URL + 'pig_farm/add'
-            
-            data = {
-                "uhid":         user_uhid,
-                "name":         farm_name
-            }
-            
-            
-            print(f'*****  Testing adding pig_farm; url = {url} ; data')
-            pprint.pprint(data)
-            
-            r = requests.post(url, json = data)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
-            
-            print(f"\n\nResult; status_code = {r.status_code}; result")
-            pprint.pprint(res_json)
-            
-            result_num  = res_json['result']['num']
-            assert(result_num == 0)
+        data = {
+            "uhid":         user_uhid,
+            "name":         farm_name
+        }
+        
+        
+        print(f'*****  Testing adding pig_farm; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
 
 
-            self.summary['pig_farm']['add'] = 'OK'
-            
-            
-            is_id_visible = True if 'id' in res_json['pig_farm'] else False
-            assert(is_id_visible == False)
-            
-            
-            farm_hid       = res_json['pig_farm']['hid']
-            res_decrypt     = hashids_common.decrypt(farm_hid)
-            pig_farm_id     = res_decrypt[0]
-            
-            print(f"created pig_farm_id = {pig_farm_id}")
-            assert(pig_farm_id > 0)
-            
+        self.summary['pig_farm']['add'] = 'OK'
+        
+        
+        is_id_visible = True if 'id' in res_json['pig_farm'] else False
+        assert(is_id_visible == False)
+        
+        
+        farm_hid       = res_json['pig_farm']['hid']
+        res_decrypt     = hashids_common.decrypt(farm_hid)
+        pig_farm_id     = res_decrypt[0]
+        
+        print(f"created pig_farm_id = {pig_farm_id}")
+        assert(pig_farm_id > 0)
+        
         
         # Test pig_farm duplicate
         url = BASE_URL + 'pig_farm/add'
@@ -535,7 +533,7 @@ class TestAPIAccount:
         }
         
         
-    def test_pig_farm_staff(self, user_id, pig_farm_id, skip_step = 0):
+    def test_pig_farm_staff(self, user_id, pig_farm_id, num_staff = 3):
         user_uhid   = hashids_user.encrypt(user_id)
         
         now             = datetime.now()
@@ -544,10 +542,12 @@ class TestAPIAccount:
         
         pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
         
-        if skip_step & 0x01 == 0: 
-            
-            len_items       = len(RANDOM_STAFF_NAMES)
-            
+           
+        len_items       = len(RANDOM_STAFF_NAMES)
+        
+        count = 0
+        
+        while count < num_staff:
             index           = random.randint(0, len_items-1)
             staff_name      = RANDOM_STAFF_NAMES[index]
             
@@ -581,14 +581,16 @@ class TestAPIAccount:
             is_id_visible = True if 'id' in res_json['pig_farm_staff'] else False
             assert(is_id_visible == False)
             
-            
-            pig_farm_staff_hid  = res_json['pig_farm_staff']['hid']
-            res_decrypt         = hashids_common.decrypt(pig_farm_staff_hid)
-            pig_farm_staff_id    = res_decrypt[0]
-            
-            print(f"pig_farm_staff_id = {pig_farm_staff_id}")
-            assert(pig_farm_staff_id > 0)
-            
+            count += 1
+        
+        
+        pig_farm_staff_hid  = res_json['pig_farm_staff']['hid']
+        res_decrypt         = hashids_common.decrypt(pig_farm_staff_hid)
+        pig_farm_staff_id    = res_decrypt[0]
+        
+        print(f"pig_farm_staff_id = {pig_farm_staff_id}")
+        assert(pig_farm_staff_id > 0)
+        
         
         # Test pig_farm_staff add duplicate
         url = BASE_URL + 'pig_farm_staff/add'
@@ -864,7 +866,7 @@ class TestAPIAccount:
         self.summary['account_pig_ops']['delete'] = 'OK'
         
 
-    def test_pig_race_line(self, user_id, account_hid, skip_step = 0):
+    def test_pig_race_line(self, user_id, account_hid):
         user_uhid   = hashids_user.encrypt(user_id)
         
         now             = datetime.now()
@@ -872,46 +874,45 @@ class TestAPIAccount:
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
-        if skip_step & 0x01 == 0: 
-        
-            url = BASE_URL + 'pig_race_line/add'
-            
-            data = {
-                "uhid":                 user_uhid,
-                "pig_race_id":          1,
-                "name":                 SAMPLE_PIG_RACE_LINE['name'],
-                "description":          SAMPLE_PIG_RACE_LINE['description']
-            }
-            
 
-            print(f"***** Testing adding pig_race_line; url = {url} ; data")
-            pprint.pprint(data)
-            
-            r = requests.post(url, json = data)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
-            
-            print(f"\n\nResult; status_code = {r.status_code}; result")
-            pprint.pprint(res_json)
-            
-            result_num  = res_json['result']['num']
-            assert(result_num == 0)
-
-            self.summary['pig_race_line']['add'] = 'OK'
-            
-            
-            is_id_visible = True if 'id' in res_json['pig_race_line'] else False
-            assert(is_id_visible == False)
-            
-            
-            pig_race_line_hid  = res_json['pig_race_line']['hid']
-            res_decrypt         = hashids_common.decrypt(pig_race_line_hid)
-            pig_race_line_id    = res_decrypt[0]
-            
-            print(f"pig_race_line_id = {pig_race_line_id}")
-            assert(pig_race_line_id > 0)
-            
+        url = BASE_URL + 'pig_race_line/add'
         
+        data = {
+            "uhid":                 user_uhid,
+            "pig_race_id":          1,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'],
+            "description":          SAMPLE_PIG_RACE_LINE['description']
+        }
+        
+
+        print(f"***** Testing adding pig_race_line; url = {url} ; data")
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+
+        self.summary['pig_race_line']['add'] = 'OK'
+        
+        
+        is_id_visible = True if 'id' in res_json['pig_race_line'] else False
+        assert(is_id_visible == False)
+        
+        
+        pig_race_line_hid  = res_json['pig_race_line']['hid']
+        res_decrypt         = hashids_common.decrypt(pig_race_line_hid)
+        pig_race_line_id    = res_decrypt[0]
+        
+        print(f"pig_race_line_id = {pig_race_line_id}")
+        assert(pig_race_line_id > 0)
+        
+    
         # Test pig_race_line add duplicate
         url = BASE_URL + 'pig_race_line/add'
             

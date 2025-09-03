@@ -337,6 +337,7 @@ class DataProdFeedBuy(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None
+    pig_prod_group_hid:     str = None
     prod_feed_buy_hid:      str = None
     feed_type_hid:          str = None
     feed_brand_hid :        str = None
@@ -345,6 +346,7 @@ class DataProdFeedBuy(BaseModel):
     
     user_id:                int = 0
     pig_prod_id:            int = 0
+    pig_prod_group_id:      int = 0
     prod_feed_buy_id:       int = 0
     
     
@@ -352,7 +354,8 @@ class DataProdFeedBuy(BaseModel):
     feed_type_id:           int = 0
     feed_brand_id:          int = 0
     feed_supplier_id:       int = 0
-    kg_per_quantity:        float
+    quantity:               int = 0
+    kg_per_unit:            float
     
     unit_cost:              float
     total_cost:             float

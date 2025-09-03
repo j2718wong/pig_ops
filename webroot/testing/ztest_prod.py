@@ -23,7 +23,14 @@ BASE_URL = 'http://localhost:8080/'
 
 
 
-
+DEFAULT_FEED_UNIT_COST = {
+    'GESTATING':    1460.0,
+    'LACTATING':    1670.0,
+    'PRESTARTER':   1600.0,
+    'STARTER':      1850.0,
+    'GROWER':       1700.0,
+    'FINISHER':     1575.0
+}
 
 
 
@@ -761,7 +768,7 @@ class TestAPIPigProd:
         
     
     
-    def _test_prod_feed_buy_add(self, account_id, feed_type_id, data, ):
+    def _test_prod_feed_buy_add(self, account_id, feed_type_id, data ):
         
         feed_type_hid = hashids_common.encrypt(feed_type_id)
         
@@ -836,33 +843,49 @@ class TestAPIPigProd:
             cur_feed_brand_hid = list_hids[index]
         
   
+        kg_per_qty = 1
         
+        if feed_type_id == FEED_TYPE_ID_GESTATING:
+            kg_per_qty      = DEFAULT_KG_PER_FEED_QTY['GESTATING']
+            cost_per_unit   = DEFAULT_FEED_UNIT_COST['GESTATING']
+        
+        elif feed_type_id == FEED_TYPE_ID_LACTATING:
+            kg_per_qty      = DEFAULT_KG_PER_FEED_QTY['LACTATING']
+            cost_per_unit   = DEFAULT_FEED_UNIT_COST['LACTATING']
+        
+        elif feed_type_id == FEED_TYPE_ID_PRESTARTER:
+            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['PRESTARTER']
+            cost_per_unit   = DEFAULT_FEED_UNIT_COST['PRESTARTER']
             
+        elif feed_type_id == FEED_TYPE_ID_STARTER:
+            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['STARTER']
+            cost_per_unit   = DEFAULT_FEED_UNIT_COST['STARTER']
             
-            data_pig_prod_feed_buy = {
-            'uhid':            
+        elif feed_type_id == FEED_TYPE_ID_GROWER:
+            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['GROWER']
+            cost_per_unit   = DEFAULT_FEED_UNIT_COST['GROWER']
             
-            'pig_prod_hid':    
-            'feed_type_hid':          str = None
-            'feed_brand_hid' :        str = None
-            'feed_supplier_hid:      str = None
+        elif feed_type_id == FEED_TYPE_ID_FINISHER:
+            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['FINISHER']
+            cost_per_unit   = DEFAULT_FEED_UNIT_COST['FINISHER']
+        
+        
+  
+        data_pig_prod_feed_buy = {
+            'uhid':            data['uhid'],
             
+            'pig_prod_hid':    data['pig_prod_hid'],
+            'feed_type_hid':   feed_type_hid,
+            'feed_brand_hid' : cur_feed_brand_hid,
+            'feed_supplier_hid': cur_feed_supplier_hid,
+            'date_buy':         data['date_buy'],
             
-            'date_buy:        
-            'feed_type_id:    
-            'feed_brand_id:   
-            'feed_supplier_id:
-            'kg_per_quantity: 
+            'quantity':         data['quantity'],
+            'kg_per_quantity':  kg_per_qty,
             
-            'unit_cost:       
-            'total_cost:      
-            
-            
-            
+            'unit_cost':       cost_per_unit,
+            'total_cost':      data['quantity'] * cost_per_unit
         }
-        
-    
-        
         
         
         url = BASE_URL + 'pig_prod_feed_buy/add'
