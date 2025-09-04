@@ -582,8 +582,7 @@ class PigProduction:
                     a.num_pigs_weaning_f,
                     a.total_pigs_weight_weaning,
                     
-                    a.num_pigs_current_m,
-                    a.num_pigs_current_f,
+                    a.num_pigs_current,
                     
                     a.num_b_lactating,
                     a.num_b_booster,
@@ -700,31 +699,30 @@ class PigProduction:
                 cur_weaning_weight          = row[32]
                 
                 
-                cur_pig_count_m             = row[33]
-                cur_pig_count_f             = row[34]
+                cur_pig_count               = row[33]
                 
                 
-                cur_prod_num_b_lactating    = row[35]
-                cur_prod_num_b_booster      = row[36]
-                cur_prod_num_b_prestarter   = row[37]
-                cur_prod_num_b_starter      = row[38]
-                cur_prod_num_b_grower       = row[39]
-                cur_prod_num_b_finisher     = row[40]
+                cur_prod_num_b_lactating    = row[34]
+                cur_prod_num_b_booster      = row[35]
+                cur_prod_num_b_prestarter   = row[36]
+                cur_prod_num_b_starter      = row[37]
+                cur_prod_num_b_grower       = row[38]
+                cur_prod_num_b_finisher     = row[39]
                 
-                cur_feed_bal_date_balance   = row[41]
-                cur_feed_bal_lactating      = row[42]
-                cur_feed_bal_booster        = row[43]
-                cur_feed_bal_prestarter     = row[44]
-                cur_feed_bal_starter        = row[45]
-                cur_feed_bal_grower         = row[46]
-                cur_feed_bal_finisher       = row[47]
+                cur_feed_bal_date_balance   = row[40]
+                cur_feed_bal_lactating      = row[41]
+                cur_feed_bal_booster        = row[42]
+                cur_feed_bal_prestarter     = row[43]
+                cur_feed_bal_starter        = row[44]
+                cur_feed_bal_grower         = row[45]
+                cur_feed_bal_finisher       = row[46]
                 
-                cur_prod_cost_lactating     = row[48]
-                cur_prod_cost_booster       = row[49]
-                cur_prod_cost_prestarter    = row[50]
-                cur_prod_cost_starter       = row[51]
-                cur_prod_cost_grower        = row[52]
-                cur_prod_cost_finisher      = row[53]
+                cur_prod_cost_lactating     = row[47]
+                cur_prod_cost_booster       = row[48]
+                cur_prod_cost_prestarter    = row[49]
+                cur_prod_cost_starter       = row[50]
+                cur_prod_cost_grower        = row[51]
+                cur_prod_cost_finisher      = row[52]
             
                 
                 cur_entry = {
@@ -732,7 +730,8 @@ class PigProduction:
                         'id':               cur_prod_id, 
                         'farm_prod_id':     cur_prod_farm_prod_id,
                         'prod_status_id':   cur_prod_status_id,
-                        'prod_status_name': cur_prod_status_name
+                        'prod_status_name': cur_prod_status_name,
+                        'cur_pig_count':    cur_pig_count
                     },
                     
                     'sow': {
@@ -783,10 +782,6 @@ class PigProduction:
                         'weight':           cur_weaning_weight    
                     },
                     
-                    'current_pig_count': {
-                        'm':                cur_pig_count_m,
-                        'f':                cur_pig_count_f
-                    },
                     
                     'feeds':{
                         'bought':{

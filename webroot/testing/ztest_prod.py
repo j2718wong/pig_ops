@@ -789,7 +789,6 @@ class TestAPIPigProd:
         self.summary['pig_prod']['lactating_ops']['update'] = 'OK'
         
     
-    
     def _test_prod_feed_buy_add(self, account_id, pig_prod_id, feed_type_id, data):
         
         feed_type_hid = hashids_common.encrypt(feed_type_id)
@@ -1170,8 +1169,7 @@ class TestAPIPigProd:
             self._test_prod_feed_buy_add_request(data_feed_buy)
             
             
-        
-        
+
     def _test_prod_feed_buy_add_request(self, data)
         
         url = BASE_URL + 'pig_prod_feed_buy/add'
@@ -1200,6 +1198,9 @@ class TestAPIPigProd:
         self.summary['pig_prod']['pig_prod_feed_buy']['add'] = 'OK'
         
         return data
+        
+    
+    def _test_prod_feed_bal_add(self, pig_prod_id):
         
     
     
