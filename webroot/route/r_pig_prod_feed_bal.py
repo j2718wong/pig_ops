@@ -99,7 +99,7 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
     
 
 @app.post("/prod_feed_bal/update")
-async def prod_feed_bal_update(prod_feed_bal_data: dm.DataProdFeedbal):
+async def prod_feed_bal_update(prod_feed_bal_data: dm.DataProdFeedBal):
     uhid    = prod_feed_bal_data.uhid
     
     res = hashids_user.decrypt(uhid)

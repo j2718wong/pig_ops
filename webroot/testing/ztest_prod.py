@@ -1174,7 +1174,6 @@ class TestAPIPigProd:
             self._test_prod_feed_buy_add_request(data_feed_buy)
             
             
-
     def _test_prod_feed_buy_add_request(self, data):
         
         url = BASE_URL + 'prod_feed_buy/add'
