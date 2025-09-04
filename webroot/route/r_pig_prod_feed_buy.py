@@ -118,7 +118,7 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     
     prod_feed_buy_data.user_id          = user_id
     prod_feed_buy_data.pig_prod_id      = pig_prod_id
-    prod_feed_buy_data.pig_prod_group_id= prod_feed_buy_data
+    prod_feed_buy_data.pig_prod_group_id= pig_prod_group_id
     prod_feed_buy_data.feed_type_id     = feed_type_id
     prod_feed_buy_data.feed_brand_id    = feed_brand_id
     prod_feed_buy_data.feed_supplier_id = feed_supplier_id
@@ -163,72 +163,24 @@ async def prod_feed_buy_update(prod_feed_buy_data: dm.DataProdFeedBuy):
     user_id = res[0]
     
     
-    pig_prod_hid    = prod_feed_buy_data.pig_prod_hid
+    prod_feed_buy_hid    = prod_feed_buy_data.prod_feed_buy_hid
     
-    res = hashids_common.decrypt(pig_prod_hid)
+    res = hashids_common.decrypt(prod_feed_buy_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                'num':  ERROR_PROD_FEED_BUY_INVALID_HASHID,
+                'code': 'ERROR_PROD_FEED_BUY_INVALID_HASHID',
                 'desc': ''
             }
         }
     
-    pig_prod_id = res[0]
-    
-    
-    feed_type_hid    = prod_feed_buy_data.feed_type_hid
-    
-    res = hashids_common.decrypt(feed_type_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_FEED_TYPE_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_FEED_TYPE_HASHID',
-                'desc': ''
-            }
-        }
-    
-    feed_type_id = res[0]
-    
-    
-    feed_brand_hid    = prod_feed_buy_data.feed_brand_hid
-    
-    res = hashids_common.decrypt(feed_brand_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_FEED_BRAND_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_FEED_BRAND_HASHID',
-                'desc': ''
-            }
-        }
-    
-    feed_brand_id = res[0]
-    
-    
-    feed_supplier_hid    = prod_feed_buy_data.feed_supplier_hid
-    
-    res = hashids_common.decrypt(feed_supplier_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID',
-                'desc': ''
-            }
-        }
-    
-    feed_supplier_id = res[0]
+    prod_feed_buy_id = res[0]
     
     
     prod_feed_buy_data.user_id          = user_id
     prod_feed_buy_data.prod_feed_buy_id = prod_feed_buy_id
-    prod_feed_buy_data.pig_prod_id      = pig_prod_id
-    prod_feed_buy_data.feed_type_id     = feed_type_id
-    prod_feed_buy_data.feed_brand_id    = feed_brand_id
-    prod_feed_buy_data.feed_supplier_id = feed_supplier_id
+    
     
     res_update    =  model['prod_feed_buy'].update(prod_feed_buy_data)
     
@@ -306,18 +258,16 @@ async def prod_feed_buy_delete(uhid:str, prod_feed_buy_hid: str):
 
     
 @app.get("/prod_feed_buy/list")
-async def prod_feed_buy_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def prod_feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
     """
     Will get prod_feed_buy list.
     
     Parameters
     ----------
     
-    ahid:str
-        account hashid
+    pig_prod_hid:str
+        pig_prod hashid
 
-    inc_deleted: int
-        if > 0, will include deleted entries
     
     inc_user_audit:
         if > 0, will include added_by and last_update info
@@ -325,21 +275,21 @@ async def prod_feed_buy_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
     """
     
     
-    res = hashids_account.decrypt(ahid)
+    res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
                 'desc': ''
             }
         }
     
     
-    account_id = res[0]
+    pig_prod_id = res[0]
         
-    res = model['prod_feed_buy'].get_list(account_id, 
-            inc_deleted, inc_user_audit)
+    res = model['prod_feed_buy'].get_list(pig_prod_id = pig_prod_id, 
+            inc_user_audit = inc_user_audit)
     
     if res is None:
         return {

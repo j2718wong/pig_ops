@@ -16,9 +16,11 @@ class PigProdPigDead:
             in_user_id              INT,
            
             in_pig_prod_id          INT,
+            in_pig_prod_group_id    INT,
+            
             in_date_dead            VARCHAR(10),
             in_dead_type_id         INT,
-            in_sex                  VARCHAR(2),
+            in_num_pigs_dead        INT,
             in_comments             VARCHAR(160)
         )  
         """
@@ -27,9 +29,11 @@ class PigProdPigDead:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id
+        sql += '%s,'    % data.pig_prod_group_id
+        
         sql += '"%s",'  % data.date_dead
         sql += '%s,'    % data.dead_type_id
-        sql += '"%s",'  % data.sex
+        sql += '%s,'    % data.num_pigs_dead
         
         if data.comments is not None:
             sql += '"%s");'   % data.comments

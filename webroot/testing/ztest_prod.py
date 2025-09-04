@@ -211,17 +211,20 @@ class TestAPIPigProd:
             
             # Test buy lactating feed
             data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
-            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_LACTATING, data)
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, 
+                    FEED_TYPE_ID_LACTATING, data_feed_buy)
             
             
             # Test buy prestarter feed
             data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
-            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_PRESTARTER, data)
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, 
+                    FEED_TYPE_ID_PRESTARTER, data_feed_buy)
             
             
             # Test buy starter feed
             data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
-            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_STARTER, data)
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, 
+                    FEED_TYPE_ID_STARTER, data_feed_buy)
             
             
             self._test_prod_update_weaning(data_birth)
@@ -239,11 +242,13 @@ class TestAPIPigProd:
             
             # Test buy grower feed
             data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
-            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_GROWER, data)
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, 
+                    FEED_TYPE_ID_GROWER, data_feed_buy)
             
             # Test buy finisher feed
             data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
-            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_FINISHER, data)
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, 
+                    FEED_TYPE_ID_FINISHER, data_feed_buy)
             
            
             count_sow = count_sow + 1
@@ -825,7 +830,7 @@ class TestAPIPigProd:
             cur_feed_supplier_hid = cur_suplier['hid']
         
         else:
-            index   = random.randint(0, list_hids-1)
+            index   = random.randint(0, len(list_hids)-1)
             cur_feed_supplier_hid = list_hids[index]
         
         
@@ -860,7 +865,7 @@ class TestAPIPigProd:
             cur_feed_brand_hid = cur_feed_brand['hid']
         
         else:
-            index   = random.randint(0, list_hids-1)
+            index   = random.randint(0, len(list_hids)-1)
             cur_feed_brand_hid = list_hids[index]
         
         
@@ -872,8 +877,8 @@ class TestAPIPigProd:
         
         feeds_bought = pig_prod['feeds']['bought']
         
-        current_pig_count   = pig_prod['current_pig_count']
-        total_pigs          = current_pig_count['m'] + current_pig_count['f']
+        total_pigs   = pig_prod['pig_production']['cur_pig_count']
+        
         
         kg_per_unit = 1
         
@@ -1170,9 +1175,9 @@ class TestAPIPigProd:
             
             
 
-    def _test_prod_feed_buy_add_request(self, data)
+    def _test_prod_feed_buy_add_request(self, data):
         
-        url = BASE_URL + 'pig_prod_feed_buy/add'
+        url = BASE_URL + 'prod_feed_buy/add'
         
         print(f'\n\n***** Testing pig_prod_feed_buy add; url = {url} ; data')
         pprint.pprint(data)
@@ -1187,7 +1192,7 @@ class TestAPIPigProd:
         result_num = res_json['result']['num']
         assert(result_num == 0)
         
-        pig_prod_feed_buy_hid = res_json['pig_prod_feed_buy']['hid']
+        pig_prod_feed_buy_hid = res_json['prod_feed_buy']['hid']
         
         
         
@@ -1201,7 +1206,7 @@ class TestAPIPigProd:
         
     
     def _test_prod_feed_bal_add(self, pig_prod_id):
-        
+        test = 1
     
     
 if __name__ == '__main__':

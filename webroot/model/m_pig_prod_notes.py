@@ -130,19 +130,19 @@ class PigProdNotes:
     
     def delete(self, data = None):
         user_id             = data['user_id']
-        pig_race_line_id    = data['pig_race_line_id']
+        pig_prod_notes_id    = data['pig_prod_notes_id']
         
         """
-        PROCEDURE pig_race_line_delete(
+        PROCEDURE pig_prod_notes_delete(
             in_user_id                  INT,
             
-            in_pig_race_line_id         INT
+            in_pig_prod_notes_id         INT
         )
         """
        
-        sql =  'CALL pig_race_line_delete('
+        sql =  'CALL pig_prod_notes_delete('
         sql += '%s,'    % user_id
-        sql += '%s);'   % pig_race_line_id
+        sql += '%s);'   % pig_prod_notes_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -178,23 +178,26 @@ class PigProdNotes:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                'pig_prod_notes': {
+                    'id'
                 }
             }
 
         return None
     
     
-    def get_list(self, pig_prod_id):
+    def get_list(self, pig_prod_id, inc_deleted = 0, inc_user_audit = 0):
+        
+        where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
+        
+        if inc_deleted == 0:
+            where_clause += ' AND a.flag & 1 = 0'
         
         sql =   """
                 SELECT 
                     a.id,
                     a.notes,
-                    a.dt_entry
+                    a.dt_entry,
                     
                     b.username,
                     b.name_last,
@@ -202,9 +205,9 @@ class PigProdNotes:
                 
                 FROM pig_prod_notes a 
                 LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
-                WHERE a.pig_prod_id = %s
+                %s
                 ORDER BY a.id DESC
-                """ % pig_prod_id
+                """ % where_clause
        
         # Check if still connected to database
         if self.model.check_if_connected() == False:

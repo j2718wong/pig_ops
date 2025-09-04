@@ -12,7 +12,7 @@ class PigProdFeedBuy:
 
     def add(self, data = None):
         """
-        PROCEDURE prod_feed_buy_add(
+        PROCEDURE pig_prod_feed_buy_add(
             in_user_id              INT,
             in_pig_prod_id          INT,
             in_pig_prod_group_id    INT,
@@ -29,17 +29,16 @@ class PigProdFeedBuy:
         )  
         """
         
-        sql =  'CALL prod_feed_buy_add('
-        sql += '%s,'    % data.user_id
-        
+        sql =  'CALL pig_prod_feed_buy_add('
+        sql += '%s,'    % data.user_id        
         sql += '%s,'    % data.pig_prod_id
         sql += '%s,'    % data.pig_prod_group_id
         
         sql += '"%s",'  % data.date_buy
-        
         sql += '%s,'    % data.feed_type_id
         sql += '%s,'    % data.feed_brand_id
         sql += '%s,'    % data.feed_supplier_id
+        sql += '%s,'    % data.quantity
         sql += '%s,'    % data.kg_per_unit
        
         sql += '%s,'    % data.unit_cost
@@ -163,67 +162,7 @@ class PigProdFeedBuy:
 
         return None
     
-    
-    def delete(self, data = None):
-        user_id             = data['user_id']
-        prod_feed_buy_id    = data['prod_feed_buy_id']
-        
-        """
-        PROCEDURE prod_feed_buy_delete(
-            in_user_id                  INT,
-            
-            in_prod_feed_buy_id         INT
-        )
-        """
-       
-        sql =  'CALL prod_feed_buy_delete('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % prod_feed_buy_id
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'delete(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'prod_feed_buy': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
-                }
-            }
-
-        return None
-    
-    
+      
     def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
         
 
@@ -249,10 +188,10 @@ class PigProdFeedBuy:
                             a.feed_brand_id,
                             c.name AS feed_brand_name,
                             
-                            a.feed_vendor_id,
-                            d.name AS vendor name
+                            a.feed_supplier_id,
+                            d.name AS feed_supplier_name
                             
-                        FROM prod_feed_buy a 
+                        FROM pig_prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -282,10 +221,10 @@ class PigProdFeedBuy:
                             a.feed_brand_id,
                             c.name AS feed_brand_name,
                             
-                            a.feed_vendor_id,
-                            d.name AS vendor name
+                            a.feed_supplier_id,
+                            d.name AS feed_supplier_name
                             
-                        FROM prod_feed_buy a 
+                        FROM pig_prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -332,7 +271,7 @@ class PigProdFeedBuy:
                             f.name_first,
                             a.dt_last_update
                             
-                        FROM prod_feed_buy a 
+                        FROM pig_prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -379,7 +318,7 @@ class PigProdFeedBuy:
                             f.name_first,
                             a.dt_last_update
                             
-                        FROM prod_feed_buy a 
+                        FROM pig_prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id

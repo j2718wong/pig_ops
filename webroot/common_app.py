@@ -64,6 +64,7 @@ from model.m_pig_prod_pig_ops   import PigProdPigOps
 
 
 from model.m_pig_prod_feed_buy  import PigProdFeedBuy
+from model.m_pig_prod_feed_bal  import PigProdFeedBal
 
 
 
@@ -102,6 +103,7 @@ model_names = [
     ('pig_prod_pig_ops',        PigProdPigOps),
     
     ('prod_feed_buy',           PigProdFeedBuy),
+    ('prod_feed_bal',           PigProdFeedBal),
     
     ('sow_act',                 SowActivity)
     

@@ -190,7 +190,8 @@ async def account_selection(ahid: str, biz_obj_id: int):
     
     res = model['account'].get_business_obj_selection(account_id, biz_obj_id)
     
-    res = [hashids_common.encrypt(id) for id in res]
+    
+    res = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
     
     
     return {

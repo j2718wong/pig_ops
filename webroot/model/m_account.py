@@ -373,21 +373,21 @@ class Account:
             sql =   """
                     SELECT semen_supplier_id
                     FROM account_selection
-                    WHERE account_id = %s
+                    WHERE account_id = %s AND semen_supplier_id > 0
                     """ % account_id
                     
         if business_obj_id == BUSINESS_OBJ_ID_FEED_SUPPLIER:
             sql =   """
                     SELECT feed_supplier_id
                     FROM account_selection
-                    WHERE account_id = %s
+                    WHERE account_id = %s AND feed_supplier_id > 0
                     """ % account_id
             
         if business_obj_id == BUSINESS_OBJ_ID_FEED_BRAND:
             sql =   """
                     SELECT feed_brand_id
                     FROM account_selection
-                    WHERE account_id = %s
+                    WHERE account_id = %s AND feed_brand_id > 0
                     """ % account_id
             
         
@@ -423,7 +423,7 @@ class Account:
         if rows is not None:
             
             for row in rows:
-                result.append(row)
+                result.append(row[0])
         
         return result
     

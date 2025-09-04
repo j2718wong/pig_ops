@@ -187,15 +187,15 @@ async def pig_prod_notes_delete(uhid:str, pig_prod_notes_hid: str):
     
     
 @app.get("/pig_prod_notes/list")
-async def pig_prod_notes_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_prod_notes_list(pig_prod_hid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get pig_prod_notes list.
     
     Parameters
     ----------
     
-    ahid:str
-        account hashid
+    pig_prod_hid:str
+        pig_prod_hid hashid
 
     inc_deleted: int
         if > 0, will include deleted entries
@@ -206,21 +206,20 @@ async def pig_prod_notes_list(ahid: str, inc_deleted: int = 0, inc_user_audit:in
     """
     
     
-    res = hashids_account.decrypt(ahid)
+    res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_NOTES_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID',
                 'desc': ''
             }
         }
     
     
-    account_id = res[0]
+    pig_prod_id = res[0]
         
-    res = model['pig_prod_notes'].get_list(account_id, 
-            inc_deleted, inc_user_audit)
+    res = model['prod_notes'].get_list(pig_prod_id, inc_deleted, inc_user_audit)
     
     if res is None:
         return {
@@ -234,17 +233,11 @@ async def pig_prod_notes_list(ahid: str, inc_deleted: int = 0, inc_user_audit:in
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['prod_notes']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-        
-        cur_pig_race_id  = cur_entry['pig_race']['id']
-        cur_pig_race_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_race']['id']
-        cur_entry['pig_race']['hid']   = cur_hid
+        del cur_entry['prod_notes']['id']
+        cur_entry['prod_notes']['hid']   = cur_hid
         
     
     return {

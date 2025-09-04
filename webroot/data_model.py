@@ -264,32 +264,23 @@ class DataPigProdWeaning(BaseModel):
         
     total_weight:           int = None
     
-
-class DataPigProdPigCount(BaseModel):
-    uhid:                   str
-        
-    pig_prod_hid:           str
-        
-        
-    pig_prod_id:            int = 0  
-        
-    num_pigs_male:          int = 0
-    num_pigs_female:        int = 0
     
     
 class DataPigProdDeadPig(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None
+    pig_prod_group_hid:     str = None
     pig_prod_pig_dead_hid:  str = None
     
     
     user_id:                int = 0
     pig_prod_id:            int = 0
+    pig_prod_group_id:      int = 0
     pig_prod_pig_dead_id:   int = 0
     date_dead:              str
     dead_type_id:           int = 0
-    sex:                    str = 'F'
+    num_pigs_dead:          int = 1
     comments:               str = None
     
     
@@ -361,7 +352,7 @@ class DataProdFeedBuy(BaseModel):
     total_cost:             float
     
     
-class DataProdFeedBalance(BaseModel):
+class DataProdFeedBal(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None

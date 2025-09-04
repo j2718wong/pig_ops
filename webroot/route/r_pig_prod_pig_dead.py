@@ -36,23 +36,44 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
     user_id = res[0]
     
     
-    pig_prod_hid    = pig_prod_pig_dead_data.pig_prod_hid
+    pig_prod_hid        = pig_prod_pig_dead_data.pig_prod_hid
+    pig_prod_id         = 0
     
-    res = hashids_common.decrypt(pig_prod_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+    if pig_prod_hid is not None:
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
             }
-        }
+        
+        pig_prod_id = res[0]
+        
     
-    pig_prod_id = res[0]
+    pig_prod_group_hid  = pig_prod_pig_dead_data.pig_prod_group_hid
+    pig_prod_group_id   = 0
+    
+    if pig_prod_group_hid is not None:
+        res = hashids_common.decrypt(pig_prod_group_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        pig_prod_group_hid = res[0]
     
     
-    pig_prod_pig_dead_data.user_id      = user_id
-    pig_prod_pig_dead_data.pig_prod_id  = pig_prod_id
+    
+    pig_prod_pig_dead_data.user_id          = user_id
+    pig_prod_pig_dead_data.pig_prod_id      = pig_prod_id
+    pig_prod_pig_dead_data.pig_prod_group_id= pig_prod_group_id
     
     res_add    =  model['prod_pig_dead'].add(pig_prod_pig_dead_data)
     

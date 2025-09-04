@@ -95,7 +95,7 @@ class PigProdPigOps:
                         
                     FROM pig_prod_pig_ops a 
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
-                    LEFT OUTER JOIN staff c             ON a.staff_id = c.id
+                    LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
                     WHERE a.pig_prod_id = %s AND a.operation_type = %s
                     ORDER BY b.num_days_since
                     """ % (pig_prod_id, operation_type)
@@ -122,7 +122,7 @@ class PigProdPigOps:
                         
                     FROM pig_prod_pig_ops a 
                      LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
-                    LEFT OUTER JOIN staff c              ON a.staff_id = c.id
+                    LEFT OUTER JOIN pig_farm_staff c     ON a.staff_id = c.id
                     LEFT OUTER JOIN user d               ON a.last_update_user_id = d.id
                     WHERE a.pig_prod_id = %s AND a.operation_type =%s
                     ORDER BY b.num_days_since
