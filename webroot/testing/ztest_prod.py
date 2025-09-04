@@ -34,8 +34,6 @@ DEFAULT_FEED_UNIT_COST = {
 
 
 
-
-
         
 class TestAPIPigProd:
     def __init__(self):
@@ -155,6 +153,7 @@ class TestAPIPigProd:
                         
             
             pig_prod_hid    = data_add['pig_prod_hid']
+            pig_prod_id     = hashids_common.decrypt(pig_prod_hid)[0]
             
             data_insem = self._test_pig_prod_update_insem(data_add)
             
@@ -208,7 +207,21 @@ class TestAPIPigProd:
                 
                 self._test_prod_lactating_ops(user_uhid, pig_prod_hid, staff_hid, 
                     after_birth = 1)
-                
+            
+            
+            # Test buy lactating feed
+            data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_LACTATING, data)
+            
+            
+            # Test buy prestarter feed
+            data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_PRESTARTER, data)
+            
+            
+            # Test buy starter feed
+            data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_STARTER, data)
             
             
             self._test_prod_update_weaning(data_birth)
@@ -222,6 +235,15 @@ class TestAPIPigProd:
             pig_prod_notes_hid = res['pig_prod_notes']['hid']
             notes = notes + " updated"
             self._test_pig_prod_notes_update(user_uhid, pig_prod_notes_hid, notes)
+            
+            
+            # Test buy grower feed
+            data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_GROWER, data)
+            
+            # Test buy finisher feed
+            data_feed_buy = {'uhid': user_uhid, 'pig_prod_hid': pig_prod_hid}
+            self._test_prod_feed_buy_add(account_id, pig_prod_id, FEED_TYPE_ID_FINISHER, data)
             
            
             count_sow = count_sow + 1
@@ -768,7 +790,7 @@ class TestAPIPigProd:
         
     
     
-    def _test_prod_feed_buy_add(self, account_id, feed_type_id, data ):
+    def _test_prod_feed_buy_add(self, account_id, pig_prod_id, feed_type_id, data):
         
         feed_type_hid = hashids_common.encrypt(feed_type_id)
         
@@ -842,51 +864,315 @@ class TestAPIPigProd:
             index   = random.randint(0, list_hids-1)
             cur_feed_brand_hid = list_hids[index]
         
-  
-        kg_per_qty = 1
+        
+        # Get number of sacks feeds already bought for pig_prod
+        list_ids =[pig_prod_id]
+        res = model['pig_prod'].get_list(list_ids = list_ids)
+        
+        pig_prod = res[0]
+        
+        feeds_bought = pig_prod['feeds']['bought']
+        
+        current_pig_count   = pig_prod['current_pig_count']
+        total_pigs          = current_pig_count['m'] + current_pig_count['f']
+        
+        kg_per_unit = 1
+        
+        """
+        The test process is 
+        
+        1.) buy lactating feeds once only
+        2.) buy prestarter feeds once only
+        3.) buy starter feeds once only
+        4.) buy grower feeds twice only
+        5.) buy grower feeds twice only
+        """
+        
         
         if feed_type_id == FEED_TYPE_ID_GESTATING:
-            kg_per_qty      = DEFAULT_KG_PER_FEED_QTY['GESTATING']
+            kg_per_unit     = DEFAULT_KG_PER_FEED_UNIT['GESTATING']
             cost_per_unit   = DEFAULT_FEED_UNIT_COST['GESTATING']
+            
         
         elif feed_type_id == FEED_TYPE_ID_LACTATING:
-            kg_per_qty      = DEFAULT_KG_PER_FEED_QTY['LACTATING']
+            kg_per_unit     = DEFAULT_KG_PER_FEED_UNIT['LACTATING']
             cost_per_unit   = DEFAULT_FEED_UNIT_COST['LACTATING']
+            num_bought      = feeds_bought['lactating']
+            
+            if num_bought is None: num_bought = 0
+            
+            MAX_FEEDS_TO_BUY_LACTATING = 2
+            num_feeds_to_buy = MAX_FEEDS_TO_BUY_LACTATING - num_bought
+            
+            if num_feeds_to_buy == 0:
+                return None
+            
+            
+            # Simulate date buy before birth
+            production_birth = pig_prod['birth']
+            
+            if production_birth['date_actual'] is not None:
+                date_ref    = production_birth['date_actual']
+            else:
+                date_ref    = production_birth['date_expected']
+                
+                
+            dt_birth    = datetime.strptime(date_ref, '%Y-%m-%d')
+            dt_feed_buy = dt_birth - timedelta(days = 4)
+            date_buy    = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+            
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy,
+                
+                'quantity':         num_feeds_to_buy,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       num_feeds_to_buy * cost_per_unit
+            }
+            
+            return self._test_prod_feed_buy_add_request(data_feed_buy)
+            
         
         elif feed_type_id == FEED_TYPE_ID_PRESTARTER:
-            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['PRESTARTER']
+            kg_per_unit     = DEFAULT_KG_PER_FEED_UNIT['PRESTARTER']
             cost_per_unit   = DEFAULT_FEED_UNIT_COST['PRESTARTER']
+            num_bought      = feeds_bought['prestarter']
+            
+            if num_bought is None: num_bought = 0
+            
+            MAX_FEEDS_TO_BUY_PRESTARTER = 1
+            
+            num_feeds_to_buy = MAX_FEEDS_TO_BUY_PRESTARTER - num_bought
+            
+            
+            if num_feeds_to_buy == 0:
+                return None
+            
+            
+            # Simulate date buy 15 days after birth
+            production_birth    = pig_prod['birth']
+            date_birth  = production_birth['date_actual']
+            
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+            dt_feed_buy = dt_birth + timedelta(days = 15)
+            date_buy    = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+            
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy,
+                
+                'quantity':         num_feeds_to_buy,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       num_feeds_to_buy * cost_per_unit
+            }
+            
+            return self._test_prod_feed_buy_add_request(data_feed_buy)
+            
+            
             
         elif feed_type_id == FEED_TYPE_ID_STARTER:
-            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['STARTER']
+            kg_per_unit     = DEFAULT_KG_PER_FEED_UNIT['STARTER']
             cost_per_unit   = DEFAULT_FEED_UNIT_COST['STARTER']
             
+            num_bought      = feeds_bought['starter']
+            
+            if num_bought is None: num_bought = 0
+            
+            MAX_FEEDS_TO_BUY_STARTER = total_pigs
+            
+            num_feeds_to_buy = MAX_FEEDS_TO_BUY_STARTER - num_bought
+            
+            
+            if num_feeds_to_buy == 0:
+                return None
+            
+            quantity_1 = int(num_feeds_to_buy/2) + random.randint(0,1)
+            quantity_2 = num_feeds_to_buy - quantity_1
+            
+                
+            # Buy twice
+            production_birth    = pig_prod['birth']
+            date_birth  = production_birth['date_actual']
+            
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+            dt_feed_buy = dt_birth + timedelta(days = 40)
+            date_buy_1  = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+            
+            dt_feed_buy = dt_birth + timedelta(days = 70)
+            date_buy_2  = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+            
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy_1,
+                
+                'quantity':         quantity_1,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       quantity_1 * cost_per_unit
+            }
+            
+            self._test_prod_feed_buy_add_request(data_feed_buy)
+            
+            
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy_2,
+                
+                'quantity':         quantity_2,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       quantity_2 * cost_per_unit
+            }
+            
+            self._test_prod_feed_buy_add_request(data_feed_buy)
+            
+            
+            
         elif feed_type_id == FEED_TYPE_ID_GROWER:
-            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['GROWER']
+            kg_per_unit     = DEFAULT_KG_PER_FEED_UNIT['GROWER']
             cost_per_unit   = DEFAULT_FEED_UNIT_COST['GROWER']
             
+            
+            num_bought      = feeds_bought['grower']
+            
+            if num_bought is None: num_bought = 0
+            
+            MAX_FEEDS_TO_BUY_GROWER = total_pigs * 2
+            
+            num_feeds_to_buy = MAX_FEEDS_TO_BUY_GROWER - num_bought
+            
+            
+            if num_feeds_to_buy == 0:
+                return None
+            
+            quantity_1 = int(num_feeds_to_buy/2) + random.randint(0,1)
+            quantity_2 = num_feeds_to_buy - quantity_1
+            
+                
+            # Buy twice
+            production_birth    = pig_prod['birth']
+            date_birth  = production_birth['date_actual']
+            
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+            dt_feed_buy = dt_birth + timedelta(days = 85)
+            date_buy_1  = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+            
+            dt_feed_buy = dt_birth + timedelta(days = 100)
+            date_buy_2  = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+            
+            
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy_1,
+                
+                'quantity':         quantity_1,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       quantity_1 * cost_per_unit
+            }
+            
+            self._test_prod_feed_buy_add_request(data_feed_buy)
+            
+            
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy_2,
+                
+                'quantity':         quantity_2,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       quantity_2 * cost_per_unit
+            }
+            
+            self._test_prod_feed_buy_add_request(data_feed_buy)
+            
+            
+            
         elif feed_type_id == FEED_TYPE_ID_FINISHER:
-            kg_per_qty = DEFAULT_KG_PER_FEED_QTY['FINISHER']
+            kg_per_unit     = DEFAULT_KG_PER_FEED_UNIT['FINISHER']
             cost_per_unit   = DEFAULT_FEED_UNIT_COST['FINISHER']
         
+            num_bought      = feeds_bought['finisher']
+            
+            if num_bought is None: num_bought = 0
+            
+            MAX_FEEDS_TO_BUY_FINISHER = total_pigs
+            
+            num_feeds_to_buy = MAX_FEEDS_TO_BUY_FINISHER - num_bought
+            
+            
+            if num_feeds_to_buy == 0:
+                return None
+                
+            quantity_1 = num_feeds_to_buy
         
-  
-        data_pig_prod_feed_buy = {
-            'uhid':            data['uhid'],
+            production_birth    = pig_prod['birth']
+            date_birth  = production_birth['date_actual']
             
-            'pig_prod_hid':    data['pig_prod_hid'],
-            'feed_type_hid':   feed_type_hid,
-            'feed_brand_hid' : cur_feed_brand_hid,
-            'feed_supplier_hid': cur_feed_supplier_hid,
-            'date_buy':         data['date_buy'],
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+            dt_feed_buy = dt_birth + timedelta(days = 110)
+            date_buy   = datetime.strftime(dt_feed_buy, '%Y-%m-%d')
+          
+            data_feed_buy = {
+                'uhid':             data['uhid'],
+                
+                'pig_prod_hid':     data['pig_prod_hid'],
+                'feed_type_hid':    feed_type_hid,
+                'feed_brand_hid' :  cur_feed_brand_hid,
+                'feed_supplier_hid': cur_feed_supplier_hid,
+                'date_buy':         date_buy,
+                
+                'quantity':         quantity_1,
+                'kg_per_unit':      kg_per_unit,
+                
+                'unit_cost':        cost_per_unit,
+                'total_cost':       quantity_1 * cost_per_unit
+            }
             
-            'quantity':         data['quantity'],
-            'kg_per_quantity':  kg_per_qty,
+            self._test_prod_feed_buy_add_request(data_feed_buy)
             
-            'unit_cost':       cost_per_unit,
-            'total_cost':      data['quantity'] * cost_per_unit
-        }
+            
         
+        
+    def _test_prod_feed_buy_add_request(self, data)
         
         url = BASE_URL + 'pig_prod_feed_buy/add'
         

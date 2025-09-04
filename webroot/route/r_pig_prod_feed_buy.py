@@ -353,17 +353,36 @@ async def prod_feed_buy_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        prod_feed_buy_id    = cur_entry['feed_buy']['id']
+        prod_feed_buy_hid   = hashids_common.encrypt(prod_feed_buy_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        # remove plain id
+        del cur_entry['feed_buy']['id']
+        cur_entry['feed_buy']['hid'] = prod_feed_buy_hid
         
-        cur_pig_race_id  = cur_entry['pig_race']['id']
-        cur_pig_race_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['pig_race']['id']
-        cur_entry['pig_race']['hid']   = cur_hid
+        feed_type_id        = cur_entry['feed_type']['id']
+        feed_type_hid       = hashids_common.encrypt(feed_type_id)
+        
+        # remove plain id
+        del cur_entry['feed_type']['id']
+        cur_entry['feed_type']['hid'] = feed_type_hid
+        
+        
+        feed_brand_id       = cur_entry['feed_brand']['id']
+        feed_brand_hid      = hashids_common.encrypt(feed_brand_id)
+        
+        # remove plain id
+        del cur_entry['feed_brand']['id']
+        cur_entry['feed_brand']['hid'] = feed_brand_hid
+        
+        
+        feed_supplier_id    = cur_entry['feed_supplier']['id']
+        feed_supplier_hid   = hashids_common.encrypt(feed_supplier_id)
+        
+        # remove plain id
+        del cur_entry['feed_supplier']['id']
+        cur_entry['feed_supplier']['hid'] = feed_supplier_hid
         
     
     return {

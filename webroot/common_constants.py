@@ -55,7 +55,7 @@ FEED_TYPE_ID_BOOSTER                                = 3
 FEED_TYPE_ID_PRESTARTER                             = 4
 FEED_TYPE_ID_STARTER                                = 5
 FEED_TYPE_ID_GROWER                                 = 6
-FEED_TYPE_ID_FINISHER                               = 6
+FEED_TYPE_ID_FINISHER                               = 7
 
 
 DEFAULT_KG_PER_FEED_QTY = {

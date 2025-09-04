@@ -360,3 +360,30 @@ class DataProdFeedBuy(BaseModel):
     unit_cost:              float
     total_cost:             float
     
+    
+class DataProdFeedBalance(BaseModel):
+    uhid:                   str
+    
+    pig_prod_hid:           str = None
+    pig_prod_group_hid:     str = None
+    prod_feed_balance_hid:  str = None
+    
+    
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    pig_prod_group_id:      int = 0
+    prod_feed_balance_id:   int = 0
+    
+    
+    date_balance:           str
+    
+    num_pigs:               int
+    
+    
+    num_lactating:          float = 0.0
+    num_booster:            float = 0.0
+    num_prestarter:         float = 0.0
+    num_starter:            float = 0.0
+    num_grower:             float = 0.0
+    num_finisher:           float = 0.0
+    

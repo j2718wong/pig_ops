@@ -592,12 +592,13 @@ class PigProduction:
                     a.num_b_grower,
                     a.num_b_finisher,
                     
-                    a.num_l_lactating,
-                    a.num_l_booster,
-                    a.num_l_prestarter,
-                    a.num_l_starter,
-                    a.num_l_grower,
-                    a.num_l_finisher,
+                    h.date_balance,
+                    h.num_lactating,
+                    h.num_booster,
+                    h.num_prestarter,
+                    h.num_starter,
+                    h.num_grower,
+                    h.num_finisher,
                     
                     a.cost_lactating,
                     a.cost_booster,
@@ -614,6 +615,7 @@ class PigProduction:
                 LEFT OUTER JOIN pig_farm_staff e    ON a.insem_staff_id = e.id
                 LEFT OUTER JOIN pig_prod_status f   ON a.prod_status_id = f.id
                 LEFT OUTER JOIN pig_farm_staff g    ON a.insem_staff_id = g.id
+                LEFT OUTER JOIN pig_prod_feed_bal h ON a.last_feed_balance_id = h.id
                 
                 %s
                 """ % where_clause
@@ -709,19 +711,20 @@ class PigProduction:
                 cur_prod_num_b_grower       = row[39]
                 cur_prod_num_b_finisher     = row[40]
                 
-                cur_prod_num_l_lactating    = row[41]
-                cur_prod_num_l_booster      = row[42]
-                cur_prod_num_l_prestarter   = row[43]
-                cur_prod_num_l_starter      = row[44]
-                cur_prod_num_l_grower       = row[45]
-                cur_prod_num_l_finisher     = row[46]
+                cur_feed_bal_date_balance   = row[41]
+                cur_feed_bal_lactating      = row[42]
+                cur_feed_bal_booster        = row[43]
+                cur_feed_bal_prestarter     = row[44]
+                cur_feed_bal_starter        = row[45]
+                cur_feed_bal_grower         = row[46]
+                cur_feed_bal_finisher       = row[47]
                 
-                cur_prod_cost_lactating     = row[47]
-                cur_prod_cost_booster       = row[48]
-                cur_prod_cost_prestarter    = row[49]
-                cur_prod_cost_starter       = row[50]
-                cur_prod_cost_grower        = row[51]
-                cur_prod_cost_finisher      = row[52]
+                cur_prod_cost_lactating     = row[48]
+                cur_prod_cost_booster       = row[49]
+                cur_prod_cost_prestarter    = row[50]
+                cur_prod_cost_starter       = row[51]
+                cur_prod_cost_grower        = row[52]
+                cur_prod_cost_finisher      = row[53]
             
                 
                 cur_entry = {
@@ -796,12 +799,13 @@ class PigProduction:
                         },
                         
                         'balance':{
-                            'lactating':    float(cur_prod_num_l_lactating)     if cur_prod_num_l_lactating     is not None else None,
-                            'booster':      float(cur_prod_num_l_booster)       if cur_prod_num_l_booster       is not None else None,
-                            'prestarter':   float(cur_prod_num_l_prestarter)    if cur_prod_num_l_prestarter    is not None else None,
-                            'starter':      float(cur_prod_num_l_starter)       if cur_prod_num_l_starter       is not None else None,
-                            'grower':       float(cur_prod_num_l_grower)        if cur_prod_num_l_grower        is not None else None,
-                            'finisher':     float(cur_prod_num_l_finisher)      if cur_prod_num_l_finisher      is not None else None
+                            'date_balance': str(cur_feed_bal_date_balance)      if cur_feed_bal_date_balance    is not None else None,
+                            'lactating':    float(cur_feed_bal_lactating)       if cur_feed_bal_lactating       is not None else None,
+                            'booster':      float(cur_feed_bal_booster)         if cur_feed_bal_booster         is not None else None,
+                            'prestarter':   float(cur_feed_bal_prestarter)      if cur_feed_bal_prestarter      is not None else None,
+                            'starter':      float(cur_feed_bal_starter)         if cur_feed_bal_starter         is not None else None,
+                            'grower':       float(cur_feed_bal_grower)          if cur_feed_bal_grower          is not None else None,
+                            'finisher':     float(cur_feed_bal_finisher)        if cur_feed_bal_finisher        is not None else None
                         },
                         
                         'cost':{
