@@ -112,7 +112,7 @@ model_names = [
 ]
 
 
-USING_PRODUCTION_DB             = 0
+USING_PRODUCTION_DB             = 1
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:

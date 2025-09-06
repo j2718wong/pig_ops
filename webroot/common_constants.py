@@ -43,6 +43,22 @@ NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY            = 5
 INS_STATUS_ID_TERMINATED                            = 2
 
 
+PROD_STATUS_ID_GESTATING                            = 1
+PROD_STATUS_ID_TERMINATED                           = 2
+PROD_STATUS_ID_NOT_PREGNANT                         = 3
+PROD_STATUS_ID_LACTATING                            = 4
+PROD_STATUS_ID_WEANING                              = 5
+PROD_STATUS_ID_GROWING                              = 6
+
+PROD_STATUS_ID_COMBINED                             = 7
+PROD_STATUS_ID_HARVESTED                            = 8
+PROD_STATUS_ID_CLOSED                               = 9
+
+
+
+
+
+
 PIG_OPERATION_TYPE_GESTATING                        = 1
 PIG_OPERATION_TYPE_LACTATING                        = 2
 PIG_OPERATION_TYPE_GROWING                          = 3

@@ -294,7 +294,7 @@ class AccountPigOps:
                 if inc_user_audit == 0:
                     cur_entry = {
                         'id':                   row[0],
-                        'num_days_since': row[1],
+                        'num_days_since':       row[1],
                         'name':                 row[2],
                         'desc':                 row[3],
                         
@@ -304,7 +304,7 @@ class AccountPigOps:
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        'num_days_since': row[1],
+                        'num_days_since':       row[1],
                         'name':                 row[2],
                         'desc':                 row[3],
                         

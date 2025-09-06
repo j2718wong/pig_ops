@@ -435,7 +435,7 @@ class SowActivity:
         return result
     
     
-    def get_pig_prod_feeding_list(self, is_growing = 0):
+    def get_pig_prod_ops_list(self, pig_farm_id,  inc_historical = 0):
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -445,21 +445,21 @@ class SowActivity:
         # Get database connection
         conn = self.model.db_conn
         
-        where_clause = 'WHERE a.status_id IN (4, 5,7,8,9)'
-        if is_growing > 0:
-            where_clause = 'WHERE a.status_id IN (5,7,8,9)'
+        
+        where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (4, 5, 6)' % pig_farm_id
+        if inc_historical > 0:
+            where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (4,5,6,8,9)' % pig_farm_id
        
         sql =   """
                 SELECT 
-                    a.id,
-                    b.sow_number,
+                    a.farm_prod_id,
+                    b.number,
                     b.name AS sow_name,
                     
-                    a.status_id,
+                    a.prod_status_id,
                     c.name AS prod_status,
                     
-                    a.num_pigs_current_m,
-                    a.num_pigs_current_f,
+                    a.num_pigs_current,
                     
                     a.date_actual_birth,
                     
@@ -484,12 +484,12 @@ class SowActivity:
                     a.num_b_grower,
                     a.num_b_finisher,
                     
-                    a.num_l_lactating,
-                    a.num_l_booster,
-                    a.num_l_prestarter,
-                    a.num_l_starter,
-                    a.num_l_grower,
-                    a.num_l_finisher,
+                    d.num_lactating,
+                    d.num_booster,
+                    d.num_prestarter,
+                    d.num_starter,
+                    d.num_grower,
+                    d.num_finisher,
                     
                     a.cost_lactating,
                     a.cost_booster,
@@ -501,14 +501,15 @@ class SowActivity:
                     a.date_harvest
                     
                 FROM pig_production a
-                LEFT OUTER JOIN sow b ON a.sow_id = b.id
-                LEFT OUTER JOIN pig_prod_status c ON a.prod_status_id = c.id
+                LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
+                LEFT OUTER JOIN pig_prod_status c   ON a.prod_status_id = c.id
+                LEFT OUTER JOIN pig_prod_feed_bal d ON a.last_feed_balance_id = d.id
                 %s
                 ORDER BY a.date_actual_birth DESC
                 """ % where_clause 
     
         rows = None
-        
+
         try:
             cursor = conn.cursor()
             cursor.execute(sql)
@@ -517,7 +518,7 @@ class SowActivity:
             cursor.close()
 
         except Exception as e:
-            msg = 'get_pig_prod_feeding_list(); error in executing query[] = ' + sql
+            msg = 'get_pig_prod_ops_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -530,56 +531,54 @@ class SowActivity:
         if rows is not None:
             
             for row in rows:
-                cur_id                  = row[0]
-                
+                cur_farm_prod_id        = row[0]                
                 cur_sow_number          = row[1]
                 cur_sow_name            = row[2]
                 
                 cur_status_id           = row[3]
                 cur_status_name         = row[4]
                 
-                cur_num_c_male          = row[5] if row[5] else None
-                cur_num_c_female        = row[6] if row[6] else None
+                cur_num_pigs_current    = row[5]               
                
-                cur_date_actual         = str(row[7])
+                cur_date_actual         = str(row[6])
                 
-                cur_date_iron_1         = str(row[8])  if row[8]  else None
-                cur_date_iron_2         = str(row[9])  if row[9]  else None
-                cur_date_vitamins_1     = str(row[10]) if row[10] else None
-                cur_date_kapon          = str(row[11]) if row[11] else None
-                cur_date_vitamins_2     = str(row[12]) if row[12] else None
-                cur_date_deworm_1       = str(row[13]) if row[13] else None
+                cur_date_iron_1         = str(row[7])  if row[7]  else None
+                cur_date_iron_2         = str(row[8])  if row[8]  else None
+                cur_date_vitamins_1     = str(row[9])  if row[9] else None
+                cur_date_kapon          = str(row[10]) if row[10] else None
+                cur_date_vitamins_2     = str(row[11]) if row[11] else None
+                cur_date_deworm_1       = str(row[12]) if row[12] else None
                 
                 
-                cur_date_booster        = str(row[14]) if row[14] else None
-                cur_date_prestarter     = str(row[15]) if row[15] else None
-                cur_date_weaning        = str(row[16]) if row[16] else None
-                cur_date_starter        = str(row[17]) if row[17] else None
-                cur_date_grower         = str(row[18]) if row[18] else None
-                cur_date_finisher       = str(row[19]) if row[19] else None
+                cur_date_booster        = str(row[13]) if row[13] else None
+                cur_date_prestarter     = str(row[14]) if row[14] else None
+                cur_date_weaning        = str(row[15]) if row[15] else None
+                cur_date_starter        = str(row[16]) if row[16] else None
+                cur_date_grower         = str(row[17]) if row[17] else None
+                cur_date_finisher       = str(row[18]) if row[18] else None
                 
-                cur_num_b_lactating     = row[20]
-                cur_num_b_booster       = row[21]
-                cur_num_b_prestarter    = row[22]
-                cur_num_b_starter       = row[23]
-                cur_num_b_grower        = row[24]
-                cur_num_b_finisher      = row[25]
+                cur_num_b_lactating     = row[19]
+                cur_num_b_booster       = row[20]
+                cur_num_b_prestarter    = row[21]
+                cur_num_b_starter       = row[22]
+                cur_num_b_grower        = row[23]
+                cur_num_b_finisher      = row[24]
                 
-                cur_num_l_lactating     = float(row[26]) if row[26] is not None else None
-                cur_num_l_booster       = float(row[27]) if row[27] is not None else None
-                cur_num_l_prestarter    = float(row[28]) if row[28] is not None else None
-                cur_num_l_starter       = float(row[29]) if row[29] is not None else None
-                cur_num_l_grower        = float(row[30]) if row[30] is not None else None
-                cur_num_l_finisher      = float(row[31]) if row[31] is not None else None
+                cur_num_l_lactating     = float(row[25]) if row[25] is not None else None
+                cur_num_l_booster       = float(row[26]) if row[26] is not None else None
+                cur_num_l_prestarter    = float(row[27]) if row[27] is not None else None
+                cur_num_l_starter       = float(row[28]) if row[28] is not None else None
+                cur_num_l_grower        = float(row[29]) if row[29] is not None else None
+                cur_num_l_finisher      = float(row[30]) if row[30] is not None else None
                 
-                cur_cost_lactating      = row[32]
-                cur_cost_booster        = row[33]
-                cur_cost_prestarter     = row[34]
-                cur_cost_starter        = row[35]
-                cur_cost_grower         = row[36]
-                cur_cost_finisher       = row[37]
+                cur_cost_lactating      = float(row[31]) if row[31] is not None else None
+                cur_cost_booster        = float(row[32]) if row[32] is not None else None
+                cur_cost_prestarter     = float(row[33]) if row[33] is not None else None
+                cur_cost_starter        = float(row[34]) if row[34] is not None else None
+                cur_cost_grower         = float(row[35]) if row[35] is not None else None
+                cur_cost_finisher       = float(row[36]) if row[36] is not None else None
                 
-                cur_date_harvest        = row[38]
+                cur_date_harvest        = str(row[37]) if row[37] else None
                 
                 
                 cur_num_c_lactating     = None
@@ -610,7 +609,7 @@ class SowActivity:
                 
                 
                 cur_entry = {
-                    'id':               cur_id,
+                    'farm_prod_id':     cur_farm_prod_id,
                     
                     'sow': {
                         'number':       cur_sow_number,
@@ -620,10 +619,7 @@ class SowActivity:
                     'status_id':        cur_status_id, 
                     'status':           cur_status_name,
                     
-                    'num_pigs_current': {
-                        'male':         cur_num_c_male,
-                        'female':       cur_num_c_female
-                    },
+                    'num_pigs_current': cur_num_pigs_current,
                     
                     'dates':{
                         'birth':        cur_date_actual,
@@ -640,7 +636,9 @@ class SowActivity:
                         'weaning':      cur_date_weaning,
                         'starter':      cur_date_starter,
                         'grower':       cur_date_grower,
-                        'finisher':     cur_date_finisher
+                        'finisher':     cur_date_finisher,
+                        
+                        'harvest':      cur_date_harvest
                     },
                     
                     'num_feeds': {
@@ -697,8 +695,7 @@ class SowActivity:
         return result
         
     
-    
-    def get_sow_operations_list(self):
+    def get_gestating_operations_list(self, pig_farm_id):
         """
         Will get list of latest sow_farrowing list.
         
@@ -721,19 +718,21 @@ class SowActivity:
       
         sql =   """
                 SELECT 
-                    a.sow_number,
-                    a.sow_status_id,
-                    b.name AS status,
-                    a.last_prod_id, 
+                    a.id,
+                    a.farm_prod_id,
+                    b.number,
+                    b.name AS sow_name,
                     
-                    c.date_insemination
+                    a.date_insemination,
+                    a.insemination_type,
+                    a.date_expected_birth
                     
-                FROM sow a
-                LEFT OUTER JOIN sow_status      b  ON a.sow_status_id = b.id
-                LEFT OUTER JOIN pig_production  c  ON a.last_prod_id = c.id
-                WHERE a.date_culled IS NULL
-                ORDER BY c.date_insemination
-                """ 
+                    
+                FROM pig_production a
+                LEFT OUTER JOIN sow_boar     b  ON a.sow_id = b.id
+                WHERE a.pig_farm_id = %s AND a.prod_status_id = 1
+                ORDER BY a.date_insemination ASC
+                """ % pig_farm_id  
     
         rows = None
         
@@ -746,7 +745,7 @@ class SowActivity:
             #conn.close()
             
         except Exception as e:
-            msg = 'get_sow_operations_list(); error in executing query[] = ' + sql
+            msg = 'get_gestating_operations_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -760,19 +759,23 @@ class SowActivity:
             
             
             for row in rows:
-
-                cur_sow_number          = row[0]
-                cur_status_id           = row[1]
-                cur_status_name         = row[2]
-                cur_last_prod_id        = row[3]
-                cur_last_date_insem     = str(row[4]) if row[4] else None
+                cur_id                  = row[0]
+                cur_farm_prod_id        = row[1]
+                cur_sow_number          = row[2]
+                cur_sow_name            = row[3]
+                cur_date_insemination   = str(row[4])
+                cur_insem_type          = row[5]
+                cur_date_expected       = str(row[6])
+                
                 
                 cur_entry = {
-                    'sow_number':       cur_sow_number, 
-                    'status_id':        cur_status_id,
-                    'status_name':      cur_status_name,
-                    'last_prod_id':     cur_last_prod_id,
-                    'date_insemination': cur_last_date_insem
+                    'id':               cur_id,
+                    'farm_prod_id':     cur_farm_prod_id, 
+                    'sow_number':       cur_sow_number,
+                    'sow_name':         cur_sow_name,
+                    'date_insemination': cur_date_insemination,
+                    'insem_type':       cur_insem_type,
+                    'date_expected':    cur_date_expected
                 }
                 
                 result.append(cur_entry)
