@@ -441,6 +441,8 @@ async def sow_act_pig_prod_ops(inc_historical : int =0,
     s += write_feeding_guide(res, inc_historical)
     s += write_feeds_consumed(res, inc_historical)
     
+    s += write_sow_boar_balance(pig_farm_id)
+    
     if inc_cost > 0:
         s += write_feeds_cost(res, inc_historical)
     
@@ -842,7 +844,7 @@ def write_feeding_guide(data, inc_historical):
     
     
     s  = 'PROD FEEDING GUIDE                       BOOSTER   PSTARTER     LUTAS   STARTER    GROWER   FINISHER\n'
-    s += '=================      ADLAW GIKAN ANAK  '
+    s += '=====================   ADLAW GIKAN ANAK '
     
     s_temp      = str(NUMDAYS_SINCE_BIRTH_BOOSTER)
     num_chars   = len(s_temp)
@@ -1050,7 +1052,7 @@ def write_feeds_consumed(data, inc_historical):
     dt_now      = datetime.now()
     
     s  = 'PROD FEEDS CONSUMED                                   LACTA            BOOSTER         PRE_STARTER         STARTER            GROWER          FINISHER    \n'
-    s += '=================                                ===============   ===============   ===============   ===============   ===============   ===============\n'
+    s += '======================                           ===============   ===============   ===============   ===============   ===============   ===============\n'
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT\n'
     
     
@@ -1763,3 +1765,67 @@ def write_feeds_cost(data, inc_historical):
     return s
     
 
+
+def write_sow_boar_balance(pig_farm_id):
+    
+    res = model['pig_farm'].get_sow_boar_balance(pig_farm_id)
+    
+    pprint.pprint(res)
+    
+    
+    
+    s  = 'SOW BOAR BALANCE       ===== SOW(ANAY) =====    BOAR     NON-PROD FEEDS\n'
+    s += '                       GESTA   LACTA   TOTAL    TOTAL    GESTA  FINISHER\n'
+    s += '==================     =====   =====   =====    =====    =====  =========\n'
+    s += 'AS OF  '          
+   
+    
+    s_temp      = res['date_balance']
+    s           += s_temp
+    s           += '      '
+    
+    
+    s_temp      = str(res['sows']['num_gestating'])
+    num_chars   = len(s_temp)
+    num_space   = 5 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    s_temp      = str(res['sows']['num_lactating'])
+    num_chars   = len(s_temp)
+    num_space   = 5 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
+    
+    s_temp      = str(res['sows']['total'])
+    num_chars   = len(s_temp)
+    num_space   = 5 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '    '
+    
+    
+    s_temp      = str(res['boars'])
+    num_chars   = len(s_temp)
+    num_space   = 5 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '    '
+    
+    
+    temp        = res['feed_balance']['num_gestating']
+    s_temp      = f"{temp:.1f}"
+    num_chars   = len(s_temp)
+    num_space   = 5 - num_chars
+    s           += ' ' * num_space + s_temp
+
+    
+    temp        = res['feed_balance']['num_finisher']
+    if temp is not None:
+        s_temp      = f"{temp:.1f}"
+        num_chars   = len(s_temp)
+        num_space   = 5 - num_chars
+        s           += ' ' * num_space + s_temp
+    
+    s += '\n'
+    
+    return s

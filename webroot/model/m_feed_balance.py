@@ -188,39 +188,34 @@ class FeedBalance:
     def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
         
 
-        if inc_user_audit == 0: 
-            if pig_prod_id > 0:
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_vendor_id,
-                            d.name AS vendor name
-                            
-                        FROM prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        WHERE a.pig_prod_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_id
+
+        if pig_prod_id > 0:
+            sql =   """
+                    SELECT 
                         
+                        date_balance,
+                        num_pigs,
+                        
+                        num_lactating,
+                        num_booster,
+                        num_prestarter,
+                        num_starter,
+                        num_grower,
+                        num_finisher
+                        a.feed_brand_id,
+                        c.name AS feed_brand_name,
+                        
+                        a.feed_vendor_id,
+                        d.name AS vendor name
+                        
+                    FROM prod_feed_buy a 
+                    LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
+                    LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
+                    LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
+                    WHERE a.pig_prod_id = %s
+                    ORDER BY a.id
+                    """ % pig_prod_id
+                    
             else:
                 
                 sql =   """

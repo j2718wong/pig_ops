@@ -310,3 +310,75 @@ class PigFarm:
         return result
     
     
+    def get_sow_boar_balance(self, pig_farm_id):
+        sql =   """
+                SELECT 
+                    b.date_balance,
+                    b.num_sows,
+                    b.num_sows_gestating,
+                    b.num_sows_lactating,
+                    
+                    b.num_boars,
+                    b.num_gestating,
+                    b.num_finisher
+                FROM pig_farm a
+                LEFT OUTER JOIN sow_boar_balance b ON a.last_sow_boar_balance_id = b.id
+                WHERE pig_farm_id = %s
+                """ % pig_farm_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except get_sow_boar_balance as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+               
+                cur_entry = {
+                    'date_balance':         str(row[0]), 
+                    
+                    'sows': {
+                        'total':            row[1],
+                        'num_gestating':    row[2],
+                        'num_lactating':    row[3],
+                    },
+                    
+                    'boars':                row[4],
+                    
+                    'feed_balance': {
+                        'num_gestating':    float(row[5]) if row[5] else None,
+                        'num_finisher':     float(row[6]) if row[6] else None
+                    }
+                    
+                    
+                }
+                
+                return cur_entry
