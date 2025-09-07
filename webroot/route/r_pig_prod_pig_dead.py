@@ -44,8 +44,8 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }
@@ -61,8 +61,8 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }

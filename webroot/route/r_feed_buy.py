@@ -19,16 +19,16 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.post("/prod_feed_buy/add")
-async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
-    uhid    = prod_feed_buy_data.uhid
+@app.post("/feed_buy/add")
+async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
+    uhid    = feed_buy_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_USER_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_USER_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -36,7 +36,7 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     user_id = res[0]
     
     
-    pig_prod_hid        = prod_feed_buy_data.pig_prod_hid
+    pig_prod_hid        = feed_buy_data.pig_prod_hid
     pig_prod_id         = 0
     
     if pig_prod_hid is not None:
@@ -44,8 +44,8 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }
@@ -53,7 +53,7 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
         pig_prod_id = res[0]
         
     
-    pig_prod_group_hid  = prod_feed_buy_data.pig_prod_group_hid
+    pig_prod_group_hid  = feed_buy_data.pig_prod_group_hid
     pig_prod_group_id   = 0
     
     if pig_prod_group_hid is not None:
@@ -61,8 +61,8 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }
@@ -70,14 +70,14 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
         pig_prod_group_hid = res[0]
     
         
-    feed_type_hid    = prod_feed_buy_data.feed_type_hid
+    feed_type_hid    = feed_buy_data.feed_type_hid
     
     res = hashids_common.decrypt(feed_type_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_FEED_TYPE_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_FEED_TYPE_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_FEED_TYPE_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_TYPE_HASHID',
                 'desc': ''
             }
         }
@@ -85,14 +85,14 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     feed_type_id = res[0]
     
     
-    feed_brand_hid    = prod_feed_buy_data.feed_brand_hid
+    feed_brand_hid    = feed_buy_data.feed_brand_hid
     
     res = hashids_common.decrypt(feed_brand_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_FEED_BRAND_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_FEED_BRAND_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_FEED_BRAND_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_BRAND_HASHID',
                 'desc': ''
             }
         }
@@ -100,14 +100,14 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     feed_brand_id = res[0]
     
     
-    feed_supplier_hid    = prod_feed_buy_data.feed_supplier_hid
+    feed_supplier_hid    = feed_buy_data.feed_supplier_hid
     
     res = hashids_common.decrypt(feed_supplier_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID',
                 'desc': ''
             }
         }
@@ -116,14 +116,14 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
     
     
     
-    prod_feed_buy_data.user_id          = user_id
-    prod_feed_buy_data.pig_prod_id      = pig_prod_id
-    prod_feed_buy_data.pig_prod_group_id= pig_prod_group_id
-    prod_feed_buy_data.feed_type_id     = feed_type_id
-    prod_feed_buy_data.feed_brand_id    = feed_brand_id
-    prod_feed_buy_data.feed_supplier_id = feed_supplier_id
+    feed_buy_data.user_id          = user_id
+    feed_buy_data.pig_prod_id      = pig_prod_id
+    feed_buy_data.pig_prod_group_id= pig_prod_group_id
+    feed_buy_data.feed_type_id     = feed_type_id
+    feed_buy_data.feed_brand_id    = feed_brand_id
+    feed_buy_data.feed_supplier_id = feed_supplier_id
     
-    res_add    =  model['prod_feed_buy'].add(prod_feed_buy_data)
+    res_add    =  model['feed_buy'].add(feed_buy_data)
     
     if res_add is None:
         return {
@@ -135,27 +135,27 @@ async def prod_feed_buy_add(prod_feed_buy_data: dm.DataProdFeedBuy):
         }
     
     
-    prod_feed_buy_id    = res_add['prod_feed_buy']['id']
-    prod_feed_buy_hid   = hashids_common.encrypt(prod_feed_buy_id)
+    feed_buy_id    = res_add['feed_buy']['id']
+    feed_buy_hid   = hashids_common.encrypt(feed_buy_id)
     
     # remove plain id
-    del res_add['prod_feed_buy']['id']
-    res_add['prod_feed_buy']['hid'] = prod_feed_buy_hid
+    del res_add['feed_buy']['id']
+    res_add['feed_buy']['hid'] = feed_buy_hid
 
         
     return res_add
     
 
-@app.post("/prod_feed_buy/update")
-async def prod_feed_buy_update(prod_feed_buy_data: dm.DataProdFeedBuy):
-    uhid    = prod_feed_buy_data.uhid
+@app.post("/feed_buy/update")
+async def feed_buy_update(feed_buy_data: dm.DataFeedBuy):
+    uhid    = feed_buy_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_USER_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_USER_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -163,26 +163,26 @@ async def prod_feed_buy_update(prod_feed_buy_data: dm.DataProdFeedBuy):
     user_id = res[0]
     
     
-    prod_feed_buy_hid    = prod_feed_buy_data.prod_feed_buy_hid
+    feed_buy_hid    = feed_buy_data.feed_buy_hid
     
-    res = hashids_common.decrypt(prod_feed_buy_hid)
+    res = hashids_common.decrypt(feed_buy_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_HASHID',
                 'desc': ''
             }
         }
     
-    prod_feed_buy_id = res[0]
+    feed_buy_id = res[0]
     
     
-    prod_feed_buy_data.user_id          = user_id
-    prod_feed_buy_data.prod_feed_buy_id = prod_feed_buy_id
+    feed_buy_data.user_id          = user_id
+    feed_buy_data.feed_buy_id = feed_buy_id
     
     
-    res_update    =  model['prod_feed_buy'].update(prod_feed_buy_data)
+    res_update    =  model['feed_buy'].update(feed_buy_data)
     
     if res_update is None:
         return {
@@ -195,21 +195,21 @@ async def prod_feed_buy_update(prod_feed_buy_data: dm.DataProdFeedBuy):
         
         
     # remove plain id
-    del res_update['prod_feed_buy']['id']
-    res_update['prod_feed_buy']['hid'] = prod_feed_buy_hid
+    del res_update['feed_buy']['id']
+    res_update['feed_buy']['hid'] = feed_buy_hid
         
     return res_update
     
     
 """
-@app.get("/prod_feed_buy/delete")
-async def prod_feed_buy_delete(uhid:str, prod_feed_buy_hid: str):
+@app.get("/feed_buy/delete")
+async def feed_buy_delete(uhid:str, feed_buy_hid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_USER_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_USER_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -217,27 +217,27 @@ async def prod_feed_buy_delete(uhid:str, prod_feed_buy_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(prod_feed_buy_hid)
+    res = hashids_common.decrypt(feed_buy_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_HASHID',
                 'desc': ''
             }
         }
     
-    prod_feed_buy_id = res[0]
+    feed_buy_id = res[0]
     
     
     
     data = {
         'user_id':              user_id,
-        'prod_feed_buy_id':     prod_feed_buy_id
+        'feed_buy_id':     feed_buy_id
     }
     
     
-    res_delete    =  model['prod_feed_buy'].delete(data)
+    res_delete    =  model['feed_buy'].delete(data)
     
     if res_delete is None:
         return {
@@ -250,17 +250,17 @@ async def prod_feed_buy_delete(uhid:str, prod_feed_buy_hid: str):
     
     
     # remove plain id
-    del res_delete['prod_feed_buy']['id']
-    res_delete['prod_feed_buy']['hid'] = prod_feed_buy_hid
+    del res_delete['feed_buy']['id']
+    res_delete['feed_buy']['hid'] = feed_buy_hid
         
     return res_delete
 """
 
     
-@app.get("/prod_feed_buy/list")
-async def prod_feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
+@app.get("/feed_buy/list")
+async def feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
     """
-    Will get prod_feed_buy list.
+    Will get feed_buy list.
     
     Parameters
     ----------
@@ -279,8 +279,8 @@ async def prod_feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PROD_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
                 'desc': ''
             }
         }
@@ -288,7 +288,7 @@ async def prod_feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
     
     pig_prod_id = res[0]
         
-    res = model['prod_feed_buy'].get_list(pig_prod_id = pig_prod_id, 
+    res = model['feed_buy'].get_list(pig_prod_id = pig_prod_id, 
             inc_user_audit = inc_user_audit)
     
     if res is None:
@@ -303,12 +303,12 @@ async def prod_feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
     
     # Replace plain id
     for cur_entry in res:
-        prod_feed_buy_id    = cur_entry['feed_buy']['id']
-        prod_feed_buy_hid   = hashids_common.encrypt(prod_feed_buy_id)
+        feed_buy_id    = cur_entry['feed_buy']['id']
+        feed_buy_hid   = hashids_common.encrypt(feed_buy_id)
         
         # remove plain id
         del cur_entry['feed_buy']['id']
-        cur_entry['feed_buy']['hid'] = prod_feed_buy_hid
+        cur_entry['feed_buy']['hid'] = feed_buy_hid
         
         
         feed_type_id        = cur_entry['feed_type']['id']

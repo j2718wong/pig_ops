@@ -1176,7 +1176,7 @@ class TestAPIPigProd:
             
     def _test_prod_feed_buy_add_request(self, data):
         
-        url = BASE_URL + 'prod_feed_buy/add'
+        url = BASE_URL + 'feed_buy/add'
         
         print(f'\n\n***** Testing pig_prod_feed_buy add; url = {url} ; data')
         pprint.pprint(data)
@@ -1191,12 +1191,12 @@ class TestAPIPigProd:
         result_num = res_json['result']['num']
         assert(result_num == 0)
         
-        pig_prod_feed_buy_hid = res_json['prod_feed_buy']['hid']
+        pig_feed_buy_hid = res_json['feed_buy']['hid']
         
         
         
         
-        data['pig_prod_feed_buy_id'] = pig_prod_feed_buy_hid
+        data['pig_feed_buy_id'] = pig_feed_buy_hid
         
         self.summary['pig_prod']['pig_prod_feed_buy'] = {}
         self.summary['pig_prod']['pig_prod_feed_buy']['add'] = 'OK'
@@ -1204,7 +1204,7 @@ class TestAPIPigProd:
         return data
         
     
-    def _test_prod_feed_bal_add(self, pig_prod_id):
+    def _test_feed_balance_add(self, pig_prod_id):
         test = 1
     
     

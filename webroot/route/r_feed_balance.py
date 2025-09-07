@@ -19,16 +19,16 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.post("/prod_feed_bal/add")
-async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
-    uhid    = prod_feed_bal_data.uhid
+@app.post("/feed_balance/add")
+async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
+    uhid    = feed_balance_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_bal_INVALID_USER_HASHID,
-                'code': 'ERROR_PROD_FEED_bal_INVALID_USER_HASHID',
+                'num':  ERROR_FEED_BALANCE_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -36,7 +36,7 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
     user_id = res[0]
     
     
-    pig_prod_hid        = prod_feed_bal_data.pig_prod_hid
+    pig_prod_hid        = feed_balance_data.pig_prod_hid
     pig_prod_id         = 0
     
     if pig_prod_hid is not None:
@@ -44,8 +44,8 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PROD_FEED_bal_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PROD_FEED_bal_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }
@@ -53,7 +53,7 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
         pig_prod_id = res[0]
         
     
-    pig_prod_group_hid  = prod_feed_bal_data.pig_prod_group_hid
+    pig_prod_group_hid  = feed_balance_data.pig_prod_group_hid
     pig_prod_group_id   = 0
     
     if pig_prod_group_hid is not None:
@@ -61,8 +61,8 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PROD_FEED_bal_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PROD_FEED_bal_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }
@@ -71,11 +71,11 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
     
 
     
-    prod_feed_bal_data.user_id          = user_id
-    prod_feed_bal_data.pig_prod_id      = pig_prod_id
-    prod_feed_bal_data.pig_prod_group_id= pig_prod_group_id
+    feed_balance_data.user_id          = user_id
+    feed_balance_data.pig_prod_id      = pig_prod_id
+    feed_balance_data.pig_prod_group_id= pig_prod_group_id
     
-    res_add    =  model['prod_feed_bal'].add(prod_feed_bal_data)
+    res_add    =  model['feed_balance'].add(feed_balance_data)
     
     if res_add is None:
         return {
@@ -87,27 +87,27 @@ async def prod_feed_bal_add(prod_feed_bal_data: dm.DataProdFeedBal):
         }
     
     
-    prod_feed_bal_id    = res_add['prod_feed_bal']['id']
-    prod_feed_bal_hid   = hashids_common.encrypt(prod_feed_bal_id)
+    feed_balance_id    = res_add['feed_balance']['id']
+    feed_balance_hid   = hashids_common.encrypt(feed_balance_id)
     
     # remove plain id
-    del res_add['prod_feed_bal']['id']
-    res_add['prod_feed_bal']['hid'] = prod_feed_bal_hid
+    del res_add['feed_balance']['id']
+    res_add['feed_balance']['hid'] = feed_balance_hid
 
         
     return res_add
     
 
-@app.post("/prod_feed_bal/update")
-async def prod_feed_bal_update(prod_feed_bal_data: dm.DataProdFeedBal):
-    uhid    = prod_feed_bal_data.uhid
+@app.post("/feed_balance/update")
+async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
+    uhid    = feed_balance_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_bal_INVALID_USER_HASHID,
-                'code': 'ERROR_PROD_FEED_bal_INVALID_USER_HASHID',
+                'num':  ERROR_FEED_BALANCE_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -115,26 +115,26 @@ async def prod_feed_bal_update(prod_feed_bal_data: dm.DataProdFeedBal):
     user_id = res[0]
     
     
-    prod_feed_balance_hid    = prod_feed_bal_data.prod_feed_balance_hid
+    feed_balanceance_hid    = feed_balance_data.feed_balanceance_hid
     
-    res = hashids_common.decrypt(prod_feed_balance_hid)
+    res = hashids_common.decrypt(feed_balanceance_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_bal_INVALID_FEED_BRAND_HASHID,
-                'code': 'ERROR_PROD_FEED_bal_INVALID_FEED_BRAND_HASHID',
+                'num':  ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID,
+                'code': 'ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID',
                 'desc': ''
             }
         }
     
-    prod_feed_balance_id = res[0]
+    feed_balanceance_id = res[0]
     
     
-    prod_feed_bal_data.user_id          = user_id
-    prod_feed_bal_data.prod_feed_bal_id = prod_feed_balance_id
+    feed_balance_data.user_id          = user_id
+    feed_balance_data.feed_balance_id = feed_balanceance_id
    
     
-    res_update    =  model['prod_feed_bal'].update(prod_feed_bal_data)
+    res_update    =  model['feed_balance'].update(feed_balance_data)
     
     if res_update is None:
         return {
@@ -147,16 +147,16 @@ async def prod_feed_bal_update(prod_feed_bal_data: dm.DataProdFeedBal):
         
         
     # remove plain id
-    del res_update['prod_feed_bal']['id']
-    res_update['prod_feed_bal']['hid'] = prod_feed_bal_hid
+    del res_update['feed_balance']['id']
+    res_update['feed_balance']['hid'] = feed_balance_hid
         
     return res_update
  
     
-@app.get("/prod_feed_bal/list")
-async def prod_feed_bal_list(pig_prod_hid: str, inc_user_audit:int = 0):
+@app.get("/feed_balance/list")
+async def feed_balance_list(pig_prod_hid: str, inc_user_audit:int = 0):
     """
-    Will get prod_feed_bal list.
+    Will get feed_balance list.
     
     Parameters
     ----------
@@ -175,8 +175,8 @@ async def prod_feed_bal_list(pig_prod_hid: str, inc_user_audit:int = 0):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PROD_FEED_bal_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PROD_FEED_bal_INVALID_PIG_PROD_HASHID',
+                'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID',
                 'desc': ''
             }
         }
@@ -184,7 +184,7 @@ async def prod_feed_bal_list(pig_prod_hid: str, inc_user_audit:int = 0):
     
     pig_prod_id = res[0]
         
-    res = model['prod_feed_bal'].get_list(pig_prod_id = pig_prod_id, 
+    res = model['feed_balance'].get_list(pig_prod_id = pig_prod_id, 
             inc_user_audit = inc_user_audit)
     
     if res is None:
@@ -199,12 +199,12 @@ async def prod_feed_bal_list(pig_prod_hid: str, inc_user_audit:int = 0):
     
     # Replace plain id
     for cur_entry in res:
-        prod_feed_bal_id    = cur_entry['feed_bal']['id']
-        prod_feed_bal_hid   = hashids_common.encrypt(prod_feed_bal_id)
+        feed_balance_id    = cur_entry['feed_bal']['id']
+        feed_balance_hid   = hashids_common.encrypt(feed_balance_id)
         
         # remove plain id
         del cur_entry['feed_bal']['id']
-        cur_entry['feed_bal']['hid'] = prod_feed_bal_hid
+        cur_entry['feed_bal']['hid'] = feed_balance_hid
         
         
         feed_type_id        = cur_entry['feed_type']['id']

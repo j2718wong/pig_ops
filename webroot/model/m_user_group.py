@@ -45,7 +45,7 @@ class UserGroup:
                     flag_priv_pig_prod_ai,
                     
                     flag_priv_pig_prod_feed_buy,
-                    flag_priv_pig_prod_feed_bal,
+                    flag_priv_feed_balance,
                     
                     flag_priv_pig_prod_pig_ops,
                     flag_priv_pig_prod_pig_dead,
@@ -125,7 +125,7 @@ class UserGroup:
                     'flag_priv_pig_prod_ai':    row[23],
                     
                     'flag_priv_pig_prod_feed_buy':  row[24],
-                    'flag_priv_pig_prod_feed_bal':  row[25],
+                    'flag_priv_feed_balance':  row[25],
                     
                     'flag_priv_pig_prod_pig_ops':   row[26],
                     'flag_priv_pig_prod_pig_dead':  row[27],

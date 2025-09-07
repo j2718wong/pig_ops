@@ -4,45 +4,64 @@
 from common_constants       import *
 
 
-class PigProdFeedBuy:
+class FeedBalance:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'PigProdFeedBuy'
+        self.TAG                = 'FeedBalance'
 
 
     def add(self, data = None):
         """
-        PROCEDURE pig_prod_feed_buy_add(
+        PROCEDURE feed_balance_add(
             in_user_id              INT,
+            
+            in_pig_farm_id          INT,
             in_pig_prod_id          INT,
             in_pig_prod_group_id    INT,
-    
-            in_date_buy             VARCHAR(10),
-            in_feed_type_id         INT,
-            in_feed_brand_id        INT,
-            in_feed_supplier_id     INT,
-            in_quantity             INT,
-            in_kg_per_unit          DECIMAL(5,1),
             
-            in_unit_cost            DECIMAL(8,2),
-            in_total_cost           DECIMAL(8,2)
+            in_date_balance         VARCHAR(10),
+            
+            in_num_pigs             INT,
+            
+            in_num_lactating        DECIMAL(5,1),
+            in_num_booster          DECIMAL(5,1),
+            in_num_prestarter       DECIMAL(5,1),
+            in_num_starter          DECIMAL(5,1),
+            in_num_grower           DECIMAL(5,1),
+            in_num_finisher         DECIMAL(5,1)
         )  
         """
         
-        sql =  'CALL pig_prod_feed_buy_add('
-        sql += '%s,'    % data.user_id        
-        sql += '%s,'    % data.pig_prod_id
-        sql += '%s,'    % data.pig_prod_group_id
+        sql =  'CALL feed_balance_add('
+        sql += '%s,'    % data.user_id
         
-        sql += '"%s",'  % data.date_buy
-        sql += '%s,'    % data.feed_type_id
-        sql += '%s,'    % data.feed_brand_id
-        sql += '%s,'    % data.feed_supplier_id
-        sql += '%s,'    % data.quantity
-        sql += '%s,'    % data.kg_per_unit
-       
-        sql += '%s,'    % data.unit_cost
-        sql += '%s)'    % data.total_cost
+        if data.pig_farm_id is not None and data.pig_farm_id > 0:
+            sql += '%s,'    % data.pig_farm_id
+            sql += 'NULL,'
+            sql += 'NULL,'
+        
+        else:
+            if data.pig_prod_id is not None and data.pig_prod_id > 0:
+                sql += 'NULL,'
+                sql += '%s,'    % data.pig_prod_id
+                sql += 'NULL,'
+                
+            else:
+                sql += 'NULL,'
+                sql += 'NULL,'
+                sql += '%s,'    % data.pig_prod_group_id
+        
+        
+        sql += '"%s",'  % data.date_balance
+        
+        sql += '%s,'    % data.num_pigs
+        
+        sql += '%s,'    % data.num_lactating
+        sql += '%s,'    % data.num_booster
+        sql += '%s,'    % data.num_prestarter
+        sql += '%s,'    % data.num_starter
+        sql += '%s,'    % data.num_grower
+        sql += '%s)'    % data.num_finisher
         
         
         # Check if still connected to database
@@ -79,7 +98,7 @@ class PigProdFeedBuy:
                     'desc':             row[2],
                 },
                 
-                'prod_feed_buy': {
+                'feed_buy': {
                     'id':               row[3]
                 }
             }
@@ -89,36 +108,39 @@ class PigProdFeedBuy:
     
     def update(self, data = None):
         """
-        PROCEDURE prod_feed_buy_update(
+        PROCEDURE feed_balance_update(
             in_user_id              INT,
-            in_prod_feed_buy_id     INT,
             
-            in_date_buy             VARCHAR(10),
-            in_feed_type_id         INT,
-            in_feed_brand_id        INT,
-            in_feed_supplier_id     INT,
-            in_quantity             INT,
-            in_kg_per_unit          DECIMAL(5,1),
+            in_feed_balance_id INT,
             
-            in_unit_cost            DECIMAL(8,2),
-            in_total_cost           DECIMAL(8,2)
+            in_date_balance         VARCHAR(10),
+            
+            in_num_pigs             INT,
+            
+            in_num_lactating        DECIMAL(5,1),
+            in_num_booster          DECIMAL(5,1),
+            in_num_prestarter       DECIMAL(5,1),
+            in_num_starter          DECIMAL(5,1),
+            in_num_grower           DECIMAL(5,1),
+            in_num_finisher         DECIMAL(5,1)
         )  
         """
         
-        sql =  'CALL prod_feed_buy_update('
+        sql =  'CALL feed_balance_update('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.prod_feed_buy_id
-        sql += '"%s",'  % data.date_buy
+        sql += '%s,'    % data.feed_balance_id
         
-        sql += '%s,'    % data.feed_type_id
-        sql += '%s,'    % data.feed_brand_id
-        sql += '%s,'    % data.feed_vendor_id
-        sql += '%s,'    % data.kg_per_quantity
-       
-        sql += '%s,'    % data.unit_cost
-        sql += '%s)'    % data.total_cost
+        sql += '"%s",'  % data.date_balance
         
+        sql += '%s,'    % data.num_pigs
+        
+        sql += '%s,'    % data.num_lactating
+        sql += '%s,'    % data.num_booster
+        sql += '%s,'    % data.num_prestarter
+        sql += '%s,'    % data.num_starter
+        sql += '%s,'    % data.num_grower
+        sql += '%s)'    % data.num_finisher
         
         
         # Check if still connected to database
@@ -155,14 +177,14 @@ class PigProdFeedBuy:
                     'desc':             row[2],
                 },
                 
-                'prod_feed_buy': {
+                'feed_balance': {
                     'id':               row[3]
                 }
             }
 
         return None
     
-      
+    
     def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
         
 
@@ -188,10 +210,10 @@ class PigProdFeedBuy:
                             a.feed_brand_id,
                             c.name AS feed_brand_name,
                             
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name
+                            a.feed_vendor_id,
+                            d.name AS vendor name
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -221,10 +243,10 @@ class PigProdFeedBuy:
                             a.feed_brand_id,
                             c.name AS feed_brand_name,
                             
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name
+                            a.feed_vendor_id,
+                            d.name AS vendor name
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -271,7 +293,7 @@ class PigProdFeedBuy:
                             f.name_first,
                             a.dt_last_update
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -318,7 +340,7 @@ class PigProdFeedBuy:
                             f.name_first,
                             a.dt_last_update
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM prod_feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id

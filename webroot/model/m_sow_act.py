@@ -446,9 +446,14 @@ class SowActivity:
         conn = self.model.db_conn
         
         
-        where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (4, 5, 6)' % pig_farm_id
+        # Inlude PROD_STATUS_ID_GESTATING that has already bought up lactating feeds 
+        
+        where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (4, 5, 6)) ' % pig_farm_id
+        where_clause += ' OR (a.pig_farm_id = %s AND a.prod_status_id = 1 AND a.num_b_lactating IS NOT NULL) ' % pig_farm_id
+        
         if inc_historical > 0:
-            where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (4,5,6,8,9)' % pig_farm_id
+            where_clause = 'WHERE (a.pig_farm_id = %s AND a.prod_status_id IN (4,5,6,8,9)) ' % pig_farm_id
+            where_clause += ' OR (a.pig_farm_id = %s AND a.prod_status_id = 1 AND a.num_b_lactating IS NOT NULL) ' % pig_farm_id
        
         sql =   """
                 SELECT 
@@ -503,7 +508,7 @@ class SowActivity:
                 FROM pig_production a
                 LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
                 LEFT OUTER JOIN pig_prod_status c   ON a.prod_status_id = c.id
-                LEFT OUTER JOIN pig_prod_feed_bal d ON a.last_feed_balance_id = d.id
+                LEFT OUTER JOIN feed_balance d      ON a.last_feed_balance_id = d.id
                 %s
                 ORDER BY a.date_actual_birth DESC
                 """ % where_clause 
@@ -540,22 +545,22 @@ class SowActivity:
                 
                 cur_num_pigs_current    = row[5]               
                
-                cur_date_actual         = str(row[6])
+                cur_date_actual         = str(row[6])   if row[6]  else None
                 
-                cur_date_iron_1         = str(row[7])  if row[7]  else None
-                cur_date_iron_2         = str(row[8])  if row[8]  else None
-                cur_date_vitamins_1     = str(row[9])  if row[9] else None
-                cur_date_kapon          = str(row[10]) if row[10] else None
-                cur_date_vitamins_2     = str(row[11]) if row[11] else None
-                cur_date_deworm_1       = str(row[12]) if row[12] else None
+                cur_date_iron_1         = str(row[7])   if row[7]  else None
+                cur_date_iron_2         = str(row[8])   if row[8]  else None
+                cur_date_vitamins_1     = str(row[9])   if row[9]  else None
+                cur_date_kapon          = str(row[10])  if row[10] else None
+                cur_date_vitamins_2     = str(row[11])  if row[11] else None
+                cur_date_deworm_1       = str(row[12])  if row[12] else None
                 
                 
-                cur_date_booster        = str(row[13]) if row[13] else None
-                cur_date_prestarter     = str(row[14]) if row[14] else None
-                cur_date_weaning        = str(row[15]) if row[15] else None
-                cur_date_starter        = str(row[16]) if row[16] else None
-                cur_date_grower         = str(row[17]) if row[17] else None
-                cur_date_finisher       = str(row[18]) if row[18] else None
+                cur_date_booster        = str(row[13])  if row[13] else None
+                cur_date_prestarter     = str(row[14])  if row[14] else None
+                cur_date_weaning        = str(row[15])  if row[15] else None
+                cur_date_starter        = str(row[16])  if row[16] else None
+                cur_date_grower         = str(row[17])  if row[17] else None
+                cur_date_finisher       = str(row[18])  if row[18] else None
                 
                 cur_num_b_lactating     = row[19]
                 cur_num_b_booster       = row[20]

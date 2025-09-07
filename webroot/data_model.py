@@ -169,6 +169,40 @@ class DataFeedSupplier(BaseModel):
     name:                   str
 
 
+class DataFeedBuy(BaseModel):
+    uhid:                   str
+    
+    pig_farm_hid:           str = None
+    pig_prod_hid:           str = None
+    pig_prod_group_hid:     str = None
+    feed_buy_hid:           str = None
+    
+    feed_type_hid:          str = None
+    feed_brand_hid :        str = None
+    feed_supplier_hid:      str = None
+    
+    
+    user_id:                int = 0
+    pig_farm_id:            int = 0
+    pig_prod_id:            int = 0
+    pig_prod_group_id:      int = 0
+    feed_buy_id:            int = 0
+    
+    
+    date_buy:               str
+    feed_type_id:           int = 0
+    feed_brand_id:          int = 0
+    feed_supplier_id:       int = 0
+    quantity:               int = 0
+    kg_per_unit:            float
+    
+    unit_cost:              float
+    total_cost:             float
+    
+
+
+
+
 class DataSemenSource(BaseModel):
     uhid:                   str
         
@@ -324,46 +358,19 @@ class DataPigProdPigOps(BaseModel):
     notes:                  str = None
     
  
-class DataProdFeedBuy(BaseModel):
-    uhid:                   str
-    
-    pig_prod_hid:           str = None
-    pig_prod_group_hid:     str = None
-    prod_feed_buy_hid:      str = None
-    feed_type_hid:          str = None
-    feed_brand_hid :        str = None
-    feed_supplier_hid:      str = None
-    
-    
-    user_id:                int = 0
-    pig_prod_id:            int = 0
-    pig_prod_group_id:      int = 0
-    prod_feed_buy_id:       int = 0
-    
-    
-    date_buy:               str
-    feed_type_id:           int = 0
-    feed_brand_id:          int = 0
-    feed_supplier_id:       int = 0
-    quantity:               int = 0
-    kg_per_unit:            float
-    
-    unit_cost:              float
-    total_cost:             float
-    
     
 class DataProdFeedBal(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None
     pig_prod_group_hid:     str = None
-    prod_feed_balance_hid:  str = None
+    feed_balanceance_hid:  str = None
     
     
     user_id:                int = 0
     pig_prod_id:            int = 0
     pig_prod_group_id:      int = 0
-    prod_feed_balance_id:   int = 0
+    feed_balanceance_id:   int = 0
     
     
     date_balance:           str

@@ -50,6 +50,8 @@ from model.m_semen_supplier     import SemenSupplier
 
 from model.m_feed_brand         import FeedBrand
 from model.m_feed_supplier      import FeedSupplier
+from model.m_feed_buy           import FeedBuy
+from model.m_feed_balance       import FeedBalance
 
 from model.m_sow_boar           import SowBoar
 from model.m_semen_source       import SemenSource
@@ -63,8 +65,8 @@ from model.m_pig_prod_pig_dead  import PigProdPigDead
 from model.m_pig_prod_pig_ops   import PigProdPigOps
 
 
-from model.m_pig_prod_feed_buy  import PigProdFeedBuy
-from model.m_pig_prod_feed_bal  import PigProdFeedBal
+
+
 
 
 
@@ -95,6 +97,8 @@ model_names = [
     
     ('sow_boar',                SowBoar),
     ('semen_source',            SemenSource),
+    ('feed_buy',                FeedBuy),
+    ('feed_balance',            FeedBalance),
     
     
     ('pig_prod',                PigProduction),
@@ -102,8 +106,8 @@ model_names = [
     ('prod_pig_dead',           PigProdPigDead),
     ('pig_prod_pig_ops',        PigProdPigOps),
     
-    ('prod_feed_buy',           PigProdFeedBuy),
-    ('prod_feed_bal',           PigProdFeedBal),
+    
+    
     
     ('sow_act',                 SowActivity)
     

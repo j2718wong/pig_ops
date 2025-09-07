@@ -431,7 +431,10 @@ async def sow_act_pig_prod_ops(inc_historical : int =0,
         
     res = model['sow_act'].get_pig_prod_ops_list(pig_farm_id, inc_historical)
     
-    s = DB_INFO + '\n\n'
+    dt_now      = datetime.now()
+    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
+    
+    s = DB_INFO + '  ' + dt_now_s + '\n\n'
         
     s += write_gestating_operations(account_id, pig_farm_id)
     s += write_baktin_operations(res, inc_historical)
@@ -461,12 +464,9 @@ def write_gestating_operations(account_id, pig_farm_id):
         
         
     dt_now      = datetime.now()
-    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
-    
-    
-    s  = 'GESTA OPERATIONS       %s\n' % dt_now_s
-    s += '=================\n\n'
-    
+        
+    s  = 'GESTA OPERATIONS\n' 
+    s += '=================\n'    
     s += 'PROD_ID  Sow           Date_TAKAL       Type  '
     
     
@@ -591,12 +591,9 @@ def write_gestating_operations(account_id, pig_farm_id):
     
 def write_baktin_operations(data, inc_historical):
     dt_now      = datetime.now()
-    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
-    
-    s  = 'BAKTIN OPERATIONS      %s\n' % dt_now_s
-    s += '=================      IRON_1   IRON_2   VITA_1   VITA_2    KAPON    PURGA_1   LUTAS\n'
-    s += 'ADLAW GIKAN ANAK       '
+    s  = 'BAKTIN OPERATIONS                        IRON_1   IRON_2   VITA_1   VITA_2    KAPON    PURGA_1   LUTAS\n'
+    s += '=================      ADLAW GIKAN ANAK  '
     
     s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_IRON_1)
     num_chars   = len(s_temp)
@@ -842,12 +839,10 @@ def write_baktin_operations(data, inc_historical):
     
 def write_feeding_guide(data, inc_historical):
     dt_now      = datetime.now()
-    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = 'FEEDING GUIDE          %s\n' % dt_now_s
-    s += '=================      BOOSTER   PSTARTER     LUTAS   STARTER    GROWER   FINISHER\n'
-    s += 'ADLAW GIKAN ANAK       '
+    s  = 'PROD FEEDING GUIDE                       BOOSTER   PSTARTER     LUTAS   STARTER    GROWER   FINISHER\n'
+    s += '=================      ADLAW GIKAN ANAK  '
     
     s_temp      = str(NUMDAYS_SINCE_BIRTH_BOOSTER)
     num_chars   = len(s_temp)
@@ -886,6 +881,10 @@ def write_feeding_guide(data, inc_historical):
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date_Grower    Date_Finisher   Date_Harvest\n'
     
     for cur_entry in data:
+        if cur_entry['status_id'] == PROD_STATUS_ID_GESTATING:
+            continue
+        
+        
         s_temp      = str(cur_entry['farm_prod_id'])
         num_chars   = len(s_temp)
         num_space   = 7 - num_chars
@@ -1049,13 +1048,9 @@ def write_feeding_guide(data, inc_historical):
 
 def write_feeds_consumed(data, inc_historical):
     dt_now      = datetime.now()
-    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
-    
-    s  = 'FEEDS CONSUMED         %s                                                               NUM SACKS\n' % dt_now_s
-    s += '=================                                ========================================================================================================\n'
-    s += '                                                      LACTA            BOOSTER         PRE_STARTER         STARTER            GROWER          FINISHER   \n'
-    s += '                                                 ===============   ===============   ===============   ===============   ===============   ===============\n'
+    s  = 'PROD FEEDS CONSUMED                                   LACTA            BOOSTER         PRE_STARTER         STARTER            GROWER          FINISHER    \n'
+    s += '=================                                ===============   ===============   ===============   ===============   ===============   ===============\n'
     s += 'PROD_ID  PROD_Status   Date_Birth       Baktin   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT   BUY  CONS  LEFT\n'
     
     
@@ -1085,39 +1080,54 @@ def write_feeds_consumed(data, inc_historical):
         s           += '  '
         
         date_birth  = cur_entry['dates']['birth']
-        dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
         
-        # Dont compute pig numdays if already ahrvested or closed
-        status_id   = cur_entry['status_id']
-        dt_final    = dt_now
-        if status_id in (PROD_STATUS_ID_HARVESTED, PROD_STATUS_ID_CLOSED):
-            date_harvest    = cur_entry['dates']['harvest']
-            dt_harvest      = datetime.strptime(date_harvest, '%Y-%m-%d')
-            dt_final        = dt_harvest
         
-        delta_d = (dt_final - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+        if date_birth is not None:
+            
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
         
-        if delta_d < 10: 
-            num_space = 2
-        elif delta_d < 100:
-            num_space = 1
+            # Dont compute pig numdays if already ahrvested or closed
+            status_id   = cur_entry['status_id']
+            dt_final    = dt_now
+            if status_id in (PROD_STATUS_ID_HARVESTED, PROD_STATUS_ID_CLOSED):
+                date_harvest    = cur_entry['dates']['harvest']
+                dt_harvest      = datetime.strptime(date_harvest, '%Y-%m-%d')
+                dt_final        = dt_harvest
+            
+            delta_d = (dt_final - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            if delta_d < 10: 
+                num_space = 2
+            elif delta_d < 100:
+                num_space = 1
+            else:
+                num_space = 0
+            
+            spaces = num_space * ' '
+            
+            s_temp      = f'{date_birth}({spaces}{delta_d})'
+            s           += s_temp         
+            
+        
         else:
-            num_space = 0
-        
-        spaces = num_space * ' '
-        
-        s_temp      = f'{date_birth}({spaces}{delta_d})'
-        s           += s_temp         
+            s += ' ' * 15
+
         s           += '  '
         
-        num_pigs_current = cur_entry['num_pigs_current']
-         
-        total_num_piglets += num_pigs_current
         
-        s_temp      = str(num_pigs_current)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
+        if date_birth is not None:
+            num_pigs_current = cur_entry['num_pigs_current']
+             
+            total_num_piglets += num_pigs_current
+            
+            s_temp      = str(num_pigs_current)
+            num_chars   = len(s_temp)
+            num_space   = 6 - num_chars
+            s           += ' ' * num_space + s_temp
+        
+        else:
+            s += ' ' * 6
+        
         s           += '   '
         
         
@@ -1462,7 +1472,13 @@ def write_feeds_consumed(data, inc_historical):
     num_space   = 15 - num_chars
     s           += ' ' * num_space + s_temp
     s           += '   '
-
+    
+    s_temp      = f"{feeds_left_finisher:.1f}"
+    num_chars   = len(s_temp)
+    num_space   = 15 - num_chars
+    s           += ' ' * num_space + s_temp
+    s           += '   '
+    
     s += '\n\n'
 
     return s
@@ -1470,13 +1486,10 @@ def write_feeds_consumed(data, inc_historical):
 
 def write_feeds_cost(data, inc_historical):
     dt_now      = datetime.now()
-    dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
     
     
-    s  = 'FEEDS COST             %s                                                               NUM SACKS\n' % dt_now_s
-    s += '=================                                ========================================================================================================\n'
-    s += '                                                      LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER    \n'
-    s += '                                                 ===============   ===============   ===============   ===============   ===============  ===============\n'
+    s  = 'FEEDS COST                                            LACTA            BOOSTER        PRE_STARTER         STARTER            GROWER          FINISHER    \n'
+    s += '=================                                ===============   ===============   ===============   ===============   ===============  ===============\n'
     s += 'PROD_ID   Total_COST   Date_Birth       Baktin   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY        COST  BUY        COST\n'
    
     
@@ -1525,37 +1538,49 @@ def write_feeds_cost(data, inc_historical):
         
         
         date_birth  = cur_entry['dates']['birth']
-        dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
         
-        # Dont compute pig numdays if already ahrvested or closed
-        status_id   = cur_entry['status_id']
-        dt_final    = dt_now
-        if status_id in (PROD_STATUS_ID_HARVESTED, PROD_STATUS_ID_CLOSED):
-            date_harvest    = cur_entry['dates']['harvest']
-            dt_harvest      = datetime.strptime(date_harvest, '%Y-%m-%d')
-            dt_final        = dt_harvest
-        
-        delta_d = (dt_final - dt_birth).days + DAY_1_STARTS_AT_BIRTH
-        
-        if delta_d < 10: 
-            num_space = 2
-        elif delta_d < 100:
-            num_space = 1
+        if date_birth is not None:
+            dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
+            
+            # Dont compute pig numdays if already ahrvested or closed
+            status_id   = cur_entry['status_id']
+            dt_final    = dt_now
+            if status_id in (PROD_STATUS_ID_HARVESTED, PROD_STATUS_ID_CLOSED):
+                date_harvest    = cur_entry['dates']['harvest']
+                dt_harvest      = datetime.strptime(date_harvest, '%Y-%m-%d')
+                dt_final        = dt_harvest
+            
+            delta_d = (dt_final - dt_birth).days + DAY_1_STARTS_AT_BIRTH
+            
+            if delta_d < 10: 
+                num_space = 2
+            elif delta_d < 100:
+                num_space = 1
+            else:
+                num_space = 0
+            
+            spaces = num_space * ' '
+            
+            s_temp      = f'{date_birth}({spaces}{delta_d})'
+            s           += s_temp
+            
         else:
-            num_space = 0
-        
-        spaces = num_space * ' '
-        
-        s_temp      = f'{date_birth}({spaces}{delta_d})'
-        s           += s_temp         
+            s += ' ' * 15
+            
         s           += '  '
         
-        num_pigs_current = cur_entry['num_pigs_current']
         
-        s_temp      = str(num_pigs_current)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
+        if date_birth is not None:
+            num_pigs_current = cur_entry['num_pigs_current']
+            
+            s_temp      = str(num_pigs_current)
+            num_chars   = len(s_temp)
+            num_space   = 6 - num_chars
+            s           += ' ' * num_space + s_temp
+            
+        else:
+            s += ' ' * 6
+            
         s           += '   '
         
         
