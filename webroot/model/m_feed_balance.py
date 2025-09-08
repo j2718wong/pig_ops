@@ -15,7 +15,6 @@ class FeedBalance:
         PROCEDURE feed_balance_add(
             in_user_id              INT,
             
-            in_pig_farm_id          INT,
             in_pig_prod_id          INT,
             in_pig_prod_group_id    INT,
             
@@ -35,22 +34,15 @@ class FeedBalance:
         sql =  'CALL feed_balance_add('
         sql += '%s,'    % data.user_id
         
-        if data.pig_farm_id is not None and data.pig_farm_id > 0:
-            sql += '%s,'    % data.pig_farm_id
-            sql += 'NULL,'
-            sql += 'NULL,'
         
+        if data.pig_prod_id is not None and data.pig_prod_id > 0:
+            sql += '%s,'    % data.pig_prod_id
+            sql += 'NULL,'
+            
         else:
-            if data.pig_prod_id is not None and data.pig_prod_id > 0:
-                sql += 'NULL,'
-                sql += '%s,'    % data.pig_prod_id
-                sql += 'NULL,'
-                
-            else:
-                sql += 'NULL,'
-                sql += 'NULL,'
-                sql += '%s,'    % data.pig_prod_group_id
-        
+            sql += 'NULL,'
+            sql += '%s,'    % data.pig_prod_group_id
+    
         
         sql += '"%s",'  % data.date_balance
         
@@ -185,166 +177,39 @@ class FeedBalance:
         return None
     
     
-    def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
+    def get_list(self, pig_farm_id, inc_user_audit = 0):
         
-
-
-        if pig_prod_id > 0:
-            sql =   """
-                    SELECT 
-                        
-                        date_balance,
-                        num_pigs,
-                        
-                        num_lactating,
-                        num_booster,
-                        num_prestarter,
-                        num_starter,
-                        num_grower,
-                        num_finisher
-                        a.feed_brand_id,
-                        c.name AS feed_brand_name,
-                        
-                        a.feed_vendor_id,
-                        d.name AS vendor name
-                        
-                    FROM prod_feed_buy a 
-                    LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                    LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                    LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                    WHERE a.pig_prod_id = %s
-                    ORDER BY a.id
-                    """ % pig_prod_id
+        sql =   """
+                SELECT 
+                    a.pig_prod_id,
+                    b.prod_status_id, 
                     
-            else:
-                
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_vendor_id,
-                            d.name AS vendor name
-                            
-                        FROM prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        WHERE a.pig_prod_group_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_group_id
-                
-                
-        else:
-            
-            if pig_prod_id > 0:
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name,
-                            
-                            
-                            e.username,
-                            e.name_last,
-                            e.name_first,
-                            a.dt_entry,
-                            
-                            
-                            f.username,
-                            f.name_last,
-                            f.name_first,
-                            a.dt_last_update
-                            
-                        FROM prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
-                        LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
-                        WHERE a.pig_prod_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_id
-                        
-            else:
-                
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name,
-                            
-                            
-                            e.username,
-                            e.name_last,
-                            e.name_first,
-                            a.dt_entry,
-                            
-                            
-                            f.username,
-                            f.name_last,
-                            f.name_first,
-                            a.dt_last_update
-                            
-                        FROM prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
-                        LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
-                        WHERE a.pig_prod_group_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_group_id
-            
+                    a.date_balance,
+                    a.num_days_since_birth,
+                    a.num_weeks_since_birth,
+                    a.num_pigs,
+                    
+                    a.num_lactating,
+                    a.num_booster,
+                    a.num_prestarter,
+                    a.num_starter,
+                    a.num_grower,
+                    a.num_finisher,
+                    
+                    a.num_cons_kg_lactating,
+                    a.num_cons_kg_booster,
+                    a.num_cons_kg_prestarter,
+                    a.num_cons_kg_starter,
+                    a.num_cons_kg_grower,
+                    a.num_cons_kg_finisher
+
+                    
+                FROM feed_balance a
+                LEFT OUTER JOIN pig_production b ON a.pig_prod_id = b.id 
+                WHERE b.pig_farm_id = %s AND b.status = IN (4,5,6)
+                ORDER BY a.pig_prod_id ASC, a.num_days_since_birth 
+                """ % pig_farm_id
+                    
             
         # Check if still connected to database
         if self.model.check_if_connected() == False:
