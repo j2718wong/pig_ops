@@ -446,7 +446,7 @@ class SowActivity:
         conn = self.model.db_conn
         
         
-        # Inlude PROD_STATUS_ID_GESTATING that has already bought up lactating feeds 
+        # Include PROD_STATUS_ID_GESTATING that has already bought up lactating feeds 
         
         where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (4, 5, 6)) ' % pig_farm_id
         where_clause += ' OR (a.pig_farm_id = %s AND a.prod_status_id = 1 AND a.num_b_lactating IS NOT NULL) ' % pig_farm_id

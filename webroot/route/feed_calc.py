@@ -8,4 +8,4 @@ class FeedCalculator:
         
     def estimate_consumption_by_date(self, date_s):
         
-        
+        # Step 1: Gte 

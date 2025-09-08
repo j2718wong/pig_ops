@@ -206,7 +206,7 @@ class FeedBalance:
                     
                 FROM feed_balance a
                 LEFT OUTER JOIN pig_production b ON a.pig_prod_id = b.id 
-                WHERE b.pig_farm_id = %s AND b.status = IN (4,5,6)
+                WHERE b.pig_farm_id = %s AND b.prod_status_id = IN (4,5,6)
                 ORDER BY a.pig_prod_id ASC, a.num_days_since_birth 
                 """ % pig_farm_id
                     
