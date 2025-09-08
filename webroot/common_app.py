@@ -52,6 +52,9 @@ from model.m_feed_brand         import FeedBrand
 from model.m_feed_supplier      import FeedSupplier
 from model.m_feed_buy           import FeedBuy
 from model.m_feed_balance       import FeedBalance
+from model.m_feed_calc          import FeedCalc
+
+
 
 from model.m_sow_boar           import SowBoar
 from model.m_semen_source       import SemenSource
@@ -94,19 +97,19 @@ model_names = [
     
     ('feed_brand',              FeedBrand),
     ('feed_supplier',           FeedSupplier),
+    ('feed_buy',                FeedBuy),
+    ('feed_balance',            FeedBalance),
+    ('feed_calc',               FeedCalc),
+    
     
     ('sow_boar',                SowBoar),
     ('semen_source',            SemenSource),
-    ('feed_buy',                FeedBuy),
-    ('feed_balance',            FeedBalance),
     
     
     ('pig_prod',                PigProduction),
     ('prod_notes',              PigProdNotes),
     ('prod_pig_dead',           PigProdPigDead),
     ('pig_prod_pig_ops',        PigProdPigOps),
-    
-    
     
     
     

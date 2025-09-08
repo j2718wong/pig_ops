@@ -1,6 +1,8 @@
 # September 8, 2025
 # Jack Wong
 
+import pandas       as pd 
+
 from common_constants       import *
 
 
@@ -31,8 +33,8 @@ class FeedCalc:
                     b.name AS sow_name,
                     
                     a.prod_status_id,
+                    c.name AS prod_status,
                     
-                    a.num_pigs_current,
                     
                     a.date_actual_birth,
                                         
@@ -52,6 +54,7 @@ class FeedCalc:
                     
                     
                     d.date_balance,
+                    d.num_pigs,
                     d.num_days_since_birth,
                     d.num_weeks_since_birth,
                     
@@ -62,24 +65,29 @@ class FeedCalc:
                     d.num_grower,
                     d.num_finisher,
                     
+                    d.consumed_kg_lactating,
+                    d.consumed_kg_booster,
+                    d.consumed_kg_prestarter,
+                    d.consumed_kg_starter,
+                    d.consumed_kg_grower,
+                    d.consumed_kg_finisher,
                     
-                    d.cons_kg_lactating,
-                    d.cons_kg_booster,
-                    d.cons_kg_prestarter,
-                    d.cons_kg_starter,
-                    d.cons_kg_grower,
-                    d.cons_kg_finisher,
+                    d.consumed_kg_total,
+                    d.diff_consumed_kg_total,
+                    d.diff_consumption_per_pig,
+                    
                     
                     a.cost_lactating,
                     a.cost_booster,
                     a.cost_prestarter,
                     a.cost_starter,
                     a.cost_grower,
-                    a.cost_finisher,
+                    a.cost_finisher
                     
                     
                 FROM pig_production a
                 LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
+                LEFT OUTER JOIN pig_prod_status c   ON a.prod_status_id = c.id
                 LEFT OUTER JOIN feed_balance d      ON a.last_feed_balance_id = d.id
                 %s
                 ORDER BY a.date_actual_birth DESC
@@ -103,461 +111,225 @@ class FeedCalc:
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
             rows = None
         
+        
+        """
+        Convert to pandas dataframe with these columns
+        """
+        
 
-        result = []
+        prod_id         = []
+        sow_number      = []
+        sow_name        = []
+        status_id       = []
+        status_name     = []
+        
+        date_birth      = []
+        
+        date_balance    = []
+        bal_num_pigs    = []
+        days_since_b    = []
+        weeks_since_b   = []
+        
+        buy_num_LAC     = []
+        bal_num_LAC     = []
+        con_num_LAC     = []
+        
+        buy_kg_LAC      = []
+        bal_kg_LAC      = []
+        con_kg_LAC      = []
+        
+        buy_num_BOS     = []
+        bal_num_BOS     = []
+        con_num_BOS     = []
+        
+        buy_kg_BOS      = []
+        bal_kg_BOS      = []
+        con_kg_BOS      = []
+        
+        buy_num_PRE     = []
+        bal_num_PRE     = []
+        con_num_PRE     = []
+        
+        buy_kg_PRE      = []
+        bal_kg_PRE      = []
+        con_kg_PRE      = []
+        
+        buy_num_STR     = []
+        bal_num_STR     = []
+        con_num_STR     = []
+        
+        buy_kg_STR      = []
+        bal_kg_STR      = []
+        con_kg_STR      = []
+        
+        buy_num_GRO     = []
+        bal_num_GRO     = []
+        con_num_GRO     = []
+        
+        buy_kg_GRO      = []
+        bal_kg_GRO      = []
+        con_kg_GRO      = []
+        
+        buy_num_FIN     = []
+        bal_num_FIN     = []
+        con_num_FIN     = []
+        
+        buy_kg_FIN      = []
+        bal_kg_FIN      = []
+        con_kg_FIN      = []
+        
+        
+        con_kg_total    = []
+        diff_con_kg     = []
+        diff_con_pp     = []
+        
+        
+        cost_LAC        = []
+        cost_BOS        = []
+        cost_PRE        = []
+        cost_STR        = []
+        cost_GRO        = []
+        cost_FIN        = []
+        
+        
         if rows is not None:
             
             for row in rows:
-                cur_farm_prod_id        = row[0]
-                cur_sow_number          = row[1]
-                cur_sow_name            = row[2]
+                prod_id         .append(row[0])
+                sow_number      .append(row[1])
+                sow_name        .append(row[2])
+                status_id       .append(row[3])
+                status_name     .append(row[4])
+                    
+                    
+                date_birth      .append(row[5]) 
+                                            
+                buy_num_LAC     .append(row[6])
+                buy_num_BOS     .append(row[7])
+                buy_num_PRE     .append(row[8])
+                buy_num_STR     .append(row[9])
+                buy_num_GRO     .append(row[10])
+                buy_num_FIN     .append(row[11])
+                    
+                buy_kg_LAC      .append(row[12])
+                buy_kg_BOS      .append(row[13])
+                buy_kg_PRE      .append(row[14])
+                buy_kg_STR      .append(row[15])
+                buy_kg_GRO      .append(row[16])
+                buy_kg_FIN      .append(row[17])
+                    
+                    
+                date_balance    .append(row[18])
+                bal_num_pigs    .append(row[19])
+                days_since_b    .append(row[20])
+                weeks_since_b   .append(row[21])
                 
-                cur_status_id           = row[3]
+                bal_num_LAC     .append(float(row[22]) if row[22] is not None else None)
+                bal_num_BOS     .append(float(row[23]) if row[23] is not None else None)
+                bal_num_PRE     .append(float(row[24]) if row[24] is not None else None)
+                bal_num_STR     .append(float(row[25]) if row[25] is not None else None)
+                bal_num_GRO     .append(float(row[26]) if row[26] is not None else None)
+                bal_num_FIN     .append(float(row[27]) if row[27] is not None else None)
                 
-                cur_num_pigs_current    = row[4]
-               
-                cur_date_actual         = str(row[5])   if row[5]  else None
+                con_kg_LAC      .append(row[28])
+                con_kg_BOS      .append(row[29])
+                con_kg_PRE      .append(row[30])
+                con_kg_STR      .append(row[31])
+                con_kg_GRO      .append(row[32])
+                con_kg_FIN      .append(row[33])
                 
-                cur_num_b_lactating     = row[6]
-                cur_num_b_booster       = row[7]
-                cur_num_b_prestarter    = row[8]
-                cur_num_b_starter       = row[9]
-                cur_num_b_grower        = row[10]
-                cur_num_b_finisher      = row[11]
+                con_kg_total    .append(row[34])
+                diff_con_kg     .append(row[35])
+                diff_con_pp     .append(row[36])
                 
-                cur_num_b_kg_lactating  = row[12]
-                cur_num_b_kg_booster    = row[13]
-                cur_num_b_kg_prestarter = row[14]
-                cur_num_b_kg_starter    = row[15]
-                cur_num_b_kg_grower     = row[16]
-                cur_num_b_kg_finisher   = row[17]
+                cost_LAC        .append(float(row[37]) if row[37] is not None else None)
+                cost_BOS        .append(float(row[38]) if row[38] is not None else None)
+                cost_PRE        .append(float(row[39]) if row[39] is not None else None)
+                cost_STR        .append(float(row[40]) if row[40] is not None else None)
+                cost_GRO        .append(float(row[41]) if row[41] is not None else None)
+                cost_FIN        .append(float(row[42]) if row[42] is not None else None)
+        
+        
+        len_items = len(prod_id)
+        
+        data = {
+            'p_id':             prod_id,
+            'sow_number':       sow_number,
+            'sow_name':         sow_name,
+            'status_id':        status_id,
+            'status_name':      status_name,
                 
+            'date_birth':       date_birth,
                 
-                cur_bal_date_balance            = row[18]
-                cur_bal_num_days_since_birth    = row[19]
-                cur_bal_num_weeks_since_birth   = row[20]
-                
-                cur_bal_num_lactating   = float(row[21]) if row[21] is not None else None
-                cur_bal_num_booster     = float(row[22]) if row[22] is not None else None
-                cur_bal_num_prestarter  = float(row[23]) if row[23] is not None else None
-                cur_bal_num_starter     = float(row[24]) if row[24] is not None else None
-                cur_bal_num_grower      = float(row[25]) if row[25] is not None else None
-                cur_bal_num_finisher    = float(row[26]) if row[26] is not None else None
-                
-                
-                cur_cons_kg_lactating   = float(row[27]) if row[21] is not None else None
-                cur_cons_kg_booster     = float(row[28]) if row[22] is not None else None
-                cur_cons_kg_prestarter  = float(row[29]) if row[23] is not None else None
-                cur_cons_kg_starter     = float(row[30]) if row[24] is not None else None
-                cur_cons_kg_grower      = float(row[31]) if row[25] is not None else None
-                cur_cons_kg_finisher    = float(row[32]) if row[26] is not None else None
-                
-                
-                cur_cost_lactating      = float(row[33]) if row[27] is not None else None
-                cur_cost_booster        = float(row[34]) if row[28] is not None else None
-                cur_cost_prestarter     = float(row[35]) if row[29] is not None else None
-                cur_cost_starter        = float(row[30]) if row[30] is not None else None
-                cur_cost_grower         = float(row[31]) if row[31] is not None else None
-                cur_cost_finisher       = float(row[32]) if row[32] is not None else None
-                
-                
-                cur_cons_num_lactating  = None
-                cur_cons_num_booster    = None
-                cur_cons_num_prestarter = None
-                cur_cons_num_starter    = None
-                cur_cons_num_grower     = None
-                cur_cons_num_finisher   = None
-                
-                cur_kg_cons_lactating   = None
-                cur_kg_cons_booster     = None
-                cur_kg_cons_prestarter  = None
-                cur_kg_cons_starter     = None
-                cur_kg_cons_grower      = None
-                cur_kg_cons_finisher    = None
-                
-                
+            'date_bal':         date_balance,
+            'num_pigs':         bal_num_pigs,
+            'days_b':           days_since_b,
+            'weeks_b':          weeks_since_b,
             
-                if cur_num_b_lactating is not None and cur_cons_num_lactating is not None:
-                    cur_cons_num_lactating  = float(cur_num_b_lactating) - cur_cons_num_lactating
-                    cur_kg_cons_lactating   = cur_num_b_kg_lactating - 
-                
-                if cur_num_b_booster is not None and cur_cons_num_booster is not None:
-                    cur_cons_num_booster = float(cur_num_b_booster) - cur_cons_num_booster
-                
-                if cur_num_b_prestarter is not None and cur_cons_num_prestarter is not None:
-                    cur_cons_num_prestarter = float(cur_num_b_prestarter) - cur_cons_num_prestarter
-                
-                if cur_num_b_starter is not None and cur_cons_num_starter is not None:
-                    cur_cons_num_starter = float(cur_num_b_starter) - cur_cons_num_starter
-                
-                if cur_num_b_grower is not None and cur_cons_num_grower is not None:
-                    cur_cons_num_grower = float(cur_num_b_grower) - cur_cons_num_grower
-                
-                if cur_num_b_finisher is not None and cur_cons_num_finisher is not None:
-                    cur_cons_num_finisher = float(cur_num_b_finisher) - cur_cons_num_finisher
-                
-                
-                cur_entry = {
-                    'farm_prod_id':     cur_farm_prod_id,
-                    
-                    'sow': {
-                        'number':       cur_sow_number,
-                        'name':         cur_sow_name,
-                    },
-                    
-                    'status_id':        cur_status_id, 
-                    'status':           cur_status_name,
-                    
-                    'num_pigs_current': cur_num_pigs_current,
-                    
-                    'dates':{
-                        'birth':        cur_date_actual,
-                        
-                        'iron_1':       cur_date_iron_1,
-                        'iron_2':       cur_date_iron_2,
-                        'vitamins_1':   cur_date_vitamins_1,
-                        'kapon':        cur_date_kapon,
-                        'vitamins_2':   cur_date_vitamins_2,
-                        'deworm_1':     cur_date_deworm_1,
-                        
-                        'booster':      cur_date_booster,
-                        'prestarter':   cur_date_prestarter,
-                        'weaning':      cur_date_weaning,
-                        'starter':      cur_date_starter,
-                        'grower':       cur_date_grower,
-                        'finisher':     cur_date_finisher,
-                        
-                        'harvest':      cur_date_harvest
-                    },
-                    
-                    'num_feeds': {
-                        'lactating': {
-                            'bought':   cur_num_b_lactating,
-                            'consumed': cur_cons_num_lactating,
-                            'left':     cur_cons_num_lactating
-                        },
-                        
-                        'booster': {
-                            'bought':   cur_num_b_booster,
-                            'consumed': cur_cons_num_booster,
-                            'left':     cur_cons_num_booster
-                        },
-                            
-                        'prestarter': {
-                            'bought':   cur_num_b_prestarter,
-                            'consumed': cur_cons_num_prestarter,
-                            'left':     cur_cons_num_prestarter
-                        },
-                            
-                        'starter': {     
-                            'bought':   cur_num_b_starter,
-                            'consumed': cur_cons_num_starter,
-                            'left':     cur_cons_num_starter
-                        },
-                        
-                        'grower': {
-                            'bought':   cur_num_b_grower,
-                            'consumed': cur_cons_num_grower,
-                            'left':     cur_cons_num_grower
-                        },
-                        
-                        'finisher': {    
-                            'bought':   cur_num_b_finisher,
-                            'consumed': cur_cons_num_finisher,
-                            'left':     cur_cons_num_finisher
-                        }
-                    },
-                    
-                    'cost_feeds': {
-                        'lactating':    cur_cost_lactating,
-                        'booster':      cur_cost_booster,
-                        'prestarter':   cur_cost_prestarter,
-                        'starter':      cur_cost_starter,
-                        'grower':       cur_cost_grower,
-                        'finisher':     cur_cost_finisher
-                    }
-                   
-                }
-                result.append(cur_entry)
-
-        
-        return result
-        
-    
-      
-    def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
-        
-
-        if inc_user_audit == 0: 
-            if pig_prod_id > 0:
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name
-                            
-                        FROM pig_prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        WHERE a.pig_prod_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_id
-                        
-            else:
-                
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name
-                            
-                        FROM pig_prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        WHERE a.pig_prod_group_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_group_id
-                
-                
-        else:
+            'buy_num_LAC':      buy_num_LAC,
+            'bal_num_LAC':      bal_num_LAC,
+            'con_num_LAC':      [None] * len_items,
             
-            if pig_prod_id > 0:
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name,
-                            
-                            
-                            e.username,
-                            e.name_last,
-                            e.name_first,
-                            a.dt_entry,
-                            
-                            
-                            f.username,
-                            f.name_last,
-                            f.name_first,
-                            a.dt_last_update
-                            
-                        FROM pig_prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
-                        LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
-                        WHERE a.pig_prod_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_id
-                        
-            else:
+            'buy_kg_LAC':       buy_kg_LAC,
+            'bal_kg_LAC':       [None] * len_items,
+            'con_kg_LAC':       con_kg_LAC,
+            
+            'buy_num_BOS':      buy_num_BOS,
+            'bal_num_BOS':      bal_num_BOS,
+            'con_num_BOS':      [None] * len_items,
+            
+            'buy_kg_BOS':       buy_kg_BOS,
+            'bal_kg_BOS':       [None] * len_items,
+            'con_kg_BOS':       con_kg_BOS,
+           
+            
+            'buy_num_PRE':      buy_num_PRE,
+            'bal_num_PRE':      bal_num_PRE,
+            'con_num_PRE':      [None] * len_items,
+            
+            'buy_kg_PRE':       buy_kg_PRE,
+            'bal_kg_PRE':       [None] * len_items,
+            'con_kg_PRE':       con_kg_PRE,
+            
+            'buy_num_STR':      buy_num_STR,
+            'bal_num_STR':      bal_num_STR,
+            'con_num_STR':      [None] * len_items,
+            
+            'buy_kg_STR':       buy_kg_STR,
+            'bal_kg_STR':       [None] * len_items,
+            'con_kg_STR':       con_kg_STR,
+            
+            'buy_num_GRO':      buy_num_GRO,
+            'bal_num_GRO':      bal_num_GRO,
+            'con_num_GRO':      [None] * len_items,
+            
+            'buy_kg_GRO':       buy_kg_GRO,
+            'bal_kg_GRO':       [None] * len_items,
+            'con_kg_GRO':       con_kg_GRO,
+            
+            'buy_num_FIN':      buy_num_FIN,
+            'bal_num_FIN':      bal_num_FIN,
+            'con_num_FIN':      [None] * len_items,
+            
+            'buy_kg_FIN':       buy_kg_FIN,
+            'bal_kg_FIN':       [None] * len_items,
+            'con_kg_FIN':       con_kg_FIN,
                 
-                sql =   """
-                        SELECT 
-                            a.id,
-                            
-                            a.date_buy,
-                            a.quantity,
-                            a.kg_per_unit,
-                            a.kg_total,
-                            
-                            a.unit_cost,
-                            a.total_cost,
-                            
-                            a.dt_entry,
-                            
-                            a.feed_type_id,
-                            b.name AS feed_type_name,
-                            
-                            a.feed_brand_id,
-                            c.name AS feed_brand_name,
-                            
-                            a.feed_supplier_id,
-                            d.name AS feed_supplier_name,
-                            
-                            
-                            e.username,
-                            e.name_last,
-                            e.name_first,
-                            a.dt_entry,
-                            
-                            
-                            f.username,
-                            f.name_last,
-                            f.name_first,
-                            a.dt_last_update
-                            
-                        FROM pig_prod_feed_buy a 
-                        LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
-                        LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
-                        LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
-                        LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
-                        WHERE a.pig_prod_group_id = %s
-                        ORDER BY a.id
-                        """ % pig_prod_group_id
+                
+            'con_kg_total':     con_kg_total,
+            'diff_con_kg':      diff_con_kg
+            'diff_con_pp':      diff_con_pp
             
             
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            'cost_LAC':         cost_LAC,
+            'cost_BOS':         cost_BOS,
+            'cost_PRE':         cost_PRE,
+            'cost_STR':         cost_STR,
+            'cost_GRO':         cost_GRO,
+            'cost_FIN':         cost_FIN
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        }
         
-        result = []
-        if rows is not None:
-            
-            for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'feed_buy': {
-                            'id':               row[0],
-                            'date_buy':         str(row[1]),
-                            'quantity':         row[2],
-                            'kg_per_unit':      float(row[3]),
-                            'kg_total':         float(row[4]),
-                            'unit_cost':        float(row[5]),
-                            'total_cost':       float(row[6]),
-                            'dt_entry':         str(row[7])
-                        },
-                        
-                        'feed_type':{
-                            'id':               row[8],
-                            'name':             row[9],
-                        },
-                        
-                        'feed_brand':{
-                            'id':               row[10],
-                            'name':             row[11],
-                        },
-                        
-                        'feed_supplier':{
-                            'id':               row[12],
-                            'name':             row[13],
-                        }
-                    }
-                    
-                else:
-                    cur_entry = {
-                        'feed_buy': {
-                            'id':               row[0],
-                            'date_buy':         str(row[1]),
-                            'quantity':         row[2],
-                            'kg_per_unit':      float(row[3]),
-                            'kg_total':         float(row[4]),
-                            'unit_cost':        float(row[5]),
-                            'total_cost':       float(row[6]),
-                            'dt_entry':         str(row[7])
-                        },
-                        
-                        'feed_type':{
-                            'id':               row[8],
-                            'name':             row[9],
-                        },
-                        
-                        'feed_brand':{
-                            'id':               row[10],
-                            'name':             row[11],
-                        },
-                        
-                        'feed_supplier':{
-                            'id':               row[12],
-                            'name':             row[13],
-                        },
-                        
-                        'added_by': {
-                            'username':         row[14],
-                            'name_last':        row[15],
-                            'name_first':       row[16],
-                            'dt_entry':         row[17]
-                        },
-                        
-                        'last_update':{
-                            'username':         row[18],
-                            'name_last':        row[19],
-                            'name_first':       row[20],
-                            'dt_update':        str(row[21]) if row[21] else None
-                        }
-                    }
-                
-                    
-                result.append(cur_entry)
+        return pd.DataFrame(data)
         
-        return result
-    
     
