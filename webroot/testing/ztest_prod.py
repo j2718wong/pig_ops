@@ -935,7 +935,7 @@ class TestAPIPigProd:
                 'date_buy':         date_buy,
                 
                 'quantity':         num_feeds_to_buy,
-                'kg_per_unit':      kg_per_unit,
+                'kg_per_unit':      int(kg_per_unit),
                 
                 'unit_cost':        cost_per_unit,
                 'total_cost':       num_feeds_to_buy * cost_per_unit

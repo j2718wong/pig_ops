@@ -74,13 +74,15 @@ FEED_TYPE_ID_GROWER                                 = 6
 FEED_TYPE_ID_FINISHER                               = 7
 
 
+
 DEFAULT_KG_PER_FEED_UNIT = {
-    'GESTATING':    50,
-    'LACTATING':    50,
-    'PRESTARTER':   25,
-    'STARTER':      50,
-    'GROWER':       50,
-    'FINISHER':     50
+    'GESTATING':    50.0,
+    'LACTATING':    50.0,
+    'BOOSTER':       1.0
+    'PRESTARTER':   25.0,
+    'STARTER':      50.0,
+    'GROWER':       50.0,
+    'FINISHER':     50.0
 }
 
 

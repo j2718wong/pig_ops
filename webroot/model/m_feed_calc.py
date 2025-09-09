@@ -73,10 +73,7 @@ class FeedCalc:
                     d.consumed_kg_finisher,
                     
                     d.consumed_kg_total,
-                    d.diff_consumed_kg_total,
-                    d.diff_consumption_per_pig,
-                    
-                    
+                                       
                     a.cost_lactating,
                     a.cost_booster,
                     a.cost_prestarter,
@@ -180,9 +177,7 @@ class FeedCalc:
         
         
         con_kg_total    = []
-        diff_con_kg     = []
-        diff_con_pp     = []
-        
+      
         
         cost_LAC        = []
         cost_BOS        = []
@@ -202,7 +197,7 @@ class FeedCalc:
                 status_name     .append(row[4])
                     
                     
-                date_birth      .append(row[5]) 
+                date_birth      .append(row[5])  # dont convert to string
                                             
                 buy_num_LAC     .append(row[6])
                 buy_num_BOS     .append(row[7])
@@ -219,7 +214,7 @@ class FeedCalc:
                 buy_kg_FIN      .append(row[17])
                     
                     
-                date_balance    .append(row[18])
+                date_balance    .append(row[18]) # dont convert to string
                 bal_num_pigs    .append(row[19])
                 days_since_b    .append(row[20])
                 weeks_since_b   .append(row[21])
@@ -332,4 +327,157 @@ class FeedCalc:
         
         return pd.DataFrame(data)
         
+        
+    def get_feed_consumed_list(self, pig_farm_id, by_pig_prod = 1):
+        
+        if by_pig_prod > 0:
+            sql =   """
+                SELECT 
+                    a.farm_prod_id,
+                    
+                    c.number,
+                    c.name, 
+                    
+                    a.date_actual_birth,
+                    
+                    b.date_balance,
+                    b.num_days_since_birth,
+                    b.num_weeks_since_birth,
+                    
+                    b.num_pigs,
+                        
+                    b.consumed_kg_booster,
+                    b.consumed_kg_lactating,
+                    b.consumed_kg_prestarter,
+                    b.consumed_kg_starter,
+                    b.consumed_kg_grower,
+                    b.consumed_kg_finisher,
+                        
+                        
+                    b.consumed_kg_total,
+                    b.diff_consumed_kg_total,
+                    b.diff_consumption_per_pig
+                    
+                FROM pig_production a 
+                RIGHT JOIN feed_balance b       ON a.id = b.pig_prod_id
+                LEFT OUTER JOIN sow_boar c      ON a.sow_id  = c.id
+                WHERE a.pig_farm_id = %s AND a.prod_status_id IN (4,5,6)
+                ORDER BY a.date_actual_birth, b.id DESC
+                """ % pig_farm_id
+                
+        else:
+            #TODO
+            test = 1
+            
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_feed_consumed_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        
+        prod_id         = []
+        sow_number      = []
+        sow_name        = []
+        
+        date_birth      = []
+        date_balance    = []
+        
+        days_since_b    = []
+        weeks_since_b   = []
+        bal_num_pigs    = []
+        
+        con_kg_LAC      = []
+        con_kg_BOS      = []
+        con_kg_PRE      = []
+        con_kg_STR      = []
+        con_kg_GRO      = []
+        con_kg_FIN      = []
+        
+        con_kg_tot      = []
+        con_kg_diff     = []
+        con_kg_diff_pp  = []
+        
+        
+        if rows is not None:
+            
+            for row in rows:
+                prod_id         .append(row[0])
+                sow_number      .append(row[1])
+                sow_name        .append(row[2])
+                    
+                date_birth      .append(str(row[3])) 
+                date_balance    .append(str(row[4]))
+                days_since_b    .append(row[5])
+                weeks_since_b   .append(row[6])
+                bal_num_pigs    .append(row[7])
+                
+                con_kg_LAC      .append(row[8])
+                con_kg_BOS      .append(row[9])
+                con_kg_PRE      .append(row[10])
+                con_kg_STR      .append(row[11])
+                con_kg_GRO      .append(row[12])
+                con_kg_FIN      .append(row[13])
+                    
+                con_kg_tot      .append(row[14])
+                con_kg_diff     .append(row[15])
+                con_kg_diff_pp  .append(float(row[16]) if row[16] is not None)
+                
+                
+        len_items = len(prod_id)
+        
+        data = {
+            'p_id':             prod_id,
+            'sow_number':       sow_number,
+            'sow_name':         sow_name,
+            'date_birth':       date_birth,
+                
+            'date_bal':         date_balance,
+            'days_b':           days_since_b,
+            'weeks_b':          weeks_since_b,
+            'num_pigs':         bal_num_pigs,
+            
+            'con_kg_LAC':       con_kg_LAC,
+            'con_kg_BOS':       con_kg_BOS,
+            'con_kg_PRE':       con_kg_PRE, 
+            'con_kg_STR':       con_kg_STR,
+            'con_kg_GRO':       con_kg_GRO,
+            'con_kg_FIN':       con_kg_FIN,
+            
+            'con_num_LAC':      [None] * len_items,
+            'con_num_BOS':      [None] * len_items,
+            'con_num_PRE':      [None] * len_items,
+            'con_num_STR':      [None] * len_items,
+            'con_num_GRO':      [None] * len_items,
+            'con_num_FIN':      [None] * len_items,
+            
+            'con_kg_tot':       con_kg_tot,
+            'con_kg_diff':      con_kg_diff,
+            'con_kg_diff_pp':   con_kg_diff_pp
+        }
+        
+        return pd.DataFrame(data)
+    
     
