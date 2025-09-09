@@ -26,6 +26,7 @@ from route.r_feed_brand         import *
 from route.r_feed_supplier      import *
 from route.r_feed_buy           import *
 from route.r_feed_balance       import *
+from route.r_feed_calc          import *
 
 from route.r_semen_source       import *
 from route.r_sow_boar           import *

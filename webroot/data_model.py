@@ -90,7 +90,8 @@ class DataSowBoar(BaseModel):
     line_id:                int = 0
     sow_status_id:          int = 2
         
-    sex:                    str = 'F' # Sow = 'F';  Boar = 'M'  
+    sex:                    str = 'F' # Sow = 'F';  Boar = 'M'
+    is_external:            int = 0 # not owned by the farm
         
     number:                 str = None
     name:                   str = None

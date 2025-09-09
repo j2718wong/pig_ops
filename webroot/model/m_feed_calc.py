@@ -312,9 +312,6 @@ class FeedCalc:
                 
                 
             'con_kg_total':     con_kg_total,
-            'diff_con_kg':      diff_con_kg
-            'diff_con_pp':      diff_con_pp
-            
             
             'cost_LAC':         cost_LAC,
             'cost_BOS':         cost_BOS,
@@ -345,9 +342,9 @@ class FeedCalc:
                     b.num_weeks_since_birth,
                     
                     b.num_pigs,
-                        
-                    b.consumed_kg_booster,
+                    
                     b.consumed_kg_lactating,
+                    b.consumed_kg_booster,
                     b.consumed_kg_prestarter,
                     b.consumed_kg_starter,
                     b.consumed_kg_grower,
@@ -362,7 +359,7 @@ class FeedCalc:
                 RIGHT JOIN feed_balance b       ON a.id = b.pig_prod_id
                 LEFT OUTER JOIN sow_boar c      ON a.sow_id  = c.id
                 WHERE a.pig_farm_id = %s AND a.prod_status_id IN (4,5,6)
-                ORDER BY a.date_actual_birth, b.id DESC
+                ORDER BY a.date_actual_birth DESC, b.id DESC
                 """ % pig_farm_id
                 
         else:
@@ -403,8 +400,8 @@ class FeedCalc:
         sow_name        = []
         
         date_birth      = []
-        date_balance    = []
         
+        date_balance    = []
         days_since_b    = []
         weeks_since_b   = []
         bal_num_pigs    = []
@@ -429,6 +426,7 @@ class FeedCalc:
                 sow_name        .append(row[2])
                     
                 date_birth      .append(str(row[3])) 
+                
                 date_balance    .append(str(row[4]))
                 days_since_b    .append(row[5])
                 weeks_since_b   .append(row[6])
@@ -443,7 +441,7 @@ class FeedCalc:
                     
                 con_kg_tot      .append(row[14])
                 con_kg_diff     .append(row[15])
-                con_kg_diff_pp  .append(float(row[16]) if row[16] is not None)
+                con_kg_diff_pp  .append(float(row[16]) if row[16] is not None else None)
                 
                 
         len_items = len(prod_id)

@@ -18,7 +18,7 @@ from fastapi.responses      import PlainTextResponse
 
     
 @app.get("/feed_calc/consumption/list", response_class=PlainTextResponse)
-async def feed_calc_consumption_list(pig_farm_hid:str, num_per_prod:int = None):
+async def feed_calc_consumption_list(pig_farm_hid:str, num_per_prod:int = 5):
     """
     Will feed consumption list.
 
@@ -54,12 +54,12 @@ async def feed_calc_consumption_list(pig_farm_hid:str, num_per_prod:int = None):
     
     df_consume  = model['feed_calc'].get_feed_consumed_list(pig_farm_id)
     
-    df_consume['con_num_LAC'] = df_consume['con_kg_LAC'] / DEFAULT_KG_PER_UNIT['LACTATING']
-    df_consume['con_num_BOS'] = df_consume['con_kg_BOS'] / DEFAULT_KG_PER_UNIT['BOOSTER']
-    df_consume['con_num_PRE'] = df_consume['con_kg_PRE'] / DEFAULT_KG_PER_UNIT['PRESTARTER']
-    df_consume['con_num_STR'] = df_consume['con_kg_STR'] / DEFAULT_KG_PER_UNIT['STARTER']
-    df_consume['con_num_GRO'] = df_consume['con_kg_GRO'] / DEFAULT_KG_PER_UNIT['GROWER']
-    df_consume['con_num_FIN'] = df_consume['con_kg_FIN'] / DEFAULT_KG_PER_UNIT['FINISHER']
+    df_consume['con_num_LAC'] = df_consume['con_kg_LAC'] / DEFAULT_KG_PER_FEED_UNIT['LACTATING']
+    df_consume['con_num_BOS'] = df_consume['con_kg_BOS'] / DEFAULT_KG_PER_FEED_UNIT['BOOSTER']
+    df_consume['con_num_PRE'] = df_consume['con_kg_PRE'] / DEFAULT_KG_PER_FEED_UNIT['PRESTARTER']
+    df_consume['con_num_STR'] = df_consume['con_kg_STR'] / DEFAULT_KG_PER_FEED_UNIT['STARTER']
+    df_consume['con_num_GRO'] = df_consume['con_kg_GRO'] / DEFAULT_KG_PER_FEED_UNIT['GROWER']
+    df_consume['con_num_FIN'] = df_consume['con_kg_FIN'] / DEFAULT_KG_PER_FEED_UNIT['FINISHER']
     
     # remove unwanted columns
     df_filtered = df_consume[[
@@ -102,7 +102,7 @@ def write_feed_consumed(df, num_per_prod):
     dt_now      = datetime.now()
     
     
-    s += 'FEED_CONSUMPTON                                        Consumed (NUMBER OF SACKS)        Consumed (KG)\n'
+    s  = 'FEED_CONSUMPTON                                        Consumed (NUMBER OF SACKS)        Consumed (KG)\n'
     s += '===============                                   ==================================  ====================\n'
     s += ' P_ID  DATE_BIRTH  DATE_BAL    DAYS  WEKS  PIGS   LACT  BOST  PRES  STAR  GROW  FINS  TOTAL  DIFF  DIFF_PP\n'
     
@@ -115,6 +115,11 @@ def write_feed_consumed(df, num_per_prod):
     count_row_per_prod  = 0
     
     for row in df.itertuples():
+        if num_per_prod is not None:
+            if count_row_per_prod >= num_per_prod:
+                if last_prod_id == row.p_id:
+                    continue
+        
         if last_prod_id != row.p_id:
             last_prod_id = row.p_id
             
@@ -131,11 +136,12 @@ def write_feed_consumed(df, num_per_prod):
             s           += row.date_birth
             s           += '  '
             
-            s           += row.date_bal
-            s           += '  '
             
         else:
             s           += ' ' * 19
+            
+        s           += row.date_bal
+        s           += '  '
             
         s_temp      = str(row.days_b)
         num_chars   = len(s_temp)
@@ -245,6 +251,8 @@ def write_feed_consumed(df, num_per_prod):
         num_space   = 5 - num_chars
         s           += ' ' * num_space + s_temp
         
+        
+        count_row_per_prod += 1
         s += '\n'
         
         

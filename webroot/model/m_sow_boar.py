@@ -342,6 +342,13 @@ class SowBoar:
 
         """
         
+        """
+        sow_boar.flag bits
+        0 = is_disposed
+        1 = is_external 
+        
+        """
+        
         where_clause = ''
         if list_ids is not None:
             s = ''
@@ -353,7 +360,7 @@ class SowBoar:
                 count += 1
             
             if inc_disposed == 0:
-                where_clause = ' WHERE a.id IN (%s) AND (a.flag & 1) = 0 ' % s
+                where_clause = ' WHERE a.id IN (%s) AND (a.flag & 3) = 0 ' % s
             
             else:
                 where_clause = ' WHERE a.id IN (%s) ' % s
@@ -362,7 +369,7 @@ class SowBoar:
             if sex is not None:
                 if inc_disposed == 0:
                     values = (farm_id, sex)
-                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
+                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
                 
                 else:
                     values = (farm_id, sex)
@@ -372,7 +379,7 @@ class SowBoar:
                 
                 if inc_disposed == 0:
                     values = (farm_id, sex)
-                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
+                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
                 
                 else:
                     values = (farm_id, sex)

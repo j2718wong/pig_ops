@@ -14,7 +14,8 @@ sys.path.append('..')
 from common_constants       import *
 from common_app             import *
 
-
+DAYS_ESTIMATE_MINIMUM       = 7
+DAYS_ESTIMATE_MAXIMUM       = 35
 
 class FeedCalculator:
     def __init__(self, pig_farm_id):
@@ -24,9 +25,41 @@ class FeedCalculator:
         
         
     def estimate_consumption_by_date(self, date_estimate):
-        dt_estimate = datetime.strptime(date_estimate, '%Y-%m-%d')
+        dt_estimate     = datetime.strptime(date_estimate, '%Y-%m-%d')
         
-        df_prod = self.model['feed_calc'].get_pig_prod_list(self.pig_farm_id)
+        dt_now          = datetime.now()
+        
+        delta_days  = (dt_estimate - dt_now).days
+        
+        if delta_days < DAYS_ESTIMATE_MINIMUM and delta_days > DAYS_ESTIMATE_MAXIMUM:
+            return {
+                values = (DAYS_ESTIMATE_MINIMUM, DAYS_ESTIMATE_MAXIMUM)
+                msg = 'Please enter between %s and %s days.' % values
+                
+                'result': {
+                    'num':  ERROR_FEED_ESTIMATE_OUTSIDE_RANGE
+                    'code': 'ERROR_FEED_ESTIMATE_OUTSIDE_RANGE'
+                    'desc': 
+                }
+            
+            }
+        
+        
+        # Check if there is a sow or boar list
+        list_sows       = self.model['sow_boar'].get_list(self.pig_farm_id, 'F')
+        list_boars      = self.model['sow_boar'].get_list(self.pig_farm_id, 'M')
+        
+        len_sows        = len(list_sows)
+        len_boars       = len(list_boars)
+        
+        
+        # Get production list
+        df_prod         = self.model['feed_calc'].get_pig_prod_list(self.pig_farm_id)
+        
+        len_prod        = len(df_prod)
+        
+        
+        
         
         df_prod['con_num_LAC']  = df_prod['buy_num_LAC']    - df_prod['bal_num_LAC']
         df_prod['bal_kg_LAC']   = df_prod['buy_kg_LAC']     - df_prod['con_kg_LAC']
