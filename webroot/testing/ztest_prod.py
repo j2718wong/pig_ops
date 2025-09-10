@@ -133,10 +133,10 @@ class TestAPIPigProd:
         
         
             # random insemenation date
-            now             = datetime.now()
+            dt_now          = datetime.now()
         
             random_num_days = random.randint(0, 30)
-            dt_insem        = now - timedelta(days = (30 + random_num_days))
+            dt_insem        = dt_now - timedelta(days = (30 + random_num_days))
             dt_insem_s      = dt_insem.strftime('%Y-%m-%d')
         
         
@@ -254,6 +254,45 @@ class TestAPIPigProd:
             count_sow = count_sow + 1
         
         
+        res_fattening = self.test_pig_prod_fattening_add(user_uhid, pig_farm_hid)
+        num_pigs = res_fattening['data'] + 1
+        self._test_prod_update_pig_count(user_uhid, pig_prod_hid, num_pigs)
+        
+        
+    def test_pig_prod_fattening_add(self, user_hid, pig_farm_hid):
+        num_pigs        = 12 + random.randint(0,2)
+        
+        dt_now          = datetime.now()
+        dt_weaning      = dt_now - timedelta(days = 4)
+        dt_weaning_s    = dt_birth.strftime('%Y-%m-%d')
+        
+        url = BASE_URL + '/pig_prod/fattening/add'
+        
+        data = {
+            "uhid":                 user_uhid,
+            
+            "pig_farm_hid":         pig_farm_hid,
+            "num_pigs":             num_pigs,
+            "notes":                notes,
+            "date_weaning":         dt_weaning_s
+        }
+
+        print(f'\n\n***** Testing adding pig_prod_fattening; url = {url} ')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
+        self.summary['pig_prod']['fattening'] = {}
+        self.summary['pig_prod']['fattening']['add'] = 'OK'
+        
+        return data
+        
         
     def _test_pig_prod_notes_add(self, user_uhid, pig_prod_hid, notes):
         url = BASE_URL + 'pig_prod_notes/add'
@@ -271,6 +310,9 @@ class TestAPIPigProd:
         r = requests.post(url, json = data)
         res_text = str(r.text)
         res_json = json.loads(res_text)
+        
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
         
         self.summary['pig_prod']['prod_notes'] = {}
         self.summary['pig_prod']['prod_notes']['add'] = 'OK'
@@ -294,6 +336,10 @@ class TestAPIPigProd:
         r = requests.post(url, json = data)
         res_text = str(r.text)
         res_json = json.loads(res_text)
+        
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
         
         self.summary['pig_prod']['prod_notes']['update'] = 'OK'
         
@@ -324,8 +370,8 @@ class TestAPIPigProd:
         sow_hid         = sow['hid']
         
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
     
@@ -424,8 +470,8 @@ class TestAPIPigProd:
         sow_hid         = sow['hid']
         
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
     
@@ -652,6 +698,40 @@ class TestAPIPigProd:
         self.summary['pig_prod']['pig_dead']['add'] = 'OK'
         
         return data
+    
+    
+    def _test_prod_update_pig_count(self, user_uhid, pig_prod_hid, num_pigs):
+
+        url = BASE_URL + 'pig_prod/update_pig_count'
+        
+        
+        data_pig_count = {
+            "uhid":                 user_uhid,
+            "pig_prod_hid":         pig_prod_hid,
+            
+            "num_pigs":             num_pigs,
+            "notes":                updated_num_pigs
+        }
+        
+        
+        print(f'\n\n***** Testing pig_prod_update_pig_count; url = {url} ; data')
+        pprint.pprint(data_birth)
+        
+        r = requests.post(url, json = data_birth)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['pig_prod']['update_pig_count'] = 'OK'
+        
+   
+         
+    
     
     
     def _test_pig_prod_gestating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
@@ -1204,8 +1284,14 @@ class TestAPIPigProd:
         return data
         
     
+    
+    
+    
     def _test_feed_balance_add(self, pig_prod_id):
         test = 1
+    
+    
+    
     
     
 if __name__ == '__main__':

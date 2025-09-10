@@ -109,12 +109,12 @@ async def user_register(user_data: dm.DataUser):
         verify_code = random.randint(MFA_VERIFICATION_CODE_MIN,
                         MFA_VERIFICATION_CODE_MAX)
         
-        now         = datetime.now()
-        expiry      = now + timedelta(
+        dt_now      = datetime.now()
+        dt_expiry   = dt_now + timedelta(
                         minutes = NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY)
         
-        expiry_ts   = int(datetime.timestamp(expiry))
-        expiry_str  = expiry.strftime('%Y-%m-%d %H:%M:%S')
+        expiry_ts   = int(datetime.timestamp(dt_expiry))
+        expiry_str  = dt_expiry.strftime('%Y-%m-%d %H:%M:%S')
         
         
         # TODO: send verification code
@@ -245,12 +245,12 @@ async def user_email_verify_resend(uhid:str):
     verify_code = random.randint(MFA_VERIFICATION_CODE_MIN,
                             MFA_VERIFICATION_CODE_MAX)
             
-    now         = datetime.now()
-    expiry      = now + timedelta(
+    dt_now      = datetime.now()
+    dt_expiry   = dt_now + timedelta(
                     minutes = NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY)
     
-    expiry_ts   = int(datetime.timestamp(expiry))
-    expiry_str  = expiry.strftime('%Y-%m-%d %H:%M:%S')
+    expiry_ts   = int(datetime.timestamp(dt_expiry))
+    expiry_str  = dt_expiry.strftime('%Y-%m-%d %H:%M:%S')
     
     
     user_info = model['user'].get_user_info(user_id)

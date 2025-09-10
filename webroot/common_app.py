@@ -32,6 +32,8 @@ s = '\n\nStarting Pig Operations application\n'
 logger.append(tag = 'Main', msg = s)
 
 
+from model.m_app_analytics      import AppAnalytics
+
 from model.m_account            import Account
 from model.m_account_request    import AccountRequest
 from model.m_mfa                import Mfa
@@ -71,13 +73,10 @@ from model.m_pig_prod_pig_ops   import PigProdPigOps
 
 
 
-
-
-
-
-
 # Models for connecting to database
 model_names = [
+    ('app_analytics',           AppAnalytics),
+
     ('account',                 Account),
     ('acc_req',                 AccountRequest),
     ('mfa',                     Mfa),

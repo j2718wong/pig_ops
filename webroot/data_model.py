@@ -300,6 +300,20 @@ class DataPigProdWeaning(BaseModel):
     total_weight:           int = None
     
     
+class DataPigProdFattening(BaseModel):
+    uhid:                   str
+        
+    pig_farm_hid:           str = None
+    
+    
+    user_id:                int = 0
+    pig_farm_id:            int = 0
+    num_pigs:               int
+    
+    date_weaning:           str
+    date_added
+    
+    
     
 class DataPigProdDeadPig(BaseModel):
     uhid:                   str
@@ -329,8 +343,22 @@ class DataPigProdNotes(BaseModel):
     user_id:                int = 0
     pig_prod_id:            int = 0
     pig_prod_notes_id:      int = 0
+    date_notes:             str = None
     notes:                  str
     
+    
+class DataPigProdPigCount(BaseModel):
+    uhid:                   str
+        
+    pig_prod_hid:           str = None
+        
+        
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    num_pigs:               int
+    date_notes:             str = None
+    notes:                  str
+
     
 class DataPigProdFeedType(BaseModel):
     uhid:                   str

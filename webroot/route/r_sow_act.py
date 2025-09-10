@@ -405,11 +405,11 @@ NUMDAYS_SINCE_BIRTH_STARTER             = 50
 NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
     
-@app.get("/pig_prod/ops", response_class=PlainTextResponse)
-async def sow_act_pig_prod_ops(inc_historical : int =0, 
+@app.get("/pig_prod_ops/report", response_class=PlainTextResponse)
+async def pig_prod_ops_report(uhid:str, pfhid:str, inc_historical: int =0, 
         inc_cost : int = 0, year:int = None):
     """
-    Will get pig feeding list.
+    Will generate pig_prod_ops report.
 
     Parameters
     ==========
@@ -424,10 +424,46 @@ async def sow_act_pig_prod_ops(inc_historical : int =0,
         
     """
     
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_OPS_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
     
-    # TODO; currently hard coded
-    account_id      = 1
-    pig_farm_id     = 1
+    user_id = res[0]
+    
+    
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_OPS_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_PROD_OPS_INVALID_PIG_FARM_HASHID',
+                'desc': ''
+            }
+        }
+    
+    pig_farm_id = res[0]
+    
+    
+    res_get = model['user'].get_user_info(user_id)
+    
+    if res_get is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    account_id      = res_get['user']['account_id']
+   
         
     res = model['sow_act'].get_pig_prod_ops_list(pig_farm_id, inc_historical)
     
@@ -437,7 +473,7 @@ async def sow_act_pig_prod_ops(inc_historical : int =0,
     s = DB_INFO + '  ' + dt_now_s + '\n\n'
         
     s += write_gestating_operations(account_id, pig_farm_id)
-    s += write_baktin_operations(res, inc_historical)
+    s += write_lactating_operations(res, inc_historical)
     s += write_feeding_guide(res, inc_historical)
     s += write_feeds_consumed(res, inc_historical)
     
@@ -445,6 +481,9 @@ async def sow_act_pig_prod_ops(inc_historical : int =0,
     
     if inc_cost > 0:
         s += write_feeds_cost(res, inc_historical)
+    
+    # Record analytics
+    model['app_analytics'].add(user_id, APP_ANALYTICS_ID_REPORT_PIG_OPS)
     
     return s
     
@@ -591,7 +630,7 @@ def write_gestating_operations(account_id, pig_farm_id):
     return s 
     
     
-def write_baktin_operations(data, inc_historical):
+def write_lactating_operations(data, inc_historical):
     dt_now      = datetime.now()
     
     s  = 'BAKTIN OPERATIONS                        IRON_1   IRON_2   VITA_1   VITA_2    KAPON    PURGA_1   LUTAS\n'

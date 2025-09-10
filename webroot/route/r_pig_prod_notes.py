@@ -23,6 +23,10 @@ import data_model           as dm
 async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     uhid    = pig_prod_notes_data.uhid
     
+    if pig_prod_notes_data.date_notes is None:
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d')
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {

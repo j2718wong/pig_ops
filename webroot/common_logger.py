@@ -139,16 +139,16 @@ class Logger:
             tag = ' '
         
         # Add current date to path_logs
-        now             = datetime.now()
-        date_str        = now.strftime('%Y-%m-%d')
-        path_log        = os.path.join(self.path_logs, date_str)
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d')
+        path_log        = os.path.join(self.path_logs, dt_now_s)
 
         if not os.path.isdir(path_log):
             os.makedirs(path_log)
 
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        now_ts          = dt_now.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         
-        fname           = date_str 
+        fname           = dt_now_s 
         fname           += '_' + self.log_name
         
         if log_name is not None:

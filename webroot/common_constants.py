@@ -10,6 +10,10 @@ LOG_FATAL               = 3
 
 
 
+APP_ANALYTICS_ID_REPORT_PIG_OPS                     = 1
+APP_ANALYTICS_ID_REPORT_FEED_CONSUMPTION            = 2
+
+
 BUSINESS_OBJ_ID_USER_REGISTER                       = 1
 BUSINESS_OBJ_ID_SEMEN_SUPPLIER                      = 13
 BUSINESS_OBJ_ID_FEED_SUPPLIER                       = 14

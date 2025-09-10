@@ -16,6 +16,7 @@ class PigProdNotes:
             in_user_id              INT,
            
             in_pig_prod_id          INT,
+            in_date_notes           VARCHAR(10),
             in_notes                VARCHAR(160)
         )  
         """
@@ -24,6 +25,7 @@ class PigProdNotes:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id
+        sql += '"%s",'  % data.date_notes
         sql += '"%s");'  % data.notes
         
         
@@ -75,6 +77,7 @@ class PigProdNotes:
             in_user_id              INT,
            
             in_pig_prod_notes_id    INT,
+            in_date_notes           VARCHAR(10),
             in_notes                VARCHAR(160)
         )
         """
@@ -82,7 +85,7 @@ class PigProdNotes:
         sql =  'CALL pig_prod_notes_update('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_prod_notes_id
-    
+        sql += '"%s",'  % data.date_notes
         sql += '"%s");'  % data.notes
         
         

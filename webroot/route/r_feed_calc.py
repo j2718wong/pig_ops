@@ -17,8 +17,8 @@ from fastapi.responses      import PlainTextResponse
 
 
     
-@app.get("/feed_calc/consumption/list", response_class=PlainTextResponse)
-async def feed_calc_consumption_list(pig_farm_hid:str, num_per_prod:int = 5):
+@app.get("/feed_calc/consumption/report", response_class=PlainTextResponse)
+async def feed_calc_consumption_report(uhid:str, pig_farm_hid:str, num_per_prod:int = 5):
     """
     Will feed consumption list.
 
@@ -37,6 +37,20 @@ async def feed_calc_consumption_list(pig_farm_hid:str, num_per_prod:int = 5):
     if num_per_prod is not None:
         if num_per_prod < 3: # set lower limit
             num_per_prod = 3
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_OPS_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
     
     res = hashids_common.decrypt(pig_farm_hid)
     if len(res) == 0:

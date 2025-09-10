@@ -102,8 +102,8 @@ class TestAPIAccount:
     def test_account_register(self, user_id, acc_name):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
@@ -166,8 +166,8 @@ class TestAPIAccount:
         
         
         # Test account update
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'account/update'
         
@@ -252,8 +252,8 @@ class TestAPIAccount:
     def test_semen_supplier(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         url = BASE_URL + 'semen_supplier/add'
@@ -303,8 +303,8 @@ class TestAPIAccount:
     def test_feed_brand(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         url = BASE_URL + 'feed_brand/add'
@@ -380,8 +380,8 @@ class TestAPIAccount:
     def test_feed_supplier(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         url = BASE_URL + 'feed_supplier/add'
@@ -432,8 +432,8 @@ class TestAPIAccount:
     def test_pig_farm(self, user_id, farm_name):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
@@ -497,8 +497,8 @@ class TestAPIAccount:
         self.summary['pig_farm']['add_duplicate_check'] = 'OK'
         
         # Test farm update
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'pig_farm/update'
         
@@ -536,8 +536,8 @@ class TestAPIAccount:
     def test_pig_farm_staff(self, user_id, pig_farm_id, num_staff = 3):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
@@ -618,8 +618,8 @@ class TestAPIAccount:
         
         
         # Test pig_farm_staff update
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'pig_farm_staff/update'
         
@@ -648,8 +648,8 @@ class TestAPIAccount:
         
         
         # Add new pig_farm_staff
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'pig_farm_staff/add'
             
@@ -723,8 +723,8 @@ class TestAPIAccount:
     def test_account_pig_ops(self, user_id, operation_type):
         user_uhid       = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
@@ -807,8 +807,8 @@ class TestAPIAccount:
 
         
         # Test account_pig_ops update
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'account_pig_ops/update'
         
@@ -869,8 +869,8 @@ class TestAPIAccount:
     def test_pig_race_line(self, user_id, account_hid):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
@@ -941,8 +941,8 @@ class TestAPIAccount:
         
         
         # Test pig_race_line update
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'pig_race_line/update'
         
@@ -972,8 +972,8 @@ class TestAPIAccount:
         
         
         # Add new pig_race_line
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         url = BASE_URL + 'pig_race_line/add'
             
@@ -1074,8 +1074,8 @@ class TestAPIAccount:
         bit_0: if > 0, skip update
         """
         
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {now_ts}  ###########################")
         
         
@@ -1140,11 +1140,11 @@ class TestAPIAccount:
                 sow_boar_name   = sow_boar_names[index]
                     
         
-        now         = datetime.now()
+        dt_now      = datetime.now()
         
         random_num_days = random.randint(0, 60)
-        dt_dob      = now - timedelta(days = (210 + random_num_days))
-        dt_dob_s    = now.strftime('%Y-%m-%d')
+        dt_dob      = dt_now - timedelta(days = (210 + random_num_days))
+        dt_dob_s    = dt_dob.strftime('%Y-%m-%d')
         
         data = {
           "uhid": user_uhid,
@@ -1182,8 +1182,8 @@ class TestAPIAccount:
         if skip_flag & 0x01 == 0:
         
             # Test sow boar update
-            now             = datetime.now()
-            now_ts          = now.strftime('%Y%m%d_%H%M%S')
+            dt_now          = datetime.now()
+            dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
             
             new_name        = sow_boar_name + now_ts
             new_name        = new_name[0:20]
@@ -1221,8 +1221,8 @@ class TestAPIAccount:
             
         
     def test_sow_boar_dispose(self, user_id, pig_farm_id, sex):
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n###############################  {now_ts}  ####################################################")
         
         
@@ -1251,9 +1251,9 @@ class TestAPIAccount:
         dispose_status_id    = dispose_status_ids[index]
         
         
-        now             = datetime.now()
-        now_dt_s        = now.strftime('%Y-%m-%d')
-        now_ts          = now.strftime('%Y%m%d_%H%M%S')
+        dt_now          = datetime.now()
+        now_dt_s        = dt_now.strftime('%Y-%m-%d')
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         
         url = BASE_URL + 'sow_boar/dispose'
@@ -1285,8 +1285,8 @@ class TestAPIAccount:
         
         
     def test_semen_source(self, user_id, pig_farm_id):
-        now             = datetime.now()
-        now_ts          = now.strftime('%Y-%m-%d %H:%M:%S')
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n###############################  {now_ts}  ####################################################")
         
         

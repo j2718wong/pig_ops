@@ -165,6 +165,67 @@ class PigProduction:
         return None
 
     
+    def add_fattening(self, data = None):
+        """
+        PROCEDURE pig_prod_fattening_add(
+            in_user_id              INT,
+            in_pig_farm_id          INT,
+            
+            in_num_pigs             INT,
+            
+            in_date_weaning         VARCHAR(10)
+        )  
+        """
+        
+        sql =  'CALL pig_prod_fattening_add('
+        sql += '%s,'    % data.user_id        
+        sql += '%s,'    % data.pig_farm_id
+        sql += '%s,'    % data.num_pigs
+        
+        sql += '"%s");'  % data.date_weaning
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'add_fattening(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+
+    
     def update_insemination(self, data = None):
         """
         PROCEDURE pig_prod_update_insem(
@@ -384,25 +445,26 @@ class PigProduction:
         return None
     
     
-    def update_current_count(self, data = None):
+    def update_pig_count(self, data = None):
         """
-        PROCEDURE pig_prod_update_current_count(
-            in_user_id              INT,
-           
+        PROCEDURE pig_prod_update_pig_count(
+            in_user_id              INT,           
             in_pig_prod_id          INT,
             
-            in_num_pigs_female      INT,
-            in_num_pigs_male        INT
+            in_num_pigs             INT,
+            in_date_notes           VARCHAR(10),
+            in_notes                VARCHAR(160)
+
         )  
         """
         
-        sql =  'CALL pig_prod_update_current_count('
-        sql += '%s,'    % data.user_id
-        
+        sql =  'CALL pig_prod_update_pig_count('
+        sql += '%s,'    % data.user_id        
         sql += '%s,'    % data.pig_prod_id
         
-        sql += '%s,'    % data.num_pigs_female
-        sql += '%s);'   % data.num_pigs_male
+        sql += '%s,'    % data.num_pigs
+        sql += '"%s",'   % data.date_notes
+        sql += '"%s");'  % data.notes
        
         
         # Check if still connected to database
@@ -423,7 +485,7 @@ class PigProduction:
             cursor.close()
 
         except Exception as e:
-            msg = 'update_current_count(); error in executing query[] = ' + sql
+            msg = 'update_pig_count(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
