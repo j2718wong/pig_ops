@@ -457,6 +457,7 @@ class SowActivity:
        
         sql =   """
                 SELECT 
+                    a.id,
                     a.farm_prod_id,
                     b.number,
                     b.name AS sow_name,
@@ -489,6 +490,7 @@ class SowActivity:
                     a.num_b_grower,
                     a.num_b_finisher,
                     
+                    d.date_balance,
                     d.num_lactating,
                     d.num_booster,
                     d.num_prestarter,
@@ -536,54 +538,56 @@ class SowActivity:
         if rows is not None:
             
             for row in rows:
-                cur_farm_prod_id        = row[0]                
-                cur_sow_number          = row[1]
-                cur_sow_name            = row[2]
+                cur_id                  = row[0]
+                cur_farm_prod_id        = row[1]
+                cur_sow_number          = row[2]
+                cur_sow_name            = row[3]
                 
-                cur_status_id           = row[3]
-                cur_status_name         = row[4]
+                cur_status_id           = row[4]
+                cur_status_name         = row[5]
                 
-                cur_num_pigs_current    = row[5]               
+                cur_num_pigs_current    = row[6]
                
-                cur_date_actual         = str(row[6])   if row[6]  else None
+                cur_date_actual         = str(row[7])   if row[7]  else None
                 
-                cur_date_iron_1         = str(row[7])   if row[7]  else None
-                cur_date_iron_2         = str(row[8])   if row[8]  else None
-                cur_date_vitamins_1     = str(row[9])   if row[9]  else None
-                cur_date_kapon          = str(row[10])  if row[10] else None
-                cur_date_vitamins_2     = str(row[11])  if row[11] else None
-                cur_date_deworm_1       = str(row[12])  if row[12] else None
+                cur_date_iron_1         = str(row[8])   if row[8]  else None
+                cur_date_iron_2         = str(row[9])   if row[9]  else None
+                cur_date_vitamins_1     = str(row[10])  if row[10]  else None
+                cur_date_kapon          = str(row[11])  if row[11] else None
+                cur_date_vitamins_2     = str(row[12])  if row[12] else None
+                cur_date_deworm_1       = str(row[13])  if row[13] else None
                 
                 
-                cur_date_booster        = str(row[13])  if row[13] else None
-                cur_date_prestarter     = str(row[14])  if row[14] else None
-                cur_date_weaning        = str(row[15])  if row[15] else None
-                cur_date_starter        = str(row[16])  if row[16] else None
-                cur_date_grower         = str(row[17])  if row[17] else None
-                cur_date_finisher       = str(row[18])  if row[18] else None
+                cur_date_booster        = str(row[14])  if row[14] else None
+                cur_date_prestarter     = str(row[15])  if row[15] else None
+                cur_date_weaning        = str(row[16])  if row[16] else None
+                cur_date_starter        = str(row[17])  if row[17] else None
+                cur_date_grower         = str(row[18])  if row[18] else None
+                cur_date_finisher       = str(row[19])  if row[19] else None
                 
-                cur_num_b_lactating     = row[19]
-                cur_num_b_booster       = row[20]
-                cur_num_b_prestarter    = row[21]
-                cur_num_b_starter       = row[22]
-                cur_num_b_grower        = row[23]
-                cur_num_b_finisher      = row[24]
+                cur_num_b_lactating     = row[20]
+                cur_num_b_booster       = row[21]
+                cur_num_b_prestarter    = row[22]
+                cur_num_b_starter       = row[23]
+                cur_num_b_grower        = row[24]
+                cur_num_b_finisher      = row[25]
                 
-                cur_num_l_lactating     = float(row[25]) if row[25] is not None else None
-                cur_num_l_booster       = float(row[26]) if row[26] is not None else None
-                cur_num_l_prestarter    = float(row[27]) if row[27] is not None else None
-                cur_num_l_starter       = float(row[28]) if row[28] is not None else None
-                cur_num_l_grower        = float(row[29]) if row[29] is not None else None
-                cur_num_l_finisher      = float(row[30]) if row[30] is not None else None
+                cur_feed_date_balance   = str(row[26])   if row[26] is not None else None
+                cur_num_l_lactating     = float(row[27]) if row[27] is not None else None
+                cur_num_l_booster       = float(row[28]) if row[28] is not None else None
+                cur_num_l_prestarter    = float(row[29]) if row[29] is not None else None
+                cur_num_l_starter       = float(row[30]) if row[30] is not None else None
+                cur_num_l_grower        = float(row[31]) if row[31] is not None else None
+                cur_num_l_finisher      = float(row[32]) if row[32] is not None else None
                 
-                cur_cost_lactating      = float(row[31]) if row[31] is not None else None
-                cur_cost_booster        = float(row[32]) if row[32] is not None else None
-                cur_cost_prestarter     = float(row[33]) if row[33] is not None else None
-                cur_cost_starter        = float(row[34]) if row[34] is not None else None
-                cur_cost_grower         = float(row[35]) if row[35] is not None else None
-                cur_cost_finisher       = float(row[36]) if row[36] is not None else None
+                cur_cost_lactating      = float(row[33]) if row[33] is not None else None
+                cur_cost_booster        = float(row[34]) if row[34] is not None else None
+                cur_cost_prestarter     = float(row[35]) if row[35] is not None else None
+                cur_cost_starter        = float(row[36]) if row[36] is not None else None
+                cur_cost_grower         = float(row[37]) if row[37] is not None else None
+                cur_cost_finisher       = float(row[38]) if row[38] is not None else None
                 
-                cur_date_harvest        = str(row[37]) if row[37] else None
+                cur_date_harvest        = str(row[39]) if row[39] else None
                 
                 
                 cur_num_c_lactating     = None
@@ -614,17 +618,20 @@ class SowActivity:
                 
                 
                 cur_entry = {
-                    'farm_prod_id':     cur_farm_prod_id,
+                    'pig_prod':{
+                        'id':           cur_id,
+                        'farm_prod_id': cur_farm_prod_id,
+                        
+                        'status_id':    cur_status_id, 
+                        'status':       cur_status_name,
+                    
+                        'num_pigs_current': cur_num_pigs_current
+                    },
                     
                     'sow': {
                         'number':       cur_sow_number,
-                        'name':         cur_sow_name,
+                        'name':         cur_sow_name
                     },
-                    
-                    'status_id':        cur_status_id, 
-                    'status':           cur_status_name,
-                    
-                    'num_pigs_current': cur_num_pigs_current,
                     
                     'dates':{
                         'birth':        cur_date_actual,
@@ -647,6 +654,8 @@ class SowActivity:
                     },
                     
                     'num_feeds': {
+                        'date_balance': cur_feed_date_balance,
+                    
                         'lactating': {
                             'bought':   cur_num_b_lactating,
                             'consumed': cur_num_c_lactating,

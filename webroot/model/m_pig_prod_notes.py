@@ -202,7 +202,6 @@ class PigProdNotes:
                     a.notes,
                     a.dt_entry,
                     
-                    b.username,
                     b.name_last,
                     b.name_first
                 
@@ -252,9 +251,8 @@ class PigProdNotes:
                     },
                     
                     'added_by_user':{
-                        'username':         row[3],
-                        'name_first':       row[4],
-                        'name_last':        row[5]
+                        'name_first':       row[3],
+                        'name_last':        row[4]
                     }
                 }
                 

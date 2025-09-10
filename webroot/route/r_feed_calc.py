@@ -18,14 +18,14 @@ from fastapi.responses      import PlainTextResponse
 
     
 @app.get("/feed_calc/consumption/report", response_class=PlainTextResponse)
-async def feed_calc_consumption_report(uhid:str, pig_farm_hid:str, num_per_prod:int = 5):
+async def feed_calc_consumption_report(uhid:str, pfhid:str, num_per_prod:int = 5):
     """
     Will feed consumption list.
 
     Parameters
     ==========
        
-    pig_farm_hid : str
+    pfhid : str
         pig_farm hashed id
     
     num_per_prod : int
@@ -52,7 +52,7 @@ async def feed_calc_consumption_report(uhid:str, pig_farm_hid:str, num_per_prod:
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(pig_farm_hid)
+    res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
         return {
             'result':{

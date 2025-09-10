@@ -115,7 +115,6 @@ class PigProdPigOps:
                         
                         c.name  AS staff_name,
                         
-                        d.username,
                         d.name_last,
                         d.name_first,
                         a.dt_last_update
@@ -205,10 +204,9 @@ class PigProdPigOps:
                         },
                         
                         'last_update': {
-                            'username':         row[10],
-                            'name_last':        row[11],
-                            'name_first':       row[12],
-                            'dt_update':        str(row[13]) if row[13] else None
+                            'name_last':        row[10],
+                            'name_first':       row[11],
+                            'dt_update':        str(row[12]) if row[12] else None
                         }
                     }
                 

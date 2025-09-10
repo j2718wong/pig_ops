@@ -240,12 +240,10 @@ class AccountPigOps:
                         a.name,
                         a.description,
                         
-                        c.username,
                         c.name_last,
                         c.name_first,
                         a.dt_entry,
                         
-                        d.username,
                         d.name_last,
                         d.name_first,
                         a.dt_last_update
@@ -309,17 +307,15 @@ class AccountPigOps:
                         'desc':                 row[3],
                         
                         'added_by': {
-                            'username':         row[4],
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_entry':         row[7]
+                            'name_last':        row[4],
+                            'name_first':       row[5],
+                            'dt_entry':         row[6]
                         },
                         
                         'last_update':{
-                            'username':         row[8],
-                            'name_last':        row[9],
-                            'name_first':       row[10],
-                            'dt_update':        str(row[11]) if row[11] else None
+                            'name_last':        row[7],
+                            'name_first':       row[8],
+                            'dt_update':        str(row[9]) if row[9] else None
                         }
                     }
                     

@@ -68,17 +68,8 @@ def write_user_flag_bits(user, user_flag):
 
 @app.post("/user/register")
 async def user_register(user_data: dm.DataUser):
-    data = {
-        'username':         user_data.username,
-        'name_last':        user_data.name_last,
-        'name_first':       user_data.name_first,
-        'email':            user_data.email,
-        'password':         user_data.password,
-        'mobile_num':       user_data.mobile_num
-    }
-    
-    
-    res_register    =  model['user'].register(data)
+
+    res_register    =  model['user'].register(user_data)
     
     if res_register is None:
         return {

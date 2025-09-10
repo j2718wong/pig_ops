@@ -115,12 +115,10 @@ class SemenSupplier:
                         
                         a.name,
                         
-                        c.username,
                         c.name_last,
                         c.name_first,
                         a.dt_entry,
                         
-                        d.username,
                         d.name_last,
                         d.name_first,
                         a.dt_last_update
@@ -215,17 +213,15 @@ class SemenSupplier:
                         'name':                 row[5],
                         
                         'added_by': {
-                            'username':         row[6],
-                            'name_last':        row[7],
-                            'name_first':       row[8],
-                            'dt_entry':         row[9]
+                            'name_last':        row[6],
+                            'name_first':       row[7],
+                            'dt_entry':         row[8]
                         },
                         
                         'last_update':{
-                            'username':         row[10],
-                            'name_last':        row[11],
-                            'name_first':       row[12],
-                            'dt_update':        str(row[13]) if row[13] else None
+                            'name_last':        row[9],
+                            'name_first':       row[10],
+                            'dt_update':        str(row[11]) if row[11] else None
                         }
                     }
                 

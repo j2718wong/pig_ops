@@ -320,12 +320,10 @@ class SemenSource:
                         a.name,
                         a.description,
                         
-                        f.username,
                         f.name_last,
                         f.name_first,
                         a.dt_entry,
                         
-                        g.username,
                         g.name_last,
                         g.name_first,
                         a.dt_last_update
@@ -446,17 +444,15 @@ class SemenSource:
                         'description':          row[12],
                         
                         'added_by': {
-                            'username':         row[13],
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_entry':         row[16]
+                            'name_last':        row[13],
+                            'name_first':       row[14],
+                            'dt_entry':         row[15]
                         },
                         
                         'last_update':{
-                            'username':         row[17],
-                            'name_last':        row[18],
-                            'name_first':       row[19],
-                            'dt_update':        str(row[20]) if row[20] else None
+                            'name_last':        row[16],
+                            'name_first':       row[17],
+                            'dt_update':        str(row[18]) if row[18] else None
                         }
                         
                     }

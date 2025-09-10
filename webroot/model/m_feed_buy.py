@@ -181,11 +181,17 @@ class FeedBuy:
         return None
     
       
-    def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, inc_user_audit = 0):
+    def get_list(self, pig_prod_id = 0, pig_prod_group_id = 0, 
+            inc_user_audit = 0, after_date = None):
         
 
         if inc_user_audit == 0: 
             if pig_prod_id > 0:
+                
+                s_after_date = ''
+                if after_date is not None:
+                    s_after_date = ' AND a.date_buy >= "%s"' % after_date
+                
                 sql =   """
                         SELECT 
                             a.id,
@@ -209,13 +215,13 @@ class FeedBuy:
                             a.feed_supplier_id,
                             d.name AS feed_supplier_name
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
-                        WHERE a.pig_prod_id = %s
+                        WHERE a.pig_prod_id = %s %s
                         ORDER BY a.id
-                        """ % pig_prod_id
+                        """ % (pig_prod_id, s_after_date)
                         
             else:
                 
@@ -242,7 +248,7 @@ class FeedBuy:
                             a.feed_supplier_id,
                             d.name AS feed_supplier_name
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -254,6 +260,11 @@ class FeedBuy:
         else:
             
             if pig_prod_id > 0:
+                s_after_date = ''
+                if after_date is not None:
+                    s_after_date = ' AND a.date_buy >= "%s"' % after_date
+                
+                
                 sql =   """
                         SELECT 
                             a.id,
@@ -278,26 +289,24 @@ class FeedBuy:
                             d.name AS feed_supplier_name,
                             
                             
-                            e.username,
                             e.name_last,
                             e.name_first,
                             a.dt_entry,
                             
                             
-                            f.username,
                             f.name_last,
                             f.name_first,
                             a.dt_last_update
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
                         LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
                         LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
-                        WHERE a.pig_prod_id = %s
+                        WHERE a.pig_prod_id = %s %s
                         ORDER BY a.id
-                        """ % pig_prod_id
+                        """ % (pig_prod_id, s_after_date)
                         
             else:
                 
@@ -325,18 +334,16 @@ class FeedBuy:
                             d.name AS feed_supplier_name,
                             
                             
-                            e.username,
                             e.name_last,
                             e.name_first,
                             a.dt_entry,
                             
                             
-                            f.username,
                             f.name_last,
                             f.name_first,
                             a.dt_last_update
                             
-                        FROM pig_prod_feed_buy a 
+                        FROM feed_buy a 
                         LEFT OUTER JOIN feed_type b     ON a.feed_type_id = b.id
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
@@ -437,17 +444,15 @@ class FeedBuy:
                         },
                         
                         'added_by': {
-                            'username':         row[14],
-                            'name_last':        row[15],
-                            'name_first':       row[16],
-                            'dt_entry':         row[17]
+                            'name_last':        row[14],
+                            'name_first':       row[15],
+                            'dt_entry':         row[16]
                         },
                         
                         'last_update':{
-                            'username':         row[18],
-                            'name_last':        row[19],
-                            'name_first':       row[20],
-                            'dt_update':        str(row[21]) if row[21] else None
+                            'name_last':        row[17],
+                            'name_first':       row[18],
+                            'dt_update':        str(row[19]) if row[19] else None
                         }
                     }
                 

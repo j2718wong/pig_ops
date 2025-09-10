@@ -301,17 +301,15 @@ class FeedBalance:
                         },
                         
                         'added_by': {
-                            'username':         row[14],
-                            'name_last':        row[15],
-                            'name_first':       row[16],
-                            'dt_entry':         row[17]
+                            'name_last':        row[14],
+                            'name_first':       row[15],
+                            'dt_entry':         row[16]
                         },
                         
                         'last_update':{
-                            'username':         row[18],
-                            'name_last':        row[19],
-                            'name_first':       row[20],
-                            'dt_update':        str(row[21]) if row[21] else None
+                            'name_last':        row[17],
+                            'name_first':       row[18],
+                            'dt_update':        str(row[19]) if row[19] else None
                         }
                     }
                 

@@ -7,11 +7,9 @@ from pydantic               import BaseModel
 COUNTRY_ID_PHILIPPINES      = 1
 
 class DataUser(BaseModel):
-    username:               str
     name_last:              str
     name_first:             str
     email:                  str
-    password:               str
     country_code:           int = 63    # default to PH
     mobile_num:             str
 
@@ -311,7 +309,7 @@ class DataPigProdFattening(BaseModel):
     num_pigs:               int
     
     date_weaning:           str
-    date_added
+    date_added:             str
     
     
     

@@ -439,12 +439,10 @@ class SowBoar:
                         a.notes,
                         a.dispose_notes,
                         
-                        c.username,
                         c.name_last,
                         c.name_first,
                         a.dt_entry,
                         
-                        d.username,
                         d.name_last,
                         d.name_first,
                         a.dt_last_update
@@ -533,17 +531,15 @@ class SowBoar:
                         'dispose_notes':        row[13],
                         
                         'added_by': {
-                            'username':         row[14],
-                            'name_last':        row[15],
-                            'name_first':       row[16],
-                            'dt_entry':         str(row[17])
+                            'name_last':        row[14],
+                            'name_first':       row[15],
+                            'dt_entry':         str(row[16])
                         },
                         
                         'last_update':{
-                            'username':         row[18],
-                            'name_last':        row[19],
-                            'name_first':       row[20],
-                            'dt_update':        row[21]
+                            'name_last':        row[17],
+                            'name_first':       row[18],
+                            'dt_update':        row[19]
                         }                    
                     }
                     

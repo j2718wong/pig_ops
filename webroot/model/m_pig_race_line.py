@@ -242,12 +242,10 @@ class PigRaceLine:
                         a.name,
                         a.description,
                         
-                        c.username,
                         c.name_last,
                         c.name_first,
                         a.dt_entry,
                         
-                        d.username,
                         d.name_last,
                         d.name_first,
                         a.dt_last_update
@@ -318,20 +316,18 @@ class PigRaceLine:
                         },
                         
                         'name':                 row[3],
-                        'description':         row[4],
+                        'description':          row[4],
                         
                         'added_by': {
-                            'username':         row[5],
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_entry':         row[8]
+                            'name_last':        row[5],
+                            'name_first':       row[6],
+                            'dt_entry':         row[7]
                         },
                         
                         'last_update':{
-                            'username':         row[9],
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_update':        str(row[12]) if row[12] else None
+                            'name_last':        row[8],
+                            'name_first':       row[9],
+                            'dt_update':        str(row[10]) if row[10] else None
                         }
                     }
                 

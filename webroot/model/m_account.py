@@ -302,7 +302,6 @@ class Account:
                     a.name,
                     
                     a.added_by_user_id,
-                    b.username,
                     b.name_last,
                     b.name_first,
                     

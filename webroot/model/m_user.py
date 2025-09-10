@@ -17,7 +17,6 @@ class User:
                     a.account_id,
                     a.flag,
                     a.email,
-                    a.username,
                     a.mobile_num,
                     
                     a.user_group_id,
@@ -69,15 +68,14 @@ class User:
                         'account_id':       row[1],
                         'flag':             row[2],
                         'email':            row[3],
-                        'username':         row[4],
-                        'mobile_num':       row[5],
+                        'mobile_num':       row[4],
                     },
                     
                     'user_group': {
-                        'id':               row[6],
-                        'group_num':        row[7],
-                        'flag_business_obj': row[8],
-                        'name':             row[9]
+                        'id':               row[5],
+                        'group_num':        row[6],
+                        'flag_business_obj': row[7],
+                        'name':             row[8]
                     }
                 }
                     
@@ -91,34 +89,27 @@ class User:
     def register(self, data = None):
         """
         PROCEDURE user_register(
-            in_username             VARCHAR(50),
             in_name_last            VARCHAR(50),
             in_name_first           VARCHAR(50),
     
-            in_email                VARCHAR(50),
-            in_mobile_num           VARCHAR(50),
-            in_password             VARCHAR(200)
+            in_email                VARCHAR(50)
         )  
         """
         
-        username        = data['username']
-        name_last       = data['name_last'].upper()
-        name_first      = data['name_first'].upper()
+
+        name_last       = data.name_last.upper()
+        name_first      = data.name_first.upper()
         
-        email           = data['email'].lower()
-        mobile_num      = data['mobile_num']
-        password        = data['password']
+        email           = data.email.lower()
         
         
         sql =  'CALL user_register('
-        sql += '"%s",'  % username
         sql += '"%s",'  % name_last
         sql += '"%s",'  % name_first
         
         
-        sql += '"%s",'  % email
-        sql += '"%s",'  % mobile_num
-        sql += '"%s");' % password
+        sql += '"%s");'  % email
+
         
         
         # Check if still connected to database
