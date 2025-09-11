@@ -884,3 +884,280 @@ class PigProduction:
         return result
     
     
+    def get_pig_prod_ops_list(self, pig_farm_id,  inc_historical = 0):
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        # Include PROD_STATUS_ID_GESTATING that has already bought up lactating feeds 
+        
+        where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (4, 5, 6)) ' % pig_farm_id
+        where_clause += ' OR (a.pig_farm_id = %s AND a.prod_status_id = 1 AND a.num_b_lactating IS NOT NULL) ' % pig_farm_id
+        
+        if inc_historical > 0:
+            where_clause = 'WHERE (a.pig_farm_id = %s AND a.prod_status_id IN (4,5,6,8,9)) ' % pig_farm_id
+            where_clause += ' OR (a.pig_farm_id = %s AND a.prod_status_id = 1 AND a.num_b_lactating IS NOT NULL) ' % pig_farm_id
+       
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.farm_prod_id,
+                    b.number,
+                    b.name AS sow_name,
+                    
+                    a.prod_status_id,
+                    c.name AS prod_status,
+                    
+                    a.num_pigs_current,
+                    
+                    a.date_actual_birth,
+                    
+                    a.date_iron_1,
+                    a.date_iron_2,
+                    a.date_vitamins_1,
+                    a.date_kapon,
+                    a.date_vitamins_2,
+                    a.date_deworm_1,
+                    
+                    a.date_booster,
+                    a.date_prestarter,
+                    a.date_weaning,
+                    a.date_starter,
+                    a.date_grower,
+                    a.date_finisher,
+                    
+                    a.num_b_lactating,
+                    a.num_b_booster,
+                    a.num_b_prestarter,
+                    a.num_b_starter,
+                    a.num_b_grower,
+                    a.num_b_finisher,
+                    
+                    d.date_balance,
+                    d.num_lactating,
+                    d.num_booster,
+                    d.num_prestarter,
+                    d.num_starter,
+                    d.num_grower,
+                    d.num_finisher,
+                    
+                    a.cost_lactating,
+                    a.cost_booster,
+                    a.cost_prestarter,
+                    a.cost_starter,
+                    a.cost_grower,
+                    a.cost_finisher,
+                    
+                    a.date_harvest
+                    
+                FROM pig_production a
+                LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
+                LEFT OUTER JOIN pig_prod_status c   ON a.prod_status_id = c.id
+                LEFT OUTER JOIN feed_balance d      ON a.last_feed_balance_id = d.id
+                %s
+                ORDER BY a.date_actual_birth DESC
+                """ % where_clause 
+    
+        rows = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'get_pig_prod_ops_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_id                  = row[0]
+                cur_farm_prod_id        = row[1]
+                cur_sow_number          = row[2]
+                cur_sow_name            = row[3]
+                
+                cur_status_id           = row[4]
+                cur_status_name         = row[5]
+                
+                cur_num_pigs_current    = row[6]
+               
+                cur_date_actual         = str(row[7])   if row[7]  else None
+                
+                cur_date_iron_1         = str(row[8])   if row[8]  else None
+                cur_date_iron_2         = str(row[9])   if row[9]  else None
+                cur_date_vitamins_1     = str(row[10])  if row[10]  else None
+                cur_date_kapon          = str(row[11])  if row[11] else None
+                cur_date_vitamins_2     = str(row[12])  if row[12] else None
+                cur_date_deworm_1       = str(row[13])  if row[13] else None
+                
+                
+                cur_date_booster        = str(row[14])  if row[14] else None
+                cur_date_prestarter     = str(row[15])  if row[15] else None
+                cur_date_weaning        = str(row[16])  if row[16] else None
+                cur_date_starter        = str(row[17])  if row[17] else None
+                cur_date_grower         = str(row[18])  if row[18] else None
+                cur_date_finisher       = str(row[19])  if row[19] else None
+                
+                cur_num_b_lactating     = row[20]
+                cur_num_b_booster       = row[21]
+                cur_num_b_prestarter    = row[22]
+                cur_num_b_starter       = row[23]
+                cur_num_b_grower        = row[24]
+                cur_num_b_finisher      = row[25]
+                
+                cur_feed_date_balance   = str(row[26])   if row[26] is not None else None
+                cur_num_l_lactating     = float(row[27]) if row[27] is not None else None
+                cur_num_l_booster       = float(row[28]) if row[28] is not None else None
+                cur_num_l_prestarter    = float(row[29]) if row[29] is not None else None
+                cur_num_l_starter       = float(row[30]) if row[30] is not None else None
+                cur_num_l_grower        = float(row[31]) if row[31] is not None else None
+                cur_num_l_finisher      = float(row[32]) if row[32] is not None else None
+                
+                cur_cost_lactating      = float(row[33]) if row[33] is not None else None
+                cur_cost_booster        = float(row[34]) if row[34] is not None else None
+                cur_cost_prestarter     = float(row[35]) if row[35] is not None else None
+                cur_cost_starter        = float(row[36]) if row[36] is not None else None
+                cur_cost_grower         = float(row[37]) if row[37] is not None else None
+                cur_cost_finisher       = float(row[38]) if row[38] is not None else None
+                
+                cur_date_harvest        = str(row[39]) if row[39] else None
+                
+                
+                cur_num_c_lactating     = None
+                cur_num_c_booster       = None
+                cur_num_c_prestarter    = None
+                cur_num_c_starter       = None
+                cur_num_c_grower        = None
+                cur_num_c_finisher      = None
+            
+            
+                if cur_num_b_lactating is not None and cur_num_l_lactating is not None:
+                    cur_num_c_lactating = float(cur_num_b_lactating) - cur_num_l_lactating
+                
+                if cur_num_b_booster is not None and cur_num_l_booster is not None:
+                    cur_num_c_booster = float(cur_num_b_booster) - cur_num_l_booster
+                
+                if cur_num_b_prestarter is not None and cur_num_l_prestarter is not None:
+                    cur_num_c_prestarter = float(cur_num_b_prestarter) - cur_num_l_prestarter
+                
+                if cur_num_b_starter is not None and cur_num_l_starter is not None:
+                    cur_num_c_starter = float(cur_num_b_starter) - cur_num_l_starter
+                
+                if cur_num_b_grower is not None and cur_num_l_grower is not None:
+                    cur_num_c_grower = float(cur_num_b_grower) - cur_num_l_grower
+                
+                if cur_num_b_finisher is not None and cur_num_l_finisher is not None:
+                    cur_num_c_finisher = float(cur_num_b_finisher) - cur_num_l_finisher
+                
+                
+                cur_entry = {
+                    'pig_prod':{
+                        'id':           cur_id,
+                        'farm_prod_id': cur_farm_prod_id,
+                        
+                        'status_id':    cur_status_id, 
+                        'status':       cur_status_name,
+                    
+                        'num_pigs_current': cur_num_pigs_current
+                    },
+                    
+                    'sow': {
+                        'number':       cur_sow_number,
+                        'name':         cur_sow_name
+                    },
+                    
+                    'dates':{
+                        'birth':        cur_date_actual,
+                        
+                        'iron_1':       cur_date_iron_1,
+                        'iron_2':       cur_date_iron_2,
+                        'vitamins_1':   cur_date_vitamins_1,
+                        'kapon':        cur_date_kapon,
+                        'vitamins_2':   cur_date_vitamins_2,
+                        'deworm_1':     cur_date_deworm_1,
+                        
+                        'booster':      cur_date_booster,
+                        'prestarter':   cur_date_prestarter,
+                        'weaning':      cur_date_weaning,
+                        'starter':      cur_date_starter,
+                        'grower':       cur_date_grower,
+                        'finisher':     cur_date_finisher,
+                        
+                        'harvest':      cur_date_harvest
+                    },
+                    
+                    'num_feeds': {
+                        'date_balance': cur_feed_date_balance,
+                    
+                        'lactating': {
+                            'bought':   cur_num_b_lactating,
+                            'consumed': cur_num_c_lactating,
+                            'left':     cur_num_l_lactating
+                        },
+                        
+                        'booster': {
+                            'bought':   cur_num_b_booster,
+                            'consumed': cur_num_c_booster,
+                            'left':     cur_num_l_booster
+                        },
+                            
+                        'prestarter': {
+                            'bought':   cur_num_b_prestarter,
+                            'consumed': cur_num_c_prestarter,
+                            'left':     cur_num_l_prestarter
+                        },
+                            
+                        'starter': {     
+                            'bought':   cur_num_b_starter,
+                            'consumed': cur_num_c_starter,
+                            'left':     cur_num_l_starter
+                        },
+                        
+                        'grower': {
+                            'bought':   cur_num_b_grower,
+                            'consumed': cur_num_c_grower,
+                            'left':     cur_num_l_grower
+                        },
+                        
+                        'finisher': {    
+                            'bought':   cur_num_b_finisher,
+                            'consumed': cur_num_c_finisher,
+                            'left':     cur_num_l_finisher
+                        }
+                    },
+                    
+                    'cost_feeds': {
+                        'lactating':    cur_cost_lactating,
+                        'booster':      cur_cost_booster,
+                        'prestarter':   cur_cost_prestarter,
+                        'starter':      cur_cost_starter,
+                        'grower':       cur_cost_grower,
+                        'finisher':     cur_cost_finisher
+                    }
+                   
+                }
+                result.append(cur_entry)
+
+        
+        return result
+        
+    
+    
+    def get_insem_info_boar(self, pig_prod_id):
+        test = 1

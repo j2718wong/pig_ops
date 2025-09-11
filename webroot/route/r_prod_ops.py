@@ -143,22 +143,24 @@ class ReportGenProdOps:
         res_list    = model['pig_farm'].get_list(id_list = id_list)
         farm_info   = res_list[0]
         
-        res_prod_ops = model['sow_act'].get_pig_prod_ops_list(pig_farm_id, 
+        res_prod_ops = model['pig_prod'].get_pig_prod_ops_list(pig_farm_id, 
                     inc_historical)
     
         
         
         s  = self._write_report_header(farm_info)
-        s += self._write_gestating_operations(account_id, pig_farm_id)
-        s += self._write_lactating_sows_operations()
+        s += self._write_gestating_operations(account_id, pig_farm_id, inc_historical)
+        s += self._write_lactating_sows_operations(account_id)
         s += self._write_lactating_piglets_operations(res_prod_ops, inc_historical)
         s += self._write_feeding_guide(res_prod_ops, inc_historical)
         s += self._write_feeds_consumed(res_prod_ops, inc_historical)
-        s += self._write_sow_boar_balance(pig_farm_id)
         
         if inc_cost > 0:
             s += self._write_feeds_cost(res_prod_ops, inc_historical)
-    
+        
+        s += self._write_sow_boar_balance(pig_farm_id)
+        
+        
         return s
     
     
@@ -173,12 +175,12 @@ class ReportGenProdOps:
         return s
         
     
-    def _write_gestating_operations(self, account_id, pig_farm_id):
+    def _write_gestating_operations(self, account_id, pig_farm_id, inc_historical):
         acc_pig_ops = model['account_pig_ops'].get_list(account_id, 
                 PIG_OPERATION_TYPE_GESTATING)
         
         list_gestating  = model['sow_act'].get_gestating_operations_list(
-                                        pig_farm_id)
+                            pig_farm_id, inc_historical)
         
         for cur_entry in list_gestating:
             cur_pig_prod_id = cur_entry['id']
@@ -194,7 +196,7 @@ class ReportGenProdOps:
             
         s  = 'GESTA OPERATIONS\n' 
         s += '=================\n'    
-        s += 'PROD_ID  Sow           Date_TAKAL       Type  '
+        s += ' P_ID  Sow           Date_TAKAL       Boar        '
         
         
         max_chars_per_date_col = 15
@@ -219,22 +221,27 @@ class ReportGenProdOps:
         s_temp      = 'DATE_Expected'
         num_chars   = len(s_temp)
         #num_space   = 12 - num_chars
-        
         s +=        s_temp
+        s += '  '
+        
+        
+        
+        
         s += '\n'
+        
         
         
         for cur_entry in list_gestating:
             
             s_temp      = str(cur_entry['farm_prod_id'])
             num_chars   = len(s_temp)
-            num_space   = 7 - num_chars
+            num_space   = 5 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
             
             
-            sow_number  = cur_entry['sow_number']
-            sow_name    = cur_entry['sow_name']
+            sow_number  = cur_entry['sow']['number']
+            sow_name    = cur_entry['sow']['name']
             s_temp      = sow_name if sow_name else sow_number 
             num_chars   = len(s_temp)
             num_space   = 12 - num_chars
@@ -242,7 +249,7 @@ class ReportGenProdOps:
             s           += '  '
             
             
-            date_insem  = cur_entry['date_insemination']
+            date_insem  = cur_entry['insemination']['date']
             dt_insem    = datetime.strptime(date_insem, '%Y-%m-%d')
             delta_d_now = (dt_now - dt_insem).days 
             
@@ -260,9 +267,18 @@ class ReportGenProdOps:
             s           += '  '
             
             
-            s_temp      = cur_entry['insem_type']
+            boar_id         = cur_entry['boar']['id']
+            semen_source_id = cur_entry['semen_source']['id']
+            
+            if boar_id is None:
+                s_temp      = cur_entry['insemination']['type']
+            else:
+                boar_number = cur_entry['boar']['number']
+                boar_name   = cur_entry['boar']['name']
+                s_temp      = boar_name if boar_name else boar_number
+            
             num_chars   = len(s_temp)
-            num_space   = 4 - num_chars
+            num_space   = 10 - num_chars
             s           += s_temp + ' ' * num_space 
             s           += '  '
             
@@ -383,7 +399,7 @@ class ReportGenProdOps:
         
         
         
-        s += 'PROD_ID  Sow           Date_Birth       Baktin  Inject_IRON1   Inject_IRON2    InjVitamins1    InjVitamins2    Kapon           Purga           Date_Lutas \n'
+        s += ' P_ID  Sow           Date_Birth       Pigs  Inject_IRON1   Inject_IRON2    InjVitamins1    InjVitamins2    Kapon           Purga           Date_Lutas \n'
          
         for cur_entry in data:
             pig_prod    = cur_entry['pig_prod']
@@ -395,7 +411,7 @@ class ReportGenProdOps:
             
             s_temp      = str(pig_prod['farm_prod_id'])
             num_chars   = len(s_temp)
-            num_space   = 7 - num_chars
+            num_space   = 5 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
             
@@ -428,7 +444,7 @@ class ReportGenProdOps:
             
             s_temp      = str(num_pigs_current)
             num_chars   = len(s_temp)
-            num_space   = 6 - num_chars
+            num_space   = 4 - num_chars
             s           += ' ' * num_space + s_temp
             s           += '  '
             
@@ -909,7 +925,7 @@ class ReportGenProdOps:
             
             index = 0
             for cur_feed_type in PRODUCTION_FEEDS:
-                res = _write_feed_consumed_type(cur_feed_type, 
+                res = self._write_feeds_consumed_type(cur_feed_type, 
                         cur_entry['num_feeds'], list_feed_bought)
                 
                 s += res[0]
@@ -922,12 +938,12 @@ class ReportGenProdOps:
         s += '\n'
         
         
-        s += '                              Nabilin'
+        s += '                          Balance  '
         s += '   '
         
         s_temp      = str(total_num_pigs)
         num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
+        num_space   = 4 - num_chars
         s           += ' ' * num_space + s_temp
         s           += '   '
         
@@ -947,7 +963,7 @@ class ReportGenProdOps:
         return s
         
 
-    def _write_feed_consumed_type(feed_type_id, data, list_feed_bought):
+    def _write_feeds_consumed_type(self, feed_type_id, data, list_feed_bought):
         s = ''
         
         if feed_type_id == FEED_TYPE_ID_LACTATING:
@@ -991,7 +1007,7 @@ class ReportGenProdOps:
             
             # New bought feeds after last feed balance date 
             new_bought_feeds = None
-            feed_buy    = _get_feed_buy(list_feed_bought, feed_type_id)
+            feed_buy    = self._get_feed_buy(list_feed_bought, feed_type_id)
             if feed_buy is not None:
                 new_bought_feeds = feed_buy['feed_buy']['quantity']
 
@@ -1042,18 +1058,19 @@ class ReportGenProdOps:
         return s, balance_feeds
             
 
-    def _write_feeds_cost(data, inc_historical):
+    def _write_feeds_cost(self, data, inc_historical):
         dt_now      = datetime.now()
         
         
-        s  = 'FEEDS COST                                        LACTA            BOOSTER         PRE_STARTER         STARTER            GROWER          FINISHER    \n'
-        s += '=================                            ===============   ===============   ===============   ===============   ===============  ===============\n'
-        s += ' P_ID   Total_COST   Date_Birth       Pigs   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY        COST  BUY        COST\n'
+        s  = 'FEEDS COST                                        LACTA            BOOSTER         PRE_STARTER         STARTER           GROWER           FINISHER    \n'
+        s += '=================                            ===============   ===============   ===============   ===============   ===============   ===============\n'
+        s += ' P_ID   Total_COST   Date_Birth       Pigs   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY        COST   BUY        COST\n'
        
         
         for cur_entry in data:
+            pig_prod    = cur_entry['pig_prod']
                 
-            s_temp      = str(cur_entry['farm_prod_id'])
+            s_temp      = str(pig_prod['farm_prod_id'])
             num_chars   = len(s_temp)
             num_space   = 5 - num_chars
             s           += ' ' * num_space + s_temp
@@ -1101,7 +1118,7 @@ class ReportGenProdOps:
                 dt_birth    = datetime.strptime(date_birth, '%Y-%m-%d')
                 
                 # Dont compute pig numdays if already ahrvested or closed
-                status_id   = cur_entry['status_id']
+                status_id   = pig_prod['status_id']
                 dt_final    = dt_now
                 if status_id in (PROD_STATUS_ID_HARVESTED, PROD_STATUS_ID_CLOSED):
                     date_harvest    = cur_entry['dates']['harvest']
@@ -1129,7 +1146,7 @@ class ReportGenProdOps:
             
             
             if date_birth is not None:
-                num_pigs_current = cur_entry['num_pigs_current']
+                num_pigs_current = pig_prod['num_pigs_current']
                 
                 s_temp      = str(num_pigs_current)
                 num_chars   = len(s_temp)
@@ -1142,187 +1159,84 @@ class ReportGenProdOps:
             s           += '   '
             
             
-            num_lactating  = cur_entry['num_feeds']['lactating']
-            if num_lactating is not None:
-                    
-                num_bought  = num_lactating['bought']
-                
-                if num_bought is not None and num_bought > 0:
-                    s_temp      = str(num_bought)
-                    num_chars   = len(s_temp)
-                    num_space   = 3 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += '   '
-                s           += '  '
-                
-                if cost_lactating is not None:
-                    s_temp      = f"{cost_lactating:,.1f}"
-                    num_chars   = len(s_temp)
-                    num_space   = 10 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += ' ' * 10
             
-            else:
-                print(fid={cur_entry['id']})
-                s           += 15 * ' '
+            index = 0
+            for cur_feed_type in PRODUCTION_FEEDS:
+                res = self._write_feeds_cost_type(cur_feed_type, 
+                        cur_entry['num_feeds'], cost_feeds)
                 
-            s           += '   '
-            
-            
-            num_booster  = cur_entry['num_feeds']['booster']
-            if num_booster is not None:
-                
-                num_bought  = num_booster['bought']
-                
-                if num_bought is not None and num_bought > 0:
-                    s_temp      = str(num_bought)
-                    num_chars   = len(s_temp)
-                    num_space   = 3 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += '   '
-                    
-                s           += '  '
-                
-                if cost_booster is not None:
-                    s_temp      = f"{cost_booster:,.1f}"
-                    num_chars   = len(s_temp)
-                    num_space   = 10 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += ' ' * 10
-                
-            else:
-                s           += 15 * ' '
-            
-            s           += '   '
-                
-            
-            num_prestarter  = cur_entry['num_feeds']['prestarter']
-            if num_prestarter is not None:
-                    
-                num_bought  = num_prestarter['bought']
-                
-                if num_bought is not None and num_bought > 0:
-                    s_temp      = str(num_bought)
-                    num_chars   = len(s_temp)
-                    num_space   = 3 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += '   '
-                s           += '  '
-                
-                if cost_prestarter is not None:
-                    s_temp      = f"{cost_prestarter:,.1f}"
-                    num_chars   = len(s_temp)
-                    num_space   = 10 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += ' ' * 10
-            
-            else:
-                s           += 15 * ' '
-                
-            s           += '   '
-                
-            
-            num_starter  = cur_entry['num_feeds']['starter']
-            if num_starter is not None:
-                    
-                num_bought  = num_starter['bought']
-                
-                if num_bought is not None and num_bought > 0:
-                    s_temp      = str(num_bought)
-                    num_chars   = len(s_temp)
-                    num_space   = 3 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += '   '
-                
-                s           += '  '
-                
-                if cost_starter is not None:
-                    s_temp      = f"{cost_starter:,.1f}"
-                    num_chars   = len(s_temp)
-                    num_space   = 10 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += ' ' * 10
-            
-            else:
-                s           += 15 * ' '
-                
-            s           += '   '
-                
-            
-            num_grower  = cur_entry['num_feeds']['grower']
-            if num_grower is not None:
-                    
-                num_bought  = num_grower['bought']
-                
-                if num_bought is not None and num_bought > 0:
-                    s_temp      = str(num_bought)
-                    num_chars   = len(s_temp)
-                    num_space   = 3 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += '   '
-                
-                s           += '  '
-                
-                if cost_grower is not None:
-                    s_temp      = f"{cost_grower:,.1f}"
-                    num_chars   = len(s_temp)
-                    num_space   = 10 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += ' ' * 10
-            
-            else:
-                s           += 9 * ' '
-            
-            s           += '   '
-                
-            
-            num_finisher  = cur_entry['num_feeds']['finisher']
-            if num_finisher is not None:
-                    
-                num_bought  = num_finisher['bought']
-                
-                if num_bought is not None and num_bought > 0:
-                    s_temp      = str(num_bought)
-                    num_chars   = len(s_temp)
-                    num_space   = 3 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += '   '
-                
-                s           += '  '
-                
-                if cost_finisher is not None:
-                    s_temp      = f"{cost_finisher:,.1f}"
-                    num_chars   = len(s_temp)
-                    num_space   = 10 - num_chars
-                    s           += ' ' * num_space + s_temp
-                else:
-                    s       += ' ' * 10
-            
-            else:
-                s           += 9 * ' '
-            
-            s           += '   '
-            
+                s += res
+                index += 1
             
             
             s+= '\n'
-
+        
+        s+= '\n\n'
+        
+        return s
+            
+            
+    def _write_feeds_cost_type(self, feed_type_id, data, cost_feeds):
+        s = ''
+        
+        if feed_type_id == FEED_TYPE_ID_LACTATING:
+            data_feed_type = data['lactating']
+            cost_feed_type = cost_feeds['lactating']
+        
+        elif feed_type_id == FEED_TYPE_ID_BOOSTER:
+            data_feed_type = data['booster']
+            cost_feed_type = cost_feeds['booster']
+            
+        elif feed_type_id == FEED_TYPE_ID_PRESTARTER:
+            data_feed_type = data['prestarter']
+            cost_feed_type = cost_feeds['prestarter']
+        
+        elif feed_type_id == FEED_TYPE_ID_STARTER:
+            data_feed_type = data['starter']
+            cost_feed_type = cost_feeds['starter']
+        
+        elif feed_type_id == FEED_TYPE_ID_GROWER:
+            data_feed_type = data['grower']
+            cost_feed_type = cost_feeds['grower']
+        
+        elif feed_type_id == FEED_TYPE_ID_FINISHER:
+            data_feed_type = data['finisher']
+            cost_feed_type = cost_feeds['finisher']
+        
+            
+           
+        if data_feed_type is not None:
+                
+            num_bought  = data_feed_type['bought']
+            
+            if num_bought is not None and num_bought > 0:
+                s_temp      = str(num_bought)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += '   '
+            s           += '  '
+            
+            if cost_feed_type is not None:
+                s_temp      = f"{cost_feed_type:,.1f}"
+                num_chars   = len(s_temp)
+                num_space   = 10 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s       += ' ' * 10
+        
+        else:
+            s           += 15 * ' '
+            
+        s           += '   '
+        
+            
+        
         return s
         
 
-
-    def _write_sow_boar_balance(pig_farm_id):
+    def _write_sow_boar_balance(self, pig_farm_id):
         
         res = model['pig_farm'].get_sow_boar_balance(pig_farm_id)
         
