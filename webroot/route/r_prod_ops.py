@@ -150,7 +150,8 @@ class ReportGenProdOps:
         
         s  = self._write_report_header(farm_info)
         s += self._write_gestating_operations(account_id, pig_farm_id)
-        s += self._write_lactating_operations(res_prod_ops, inc_historical)
+        s += self._write_lactating_sows_operations()
+        s += self._write_lactating_piglets_operations(res_prod_ops, inc_historical)
         s += self._write_feeding_guide(res_prod_ops, inc_historical)
         s += self._write_feeds_consumed(res_prod_ops, inc_historical)
         s += self._write_sow_boar_balance(pig_farm_id)
@@ -313,7 +314,21 @@ class ReportGenProdOps:
         return s 
          
         
-    def _write_lactating_operations(self, data, inc_historical):
+    def _write_lactating_sows_operations(self, account_id):
+        # Check first if there are lactating sow operations set by account
+        
+        acc_pig_ops = model['account_pig_ops'].get_list(account_id, 
+                PIG_OPERATION_TYPE_LACTATING_SOW)
+        
+        if len(acc_pig_ops) == 0:
+            return ''
+        
+        s = ''
+        
+        return s
+        
+        
+    def _write_lactating_piglets_operations(self, data, inc_historical):
         dt_now      = datetime.now()
         
         s  = 'BAKTIN OPERATIONS                        IRON_1   IRON_2   VITA_1   VITA_2    KAPON    PURGA_1   LUTAS\n'
