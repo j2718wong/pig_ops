@@ -23,7 +23,7 @@ import data_model           as dm
 
 PIG_OPERATION_TYPES = [
     PIG_OPERATION_TYPE_GESTATING,
-    PIG_OPERATION_TYPE_LACTATING,
+    PIG_OPERATION_TYPE_LACTATING_PIGLETS,
     PIG_OPERATION_TYPE_GROWING
 ]
 
@@ -71,7 +71,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
             }
             
     
-    if operation_type == PIG_OPERATION_TYPE_LACTATING:
+    if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
         if num_days_since < 0 and num_days_since > 45:
             return {
                 'result':{
@@ -173,7 +173,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
             }
             
     
-    if operation_type == PIG_OPERATION_TYPE_LACTATING:
+    if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
         if num_days_since < 0 and num_days_since > 45:
             return {
                 'result':{

@@ -609,7 +609,7 @@ async def pig_prod_list(pfhid):
         cur_entry['gestating_ops'] = gestating_ops
 
     
-        operation_type  = PIG_OPERATION_TYPE_LACTATING
+        operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
         lactating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
             operation_type, inc_user_audit = 1)
         

@@ -807,7 +807,7 @@ class TestAPIPigProd:
     def _test_prod_lactating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
             after_birth = 1):
         
-        values = (pig_prod_hid, PIG_OPERATION_TYPE_LACTATING)
+        values = (pig_prod_hid, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
         url = BASE_URL + 'pig_prod_pig_ops/list?prod_hid=%s&operation_type=%s' % values
         
         print(f'\n\n****** GET prod_lactating_ops list; url = {url} ')

@@ -69,7 +69,7 @@ SAMPLE_PIG_RACE_LINE = {
 
 
 PIG_OPERATION_TYPE_GESTATING        = 1
-PIG_OPERATION_TYPE_LACTATING        = 2
+PIG_OPERATION_TYPE_LACTATING_PIGLETS        = 2
 PIG_OPERATION_TYPE_GROWING          = 3
 
 
@@ -222,10 +222,10 @@ class TestAPIAccount:
         self.summary['account']['gestating_ops_list'] = 'OK'
         
         
-        self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_LACTATING)
+        self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
         
         print(f'\n\n***** Testing get account_pig_ops; account_id = {account_id}')
-        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_LACTATING)
+        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
         len_items = len(res)
         
         print(f'\n\nAccount lactating_ops; len = {len_items}')
@@ -739,7 +739,7 @@ class TestAPIAccount:
                 "description":      SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
             }
         
-        if operation_type == PIG_OPERATION_TYPE_LACTATING:
+        if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
             data = {
                 "uhid":             user_uhid,
                 "operation_type":   operation_type,
@@ -754,8 +754,8 @@ class TestAPIAccount:
         if operation_type == PIG_OPERATION_TYPE_GESTATING:
             s_type = 'PIG_OPERATION_TYPE_GESTATING'
             
-        elif operation_type == PIG_OPERATION_TYPE_LACTATING:
-            s_type = 'PIG_OPERATION_TYPE_LACTATING'
+        elif operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
+            s_type = 'PIG_OPERATION_TYPE_LACTATING_PIGLETS'
             
         else:
             s_type = 'PIG_OPERATION_TYPE_GROWING'
@@ -823,7 +823,7 @@ class TestAPIAccount:
             }
         
         
-        if operation_type == PIG_OPERATION_TYPE_LACTATING:
+        if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
             data = {
                 "uhid":                     user_uhid,
                 "account_pig_ops_hid":      account_pig_ops_hid,

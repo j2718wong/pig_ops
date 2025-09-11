@@ -187,7 +187,7 @@ class PigFarm:
         return None
         
     
-    def get_list(self, account_id = 0):
+    def get_list(self, account_id = 0, id_list = None):
         """
         Will get pig farm list.
         
@@ -201,9 +201,16 @@ class PigFarm:
         if account_id > 0:
             where_clause = 'account_id = %s' % account_id
         else:
-            
+            s = ''
+            index = 0
             for cur_entry in id_list:
-                test = 1
+                if index > 0: s += ','
+                s += str(cur_entry)
+                index += 1
+                
+        
+            
+            where_clause = 'a.id IN (%s)' % s
             
         sql =   """
                 SELECT 
@@ -219,8 +226,8 @@ class PigFarm:
                     a.longitude
                 FROM pig_farm a
                 LEFT OUTER JOIN app_country b ON a.country_id = b.id
-                WHERE account_id = %s
-                """ % account_id
+                WHERE %s
+                """ % where_clause
         
         
         # Check if still connected to database
@@ -272,9 +279,11 @@ class PigFarm:
                 
                
                 cur_entry = {
-                    'hid':             cur_farm_hashid, 
-                    'flag':             cur_farm_flag,
-                    'name':             cur_farm_name,
+                    'pig_farm': {
+                        'hid':          cur_farm_hashid, 
+                        'flag':         cur_farm_flag,
+                        'name':         cur_farm_name
+                    },
                     
                     'location':{
                         'country': {
