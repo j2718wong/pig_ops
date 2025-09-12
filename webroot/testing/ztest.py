@@ -32,12 +32,17 @@ RANDOM_NAMES = [
 ('Genkei',      'Javier',       'gJavier@gmail.com')]
 
 
-RANDOM_SOW_NAMES = [
+RANDOM_SOW_NAMES_1 = [
 'Soling', 'Sita', 'Kurdapya', 'Imyat', 'Tasing', 'Narsing', 'Medi', 
 'Segunda', 'Berta', 'Osang', 'Petra',  'Nitang',  'Menang', 'Adela',
 'Linda', 'Kikay', 'Diday', 'Puring', 'Bentay', 'Indang'
-
 ]
+
+RANDOM_SOW_NAMES_2 = [
+'Landa', 'Ging2x', 'Agnes', 'Conching'
+]
+
+
 
 RANDOM_BOAR_NAMES = ['Berto', 'Kurdapyo', 'KiKoY', 'Didoy', 'Gorio', 'Desidido',
 'Ondo', 'Juaning', 'Kokoy', 'Dodo', 'Nanding', 'Bitoy'
@@ -1067,7 +1072,8 @@ class TestAPIAccount:
             count += 1
     
     
-    def test_sow_boar_add(self, user_id, pig_farm_id, sex= 'F', skip_flag = 0, 
+    def test_sow_boar_add(self, user_id, pig_farm_id, sex= 'F', is_external = 0,
+            skip_flag = 0, 
             opt_msg = None):
         """
         skip_flag:
@@ -1084,7 +1090,7 @@ class TestAPIAccount:
         
         # Get sow list first for pig farm_name
         if sex =='F':
-            sow_boar_names = RANDOM_SOW_NAMES
+            sow_boar_names = RANDOM_SOW_NAMES_1
             url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=F&order_by=1' 
         else:
             sow_boar_names = RANDOM_BOAR_NAMES
@@ -1152,10 +1158,15 @@ class TestAPIAccount:
           
           "sow_status_id": 2,
           "sex": sex,
+          "is_external": is_external,
           "number": str(sow_boar_number),
           "name": sow_boar_name,
           "date_of_birth": dt_dob_s
         }
+        
+        if is_external > 0:
+            data['number'] =  None
+        
         
         url = BASE_URL + 'sow_boar/add'
         

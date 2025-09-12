@@ -298,6 +298,18 @@ class DataPigProdWeaning(BaseModel):
     total_weight:           int = None
     
     
+class DataPigProdStatus(BaseModel):
+    uhid:                   str
+        
+    pig_prod_hid:           str
+    prod_status_hid:        str
+        
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    prod_status_id:         int = 0    
+    
+    
+    
 class DataPigProdFattening(BaseModel):
     uhid:                   str
         

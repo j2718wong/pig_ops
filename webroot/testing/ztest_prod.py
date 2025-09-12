@@ -115,10 +115,10 @@ class TestAPIPigProd:
         
         count_sow = 0
         
-        INSEM_TYPE_BOAR = 0
-        INSEM_TYPE_AI   = 1
+        INSEM_TYPE_BOAR     = 0
+        INSEM_TYPE_AI       = 1
         
-        cur_insem_type  = INSEM_TYPE_BOAR
+        cur_insem_type      = INSEM_TYPE_BOAR
         
  
         for cur_sow in list_sow:

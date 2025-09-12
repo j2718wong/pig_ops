@@ -435,9 +435,9 @@ class SowActivity:
         return result
     
     
-    def get_gestating_operations_list(self, pig_farm_id, inc_historical = 0):
+    def get_gestating_sow_list(self, pig_farm_id, inc_historical = 0):
         """
-        Will get list of latest sow_farrowing list.
+        Will get list of latest gestating sow list.
         
         
         Returns
@@ -475,12 +475,23 @@ class SowActivity:
                     a.semen_source_id,
                     
                     c.number,
-                    c.name,
-                    c.notes
+                    c.name AS boar_name,
+                    c.notes,
+                    
+                    d.name AS semen_source_name,
+                    d.semen_supplier_id,
+                    e.name AS semen_supplier_name,
+                    
+                    d.boar_id AS semen_source_boar_id,
+                    f.number AS semen_source_boar_num
+                    f.name AS semen_source_boar_name 
                     
                 FROM pig_production a
-                LEFT OUTER JOIN sow_boar     b  ON a.sow_id = b.id
-                LEFT OUTER JOIN sow_boar     c  ON a.boar_id = c.id
+                LEFT OUTER JOIN sow_boar       b    ON a.sow_id = b.id
+                LEFT OUTER JOIN sow_boar       c    ON a.boar_id = c.id
+                LEFT OUTER JOIN semen_source   d    ON a.semen_source_id = d.id
+                LEFT OUTER JOIN semen_supplier e    ON d.semen_supplier_id = e.id
+                LEFT OUTER JOIN sow_boar       f    ON d.boar_id = f.id
                 WHERE a.pig_farm_id = %s AND %s
                 ORDER BY a.date_insemination DESC
                 """ % (pig_farm_id, filter)  
@@ -496,7 +507,7 @@ class SowActivity:
             #conn.close()
             
         except Exception as e:
-            msg = 'get_gestating_operations_list(); error in executing query[] = ' + sql
+            msg = 'get_gestating_sow_list(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -525,6 +536,13 @@ class SowActivity:
                 cur_boar_name           = row[10]
                 cur_boar_notes          = row[11]
                 
+                cur_semen_source_name   = row[12]
+                cur_semen_supplier_id   = row[13]
+                cur_semen_supplier_name = row[14]
+                
+                cur_semen_source_boar_id    = row[15]
+                cur_semen_source_boar_num   = row[16]
+                cur_semen_source_boar_name  = row[17]
                 
                 cur_entry = {
                     'id':               cur_id,
@@ -547,7 +565,21 @@ class SowActivity:
                     },
                     
                     'semen_source': {
-                        'id':           cur_semen_source_id
+                        'id':           cur_semen_source_id,
+                        'name':         cur_semen_source_name,
+                        
+                        'is_external':  1,
+                        
+                        'supplier':{
+                            'id':       cur_semen_supplier_id,
+                            'name':     cur_semen_supplier_name
+                        },
+                        
+                        'boar':{
+                            'id':       cur_semen_source_boar_id,
+                            'number':   cur_semen_source_boar_num,
+                            'name':     cur_semen_source_boar_name,
+                        }
                     },
                     
                     'insemination': {
@@ -556,9 +588,11 @@ class SowActivity:
                     }
                 }
                 
+                if cur_semen_source_boar_id  and cur_semen_source_boar_id > 0:
+                    cur_entry['semen_source']['is_external'] = 0
+                
                 result.append(cur_entry)
 
-        
         return result
     
     

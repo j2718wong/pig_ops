@@ -1,0 +1,15 @@
+
+REPORT_PIG_PROD_OPS = {
+    "gesta_operations": {
+        "col_sow":      "Sow",
+        "col_breeding": "BREEDING",
+        "col_boar":     "Boar"
+    },
+    
+    
+    "piglet_operations":{
+        "piglet_operations":    "PIGLET OPERATIONS",
+        "days_from_birth":      "DAYS FROM BIRTH"
+    }
+
+}

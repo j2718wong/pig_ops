@@ -1,0 +1,15 @@
+
+REPORT_PIG_PROD_OPS = {
+    "gesta_operations": {
+        "col_sow":      "Anay",
+        "col_breeding": "TAKAL",
+        "col_boar":     "Butakal",
+    },
+    
+    
+    "piglet_operations":{
+        "piglet_operations":    "BAKTIN OPERATIONS",
+        "days_from_birth":      "DAYS FROM BIRTH"
+    }
+
+}

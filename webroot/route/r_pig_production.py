@@ -32,7 +32,34 @@ async def pig_prod_status_list():
 
     """
     
-    return model['pig_prod'].get_pig_prod_status_list()
+    res = model['pig_prod'].get_pig_prod_status_list()
+    
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+        
+        
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
     
 
 @app.post("/pig_prod/add")
@@ -278,6 +305,83 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     pig_prod_data.insem_staff_id    = insem_staff_id
     
     res_update    =  model['pig_prod'].update_insemination(pig_prod_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id     = res_update['pig_prod']['id']        
+    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
+    
+   
+    # remove plain id
+    del res_update['pig_prod']['id']
+    res_update['pig_prod']['hid'] = pig_prod_hashid
+
+
+    return res_update
+    
+    
+
+@app.post("/pig_prod/update_status")
+async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
+    uhid    = prod_status_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+
+    pig_prod_hid    = prod_status_data.pig_prod_hid
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    pig_prod_id = res[0]
+
+
+    prod_status_hid = prod_status_data.prod_status_hid
+        
+    res = hashids_common.decrypt(prod_status_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID',
+                'desc': ''
+            }
+        }
+    
+    prod_status_id = res[0]
+    
+    
+
+    prod_status_data.user_id           = user_id
+    prod_status_data.pig_prod_id       = pig_prod_id
+    prod_status_data.prod_status_id    = prod_status_id
+    
+    res_update    =  model['pig_prod'].update_status(prod_status_data)
     
     if res_update is None:
         return {

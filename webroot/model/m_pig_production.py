@@ -301,6 +301,63 @@ class PigProduction:
         return None
 
     
+    def update_status(self, data = None):
+        """
+        PROCEDURE pig_prod_update_status(
+            in_user_id              INT,
+            
+            in_pig_production_id    INT,
+            in_pig_prod_status_id   INT
+        )  
+        """
+        
+        sql =  'CALL pig_prod_update_status('
+        sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.pig_prod_id
+        sql += '%s);'   % data.prod_status_id
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update_birth(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+
+    
     def update_birth(self, data = None):
         """
         PROCEDURE pig_prod_update_birth(
