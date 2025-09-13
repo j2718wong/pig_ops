@@ -50,6 +50,8 @@ NUMDAYS_SINCE_BIRTH_PRESTARTER          = 30
 NUMDAYS_SINCE_BIRTH_STARTER             = 50
 NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
+NUMDAYS_SINCE_BIRTH_TARGET_HARVEST      = 150
+
 
 PRODUCTION_FEEDS = [
     FEED_TYPE_ID_LACTATING,
@@ -61,14 +63,20 @@ PRODUCTION_FEEDS = [
 ]
 
     
-@app.get("/pig_prod_ops/report", response_class=PlainTextResponse)
+@app.get("/pig_prod/ops/report", response_class=PlainTextResponse)
 async def pig_prod_ops_report(uhid:str, pfhid:str, inc_historical: int =0, 
-        inc_cost : int = 0, year:int = None):
+        inc_cost: int = 0, inc_target_harvest: int= 0, year:int = None):
     """
-    Will generate pig_prod_ops report.
+    Will generate pig_prod operations report.
 
     Parameters
     ==========
+    
+    uhid : str
+        user hash id
+        
+    pfhid : str
+        pig farm hash id
        
     inc_historical : int
         if > 0, pig production with status lactating, growing, harvested, 
@@ -77,6 +85,8 @@ async def pig_prod_ops_report(uhid:str, pfhid:str, inc_historical: int =0,
     inc_cost : int
         if > 0, will include feeds cost
         
+    inc_target_harvest : int
+        if > 0, will compute target harvest date
         
     """
     
@@ -120,24 +130,102 @@ async def pig_prod_ops_report(uhid:str, pfhid:str, inc_historical: int =0,
     
     account_id      = res_get['user']['account_id']
     
-    rep_gen = ReportGenProdOps()
-    s = rep_gen.write_report(account_id, pig_farm_id, inc_historical, inc_cost)
+    rep_gen = ReportGenPigProdOps()
+    s = rep_gen.write_report(account_id, pig_farm_id, inc_historical, inc_cost,
+                inc_target_harvest)
         
     
     # Record analytics
     data = {
         'user_id': user_id,
-        'app_function_id': APP_ANALYTICS_ID_REPORT_PIG_OPS
+        'app_function_id': APP_ANALYTICS_ID_REPORT_PIG_PROD_OPERATIONS
     }
     model['app_analytics'].add(data)
     
     return s
     
     
-class ReportGenProdOps:
+@app.get("/pig_prod/weaning/report", response_class=PlainTextResponse)
+async def pig_prod_weaning_report(uhid:str, pfhid:str, inc_historical: int =0):
+    """
+    Will generate pig_prod weaning report.
+
+    Parameters
+    ==========
+    
+    uhid : str
+        user hash id
+        
+    pfhid : str
+        pig farm hash id
+       
+    inc_historical : int
+        if > 0, pig production with status lactating, growing, harvested, 
+        close will be returned
+    
+    """
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_OPS_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
     
     
-    def write_report(self, account_id, pig_farm_id, inc_historical, inc_cost):
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_OPS_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_PROD_OPS_INVALID_PIG_FARM_HASHID',
+                'desc': ''
+            }
+        }
+    
+    pig_farm_id = res[0]
+    
+    
+    res_get = model['user'].get_user_info(user_id)
+    
+    if res_get is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    account_id      = res_get['user']['account_id']
+    
+    rep_gen = ReportGenPigWeaning()
+    s = rep_gen.write_report(account_id, pig_farm_id, inc_historical)
+    
+    return s 
+        
+    # Record analytics
+    data = {
+        'user_id': user_id,
+        'app_function_id': APP_ANALYTICS_ID_REPORT_PIG_PROD_WEANING
+    }
+    model['app_analytics'].add(data)
+
+    return s
+
+    
+    
+class ReportGenPigProdOps:
+    
+    
+    def write_report(self, account_id, pig_farm_id, inc_historical, inc_cost,
+            inc_target_harvest):
         id_list     = [pig_farm_id]
         
         res_list    = model['pig_farm'].get_list(id_list = id_list)
@@ -152,7 +240,7 @@ class ReportGenProdOps:
         s += self._write_gestating_operations(account_id, pig_farm_id, inc_historical)
         s += self._write_lactating_sows_operations(account_id)
         s += self._write_lactating_piglets_operations(res_prod_ops, inc_historical)
-        s += self._write_feeding_guide(res_prod_ops, inc_historical)
+        s += self._write_feeding_guide(res_prod_ops, inc_target_harvest, inc_historical)
         s += self._write_feeds_consumed(res_prod_ops, inc_historical)
         
         if inc_cost > 0:
@@ -171,7 +259,7 @@ class ReportGenProdOps:
         dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
         
         values = (farm_name, dt_now_s)
-        s = 'Pig Operations Report for %s on %s\n\n' % values 
+        s = 'Pig Production Operations Report for %s on %s\n\n' % values 
         return s
         
     
@@ -181,11 +269,13 @@ class ReportGenProdOps:
         acc_pig_ops = model['account_pig_ops'].get_list(account_id, 
                 PIG_OPERATION_TYPE_GESTATING)
         
-        list_gestating_sows  = model['sow_act'].get_gestating_sow_list(
-                            pig_farm_id, inc_historical)
+        len_acc_pig_ops     = len(acc_pig_ops)
+        
+        list_gestating_sows = model['sow_act'].get_production_sow_list(
+                            pig_farm_id, 0, inc_historical)
         
         for cur_entry in list_gestating_sows:
-            cur_pig_prod_id = cur_entry['id']
+            cur_pig_prod_id = cur_entry['pig_prod']['id']
             
             # This is the actual pig operations on the gestating sow.
             list_pig_ops  = model['pig_prod_pig_ops'].get_list(
@@ -203,6 +293,7 @@ class ReportGenProdOps:
         
         
         max_chars_per_date_col = 15
+        
         
         for cur_entry in acc_pig_ops:
             s_temp      = cur_entry['name']
@@ -235,7 +326,7 @@ class ReportGenProdOps:
         
         for cur_entry in list_gestating_sows:
             
-            s_temp      = str(cur_entry['farm_prod_id'])
+            s_temp      = str(cur_entry['pig_prod']['farm_prod_id'])
             num_chars   = len(s_temp)
             num_space   = 5 - num_chars
             s           += ' ' * num_space + s_temp
@@ -319,7 +410,14 @@ class ReportGenProdOps:
                     s           += '  '
             
             
-            s_temp      = cur_entry['date_expected']
+            len_items   = len(cur_gestating_ops)
+            
+            if len_items == 0 and len_acc_pig_ops > 0:
+                num_space   = len_acc_pig_ops * (max_chars_per_date_col + 2)
+                s           += ' ' * num_space 
+                
+            
+            s_temp      = cur_entry['birth']['date_expected']
             num_chars   = len(s_temp)
             num_space   = max_chars_per_date_col - num_chars
             s           += s_temp + ' ' * num_space 
@@ -378,59 +476,9 @@ class ReportGenProdOps:
     def _write_lactating_piglets_operations(self, data, inc_historical):
         dt_now      = datetime.now()
         
-        s  = 'BAKTIN OPERATIONS                        IRON_1   IRON_2   VITA_1   VITA_2    KAPON    PURGA_1   LUTAS\n'
-        s += '=================      ADLAW GIKAN ANAK  '
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_IRON_1)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_IRON_2)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_1)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_VITAMINS_2)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_KAPON)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_INJECT_DEWORM_1)
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_WEANING)
-        num_chars   = len(s_temp)
-        num_space   = 6 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        
-        s           += "\n\n"
-        
-        
-        
-        s += ' P_ID  Sow           Date_Birth       Pigs  Inject_IRON1   Inject_IRON2    InjVitamins1    InjVitamins2    Kapon           Purga           Date_Lutas \n'
+        s  = 'BAKTIN OPERATIONS\n'
+        s += '=================\n'
+        s += ' P_ID  Sow           Date_Birth       Pigs  InjIron1  (3)  InjIron2  (13)  InjVita1  (14)  InjVita2  (21)  Kapon     (22)  Purga     (25)  Date_Lutas(45)\n'
          
         for cur_entry in data:
             pig_prod    = cur_entry['pig_prod']
@@ -626,50 +674,15 @@ class ReportGenProdOps:
         return s
 
         
-    def _write_feeding_guide(self, data, inc_historical):
+    def _write_feeding_guide(self, data, inc_target_harvest, inc_historical):
         dt_now      = datetime.now()
         
         
-        s  = 'PROD FEEDING GUIDE                       BOOSTER   PSTARTER     LUTAS   STARTER    GROWER   FINISHER\n'
-        s += '=====================   ADLAW GIKAN ANAK '
+        s  = 'PROD FEEDING GUIDE\n'
+        s += '===================\n'
+        s += ' P_ID  PROD_Status   Date_Birth       Pigs  Booster   (7)  PreStarter(30)   Date_Lutas(45)  Starter   (50)  Grower    (90)  Finisher         Date_Harvest\n'
         
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_BOOSTER)
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_PRESTARTER)
-        num_chars   = len(s_temp)
-        num_space   = 8 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_WEANING)
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_STARTER)
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-        
-        
-        s_temp      = str(NUMDAYS_SINCE_BIRTH_GROWER)
-        num_chars   = len(s_temp)
-        num_space   = 7 - num_chars
-        s           += ' ' * num_space + s_temp
-        s           += '   '
-
-        s           += "\n\n"
-        
-        
-        s += ' P_ID  PROD_Status   Date_Birth       Pigs  Date_Booster   Date_PreStarter  Date_Lutas      Date_Starter    Date_Grower     Date_Finisher   Date_Harvest\n'
-        
-        for cur_entry in data:
+        for     cur_entry in data:
             pig_prod    = cur_entry['pig_prod']
             status_id   = pig_prod['status_id']
             
@@ -737,7 +750,8 @@ class ReportGenProdOps:
                 else:
                     s       += ' '
             else:
-                dt_booster  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_BOOSTER - DAY_1_STARTS_AT_BIRTH)
+                num_days    = NUMDAYS_SINCE_BIRTH_BOOSTER - DAY_1_STARTS_AT_BIRTH
+                dt_booster  = dt_birth + timedelta(days = num_days)
                 date_booster = datetime.strftime(dt_booster, '%Y-%m-%d')
                
                 s           += f"{date_booster}(P)"
@@ -754,7 +768,8 @@ class ReportGenProdOps:
                 s           += f"({numdays_delta})"
                 s           += '   '
             else:
-                dt_prestarter  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_PRESTARTER - DAY_1_STARTS_AT_BIRTH)
+                num_days    = NUMDAYS_SINCE_BIRTH_PRESTARTER - DAY_1_STARTS_AT_BIRTH
+                dt_prestarter  = dt_birth + timedelta(days = num_days)
                 date_prestarter = datetime.strftime(dt_prestarter, '%Y-%m-%d')
                
                 s           += f"{date_prestarter}(P)"
@@ -771,11 +786,12 @@ class ReportGenProdOps:
                 s           += f"({numdays_delta})"
                 s           += '  '
             else:
-                dt_weaning  = dt_birth + timedelta(days = NUMDAYS_SINCE_BIRTH_WEANING - DAY_1_STARTS_AT_BIRTH)
+                num_days    = NUMDAYS_SINCE_BIRTH_WEANING - DAY_1_STARTS_AT_BIRTH
+                dt_weaning  = dt_birth + timedelta(days = num_days)
                 date_weaning = datetime.strftime(dt_weaning, '%Y-%m-%d')
                
                 s           += f"{date_weaning}(P)"
-                s           += '  '
+                s           += '   '
                 
             
             date_starter    = cur_entry['dates']['starter']
@@ -811,12 +827,15 @@ class ReportGenProdOps:
                 
                 s_temp      = date_finisher
                 s           += s_temp
-                s           += f"({numdays_delta})"            
+                s           += f"({numdays_delta})"
             else:
-                s           += ' ' * 14
+                s           += ' ' * 15
             s           += '  '
             
+            
             date_harvest     = cur_entry['dates']['harvest']
+            
+            
             if date_harvest is not None:
                 dt_harvest   = datetime.strptime(date_harvest, '%Y-%m-%d')
                 numdays_delta = (dt_harvest - dt_birth).days + DAY_1_STARTS_AT_BIRTH
@@ -826,7 +845,21 @@ class ReportGenProdOps:
                 s           += f"({numdays_delta})"
                 s           += '  '
             else:
-                s           += ' ' * 14
+                
+                if inc_target_harvest > 0:
+                    num_days = NUMDAYS_SINCE_BIRTH_TARGET_HARVEST
+                    dt_harvest = dt_birth + timedelta(days = num_days)
+                    date_harvest = datetime.strftime(dt_harvest, '%Y-%m-%d')
+                    
+                    numdays_delta = num_days
+                    
+                    s_temp      = date_harvest
+                    s           += s_temp
+                    s           += f"({numdays_delta}T)"
+                    s           += '  '
+                else:
+            
+                    s           += ' ' * 14
             
             
             
@@ -1333,4 +1366,259 @@ class ReportGenProdOps:
         
         
         
+class ReportGenPigWeaning:
+    
+    def write_report(self, account_id, pig_farm_id, inc_historical):
+        id_list     = [pig_farm_id]
         
+        res_list    = model['pig_farm'].get_list(id_list = id_list)
+        farm_info   = res_list[0]
+        
+        
+        s  = self._write_report_header(farm_info)
+        s += self._write_weaning_list(pig_farm_id, inc_historical)
+        
+        return s
+    
+    
+    def _write_report_header(self, farm_info):
+        farm_name   = farm_info['pig_farm']['name']
+        
+        dt_now      = datetime.now()
+        dt_now_s    = datetime.strftime(dt_now, '%Y-%m-%d')
+        
+        values = (farm_name, dt_now_s)
+        s = 'Pig Production at Weaning Report for %s on %s\n\n' % values 
+        return s
+        
+    
+    
+    def _write_weaning_list(self, pig_farm_id, inc_historical):
+        list_weaning_sows = model['sow_act'].get_production_sow_list(
+                            pig_farm_id, 1, inc_historical)
+    
+        
+        s  = '       PIG PRODUCTION                                                                  Birth                    Wean\n'
+        s += '=======================================                                            ============              ============\n'
+        s += ' P_ID  Sow       Boar      PROD_Status   Date_TAKAL  Expected    Date_Birth  Days   D    M    F  Date_Lutas   D    M    F   Pigs  \n'
+        
+        
+
+        for cur_entry in list_weaning_sows:
+            s_temp      = str(cur_entry['pig_prod']['id'])
+            num_chars   = len(s_temp)
+            num_space   = 5 - num_chars
+            s           += ' ' * num_space + s_temp
+            s           += '  '
+
+            
+            sow_number  = cur_entry['sow']['number']
+            sow_name    = cur_entry['sow']['name']
+            s_temp      = sow_name if sow_name else sow_number 
+            s_temp      = s_temp[0:8]
+            num_chars   = len(s_temp)
+            num_space   = 8 - num_chars
+            s           += s_temp + ' ' * num_space
+            s           += '  '
+            
+            
+            boar_id     = cur_entry['boar']['id']
+            boar_number = cur_entry['boar']['number']
+            boar_name   = cur_entry['boar']['name']
+            
+            if boar_id and boar_id > 0:
+                s_temp  = boar_name if boar_name else boar_number
+            else:
+                s_temp  = cur_entry['insemination']['type']
+                
+            s_temp      = s_temp[0:8]
+            num_chars   = len(s_temp)
+            num_space   = 8 - num_chars
+            s           += s_temp + ' ' * num_space
+            s           += '  '
+                
+                
+            s_temp      = cur_entry['pig_prod']['status_name']
+            num_chars   = len(s_temp)
+            num_space   = 12 - num_chars
+            s           += s_temp + ' ' * num_space 
+            s           += '  '
+            
+            
+            s_temp      = cur_entry['insemination']['date']
+            s           += s_temp 
+            s           += '  '
+            
+            
+            cur_entry_birth = cur_entry['birth']
+            
+            
+            s_temp      = cur_entry_birth['date_expected']
+            s           += s_temp 
+            s           += '  '
+            
+                
+            date_birth  = cur_entry_birth['date_actual']
+            if date_birth is not None:
+                s_temp      = date_birth
+                s           += s_temp 
+            else:
+                s           += ' ' * 10
+            s           += '  '
+            
+            
+            cur_days_actual = cur_entry_birth['num_days_actual']
+            if cur_days_actual is not None and cur_days_actual > 0:
+                s_temp      = str(cur_days_actual)
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += s_temp + ' ' * num_space
+                
+            else:
+                s           += ' ' * 4
+            s           += '  '
+            
+                                      
+            num_pigs_birth  = cur_entry_birth['num_pigs']
+            num_dead        = num_pigs_birth['dead_at_birth']
+            num_male        = num_pigs_birth['live_m']
+            num_female      = num_pigs_birth['live_f']
+            
+            total_pigs_birth = None
+            if num_male is not None and num_female is not None:
+                total_pigs_birth = num_male + num_female
+            
+            if num_dead is not None:
+                s_temp      = str(num_dead)
+                num_chars   = len(s_temp)
+                num_space   = 2 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 2
+                
+            s           += '  '
+                
+            
+            if num_male is not None:
+                s_temp      = str(num_male)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 3
+            
+            s           += '  '
+                
+            
+            if num_female is not None:
+                s_temp      = str(num_female)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 3
+
+            s           += '  '
+            
+            
+            weaning         = cur_entry['weaning']
+            num_dead        = None
+            num_male        = weaning['num_pigs_m']
+            num_female      = weaning['num_pigs_f']
+            
+            total_pigs_wean = None
+            if num_male is not None and num_female is not None:
+                total_pigs_wean = num_male + num_female
+                
+            if total_pigs_birth is not None and total_pigs_wean is not None:
+                num_dead = total_pigs_birth - total_pigs_wean
+                
+            if weaning['date'] is not None:
+                s_temp      = weaning['date']
+                s           += s_temp 
+            else:
+                s           += ' ' * 10
+                
+            s           += '  '
+            
+            
+            if num_dead is not None:
+                s_temp      = str(num_dead)
+                num_chars   = len(s_temp)
+                num_space   = 2 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 2
+            
+            s           += '  '
+            
+            
+            if num_male is not None:
+                s_temp      = str(num_male)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 3
+            
+            s           += '  '
+            
+            
+            if num_female is not None:
+                s_temp      = str(num_female)
+                num_chars   = len(s_temp)
+                num_space   = 3 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 3
+
+            s           += '   '
+            
+            
+            if total_pigs_wean is not None:
+                s_temp      = str(total_pigs_wean)
+                num_chars   = len(s_temp)
+                num_space   = 4 - num_chars
+                s           += ' ' * num_space + s_temp
+            else:
+                s           += ' ' * 4
+            
+            s           += '  '
+            
+            
+            boar_id         = cur_entry['boar']['id']
+            semen_source    = cur_entry['semen_source']
+            semen_source_id = semen_source['id']
+            
+            # Add comments of the semen source if artificial insemination
+            s_temp = ''
+            if semen_source_id is not None:
+                semen_is_external = semen_source['is_external']
+                
+                if semen_is_external > 0:
+                    semen_source_name       = semen_source['name']
+                    semen_source_supplier   = semen_source['supplier']['name']
+                
+                    s_temp = semen_source_name + ' from ' + semen_source_supplier
+                else:
+                    boar_number = semen_source['boar']['number']
+                    boar_name = semen_source['boar']['name']
+                    
+                    s_temp = 'Internal semen from BOAR: '
+                    
+                    if boar_name is not None:
+                        s_temp += boar_name
+                    else:
+                        s_temp += boar_number
+            else:
+                boar_notes = cur_entry['boar']['notes']
+                if boar_notes is not None:
+                    s_temp = boar_notes
+                
+            s += s_temp
+            
+            
+            s           += '\n'
+            
+            
+        return s

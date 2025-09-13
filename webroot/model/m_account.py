@@ -14,7 +14,7 @@ class Account:
         
         sql =   """
                 SELECT 
-                    a.id,,
+                    a.id,
                     a.flag,
                     a.status_id, 
                     b.name AS status_name,
@@ -22,12 +22,15 @@ class Account:
                     a.name,
                     a.date_trial_start,
                     a.date_trial_end,
-                    a.num_bills_paid,
+                    a.flag_settings,
+                    
                     a.farm_id_01,
                     a.farm_id_02,
                     a.farm_id_03,
                     a.farm_id_04,
                     a.farm_id_05,
+                    
+                    a.num_bills_paid,
                     a.last_acc_paid_bill_id,
                     a.dt_entry
                 FROM account a
@@ -221,6 +224,62 @@ class Account:
                     'status_name':      row[7],
                     'dt_trial_start':   row[8],
                     'dt_trial_end':     row[9]
+                }
+            }
+
+        return None
+    
+    
+    def update_settings(self, data = None):
+        """
+        PROCEDURE account_update_settings(
+            in_user_id              INT,
+    
+            in_day_1_on_dob         INT
+        )  
+        """
+        
+        sql =  'CALL account_update_settings('
+        sql += '%s,'    % data.user_id
+        sql += '%s);'   % data.in_day_1_on_dob
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'account': {
+                    'id':               row[3]
                 }
             }
 

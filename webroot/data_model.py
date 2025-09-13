@@ -21,6 +21,12 @@ class DataAccount(BaseModel):
     country_id:             int = COUNTRY_ID_PHILIPPINES
     
 
+class DataAccountSettings(BaseModel):
+    uhid:                   str
+    user_id:                int = 0
+    day_1_on_date_of_birth: int = 0
+
+
 class DataAccountPigOps(BaseModel):
     uhid:                   str
     account_pig_ops_hid:    str = None

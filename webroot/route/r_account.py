@@ -161,6 +161,49 @@ async def account_update(account_data: dm.DataAccount):
         
     return res_update
     
+    
+@app.post("/account/update_settings")
+async def account_update_settings(account_settings_data: dm.DataAccountSettings):
+    uhid    = account_settings_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    user_id = res[0]
+    
+    account_settings_data.user_id    = user_id
+        
+    res_update      =  model['account'].update_settings(account_settings_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    account_id      = res_update['account']['id']
+        
+    account_hashid  = hashids_account.encrypt(account_id)
+    
+    # remove plain id
+    del res_update['account']['id']
+    res_update['account']['hid'] = account_hashid
+
+        
+    return res_update
+    
+    
  
 @app.get("/account/selection")
 async def account_selection(ahid: str, biz_obj_id: int):

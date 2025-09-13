@@ -2,6 +2,7 @@
 # Jack Wong
 
 import pandas       as pd 
+import numpy        as np
 
 from common_constants       import *
 
