@@ -87,6 +87,14 @@ async def feed_calc_consumption_report(uhid:str, pfhid:str, num_per_prod:int = 5
     rep_gen = ReportGenFeedConsumption()
     s = rep_gen.write_report(account_id, pig_farm_id, num_per_prod, inc_historical)
     
+    
+    # Record analytics
+    data = {
+        'user_id': user_id,
+        'app_function_id': APP_ANALYTICS_ID_REPORT_FEED_CONSUMPTION
+    }
+    model['app_analytics'].add(data)
+    
     return s 
     
     

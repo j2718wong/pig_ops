@@ -91,6 +91,7 @@ class SowBoar:
             in_sow_status_id        INT,
             
             in_sex                  CHAR(1),
+            in_is_external          INT,
                     
             in_number               VARCHAR(10),
             in_name                 VARCHAR(20),
@@ -107,6 +108,7 @@ class SowBoar:
         sql += '%s,'    % data.sow_status_id
         
         sql += '"%s",'  % data.sex
+        sql += '%s,'    % data.is_external
         
         if data.number is not None:
             sql += '"%s",'  % data.number
@@ -182,6 +184,7 @@ class SowBoar:
             in_farm_birth_prod_id   INT,
             in_line_id              INT,
             in_sow_status_id        INT,
+            in_is_external          INT,
             
             in_number               VARCHAR(10),
             in_name                 VARCHAR(20),
@@ -196,8 +199,12 @@ class SowBoar:
         sql += '%s,'    % data.farm_birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
+        sql += '%s,'    % data.is_external
         
-        sql += '"%s",'  % data.number
+        if data.number is not None:
+            sql += '"%s",'  % data.number
+        else:
+            sql += 'NULL,'
         
         if data.name is not None:
             sql += '"%s",'    % data.name

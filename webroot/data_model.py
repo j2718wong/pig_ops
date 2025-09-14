@@ -6,6 +6,14 @@ from pydantic               import BaseModel
 
 COUNTRY_ID_PHILIPPINES      = 1
 
+
+class ModelAddress(BaseModel):
+    country_id:             int = 1     # default to PH
+    adrs_level_1_id:        int = 0
+    adrs_level_2_id:        int = 0
+    adrs_level_3_id:        int = 0
+    
+
 class DataUser(BaseModel):
     name_last:              str
     name_first:             str
@@ -27,6 +35,21 @@ class DataAccountSettings(BaseModel):
     day_1_on_date_of_birth: int = 0
 
 
+class DataPigFarm(ModelAddress):
+    uhid:                   str
+    pig_farm_hid:           str = None
+        
+        
+    user_id:                int = 0
+    pig_farm_id:            int = 0
+        
+        
+    name:                   str
+    
+    latitude:               float = None
+    longitude:              float = None
+
+
 class DataAccountPigOps(BaseModel):
     uhid:                   str
     account_pig_ops_hid:    str = None
@@ -41,23 +64,21 @@ class DataAccountPigOps(BaseModel):
     name:                   str
     description:            str = None 
     
-
-class DataPigFarm(BaseModel):
+    
+class DataAccountPigBuyer(ModelAddress):
     uhid:                   str
-    pig_farm_hid:           str = None
+    account_pig_buyer_hid:  str = None
         
         
     user_id:                int = 0
-    pig_farm_id:            int = 0
+    account_pig_buyer_id:   int = 0
         
         
     name:                   str
-    country_id:             int = 1     # default to PH
-    adrs_level_1_id:        int = 0
-    adrs_level_2_id:        int = 0
-    adrs_level_3_id:        int = 0
-    latitude:               float = None
-    longitude:              float = None
+    contact_number:         str = None
+    whatsapp:               str = None
+    messenger:              str = None
+    
     
     
 class DataPigFarmStaff(BaseModel):
@@ -131,7 +152,7 @@ class DataPigRaceLine(BaseModel):
     description:            str =  None
 
 
-class DataSemenSupplier(BaseModel):
+class DataSemenSupplier(ModelAddress):
     uhid:                   str
     semen_supplier_hid:     str = None
         
@@ -140,9 +161,6 @@ class DataSemenSupplier(BaseModel):
     semen_supplier_id:      int = 0
         
         
-    country_id:             int = COUNTRY_ID_PHILIPPINES
-    address_level_1_id:     int
-    address_level_2_id:     int
     name:                   str
 
 
@@ -159,7 +177,7 @@ class DataFeedBrand(BaseModel):
     name:                   str
 
 
-class DataFeedSupplier(BaseModel):
+class DataFeedSupplier(ModelAddress):
     uhid:                   str
     feed_supplier_hid:      str = None
         
@@ -168,9 +186,6 @@ class DataFeedSupplier(BaseModel):
     feed_supplier_id:       int = 0
         
         
-    country_id:             int = COUNTRY_ID_PHILIPPINES
-    address_level_1_id:     int
-    address_level_2_id:     int
     name:                   str
 
 

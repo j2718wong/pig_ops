@@ -208,7 +208,6 @@ async def pig_prod_weaning_report(uhid:str, pfhid:str, inc_historical: int =0):
     rep_gen = ReportGenPigWeaning()
     s = rep_gen.write_report(account_id, pig_farm_id, inc_historical)
     
-    return s 
         
     # Record analytics
     data = {

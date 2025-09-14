@@ -26,6 +26,7 @@ class UserGroup:
                     
                     flag_priv_acc_translation,
                     flag_priv_acc_billing,
+                    flag_priv_acc_pig_buyer,
                     flag_priv_acc_pig_ops,
                     
                     flag_priv_pig_farm,
@@ -38,19 +39,22 @@ class UserGroup:
                     flag_priv_feed_supplier,
                     flag_priv_feed_brand,
                     flag_priv_feed_type,
+                    flag_priv_feed_buy,
+                    flag_priv_feed_balance,
                     
                     flag_priv_sow_boar,
                     flag_priv_semen_source,
                     flag_priv_pig_production,
                     flag_priv_pig_prod_ai,
                     
-                    flag_priv_pig_prod_feed_buy,
-                    flag_priv_feed_balance,
                     
                     flag_priv_pig_prod_pig_ops,
                     flag_priv_pig_prod_pig_dead,
-                    flag_priv_pig_prod_harvest,
                     flag_priv_pig_prod_notes,
+                    flag_priv_pig_prod_harvest,
+                    
+                    
+                    flag_priv_sow_boar_balance,
                     
                     dt_entry
                 FROM user_group
@@ -106,33 +110,36 @@ class UserGroup:
                     
                     'flag_priv_acc_translation': row[9],
                     'flag_priv_acc_billing':    row[10],
-                    'flag_priv_acc_pig_ops':    row[11],
+                    'flag_priv_acc_pig_buyer':  row[11],
+                    'flag_priv_acc_pig_ops':    row[12],
                     
-                    'flag_priv_pig_farm':       row[12],
-                    'flag_priv_pig_farm_staff': row[13], 
-                    'flag_priv_pig_race':       row[14],
-                    'flag_priv_pig_race_line':  row[15],
+                    'flag_priv_pig_farm':       row[13],
+                    'flag_priv_pig_farm_staff': row[14], 
+                    'flag_priv_pig_race':       row[15],
+                    'flag_priv_pig_race_line':  row[16],
                     
-                    'flag_priv_semen_supplier': row[16],
-                    'flag_priv_feed_supplier':  row[17],
-                    'flag_priv_feed_brand':     row[18],
-                    'flag_priv_feed_type':      row[19],
+                    'flag_priv_semen_supplier': row[17],
+                    'flag_priv_feed_supplier':  row[18],
+                    'flag_priv_feed_brand':     row[19],
+                    'flag_priv_feed_type':      row[20],
+                    'flag_priv_feed_buy':       row[21],
+                    'flag_priv_feed_balance':   row[22],
                     
                     
-                    'flag_priv_sow_boar':       row[20],
-                    'flag_priv_semen_source':   row[21],
-                    'flag_priv_pig_production': row[22],
-                    'flag_priv_pig_prod_ai':    row[23],
+                    'flag_priv_sow_boar':       row[23],
+                    'flag_priv_semen_source':   row[24],
+                    'flag_priv_pig_production': row[25],
+                    'flag_priv_pig_prod_ai':    row[26],
                     
-                    'flag_priv_pig_prod_feed_buy':  row[24],
-                    'flag_priv_feed_balance':  row[25],
                     
-                    'flag_priv_pig_prod_pig_ops':   row[26],
-                    'flag_priv_pig_prod_pig_dead':  row[27],
-                    'flag_priv_pig_prod_harvest':   row[28],
+                    'flag_priv_pig_prod_pig_ops':   row[27],
+                    'flag_priv_pig_prod_pig_dead':  row[28],
                     'flag_priv_pig_prod_notes':     row[29],
+                    'flag_priv_pig_prod_harvest':   row[30],
                     
-                    'dt_entry':                 row[30]
+                    'flag_priv_sow_boar_balance':   row[31],
+                    
+                    'dt_entry':                 row[32]
                     
                 }
                     

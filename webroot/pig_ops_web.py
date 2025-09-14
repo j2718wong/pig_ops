@@ -18,6 +18,7 @@ from route.r_pig_farm           import *
 from route.r_pig_farm_staff     import *
 
 from route.r_account_pig_ops    import *
+from route.r_account_pig_buyer  import *
 
 from route.r_pig_race           import *
 from route.r_pig_race_line      import *

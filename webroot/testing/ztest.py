@@ -15,6 +15,7 @@ from common_fast_api        import *
 import requests
 import random
 import json
+import copy
 import pprint
 
 BASE_URL = 'http://localhost:8080/'
@@ -73,9 +74,167 @@ SAMPLE_PIG_RACE_LINE = {
 
 
 
+
+RANDOM_PIG_BUYERS = [
+
+{
+    'name': 'Segundo Facundo Impacto',
+    'adrs_level_1_id':  2,
+    'adrs_level_2_id':  3,
+    'adrs_level_3_id':  3,
+    'contact_number':   '09178888567',
+    'whatsapp':         '0987567898',
+    'messenger':    'Segundo Facundo'
+},
+
+{
+    'name': 'Desidido Muhabal Jr',
+    'adrs_level_1_id':  2,
+    'adrs_level_2_id':  3,
+    'adrs_level_3_id':  5,
+    'contact_number':   '0917123456',
+    'whatsapp':         '0987567000',
+    'messenger':    'Desidido Muhabal'
+},
+
+
+{
+    'name': 'Epitacia U Cabrera',
+    'adrs_level_1_id':  2,
+    'adrs_level_2_id':  3,
+    'adrs_level_3_id':  5,
+    'contact_number':   '091710986',
+    'whatsapp':         '087969000',
+    'messenger':    'Epitacia Cabrera'
+}
+
+
+]
+
+
+
+
 PIG_OPERATION_TYPE_GESTATING        = 1
 PIG_OPERATION_TYPE_LACTATING_PIGLETS        = 2
 PIG_OPERATION_TYPE_GROWING          = 3
+
+class TestBase:
+    def __init__(self, business_object, summary):
+        self.business_object    = business_object
+        
+        self.summary            = summary
+        
+    
+    def test_duplicate_check(self, url, data):
+        values = (self.business_object, url)
+        s = '\n\n***** Testing duplicate adding %s; url = %s; data' %values
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
+        
+        self.summary[self.business_object]['add_duplicate_check'] = 'OK'
+
+
+
+class TestFeedSupplier(TestBase):
+    def __init__(self, summary):
+        self.business_object = 'feed_supplier'
+        super.__init__(self.business_object, summary)
+        
+        self.url_add    = BASE_URL + 'feed_supplier/add'
+        
+    
+    def test_add(self, user_id):
+        user_uhid   = hashids_user.encrypt(user_id)
+        
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"\n\n#################  {dt_now_s}  ###########################")
+        
+            
+        data = {
+            "uhid":         user_uhid,
+            "name":         'Ayan Sampan',
+            "address_level_1_id":   1,
+            "address_level_2_id":   1,
+            "address_level_3_id":   1
+        }
+        
+
+        print(f'***** Testing add {self.business_object}; url = {self.url_add} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(self.url_add, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
+        feed_supplier_hid = res_json['feed_supplier']['hid']
+        data['feed_supplier_hid'] = feed_supplier_hid
+
+        self.summary['feed_supplier']['add'] = 'OK'
+        
+        return data
+        
+        
+    def test_update(self, data):
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'feed_supplier/update'
+        
+        data['name']    = data['name'] + dt_now_s
+              
+        
+        print(f'\n\n*****  Testing update {self.business_object}; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['feed_supplier']['update'] = 'OK'
+        
+        
+        
+    def test_get_list(self):
+        # Test get_list feed_supplier
+        url = BASE_URL + 'feed_supplier/list?adrs_level_2_id=1'
+        
+        print(f'\n\n****** Testing feed_suppler get_list; url = {url} ')
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+    
+        len_items = len(res_json['data'])
+        assert(len_items > 0)
+        
+        self.summary['feed_supplier']['list'] = 'OK'
+    
+
 
 
 class TestAPIAccount:
@@ -109,7 +268,7 @@ class TestAPIAccount:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         
         
@@ -178,7 +337,7 @@ class TestAPIAccount:
         
         data = {
             "uhid":         user_uhid,
-            "name":         acc_name + now_ts
+            "name":         acc_name + dt_now_s
         }
         
         
@@ -259,7 +418,7 @@ class TestAPIAccount:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         url = BASE_URL + 'semen_supplier/add'
             
@@ -310,7 +469,7 @@ class TestAPIAccount:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         url = BASE_URL + 'feed_brand/add'
             
@@ -383,63 +542,19 @@ class TestAPIAccount:
     
     
     def test_feed_supplier(self, user_id):
-        user_uhid   = hashids_user.encrypt(user_id)
+        t = TestFeedSupplier(self.summary)
+        data_input = t.test_add(user_id)
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        t.test_duplicate_check(t.url_add, data_input)
         
-        url = BASE_URL + 'feed_supplier/add'
-            
-        data = {
-            "uhid":         user_uhid,
-            "name":         'Ayan Sampan',
-            "address_level_1_id":   1,
-            "address_level_2_id":   1
-        }
         
-
-        print(f'***** Testing adding feed_supplier; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-
-        self.summary['feed_supplier']['add'] = 'OK'
-        
-    
-        # Test get_list feed_supplier
-        url = BASE_URL + 'feed_supplier/list?inc_deleted=1&inc_user_audit=1'
-        
-        print(f'\n\n****** Testing pig_race_line get_list; url = {url} ')
-        
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-    
-        len_items = len(res_json['data'])
-        assert(len_items > 0)
-        
-        self.summary['feed_supplier']['list'] = 'OK'
-    
         
     def test_pig_farm(self, user_id, farm_name):
         user_uhid   = hashids_user.encrypt(user_id)
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         
         url = BASE_URL + 'pig_farm/add'
@@ -510,7 +625,7 @@ class TestAPIAccount:
         data = {
             "uhid":         user_uhid,
             "pig_farm_hid": farm_hid,
-            "name":         farm_name + now_ts,
+            "name":         farm_name + dt_now_s,
             "adrs_level_1_id": 1,
             "adrs_level_2_id": 2,
             "latitude":     10.262995, 
@@ -543,7 +658,7 @@ class TestAPIAccount:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
         
@@ -632,7 +747,7 @@ class TestAPIAccount:
             "uhid":                 user_uhid,
             "pig_farm_hid":         pig_farm_hid,
             "pig_farm_staff_hid":   pig_farm_staff_hid,
-            "name":                 staff_name + now_ts
+            "name":                 staff_name + dt_now_s
         }
         
         
@@ -661,7 +776,7 @@ class TestAPIAccount:
         data = {
             "uhid":                 user_uhid,
             "pig_farm_hid":         pig_farm_hid,
-            "name":                 staff_name + now_ts
+            "name":                 staff_name + dt_now_s
         }
         
 
@@ -730,7 +845,7 @@ class TestAPIAccount:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         
         url = BASE_URL + 'account_pig_ops/add'
@@ -822,7 +937,7 @@ class TestAPIAccount:
                 "uhid":                     user_uhid,
                 "account_pig_ops_hid":      account_pig_ops_hid,
                 "operation_type":           operation_type,
-                "name":                     SAMPLE_CUSTOMIZED_GESTATING_OPS['name'] + now_ts,
+                "name":                     SAMPLE_CUSTOMIZED_GESTATING_OPS['name'] + dt_now_s,
                 "num_days_since":           SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since'],
                 "description":              SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
             }
@@ -833,7 +948,7 @@ class TestAPIAccount:
                 "uhid":                     user_uhid,
                 "account_pig_ops_hid":      account_pig_ops_hid,
                 "operation_type":           operation_type,
-                "name":                     SAMPLE_CUSTOMIZED_LACTATING_OPS['name'] + now_ts,
+                "name":                     SAMPLE_CUSTOMIZED_LACTATING_OPS['name'] + dt_now_s,
                 "num_days_since":           SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since'],
                 "description":              SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
             }
@@ -870,13 +985,60 @@ class TestAPIAccount:
         
         self.summary['account_pig_ops']['delete'] = 'OK'
         
+        
+    def test_account_pig_buyer(self, user_id):
+        user_uhid       = hashids_user.encrypt(user_id)
+        
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"\n\n#################  {dt_now_s}  ###########################")
+        
+        
+        url = BASE_URL + 'account_pig_buyer/add'
+        
+        index = 0
+        data_to_update = None
+        data_to_delete = None
+        
+        for cur_entry in RANDOM_PIG_BUYERS:
+            data = copy.copy(cur_entry)
+            data['uhid'] = user_uhid
+            
+            
+            print(f'\n\n*****  Testing account_pig_ops add; url = {url} ; data')
+            pprint.pprint(data)
+            
+            r = requests.post(url, json = data)
+            res_text = str(r.text)
+            res_json = json.loads(res_text)
+            
 
+            print(f"\n\nResult; status_code = {r.status_code}; result = ")
+            pprint.pprint(res_json)
+            
+            result_num  = res_json['result']['num']
+            assert(result_num == 0)
+            
+            account_pig_buyer_hid  = res_json['accout_pig_buyer']['hid'] 
+            
+            data['account_pig_buyer_hid'] = account_pig_buyer_hid
+            
+            if index == 1:
+                data_to_update = data
+            
+            if index == 2:
+                data_to_delete = data
+            
+            index += 1
+        
+        
+        
     def test_pig_race_line(self, user_id, account_hid):
         user_uhid   = hashids_user.encrypt(user_id)
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         
 
@@ -955,7 +1117,7 @@ class TestAPIAccount:
             "uhid":                 user_uhid,
             "pig_race_line_hid":    pig_race_line_hid,
             "pig_race_id":          1,
-            "name":                 SAMPLE_PIG_RACE_LINE['name'] + now_ts,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'] + dt_now_s,
             "description":          SAMPLE_PIG_RACE_LINE['description']
         }
         
@@ -985,7 +1147,7 @@ class TestAPIAccount:
         data = {
             "uhid":                 user_uhid,
             "pig_race_id":          1,
-            "name":                 SAMPLE_PIG_RACE_LINE['name'] + now_ts,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'] + dt_now_s,
             "description":          SAMPLE_PIG_RACE_LINE['description']
         }
         
@@ -1082,7 +1244,7 @@ class TestAPIAccount:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
         
         user_uhid   = hashids_user.encrypt(user_id)
@@ -1196,7 +1358,7 @@ class TestAPIAccount:
             dt_now          = datetime.now()
             dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
             
-            new_name        = sow_boar_name + now_ts
+            new_name        = sow_boar_name + dt_now_s
             new_name        = new_name[0:20]
             
             
@@ -1230,11 +1392,10 @@ class TestAPIAccount:
             self.summary['sow_boar']['update'] = 'OK'
             
             
-        
     def test_sow_boar_dispose(self, user_id, pig_farm_id, sex):
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n###############################  {now_ts}  ####################################################")
+        print(f"\n\n###############################  {dt_now_s}  ####################################################")
         
         
         user_uhid   = hashids_user.encrypt(user_id)
@@ -1275,7 +1436,7 @@ class TestAPIAccount:
             
             "dispose_status_id":dispose_status_id,
             "date_dispose":     now_dt_s,
-            "dispose_notes":    "disposed sow boar " + now_ts
+            "dispose_notes":    "disposed sow boar " + dt_now_s
             
         }
         
@@ -1298,7 +1459,7 @@ class TestAPIAccount:
     def test_semen_source(self, user_id, pig_farm_id):
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n###############################  {now_ts}  ####################################################")
+        print(f"\n\n###############################  {dt_now_s}  ####################################################")
         
         
         user_uhid   = hashids_user.encrypt(user_id)
@@ -1460,6 +1621,17 @@ class TestAPIAccount:
         
         
     def test_auto_clean_data(self, user_id, acc_name, farm_name):
+        
+        s =  '\n\n\nTesting on '
+        
+        if USING_PRODUCTION_DB > 0:
+            s += ' PRODUCTION database'
+        else:
+            s += ' DEV database'
+        s += '\n\n'
+            
+        print(s)
+        
         res_register = self.test_account_register(user_id, acc_name)
         account_id  = res_register['account_id']
         account_hid  = res_register['account_hid']
@@ -1469,6 +1641,8 @@ class TestAPIAccount:
         pig_farm_id = res_pig_farm['pig_farm_id']
         self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
         self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
+        
+        self.test_sow_boar_add(user_id, pig_farm_id, sex= 'M', is_external = 1)
         
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')

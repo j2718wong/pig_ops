@@ -45,6 +45,7 @@ from model.m_pig_farm           import PigFarm
 from model.m_pig_farm_staff     import PigFarmStaff
 
 from model.m_account_pig_ops    import AccountPigOps
+from model.m_account_pig_buyer  import AccountPigBuyer
 
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
@@ -88,6 +89,7 @@ model_names = [
     ('pig_farm_staff',          PigFarmStaff),
     
     ('account_pig_ops',         AccountPigOps),
+    ('account_pig_buyer',       AccountPigBuyer),
     
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),
@@ -119,7 +121,7 @@ model_names = [
 ]
 
 
-USING_PRODUCTION_DB             = 1
+USING_PRODUCTION_DB             = 0
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:
