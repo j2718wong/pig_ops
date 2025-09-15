@@ -215,7 +215,6 @@ class TestFeedSupplier(TestBase):
         self.summary['feed_supplier']['update'] = 'OK'
         
         
-        
     def test_get_list(self):
         # Test get_list feed_supplier
         url = BASE_URL + 'feed_supplier/list?adrs_level_2_id=1'
@@ -235,7 +234,66 @@ class TestFeedSupplier(TestBase):
         self.summary['feed_supplier']['list'] = 'OK'
     
 
+class TestSemenSupplier(TestBase):
+    def __init__(self, summary):
+        self.business_object = 'semen_supplier'
+        super.__init__(self.business_object, summary)
+        
+        self.url_add    = BASE_URL + 'semen_supplier/add'
+        
+    
+    def test_add(self, user_id):
+        user_uhid   = hashids_user.encrypt(user_id)
+        
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"\n\n#################  {dt_now_s}  ###########################")
+        
+        url = BASE_URL + 'semen_supplier/add'
+            
+        data = {
+            "uhid":         user_uhid,
+            "name":                 'Growbest Agrivet',
+            "address_level_1_id":   1,
+            "address_level_2_id":   1
+        }
+        
 
+        print(f'***** Testing add {self.business_object}; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+
+        self.summary[self.business_object]['add'] = 'OK'
+        
+    
+    def test_get_list(self):
+        # Test get_list semen_supplier
+        url = BASE_URL + 'semen_supplier/list'
+        
+        print(f'\n\n****** Testing semen_supplier get_list; url = {url} adrs_level_2_id=1')
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+        
+        len_items = len(res_json['data'])
+        assert(len_items > 0)
+        
+        self.summary['semen_supplier']['list'] = 'OK'
+    
+    
 
 class TestAPIAccount:
     def __init__(self):
@@ -547,6 +605,7 @@ class TestAPIAccount:
         
         t.test_duplicate_check(t.url_add, data_input)
         
+        t.test_update(data_input)
         
         
     def test_pig_farm(self, user_id, farm_name):
