@@ -5,23 +5,49 @@
 
 
 /* Alter root password*/
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '0@Root1234.';
-
+ALTER USER 'root'@'localhost' IDENTIFIED  mysql_native_password BY '0@Root1234.';
 
 
 
 /* This is for pig_operations database*/
 
-CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED WITH mysql_native_password BY '1@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED WITH mysql_native_password BY '1@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED WITH mysql_native_password BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED  mysql_native_password BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED  mysql_native_password BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED  mysql_native_password BY '1@PO#db$1234.';
 
-CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED WITH mysql_native_password BY '2@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED WITH mysql_native_password BY '2@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_bkops3'@'localhost' IDENTIFIED WITH mysql_native_password BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED  mysql_native_password BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED  mysql_native_password BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops3'@'localhost' IDENTIFIED  mysql_native_password BY '2@PO#db$1234.';
 
-CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED WITH mysql_native_password BY '3@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED WITH mysql_native_password BY '4@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED  mysql_native_password BY '3@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED  mysql_native_password BY '4@PO#db$1234.';
+
+
+https://www.digitalocean.com/community/tutorials/how-to-reset-your-mysql-or-mariadb-root-password
+
+/* Alter root password*/
+ALTER USER 'root'@'localhost' IDENTIFIED BY '0@Root1234.';
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost';
+
+/* This is for pig_operations database*/
+
+CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web3'@'%'   IDENTIFIED BY '1@PO#db$1234.';
+
+CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops3'@'localhost' IDENTIFIED BY '2@PO#db$1234.';
+
+CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED BY '3@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED BY '4@PO#db$1234.';
+
+
+
+
+
 
 
 
@@ -29,15 +55,16 @@ CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED WITH mysql_native
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web'@'localhost';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web2'@'localhost';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web3'@'localhost';
+GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web3'@'%';
 
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_bkops'@'localhost';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_bkops2'@'localhost';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_bkops3'@'localhost';
 
 
-/* Step 3: Grant privileges to other users*/  
-GRANT ALL PRIVILEGES ON po.* TO 'pops_sched'@'localhost';
-GRANT ALL PRIVILEGES ON po.* TO 'pops_msgr'@'localhost';  
+
+GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_sched'@'localhost';
+GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_msgr'@'localhost';  
 
 FLUSH PRIVILEGES;
 

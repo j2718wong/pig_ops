@@ -121,23 +121,33 @@ model_names = [
 ]
 
 
-USING_PRODUCTION_DB             = 0
+USING_PRODUCTION_DB             = 1
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
     db_desc     = 'Jackson Farm Production'
 
+    credentials_po = {
+        'db_host':      '10.10.2.62',
+        'db_user':      'pops_web3',
+        'db_password':  '1@PO#db$1234.',
+        'database':     DATABASE_NAME_PIG_OPERATIONS
+    }
+
+
+
 else:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_ops_dev'
     db_desc     = 'Jackson PigOps Development' 
+    
+    credentials_po = {
+        'db_host':      '10.10.2.62',
+        'db_user':      'pops_web3',
+        'db_password':  '1@PO#db$1234.',
+        'database':     DATABASE_NAME_PIG_OPERATIONS
+    }
 
-credentials_po = {
-    'db_host':      '127.0.0.1',
-    'db_user':      'pops_web',
-    'db_password':  '1@PO#db$1234.',
-    'database':     DATABASE_NAME_PIG_OPERATIONS
-}
 
 DB_INFO = f"Host: {credentials_po['db_host']}; DB_Desc: {db_desc}"
 
@@ -175,8 +185,8 @@ model = Model(
             database_id     = 1, 
             logger          = logger, 
             credentials     = credentials_po,
-            ssl             = ssl_po,
-            tunnel_settings = ssh_tunnel)
+            ssl             = None,
+            tunnel_settings = None)
 
             
 model.append_models(model_names)
