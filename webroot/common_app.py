@@ -129,41 +129,56 @@ if USING_PRODUCTION_DB > 0:
     db_desc     = 'Jackson Farm Production'
 
     credentials_po = {
-        'db_host':      '10.10.2.62',
+        'db_host':      '127.0.0.1',
         'db_user':      'pops_web',
         'db_password':  '1@PO#db$1234.',
         'database':     DATABASE_NAME_PIG_OPERATIONS
     }
 
+    
+    ssh_tunnel_prod = {
+        'ssh_host':         '10.10.2.62',
+        'ssh_port':         22,
+        'ssh_username':     'dev01',
+        'ssh_password':     '0@DEV12345.',
+        'ssh_pkey':         None,
 
+        'remote_hostname':  '127.0.0.1',
+        'remote_port':      3306,
+        'local_hostname':   '127.0.0.1',
+        'local_port':       3307
+    }
+    
 
 else:
-    DATABASE_NAME_PIG_OPERATIONS = 'pig_ops_dev'
-    db_desc     = 'Jackson PigOps Development' 
-    
+    DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
+    db_desc     = 'Jackson Farm Production'
+
     credentials_po = {
-        'db_host':      '10.10.2.62',
-        'db_user':      'pops_web3',
+        'db_host':      '127.0.0.1',
+        'db_user':      'pops_web',
         'db_password':  '1@PO#db$1234.',
         'database':     DATABASE_NAME_PIG_OPERATIONS
     }
 
+    
+    ssh_tunnel_prod = {
+        'ssh_host':         '10.10.2.62',
+        'ssh_port':         22,
+        'ssh_username':     'dev01',
+        'ssh_password':     '0@DEV12345.',
+        'ssh_pkey':         None,
+
+        'remote_hostname':  '127.0.0.1',
+        'remote_port':      4306,
+        'local_hostname':   '127.0.0.1',
+        'local_port':       3307
+    }
 
 DB_INFO = f"Host: {credentials_po['db_host']}; DB_Desc: {db_desc}"
 
 
-ssh_tunnel_prod = {
-    'ssh_host':         '10.10.2.62',
-    'ssh_port':         22,
-    'ssh_username':     'dev01',
-    'ssh_password':     '0@DEV12345.',
-    'ssh_pkey':         None,
 
-    'remote_hostname':  '127.0.0.1',
-    'remote_port':      3306,
-    'local_hostname':   '127.0.0.1',
-    'local_port':       3307
-}
 
 
 ssl_po = {'ca': None}
