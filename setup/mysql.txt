@@ -23,6 +23,7 @@ CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED  mysql_native_pas
 CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED  mysql_native_password BY '4@PO#db$1234.';
 
 
+/* This is using 10.11.14-MariaDB-0+deb12u2 */
 https://www.digitalocean.com/community/tutorials/how-to-reset-your-mysql-or-mariadb-root-password
 
 /* Alter root password*/
@@ -35,7 +36,10 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost';
 CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED BY '1@PO#db$1234.';
 CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED BY '1@PO#db$1234.';
 CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED BY '1@PO#db$1234.';
+
+CREATE USER IF NOT EXISTS 'pops_web'@'%'   IDENTIFIED BY '1@PO#db$1234.';
 CREATE USER IF NOT EXISTS 'pops_web3'@'%'   IDENTIFIED BY '1@PO#db$1234.';
+
 
 CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED BY '2@PO#db$1234.';
 CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED BY '2@PO#db$1234.';
@@ -55,6 +59,7 @@ CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED BY '4@PO#db$1234.
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web'@'localhost';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web2'@'localhost';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web3'@'localhost';
+GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web'@'%';
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_web3'@'%';
 
 GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_bkops'@'localhost';

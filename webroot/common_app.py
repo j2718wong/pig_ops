@@ -130,7 +130,7 @@ if USING_PRODUCTION_DB > 0:
 
     credentials_po = {
         'db_host':      '10.10.2.62',
-        'db_user':      'pops_web3',
+        'db_user':      'pops_web',
         'db_password':  '1@PO#db$1234.',
         'database':     DATABASE_NAME_PIG_OPERATIONS
     }
@@ -152,12 +152,12 @@ else:
 DB_INFO = f"Host: {credentials_po['db_host']}; DB_Desc: {db_desc}"
 
 
-ssh_tunnel_aws = {
-    'ssh_host':         'ec2-13-250-35-87.ap-southeast-1.compute.amazonaws.com',
+ssh_tunnel_prod = {
+    'ssh_host':         '10.10.2.62',
     'ssh_port':         22,
-    'ssh_username':     'ubuntu',
-    'ssh_password':     None,
-    'ssh_pkey':         'sow_prod_key.pem',
+    'ssh_username':     'dev01',
+    'ssh_password':     '0@DEV12345.',
+    'ssh_pkey':         None,
 
     'remote_hostname':  '127.0.0.1',
     'remote_port':      3306,
@@ -172,13 +172,13 @@ ssl_po = {'ca': None}
 # Read PO_DATABASE_LOC environment variable if there is any.
 # This environment variable is used to control what database to access.
 
-ssh_tunnel = ssh_tunnel_aws
+ssh_tunnel = ssh_tunnel_prod
 try:
     database_loc = os.environ['PO_DATABASE_LOC']
     if database_loc == 'LOCAL':
         ssh_tunnel = None
 except:
-    ssh_tunnel = ssh_tunnel_aws
+    ssh_tunnel = ssh_tunnel_prod
 
 
 model = Model(
@@ -186,7 +186,7 @@ model = Model(
             logger          = logger, 
             credentials     = credentials_po,
             ssl             = None,
-            tunnel_settings = None)
+            tunnel_settings = ssh_tunnel_prod)
 
             
 model.append_models(model_names)
