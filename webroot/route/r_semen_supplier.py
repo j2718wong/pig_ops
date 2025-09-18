@@ -49,7 +49,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     user_id = res[0]
     
     
-    if semen_supplier_data.adrs_level_1_id == 0:
+    if semen_supplier_data.address_level_1_id == 0:
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
@@ -59,7 +59,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
         }
     
     
-    if semen_supplier_data.adrs_level_2_id == 0:
+    if semen_supplier_data.address_level_2_id == 0:
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
@@ -95,10 +95,66 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     return res_add
     
 
+@app.post("/semen_supplier/update")
+async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
+    name    = semen_supplier_data.name
+    uhid    = semen_supplier_data.uhid
+    
+    name    = name.strip() if name else None 
+    
+    if name is None or len(name) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_INVALID_NAME,
+                'code': 'ERROR_SEMEN_SUPPLIER_INVALID_NAME',
+                'desc': ''
+            }
+        }
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_INVALID_USER_HASHID,
+                'code': 'ERROR_SEMEN_SUPPLIER_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    semen_supplier_data.name      = name
+    semen_supplier_data.user_id   = user_id
+    
+    res_add    =  model['semen_supplier'].update(semen_supplier_data)
+    
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    semen_supplier_id    = res_add['semen_supplier']['id']
+    semen_supplier_hid   = hashids_common.encrypt(semen_supplier_id)
+    
+    # remove plain id
+    del res_add['semen_supplier']['id']
+    res_add['semen_supplier']['hid'] = semen_supplier_hid
+
+        
+    return res_add
+    
+
+
    
 @app.get("/semen_supplier/list")
-async def semen_supplier_list(country_id: int = 1, adrs_level_1_id: int = None, 
-        inc_deleted: int = 0, inc_user_audit:int = 0):
+async def semen_supplier_list( address_level_1_id: int):
     """
     Will get semen_supplier list.
     
@@ -116,7 +172,7 @@ async def semen_supplier_list(country_id: int = 1, adrs_level_1_id: int = None,
     """
     
         
-    res = model['semen_supplier'].get_list(country_id, adrs_level_1_id,
+    res = model['semen_supplier'].get_list(country_id, address_level_1_id,
             inc_deleted, inc_user_audit)
     
     if res is None:

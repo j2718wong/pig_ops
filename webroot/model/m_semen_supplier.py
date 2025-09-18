@@ -20,7 +20,10 @@ class SemenSupplier:
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
             
-            in_name                 VARCHAR(50)
+            in_name                 VARCHAR(50),
+            in_contact_number       VARCHAR(20),
+            in_whatsapp             VARCHAR(20),
+            in_messenger            VARCHAR(50)
         )  
         """
         
@@ -36,7 +39,24 @@ class SemenSupplier:
         else:
             sql += 'NULL,'
         
-        sql += '"%s")'  % data.name
+        sql += '"%s",'  % data.name
+        
+        if data.contact_number is not None and len(data.contact_number) > 0:
+            sql += '"%s",'  % data.contact_number
+        else:
+            sql += 'NULL,'
+        
+        if data.whatsapp is not None and len(data.whatsapp) > 0:
+            sql += '"%s",'  % data.whatsapp
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.messenger is not None and len(data.messenger) > 0:
+            sql += '"%s");' % data.messenger
+        else:
+            sql += 'NULL);'
+        
         
         
         # Check if still connected to database
@@ -82,61 +102,112 @@ class SemenSupplier:
 
         return None
     
+    
+    def update(self, data = None):
+        """
+        PROCEDURE semen_supplier_update(
+            in_user_id              INT,
+            
+            in_semen_supplier_id    INT,
+            
+            in_name                 VARCHAR(50),
+            in_contact_number       VARCHAR(20),
+            in_whatsapp             VARCHAR(20),
+            in_messenger            VARCHAR(50)
+        )  
+        """
         
-    def get_list(self, country_id, address_level_1_id = None, 
-            inc_deleted = 0, inc_user_audit = 0):
+        sql =  'CALL semen_supplier_add('
+        sql += '%s,'    % data.user_id
         
-        where_clause = 'WHERE a.country_id = %s ' % country_id
-        if address_level_1_id is not None:
-            where_clause += ' AND address_level_1_id = %s ' %  address_level_1_id
-                
-        if inc_deleted == 0:
-            where_clause += 'AND (a.flag & 1) = 0'  
+        sql += '%s,'    % data.semen_supplier_id
         
+        sql += '"%s",'  % data.name
         
-        if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.country_id,
-                        b.name AS country_name,
-                        a.address_level_1_id,
-                        a.address_level_2_id,
-                        
-                        a.name,
-                        a.dt_entry
-                    FROM semen_supplier a 
-                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
+        if data.contact_number is not None and len(data.contact_number) > 0:
+            sql += '"%s",'  % data.contact_number
         else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.country_id,
-                        b.name AS country_name,
-                        a.address_level_1_id,
-                        a.address_level_2_id,
-                        
-                        a.name,
-                        
-                        c.name_last,
-                        c.name_first,
-                        a.dt_entry,
-                        
-                        d.name_last,
-                        d.name_first,
-                        a.dt_last_update
-                        
-                    FROM semen_supplier a 
-                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+            sql += 'NULL,'
+        
+        if data.whatsapp is not None and len(data.whatsapp) > 0:
+            sql += '"%s",'  % data.whatsapp
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.messenger is not None and len(data.messenger) > 0:
+            sql += '"%s");' % data.messenger
+        else:
+            sql += 'NULL);'
+        
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
                 
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
+                'semen_supplier': {
+                    'id':               row[3],
+                    'flag':             row[4],
+                    'name':             row[5]
+                }
+            }
+
+        return None
+    
+
+    def get_list(self, address_level_1_id):
+        
+       
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.name,
+                    a.contact_number,
+                    a.whatsapp,
+                    a.messenger,
+                    
+                    a.country_id,
+                    b.name AS country_name,
+                    a.address_level_1_id,
+                    a.address_level_2_id,
+                    a.address_level_3_id
+                    
+                FROM semen_supplier a 
+                LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                WHERE a.address_level_1_id = %s
+                ORDER BY a.name
+                """ % address_level_1_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -169,67 +240,39 @@ class SemenSupplier:
         if rows is not None:
             
             for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'id':                   row[0],
-                        
-                        'location':{
-                            
-                            'country': {
-                                'id':           row[1],
-                                'name':         row[2]
-                            },
-                            
-                            'address': {
-                                'level_1':{
-                                    'id':       row[3]
-                                },
-                            
-                                'level_2':{
-                                    'id':       row[4]
-                                }
-                            }
-                        },
-                        
-                        'name':                 row[5],
-                        
-                        'dt_entry':             str(row[6])
-                    }
+                cur_entry = {
+                    'semen_supplier'{
+                        'id':               row[0],
+                        'name':             row[1],
+                        'contact_number':   row[2],
+                        'whatsapp':         row[3],
+                        'messenger':        row[4]
+                    },
                     
-                else:
-                    cur_entry = {
-                        'id':                   row[0],
+                    'location':{
                         
-                        'location':{
-                            
-                            'country': {
-                                'id':           row[1],
-                                'name':         row[2]
+                        'country': {
+                            'id':           row[5],
+                            'name':         row[6]
+                        },
+                        
+                        'address': {
+                            'level_1':{
+                                'id':       row[7]
+                            },
+                        
+                            'level_2':{
+                                'id':       row[8]
                             },
                             
-                            'address_level_1':{
-                                'id':           row[3]
-                            },
-                            
-                            'address_level_2':{
-                                'id':           row[4]
+                            'level_3':{
+                                'id':       row[8]
                             }
-                        },
-                        
-                        'name':                 row[5],
-                        
-                        'added_by': {
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_entry':         row[8]
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[9],
-                            'name_first':       row[10],
-                            'dt_update':        str(row[11]) if row[11] else None
+                            
                         }
                     }
+                }
+                    
                 
                     
                 result.append(cur_entry)

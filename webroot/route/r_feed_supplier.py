@@ -75,29 +75,78 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     return res_add
     
 
+@app.post("/feed_supplier/update")
+async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
+    name    = feed_supplier_data.name
+    uhid    = feed_supplier_data.uhid
+    
+    name    = name.strip() if name else None 
+    
+    if name is None or len(name) == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_SUPPLIER_INVALID_NAME,
+                'code': 'ERROR_FEED_SUPPLIER_INVALID_NAME',
+                'desc': ''
+            }
+        }
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_SUPPLIER_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_SUPPLIER_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    feed_supplier_data.name      = name
+    feed_supplier_data.user_id   = user_id
+    
+    res_update      =  model['feed_supplier'].update(feed_supplier_data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    feed_supplier_id    = res_update['feed_supplier']['id']
+    feed_supplier_hid   = hashids_common.encrypt(feed_supplier_id)
+    
+    # remove plain id
+    del res_update['feed_supplier']['id']
+    res_update['feed_supplier']['hid'] = feed_supplier_hid
+
+        
+    return res_update
+    
+
    
 @app.get("/feed_supplier/list")
-async def feed_supplier_list(country_id: int = 1, adrs_level_1_id: int = None, 
-        inc_deleted: int = 0, inc_user_audit:int = 0):
+async def feed_supplier_list(address_level_2_id: int):
     """
     Will get feed_supplier list.
     
     Parameters
     ----------
     
-    country_id:int
-        country_id
+    address_level_2_id:int
+        address_level_2_id
 
-    inc_deleted: int
-        if > 0, will include deleted entries
-    
-    inc_user_audit:
-        if > 0, will include added_by and last_update info
     """
     
         
-    res = model['feed_supplier'].get_list(country_id, adrs_level_1_id,
-            inc_deleted, inc_user_audit)
+    res = model['feed_supplier'].get_list(address_level_2_id)
     
     if res is None:
         return {

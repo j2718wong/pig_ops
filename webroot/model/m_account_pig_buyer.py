@@ -16,9 +16,9 @@ class AccountPigBuyer:
             in_user_id              INT,
     
             in_country_id           INT,
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
+            in_address_level_1_id      INT,
+            in_address_level_2_id      INT,
+            in_address_level_3_id      INT,
             
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
@@ -31,9 +31,9 @@ class AccountPigBuyer:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
+        sql += '%s,'    % data.address_level_1_id
+        sql += '%s,'    % data.address_level_2_id
+        sql += '%s,'    % data.address_level_3_id
         
         
         sql += '"%s",'  % data.name
@@ -106,9 +106,9 @@ class AccountPigBuyer:
             in_account_pig_buyer_id INT,
     
             in_country_id           INT,
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
+            in_address_level_1_id      INT,
+            in_address_level_2_id      INT,
+            in_address_level_3_id      INT,
             
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
@@ -123,9 +123,9 @@ class AccountPigBuyer:
         sql += '%s,'    % data.account_pig_buyer_id
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
+        sql += '%s,'    % data.address_level_1_id
+        sql += '%s,'    % data.address_level_2_id
+        sql += '%s,'    % data.address_level_3_id
         
         
         sql += '"%s",'  % data.name
@@ -265,9 +265,9 @@ class AccountPigBuyer:
                         a.country_id,
                         b.name AS country_name,
                         
-                        a.adrs_level_1_id,
-                        a.adrs_level_2_id,
-                        a.adrs_level_3_id,
+                        a.address_level_1_id,
+                        a.address_level_2_id,
+                        a.address_level_3_id,
                         
                         a.name,
                         a.contact_number,
@@ -287,9 +287,9 @@ class AccountPigBuyer:
                         a.country_id,
                         b.name,
                         
-                        a.adrs_level_1_id,
-                        a.adrs_level_2_id,
-                        a.adrs_level_3_id,
+                        a.address_level_1_id,
+                        a.address_level_2_id,
+                        a.address_level_3_id,
                         
                         a.name,
                         a.contact_number,
@@ -351,9 +351,9 @@ class AccountPigBuyer:
                 cur_country_id          = row[1]
                 cur_country_name        = row[2]
                 
-                cur_adrs_level_1_id     = row[3]
-                cur_adrs_level_2_id     = row[4]
-                cur_adrs_level_3_id     = row[5]
+                cur_address_level_1_id     = row[3]
+                cur_address_level_2_id     = row[4]
+                cur_address_level_3_id     = row[5]
                 
                 cur_name                = row[6]
                 cur_contact_number      = row[7]
@@ -382,15 +382,15 @@ class AccountPigBuyer:
                             
                             'address':{
                                 'level_1':  {
-                                    'id':   cur_farm_adrs_level_1_id
+                                    'id':   cur_farm_address_level_1_id
                                 },
                                 
                                 'level_2':  {
-                                    'id':   cur_farm_adrs_level_2_id
+                                    'id':   cur_farm_address_level_2_id
                                 },
                                 
                                 'level_3_id': {
-                                    'id':   cur_farm_adrs_level_3_id
+                                    'id':   cur_farm_address_level_3_id
                                 }
                             }
                         }
@@ -417,15 +417,15 @@ class AccountPigBuyer:
                             
                             'address':{
                                 'level_1':  {
-                                    'id':   cur_farm_adrs_level_1_id
+                                    'id':   cur_farm_address_level_1_id
                                 },
                                 
                                 'level_2':  {
-                                    'id':   cur_farm_adrs_level_2_id
+                                    'id':   cur_farm_address_level_2_id
                                 },
                                 
                                 'level_3_id': {
-                                    'id':   cur_farm_adrs_level_3_id
+                                    'id':   cur_farm_address_level_3_id
                                 }
                             }
                         },

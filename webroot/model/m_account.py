@@ -365,9 +365,9 @@ class Account:
                     b.name_first,
                     
                     a.country_id,
-                    a.adrs_level_1_id,
-                    a.adrs_level_2_id,
-                    a.adrs_level_3_id,
+                    a.address_level_1_id,
+                    a.address_level_2_id,
+                    a.address_level_3_id,
                     a.latitude,
                     a.longitude
                 FROM pig_farm a

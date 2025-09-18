@@ -85,8 +85,9 @@ class FeedSupplier:
             in_user_id              INT,
             
             in_feed_supplier_id     INT,
-
-            in_adrs_level_3_id      INT,
+            
+            in_address_level_2_id   INT,
+            in_address_level_3_id   INT,
             
             in_name                 VARCHAR(50)
         )  
@@ -96,7 +97,8 @@ class FeedSupplier:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.in_feed_supplier_id
-
+        
+        sql += '%s,'    % data.address_level_2_id
         sql += '%s,'    % data.address_level_3_id
         
         sql += '"%s")'  % data.name
@@ -146,7 +148,6 @@ class FeedSupplier:
         return None
     
     
-        
     def get_list(self, address_level_2_id):
        
         sql =   """

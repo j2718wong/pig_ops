@@ -7,12 +7,20 @@ from pydantic               import BaseModel
 COUNTRY_ID_PHILIPPINES      = 1
 
 
-class ModelAddress(BaseModel):
+class HasAddressLevel:
     country_id:             int = 1     # default to PH
-    adrs_level_1_id:        int = 0
-    adrs_level_2_id:        int = 0
-    adrs_level_3_id:        int = 0
+    address_level_1_id:     int = 0
+    address_level_2_id:     int = 0
+    address_level_3_id:     int = 0
     
+    
+class HasContactDetails:
+    contact_number:         str = None
+    whatsapp:               str = None
+    messenger:              str = None
+    
+
+
 
 class DataUser(BaseModel):
     name_last:              str
@@ -35,7 +43,7 @@ class DataAccountSettings(BaseModel):
     day_1_on_date_of_birth: int = 0
 
 
-class DataPigFarm(ModelAddress):
+class DataPigFarm(BaseModel, HasAddressLevel):
     uhid:                   str
     pig_farm_hid:           str = None
         
@@ -65,7 +73,7 @@ class DataAccountPigOps(BaseModel):
     description:            str = None 
     
     
-class DataAccountPigBuyer(ModelAddress):
+class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
     uhid:                   str
     account_pig_buyer_hid:  str = None
         
@@ -152,7 +160,7 @@ class DataPigRaceLine(BaseModel):
     description:            str =  None
 
 
-class DataSemenSupplier(ModelAddress):
+class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):
     uhid:                   str
     semen_supplier_hid:     str = None
         
@@ -177,7 +185,7 @@ class DataFeedBrand(BaseModel):
     name:                   str
 
 
-class DataFeedSupplier(ModelAddress):
+class DataFeedSupplier(BaseModel, HasAddressLevel, HasContactDetails):
     uhid:                   str
     feed_supplier_hid:      str = None
         

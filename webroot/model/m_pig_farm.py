@@ -18,9 +18,9 @@ class PigFarm:
             in_name                 VARCHAR(50),
             
             in_country_id           INT, 
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
+            in_address_level_1_id      INT,
+            in_address_level_2_id      INT,
+            in_address_level_3_id      INT,
             in_latitude             DECIMAL(10,5),
             in_longitude            DECIMAL(10,5)
         )  
@@ -31,11 +31,11 @@ class PigFarm:
         sql += '"%s",'  % data.name
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
+        sql += '%s,'    % data.address_level_1_id
+        sql += '%s,'    % data.address_level_2_id
+        sql += '%s,'    % data.address_level_3_id
         
-        if data.latitude is not None:
+        if data.latitude is not None:   
             sql += '%s,'    % data.latitude
         else:
             sql += 'NULL,'
@@ -114,9 +114,9 @@ class PigFarm:
             in_name                 VARCHAR(50),
             
             in_country_id           INT, 
-            in_adrs_level_1_id      INT,
-            in_adrs_level_2_id      INT,
-            in_adrs_level_3_id      INT,
+            in_address_level_1_id      INT,
+            in_address_level_2_id      INT,
+            in_address_level_3_id      INT,
             in_latitude             DECIMAL(10,5),
             in_longitude            DECIMAL(10,5)
         )
@@ -128,9 +128,9 @@ class PigFarm:
         sql += '"%s",'  % data.name
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.adrs_level_1_id
-        sql += '%s,'    % data.adrs_level_2_id
-        sql += '%s,'    % data.adrs_level_3_id
+        sql += '%s,'    % data.address_level_1_id
+        sql += '%s,'    % data.address_level_2_id
+        sql += '%s,'    % data.address_level_3_id
         
         if data.latitude is not None:
             sql += '%s,'    % data.latitude
@@ -219,9 +219,9 @@ class PigFarm:
                     a.name,
                     a.country_id,
                     b.name AS country_name,
-                    a.adrs_level_1_id,
-                    a.adrs_level_2_id,
-                    a.adrs_level_3_id,
+                    a.address_level_1_id,
+                    a.address_level_2_id,
+                    a.address_level_3_id,
                     a.latitude,
                     a.longitude
                 FROM pig_farm a
@@ -271,9 +271,9 @@ class PigFarm:
                 cur_country_id          = row[3]
                 cur_country_name        = row[4]
                 
-                cur_farm_adrs_level_1_id= row[5]
-                cur_farm_adrs_level_2_id= row[6]
-                cur_farm_adrs_level_3_id= row[7]
+                cur_farm_address_level_1_id= row[5]
+                cur_farm_address_level_2_id= row[6]
+                cur_farm_address_level_3_id= row[7]
                 cur_farm_latitude       = float(row[8]) if row[8] else None
                 cur_farm_longitude      = float(row[9]) if row[9] else None
                 
@@ -293,15 +293,15 @@ class PigFarm:
                         
                         'address':{
                             'level_1':  {
-                                'id':   cur_farm_adrs_level_1_id
+                                'id':   cur_farm_address_level_1_id
                             },
                             
                             'level_2':  {
-                                'id':   cur_farm_adrs_level_2_id
+                                'id':   cur_farm_address_level_2_id
                             },
                             
                             'level_3_id': {
-                                'id':   cur_farm_adrs_level_3_id
+                                'id':   cur_farm_address_level_3_id
                             }
                         },
                         
