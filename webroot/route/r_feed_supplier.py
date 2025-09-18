@@ -76,7 +76,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     
 
 @app.post("/feed_supplier/update")
-async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
+async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     name    = feed_supplier_data.name
     uhid    = feed_supplier_data.uhid
     

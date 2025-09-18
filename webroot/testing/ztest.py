@@ -289,6 +289,32 @@ class TestSemenSupplier(TestBase):
         return data
         
     
+    def test_update(self, data):
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        url = BASE_URL + 'semen_supplier/update'
+        
+        data['name']    = data['name'] + dt_now_s
+              
+        
+        print(f'\n\n*****  Testing update {self.business_object}; url = {url} ; data')
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['semen_supplier']['update'] = 'OK'
+    
+    
+    
     def test_get_list(self):
         # Test get_list semen_supplier
         url = BASE_URL + 'semen_supplier/list'
@@ -494,8 +520,12 @@ class TestAPIAccount:
         
         t.test_duplicate_check(t.url_add, data_input)
         
-        #t.test_update(data_input)
+        t.test_update(data_input)
         
+        
+        address_level_1_id = ADRS_LEVEL_2_ID_CEBU
+        t.test_get_list(address_level_1_id)
+
 
     def test_feed_brand(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)

@@ -241,7 +241,7 @@ class SemenSupplier:
             
             for row in rows:
                 cur_entry = {
-                    'semen_supplier'{
+                    'semen_supplier': {
                         'id':               row[0],
                         'name':             row[1],
                         'contact_number':   row[2],
