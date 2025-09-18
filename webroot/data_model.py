@@ -220,9 +220,6 @@ class DataFeedBuy(BaseModel):
     total_cost:             float
     
 
-
-
-
 class DataSemenSource(BaseModel):
     uhid:                   str
         
@@ -330,7 +327,6 @@ class DataPigProdStatus(BaseModel):
     prod_status_id:         int = 0    
     
     
-    
 class DataPigProdFattening(BaseModel):
     uhid:                   str
         
@@ -343,7 +339,6 @@ class DataPigProdFattening(BaseModel):
     
     date_weaning:           str
     date_added:             str
-    
     
     
 class DataPigProdDeadPig(BaseModel):
@@ -418,19 +413,18 @@ class DataPigProdPigOps(BaseModel):
     notes:                  str = None
     
  
-    
 class DataProdFeedBal(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None
     pig_prod_group_hid:     str = None
-    feed_balanceance_hid:  str = None
+    feed_balance_hid:       str = None
     
     
     user_id:                int = 0
     pig_prod_id:            int = 0
     pig_prod_group_id:      int = 0
-    feed_balanceance_id:   int = 0
+    feed_balance_id:        int = 0
     
     
     date_balance:           str
@@ -444,4 +438,30 @@ class DataProdFeedBal(BaseModel):
     num_starter:            float = 0.0
     num_grower:             float = 0.0
     num_finisher:           float = 0.0
+    
+    
+class DataProductionHarvest:
+    uhid:                   str
+    
+    pig_prod_hid:           str = None
+    pig_prod_group_hid:     str = None
+    acc_pig_buyer_hid:      str = None
+    production_harvest_hid: str = None
+    
+    
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    pig_prod_group_id:      int = 0
+    acc_pig_buyer_id:       int = 0
+    production_harvest_id:  int = 0
+    
+    date_harvest:           str
+    num_pigs_harvest:       int
+    live_weight:            int = None
+    slaughter_weight:       int = None
+    
+    sales:                  float
+    harvest_cost:           float = 0.0
+    cost_comments:          str = None
+    
     

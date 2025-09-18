@@ -49,6 +49,26 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     user_id = res[0]
     
     
+    if semen_supplier_data.adrs_level_1_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
+                'code': 'ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_1',
+                'desc': ''
+            }
+        }
+    
+    
+    if semen_supplier_data.adrs_level_2_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
+                'code': 'ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_2',
+                'desc': ''
+            }
+        }
+        
+    
     semen_supplier_data.name      = name
     semen_supplier_data.user_id   = user_id
     

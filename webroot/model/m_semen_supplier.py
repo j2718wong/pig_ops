@@ -18,6 +18,7 @@ class SemenSupplier:
             in_country_id           INT,
             in_address_level_1_id   INT,
             in_address_level_2_id   INT,
+            in_address_level_3_id   INT,
             
             in_name                 VARCHAR(50)
         )  
@@ -29,6 +30,11 @@ class SemenSupplier:
         sql += '%s,'    % data.country_id
         sql += '%s,'    % data.address_level_1_id
         sql += '%s,'    % data.address_level_2_id
+        
+        if data.address_level_3_id is not None and data.address_level_3_id > 0:
+            sql += '%s,'    % data.address_level_3_id
+        else:
+            sql += 'NULL,'
         
         sql += '"%s")'  % data.name
         

@@ -21,13 +21,6 @@ import data_model           as dm
 
 
 
-PIG_OPERATION_TYPES = [
-    PIG_OPERATION_TYPE_GESTATING,
-    PIG_OPERATION_TYPE_LACTATING_PIGLETS,
-    PIG_OPERATION_TYPE_GROWING
-]
-
-
     
 @app.post("/account_pig_buyer/add")
 async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):

@@ -1,26 +1,23 @@
 
-// Follow these steps to install MySQL 5.7
-//https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-18-04
 
 
-
+// MYSQL version:  8.0.43-0ubuntu0.24.04.1 
 /* Alter root password*/
-ALTER USER 'root'@'localhost' IDENTIFIED  mysql_native_password BY '0@Root1234.';
-
+ALTER USER 'root'@'localhost' IDENTIFIED  BY '0@Root1234.';
 
 
 /* This is for pig_operations database*/
 
-CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED  mysql_native_password BY '1@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED  mysql_native_password BY '1@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED  mysql_native_password BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web'@'localhost'    IDENTIFIED BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web2'@'localhost'   IDENTIFIED BY '1@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_web3'@'localhost'   IDENTIFIED BY '1@PO#db$1234.';
 
-CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED  mysql_native_password BY '2@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED  mysql_native_password BY '2@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_bkops3'@'localhost' IDENTIFIED  mysql_native_password BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops'@'localhost'  IDENTIFIED BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops2'@'localhost' IDENTIFIED BY '2@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_bkops3'@'localhost' IDENTIFIED BY '2@PO#db$1234.';
 
-CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED  mysql_native_password BY '3@PO#db$1234.';
-CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED  mysql_native_password BY '4@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_sched'@'localhost'  IDENTIFIED BY '3@PO#db$1234.';
+CREATE USER IF NOT EXISTS 'pops_msgr'@'localhost'   IDENTIFIED BY '4@PO#db$1234.';
 
 
 /* This is using 10.11.14-MariaDB-0+deb12u2 */

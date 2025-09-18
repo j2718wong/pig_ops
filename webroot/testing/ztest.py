@@ -73,15 +73,25 @@ SAMPLE_PIG_RACE_LINE = {
 }
 
 
+ADDRESS_LEVEL_1_ID_CEBU_PROV    = 49
+
+ADDRESS_LEVEL_2_ID_ARGAO        = 987
+ADDRESS_LEVEL_2_ID_TALISAY      = 1029
+ADDRESS_LEVEL_2_ID_MINGLA       = 1011
+ADDRESS_LEVEL_2_ID_NAGA         = 1013
+
+ADDRESS_LEVEL_3_ID_BALIRONG     = 27013
+ADDRESS_LEVEL_3_ID_TAGJAGUIMIT  = 27033
+ADDRESS_LEVEL_3_ID_TABUNOC      = 27323
 
 
 RANDOM_PIG_BUYERS = [
 
 {
     'name': 'Segundo Facundo Impacto',
-    'adrs_level_1_id':  2,
-    'adrs_level_2_id':  3,
-    'adrs_level_3_id':  3,
+    'adrs_level_1_id':  ADDRESS_LEVEL_1_ID_CEBU_PROV,
+    'adrs_level_2_id':  ADDRESS_LEVEL_2_ID_NAGA,
+    'adrs_level_3_id':  ADDRESS_LEVEL_3_ID_BALIRONG,
     'contact_number':   '09178888567',
     'whatsapp':         '0987567898',
     'messenger':    'Segundo Facundo'
@@ -89,9 +99,8 @@ RANDOM_PIG_BUYERS = [
 
 {
     'name': 'Desidido Muhabal Jr',
-    'adrs_level_1_id':  2,
-    'adrs_level_2_id':  3,
-    'adrs_level_3_id':  5,
+    'adrs_level_1_id':  ADDRESS_LEVEL_1_ID_CEBU_PROV,
+    'adrs_level_2_id':  ADDRESS_LEVEL_2_ID_MINGLA,
     'contact_number':   '0917123456',
     'whatsapp':         '0987567000',
     'messenger':    'Desidido Muhabal'
@@ -100,9 +109,9 @@ RANDOM_PIG_BUYERS = [
 
 {
     'name': 'Epitacia U Cabrera',
-    'adrs_level_1_id':  2,
-    'adrs_level_2_id':  3,
-    'adrs_level_3_id':  5,
+    'adrs_level_1_id':  ADDRESS_LEVEL_1_ID_CEBU_PROV,
+    'adrs_level_2_id':  ADDRESS_LEVEL_2_ID_TALISAY,
+    'adrs_level_3_id':  ADDRESS_LEVEL_3_ID_TABUNOC,
     'contact_number':   '091710986',
     'whatsapp':         '087969000',
     'messenger':    'Epitacia Cabrera'
@@ -162,9 +171,9 @@ class TestFeedSupplier(TestBase):
         data = {
             "uhid":         user_uhid,
             "name":         'Ayan Sampan',
-            "address_level_1_id":   1,
-            "address_level_2_id":   1,
-            "address_level_3_id":   1
+            "address_level_1_id":   ADDRESS_LEVEL_1_ID_CEBU_PROV,
+            "address_level_2_id":   ADDRESS_LEVEL_2_ID_NAGA,
+            "address_level_3_id":   ADDRESS_LEVEL_3_ID_TAGJAGUIMIT
         }
         
 
@@ -217,7 +226,7 @@ class TestFeedSupplier(TestBase):
         
     def test_get_list(self):
         # Test get_list feed_supplier
-        url = BASE_URL + 'feed_supplier/list?adrs_level_2_id=1'
+        url = BASE_URL + 'feed_supplier/list?adrs_level_2_id=%s' % ADDRESS_LEVEL_2_ID_NAGA
         
         print(f'\n\n****** Testing feed_suppler get_list; url = {url} ')
         
@@ -254,8 +263,8 @@ class TestSemenSupplier(TestBase):
         data = {
             "uhid":         user_uhid,
             "name":                 'Growbest Agrivet',
-            "address_level_1_id":   1,
-            "address_level_2_id":   1
+            "address_level_1_id":   ADDRESS_LEVEL_1_ID_CEBU_PROV,
+            "address_level_2_id":   ADDRESS_LEVEL_2_ID_ARGAO
         }
         
 
@@ -462,64 +471,25 @@ class TestAPIAccount:
         self.test_semen_supplier(user_id)
         
         self.test_feed_brand(user_id)
-        
         self.test_feed_supplier(user_id)
+        
+        
+        
+        
         
         return {
             'account_id':       account_id,
             'account_hid':     account_hid,
         }
         
-        
-    def test_semen_supplier(self, user_id):
-        user_uhid   = hashids_user.encrypt(user_id)
-        
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
-        
-        url = BASE_URL + 'semen_supplier/add'
-            
-        data = {
-            "uhid":         user_uhid,
-            "name":                 'Growbest Agrivet',
-            "address_level_1_id":   1,
-            "address_level_2_id":   1
-        }
-        
-
-        print(f'***** Testing adding semen_supplier; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-        self.summary['semen_supplier']['add'] = 'OK'
-        
     
-        # Test get_list semen_supplier
-        url = BASE_URL + 'semen_supplier/list?inc_deleted=1&inc_user_audit=1'
+    def test_semen_supplier(self, user_id):
+        t = TestSemenSupplier(self.summary)
+        data_input = t.test_add(user_id)
         
-        print(f'\n\n****** Testing semen_supplier get_list; url = {url} ')
+        t.test_duplicate_check(t.url_add, data_input)
         
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        len_items = len(res_json['data'])
-        assert(len_items > 0)
-        
-        self.summary['semen_supplier']['list'] = 'OK'
+        t.test_update(data_input)
         
 
     def test_feed_brand(self, user_id):
@@ -606,7 +576,7 @@ class TestAPIAccount:
         t.test_duplicate_check(t.url_add, data_input)
         
         t.test_update(data_input)
-        
+    
         
     def test_pig_farm(self, user_id, farm_name):
         user_uhid   = hashids_user.encrypt(user_id)

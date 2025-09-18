@@ -121,7 +121,7 @@ model_names = [
 ]
 
 
-USING_PRODUCTION_DB             = 1
+USING_PRODUCTION_DB             = 0
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:
@@ -149,7 +149,7 @@ if USING_PRODUCTION_DB > 0:
         'local_port':       3307
     }
     
-
+    print('\n\nWill use PRODUCTION database\n\n')
 else:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
     db_desc     = 'Jackson Farm Production'
@@ -174,7 +174,9 @@ else:
         'local_hostname':   '127.0.0.1',
         'local_port':       3307
     }
-
+    
+    print('\n\nWill use DEVELOPMENT database\n\n')
+    
 DB_INFO = f"Host: {credentials_po['db_host']}; DB_Desc: {db_desc}"
 
 
