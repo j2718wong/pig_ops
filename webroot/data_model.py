@@ -465,8 +465,8 @@ class DataProductionHarvest:
     
     date_harvest:           str
     num_pigs_harvest:       int
-    live_weight:            int = None
-    slaughter_weight:       int = None
+    live_weight:            float = None
+    slaughter_weight:       float = None
     
     sales:                  float
     harvest_cost:           float = 0.0

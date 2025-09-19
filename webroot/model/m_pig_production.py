@@ -173,7 +173,8 @@ class PigProduction:
             
             in_num_pigs             INT,
             
-            in_date_weaning         VARCHAR(10)
+            in_date_weaning         VARCHAR(10),
+            in_date_added           VARCHAR(10)
         )  
         """
         
@@ -182,7 +183,8 @@ class PigProduction:
         sql += '%s,'    % data.pig_farm_id
         sql += '%s,'    % data.num_pigs
         
-        sql += '"%s");'  % data.date_weaning
+        sql += '"%s",'  % data.date_weaning
+        sql += '"%s");'  % data.date_added
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

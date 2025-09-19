@@ -130,54 +130,20 @@ PIG_OPERATION_TYPE_GROWING          = 3
 class TestBase:
     def __init__(self, business_object, summary):
         self.business_object    = business_object
-        
         self.summary            = summary
         
-    
-    def test_duplicate_check(self, url, data):
-        values = (self.business_object, url)
-        s = '\n\n***** Testing duplicate adding %s; url = %s; data' %values
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
- 
-        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
-        
-        self.summary[self.business_object]['add_duplicate_check'] = 'OK'
-
-
-
-class TestFeedSupplier(TestBase):
-    def __init__(self, summary):
-        self.business_object = 'feed_supplier'
-        super().__init__(self.business_object, summary)
-        
-        self.url_add    = BASE_URL + 'feed_supplier/add'
+        self.url_add            = '%s%s/add'    %(BASE_URL, business_object)
+        self.url_update         = '%s%s/update' %(BASE_URL, business_object)
         
     
-    def test_add(self, user_id):
-        user_uhid   = hashids_user.encrypt(user_id)
+    def request_add(self, data):
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {dt_now_s}  ###########################")
         
-            
-        data = {
-            "uhid":         user_uhid,
-            "name":         'Ayan Sampan',
-            "address_level_1_id":   ADRS_LEVEL_1_ID_CEBU_PROV,
-            "address_level_2_id":   ADRS_LEVEL_2_ID_NAGA,
-            "address_level_3_id":   ADRS_LEVEL_3_ID_TAGJAGUIMIT
-        }
-        
-
-        print(f'***** Testing add {self.business_object}; url = {self.url_add} ; data')
+        values = (self.business_object, self.url_add)
+        print('\n***** Testing add %s; url = %s ; data' % values)
         pprint.pprint(data)
         
         r = requests.post(self.url_add, json = data)
@@ -191,24 +157,46 @@ class TestFeedSupplier(TestBase):
         assert(result_num == 0)
         
         
-        feed_supplier_hid = res_json['feed_supplier']['hid']
-        data['feed_supplier_hid'] = feed_supplier_hid
+        entry_hid   = res_json[self.business_object]['hid']
+        res_decrypt = hashids_common.decrypt(entry_hid)
+        entry_id    = res_decrypt[0]
+            
+        print(f"{self.business_object}.id = {entry_id}")
+        assert(entry_id > 0)
+        
+        # Need to add back entry hid to data for update test
+        key = self.business_object + '_hid'
+        data[key] = entry_hid
 
-        self.summary['feed_supplier']['add'] = 'OK'
+        if self.business_object not in self.summary:
+            self.summary[self.business_object] = {}
+            
+        self.summary[self.business_object]['add'] = 'OK'
         
-        return data
+        return res_json
+    
+    
+    def test_duplicate_add(self, data):
+        values = (self.business_object, self.url_add )
+        s = '\n\n***** Testing duplicate adding %s; url = %s; data' %values
+        pprint.pprint(data)
         
+        r = requests.post(self.url_add, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
-    def test_update(self, data):
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
         
-        url = BASE_URL + 'feed_supplier/update'
+        self.summary[self.business_object]['add_duplicate_check'] = 'OK'
+
+
+    def request_update(self, data):
         
-        data['name']    = data['name'] + dt_now_s
-              
-        
-        print(f'\n\n*****  Testing update {self.business_object}; url = {url} ; data')
+        values = (self.business_object, self.url_update)
+        print('\n\n*****  Testing update %s; url = %s ; data', % values)
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -221,14 +209,30 @@ class TestFeedSupplier(TestBase):
         result_num  = res_json['result']['num']
         assert(result_num == 0)
         
-        self.summary['feed_supplier']['update'] = 'OK'
+        self.summary[self.business_object]['update'] = 'OK'
+    
+    
+    def request_delete(self, url):
+        values = (self.business_object, url)
+        print('\n\n***** Testing delete %s; url = %s ' % values)
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
         
         
-    def test_get_list(self, address_level_2_id):
-        # Test get_list feed_supplier
-        url = BASE_URL + 'feed_supplier/list?address_level_2_id=%s' % address_level_2_id
+        print(f"\n\nResult; status_code = {r.status_code}; result")
         
-        print(f'\n\n****** Testing feed_suppler get_list; url = {url} ')
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary[self.business_object]['delete'] = 'OK'
+    
+    
+    def request_list(self, url):
+        
+        values = (self.business_object, url)
+        print('\n\n****** Testing get_list %s; url = %s' % values)
         
         r = requests.get(url)
         res_text = str(r.text)
@@ -240,7 +244,43 @@ class TestFeedSupplier(TestBase):
         len_items = len(res_json['data'])
         assert(len_items > 0)
         
-        self.summary['feed_supplier']['list'] = 'OK'
+        self.summary[self.business_object]['list'] = 'OK'
+        
+        return res_json
+        
+
+class TestFeedSupplier(TestBase):
+    def __init__(self, summary):
+        super().__init__(feed_supplier, summary)
+        
+
+    def test_add(self, user_id):
+        user_uhid   = hashids_user.encrypt(user_id)
+            
+        data = {
+            "uhid":         user_uhid,
+            "name":         'Ayan Sampan',
+            "address_level_1_id":   ADRS_LEVEL_1_ID_CEBU_PROV,
+            "address_level_2_id":   ADRS_LEVEL_2_ID_NAGA,
+            "address_level_3_id":   ADRS_LEVEL_3_ID_TAGJAGUIMIT
+        }
+
+        res_json = self.request_add(data)
+        return data
+        
+        
+    def test_update(self, data):
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        data['name']    = data['name'] + dt_now_s
+        
+        self.request_update(data)
+        
+        
+    def test_get_list(self, address_level_2_id):
+        url = BASE_URL + 'feed_supplier/list?address_level_2_id=%s' % address_level_2_id
+        return self.request_list(url)
     
 
 class TestSemenSupplier(TestBase):
@@ -248,18 +288,10 @@ class TestSemenSupplier(TestBase):
         self.business_object = 'semen_supplier'
         super().__init__(self.business_object, summary)
         
-        self.url_add    = BASE_URL + 'semen_supplier/add'
-        
     
     def test_add(self, user_id):
         user_uhid   = hashids_user.encrypt(user_id)
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
-        
-        url = BASE_URL + 'semen_supplier/add'
-            
         data = {
             "uhid":         user_uhid,
             "name":                 'Growbest Agrivet',
@@ -267,25 +299,7 @@ class TestSemenSupplier(TestBase):
             "address_level_2_id":   ADRS_LEVEL_2_ID_ARGAO
         }
         
-
-        print(f'***** Testing add {self.business_object}; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-        semen_supplier_hid = res_json['semen_supplier']['hid']
-        data['semen_supplier_hid'] = semen_supplier_hid
-
-        self.summary[self.business_object]['add'] = 'OK'
-        
+        res_json = self.request_add(data)
         return data
         
     
@@ -293,46 +307,63 @@ class TestSemenSupplier(TestBase):
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
-        url = BASE_URL + 'semen_supplier/update'
+        data['name']    = data['name'] + dt_now_s
+              
+        self.request_update(data)
+    
+    
+    def test_get_list(self, address_level_1_id):
+        url = BASE_URL + 'semen_supplier/list?address_level_1_id=' + address_level_1_id 
+        return self.request_list(url)
+        
+
+class TestAccountPigBuyer(TestBase):
+    
+
+
+class TestFarmStaff(TestBase):
+    def __init__(self, summary):
+        self.business_object = 'farm_staff'
+        super().__init__(self.business_object, summary)
+        
+    
+    def test_add(self, user_id, pig_farm_id, num_staff = 3):
+        user_uhid       = hashids_user.encrypt(user_id)
+        pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
+        
+        len_items       = len(RANDOM_STAFF_NAMES)
+        
+        count = 0
+        
+        result = []
+        
+        while count < num_staff:
+            index           = random.randint(0, len_items-1)
+            staff_name      = RANDOM_STAFF_NAMES[index]
+            
+            data = {
+                "uhid":                 user_uhid,
+                "pig_farm_hid":         pig_farm_hid,
+                "name":                 staff_name
+            }
+            
+            self.request_add(data)
+            
+            result.append(data)
+            
+            count += 1
+        
+        return result
+        
+        
+    def test_update(self, data):
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
         data['name']    = data['name'] + dt_now_s
               
+        self.request_update(data)
         
-        print(f'\n\n*****  Testing update {self.business_object}; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result = ")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-        
-        self.summary['semen_supplier']['update'] = 'OK'
-    
-    
-    
-    def test_get_list(self):
-        # Test get_list semen_supplier
-        url = BASE_URL + 'semen_supplier/list'
-        
-        print(f'\n\n****** Testing semen_supplier get_list; url = {url} address_level_2_id=1')
-        
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        len_items = len(res_json['data'])
-        assert(len_items > 0)
-        
-        self.summary['semen_supplier']['list'] = 'OK'
-    
     
 
 class TestAPIAccount:
@@ -518,12 +549,11 @@ class TestAPIAccount:
         t = TestSemenSupplier(self.summary)
         data_input = t.test_add(user_id)
         
-        t.test_duplicate_check(t.url_add, data_input)
+        t.test_duplicate_add(data_input)
         
         t.test_update(data_input)
         
-        
-        address_level_1_id = ADRS_LEVEL_2_ID_CEBU
+        address_level_1_id = ADRS_LEVEL_1_ID_CEBU
         t.test_get_list(address_level_1_id)
 
 
@@ -608,7 +638,7 @@ class TestAPIAccount:
         t = TestFeedSupplier(self.summary)
         data_input = t.test_add(user_id)
         
-        t.test_duplicate_check(t.url_add, data_input)
+        t.test_duplicate_add(data_input)
         
         t.test_update(data_input)
         
@@ -724,192 +754,31 @@ class TestAPIAccount:
         
         
     def test_pig_farm_staff(self, user_id, pig_farm_id, num_staff = 3):
-        user_uhid   = hashids_user.encrypt(user_id)
+        t = TestFarmStaff(self.summary)
+        data_staff = t.test_add(user_id, pig_farm_id, num_staff)
+        data_input = data_staff[0] # get the first entry
+        pig_farm_hid = data_input['pig_farm_hid']
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
+        t.test_duplicate_add(data_input)
         
-        pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
+        t.test_update(data_input)
         
-           
-        len_items       = len(RANDOM_STAFF_NAMES)
-        
-        count = 0
-        
-        while count < num_staff:
-            index           = random.randint(0, len_items-1)
-            staff_name      = RANDOM_STAFF_NAMES[index]
-            
-        
-            url = BASE_URL + 'pig_farm_staff/add'
-            
-            data = {
-                "uhid":                 user_uhid,
-                "pig_farm_hid":         pig_farm_hid,
-                "name":                 staff_name
-            }
-            
-
-            print(f"***** Testing adding pig_farm_staff; url = {url} ; data")
-            pprint.pprint(data)
-            
-            r = requests.post(url, json = data)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
-            
-            print(f"\n\nResult; status_code = {r.status_code}; result")
-            pprint.pprint(res_json)
-            
-            result_num  = res_json['result']['num']
-            assert(result_num == 0)
-
-
-            self.summary['pig_farm_staff']['add'] = 'OK'
-            
-            
-            is_id_visible = True if 'id' in res_json['pig_farm_staff'] else False
-            assert(is_id_visible == False)
-            
-            count += 1
-        
-        
-        pig_farm_staff_hid  = res_json['pig_farm_staff']['hid']
-        res_decrypt         = hashids_common.decrypt(pig_farm_staff_hid)
-        pig_farm_staff_id    = res_decrypt[0]
-        
-        print(f"pig_farm_staff_id = {pig_farm_staff_id}")
-        assert(pig_farm_staff_id > 0)
-        
-        
-        # Test pig_farm_staff add duplicate
-        url = BASE_URL + 'pig_farm_staff/add'
-            
-        data = {
-            "uhid":                 user_uhid,
-            "pig_farm_hid":         pig_farm_hid,
-            "name":                 staff_name
-        }
-
-        print(f'\n\n***** Testing duplicate adding pig_farm_staff; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
- 
-        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
-        
-        self.summary['pig_farm_staff']['add_duplicate_check'] = 'OK'
-            
-        
-        
-        # Test pig_farm_staff update
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
-        
-        url = BASE_URL + 'pig_farm_staff/update'
-        
-        data = {
-            "uhid":                 user_uhid,
-            "pig_farm_hid":         pig_farm_hid,
-            "pig_farm_staff_hid":   pig_farm_staff_hid,
-            "name":                 staff_name + dt_now_s
-        }
-        
-        
-        print(f'\n\n***** Testing pig_farm_staff update; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result = ")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-        
-        self.summary['pig_farm_staff']['update'] = 'OK'
-        
-        
-        # Add new pig_farm_staff
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
-        
-        url = BASE_URL + 'pig_farm_staff/add'
-            
-        data = {
-            "uhid":                 user_uhid,
-            "pig_farm_hid":         pig_farm_hid,
-            "name":                 staff_name + dt_now_s
-        }
-        
-
-        print(f'\n\n***** Testing adding pig_farm_staff; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-       
-        
-        is_id_visible = True if 'id' in res_json['pig_farm_staff'] else False
-        assert(is_id_visible == False)
-        
-        new_pig_farm_staff_hid = res_json['pig_farm_staff']['hid']
-        
+        data_delete = data_staff[num_staff - 1]
+        user_uhid   = data_delete['uhid']
+        pig_farm_staff_hid = data_delete['pig_farm_staff_hid']
         
         # Test delete pig_farm_staff
-        url = BASE_URL + 'pig_farm_staff/delete?uhid=' + user_uhid + '&pig_farm_staff_hid=' + new_pig_farm_staff_hid
+        values = (user_uhid, pig_farm_staff_hid)
+        url = BASE_URL + 'pig_farm_staff/delete?uhid=%s&pig_farm_staff_hid=%s' % values
         
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f'\n\n***** Testing pig_farm_staff delete; url = {url} ')
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-        
-        self.summary['pig_farm_staff']['delete'] = 'OK'
-        
+        t.request_delete(url)
         
         
         # Test get_list pig_farm_staff
         url = BASE_URL + 'pig_farm_staff/list?pfhid=' + pig_farm_hid + '&inc_deleted=1&inc_user_audit=1'
+        t.request_list(url)
         
-        print(f'\n\nTesting pig_farm_staff get_list; url = {url} ')
-        
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        len_items = len(res_json['data'])
-        assert(len_items > 0)
-        
-        self.summary['pig_farm_staff']['list'] = 'OK'
-        
-        return {
-            'pig_farm_staff_id': pig_farm_staff_id
-        }
     
-        
     def test_account_pig_ops(self, user_id, operation_type):
         user_uhid       = hashids_user.encrypt(user_id)
         
@@ -1100,6 +969,9 @@ class TestAPIAccount:
                 data_to_delete = data
             
             index += 1
+            
+        
+        
         
         
         
