@@ -214,7 +214,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     
 
 @app.get("/pig_farm_staff/delete")
-async def pig_farm_staff_delete(uhid:str, pig_farm_staff_hid: str):
+async def pig_farm_staff_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -228,7 +228,7 @@ async def pig_farm_staff_delete(uhid:str, pig_farm_staff_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(pig_farm_staff_hid)
+    res = hashids_common.decrypt(ehid)
     if len(res) == 0:
         return {
             'result':{

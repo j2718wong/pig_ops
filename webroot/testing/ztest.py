@@ -115,7 +115,21 @@ RANDOM_PIG_BUYERS = [
     'contact_number':   '091710986',
     'whatsapp':         '087969000',
     'messenger':    'Epitacia Cabrera'
-}
+},
+
+
+{
+    'name': 'Rennie Requistas',
+    'address_level_1_id':  ADRS_LEVEL_1_ID_CEBU_PROV,
+    'address_level_2_id':  ADRS_LEVEL_2_ID_TALISAY,
+    'address_level_3_id':  ADRS_LEVEL_3_ID_TABUNOC,
+    'contact_number':   '0920345987',
+    'whatsapp':         '08796900234',
+    'messenger':    'Rennie Requistas'
+},
+
+
+
 
 
 ]
@@ -318,8 +332,126 @@ class TestSemenSupplier(TestBase):
         
 
 class TestAccountPigBuyer(TestBase):
+    def __init__(self, summary):
+        self.business_object = 'account_pig_buyer'
+        super().__init__(self.business_object, summary)
+        
+    
+    def test_add(self, user_id, num_entries = 2):
+        user_uhid       = hashids_user.encrypt(user_id)
+        
+        len_items       = len(RANDOM_PIG_BUYERS)
+        
+        count           = 0
+        
+        taken_index     = []
+        
+        result          = []
+        
+        while count < num_entries:
+            index = random.randint(0, len_items-1)
+            
+            # Be sure num_entries < len(RANDOM_PIG_BUYERS)
+            if index in taken_index:
+                continue
+        
+            data = copy.copy(RANDOM_PIG_BUYERS[index])
+            data['uhid'] = user_uhid
+            
+            count += 1
+        
+            res_json = self.request_add(data)
+            
+            result.append(data)
+            
+        return result
+    
+    
+    def test_update(self, data):
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        data['name']    = data['name'] + dt_now_s
+        
+        self.request_update(data)
     
 
+class TestAccountPigOps(TestBase):
+    def __init__(self, summary):
+        self.business_object = 'account_pig_ops'
+        super().__init__(self.business_object, summary)
+    
+    
+    def test_add(self, user_id, operation_type):
+        user_uhid       = hashids_user.encrypt(user_id)
+        
+        
+        if operation_type == PIG_OPERATION_TYPE_GESTATING:
+            data = {
+                "uhid":             user_uhid,
+                "operation_type":   operation_type,
+                "name":             SAMPLE_CUSTOMIZED_GESTATING_OPS['name'],
+                "num_days_since":   SAMPLE_CUSTOMIZED_GESTATING_OPS['num_days_since'],
+                "description":      SAMPLE_CUSTOMIZED_GESTATING_OPS['description']
+            }
+        
+        if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
+            data = {
+                "uhid":             user_uhid,
+                "operation_type":   operation_type,
+                "name":             SAMPLE_CUSTOMIZED_LACTATING_OPS['name'],
+                "num_days_since":   SAMPLE_CUSTOMIZED_LACTATING_OPS['num_days_since'],
+                "description":      SAMPLE_CUSTOMIZED_LACTATING_OPS['description']
+            }
+        
+        
+        s_type = ''
+        
+        if operation_type == PIG_OPERATION_TYPE_GESTATING:
+            s_type = 'PIG_OPERATION_TYPE_GESTATING'
+            
+        elif operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
+            s_type = 'PIG_OPERATION_TYPE_LACTATING_PIGLETS'
+            
+        else:
+            s_type = 'PIG_OPERATION_TYPE_GROWING'
+
+
+        print(f'*****  Testing adding account_pig_ops; operation_type ={s_type}')
+      
+        res_json = self.request_add(data)
+        
+        return data
+        
+        
+        
+    def test_update(self, data)
+        # Test account_pig_ops update
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        data['name']    = data['name'] + dt_now_s
+        
+        self.request_update(data)
+        
+        
+        
+        # Test delete account_pig_ops
+        values = (user_uhid, account_pig_ops_hid)
+        url = BASE_URL + 'account_pig_ops/delete?uhid=%s&ehid=' % values
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\n***** Testing account_pig_ops delete; url = {url} ")
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary['account_pig_ops']['delete'] = 'OK'
+    
 
 class TestFarmStaff(TestBase):
     def __init__(self, summary):
@@ -327,18 +459,25 @@ class TestFarmStaff(TestBase):
         super().__init__(self.business_object, summary)
         
     
-    def test_add(self, user_id, pig_farm_id, num_staff = 3):
+    def test_add(self, user_id, pig_farm_id, num_entries = 3):
         user_uhid       = hashids_user.encrypt(user_id)
         pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
         
         len_items       = len(RANDOM_STAFF_NAMES)
         
-        count = 0
+        count           = 0
         
-        result = []
+        taken_index     = []
         
-        while count < num_staff:
+        result          = []
+        
+        while count < num_entries:
             index           = random.randint(0, len_items-1)
+            
+            # Be sure num_entries < len(RANDOM_STAFF_NAMES)
+            if index in taken_index:
+                continue
+            
             staff_name      = RANDOM_STAFF_NAMES[index]
             
             data = {
@@ -368,6 +507,8 @@ class TestFarmStaff(TestBase):
 
 class TestAPIAccount:
     def __init__(self):
+        self.account_hid        = None
+        
         self.summary    = {
             'account':          {},
             'account_request':  {},
@@ -393,7 +534,7 @@ class TestAPIAccount:
     
     
     def test_account_register(self, user_id, acc_name):
-        user_uhid   = hashids_user.encrypt(user_id)
+        user_uhid       = hashids_user.encrypt(user_id)
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
@@ -426,11 +567,12 @@ class TestAPIAccount:
         self.summary['account']['register'] = 'OK'
         
         
-        account_hid    = res_json['account']['hid']
+        account_hid     = res_json['account']['hid']
         res_decrypt     = hashids_account.decrypt(account_hid)
         account_id      = res_decrypt[0]
+        self.account_hid= account_hid
     
-        print(f"created account_id = {account_id}")            
+        print(f"created account_id = {account_id}")
         assert(account_id > 0)
         
         
@@ -502,6 +644,9 @@ class TestAPIAccount:
         self.summary['account']['user_groups_list'] = 'OK'
         
         
+        self.test_account_pig_buyer(user_id)
+        
+        
         self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_GESTATING)
         
         print(f'\n\n***** Testing get account_pig_ops list; account_id = {account_id}')
@@ -534,9 +679,6 @@ class TestAPIAccount:
         
         self.test_feed_brand(user_id)
         self.test_feed_supplier(user_id)
-        
-        
-        
         
         
         return {
@@ -753,23 +895,25 @@ class TestAPIAccount:
         }
         
         
-    def test_pig_farm_staff(self, user_id, pig_farm_id, num_staff = 3):
+    def test_pig_farm_staff(self, user_id, pig_farm_id, num_entries = 3):
         t = TestFarmStaff(self.summary)
-        data_staff = t.test_add(user_id, pig_farm_id, num_staff)
-        data_input = data_staff[0] # get the first entry
-        pig_farm_hid = data_input['pig_farm_hid']
+        
+        list_data_input = t.test_add(user_id, pig_farm_id, num_entries)
+        data_input      = list_data_input[0] # get the first entry
+        pig_farm_hid    = data_input['pig_farm_hid']
         
         t.test_duplicate_add(data_input)
         
         t.test_update(data_input)
         
-        data_delete = data_staff[num_staff - 1]
+        # Delete last entry
+        data_delete = list_data_input[num_entries - 1]
         user_uhid   = data_delete['uhid']
-        pig_farm_staff_hid = data_delete['pig_farm_staff_hid']
+        entry_hid   = data_delete['pig_farm_staff_hid']
         
         # Test delete pig_farm_staff
-        values = (user_uhid, pig_farm_staff_hid)
-        url = BASE_URL + 'pig_farm_staff/delete?uhid=%s&pig_farm_staff_hid=%s' % values
+        values = (user_uhid, entry_hid)
+        url = BASE_URL + 'pig_farm_staff/delete?uhid=%s&ehid=%s' % values
         
         t.request_delete(url)
         
@@ -778,8 +922,35 @@ class TestAPIAccount:
         url = BASE_URL + 'pig_farm_staff/list?pfhid=' + pig_farm_hid + '&inc_deleted=1&inc_user_audit=1'
         t.request_list(url)
         
-    
+        
     def test_account_pig_ops(self, user_id, operation_type):
+        t = TestAccountPigOps(self.summary)
+        
+        data_input      = t.add(user_id, operation_type)
+        
+        t.test_duplicate_add(data_input)
+        
+        t.test_update(data_input)
+        
+        
+        # Test delete account_pig_ops
+        data_delete = data_input
+        user_uhid   = data_delete['uhid']
+        entry_hid   = data_delete['account_pig_ops_hid']
+        
+        values = (user_uhid, account_pig_ops_hid)
+        url = BASE_URL + 'account_pig_ops/delete?uhid=%s&ehid=' % values
+        
+        t.request_delete(url)
+        
+        # Test get_list account_pig_ops
+        values  = (self.account_id , operation_type)
+        url = BASE_URL + 'account_pig_ops/list?ahid=%s&operation_type=%s&inc_deleted=1&inc_user_audit=1' % values
+        t.request_list(url)
+        
+        
+        
+        """
         user_uhid       = hashids_user.encrypt(user_id)
         
         dt_now          = datetime.now()
@@ -910,7 +1081,8 @@ class TestAPIAccount:
         
         
         # Test delete account_pig_ops
-        url = BASE_URL + 'account_pig_ops/delete?uhid=' + user_uhid + '&account_pig_ops_hid=' + account_pig_ops_hid
+        values = (user_uhid, account_pig_ops_hid)
+        url = BASE_URL + 'account_pig_ops/delete?uhid=%s&ehid=' % values
         
         r = requests.get(url)
         res_text = str(r.text)
@@ -923,56 +1095,35 @@ class TestAPIAccount:
         assert(result_num == 0)
         
         self.summary['account_pig_ops']['delete'] = 'OK'
+        """
         
         
-    def test_account_pig_buyer(self, user_id):
-        user_uhid       = hashids_user.encrypt(user_id)
+    def test_account_pig_buyer(self, user_id, num_entries = 2):
+        t = TestAccountPigBuyer(self.summary)
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
+        list_data_input = t.test_add(user_id, num_entries)
+        data_input      = data_staff[0] # get the first entry
         
+        t.test_duplicate_add(data_input)
         
-        url = BASE_URL + 'account_pig_buyer/add'
-        
-        index = 0
-        data_to_update = None
-        data_to_delete = None
-        
-        for cur_entry in RANDOM_PIG_BUYERS:
-            data = copy.copy(cur_entry)
-            data['uhid'] = user_uhid
-            
-            
-            print(f'\n\n*****  Testing account_pig_ops add; url = {url} ; data')
-            pprint.pprint(data)
-            
-            r = requests.post(url, json = data)
-            res_text = str(r.text)
-            res_json = json.loads(res_text)
-            
-
-            print(f"\n\nResult; status_code = {r.status_code}; result = ")
-            pprint.pprint(res_json)
-            
-            result_num  = res_json['result']['num']
-            assert(result_num == 0)
-            
-            account_pig_buyer_hid  = res_json['accout_pig_buyer']['hid'] 
-            
-            data['account_pig_buyer_hid'] = account_pig_buyer_hid
-            
-            if index == 1:
-                data_to_update = data
-            
-            if index == 2:
-                data_to_delete = data
-            
-            index += 1
-            
+        t.test_update(data_input) 
         
         
+        # Delete last entry
+        data_delete = data_staff[num_entries - 1]
+        user_uhid   = data_delete['uhid']
+        entry_hid   = data_delete['account_pig_buyer_hid']
         
+        # Test delete account_pig_buyer
+        values = (user_uhid, entry_hid)
+        url = BASE_URL + 'account_pig_buyer/delete?uhid=%s&ehid=%s' % values
+        
+        t.request_delete(url)
+        
+        
+        # Test get_list account_pig_buyer
+        url = BASE_URL + 'account_pig_buyer/list?ahid=' + self.account_id + '&inc_deleted=1&inc_user_audit=1'
+        t.request_list(url)
         
         
     def test_pig_race_line(self, user_id, account_hid):
@@ -1118,6 +1269,7 @@ class TestAPIAccount:
         
         
         # Test delete pig_race_line
+        values = (user_uhid, new_pig_race_line_hid)
         url = BASE_URL + 'pig_race_line/delete?uhid=' + user_uhid + '&pig_race_line_hid=' + new_pig_race_line_hid
         
         r = requests.get(url)

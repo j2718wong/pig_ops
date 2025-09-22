@@ -137,7 +137,7 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     
 
 @app.get("/pig_prod_notes/delete")
-async def pig_prod_notes_delete(uhid:str, pig_prod_notes_hid: str):
+async def pig_prod_notes_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -151,7 +151,7 @@ async def pig_prod_notes_delete(uhid:str, pig_prod_notes_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(pig_prod_notes_hid)
+    res = hashids_common.decrypt(ehid)
     if len(res) == 0:
         return {
             'result':{

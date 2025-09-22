@@ -1350,7 +1350,8 @@ class ReportGenPigProdOps:
         num_chars   = len(s_temp)
         num_space   = 5 - num_chars
         s           += ' ' * num_space + s_temp
-
+        s           += '  '
+        
         
         temp        = res['feed_balance']['num_finisher']
         if temp is not None:

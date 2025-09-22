@@ -247,7 +247,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     
 
 @app.get("/account_pig_ops/delete")
-async def account_pig_ops_delete(uhid:str, account_pig_ops_hid: str):
+async def account_pig_ops_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -261,7 +261,7 @@ async def account_pig_ops_delete(uhid:str, account_pig_ops_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(account_pig_ops_hid)
+    res = hashids_common.decrypt(ehid)
     if len(res) == 0:
         return {
             'result':{

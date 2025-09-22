@@ -10,6 +10,10 @@ class ProductionHarvest:
         self.TAG                = 'ProductionHarvest'
 
 
+    def get_harvest_type(self):
+        
+
+
     def add(self, data = None):
         """
         PROCEDURE production_harvest_add(
@@ -21,12 +25,18 @@ class ProductionHarvest:
             in_date_harvest         VARCHAR(10),
             
             in_num_pigs_harvest     INT,
-            in_live_weight          INT,
-            in_slaugther_weight     INT,
+            in_harvest_type_id      INT,
             
-            in_sales                DECIMAL(8,1),
+            in_live_weight          INT,
+            in_slaughter_weight     DECIMAL(6,1),
+            in_slaughter_net_weight DECIMAL(6,1),
+            
+            in_live_price_per_unit          DECIMAL(6,1),
+            in_slaughther_price_per_unit    DECIMAL(6,1),
+            
+            in_net_sales            DECIMAL(8,1),
             in_harvest_cost         DECIMAL(5,1),
-            in_cost_comments        VARCHAR(160)
+            in_comments             VARCHAR(160)
         )  
         """
         
@@ -39,6 +49,7 @@ class ProductionHarvest:
         
         sql += '"%s",'  % data.date_harvest
         sql += '%s,'    % data.num_pigs_harvest
+        sql += '%s,'    % data.harvest_type_id
         
         if data.live_weight is not None:
             sql += '%s,'    % data.live_weight
@@ -49,12 +60,28 @@ class ProductionHarvest:
             sql += '%s,'    % data.slaughter_weight
         else:
             sql += 'NULL,'
+            
+        if data.slaughter_net_weight is not None:
+            sql += '%s,'    % data.slaughter_net_weight
+        else:
+            sql += 'NULL,'
         
-        sql += '%s,'    % data.sales
+        if data.live_price_per_unit is not None:
+            sql += '%s,'    % data.live_price_per_unit
+        else:
+            sql += 'NULL,'
+        
+        if data.slaughter_price_per_unit is not None:
+            sql += '%s,'    % data.slaughter_price_per_unit
+        else:
+            sql += 'NULL,'
+        
+
+        sql += '%s,'    % data.net_sales
         sql += '%s,'    % data.harvest_cost
         
-        if cost_comments is not None:
-            sql += '"%s");'  % data.cost_comments
+        if data.comments is not None:
+            sql += '"%s");'  % data.comments
         else:
             sql += 'NULL);'
         
@@ -109,14 +136,20 @@ class ProductionHarvest:
             in_production_harvest_id INT,
             
             in_date_harvest         VARCHAR(10),
-            
+    
             in_num_pigs_harvest     INT,
-            in_live_weight          INT,
-            in_slaugther_weight     INT,
+            in_harvest_type_id      INT,
             
-            in_sales                DECIMAL(8,1),
+            in_live_weight          DECIMAL(6,1),
+            in_slaughter_weight     DECIMAL(6,1),
+            in_slaughter_net_weight DECIMAL(6,1),
+            
+            in_live_price_per_unit          DECIMAL(6,1),
+            in_slaughther_price_per_unit    DECIMAL(6,1),
+            
+            in_net_sales            DECIMAL(8,1),
             in_harvest_cost         DECIMAL(5,1),
-            in_cost_comments        VARCHAR(160)
+            in_comments             VARCHAR(160)
         )
         """
        
@@ -127,6 +160,7 @@ class ProductionHarvest:
         
         sql += '"%s",'  % data.date_harvest
         sql += '%s,'    % data.num_pigs_harvest
+        sql += '%s,'    % data.harvest_type_id
         
         if data.live_weight is not None:
             sql += '%s,'    % data.live_weight
@@ -137,12 +171,28 @@ class ProductionHarvest:
             sql += '%s,'    % data.slaughter_weight
         else:
             sql += 'NULL,'
+            
+        if data.slaughter_net_weight is not None:
+            sql += '%s,'    % data.slaughter_net_weight
+        else:
+            sql += 'NULL,'
         
-        sql += '%s,'    % data.sales
+        if data.live_price_per_unit is not None:
+            sql += '%s,'    % data.live_price_per_unit
+        else:
+            sql += 'NULL,'
+        
+        if data.slaughter_price_per_unit is not None:
+            sql += '%s,'    % data.slaughter_price_per_unit
+        else:
+            sql += 'NULL,'
+        
+
+        sql += '%s,'    % data.net_sales
         sql += '%s,'    % data.harvest_cost
         
-        if cost_comments is not None:
-            sql += '"%s");'  % data.cost_comments
+        if data.comments is not None:
+            sql += '"%s");'  % data.comments
         else:
             sql += 'NULL);'
         
@@ -206,7 +256,7 @@ class ProductionHarvest:
                         
                         a.sales,
                         a.harvest_cost,
-                        a.cost_comments,
+                        a.comments,
                         
                         a.acc_pig_buyer_id
                         b.name

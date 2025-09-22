@@ -452,24 +452,30 @@ class DataProductionHarvest:
     uhid:                   str
     
     pig_prod_hid:           str = None
-    pig_prod_group_hid:     str = None
+    production_group_hid:   str = None
     acc_pig_buyer_hid:      str = None
     production_harvest_hid: str = None
     
     
     user_id:                int = 0
     pig_prod_id:            int = 0
-    pig_prod_group_id:      int = 0
+    production_group_id:    int = 0
     acc_pig_buyer_id:       int = 0
     production_harvest_id:  int = 0
     
     date_harvest:           str
     num_pigs_harvest:       int
+    harvest_type_id:        int
+    
     live_weight:            float = None
     slaughter_weight:       float = None
+    slaughter_net_weight:   float = None
     
-    sales:                  float
+    live_price_per_unit:    float = None
+    slaughter_price_per_unit: float = None
+    
+    net_sales:              float
     harvest_cost:           float = 0.0
-    cost_comments:          str = None
+    comments:               str = None
     
     

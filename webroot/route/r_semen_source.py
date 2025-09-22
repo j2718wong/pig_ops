@@ -303,7 +303,7 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
     
 
 @app.get("/semen_source/delete")
-async def semen_source_delete(uhid:str, semen_source_hid: str):
+async def semen_source_delete(uhid:str, ehid: str):
    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -318,7 +318,7 @@ async def semen_source_delete(uhid:str, semen_source_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(semen_source_hid)
+    res = hashids_common.decrypt(ehid)
     if len(res) == 0:
         return {
             'result':{

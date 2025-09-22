@@ -21,7 +21,8 @@ class User:
                     
                     a.user_group_id,
                     b.group_num,
-                    b.flag_business_obj,
+                    b.flag_business_obj_1,
+                    b.flag_business_obj_2,
                     b.name AS group_name
                 FROM user a
                 LEFT OUTER JOIN user_group b ON a.user_group_id = b.id
@@ -74,8 +75,9 @@ class User:
                     'user_group': {
                         'id':               row[5],
                         'group_num':        row[6],
-                        'flag_business_obj': row[7],
-                        'name':             row[8]
+                        'flag_business_obj_1': row[7],
+                        'flag_business_obj_2': row[8],
+                        'name':             row[9]
                     }
                 }
                     

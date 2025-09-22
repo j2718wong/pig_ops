@@ -146,7 +146,7 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     
 
 @app.get("/pig_race_line/delete")
-async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
+async def pig_race_line_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -160,7 +160,7 @@ async def pig_race_line_delete(uhid:str, pig_race_line_hid: str):
     user_id = res[0]
     
     
-    res = hashids_common.decrypt(pig_race_line_hid)
+    res = hashids_common.decrypt(ehid)
     if len(res) == 0:
         return {
             'result':{
