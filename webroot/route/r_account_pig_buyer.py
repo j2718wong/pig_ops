@@ -192,7 +192,7 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
     
     # remove plain id
     del res_delete['account_pig_buyer']['id']
-    res_delete['account_pig_buyer']['hid'] = account_pig_buyer_hid
+    res_delete['account_pig_buyer']['hid'] = ehid
         
     return res_delete
     
@@ -244,11 +244,11 @@ async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0,
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['pig_buyer']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['pig_buyer']['id']
+        cur_entry['pig_buyer']['hid']   = cur_hid
         
             
     return {

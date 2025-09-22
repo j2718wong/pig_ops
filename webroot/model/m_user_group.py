@@ -16,7 +16,8 @@ class UserGroup:
                     id,
                     account_id,
                     group_num,
-                    flag_business_obj,
+                    flag_business_obj_1,
+                    flag_business_obj_2,
                     name,
                     
                     flag_priv_user,
@@ -99,47 +100,52 @@ class UserGroup:
                     'id':                       row[0],
                     'account_id':               row[1],
                     'group_num':                row[2],
-                    'flag_business_obj':        row[3],
-                    'flag_business_obj_h':      f"0x{row[3]:08x}",
-                    'name':                     row[4],
+                    'flag_business_obj_1':      row[3],
+                    'flag_business_obj_1_h':    f"0x{row[3]:08x}",
                     
-                    'flag_priv_user':           row[5],
-                    'flag_priv_account':        row[6],
-                    'flag_priv_acc_req':        row[7],
-                    'flag_priv_user_group':     row[8],
-                    
-                    'flag_priv_acc_translation': row[9],
-                    'flag_priv_acc_billing':    row[10],
-                    'flag_priv_acc_pig_buyer':  row[11],
-                    'flag_priv_acc_pig_ops':    row[12],
-                    
-                    'flag_priv_pig_farm':       row[13],
-                    'flag_priv_pig_farm_staff': row[14], 
-                    'flag_priv_pig_race':       row[15],
-                    'flag_priv_pig_race_line':  row[16],
-                    
-                    'flag_priv_semen_supplier': row[17],
-                    'flag_priv_feed_supplier':  row[18],
-                    'flag_priv_feed_brand':     row[19],
-                    'flag_priv_feed_type':      row[20],
-                    'flag_priv_feed_buy':       row[21],
-                    'flag_priv_feed_balance':   row[22],
+                    'flag_business_obj_2':      row[4],
+                    'flag_business_obj_2_h':    f"0x{row[4]:08x}",
                     
                     
-                    'flag_priv_sow_boar':       row[23],
-                    'flag_priv_semen_source':   row[24],
-                    'flag_priv_pig_production': row[25],
-                    'flag_priv_pig_prod_ai':    row[26],
+                    'name':                     row[5],
+                    
+                    'flag_priv_user':           row[6],
+                    'flag_priv_account':        row[7],
+                    'flag_priv_acc_req':        row[8],
+                    'flag_priv_user_group':     row[9],
+                    
+                    'flag_priv_acc_translation': row[10],
+                    'flag_priv_acc_billing':    row[11],
+                    'flag_priv_acc_pig_buyer':  row[12],
+                    'flag_priv_acc_pig_ops':    row[13],
+                    
+                    'flag_priv_pig_farm':       row[14],
+                    'flag_priv_pig_farm_staff': row[15], 
+                    'flag_priv_pig_race':       row[16],
+                    'flag_priv_pig_race_line':  row[17],
+                    
+                    'flag_priv_semen_supplier': row[18],
+                    'flag_priv_feed_supplier':  row[19],
+                    'flag_priv_feed_brand':     row[20],
+                    'flag_priv_feed_type':      row[21],
+                    'flag_priv_feed_buy':       row[22],
+                    'flag_priv_feed_balance':   row[23],
                     
                     
-                    'flag_priv_pig_prod_pig_ops':   row[27],
-                    'flag_priv_pig_prod_pig_dead':  row[28],
-                    'flag_priv_pig_prod_notes':     row[29],
-                    'flag_priv_pig_prod_harvest':   row[30],
+                    'flag_priv_sow_boar':       row[24],
+                    'flag_priv_semen_source':   row[25],
+                    'flag_priv_pig_production': row[26],
+                    'flag_priv_pig_prod_ai':    row[27],
                     
-                    'flag_priv_sow_boar_balance':   row[31],
                     
-                    'dt_entry':                 row[32]
+                    'flag_priv_pig_prod_pig_ops':   row[28],
+                    'flag_priv_pig_prod_pig_dead':  row[29],
+                    'flag_priv_pig_prod_notes':     row[30],
+                    'flag_priv_pig_prod_harvest':   row[31],
+                    
+                    'flag_priv_sow_boar_balance':   row[32],
+                    
+                    'dt_entry':                 row[33]
                     
                 }
                     

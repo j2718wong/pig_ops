@@ -295,7 +295,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
     
     # remove plain id
     del res_delete['account_pig_ops']['id']
-    res_delete['account_pig_ops']['hid'] = account_pig_ops_hid
+    res_delete['account_pig_ops']['hid'] = ehid
         
     return res_delete
     

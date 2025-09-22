@@ -285,7 +285,7 @@ class AccountPigBuyer:
                     SELECT 
                         a.id,
                         a.country_id,
-                        b.name,
+                        b.name AS country_name,
                         
                         a.address_level_1_id,
                         a.address_level_2_id,
@@ -304,12 +304,12 @@ class AccountPigBuyer:
                         d.name_first,
                         a.dt_last_update
                         
-                    FROM account_pig_ops a
+                    FROM account_pig_buyer a
                     LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                     %s
-                    ORDER BY a.num_days_since
+                    ORDER BY a.name
                     """ % where_clause
 
             
@@ -351,9 +351,9 @@ class AccountPigBuyer:
                 cur_country_id          = row[1]
                 cur_country_name        = row[2]
                 
-                cur_address_level_1_id     = row[3]
-                cur_address_level_2_id     = row[4]
-                cur_address_level_3_id     = row[5]
+                cur_address_level_1_id  = row[3]
+                cur_address_level_2_id  = row[4]
+                cur_address_level_3_id  = row[5]
                 
                 cur_name                = row[6]
                 cur_contact_number      = row[7]
@@ -382,15 +382,15 @@ class AccountPigBuyer:
                             
                             'address':{
                                 'level_1':  {
-                                    'id':   cur_farm_address_level_1_id
+                                    'id':   cur_address_level_1_id
                                 },
                                 
                                 'level_2':  {
-                                    'id':   cur_farm_address_level_2_id
+                                    'id':   cur_address_level_2_id
                                 },
                                 
                                 'level_3_id': {
-                                    'id':   cur_farm_address_level_3_id
+                                    'id':   cur_address_level_3_id
                                 }
                             }
                         }
@@ -417,15 +417,15 @@ class AccountPigBuyer:
                             
                             'address':{
                                 'level_1':  {
-                                    'id':   cur_farm_address_level_1_id
+                                    'id':   cur_address_level_1_id
                                 },
                                 
                                 'level_2':  {
-                                    'id':   cur_farm_address_level_2_id
+                                    'id':   cur_address_level_2_id
                                 },
                                 
                                 'level_3_id': {
-                                    'id':   cur_farm_address_level_3_id
+                                    'id':   cur_address_level_3_id
                                 }
                             }
                         },

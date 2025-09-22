@@ -349,7 +349,7 @@ async def semen_source_delete(uhid:str, ehid: str):
     
     # remove plain id
     del res_delete['semen_source']['id']
-    res_delete['semen_source']['hid'] = semen_source_hid
+    res_delete['semen_source']['hid'] = ehid
         
     return res_delete
 

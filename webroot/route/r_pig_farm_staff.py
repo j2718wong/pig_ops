@@ -262,7 +262,7 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
     
     # remove plain id
     del res_delete['pig_farm_staff']['id']
-    res_delete['pig_farm_staff']['hid'] = pig_farm_staff_hid
+    res_delete['pig_farm_staff']['hid'] = ehid
         
     return res_delete
     
