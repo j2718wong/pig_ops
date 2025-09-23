@@ -158,6 +158,19 @@ class DataPigRaceLine(BaseModel):
     pig_race_id:            int
     name:                   str
     description:            str =  None
+    
+
+class DataPigPen(BaseModel):
+    uhid:                   str
+    pig_pen_hid:            str = None
+        
+        
+    user_id:                int = 0
+    pig_pen_id:             int = 0
+        
+        
+    pig_pen_type_id:        int
+    name:                   str
 
 
 class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):

@@ -16,6 +16,7 @@ from common_fast_api        import *
 import requests
 import random
 import json
+import string
 import copy
 import pprint
 
@@ -137,6 +138,15 @@ RANDOM_PIG_BUYERS = [
 
 
 
+def generate_random_string(length):
+    # Define the characters to choose from
+    characters = string.ascii_letters + string.digits
+    # Generate the random string by choosing 'length' characters
+    random_string = ''.join(random.choices(characters, k=length))
+    return random_string
+
+
+
 def write_summary_to_file(summary):
     s = json.dumps(summary, indent=4)
 
@@ -166,22 +176,47 @@ class TestBase:
         self.url_add = url_add
     
     
-    def request_add(self, data):
+    def request_add(self, data, input_checks = None):
+        """
+        input_checks : list of dictionary
+            [
+                {'input':'uhid', 'type':'str', 'cannot_be_empty': 1, 'test_random': 1}
+            ]
+        """
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         print(f"\n\n#################  {dt_now_s}  ###########################")
         
-        values = (self.business_object, self.url_add)
-        print('\n***** Testing add %s; url = %s ; data' % values)
-        pprint.pprint(data)
         
-        r = requests.post(self.url_add, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
+        if input_checks is not None:
+            
+            for cur_entry in input_checks:
+                cur_entry_type = cur_entry['type']
+                if cur_entry_type == 'str':
+                    
+                    values = cur_entry['input']
+                    print ('\n\nTesting input check; invalid input: %s') % values
+                    
+                    if 'test_random' in cur_entry:
+                        
+                        cur_data = copy.copy(data)
+                        cur_data[cur_entry['input']] = generate_random_string(6)
+                        res_json = self._request_add_send(cur_data)
+                        
+                        result_num  = res_json['result']['num']
+                        assert(result_num > 0)
+                    
+                    if 'cannot_be_empty' in cur_entry:
+                        cur_data = copy.copy(data)
+                        cur_data[cur_entry['input']] = ''
+                        res_json = self._request_add_send(cur_data)
+                        
+                        result_num  = res_json['result']['num']
+                        assert(result_num > 0)
+                    
         
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
+        res_json = self._request_add_send(data)
         
         result_num  = res_json['result']['num']
         assert(result_num == 0)
@@ -215,6 +250,21 @@ class TestBase:
         self.summary[self.business_object]['add'] = 'OK'
         
         write_summary_to_file(self.summary)
+        
+        return res_json
+    
+    
+    def _request_add_send(self, data):
+        values = (self.business_object, self.url_add)
+        print('\n***** Testing add %s; url = %s ; data' % values)
+        pprint.pprint(data)
+        
+        r = requests.post(self.url_add, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
         
         return res_json
     
@@ -359,6 +409,29 @@ class TestAccount(TestBase):
         self.summary['account']['user_groups_list'] = 'OK'
         
     
+class TestFeedBrand(TestBase):
+    def __init__(self, summary):
+        super().__init__('feed_brand', summary)
+    
+    
+    def test_add(self, user_id, name):
+        user_uhid   = hashids_user.encrypt(user_id)
+            
+        data = {
+            "uhid":         user_uhid,
+            "name":         name
+        }
+
+        
+        input_checks = [
+            {'input':'uhid', 'type':'str',  'test_random': 1},
+            {'input':'name', 'type':'str', 'cannot_be_empty': 1}
+        ]
+
+
+        res_json = self.request_add(data, input_checks)
+        return data
+    
     
 
 class TestFeedSupplier(TestBase):
@@ -376,6 +449,11 @@ class TestFeedSupplier(TestBase):
             "address_level_2_id":   ADRS_LEVEL_2_ID_NAGA,
             "address_level_3_id":   ADRS_LEVEL_3_ID_TAGJAGUIMIT
         }
+
+        input_checks = [
+            {'input':'uhid', 'type':'str',  'test_random': 1},
+            {'input':'name', 'type':'str', 'cannot_be_empty': 1}
+        ]
 
         res_json = self.request_add(data)
         return data
@@ -397,8 +475,7 @@ class TestFeedSupplier(TestBase):
 
 class TestSemenSupplier(TestBase):
     def __init__(self, summary):
-        self.business_object = 'semen_supplier'
-        super().__init__(self.business_object, summary)
+        super().__init__('semen_supplier', summary)
         
     
     def test_add(self, user_id):
@@ -429,10 +506,17 @@ class TestSemenSupplier(TestBase):
         return self.request_list(url)
         
 
+class TestPigRaceLine(TestBase):
+    def __init__(self, summary):
+        super().__init__('pig_race_line', summary)
+
+    
+
+
+
 class TestAccountPigBuyer(TestBase):
     def __init__(self, summary):
-        self.business_object = 'account_pig_buyer'
-        super().__init__(self.business_object, summary)
+        super().__init__('account_pig_buyer', summary)
         
     
     def test_add(self, user_id, num_entries = 2):
@@ -478,8 +562,7 @@ class TestAccountPigBuyer(TestBase):
 
 class TestAccountPigOps(TestBase):
     def __init__(self, summary):
-        self.business_object = 'account_pig_ops'
-        super().__init__(self.business_object, summary)
+        super().__init__('account_pig_ops', summary)
     
     
     def test_add(self, user_id, operation_type):
@@ -534,7 +617,6 @@ class TestAccountPigOps(TestBase):
         
         self.request_update(data)
         
-    
 
 class TestFarmStaff(TestBase):
     def __init__(self, summary):
@@ -630,7 +712,9 @@ class TestAPIAccount:
             
         
         account_hid = data_input['account_hid']
-        #account_id = self.summary['account']
+        
+        res = hashids_account.decrypt(account_hid)
+        account_id = res[0]
             
         t.test_get_usergroups(account_hid)
         
@@ -691,80 +775,18 @@ class TestAPIAccount:
 
 
     def test_feed_brand(self, user_id):
-        user_uhid   = hashids_user.encrypt(user_id)
+        t = TestFeedBrand(self.summary)
+        data_input = t.test_add(user_id, 'Promix')
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
-        
-        url = BASE_URL + 'feed_brand/add'
-            
-        data = {
-            "uhid":         user_uhid,
-            "name":         'Promix',
-        }
-        
-
-        print(f'***** Testing adding feed_brand; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-        self.summary['feed_brand'] = {}
-        self.summary['feed_brand']['add'] = 'OK'
+        data_input = t.test_add(user_id, 'UltraPack')
         
         
-        
-        url = BASE_URL + 'feed_brand/add'
-            
-        data = {
-            "uhid":         user_uhid,
-            "name":         'Ultrapack',
-        }
-        
-
-        print(f'***** Testing adding feed_brand; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-        self.summary['feed_brand']['add'] = 'OK'
-        
+        t.test_duplicate_add(data_input)
         
         
         # Test get_list feed_brand
         url = BASE_URL + 'feed_brand/list?inc_deleted=1&inc_user_audit=1'
-        
-        print(f'\n\n****** Testing pig_race_line get_list; url = {url} ')
-        
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-    
-        len_items = len(res_json['data'])
-        assert(len_items > 0)
-        
-        
-        self.summary['feed_brand']['list'] = 'OK'
+        t.request_list(url)
     
     
     def test_feed_supplier(self, user_id):
