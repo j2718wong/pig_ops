@@ -202,7 +202,7 @@ class AccountPigBuyer:
         )
         """
        
-        sql =  'CALL account_pig_ops_delete('
+        sql =  'CALL account_pig_buyer_delete('
         sql += '%s,'    % user_id
         sql += '%s);'   % account_pig_buyer_id
         

@@ -117,7 +117,7 @@ class SemenSupplier:
         )  
         """
         
-        sql =  'CALL semen_supplier_add('
+        sql =  'CALL semen_supplier_update('
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.semen_supplier_id

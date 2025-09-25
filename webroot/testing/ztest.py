@@ -510,9 +510,37 @@ class TestPigRaceLine(TestBase):
     def __init__(self, summary):
         super().__init__('pig_race_line', summary)
 
+
+    def test_add(self, user_id, name = None):
+        user_uhid   = hashids_user.encrypt(user_id)
+        
+        data = {
+            "uhid":                 user_uhid,
+            "pig_race_id":          1,
+            "name":                 SAMPLE_PIG_RACE_LINE['name'],
+            "description":          SAMPLE_PIG_RACE_LINE['description']
+        }
+        
+        if name is not None:
+            data['name'] = name
+        
+        res_json = self.request_add(data)
+        return data
+        
     
-
-
+    def test_update(self, data):
+        
+        # Test pig_race_line update
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        data['name']    = data['name'] + dt_now_s
+              
+        self.request_update(data)
+        
 
 class TestAccountPigBuyer(TestBase):
     def __init__(self, summary):
@@ -722,6 +750,11 @@ class TestAPIAccount:
         self.test_account_pig_buyer(user_id)
         
         
+        print(f'\n\n***** Testing get account_pig_ops list before testing; account_id = {account_id}')
+        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_GESTATING)
+        len_items = len(res)
+        print("num_items=%s" % len_items )        
+        
         self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_GESTATING)
         
         print(f'\n\n***** Testing get account_pig_ops list; account_id = {account_id}')
@@ -748,7 +781,7 @@ class TestAPIAccount:
         self.summary['account']['lactating_ops_list'] = 'OK'
         
         
-        self.test_pig_race_line(user_id, account_hid)
+        self.test_pig_race_line(user_id)
         
         self.test_semen_supplier(user_id)
         
@@ -982,8 +1015,7 @@ class TestAPIAccount:
         
         # Test delete account_pig_buyer
         values = (user_uhid, entry_hid)
-        url = BASE_URL + 'account_pig_buyer/delete?uhid=%s&ehid=%s' % values
-        
+        url = BASE_URL + 'account_pig_buyer/delete?uhid=%s&ehid=%s' % values        
         t.request_delete(url)
         
         
@@ -994,186 +1026,33 @@ class TestAPIAccount:
         t.request_list(url)
         
         
-    def test_pig_race_line(self, user_id, account_hid):
-        user_uhid   = hashids_user.encrypt(user_id)
+    def test_pig_race_line(self, user_id):
+        t = TestPigRaceLine(self.summary)
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
+        data_input = t.test_add(user_id)
         
+        t.test_duplicate_add(data_input)
         
-
-        url = BASE_URL + 'pig_race_line/add'
-        
-        data = {
-            "uhid":                 user_uhid,
-            "pig_race_id":          1,
-            "name":                 SAMPLE_PIG_RACE_LINE['name'],
-            "description":          SAMPLE_PIG_RACE_LINE['description']
-        }
-        
-
-        print(f"***** Testing adding pig_race_line; url = {url} ; data")
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-        self.summary['pig_race_line']['add'] = 'OK'
-        
-        
-        is_id_visible = True if 'id' in res_json['pig_race_line'] else False
-        assert(is_id_visible == False)
-        
-        
-        pig_race_line_hid  = res_json['pig_race_line']['hid']
-        res_decrypt         = hashids_common.decrypt(pig_race_line_hid)
-        pig_race_line_id    = res_decrypt[0]
-        
-        print(f"pig_race_line_id = {pig_race_line_id}")
-        assert(pig_race_line_id > 0)
-        
-    
-        # Test pig_race_line add duplicate
-        url = BASE_URL + 'pig_race_line/add'
-            
-        data = {
-            "uhid":                 user_uhid,
-            "pig_race_id":          1,
-            "name":                 SAMPLE_PIG_RACE_LINE['name'],
-            "description":          SAMPLE_PIG_RACE_LINE['description']
-        }
-            
-
-        print(f"\n\n***** Testing duplicate adding pig_race_line; url = {url} ; data")
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
- 
-        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
-        
-        self.summary['pig_race_line']['add_duplicate_check'] = 'OK'
+        t.test_update(data_input) 
             
         
+        data_input = t.test_add(user_id, name = "new pig race line")
+        user_uhid   = data_input['uhid']
+        entry_hid   = data_input['pig_race_line_hid']
         
-        # Test pig_race_line update
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
-        
-        url = BASE_URL + 'pig_race_line/update'
-        
-        data = {
-            "uhid":                 user_uhid,
-            "pig_race_line_hid":    pig_race_line_hid,
-            "pig_race_id":          1,
-            "name":                 SAMPLE_PIG_RACE_LINE['name'] + dt_now_s,
-            "description":          SAMPLE_PIG_RACE_LINE['description']
-        }
-        
-        
-        print(f"\n\n***** Testing pig_race_line update; url = {url} ; data")
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result = ")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-        
-        self.summary['pig_race_line']['update'] = 'OK'
-        
-        
-        # Add new pig_race_line
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
-        
-        url = BASE_URL + 'pig_race_line/add'
-            
-        data = {
-            "uhid":                 user_uhid,
-            "pig_race_id":          1,
-            "name":                 SAMPLE_PIG_RACE_LINE['name'] + dt_now_s,
-            "description":          SAMPLE_PIG_RACE_LINE['description']
-        }
-        
-
-        print(f"\n\n***** Testing adding pig_race_line; url = {url} ; data")
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-        if result_num != 0:
-            return
-        
-        
-        is_id_visible = True if 'id' in res_json['pig_race_line'] else False
-        assert(is_id_visible == False)
-        
-        new_pig_race_line_hid = res_json['pig_race_line']['hid']
         
         
         # Test delete pig_race_line
-        values = (user_uhid, new_pig_race_line_hid)
-        url = BASE_URL + 'pig_race_line/delete?uhid=' + user_uhid + '&pig_race_line_hid=' + new_pig_race_line_hid
-        
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\n***** Testing pig_race_line delete; url = {url} ")
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-        
-        self.summary['pig_race_line']['delete'] = 'OK'
+        values = (user_uhid, entry_hid)
+        url = BASE_URL + 'pig_race_line/delete?uhid=%s&ehid=%s' % values
+        t.request_delete(url)
         
         
+        account_hid = self.summary['account']['account_hid']
         
         # Test get_list pig_race_line
         url = BASE_URL + 'pig_race_line/list?ahid=' + account_hid + '&inc_deleted=1&inc_user_audit=1'
-        
-        print(f"\n\nTesting pig_race_line get_list; url = {url} ")
-        
-        r = requests.get(url)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        len_items = len(res_json['data'])
-        assert(len_items > 0)
-        
-        self.summary['pig_race_line']['list'] = 'OK'
-        
-        return {
-            'pig_race_line_id': pig_race_line_id
-        }
+        t.request_list(url)
         
        
     def test_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
