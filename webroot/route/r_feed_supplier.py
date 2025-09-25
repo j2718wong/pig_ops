@@ -105,8 +105,24 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     user_id = res[0]
     
     
+    feed_supplier_hid = pig_race_line_data.feed_supplier_hid
+    
+    res = hashids_common.decrypt(feed_suplier_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_SUPPLIER_HASHID,
+                'code': 'ERROR_FEED_SUPPLIER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    semen_supplier_id = res[0]
+    
+    
     feed_supplier_data.name      = name
     feed_supplier_data.user_id   = user_id
+    feed_supplier_data.feed_supplier_hid = feed_supplier_hid
     
     res_update      =  model['feed_supplier'].update(feed_supplier_data)
     

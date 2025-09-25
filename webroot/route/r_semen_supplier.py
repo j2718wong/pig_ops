@@ -125,12 +125,28 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
     user_id = res[0]
     
     
+    semen_supplier_hid = semen_supplier_data.semen_supplier_hid
+    
+    res = hashids_common.decrypt(semen_supplier_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_HASHID,
+                'code': 'ERROR_SEMEN_SUPPLIER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    semen_supplier_id = res[0]
+    
+    
     semen_supplier_data.name      = name
     semen_supplier_data.user_id   = user_id
+    semen_supplier_data.semen_supplier_id = semen_supplier_id
     
-    res_add    =  model['semen_supplier'].update(semen_supplier_data)
+    res_update    =  model['semen_supplier'].update(semen_supplier_data)
     
-    if res_add is None:
+    if res_update is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
@@ -140,15 +156,15 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
         }
     
     
-    semen_supplier_id    = res_add['semen_supplier']['id']
+    semen_supplier_id    = res_update['semen_supplier']['id']
     semen_supplier_hid   = hashids_common.encrypt(semen_supplier_id)
     
     # remove plain id
-    del res_add['semen_supplier']['id']
-    res_add['semen_supplier']['hid'] = semen_supplier_hid
+    del res_update['semen_supplier']['id']
+    res_update['semen_supplier']['hid'] = semen_supplier_hid
 
         
-    return res_add
+    return res_update
     
 
 

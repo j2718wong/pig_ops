@@ -178,8 +178,8 @@ async def feed_buy_update(feed_buy_data: dm.DataFeedBuy):
     feed_buy_id = res[0]
     
     
-    feed_buy_data.user_id          = user_id
-    feed_buy_data.feed_buy_id = feed_buy_id
+    feed_buy_data.user_id           = user_id
+    feed_buy_data.feed_buy_id       = feed_buy_id
     
     
     res_update    =  model['feed_buy'].update(feed_buy_data)

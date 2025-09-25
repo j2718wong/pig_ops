@@ -241,8 +241,6 @@ class TestBase:
         key = self.business_object + '_hid'
         data[key] = entry_hid
 
-        if self.business_object not in self.summary:
-            self.summary[self.business_object] = {}
             
         if self.business_object not in self.summary:
             self.summary[self.business_object] = {}
@@ -378,7 +376,11 @@ class TestAccount(TestBase):
             
             self.summary['account']['account_hid'] = data['account_hid']
             self.summary['account']['register'] = 'OK'
-        
+            
+            res = hashids_account.decrypt(data['account_hid'])
+            account_id = res[0]
+            self.summary['account']['account_id'] = account_id
+            
         return data
         
         
@@ -502,7 +504,7 @@ class TestSemenSupplier(TestBase):
     
     
     def test_get_list(self, address_level_1_id):
-        url = BASE_URL + 'semen_supplier/list?address_level_1_id=' + address_level_1_id 
+        url = BASE_URL + 'semen_supplier/list?address_level_1_id=%s' % address_level_1_id 
         return self.request_list(url)
         
 
@@ -730,6 +732,14 @@ class TestAPIAccount:
             
     
     def test_account_register(self, user_id, acc_name):
+        
+        """
+        if 'ztest_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_step = self.summary['ztest_step']
+        """
+            
         t = TestAccount(self.summary)
         
         data_input = t.test_register(user_id, acc_name)
@@ -745,15 +755,10 @@ class TestAPIAccount:
         account_id = res[0]
             
         t.test_get_usergroups(account_hid)
-        
+            
         
         self.test_account_pig_buyer(user_id)
         
-        
-        print(f'\n\n***** Testing get account_pig_ops list before testing; account_id = {account_id}')
-        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_GESTATING)
-        len_items = len(res)
-        print("num_items=%s" % len_items )        
         
         self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_GESTATING)
         
@@ -786,6 +791,7 @@ class TestAPIAccount:
         self.test_semen_supplier(user_id)
         
         self.test_feed_brand(user_id)
+        
         self.test_feed_supplier(user_id)
         
         
@@ -803,7 +809,7 @@ class TestAPIAccount:
         
         t.test_update(data_input)
         
-        address_level_1_id = ADRS_LEVEL_1_ID_CEBU
+        address_level_1_id = ADRS_LEVEL_1_ID_CEBU_PROV
         t.test_get_list(address_level_1_id)
 
 

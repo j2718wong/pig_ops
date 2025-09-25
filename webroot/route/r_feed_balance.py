@@ -115,9 +115,9 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
     user_id = res[0]
     
     
-    feed_balanceance_hid    = feed_balance_data.feed_balanceance_hid
+    feed_balance_hid    = feed_balance_data.feed_balance_hid
     
-    res = hashids_common.decrypt(feed_balanceance_hid)
+    res = hashids_common.decrypt(feed_balance_hid)
     if len(res) == 0:
         return {
             'result':{
@@ -127,11 +127,11 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
             }
         }
     
-    feed_balanceance_id = res[0]
+    feed_balance_id = res[0]
     
     
-    feed_balance_data.user_id          = user_id
-    feed_balance_data.feed_balance_id = feed_balanceance_id
+    feed_balance_data.user_id           = user_id
+    feed_balance_data.feed_balance_id   = feed_balance_id
    
     
     res_update    =  model['feed_balance'].update(feed_balance_data)

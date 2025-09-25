@@ -107,7 +107,6 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     
     pig_race_line_hid = pig_race_line_data.pig_race_line_hid
     
-    
     res = hashids_common.decrypt(pig_race_line_hid)
     if len(res) == 0:
         return {
