@@ -177,9 +177,6 @@ async def semen_supplier_list( address_level_1_id: int):
     Parameters
     ----------
     
-    country_id:int
-        country_id
-
     inc_deleted: int
         if > 0, will include deleted entries
     
@@ -188,8 +185,7 @@ async def semen_supplier_list( address_level_1_id: int):
     """
     
         
-    res = model['semen_supplier'].get_list(country_id, address_level_1_id,
-            inc_deleted, inc_user_audit)
+    res = model['semen_supplier'].get_list(address_level_1_id)
     
     if res is None:
         return {
@@ -203,11 +199,11 @@ async def semen_supplier_list( address_level_1_id: int):
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['semen_supplier']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['semen_supplier']['id']
+        cur_entry['semen_supplier']['hid']   = cur_hid
         
     
     return {

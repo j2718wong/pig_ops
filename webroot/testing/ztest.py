@@ -196,7 +196,7 @@ class TestBase:
                 if cur_entry_type == 'str':
                     
                     values = cur_entry['input']
-                    print ('\n\nTesting input check; invalid input: %s') % values
+                    print ('\n\nTesting input check; invalid input: %s' % values) 
                     
                     if 'test_random' in cur_entry:
                         
@@ -732,67 +732,175 @@ class TestAPIAccount:
             
     
     def test_account_register(self, user_id, acc_name):
+        proceed_test    = 0
+        cur_step        = 1
         
-        """
-        if 'ztest_step' not in self.summary:
+        if 'ztest_last_step' not in self.summary:
             proceed_test = 1
         else:
-            ztest_step = self.summary['ztest_step']
-        """
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            t = TestAccount(self.summary)
             
-        t = TestAccount(self.summary)
+            data_input = t.test_register(user_id, acc_name)
+            
+            t.test_duplicate_add(data_input)
         
-        data_input = t.test_register(user_id, acc_name)
-        
-        t.test_duplicate_add(data_input)
-    
-        t.test_update(data_input)
+            t.test_update(data_input)
+                
+            
+            account_hid = data_input['account_hid']
+            
+            res = hashids_account.decrypt(account_hid)
+            account_id = res[0]
+                
+            t.test_get_usergroups(account_hid)
+            
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'TestAccount'
+            write_summary_to_file(self.summary)
             
         
-        account_hid = data_input['account_hid']
         
-        res = hashids_account.decrypt(account_hid)
-        account_id = res[0]
+        proceed_test    = 0
+        cur_step        = 2
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            self.test_account_pig_buyer(user_id)
             
-        t.test_get_usergroups(account_hid)
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_account_pig_buyer'
+            write_summary_to_file(self.summary)
+        
+        
+        
+        proceed_test    = 0
+        cur_step        = 3
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        
+        if proceed_test > 0:
+            self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_GESTATING)
             
-        
-        self.test_account_pig_buyer(user_id)
-        
-        
-        self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_GESTATING)
-        
-        print(f'\n\n***** Testing get account_pig_ops list; account_id = {account_id}')
-        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_GESTATING)
-        len_items = len(res)
-        
-        print(f'\n\nAccount gestating_ops; len = {len_items}')
-        pprint.pprint(res)
-        assert(len_items>= 3)
-        
-        self.summary['account']['gestating_ops_list'] = 'OK'
-        
-        
-        self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
-        
-        print(f'\n\n***** Testing get account_pig_ops; account_id = {account_id}')
-        res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
-        len_items = len(res)
-        
-        print(f'\n\nAccount lactating_ops; len = {len_items}')
-        pprint.pprint(res)
-        assert(len_items >= 4)
-        
-        self.summary['account']['lactating_ops_list'] = 'OK'
+            print(f'\n\n***** Testing get account_pig_ops list; account_id = {account_id}')
+            res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_GESTATING)
+            len_items = len(res)
+            
+            print(f'\n\nAccount gestating_ops; len = {len_items}')
+            pprint.pprint(res)
+            assert(len_items>= 3)
+            
+            self.summary['account']['gestating_ops_list'] = 'OK'
+            
+            
+            self.test_account_pig_ops(user_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
+            
+            print(f'\n\n***** Testing get account_pig_ops; account_id = {account_id}')
+            res = model['account_pig_ops'].get_list(account_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS)
+            len_items = len(res)
+            
+            print(f'\n\nAccount lactating_ops; len = {len_items}')
+            pprint.pprint(res)
+            assert(len_items >= 4)
+            
+            self.summary['account']['lactating_ops_list'] = 'OK'
+            
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_account_pig_ops'
+            write_summary_to_file(self.summary)
         
         
-        self.test_pig_race_line(user_id)
         
-        self.test_semen_supplier(user_id)
+        proceed_test    = 0
+        cur_step        = 4
         
-        self.test_feed_brand(user_id)
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+                
+        if proceed_test > 0:
+            self.test_pig_race_line(user_id)
         
-        self.test_feed_supplier(user_id)
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_pig_race_line'
+            write_summary_to_file(self.summary)
+        
+        
+        
+        proceed_test    = 0
+        cur_step        = 5
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            self.test_semen_supplier(user_id)
+            
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_semen_supplier'
+            write_summary_to_file(self.summary)
+        
+        
+        
+        proceed_test    = 0
+        cur_step        = 6
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            self.test_feed_brand(user_id)
+            
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_feed_brand'
+            write_summary_to_file(self.summary)
+        
+        
+        
+        proceed_test    = 0
+        cur_step        = 7
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            self.test_feed_supplier(user_id)
+        
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_feed_supplier'
+            write_summary_to_file(self.summary)
+        
         
         
         return {

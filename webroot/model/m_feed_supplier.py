@@ -21,6 +21,9 @@ class FeedSupplier:
             in_address_level_3_id   INT,
             
             in_name                 VARCHAR(50)
+            in_contact_number       VARCHAR(20),
+            in_whatsapp             VARCHAR(20),
+            in_messenger            VARCHAR(50)
         )  
         """
         
@@ -32,7 +35,24 @@ class FeedSupplier:
         sql += '%s,'    % data.address_level_2_id
         sql += '%s,'    % data.address_level_3_id
         
-        sql += '"%s")'  % data.name
+        sql += '"%s",'  % data.name
+        
+        if data.contact_number is not None and len(data.contact_number) > 0:
+            sql += '"%s",'  % data.contact_number
+        else:
+            sql += 'NULL,'
+        
+        if data.whatsapp is not None and len(data.whatsapp) > 0:
+            sql += '"%s",'  % data.whatsapp
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.messenger is not None and len(data.messenger) > 0:
+            sql += '"%s");' % data.messenger
+        else:
+            sql += 'NULL);'
+        
         
         
         # Check if still connected to database
@@ -86,10 +106,12 @@ class FeedSupplier:
             
             in_feed_supplier_id     INT,
             
-            in_address_level_2_id   INT,
             in_address_level_3_id   INT,
-            
-            in_name                 VARCHAR(50)
+    
+            in_name                 VARCHAR(50),
+            in_contact_number       VARCHAR(20),
+            in_whatsapp             VARCHAR(20),
+            in_messenger            VARCHAR(50)
         )  
         """
         
@@ -98,10 +120,26 @@ class FeedSupplier:
         
         sql += '%s,'    % data.in_feed_supplier_id
         
-        sql += '%s,'    % data.address_level_2_id
+       
         sql += '%s,'    % data.address_level_3_id
         
-        sql += '"%s")'  % data.name
+         sql += '"%s",'  % data.name
+        
+        if data.contact_number is not None and len(data.contact_number) > 0:
+            sql += '"%s",'  % data.contact_number
+        else:
+            sql += 'NULL,'
+        
+        if data.whatsapp is not None and len(data.whatsapp) > 0:
+            sql += '"%s",'  % data.whatsapp
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.messenger is not None and len(data.messenger) > 0:
+            sql += '"%s");' % data.messenger
+        else:
+            sql += 'NULL);'
         
         
         # Check if still connected to database
@@ -153,14 +191,17 @@ class FeedSupplier:
         sql =   """
                 SELECT 
                     a.id,
+                    a.name,
+                    a.contact_number,
+                    a.whatsapp,
+                    a.messenger,
+                    
                     a.country_id,
                     b.name AS country_name,
                     a.address_level_1_id,
                     a.address_level_2_id,
-                    a.address_level_3_id,
+                    a.address_level_3_id
                     
-                    a.name,
-                    a.dt_entry
                 FROM feed_supplier a 
                 LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                 WHERE  a.address_level_2_id = %s 
