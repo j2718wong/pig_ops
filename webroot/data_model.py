@@ -42,6 +42,7 @@ class DataAccountSettings(BaseModel):
     user_id:                int = 0
     day_1_on_date_of_birth: int = 0
     num_days_weaning:       int = 45
+    num_days_harvest:       int = 100
 
 
 class DataPigFarm(BaseModel, HasAddressLevel):

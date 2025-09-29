@@ -52,7 +52,8 @@ RANDOM_BOAR_NAMES = ['Berto', 'Kurdapyo', 'KiKoY', 'Didoy', 'Gorio', 'Desidido',
 ]
 
 
-RANDOM_STAFF_NAMES = ['Arnel', 'Kevin', 'Michael', 'Hilmero', 'Bogart', 'Ruben']
+RANDOM_STAFF_NAMES = ['Arnel', 'Kevin', 'Michael', 'Hilmero', 'Bogart', 'Ruben',
+                    'Juffrey', 'Irvil']
 
 
 SAMPLE_CUSTOMIZED_GESTATING_OPS = {
@@ -193,13 +194,13 @@ class TestBase:
             
             for cur_entry in input_checks:
                 cur_entry_type = cur_entry['type']
+                
+                values = cur_entry['input']
+                print ('\n\nTesting input check; invalid input: %s' % values) 
+                
+                
                 if cur_entry_type == 'str':
-                    
-                    values = cur_entry['input']
-                    print ('\n\nTesting input check; invalid input: %s' % values) 
-                    
-                    if 'test_random' in cur_entry:
-                        
+                    if 'test_random' in cur_entry:                        
                         cur_data = copy.copy(data)
                         cur_data[cur_entry['input']] = generate_random_string(6)
                         res_json = self._request_add_send(cur_data)
@@ -214,6 +215,17 @@ class TestBase:
                         
                         result_num  = res_json['result']['num']
                         assert(result_num > 0)
+                        
+                        
+                if cur_entry_type == 'int':
+                    if 'cannot_be_zero' in cur_entry:                        
+                        cur_data = copy.copy(data)
+                        cur_data[cur_entry['input']] = 0
+                        res_json = self._request_add_send(cur_data)
+                        
+                        result_num  = res_json['result']['num']
+                        assert(result_num > 0)
+                
                     
         
         res_json = self._request_add_send(data)
@@ -491,10 +503,12 @@ class TestFeedSupplier(TestBase):
 
         input_checks = [
             {'input':'uhid', 'type':'str',  'test_random': 1},
-            {'input':'name', 'type':'str', 'cannot_be_empty': 1}
+            {'input':'name', 'type':'str', 'cannot_be_empty': 1},
+            {'input':'address_level_1_id', 'type':'int', 'cannot_be_zero': 1},
+            {'input':'address_level_2_id', 'type':'int', 'cannot_be_zero': 1}
         ]
 
-        res_json = self.request_add(data)
+        res_json = self.request_add(data, input_checks)
         return data
         
         
@@ -526,6 +540,11 @@ class TestSemenSupplier(TestBase):
             "address_level_1_id":   ADRS_LEVEL_1_ID_CEBU_PROV,
             "address_level_2_id":   ADRS_LEVEL_2_ID_ARGAO
         }
+        
+        input_checks = [
+            {'input':'uhid', 'type':'str',  'test_random': 1},
+            {'input':'name', 'type':'str', 'cannot_be_empty': 1}
+        ]
         
         res_json = self.request_add(data)
         return data
@@ -684,7 +703,7 @@ class TestAccountPigOps(TestBase):
 
 class TestFarmStaff(TestBase):
     def __init__(self, summary):
-        super().__init__('farm_staff', summary)
+        super().__init__('pig_farm_staff', summary)
         
     
     def test_add(self, user_id, pig_farm_id, num_entries = 3):
@@ -706,7 +725,7 @@ class TestFarmStaff(TestBase):
             if index in taken_index:
                 continue
                 
-            index = taken_index.append(index)
+            taken_index.append(index)
             
             staff_name      = RANDOM_STAFF_NAMES[index]
             
@@ -736,7 +755,7 @@ class TestFarmStaff(TestBase):
     
 class TestPigFarm(TestBase):
     def __init__(self, summary):
-        super().__init__(self.pig_farm, summary)
+        super().__init__('pig_farm', summary)
         
     
     def test_add(self, user_id, farm_name):
@@ -806,7 +825,7 @@ class TestAPIAccount:
         
         else:
             if 'test_run' not in self.summary:
-                test_run = 'test_run':{
+                test_run = {
                     'num':  1,
                     'dt':   dt_now_s
                 }
@@ -844,6 +863,7 @@ class TestAPIAccount:
             
             t.test_update_settings(user_id)
                 
+            account_hid = data_input['account_hid']
             t.test_get_usergroups(account_hid)
             
             self.summary['ztest_last_step'] = cur_step
@@ -1298,7 +1318,8 @@ class TestAPIAccount:
         }
         
         if is_external > 0:
-            data['number'] =  None
+            del data['number']
+            del data['date_of_birth']
         
         
         url = BASE_URL + 'sow_boar/add'

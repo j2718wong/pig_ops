@@ -118,7 +118,7 @@ class FeedSupplier:
         sql =  'CALL feed_supplier_update('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.in_feed_supplier_id
+        sql += '%s,'    % data.feed_supplier_id
         
        
         sql += '%s,'    % data.address_level_3_id

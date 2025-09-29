@@ -1307,9 +1307,6 @@ class ReportGenPigProdOps:
         
         res = model['pig_farm'].get_sow_boar_balance(pig_farm_id)
         
-        pprint.pprint(res)
-        
-        
         
         s  = 'SOW BOAR BALANCE       ===== SOW(ANAY) =====    BOAR     NON-PROD FEEDS\n'
         s += '                       GESTA   LACTA   TOTAL    TOTAL    GESTA  FINISHER\n'

@@ -105,9 +105,9 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     user_id = res[0]
     
     
-    feed_supplier_hid = pig_race_line_data.feed_supplier_hid
+    feed_supplier_hid = feed_supplier_data.feed_supplier_hid
     
-    res = hashids_common.decrypt(feed_suplier_hid)
+    res = hashids_common.decrypt(feed_supplier_hid)
     if len(res) == 0:
         return {
             'result':{
@@ -117,12 +117,12 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
             }
         }
     
-    semen_supplier_id = res[0]
+    feed_supplier_id = res[0]
     
     
     feed_supplier_data.name      = name
     feed_supplier_data.user_id   = user_id
-    feed_supplier_data.feed_supplier_hid = feed_supplier_hid
+    feed_supplier_data.feed_supplier_id = feed_supplier_id
     
     res_update      =  model['feed_supplier'].update(feed_supplier_data)
     
@@ -135,9 +135,6 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
             }
         }
     
-    
-    feed_supplier_id    = res_update['feed_supplier']['id']
-    feed_supplier_hid   = hashids_common.encrypt(feed_supplier_id)
     
     # remove plain id
     del res_update['feed_supplier']['id']
@@ -176,11 +173,11 @@ async def feed_supplier_list(address_level_2_id: int):
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['feed_supplier']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['feed_supplier']['id']
+        cur_entry['feed_supplier']['hid']   = cur_hid
         
             
     return {

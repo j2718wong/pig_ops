@@ -230,17 +230,19 @@ class Account:
     def update_settings(self, data = None):
         """
         PROCEDURE account_update_settings(
-            in_user_id              INT,
+            in_user_id                  INT,
     
-            in_day_1_on_dob         INT,
-            in_num_days_weaning     INT
+            in_day_1_on_dob             INT,
+            in_num_days_weaning         INT,
+            in_num_days_harvest         INT
         )  
         """
         
         sql =  'CALL account_update_settings('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.day_1_on_date_of_birth
-        sql += '%s);'   % data.num_days_weaning
+        sql += '%s,'    % data.num_days_weaning
+        sql += '%s);'   % data.num_days_harvest
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
