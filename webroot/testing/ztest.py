@@ -1508,6 +1508,7 @@ class TestAPIAccount:
         assert(result_num == 0)
         
         
+        self.summary['semen_source'] = {}
         self.summary['semen_source']['by_boar'] = {}
         self.summary['semen_source']['by_boar']['add'] = 'OK'
         
@@ -1537,7 +1538,7 @@ class TestAPIAccount:
         
         # add semen_source by external semen_supplier id
         
-        url = BASE_URL + 'semen_supplier/list?inc_deleted=0&inc_user_audit=0'
+        url = BASE_URL + 'semen_supplier/list?address_level_1_id=%s' %ADRS_LEVEL_1_ID_CEBU_PROV
         
         print(f"\n\n****** Testing semen_supplier get_list; url = {url} ")
         
@@ -1556,9 +1557,9 @@ class TestAPIAccount:
         else:
             index = random.randint(0, len_items - 1)
         
-        semen_supplier = semen_supplier_list[index] 
+        cur_semen_supplier = semen_supplier_list[index] 
         
-        semen_supplier_hid = semen_supplier['hid']
+        semen_supplier_hid = cur_semen_supplier['semen_supplier']['hid']
         
         
         url = BASE_URL + 'semen_source/add'
@@ -1670,25 +1671,73 @@ class TestAPIAccount:
         
         if proceed_test > 0:
             self.test_pig_farm_staff(user_id, pig_farm_id)
+            
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_pig_farm_staff'
+            write_summary_to_file(self.summary)
         else:
             print('\n\nSkipping test_pig_farm_staff')
        
         
+        proceed_test    = 0
+        cur_step        = 10
         
-        self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
-        self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
         
-        self.test_sow_boar_add(user_id, pig_farm_id, sex= 'M', is_external = 1)
+        if proceed_test > 0:
+            self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
+            self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
+            
+            self.test_sow_boar_add(user_id, pig_farm_id, sex= 'M', is_external = 1)
+            
+            self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
+            self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         
-        self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
-        self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         
-        self.test_semen_source(user_id, pig_farm_id)
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_sow_boar'
+            write_summary_to_file(self.summary)
+            
+        else:
+            print('\n\nSkipping test_sow_boar')
+        
+        
+        
+        proceed_test    = 0
+        cur_step        = 11
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+            
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        
+        pig_farm_id = self.summary['pig_farm']['pig_farm_id']
+        
+        if proceed_test > 0:
+            self.test_semen_source(user_id, pig_farm_id)
+        
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_sow_boar'
+            write_summary_to_file(self.summary)
+            
+        else:
+            print('\n\nSkipping test_semen_source')
+            
         
         print('\n\nTest Summary')
         pprint.pprint(self.summary)
         
-  
+        print('\n\nSuccess')
+        
         
 if __name__ == '__main__':
     t = TestAPIAccount()
