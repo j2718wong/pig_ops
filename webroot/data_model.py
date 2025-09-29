@@ -41,6 +41,7 @@ class DataAccountSettings(BaseModel):
     uhid:                   str
     user_id:                int = 0
     day_1_on_date_of_birth: int = 0
+    num_days_weaning:       int = 45
 
 
 class DataPigFarm(BaseModel, HasAddressLevel):

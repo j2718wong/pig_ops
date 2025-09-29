@@ -18,7 +18,7 @@ from common_constants       import *
 
 from model.database_conn    import *
 
-
+from address_manager        import AddressManager
 
 
 cur_path        = os.getcwd()
@@ -237,6 +237,9 @@ hashids_account = hashids.Hashids(  salt        = HASHID_SALT_ACCOUNT,
                                     min_length  = HASHID_MIN_LENGTH_ACCOUNT,
                                     alphabet    = COMMON_HASH_ALPHABET)
 
+
+# Manager to to request address level names from a different server
+adrs_level_mngr = AddressManager(logger)
 
 
 ENABLE_HASHIDS          = 1

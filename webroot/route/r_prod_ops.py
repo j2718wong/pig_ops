@@ -225,6 +225,10 @@ class ReportGenPigProdOps:
     
     def write_report(self, account_id, pig_farm_id, inc_historical, inc_cost,
             inc_target_harvest):
+                
+        # Get account_settings
+        
+                
         id_list     = [pig_farm_id]
         
         res_list    = model['pig_farm'].get_list(id_list = id_list)

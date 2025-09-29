@@ -22,13 +22,10 @@ class Account:
                     a.name,
                     a.date_trial_start,
                     a.date_trial_end,
-                    a.flag_settings,
                     
-                    a.farm_id_01,
-                    a.farm_id_02,
-                    a.farm_id_03,
-                    a.farm_id_04,
-                    a.farm_id_05,
+                    a.flag_settings,
+                    a.num_days_weaning,
+                    a.num_days_harvest,
                     
                     a.num_bills_paid,
                     a.last_acc_paid_bill_id,
@@ -235,14 +232,15 @@ class Account:
         PROCEDURE account_update_settings(
             in_user_id              INT,
     
-            in_day_1_on_dob         INT
+            in_day_1_on_dob         INT,
+            in_num_days_weaning     INT
         )  
         """
         
         sql =  'CALL account_update_settings('
         sql += '%s,'    % data.user_id
-        sql += '%s);'   % data.in_day_1_on_dob
-        
+        sql += '%s,'    % data.day_1_on_date_of_birth
+        sql += '%s);'   % data.num_days_weaning
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -357,14 +355,15 @@ class Account:
         sql =   """
                 SELECT 
                     a.id,
-                    a.flag,
                     a.name,
                     
                     a.added_by_user_id,
                     b.name_last,
                     b.name_first,
+                    a.dt_entry,
                     
                     a.country_id,
+                    c.name AS country_name,
                     a.address_level_1_id,
                     a.address_level_2_id,
                     a.address_level_3_id,
@@ -372,8 +371,9 @@ class Account:
                     a.longitude
                 FROM pig_farm a
                 LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
-                WHERE a.account_id = %s &  flag = %s
-                """ % values
+                LEFT OUTER JOIN app_country c   ON a.country_id = c.id
+                WHERE a.account_id = %s 
+                """ % account_id
         
         
         # Check if still connected to database
@@ -396,7 +396,7 @@ class Account:
             #conn.close()
             
         except Exception as e:
-            msg = 'get_account_admin(); error in executing query[] = ' + sql
+            msg = 'get_list_pig_farm(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -408,16 +408,47 @@ class Account:
         if rows is not None:
             
             for row in rows:
-                cur_user_account_id     = row[0]
-                cur_user_flag           = row[1]
-                cur_user_email          = row[2]
-                cur_user_mobile_num     = row[3]
-                
                 cur_entry = {
-                    'id':               user_id,
-                    'flag':             cur_user_flag,
-                    'email':            cur_user_email,
-                    'mobile_num':       cur_user_mobile_num
+                    'pig_farm': {
+                        'id':               row[0],
+                        'name':             row[1],
+                        
+                        'added_by_user':{
+                            'id':           row[2],
+                            'name_last':    row[3],
+                            'name_first':   row[4]
+                        },
+                        
+                        'dt_entry':         str(row[5])
+                    },
+                    
+                    'location':{
+                        
+                        'country': {
+                            'id':           row[6],
+                            'name':         row[7]
+                        },
+                        
+                        'address': {
+                            'level_1':{
+                                'id':       row[8]
+                            },
+                        
+                            'level_2':{
+                                'id':       row[9]
+                            },
+                            
+                            'level_3':{
+                                'id':       row[10]
+                            }
+                            
+                        },
+                        
+                        'geoloc':{
+                            'latitude':     float(row[11]) if row[11] else None,
+                            'longitude':    float(row[12]) if row[12] else None
+                        }
+                    }
                 }
                     
                 result.append(cur_entry)

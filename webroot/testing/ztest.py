@@ -234,12 +234,19 @@ class TestBase:
         
         entry_id    = res_decrypt[0]
             
-        print(f"{self.business_object}.id = {entry_id}")
+        print(f"\n\nAdded new {self.business_object}.id = {entry_id}")
         assert(entry_id > 0)
         
-        # Need to add back entry hid to data for update test
+        
+        # Need to add back entry_hid to data for update test
         key = self.business_object + '_hid'
         data[key] = entry_hid
+
+        
+        # Need to add back entry_id to data for debugging
+        key = self.business_object + '_id'
+        data[key] = entry_id
+
 
             
         if self.business_object not in self.summary:
@@ -393,6 +400,36 @@ class TestAccount(TestBase):
         
         self.request_update(data)
         
+        
+    def test_update_settings(self, user_id):
+        user_uhid       = hashids_user.encrypt(user_id)
+        
+        data = {
+            "uhid":         user_uhid,
+            "day_1_on_date_of_birth": 1,
+            "num_days_weaning": 40
+        }
+        
+        url = BASE_URL + 'account/update_settings'
+        
+        values = (url)
+        print('\n\n*****  Testing update account_settings; url = %s ; data' % values)
+        pprint.pprint(data)
+        
+        r = requests.post(url, json = data)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result = ")
+        pprint.pprint(res_json)
+        
+        result_num  = res_json['result']['num']
+        assert(result_num == 0)
+        
+        self.summary[self.business_object]['update_settings'] = 'OK'
+        
+        write_summary_to_file(self.summary)
+        
     
     def test_get_usergroups(self, account_hid):
         print(f"\n\n***** Testing get account user groups; account_hid = {account_hid}")
@@ -536,9 +573,6 @@ class TestPigRaceLine(TestBase):
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
-        
         data['name']    = data['name'] + dt_now_s
               
         self.request_update(data)
@@ -650,8 +684,7 @@ class TestAccountPigOps(TestBase):
 
 class TestFarmStaff(TestBase):
     def __init__(self, summary):
-        self.business_object = 'farm_staff'
-        super().__init__(self.business_object, summary)
+        super().__init__('farm_staff', summary)
         
     
     def test_add(self, user_id, pig_farm_id, num_entries = 3):
@@ -701,6 +734,40 @@ class TestFarmStaff(TestBase):
         self.request_update(data)
         
     
+class TestPigFarm(TestBase):
+    def __init__(self, summary):
+        super().__init__(self.pig_farm, summary)
+        
+    
+    def test_add(self, user_id, farm_name):
+        user_uhid   = hashids_user.encrypt(user_id)
+        
+        data = {
+            "uhid":             user_uhid,
+            "name":             farm_name,
+            "address_level_1_id":  ADRS_LEVEL_1_ID_CEBU_PROV,
+            "address_level_2_id":  ADRS_LEVEL_2_ID_NAGA,
+            "address_level_3_id":  ADRS_LEVEL_3_ID_TAGJAGUIMIT
+        }
+        
+        
+        res_json = self.request_add(data)
+        return data
+        
+        
+    def test_update(self, data):
+        # Test farm update
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
+        
+        data['name']    = data['name'] + dt_now_s
+        data['latitude'] = 10.262995
+        data['longitude'] = 123.686722
+        
+        self.request_update(data)
+    
+    
+    
 
 class TestAPIAccount:
     def __init__(self):
@@ -726,8 +793,32 @@ class TestAPIAccount:
                 print("Error: %s" % str(e))
             
             
+        dt_now          = datetime.now()
+        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
+            
         if self.summary is None:
-            self.summary    = {}
+            self.summary    = {
+                'test_run':{
+                    'num':  1,
+                    'dt':   dt_now_s
+                }            
+            }
+        
+        else:
+            if 'test_run' not in self.summary:
+                test_run = 'test_run':{
+                    'num':  1,
+                    'dt':   dt_now_s
+                }
+                
+                self.summary['test_run'] = test_run
+                
+            else:
+                run_num = self.summary['test_run']['num']
+                run_num += 1
+                
+                self.summary['test_run']['num'] = run_num
+                self.summary['test_run']['dt']  = dt_now_s
                 
             
     
@@ -750,12 +841,8 @@ class TestAPIAccount:
             t.test_duplicate_add(data_input)
         
             t.test_update(data_input)
-                
             
-            account_hid = data_input['account_hid']
-            
-            res = hashids_account.decrypt(account_hid)
-            account_id = res[0]
+            t.test_update_settings(user_id)
                 
             t.test_get_usergroups(account_hid)
             
@@ -763,7 +850,12 @@ class TestAPIAccount:
             self.summary['ztest_last_test'] = 'TestAccount'
             write_summary_to_file(self.summary)
             
+        else:
+            print('\n\nSkipping TestAccount')
         
+        
+        account_hid     = self.summary['account']['account_hid']
+        account_id      = self.summary['account']['account_id']
         
         proceed_test    = 0
         cur_step        = 2
@@ -781,6 +873,9 @@ class TestAPIAccount:
             self.summary['ztest_last_step'] = cur_step
             self.summary['ztest_last_test'] = 'test_account_pig_buyer'
             write_summary_to_file(self.summary)
+        
+        else:
+            print('\n\nSkipping test_account_pig_buyer')
         
         
         
@@ -825,6 +920,9 @@ class TestAPIAccount:
             self.summary['ztest_last_test'] = 'test_account_pig_ops'
             write_summary_to_file(self.summary)
         
+        else:
+            print('\n\nSkipping test_account_pig_ops')
+        
         
         
         proceed_test    = 0
@@ -843,6 +941,9 @@ class TestAPIAccount:
             self.summary['ztest_last_step'] = cur_step
             self.summary['ztest_last_test'] = 'test_pig_race_line'
             write_summary_to_file(self.summary)
+        
+        else:
+            print('\n\nSkipping test_pig_race_line')
         
         
         
@@ -863,7 +964,9 @@ class TestAPIAccount:
             self.summary['ztest_last_test'] = 'test_semen_supplier'
             write_summary_to_file(self.summary)
         
-        
+        else:
+            print('\n\nSkipping test_semen_supplier')
+            
         
         proceed_test    = 0
         cur_step        = 6
@@ -882,6 +985,8 @@ class TestAPIAccount:
             self.summary['ztest_last_test'] = 'test_feed_brand'
             write_summary_to_file(self.summary)
         
+        else:
+            print('\n\nSkipping test_feed_brand')
         
         
         proceed_test    = 0
@@ -901,6 +1006,8 @@ class TestAPIAccount:
             self.summary['ztest_last_test'] = 'test_feed_supplier'
             write_summary_to_file(self.summary)
         
+        else:
+            print('\n\nSkipping test_feed_supplier')
         
         
         return {
@@ -949,106 +1056,14 @@ class TestAPIAccount:
     
         
     def test_pig_farm(self, user_id, farm_name):
-        user_uhid   = hashids_user.encrypt(user_id)
+        t = TestPigFarm(self.summary)
+        data_input = t.test_add(user_id, farm_name)
         
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {dt_now_s}  ###########################")
+        t.test_duplicate_add(data_input)
         
+        t.test_update(data_input)
         
-        url = BASE_URL + 'pig_farm/add'
-        
-        data = {
-            "uhid":             user_uhid,
-            "name":             farm_name,
-            "address_level_1_id":  ADRS_LEVEL_1_ID_CEBU_PROV,
-            "address_level_2_id":  ADRS_LEVEL_2_ID_NAGA,
-            "address_level_3_id":  ADRS_LEVEL_3_ID_TAGJAGUIMIT
-        }
-        
-        
-        print(f'*****  Testing adding pig_farm; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-
-
-        self.summary['pig_farm']['add'] = 'OK'
-        
-        
-        is_id_visible = True if 'id' in res_json['pig_farm'] else False
-        assert(is_id_visible == False)
-        
-        
-        farm_hid       = res_json['pig_farm']['hid']
-        res_decrypt     = hashids_common.decrypt(farm_hid)
-        pig_farm_id     = res_decrypt[0]
-        
-        print(f"created pig_farm_id = {pig_farm_id}")
-        assert(pig_farm_id > 0)
-        
-        
-        # Test pig_farm duplicate
-        url = BASE_URL + 'pig_farm/add'
-            
-        data = {
-            "uhid":         user_uhid,
-            "name":         farm_name
-        }
-
-        print(f'\n\n*****  Testing duplicate adding pig_farm; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result")
-        pprint.pprint(res_json)
- 
-        assert(res_json['result']['code'] == 'RES_NUM_DUPLICATE_ENTRY')
-        
-        self.summary['pig_farm']['add_duplicate_check'] = 'OK'
-        
-        # Test farm update
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y%m%d_%H%M%S')
-        
-        url = BASE_URL + 'pig_farm/update'
-        
-        data = {
-            "uhid":         user_uhid,
-            "pig_farm_hid": farm_hid,
-            "name":         farm_name + dt_now_s,
-            "address_level_1_id": 1,
-            "address_level_2_id": 2,
-            "latitude":     10.262995, 
-            "longitude":    123.686722
-        }
-        
-        
-        print(f'\n\n*****  Testing farm_update; url = {url} ; data')
-        pprint.pprint(data)
-        
-        r = requests.post(url, json = data)
-        res_text = str(r.text)
-        res_json = json.loads(res_text)
-        
-        print(f"\n\nResult; status_code = {r.status_code}; result = ")
-        pprint.pprint(res_json)
-        
-        result_num  = res_json['result']['num']
-        assert(result_num == 0)
-        
-        self.summary['pig_farm']['update'] = 'OK'
+        pig_farm_id = data_input['pig_farm_id']
         
         return {
             'pig_farm_id': pig_farm_id
@@ -1220,6 +1235,7 @@ class TestAPIAccount:
         #print(f"\n\nResult; status_code = {r.status_code}; result")
         #pprint.pprint(res_json)
         
+        self.summary['sow_boar'] = {}
         self.summary['sow_boar']['list'] = 'OK'
         
         
@@ -1591,9 +1607,53 @@ class TestAPIAccount:
         account_id  = res_register['account_id']
         account_hid  = res_register['account_hid']
        
-        res_pig_farm = self.test_pig_farm(user_id, farm_name)
         
-        pig_farm_id = res_pig_farm['pig_farm_id']
+        proceed_test    = 0
+        cur_step        = 8
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            res_pig_farm = self.test_pig_farm(user_id, farm_name)
+            
+            pig_farm_id = res_pig_farm['pig_farm_id']
+            
+            # save pig_farm_id in summary
+            self.summary['pig_farm']['pig_farm_id'] = pig_farm_id
+            
+        
+            self.summary['ztest_last_step'] = cur_step
+            self.summary['ztest_last_test'] = 'test_pig_farm'
+            write_summary_to_file(self.summary)
+        
+        else:
+            print('\n\nSkipping test_pig_farm')
+            
+        
+        pig_farm_id = self.summary['pig_farm']['pig_farm_id']
+        
+        proceed_test    = 0
+        cur_step        = 9
+        
+        if 'ztest_last_step' not in self.summary:
+            proceed_test = 1
+        else:
+            ztest_last_step = self.summary['ztest_last_step']
+            if cur_step > ztest_last_step:
+                proceed_test = 1
+        
+        if proceed_test > 0:
+            self.test_pig_farm_staff(user_id, pig_farm_id)
+        else:
+            print('\n\nSkipping test_pig_farm_staff')
+       
+        
+        
         self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
         self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
         
@@ -1601,8 +1661,6 @@ class TestAPIAccount:
         
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
         self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
-        
-        self.test_pig_farm_staff(user_id, pig_farm_id)
         
         self.test_semen_source(user_id, pig_farm_id)
         

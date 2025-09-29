@@ -123,7 +123,7 @@ class FeedSupplier:
        
         sql += '%s,'    % data.address_level_3_id
         
-         sql += '"%s",'  % data.name
+        sql += '"%s",'  % data.name
         
         if data.contact_number is not None and len(data.contact_number) > 0:
             sql += '"%s",'  % data.contact_number
@@ -241,33 +241,36 @@ class FeedSupplier:
             
             for row in rows:
                 cur_entry = {
-                    'id':                   row[0],
+                    'feed_supplier': {
+                        'id':               row[0],
+                        'name':             row[1],
+                        'contact_number':   row[2],
+                        'whatsapp':         row[3],
+                        'messenger':        row[4]
+                    },
                     
                     'location':{
                         
                         'country': {
-                            'id':           row[1],
-                            'name':         row[2]
+                            'id':           row[5],
+                            'name':         row[6]
                         },
                         
                         'address': {
                             'level_1':{
-                                'id':       row[3]
+                                'id':       row[7]
                             },
                         
                             'level_2':{
-                                'id':       row[4]
+                                'id':       row[8]
                             },
                             
                             'level_3':{
-                                'id':       row[5]
+                                'id':       row[8]
                             }
+                            
                         }
-                    },
-                    
-                    'name':                 row[6],
-                    
-                    'dt_entry':             str(row[7])
+                    }
                 }
                     
                 result.append(cur_entry)
