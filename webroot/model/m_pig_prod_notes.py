@@ -16,6 +16,8 @@ class PigProdNotes:
             in_user_id              INT,
            
             in_pig_prod_id          INT,
+            in_prod_group_id        INT,
+            
             in_date_notes           VARCHAR(10),
             in_notes                VARCHAR(160)
         )  
@@ -24,8 +26,21 @@ class PigProdNotes:
         sql =  'CALL pig_prod_notes_add('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.pig_prod_id
-        sql += '"%s",'  % data.date_notes
+        if data.pig_prod_id is not None and data.pig_prod_id > 0:
+            sql += '%s,'    % data.pig_prod_id
+        else:
+            sql += 'NULL,'
+            
+        if data.production_group_id is not None and data.production_group_id > 0:
+            sql += '%s,'    % data.production_group_id
+        else:
+            sql += 'NULL,'
+        
+        if data.date_notes is not None:
+            sql += '"%s",'  % data.date_notes
+        else:
+            sql += 'NULL,'
+            
         sql += '"%s");'  % data.notes
         
         

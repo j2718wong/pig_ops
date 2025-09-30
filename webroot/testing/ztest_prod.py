@@ -79,7 +79,9 @@ class TestAPIPigProd:
         
         
         # Select pig_farm
-        cur_pig_farm    = list_pig_farm[0]
+        sel_pig_farm    = list_pig_farm[0]
+        
+        cur_pig_farm    = sel_pig_farm['pig_farm']
         
         
         # Get list of sows in cur_pig_farm
@@ -372,7 +374,7 @@ class TestAPIPigProd:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
     
         url = BASE_URL + 'pig_prod/add'
@@ -472,7 +474,7 @@ class TestAPIPigProd:
         
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
-        print(f"\n\n#################  {now_ts}  ###########################")
+        print(f"\n\n#################  {dt_now_s}  ###########################")
         
     
         url = BASE_URL + 'pig_prod/add'

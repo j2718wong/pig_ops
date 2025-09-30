@@ -391,6 +391,7 @@ class DataPigProdNotes(BaseModel):
         
     user_id:                int = 0
     pig_prod_id:            int = 0
+    production_group_id:    int = 0
     pig_prod_notes_id:      int = 0
     date_notes:             str = None
     notes:                  str
@@ -413,6 +414,7 @@ class DataPigProdFeedType(BaseModel):
     uhid:                   str
         
     pig_prod_hid:           str
+    production_group_hid:   str = None
     feed_type_hid:          str
         
         
