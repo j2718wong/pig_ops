@@ -256,7 +256,7 @@ class TestAPIPigProd:
             count_sow = count_sow + 1
         
         
-        res_fattening = self.test_pig_prod_fattening_add(user_uhid, pig_farm_hid)
+        res_fattening = self.test_pig_prod_fattening_add(user_uhid, pfhid)
         num_pigs = res_fattening['data'] + 1
         self._test_prod_update_pig_count(user_uhid, pig_prod_hid, num_pigs)
         
@@ -877,6 +877,13 @@ class TestAPIPigProd:
         
     
     def _test_prod_feed_buy_add(self, account_id, pig_prod_id, feed_type_id, data):
+        values = (account_id, pig_prod_id, feed_type_id)
+        s = '\n\n_test_prod_feed_buy_add(); account_id =%s, pig_prod_id =%s, feed_type_id = %s' % values
+        print(s)
+        
+        print('data=\n')
+        pprint.pprint(data)
+        
         
         feed_type_hid = hashids_common.encrypt(feed_type_id)
         

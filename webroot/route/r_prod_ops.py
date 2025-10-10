@@ -922,6 +922,7 @@ class ReportGenPigProdOps:
             pig_prod_id     = pig_prod['id']
             date_balance    = cur_entry['num_feeds']['date_balance']
             
+            
             list_feed_bought = model['feed_buy'].get_list(pig_prod_id = pig_prod_id, 
                     after_date = date_balance)
             

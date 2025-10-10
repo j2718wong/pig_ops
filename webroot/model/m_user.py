@@ -18,6 +18,8 @@ class User:
                     a.flag,
                     a.email,
                     a.mobile_num,
+                    a.name_last,
+                    a.name_first,
                     
                     a.user_group_id,
                     b.group_num,
@@ -70,14 +72,16 @@ class User:
                         'flag':             row[2],
                         'email':            row[3],
                         'mobile_num':       row[4],
+                        'name_last':        row[5],
+                        'name_first':       row[6]
                     },
                     
                     'user_group': {
-                        'id':               row[5],
-                        'group_num':        row[6],
-                        'flag_business_obj_1': row[7],
-                        'flag_business_obj_2': row[8],
-                        'name':             row[9]
+                        'id':               row[7],
+                        'group_num':        row[8],
+                        'flag_business_obj_1': row[9],
+                        'flag_business_obj_2': row[10],
+                        'name':             row[11]
                     }
                 }
                     

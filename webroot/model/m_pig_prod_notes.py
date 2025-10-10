@@ -100,7 +100,12 @@ class PigProdNotes:
         sql =  'CALL pig_prod_notes_update('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_prod_notes_id
-        sql += '"%s",'  % data.date_notes
+        
+        if data.date_notes is not None:
+            sql += '"%s",'  % data.date_notes
+        else:
+            sql += 'NULL,'
+        
         sql += '"%s");'  % data.notes
         
         

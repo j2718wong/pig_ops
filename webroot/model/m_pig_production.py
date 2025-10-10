@@ -736,10 +736,9 @@ class PigProduction:
                 LEFT OUTER JOIN pig_prod_status f   ON a.prod_status_id = f.id
                 LEFT OUTER JOIN pig_farm_staff g    ON a.insem_staff_id = g.id
                 LEFT OUTER JOIN feed_balance h      ON a.last_feed_balance_id = h.id
-                ORDER BY a.date_actual_birth
                 %s
+                ORDER BY a.date_actual_birth
                 """ % where_clause
-        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
