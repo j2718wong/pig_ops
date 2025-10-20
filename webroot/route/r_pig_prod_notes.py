@@ -40,23 +40,45 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     user_id = res[0]
     
     
+    pig_prod_id     = None
+    sow_boar_id     = None
+    
     pig_prod_hid    = pig_prod_notes_data.pig_prod_hid
     
-    res = hashids_common.decrypt(pig_prod_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+    if pig_prod_hid is not None:
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
             }
-        }
+        
+        pig_prod_id = res[0]
     
-    pig_prod_id = res[0]
+    
+    sow_boar_hid    = pig_prod_notes_data.sow_boar_hid
+    
+    if sow_boar_hid is not None:
+        res = hashids_common.decrypt(sow_boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID,
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        sow_boar_id = res[0]
+    
     
     
     pig_prod_notes_data.user_id     = user_id
     pig_prod_notes_data.pig_prod_id = pig_prod_id
+    pig_prod_notes_data.sow_boar_id = sow_boar_id
     
     res_add    =  model['prod_notes'].add(pig_prod_notes_data)
     

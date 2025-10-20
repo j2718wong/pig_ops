@@ -16,6 +16,7 @@ class PigProdNotes:
             in_user_id              INT,
            
             in_pig_prod_id          INT,
+            in_sow_boar_id          INT,
             in_prod_group_id        INT,
             
             in_date_notes           VARCHAR(10),
@@ -30,6 +31,12 @@ class PigProdNotes:
             sql += '%s,'    % data.pig_prod_id
         else:
             sql += 'NULL,'
+            
+        if data.sow_boar_id is not None and data.sow_boar_id > 0:
+            sql += '%s,'    % data.sow_boar_id
+        else:
+            sql += 'NULL,'
+        
             
         if data.production_group_id is not None and data.production_group_id > 0:
             sql += '%s,'    % data.production_group_id
@@ -209,9 +216,13 @@ class PigProdNotes:
         return None
     
     
-    def get_list(self, pig_prod_id, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self, pig_prod_id = 0, sow_boar_id = 0, inc_deleted = 0):
         
-        where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
+        if pig_prod_id > 0:
+            where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
+        
+        if sow_boar_id > 0:
+            where_clause = 'WHERE a.sow_boar_id = %s ' % sow_boar_id
         
         if inc_deleted == 0:
             where_clause += ' AND a.flag & 1 = 0'
@@ -219,14 +230,21 @@ class PigProdNotes:
         sql =   """
                 SELECT 
                     a.id,
+                    a.date_notes,
                     a.notes,
-                    a.dt_entry,
                     
                     b.name_last,
-                    b.name_first
+                    b.name_first,
+                    b.dt_last_update,
+                    
+                    c.name_last,
+                    c.name_first,
+                    a.dt_entry
                 
                 FROM pig_prod_notes a 
-                LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
+                LEFT OUTER JOIN user b ON a.last_update_user_id = c.id
+                LEFT OUTER JOIN user c ON a.added_by_user_id = b.id
+                
                 %s
                 ORDER BY a.id DESC
                 """ % where_clause
@@ -266,13 +284,15 @@ class PigProdNotes:
                 cur_entry = {
                     'prod_notes': {
                         'id':               row[0],
-                        'notes':            row[1],
-                        'dt_entry':         str(row[2])
+                        'date_notes':       str(row[1]),
+                        'notes':            row[2],
+                        
                     },
                     
-                    'added_by_user':{
+                    'added_by':{
                         'name_first':       row[3],
-                        'name_last':        row[4]
+                        'name_last':        row[4],
+                        'dt_entry':         str(row[2])
                     }
                 }
                 

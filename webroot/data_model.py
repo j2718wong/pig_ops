@@ -386,11 +386,13 @@ class DataPigProdNotes(BaseModel):
     uhid:                   str
         
     pig_prod_hid:           str = None
+    sow_boar_hid:           str = None
     pig_prod_notes_hid:     str = None
         
         
     user_id:                int = 0
     pig_prod_id:            int = 0
+    sow_boar_id:            int = 0
     production_group_id:    int = 0
     pig_prod_notes_id:      int = 0
     date_notes:             str = None

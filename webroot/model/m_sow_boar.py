@@ -546,7 +546,7 @@ class SowBoar:
                         'last_update':{
                             'name_last':        row[17],
                             'name_first':       row[18],
-                            'dt_update':        row[19]
+                            'dt_update':        str(row[19]) if row[19] else None
                         }                    
                     }
                     
