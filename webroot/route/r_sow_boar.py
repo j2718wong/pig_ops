@@ -437,4 +437,66 @@ async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0,
         'data': res
     }
 
+
+@app.get("/sow/production_output")
+async def sow_boar_list(sowhid:str):
+    """
+    Will get sow production list.
+    
+    Parameters
+    ----------
+    sowhid: str
+        sow hash id
+    
+   
+
+    """
+    
+    
+    res = hashids_common.decrypt(sowhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_INVALID_SOW_HASHID,
+                'code': 'ERROR_SOW_INVALID_SOW_HASHID',
+                'desc': ''
+            }
+        }
+    
+    sow_id = res[0]
+    
+    
+    res = model['pig_prod'].get_production_output(sow_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+        
+        
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['pig_production']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_production']['id']
+        cur_entry['hid']   = cur_hid
+        
+        if sow_id > 0:
+            del cur_entry['sow']
+        
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
     
