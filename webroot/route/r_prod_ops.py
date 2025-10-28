@@ -50,7 +50,7 @@ NUMDAYS_SINCE_BIRTH_PRESTARTER          = 30
 NUMDAYS_SINCE_BIRTH_STARTER             = 50
 NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
-NUMDAYS_SINCE_BIRTH_TARGET_HARVEST      = 150
+NUMDAYS_SINCE_BIRTH_TARGET_HARVEST      = 142
 
 
 PRODUCTION_FEEDS = [
@@ -1307,6 +1307,7 @@ class ReportGenPigProdOps:
     def _write_sow_boar_balance(self, pig_farm_id):
         
         res = model['pig_farm'].get_sow_boar_balance(pig_farm_id)
+        
         
         
         s  = 'SOW BOAR BALANCE       ===== SOW(ANAY) =====    BOAR     NON-PROD FEEDS\n'

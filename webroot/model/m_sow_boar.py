@@ -120,7 +120,7 @@ class SowBoar:
         else:
             sql += 'NULL,'
             
-        if data.date_of_birth is not None:
+        if data.date_of_birth is not None and len(data.date_of_birth) > 0:
             sql += '"%s",'    % data.date_of_birth
         else:
             sql += 'NULL,'            
