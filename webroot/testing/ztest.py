@@ -160,9 +160,9 @@ def write_summary_to_file(summary):
 
 
 
-PIG_OPERATION_TYPE_GESTATING        = 1
-PIG_OPERATION_TYPE_LACTATING_PIGLETS        = 2
-PIG_OPERATION_TYPE_GROWING          = 3
+PIG_OPERATION_TYPE_GESTATING            = 1
+PIG_OPERATION_TYPE_LACTATING_PIGLETS    = 2
+PIG_OPERATION_TYPE_GROWING              = 3
 
 class TestBase:
     def __init__(self, business_object, summary):

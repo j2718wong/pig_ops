@@ -362,7 +362,7 @@ async def sow_pt_list(pfhid, full_info: int = 0):
 
 @app.get("/sow_boar/list")
 async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0, 
-        inc_user_audit:int = 0, order_by:int = 0):
+        inc_external:int = 0, inc_user_audit:int = 0, order_by:int = 0):
     """
     Will get sow list.
     
@@ -375,6 +375,10 @@ async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0,
     full_info:int
         0 = will return active sows, boars only; 
         1 = will return including disposed sows, boars
+        
+    inc_external: int
+        0 = will not include externally owned sow/boar
+        1 = will include externally owned sow/boar
         
     inc_user_audit:
         if > 0, will include added_by and last_update info
@@ -404,7 +408,8 @@ async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0,
         inc_disposed = 1
     
     res = model['sow_boar'].get_list(pig_farm_id, sex, 
-            inc_disposed    = inc_disposed, 
+            inc_disposed    = inc_disposed,
+            inc_external    = inc_external,
             inc_user_audit  = inc_user_audit,
             order_by        = order_by)
     

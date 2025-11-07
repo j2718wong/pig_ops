@@ -110,8 +110,8 @@ class PigProduction:
             
         sql += '%s,'    % data.insemination_cost
             
-        if data.insem_cost_comments is not None:
-            sql += '"%s",'    % data.insem_cost_comments
+        if data.comments is not None:
+            sql += '"%s",'    % data.comments
         else:
             sql += 'NULL,'
             
@@ -631,10 +631,14 @@ class PigProduction:
         return None
     
     
-    def get_list(self, pig_farm_id = 0, list_ids = None):
+    def get_list(self, pig_farm_id = 0 , list_ids = None, filter_type = 0, 
+            inc_historical = 0):
         """
         Will get pig_production list.
         
+        filter_type:
+            0 = gestating
+            1 = weaning
         
         Returns
         -------
@@ -646,6 +650,18 @@ class PigProduction:
         
         if pig_farm_id > 0:
             where_clause = ' WHERE a.pig_farm_id = %s' % pig_farm_id
+            
+            if filter_type == 0:
+                filter_clause = ' a.prod_status_id = 1'
+                if inc_historical > 0:
+                    filter_clause = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
+            
+            else:
+                filter_clause = ' a.prod_status_id IN (1, 4, 5, 6)'
+                if inc_historical > 0:
+                    filter_clause = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
+        
+            where_clause += ' AND ' + filter_clause
             
         else:
             count = 0
@@ -737,7 +753,7 @@ class PigProduction:
                 LEFT OUTER JOIN pig_farm_staff g    ON a.insem_staff_id = g.id
                 LEFT OUTER JOIN feed_balance h      ON a.last_feed_balance_id = h.id
                 %s
-                ORDER BY a.date_actual_birth
+                ORDER BY a.date_insemination DESC
                 """ % where_clause
         
         # Check if still connected to database
@@ -881,6 +897,7 @@ class PigProduction:
                         'insem_cost':       cur_insem_insemination_cost,
                         'cost_comments':    cur_insem_cost_comments,
                         'insem_date':       cur_insem_date_insemination,
+                        'insem_staff_id':   cur_insem_staff_id,
                         'insem_staff_name': cur_insem_staff_name
                     },
                     

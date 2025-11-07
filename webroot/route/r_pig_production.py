@@ -702,7 +702,7 @@ async def pig_prod_list(pfhid):
     
     res = model['pig_prod'].get_list(pig_farm_id)
     
-    """
+    
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
         operation_type  = PIG_OPERATION_TYPE_GESTATING
@@ -710,19 +710,91 @@ async def pig_prod_list(pfhid):
         gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
             operation_type, inc_user_audit = 1)
         
+        # Replace plain_id
+        for cur_ops in gestating_ops:
+            cur_id  = cur_ops['pig_prod_pig_ops']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_ops['pig_prod_pig_ops']['id']
+            cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_ops['account_pig_ops']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_ops['account_pig_ops']['id']
+            cur_ops['account_pig_ops']['hid']   = cur_hid
+        
         cur_entry['gestating_ops'] = gestating_ops
-
+        
     
         operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
-        lactating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+        lactating_piglets_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
             operation_type, inc_user_audit = 1)
         
-        cur_entry['lactating_ops'] = lactating_ops
+        for cur_ops in lactating_piglets_ops:
+            cur_id  = cur_ops['pig_prod_pig_ops']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_ops['pig_prod_pig_ops']['id']
+            cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_ops['account_pig_ops']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_ops['account_pig_ops']['id']
+            cur_ops['account_pig_ops']['hid']   = cur_hid
         
-        prod_notes =  model['prod_notes'].get_list(pig_prod_id)
+        cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
         
-        cur_entry['prod_notes'] = prod_notes
-    """
+        
+        # Replace plain_id
+        
+        cur_id  = pig_prod_id
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_production']['id']
+        cur_entry['pig_production']['hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['sow']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['sow']['id']
+        cur_entry['sow']['hid']   = cur_hid
+        
+        
+        # If boar_id is None, delete whole boar block
+        cur_id  = cur_entry['insemination']['boar']['id']
+        if cur_id is None:
+            del cur_entry['insemination']['boar']
+        else:
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['boar']['id']
+            cur_entry['insemination']['boar']['hid']   = cur_hid
+    
+    
+        # If semen_source_id is None, delete whole semen_source block
+        cur_id  = cur_entry['insemination']['semen_source']['id']
+        if cur_id is None:
+            del cur_entry['insemination']['semen_source']
+        else:
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['semen_source']['id']
+            cur_entry['insemination']['semen_source']['hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['insemination']['insem_staff_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['insemination']['insem_staff_id']
+        cur_entry['insemination']['insem_staff_hid']   = cur_hid
+        
+        
+    
     return res
 
 

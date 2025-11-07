@@ -333,7 +333,7 @@ class SowBoar:
         return None
 
     
-    def get_list(self, farm_id, sex, inc_disposed = 0, 
+    def get_list(self, farm_id, sex, inc_disposed = 0, inc_external = 0,
             inc_user_audit = 0, list_ids = None, order_by = 0):
         """
         Will get sow_boar list.
@@ -376,8 +376,10 @@ class SowBoar:
             if sex is not None:
                 if inc_disposed == 0:
                     values = (farm_id, sex)
-                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
-                
+                    if inc_external == 0:
+                        where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
+                    else:
+                        where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
                 else:
                     values = (farm_id, sex)
                     where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values

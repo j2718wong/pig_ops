@@ -235,7 +235,7 @@ class PigProdNotes:
                     
                     b.name_last,
                     b.name_first,
-                    b.dt_last_update,
+                    a.dt_last_update,
                     
                     c.name_last,
                     c.name_first,

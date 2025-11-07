@@ -284,7 +284,7 @@ class DataPigProd(BaseModel):
         
     semen_cost:             float = 0.0
     insemination_cost:      float = 0.0
-    insem_cost_comments:     str = None
+    comments:               str = None
         
     insem_staff_id:         int = None
     date_insemination:      str

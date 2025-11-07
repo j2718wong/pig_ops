@@ -279,23 +279,15 @@ class SowActivity:
         """
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
         if filter_type == 0:
-            filter = ' a.prod_status_id = 1'
+            filter_clause = ' a.prod_status_id = 1'
             if inc_historical > 0:
-                filter = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
+                filter_clause = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
         
         else:
-            filter = ' a.prod_status_id IN (1, 4, 5, 6)'
+            filter_clause = ' a.prod_status_id IN (1, 4, 5, 6)'
             if inc_historical > 0:
-                filter = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
+                filter_clause = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
         
       
         sql =   """
@@ -350,8 +342,18 @@ class SowActivity:
                 LEFT OUTER JOIN sow_boar       g    ON e.boar_id = g.id
                 WHERE a.pig_farm_id = %s AND %s
                 ORDER BY a.date_insemination DESC
-                """ % (pig_farm_id, filter)  
-    
+                """ % (pig_farm_id, filter_clause)  
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
         rows = None
         
         try:

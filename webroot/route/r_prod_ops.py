@@ -268,7 +268,7 @@ class ReportGenPigProdOps:
     
     def _write_gestating_operations(self, account_id, pig_farm_id, inc_historical):
         # This is the list of the gestating operations specified by the account
-        # that needs to be done fos each gestating sow(already inseminated).
+        # that needs to be done for each gestating sow(already inseminated).
         acc_pig_ops = model['account_pig_ops'].get_list(account_id, 
                 PIG_OPERATION_TYPE_GESTATING)
         

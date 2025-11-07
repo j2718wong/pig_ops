@@ -222,6 +222,7 @@ class AccountPigOps:
                     SELECT 
                         a.id,
                         a.num_days_since,
+                        a.version_num,
                         
                         a.name,
                         a.description,
@@ -236,6 +237,7 @@ class AccountPigOps:
                     SELECT 
                         a.id,
                         a.num_days_since,
+                        a.version_num,
                         
                         a.name,
                         a.description,
@@ -255,7 +257,6 @@ class AccountPigOps:
                     ORDER BY a.num_days_since
                     """ % where_clause
 
-            
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -293,29 +294,32 @@ class AccountPigOps:
                     cur_entry = {
                         'id':                   row[0],
                         'num_days_since':       row[1],
-                        'name':                 row[2],
-                        'desc':                 row[3],
+                        'version_num':          row[2],
+                        'name':                 row[3],
+                        'desc':                 row[4],
                         
-                        'dt_entry':             str(row[4])
+                        'dt_entry':             str(row[5])
                     }
                 
                 else:
                     cur_entry = {
                         'id':                   row[0],
                         'num_days_since':       row[1],
-                        'name':                 row[2],
-                        'desc':                 row[3],
+                        'version_num':          row[2],
+                        
+                        'name':                 row[3],
+                        'desc':                 row[4],
                         
                         'added_by': {
-                            'name_last':        row[4],
-                            'name_first':       row[5],
-                            'dt_entry':         row[6]
+                            'name_last':        row[5],
+                            'name_first':       row[6],
+                            'dt_entry':         row[7]
                         },
                         
                         'last_update':{
-                            'name_last':        row[7],
-                            'name_first':       row[8],
-                            'dt_update':        str(row[9]) if row[9] else None
+                            'name_last':        row[8],
+                            'name_first':       row[9],
+                            'dt_update':        str(row[10]) if row[10] else None
                         }
                     }
                     
