@@ -283,11 +283,11 @@ class DataPigProd(BaseModel):
     semen_source_id:        int = None
         
     semen_cost:             float = 0.0
-    insemination_cost:      float = 0.0
-    comments:               str = None
+    insem_cost:             float = 0.0
+    insem_notes:            str = None
         
     insem_staff_id:         int = None
-    date_insemination:      str
+    insem_date:             str
     
     
 class DataPigProdAI(BaseModel):

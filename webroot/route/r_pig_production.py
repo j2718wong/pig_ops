@@ -794,7 +794,14 @@ async def pig_prod_list(pfhid):
         cur_entry['insemination']['insem_staff_hid']   = cur_hid
         
         
-    
+        # This can be None 
+        cur_id  = cur_entry['birth']['birth_staff_id']
+        if cur_id is not None: 
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['birth']['birth_staff_id']
+            cur_entry['birth']['birth_staff_hid']   = cur_hid
+        
     return res
 
 
