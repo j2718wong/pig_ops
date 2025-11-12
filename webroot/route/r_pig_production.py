@@ -724,6 +724,28 @@ async def pig_prod_list(pfhid):
             
             del cur_ops['account_pig_ops']['id']
             cur_ops['account_pig_ops']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_ops['staff']['id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_ops['staff']['id']
+            cur_ops['staff']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_ops['notes']['id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_ops['notes']['id']
+            cur_ops['notes']['hid']   = cur_hid
+            
+            
         
         cur_entry['gestating_ops'] = gestating_ops
         

@@ -301,7 +301,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
     
 
 @app.get("/account_pig_ops/list")
-async def account_pig_ops_list(ahid: str, operation_type, inc_deleted: int = 0, 
+async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
     Will get account_pig_ops list.

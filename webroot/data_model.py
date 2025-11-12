@@ -436,6 +436,7 @@ class DataPigProdPigOps(BaseModel):
     user_id:                int = 0
     pig_prod_pig_ops_id:    int = 0
     staff_id:               int = 0
+    
     date:                   str
     notes:                  str = None
     

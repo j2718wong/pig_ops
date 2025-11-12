@@ -90,12 +90,17 @@ class PigProdPigOps:
                         b.flag AS account_pig_ops_flag,
                         b.description,
                         
-                        c.name  AS staff_name
+                        a.staff_id,
+                        c.name  AS staff_name,
+                        
+                        a.notes_id,
+                        d.notes
                         
                         
                     FROM pig_prod_pig_ops a 
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
                     LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
+                    LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
                     WHERE a.pig_prod_id = %s AND a.operation_type = %s
                     ORDER BY b.num_days_since
                     """ % (pig_prod_id, operation_type)
@@ -113,16 +118,22 @@ class PigProdPigOps:
                         b.flag AS account_pig_ops_flag,
                         b.description,
                         
+                        a.staff_id,
                         c.name  AS staff_name,
                         
-                        d.name_last,
-                        d.name_first,
+                        a.notes_id,
+                        d.notes,
+                        
+                        e.name_last,
+                        e.name_first,
                         a.dt_last_update
                         
                     FROM pig_prod_pig_ops a 
-                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
-                    LEFT OUTER JOIN pig_farm_staff c     ON a.staff_id = c.id
-                    LEFT OUTER JOIN user d               ON a.last_update_user_id = d.id
+                    LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
+                    LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
+                    LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
+                    LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
+                    
                     WHERE a.pig_prod_id = %s AND a.operation_type =%s
                     ORDER BY b.num_days_since
                     """ % (pig_prod_id, operation_type)
@@ -178,7 +189,13 @@ class PigProdPigOps:
                         },
                         
                         'staff': {
-                            'name':             row[9]
+                            'id':               row[9],
+                            'name':             row[10]
+                        },
+                        
+                        'notes': {
+                            'id':               row[11],
+                            'notes':            row[12]
                         }
                     }
                     
@@ -200,13 +217,19 @@ class PigProdPigOps:
                         },
                         
                         'staff': {
-                            'name':             row[9]
+                            'id':               row[9],
+                            'name':             row[10]
+                        },
+                        
+                        'notes': {
+                            'id':               row[11],
+                            'notes':            row[12]
                         },
                         
                         'last_update': {
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_update':        str(row[12]) if row[12] else None
+                            'name_last':        row[13],
+                            'name_first':       row[14],
+                            'dt_update':        str(row[15]) if row[15] else None
                         }
                     }
                 
