@@ -216,13 +216,18 @@ class PigProdNotes:
         return None
     
     
-    def get_list(self, pig_prod_id = 0, sow_boar_id = 0, inc_deleted = 0):
+    def get_list(self, pig_prod_id = 0, sow_boar_id = 0, prod_group_id = 0, 
+        inc_deleted = 0):
         
         if pig_prod_id > 0:
             where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
         
         if sow_boar_id > 0:
             where_clause = 'WHERE a.sow_boar_id = %s ' % sow_boar_id
+        
+        if prod_group_id > 0:
+            where_clause = 'WHERE a.prod_group_id = %s ' % sow_boar_id
+        
         
         if inc_deleted == 0:
             where_clause += ' AND a.flag & 1 = 0'
@@ -292,7 +297,7 @@ class PigProdNotes:
                     'added_by':{
                         'name_first':       row[3],
                         'name_last':        row[4],
-                        'dt_entry':         str(row[2])
+                        'dt_entry':         str(row[5])
                     }
                 }
                 

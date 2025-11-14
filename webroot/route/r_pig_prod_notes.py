@@ -213,7 +213,8 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
     
     
 @app.get("/pig_prod_notes/list")
-async def pig_prod_notes_list(pig_prod_hid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None,
+    prod_group_hid = None, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get pig_prod_notes list.
     
@@ -231,21 +232,56 @@ async def pig_prod_notes_list(pig_prod_hid: str, inc_deleted: int = 0, inc_user_
     
     """
     
+    pig_prod_id     = 0
+    sow_boar_id     = 0
+    prod_group_id   = 0
     
-    res = hashids_common.decrypt(pig_prod_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+    
+    if pig_prod_hid is not None:
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
             }
-        }
-    
-    
-    pig_prod_id = res[0]
+            
+        pig_prod_id = res[0]
         
-    res = model['prod_notes'].get_list(pig_prod_id, inc_deleted, inc_user_audit)
+        
+    if sow_boar_hid is not None:
+        res = hashids_common.decrypt(sow_boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID,
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        sow_boar_id = res[0]
+    
+    
+    if prod_group_hid is not None:
+        res = hashids_common.decrypt(prod_group_id)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID,
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        prod_group_id = res[0]
+    
+    
+        
+    res = model['prod_notes'].get_list(pig_prod_id, sow_boar_id, prod_group_id, 
+        inc_deleted, inc_user_audit)
     
     if res is None:
         return {
