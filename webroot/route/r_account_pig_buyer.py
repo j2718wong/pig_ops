@@ -22,7 +22,7 @@ import data_model           as dm
 
 
     
-@app.post("/account_pig_buyer/add")
+@app.post("/account_pig_buyer/add", tags=["Account"])
 async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     name    = account_pig_buyer_data.name
     uhid    = account_pig_buyer_data.uhid
@@ -77,7 +77,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     return res_add
     
 
-@app.post("/account_pig_buyer/update")
+@app.post("/account_pig_buyer/update", tags=["Account"])
 async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuyer):
     name    = account_pig_buyer_data.name
     uhid    = account_pig_buyer_data.uhid
@@ -144,7 +144,7 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
     return res_update
     
 
-@app.get("/account_pig_buyer/delete")
+@app.get("/account_pig_buyer/delete", tags=["Account"])
 async def account_pig_buyer_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -197,7 +197,7 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
     return res_delete
     
 
-@app.get("/account_pig_buyer/list")
+@app.get("/account_pig_buyer/list", tags=["Account"])
 async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """

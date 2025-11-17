@@ -26,7 +26,7 @@ ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
 
 
 
-@app.get("/account/info")
+@app.get("/account/info", tags=["Account"])
 async def user_account_info(ahid: str):
     """
     Will get account info
@@ -87,7 +87,7 @@ async def user_account_info(ahid: str):
         
 
 
-@app.post("/account/register")
+@app.post("/account/register", tags=["Account"])
 async def account_register(account_data: dm.DataAccount):
     name    = account_data.name
     uhid    = account_data.uhid
@@ -152,7 +152,7 @@ async def account_register(account_data: dm.DataAccount):
     return res_register
     
     
-@app.post("/account/update")
+@app.post("/account/update", tags=["Account"])
 async def account_update(account_data: dm.DataAccount):
     name    = account_data.name
     uhid    = account_data.uhid
@@ -209,7 +209,7 @@ async def account_update(account_data: dm.DataAccount):
     return res_update
     
     
-@app.post("/account/update_settings")
+@app.post("/account/update_settings", tags=["Account"])
 async def account_update_settings(account_settings_data: dm.DataAccountSettings):
     uhid    = account_settings_data.uhid
     
@@ -252,7 +252,7 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
     
     
  
-@app.get("/account/selection")
+@app.get("/account/selection", tags=["Account"])
 async def account_selection(ahid: str, biz_obj_id: int):
     """
     Will get account_selection

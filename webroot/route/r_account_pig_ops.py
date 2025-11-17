@@ -29,7 +29,7 @@ PIG_OPERATION_TYPES = [
 
 
     
-@app.post("/account_pig_ops/add")
+@app.post("/account_pig_ops/add", tags=["Account"])
 async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
     name    = account_pig_ops_data.name
     uhid    = account_pig_ops_data.uhid
@@ -131,7 +131,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
     return res_add
     
 
-@app.post("/account_pig_ops/update")
+@app.post("/account_pig_ops/update", tags=["Account"])
 async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     name    = account_pig_ops_data.name
     uhid    = account_pig_ops_data.uhid
@@ -246,7 +246,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     return res_update
     
 
-@app.get("/account_pig_ops/delete")
+@app.get("/account_pig_ops/delete", tags=["Account"])
 async def account_pig_ops_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -300,7 +300,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
     return res_delete
     
 
-@app.get("/account_pig_ops/list")
+@app.get("/account_pig_ops/list", tags=["Account"])
 async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """

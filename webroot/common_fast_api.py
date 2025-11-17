@@ -17,9 +17,11 @@ RELEASE_MODE_PRODUCTION     = 1
 # If this is set to RELEASE_MODE_PRODUCTION authentication is needed in the API.
 release_mode                = RELEASE_MODE_PRODUCTION
 
+tags_metadata = [
+    {"name": "Account", "description": "Account related operation"}
+]
 
-
-app = FastAPIOffline()
+app = FastAPIOffline(openapi_tags = tags_metadata)
 
 
 JWT_TOKEN_AUTHENTICATED             = 0

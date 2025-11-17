@@ -18,13 +18,14 @@ class Account:
                     a.flag,
                     a.status_id, 
                     b.name AS status_name,
-                    a.name,
+                    a.name AS account_name,
                     a.date_trial_start,
                     a.date_trial_end,
                     
                     a.flag_settings,
-                    a.num_days_weaning,
-                    a.num_days_harvest,
+                    a.num_days_wean,
+                    a.num_days_harvest_from_birth,
+                    a.num_days_harvest_from_wean,
                     
                     a.num_bills_paid,
                     a.last_acc_paid_bill_id,
@@ -71,26 +72,29 @@ class Account:
                 cur_acc_flag            = row[1]
                 cur_acc_status_id       = row[2]
                 cur_acc_status_name     = row[3]
-                cur_acc_date_trial_start = row[4]
-                cur_acc_date_trial_end  = row[5]
+                cur_acc_account_name    = row[4]
+                cur_acc_date_trial_start = row[5]
+                cur_acc_date_trial_end  = row[6]
                 
                 
-                cur_acc_settings_flag   = row[6]
-                cur_acc_num_days_weaning= row[7]
-                cur_acc_num_days_harvest= row[8]
-                
+                cur_acc_settings_flag   = row[7]
+                cur_acc_num_days_wean   = row[8]
+                cur_acc_num_days_harvest_from_birth = row[9]
+                cur_acc_num_days_harvest_from_wean  = row[10]
                 
                 cur_entry = {
                     'account': {
                         'id':               cur_acc_id,
                         'flag':             cur_acc_flag,
                         'status_id':        cur_acc_status_id,
-                        'status_name':      cur_user_mobile_num
+                        'status_name':      cur_acc_status_name
                     },
                     
                     'settings_operations': {
-                        'num_days_weaning': cur_acc_num_days_weaning,
-                        'num_days_harvest': cur_acc_num_days_harvest
+                        'flag':             cur_acc_settings_flag,
+                        'num_days_wean':    cur_acc_num_days_wean,
+                        'num_days_harvest_from_birth': cur_acc_num_days_harvest_from_birth,
+                        'num_days_harvest_from_wean':  cur_acc_num_days_harvest_from_wean,
                     } 
                 }
                     
