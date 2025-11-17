@@ -313,7 +313,7 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
         account hashid
         
     operation_type :int
-        1 = GESTATING; 2 = LACTATING; 3 = GROWING
+        1 = GESTATING; 2 = LACTATING_PIGLETS; 3 = LACTATING_SOW
     
     inc_deleted: int
         if > 0, will include deleted entries

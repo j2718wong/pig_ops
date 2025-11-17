@@ -732,9 +732,6 @@ class TestAPIPigProd:
         self.summary['pig_prod']['update_pig_count'] = 'OK'
         
    
-         
-    
-    
     
     def _test_pig_prod_gestating_ops(self, user_uhid, pig_prod_hid, staff_hid, 
             before_birth = 1):

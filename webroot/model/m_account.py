@@ -10,7 +10,7 @@ class Account:
         self.TAG                = 'Account'
 
     
-    def get_info(self, id):
+    def get_info(self, account_id):
         
         sql =   """
                 SELECT 
@@ -18,7 +18,6 @@ class Account:
                     a.flag,
                     a.status_id, 
                     b.name AS status_name,
-                    a.hashid,
                     a.name,
                     a.date_trial_start,
                     a.date_trial_end,
@@ -32,8 +31,8 @@ class Account:
                     a.dt_entry
                 FROM account a
                 LEFT OUTER JOIN account_status b ON a.status_id = b.id
-                WHERE a.id = 
-                """ % values
+                WHERE a.id = %s
+                """ % account_id
         
         
         # Check if still connected to database
@@ -68,21 +67,36 @@ class Account:
         if rows is not None:
             
             for row in rows:
-                cur_user_account_id     = row[0]
-                cur_user_flag           = row[1]
-                cur_user_email          = row[2]
-                cur_user_mobile_num     = row[3]
+                cur_acc_id              = row[0]
+                cur_acc_flag            = row[1]
+                cur_acc_status_id       = row[2]
+                cur_acc_status_name     = row[3]
+                cur_acc_date_trial_start = row[4]
+                cur_acc_date_trial_end  = row[5]
+                
+                
+                cur_acc_settings_flag   = row[6]
+                cur_acc_num_days_weaning= row[7]
+                cur_acc_num_days_harvest= row[8]
+                
                 
                 cur_entry = {
-                    'id':               user_id,
-                    'flag':             cur_user_flag,
-                    'email':            cur_user_email,
-                    'mobile_num':       cur_user_mobile_num
+                    'account': {
+                        'id':               cur_acc_id,
+                        'flag':             cur_acc_flag,
+                        'status_id':        cur_acc_status_id,
+                        'status_name':      cur_user_mobile_num
+                    },
+                    
+                    'settings_operations': {
+                        'num_days_weaning': cur_acc_num_days_weaning,
+                        'num_days_harvest': cur_acc_num_days_harvest
+                    } 
                 }
                     
-                result.append(cur_entry)
+                return cur_entry
         
-        return result
+        return None
     
     
     

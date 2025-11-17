@@ -38,6 +38,53 @@ async def user_account_info(ahid: str):
     
     
     """
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    account_id = res[0]
+    
+    
+    res = model['account'].get_info(account_id)
+    
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    cur_id  = res['account']['id']
+    cur_hid = hashids_account.encrypt(cur_id)
+    
+    del res['account']['id']
+    res['account']['hid']   = cur_hid
+    
+        
+    result = {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': ''
+            }
+        }
+        
+    result = result | res
+    
+    return result
+        
+        
+        
 
 
 @app.post("/account/register")
