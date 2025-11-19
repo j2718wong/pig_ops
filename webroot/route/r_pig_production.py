@@ -711,6 +711,18 @@ async def pig_prod_list(pfhid):
             operation_type, inc_user_audit = 1)
         
         # Replace plain_id
+        
+        cur_id  = cur_entry['birth']['birth_staff_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['birth']['birth_staff_id']
+        cur_entry['birth']['birth_staff_hid']   = cur_hid
+            
+        
+        
         for cur_ops in gestating_ops:
             cur_id  = cur_ops['pig_prod_pig_ops']['id']
             cur_hid = hashids_common.encrypt(cur_id)

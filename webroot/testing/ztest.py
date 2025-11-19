@@ -1204,30 +1204,116 @@ class TestAPIAccount:
         t.request_list(url)
         
        
-    def test_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3):
-        count = 0
+    def test_sow_boar_add_multi(self, user_id, pig_farm_id, sex= 'F', num = 3, 
+            simulate_operations = False):
+        
+        result = {}
         
         
-        while count < num:
-            s = f"Adding {count+1} of {num} "
-            if sex == 'F': 
-                s += "sows"
-            else:
-                s += "boars"
+        dt_now      = datetime.now()
             
-            if count == 0:
-                self.test_sow_boar_add(user_id, pig_farm_id, sex, opt_msg = s)
-            else:
-                self.test_sow_boar_add(user_id, pig_farm_id, sex, 
-                        skip_flag = 1, opt_msg = s)
+        
+        if simulate_operations == False:
+            count = 0
+            while count < num:
+                s = f"Adding {count+1} of {num} "
+                if sex == 'F': 
+                    s += "sows"
+                else:
+                    s += "boars"
                 
-            count += 1
+                if count == 0:
+                    self.test_sow_boar_add(user_id, pig_farm_id, sex, opt_msg = s)
+                else:
+                    self.test_sow_boar_add(user_id, pig_farm_id, sex, 
+                            skip_flag = 1, opt_msg = s)
+                    
+                count += 1
+        
+        else:
+            # This needs to be added manually because of the testing conditions in the UI.
+            
     
+                
+            # Add gestating sow that is already given birth but not recorded.
+            s = "Adding Sow sow_has_just_given_birth"
+            random_num_days = random.randint(1, 6)
+            dt_dob  = dt_now - timedelta(days = (210 + 113 + random_num_days))
+            res     = self.test_sow_boar_add(user_id, pig_farm_id, 'F', 
+                        dt_dob = dt_dob, opt_msg = s)
+            result['gesta_has_just_given_birth'] = res
+            
+            
+            # Add gestating sow that is has just injected iron
+            s = "Adding Sow has_just_injected_iron"
+            random_num_days = random.randint(1, 8)
+            dt_dob      = dt_now - timedelta(days = (210 + 80 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['gesta_has_just_injected_iron'] = res
+                    
+            
+            # Add gestating sow that is has just dewormed
+            s = "Adding Sow has_just_dewormed"
+            random_num_days = random.randint(1, 8)
+            dt_dob      = dt_now - timedelta(days = (210 + 100 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['gesta_has_just_dewormed'] = res
+            
+            
+            # Add lactating sow + 15 days after birth
+            s = "Adding lactating Sow + 15 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 15 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['lacta_after_15_days'] = res
+            
+            
+            # Add lactating sow + 30 days after birth
+            s = "Adding lactating Sow + 30 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 30 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['lacta_after_30_days'] = res
+            
+            
+            # Add lactating sow + 45 days after birth
+            s = "Adding lactating Sow + 45 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 45 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['lacta_after_45_days'] = res
+            
+            
+            # Add growing sow + 50 days after birth
+            s = "Adding lactating Sow + 50 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 50 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['lacta_after_50_days'] = res
+            
+            
+            # Add growing sow + 90 days after birth
+            s = "Adding lactating Sow + 90 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 90 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s)
+            result['lacta_after_90_days'] = res
+            
+        return result
+        
     
     def test_sow_boar_add(self, user_id, pig_farm_id, sex= 'F', is_external = 0,
-            skip_flag = 0, 
-            opt_msg = None):
+            dt_dob = None, skip_flag = 0, opt_msg = None):
         """
+        dt_dob : datetime object
+        
         skip_flag:
         bit_0: if > 0, skip update
         """
@@ -1299,10 +1385,13 @@ class TestAPIAccount:
                 sow_boar_name   = sow_boar_names[index]
                     
         
-        dt_now      = datetime.now()
+        if dt_dob is None:
+            dt_now      = datetime.now()
+            
+            random_num_days = random.randint(0, 60)
+            dt_dob      = dt_now - timedelta(days = (210 + random_num_days))
         
-        random_num_days = random.randint(0, 60)
-        dt_dob      = dt_now - timedelta(days = (210 + random_num_days))
+        
         dt_dob_s    = dt_dob.strftime('%Y-%m-%d')
         
         data = {
@@ -1382,6 +1471,8 @@ class TestAPIAccount:
             assert(result_num == 0)
             
             self.summary['sow_boar']['update'] = 'OK'
+            
+        return {'sow_hid': sow_boar_hid, 'sow_name': data['name']}
             
             
     def test_sow_boar_dispose(self, user_id, pig_farm_id, sex):
@@ -1690,13 +1781,20 @@ class TestAPIAccount:
                 proceed_test = 1
         
         if proceed_test > 0:
-            self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', num = 10)
+            res = self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', 
+                    simulate_operations = True)
+            
+            f = open('testing_sow.json', 'w')
+            f.write(json.dumps(res, indent=4))
+            f.close()
+            
+            
             self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
             
             self.test_sow_boar_add(user_id, pig_farm_id, sex= 'M', is_external = 1)
-            
-            self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
-            self.test_sow_boar_dispose(user_id, pig_farm_id, 'F')
+            self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 1)
+            self.test_sow_boar_dispose(user_id, pig_farm_id, 'M')
+       
         
         
             self.summary['ztest_last_step'] = cur_step
