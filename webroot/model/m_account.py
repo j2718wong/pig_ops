@@ -251,16 +251,18 @@ class Account:
             in_user_id                  INT,
     
             in_day_1_on_dob             INT,
-            in_num_days_weaning         INT,
-            in_num_days_harvest         INT
+            in_days_wean                INT,
+            in_days_harvest_from_birth  INT,
+            in_days_harvest_from_wean   INT
         )  
         """
         
         sql =  'CALL account_update_settings('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.day_1_on_date_of_birth
-        sql += '%s,'    % data.num_days_weaning
-        sql += '%s);'   % data.num_days_harvest
+        sql += '%s,'    % data.days_wean
+        sql += '%s,'    % data.days_harvest_from_birth
+        sql += '%s);'   % data.days_harvest_from_wean
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

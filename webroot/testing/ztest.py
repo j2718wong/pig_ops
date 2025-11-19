@@ -278,7 +278,12 @@ class TestBase:
         
         r = requests.post(self.url_add, json = data)
         res_text = str(r.text)
-        res_json = json.loads(res_text)
+        try:
+            res_json = json.loads(res_text)
+        except Exception as e:
+            print(f'\n_request_add_send(); Error: {str(e)}')
+            print(f'res_text={res_text}')
+            
         
         print(f"\n\nResult; status_code = {r.status_code}; result")
         pprint.pprint(res_json)
@@ -419,7 +424,7 @@ class TestAccount(TestBase):
         data = {
             "uhid":         user_uhid,
             "day_1_on_date_of_birth": 1,
-            "num_days_weaning": 40
+            "days_wean":    42
         }
         
         url = BASE_URL + 'account/update_settings'
@@ -502,7 +507,7 @@ class TestFeedSupplier(TestBase):
         }
 
         input_checks = [
-            {'input':'uhid', 'type':'str',  'test_random': 1},
+            {'input':'uhid', 'type':'str', 'test_random': 1},
             {'input':'name', 'type':'str', 'cannot_be_empty': 1},
             {'input':'address_level_1_id', 'type':'int', 'cannot_be_zero': 1},
             {'input':'address_level_2_id', 'type':'int', 'cannot_be_zero': 1}
@@ -1065,6 +1070,7 @@ class TestAPIAccount:
     
     def test_feed_supplier(self, user_id):
         t = TestFeedSupplier(self.summary)
+        print('user_id = %s' %user_id)
         data_input = t.test_add(user_id)
         
         t.test_duplicate_add(data_input)
