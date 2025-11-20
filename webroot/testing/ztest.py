@@ -1246,7 +1246,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 6)
             dt_dob  = dt_now - timedelta(days = (210 + 113 + random_num_days))
             res     = self.test_sow_boar_add(user_id, pig_farm_id, 'F', 
-                        dt_dob = dt_dob, opt_msg = s)
+                        dt_dob = dt_dob, opt_msg = s, skip_flag = 1)
             result['gesta_has_just_given_birth'] = res
             
             
@@ -1255,7 +1255,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 8)
             dt_dob      = dt_now - timedelta(days = (210 + 80 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['gesta_has_just_injected_iron'] = res
                     
             
@@ -1264,7 +1264,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 8)
             dt_dob      = dt_now - timedelta(days = (210 + 100 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['gesta_has_just_dewormed'] = res
             
             
@@ -1273,7 +1273,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 2)
             dt_dob      = dt_now - timedelta(days = (210 + 114 + 15 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['lacta_after_15_days'] = res
             
             
@@ -1282,7 +1282,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 2)
             dt_dob      = dt_now - timedelta(days = (210 + 114 + 30 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['lacta_after_30_days'] = res
             
             
@@ -1291,7 +1291,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 2)
             dt_dob      = dt_now - timedelta(days = (210 + 114 + 45 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['lacta_after_45_days'] = res
             
             
@@ -1300,7 +1300,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 2)
             dt_dob      = dt_now - timedelta(days = (210 + 114 + 50 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['lacta_after_50_days'] = res
             
             
@@ -1309,7 +1309,7 @@ class TestAPIAccount:
             random_num_days = random.randint(1, 2)
             dt_dob      = dt_now - timedelta(days = (210 + 114 + 90 + random_num_days))
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s)
+                    opt_msg = s, skip_flag = 1)
             result['lacta_after_90_days'] = res
             
         return result
@@ -1409,7 +1409,8 @@ class TestAPIAccount:
           "is_external": is_external,
           "number": str(sow_boar_number),
           "name": sow_boar_name,
-          "date_of_birth": dt_dob_s
+          "date_of_birth": dt_dob_s,
+          "notes": "Added " + sow_boar_name
         }
         
         if is_external > 0:

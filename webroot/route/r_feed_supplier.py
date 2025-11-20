@@ -46,6 +46,30 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
             }
         }
     
+    
+    address_level_1_id = feed_supplier_data.address_level_1_id
+    if address_level_1_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
+                'code': 'ERROR_FEED_SUPPLIER_INVALID_ADDRESS_LEVEL_1',
+                'desc': ''
+            }
+        }
+    
+    
+    address_level_2_id = feed_supplier_data.address_level_2_id
+    if address_level_2_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
+                'code': 'ERROR_FEED_SUPPLIER_INVALID_ADDRESS_LEVEL_2',
+                'desc': ''
+            }
+        }
+    
+    
+    
     user_id = res[0]
     
     
