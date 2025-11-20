@@ -799,6 +799,8 @@ class TestAPIAccount:
         
         self.summary    = None
         self.load_previous_test_summary()
+        
+        self.last_added_sow_boar_number = None
     
     
     def load_previous_test_summary(self):
@@ -1347,7 +1349,9 @@ class TestAPIAccount:
         #print(f"\n\nResult; status_code = {r.status_code}; result")
         #pprint.pprint(res_json)
         
-        self.summary['sow_boar'] = {}
+        if 'sow_boar' not in self.summary:
+            self.summary['sow_boar'] = {}
+        
         self.summary['sow_boar']['list'] = 'OK'
         
         
@@ -1369,10 +1373,8 @@ class TestAPIAccount:
             for cur_entry in sow_boar_list:
                 taken_sow_boar_names.append(cur_entry['name'])
             
-            last_entry = sow_boar_list[len_items -1]
-            last_number = int(last_entry['number'])
-            
-            sow_boar_number = last_number + random.randint(1, 20)
+           
+            sow_boar_number = int(self.last_added_sow_boar_number) + random.randint(1, 20)
             
             
             len_taken_sow_boar_names = len(taken_sow_boar_names)
@@ -1399,6 +1401,8 @@ class TestAPIAccount:
         
         
         dt_dob_s    = dt_dob.strftime('%Y-%m-%d')
+        
+        self.last_added_sow_boar_number = sow_boar_number;
         
         data = {
           "uhid": user_uhid,
@@ -1788,24 +1792,25 @@ class TestAPIAccount:
                 proceed_test = 1
         
         if proceed_test > 0:
-            res = self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'F', 
-                    simulate_operations = True)
+
+            if self.summary['ztest_last_test'] != 'test_sow_boar_add_update':
+                self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
+                
+                self.test_sow_boar_add(user_id, pig_farm_id, sex= 'M', is_external = 1)
+                self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 1)
+                
+                
+                self.summary['ztest_last_test'] = 'test_sow_boar_add_update'
+                write_summary_to_file(self.summary)
+            else:
+                print('\n\nSkipping test_sow_boar_add_update')
             
-            f = open('testing_sow.json', 'w')
-            f.write(json.dumps(res, indent=4))
-            f.close()
-            
-            
-            self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 3)
-            
-            self.test_sow_boar_add(user_id, pig_farm_id, sex= 'M', is_external = 1)
-            self.test_sow_boar_add_multi(user_id, pig_farm_id, sex= 'M', num = 1)
             self.test_sow_boar_dispose(user_id, pig_farm_id, 'M')
        
         
         
             self.summary['ztest_last_step'] = cur_step
-            self.summary['ztest_last_test'] = 'test_sow_boar'
+            self.summary['ztest_last_test'] = 'test_sow_boar_complete'
             write_summary_to_file(self.summary)
             
         else:

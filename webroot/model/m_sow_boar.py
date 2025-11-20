@@ -417,13 +417,15 @@ class SowBoar:
                         b.name AS status_name,
                         a.date_of_birth,
                         a.date_dispose,
-                        a.notes,
-                        a.dispose_notes,
+                        c.notes AS add_notes,
+                        d.notes AS dispose_notes,
                         
                         a.dt_entry
                         
                     FROM sow_boar a
-                    LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
+                    LEFT OUTER JOIN sow_status b        ON a.sow_status_id     = b.id
+                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
+                    LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
                     %s
                     %s 
                     """ % (where_clause, order_clause)
