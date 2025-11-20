@@ -5,6 +5,7 @@ import sys
 
 
 from datetime               import datetime, timedelta
+from collections            import OrderedDict
 
 sys.path.append('..')
 from common_constants       import *
@@ -27,7 +28,8 @@ INSEM_TYPE_AI               = 1
 
 
 class SimulProd:
-    def __init__(self, data_sow, insem_type):
+    def __init__(self, summary, data_sow, insem_type):
+        self.summary        = summary
         
         self.data_sow       = data_sow
         
@@ -41,6 +43,17 @@ class SimulProd:
         
         self.user_hid       = None
         
+        
+    def write_summary_to_file(self,):
+        s = json.dumps(self.summary, indent=4)
+
+        cur_directory   = os.getcwd()
+        abspath         = os.path.join(cur_directory, 'simul.json')
+            
+        file = open(abspath, 'w')
+        s = file.write(s)
+        file.close()
+            
         
     def run(self):
         dt_now              = datetime.now()
@@ -66,75 +79,98 @@ class SimulProd:
         cur_staff       = self.list_staff[index]
            
            
-        pig_prod_hid    = None
-            
-        if self.insem_type == INSEM_TYPE_BOAR:
-            # Get Boar
-            len_items       = len(self.list_boar)
-            index           = random.randint(0, len_items-1)
-            cur_boar        = self.list_boar[index]
-            
-            res = self._pig_prod_add_by_boar(cur_boar, cur_staff, dt_insem_s)
-            pig_prod_hid    = res['pig_prod_hid']
-        
+        sow_hid         = self.data_sow['hid']
+        if sow_hid not in self.summary:
+            sow_simul_summary = OrderedDict()
+            self.summary[sow_hid] = sow_simul_summary
         else:
-            # Get Semen Source
-            len_items       = len(self.list_semen_source)
-            index           = random.randint(0, len_items-1)
-            cur_semen_source= self.list_semen_source[index]
+            sow_simul_summary = self.summary[sow_hid]
             
-            res = self._pig_prod_add_by_ai(cur_semen_source, cur_staff, dt_insem_s)
-            pig_prod_hid = res['pig_prod_hid']
+        
+           
+        pig_prod_hid    = None
+        
             
+        if 'insem' not in sow_simul_summary:
+            
+            if self.insem_type == INSEM_TYPE_BOAR:
+                # Get Boar
+                len_items       = len(self.list_boar)
+                index           = random.randint(0, len_items-1)
+                cur_boar        = self.list_boar[index]
+                
+                res = self._pig_prod_add_by_boar(cur_boar, cur_staff, dt_insem_s)
+                pig_prod_hid    = res['pig_prod_hid']
+                
+                sow_simul_summary['insem'] = 'OK'
+            
+            else:
+                # Get Semen Source
+                len_items       = len(self.list_semen_source)
+                index           = random.randint(0, len_items-1)
+                cur_semen_source= self.list_semen_source[index]
+                
+                res = self._pig_prod_add_by_ai(cur_semen_source, cur_staff, dt_insem_s)
+                pig_prod_hid = res['pig_prod_hid']
+                
+                sow_simul_summary['insem'] = 'OK'
             
         """
         Part 2: Gestating Ops simulation 
         """
-        list_gestating_ops = self._get_pig_prod_ops(pig_prod_hid, 
-                PIG_OPERATION_TYPE_GESTATING)
-        
-        for cur_entry in list_gestating_ops:
-            date_target     = cur_entry['pig_prod_pig_ops']['date_target']
-            dt_target       = datetime.strptime(date_target, '%Y-%m-%d')
+        if 'gestating_pig_ops' not in sow_simul_summary:
             
-            # Add 30% random chance to add 1 day to target
-            index           = random.randint(0, 9)
-            if index >= 7:
-                dt_target   = dt_target + timedelta(days=1)
+            list_gestating_ops = self._get_pig_prod_ops(pig_prod_hid, 
+                    PIG_OPERATION_TYPE_GESTATING)
             
-            if dt_target >= dt_now: 
-                return
-            
-            dt_target_s     = dt_target.strftime('%Y-%m-%d')
-            
-            account_pig_ops = cur_entry['account_pig_ops']
-            
-            
-            pig_prod_pig_ops_hid = cur_entry['pig_prod_pig_ops']['hid']
-            
-            index           = random.randint(0, len_staff-1)
-            cur_staff       = self.list_staff[index]
-            staff_hid       = cur_staff['hid']
+            for cur_entry in list_gestating_ops:
+                date_target     = cur_entry['pig_prod_pig_ops']['date_target']
+                dt_target       = datetime.strptime(date_target, '%Y-%m-%d')
+                
+                # Add 30% random chance to add 1 day to target
+                index           = random.randint(0, 9)
+                if index >= 7:
+                    dt_target   = dt_target + timedelta(days=1)
+                
+                if dt_target >= dt_now: 
+                    return
+                
+                dt_target_s     = dt_target.strftime('%Y-%m-%d')
+                
+                account_pig_ops = cur_entry['account_pig_ops']
+                
+                
+                pig_prod_pig_ops_hid = cur_entry['pig_prod_pig_ops']['hid']
+                
+                index           = random.randint(0, len_staff-1)
+                cur_staff       = self.list_staff[index]
+                staff_hid       = cur_staff['hid']
 
-               
-            notes = 'Updated ' + account_pig_ops['name']
-               
-            self._update_pig_prod_ops(pig_prod_pig_ops_hid, staff_hid, 
-                        dt_target_s, notes)
-    
+                   
+                notes = 'Updated ' + account_pig_ops['name']
+                   
+                self._update_pig_prod_ops(pig_prod_pig_ops_hid, staff_hid, 
+                            dt_target_s, notes)
+            
+            sow_simul_summary['gestating_pig_ops'] = 'OK'
+        
         
         """
         Part 3: Update pig prod birth simulation 
         """
-        random_num_days = random.randint(0, 4)
-        num_days = 112 + random_num_days
-        dt_actual_birth = dt_insem + timedelta(days = num_days)
-        
-        if dt_actual_birth > dt_now:
-            return
+        if 'update_birth' not in sow_simul_summary:
+            random_num_days = random.randint(0, 4)
+            num_days = 112 + random_num_days
+            dt_actual_birth = dt_insem + timedelta(days = num_days)
             
-        self._update_pig_prod_birth(pig_prod_hid, staff_hid, date_birth)
-        
+            if dt_actual_birth > dt_now:
+                return
+                
+            self._update_pig_prod_birth(pig_prod_hid, staff_hid, date_birth)
+            
+            sow_simul_summary['update_birth'] = 'OK'
+            
+            
         
     def _pig_prod_add_by_boar(self, boar, staff, date_insem):
         url = BASE_URL + 'pig_prod/add'
@@ -336,17 +372,285 @@ class SimulProd:
     
         return data_birth
     
+"""
+Typical data_test 
+
+{
+    "user_uhid": "WPG2P2",
+    "account_hid": "EG5RPR",
+    "account_id": 1,
+    "pig_farm": {
+        "hid": "Q92W83",
+        "flag": 1,
+        "name": "Punod Farm20251120_101344"
+    },
+    "list_sow": [
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 1,
+            "number": "15871",
+            "name": "Nitang",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2024-12-30",
+            "date_dispose": null,
+            "notes": "Added Nitang",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:30:40",
+            "hid": "Q92W83"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 2,
+            "number": "15876",
+            "name": "Tasing",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2025-02-02",
+            "date_dispose": null,
+            "notes": "Added Tasing",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:30:44",
+            "hid": "EKQY8R"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 3,
+            "number": "15894",
+            "name": "Sita",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2025-01-12",
+            "date_dispose": null,
+            "notes": "Added Sita",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:30:48",
+            "hid": "0KP5K7"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 4,
+            "number": "15910",
+            "name": "Diday",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2024-12-15",
+            "date_dispose": null,
+            "notes": "Added Diday",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:30:53",
+            "hid": "1K7D9J"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 5,
+            "number": "15920",
+            "name": "Soling",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2024-11-29",
+            "date_dispose": null,
+            "notes": "Added Soling",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:30:57",
+            "hid": "08DZKQ"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 6,
+            "number": "15922",
+            "name": "Puring",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2024-11-14",
+            "date_dispose": null,
+            "notes": "Added Puring",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:01",
+            "hid": "M9ZN9G"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 7,
+            "number": "15940",
+            "name": "Indang",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2024-11-10",
+            "date_dispose": null,
+            "notes": "Added Indang",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:06",
+            "hid": "M8BE8P"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_sow_id": 8,
+            "number": "15942",
+            "name": "Imyat",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": "Gestating",
+            "date_of_birth": "2024-10-01",
+            "date_dispose": null,
+            "notes": "Added Imyat",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:10",
+            "hid": "NKNG81"
+        }
+    ],
+    "list_boar": [
+        {
+            "pig_farm_id": 1,
+            "farm_boar_id": 1,
+            "number": "12436",
+            "name": "Didoy",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": null,
+            "date_of_birth": "2025-03-15",
+            "date_dispose": null,
+            "notes": "Added Didoy",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:14",
+            "hid": "18XJK5"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_boar_id": 2,
+            "number": "12449",
+            "name": "Gorio",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": null,
+            "date_of_birth": "2025-02-27",
+            "date_dispose": null,
+            "notes": "Added Gorio",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:21",
+            "hid": "M86D9R"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_boar_id": 3,
+            "number": "12469",
+            "name": "Desidido",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": null,
+            "date_of_birth": "2025-04-18",
+            "date_dispose": null,
+            "notes": "Added Desidido",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:25",
+            "hid": "E8519Q"
+        },
+        {
+            "pig_farm_id": 1,
+            "farm_boar_id": 5,
+            "number": "12485",
+            "name": "Berto",
+            "flag": 0,
+            "farm_birth_prod_id": 0,
+            "last_prod_id": null,
+            "status": null,
+            "date_of_birth": "2025-03-02",
+            "date_dispose": null,
+            "notes": "Added Berto",
+            "dispose_notes": null,
+            "dt_entry": "2025-11-20 06:31:35",
+            "hid": "29GB8Z"
+        }
+    ],
+    "list_semen_source": [
+        {
+            "pig_farm": {
+                "name": "Punod Farm20251120_101344",
+                "hid": "Q92W83"
+            },
+            "flag": 0,
+            "boar": {
+                "number": "12485",
+                "name": "Berto",
+                "hid": "29GB8Z"
+            },
+            "name": "Semen from Butakal - Berto",
+            "description": null,
+            "dt_entry": "2025-11-20T07:01:17",
+            "hid": "Q92W83"
+        },
+        {
+            "pig_farm": {
+                "name": "Punod Farm20251120_101344",
+                "hid": "Q92W83"
+            },
+            "flag": 0,
+            "external_semen": {
+                "supplier_name": "Growbest Agrivet20251119_171215",
+                "pig_race_line": {
+                    "name": "Camborough 4820251119_171202",
+                    "hid": "Q92W83"
+                },
+                "supplier_hid": "Q92W83"
+            },
+            "name": "PIC 337",
+            "description": null,
+            "dt_entry": "2025-11-20T07:01:24",
+            "hid": "EKQY8R"
+        }
+    ],
+    "list_staff": [
+        {
+            "name": "Hilmero20251120_101355",
+            "dt_entry": "2025-11-20 02:13:49",
+            "hid": "Q92W83"
+        },
+        {
+            "name": "Kevin",
+            "dt_entry": "2025-11-20 02:13:51",
+            "hid": "EKQY8R"
+        }
+    ]
+}
+"""
+
 
 class TestSimul(TestBase):
-    def __init__(self):
-        super.__init__()
+    def __init__(self, user_id):
+        super().__init__(user_id)
         
         
     def run(self):
+        # Load simul summary if there is any
         
+        
+        count = 0
         for cur_entry in self.data_test['list_sow']:
+            cur_simul = SimulProd(cur_entry, INSEM_TYPE_BOAR)
+            cur_simul.list_staff     = self.data_test['list_staff']
+            cur_simul.list_boar      = self.data_test['list_boar']
+            cur_simul.list_semen_source = self.data_test['list_semen_source']
+            cur_simul.user_hid       = None
             
-            
-            
-    def 
+            cur_simul.run()
+    
+            return
     

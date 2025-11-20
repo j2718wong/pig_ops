@@ -5,7 +5,8 @@ import os
 import sys
 
 
-from datetime               import datetime, timedelta
+from datetime               import datetime, timedeltafrom collections            
+import OrderedDict
 
 sys.path.append('..')
 from common_constants       import *
@@ -823,12 +824,12 @@ class TestAPIAccount:
         dt_now_s        = dt_now.strftime('%Y-%m-%d %H:%M:%S')
             
         if self.summary is None:
-            self.summary    = {
-                'test_run':{
-                    'num':  1,
-                    'dt':   dt_now_s
-                }            
-            }
+            self.summary    = OrderedDict()
+            self.summary['test_run'] =  {
+                                            'num':  1,
+                                            'dt':   dt_now_s
+                                        }            
+            
         
         else:
             if 'test_run' not in self.summary:

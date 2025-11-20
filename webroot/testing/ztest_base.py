@@ -30,7 +30,7 @@ class TestBase:
     def __init__(self, user_id):
         self.summary        = {}
         
-        self.data_test      = self.get_init_data()
+        self.data_test      = self.get_init_data(user_id)
         
         
         
@@ -95,6 +95,39 @@ class TestBase:
         
         print(f"\n\nNumber of sows in {cur_pig_farm['name']} = {len_items}\n\n")
         
+        
+        # Get list of boars available in the pig_farm
+        url = BASE_URL + 'sow_boar/list?pfhid=' + pfhid + '&sex=M&order_by=1'
+        
+    
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        
+        list_boar       = res_json['data']
+        len_items       = len(list_boar)
+        assert(len_items > 0)
+        
+        
+        
+        # Get list of semen sources avaiable for the account
+        url = BASE_URL + 'semen_source/list?ahid=' + account_hid
+        
+        print(f'\n\n****** GET Semen source list; url = {url} ')
+        
+        r = requests.get(url)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+     
+    
+        list_semen_source   = res_json['data']
+        
+        
+        
+        
         # Get list_staff of the farm
         url = BASE_URL + 'pig_farm_staff/list?pfhid=' + pfhid 
         
@@ -109,12 +142,14 @@ class TestBase:
         
         
         return {
-            'user_uhid':    user_uhid,
-            'account_hid':  account_hid,
-            'account_id':   account_id,
-            'pig_farm':     cur_pig_farm,
-            'list_sow':     list_sow,
-            'list_staff':   list_staff
+            'user_uhid':        user_uhid,
+            'account_hid':      account_hid,
+            'account_id':       account_id,
+            'pig_farm':         cur_pig_farm,
+            'list_sow':         list_sow,
+            'list_boar':        list_boar,
+            'list_semen_source':list_semen_source,
+            'list_staff':       list_staff
         }
         
         
