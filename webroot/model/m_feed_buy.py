@@ -253,7 +253,7 @@ class FeedBuy:
                         LEFT OUTER JOIN feed_brand c    ON a.feed_brand_id = c.id
                         LEFT OUTER JOIN feed_supplier d ON a.feed_supplier_id = d.id
                         WHERE a.pig_prod_group_id = %s
-                        ORDER BY a.id
+                        ORDER BY a.id DESC
                         """ % pig_prod_group_id
                 
                 

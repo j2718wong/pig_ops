@@ -24,6 +24,7 @@ from route.r_pig_race           import *
 from route.r_pig_race_line      import *
 from route.r_semen_supplier     import *
 
+from route.r_feed_type          import *
 from route.r_feed_brand         import *
 from route.r_feed_supplier      import *
 from route.r_feed_buy           import *

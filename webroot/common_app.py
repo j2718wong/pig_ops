@@ -51,6 +51,7 @@ from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
 from model.m_semen_supplier     import SemenSupplier
 
+from model.m_feed_type          import FeedType
 from model.m_feed_brand         import FeedBrand
 from model.m_feed_supplier      import FeedSupplier
 from model.m_feed_buy           import FeedBuy
@@ -96,6 +97,7 @@ model_names = [
     
     ('semen_supplier',          SemenSupplier),
     
+    ('feed_type',               FeedType),
     ('feed_brand',              FeedBrand),
     ('feed_supplier',           FeedSupplier),
     ('feed_buy',                FeedBuy),
@@ -121,7 +123,7 @@ model_names = [
 ]
 
 
-USING_PRODUCTION_DB             = 0
+USING_PRODUCTION_DB             = 1
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:

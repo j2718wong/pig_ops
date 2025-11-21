@@ -170,7 +170,7 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
 
    
 @app.get("/feed_supplier/list")
-async def feed_supplier_list(address_level_2_id: int):
+async def feed_supplier_list(address_level_1_id: int = 0, address_level_2_id: int = 0):
     """
     Will get feed_supplier list.
     
@@ -183,7 +183,7 @@ async def feed_supplier_list(address_level_2_id: int):
     """
     
         
-    res = model['feed_supplier'].get_list(address_level_2_id)
+    res = model['feed_supplier'].get_list(address_level_1_id, address_level_2_id)
     
     if res is None:
         return {

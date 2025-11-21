@@ -186,27 +186,50 @@ class FeedSupplier:
         return None
     
     
-    def get_list(self, address_level_2_id):
-       
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.name,
-                    a.contact_number,
-                    a.whatsapp,
-                    a.messenger,
-                    
-                    a.country_id,
-                    b.name AS country_name,
-                    a.address_level_1_id,
-                    a.address_level_2_id,
-                    a.address_level_3_id
-                    
-                FROM feed_supplier a 
-                LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                WHERE  a.address_level_2_id = %s 
-                ORDER BY a.name
-                """ % address_level_2_id
+    def get_list(self, address_level_1_id = 0, address_level_2_id = 0):
+        
+        if address_level_2_id > 0:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.name,
+                        a.contact_number,
+                        a.whatsapp,
+                        a.messenger,
+                        
+                        a.country_id,
+                        b.name AS country_name,
+                        a.address_level_1_id,
+                        a.address_level_2_id,
+                        a.address_level_3_id
+                        
+                    FROM feed_supplier a 
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                    WHERE  a.address_level_2_id = %s 
+                    ORDER BY a.name
+                    """ % address_level_2_id
+        
+        if address_level_1_id > 0:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.name,
+                        a.contact_number,
+                        a.whatsapp,
+                        a.messenger,
+                        
+                        a.country_id,
+                        b.name AS country_name,
+                        a.address_level_1_id,
+                        a.address_level_2_id,
+                        a.address_level_3_id
+                        
+                    FROM feed_supplier a 
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                    WHERE  a.address_level_1_id = %s 
+                    ORDER BY a.name
+                    """ % address_level_1_id
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
