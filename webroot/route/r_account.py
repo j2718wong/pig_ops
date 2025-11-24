@@ -253,7 +253,8 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
     
  
 @app.get("/account/selection", tags=["Account"])
-async def account_selection(ahid: str, biz_obj_id: int):
+async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int = 0,
+        sel_s_supplier: int = 0):
     """
     Will get account_selection
 
@@ -278,10 +279,29 @@ async def account_selection(ahid: str, biz_obj_id: int):
     
     account_id = res[0]
     
-    res = model['account'].get_business_obj_selection(account_id, biz_obj_id)
+    res_f_brand = []
+    if sel_f_brand > 0:
+        res = model['account'].get_business_obj_selection(account_id, 
+            BUSINESS_OBJ_ID_FEED_BRAND)
+    
+        res_f_brand = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
     
     
-    res = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
+    res_f_supplier = []
+    if sel_f_supplier > 0:
+        res = model['account'].get_business_obj_selection(account_id, 
+            BUSINESS_OBJ_ID_FEED_SUPPLIER)
+    
+        res_f_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
+    
+    res_s_supplier = []
+    if sel_s_supplier > 0:
+        res = model['account'].get_business_obj_selection(account_id, 
+            BUSINESS_OBJ_ID_SEMEN_SUPPLIER)
+    
+        res_s_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
+    
+    
     
     
     return {
@@ -291,6 +311,8 @@ async def account_selection(ahid: str, biz_obj_id: int):
                 'desc': ''
             },
             
-            'data': res
+            'f_brand':      res_f_brand,
+            'f_supplier':   res_f_supplier,
+            's_supplier':   res_s_supplier
         }
     

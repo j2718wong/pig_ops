@@ -73,6 +73,7 @@ class DataAccountPigOps(BaseModel):
         
     num_days_since:         int
     name:                   str
+    short_name:             str = None
     description:            str = None 
     
     

@@ -18,6 +18,7 @@ class AccountPigOps:
             in_num_days_since       INT,
             
             in_name                 VARCHAR(50),
+            in_short_name           VARCHAR(15),
             in_description          VARCHAR(160)
         )  
         """
@@ -28,7 +29,12 @@ class AccountPigOps:
         sql += '%s,'    % data.num_days_since
         sql += '"%s",'  % data.name
         
-        if data.description is not None:
+        if data.short_name is not None and len(data.short_name) > 0:
+            sql += '"%s",'   % data.short_name
+        else:
+            sql += 'NULL,'
+        
+        if data.description is not None and len(data.description) > 0:
             sql += '"%s");'   % data.description
         else:
             sql += 'NULL);'
@@ -87,6 +93,7 @@ class AccountPigOps:
             in_num_days_since           INT,
             
             in_name                     VARCHAR(50),
+            in_short_name           VARCHAR(15),
             in_description              VARCHAR(160)
         )
         """
@@ -97,6 +104,11 @@ class AccountPigOps:
         sql += '%s,'    % data.num_days_since
         
         sql += '"%s",'  % data.name
+        
+        if data.short_name is not None and len(data.short_name) > 0:
+            sql += '"%s",'   % data.short_name
+        else:
+            sql += 'NULL,'
         
         if data.description is not None:
             sql += '"%s");'   % data.description
@@ -225,6 +237,7 @@ class AccountPigOps:
                         a.version_num,
                         
                         a.name,
+                        a.short_name,
                         a.description,
                         a.dt_entry
                     FROM account_pig_ops a
@@ -240,6 +253,7 @@ class AccountPigOps:
                         a.version_num,
                         
                         a.name,
+                        a.short_name,
                         a.description,
                         
                         c.name_last,
@@ -296,9 +310,10 @@ class AccountPigOps:
                         'num_days_since':       row[1],
                         'version_num':          row[2],
                         'name':                 row[3],
-                        'desc':                 row[4],
+                        'short_name':           row[4],
+                        'desc':                 row[5],
                         
-                        'dt_entry':             str(row[5])
+                        'dt_entry':             str(row[6])
                     }
                 
                 else:
@@ -308,18 +323,19 @@ class AccountPigOps:
                         'version_num':          row[2],
                         
                         'name':                 row[3],
-                        'desc':                 row[4],
+                        'short_name':           row[4],
+                        'desc':                 row[5],
                         
                         'added_by': {
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_entry':         row[7]
+                            'name_last':        row[6],
+                            'name_first':       row[7],
+                            'dt_entry':         row[8]
                         },
                         
                         'last_update':{
-                            'name_last':        row[8],
-                            'name_first':       row[9],
-                            'dt_update':        str(row[10]) if row[10] else None
+                            'name_last':        row[9],
+                            'name_first':       row[10],
+                            'dt_update':        str(row[11]) if row[11] else None
                         }
                     }
                     
