@@ -238,7 +238,7 @@ class DataFeedBuy(BaseModel):
     feed_brand_id:          int = 0
     feed_supplier_id:       int = 0
     quantity:               int = 0
-    kg_per_unit:            float
+    unit_weight:            float
     
     unit_cost:              float
     total_cost:             float
@@ -378,9 +378,8 @@ class DataPigProdDeadPig(BaseModel):
     pig_prod_group_id:      int = 0
     pig_prod_pig_dead_id:   int = 0
     date_dead:              str
-    dead_type_id:           int = 0
     num_pigs_dead:          int = 1
-    comments:               str = None
+    notes:                  str = None
     
     
 class DataPigProdNotes(BaseModel):

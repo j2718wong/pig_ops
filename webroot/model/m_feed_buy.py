@@ -392,7 +392,7 @@ class FeedBuy:
                             'id':               row[0],
                             'date_buy':         str(row[1]),
                             'quantity':         row[2],
-                            'kg_per_unit':      float(row[3]),
+                            'unit_weight':      float(row[3]),
                             'kg_total':         float(row[4]),
                             'unit_cost':        float(row[5]),
                             'total_cost':       float(row[6]),

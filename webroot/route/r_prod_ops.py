@@ -50,7 +50,7 @@ NUMDAYS_SINCE_BIRTH_PRESTARTER          = 30
 NUMDAYS_SINCE_BIRTH_STARTER             = 50
 NUMDAYS_SINCE_BIRTH_GROWER              = 90
 
-NUMDAYS_SINCE_BIRTH_TARGET_HARVEST      = 142
+NUMDAYS_SINCE_BIRTH_TARGET_HARVEST      = 145
 
 
 PRODUCTION_FEEDS = [
@@ -851,6 +851,7 @@ class ReportGenPigProdOps:
                 
                 if inc_target_harvest > 0:
                     num_days = NUMDAYS_SINCE_BIRTH_TARGET_HARVEST
+                    num_days -= DAY_1_STARTS_AT_BIRTH;
                     dt_harvest = dt_birth + timedelta(days = num_days)
                     date_harvest = datetime.strftime(dt_harvest, '%Y-%m-%d')
                     
@@ -858,7 +859,7 @@ class ReportGenPigProdOps:
                     
                     s_temp      = date_harvest
                     s           += s_temp
-                    s           += f"({numdays_delta}T)"
+                    s           += f"({NUMDAYS_SINCE_BIRTH_TARGET_HARVEST}T)"
                     s           += '  '
                 else:
             

@@ -19,9 +19,8 @@ class PigProdPigDead:
             in_pig_prod_group_id    INT,
             
             in_date_dead            VARCHAR(10),
-            in_dead_type_id         INT,
             in_num_pigs_dead        INT,
-            in_comments             VARCHAR(160)
+            in_notes                VARCHAR(160)
         )  
         """
         
@@ -32,10 +31,9 @@ class PigProdPigDead:
         sql += '%s,'    % data.pig_prod_group_id
         
         sql += '"%s",'  % data.date_dead
-        sql += '%s,'    % data.dead_type_id
         sql += '%s,'    % data.num_pigs_dead
         
-        if data.comments is not None:
+        if data.notes is not None and len(data.notes) > 0:
             sql += '"%s");'   % data.comments
         else:
             sql += 'NULL);'
@@ -87,13 +85,12 @@ class PigProdPigDead:
         """
         PROCEDURE pig_prod_pig_dead_update(
             in_user_id                  INT,
-            
+    
             in_pig_prod_pig_dead_id     INT,
             
             in_date_dead                VARCHAR(10),
-            in_dead_type_id             INT,
-            in_sex                      VARCHAR(2),
-            in_comments                 VARCHAR(160)
+            in_num_pigs_dead            INT,
+            in_notes                    VARCHAR(160)
         )
         """
        
@@ -102,10 +99,10 @@ class PigProdPigDead:
         
         sql += '%s,'    % data.pig_prod_pig_dead_id
         sql += '"%s",'  % data.date_dead
-        sql += '%s,'    % data.dead_type_id
+        sql += '%s,'    % data.num_pigs_dead
                 
-        if data.comments is not None:
-            sql += '"%s");'   % data.comments
+        if data.notes is not None and len(data.notes) > 0:
+            sql += '"%s");'   % data.notes
         else:
             sql += 'NULL);'
         
@@ -213,57 +210,32 @@ class PigProdPigDead:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0,
-            inc_user_audit = 0):
+    def get_list(self, pig_prod_id):
         
-        if inc_deleted > 0:
-            where_clause = 'WHERE a.account_id = %s' % account_id 
-        else:
-            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
-        
-        
-        if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
-                        a.name,
-                        a.description,
-                        a.dt_entry
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
-        else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
-                        a.name,
-                        a.description,
-                        
-                        c.name_last,
-                        c.name_first,
-                        a.dt_entry,
-                        
-                        d.name_last,
-                        d.name_first,
-                        a.dt_last_update
-                        
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b      ON a.pig_race_id = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
-                
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
-        
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.date_dead,
+                    a.num_pigs_dead,
+                    d.notes,
+                    
+                    b.name_last,
+                    b.name_first,
+                    a.dt_entry,
+                    
+                    c.name_last,
+                    c.name_first,
+                    a.dt_last_update
+                    
+                FROM pig_prod_pig_dead a 
+                LEFT OUTER JOIN user b          ON a.added_by_user_id   = b.id
+                LEFT OUTER JOIN user c          ON a.last_update_user_id = c.id
+                LEFT OUTER JOIN pig_prod_notes d ON a.notes_id = d.id
+            
+                WHERE pig_prod_id = %s
+                ORDER a.date_dead DESC
+                """ % pig_prod_id
+    
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -296,46 +268,29 @@ class PigProdPigDead:
         if rows is not None:
             
             for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'id':                   row[0],
-                        
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'desc':                 row[4],
-                        
-                        'dt_entry':             str(row[5])
-                    }
-                    
-                else:
-                    cur_entry = {
-                        'id':                   row[0],
-                        
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'description':          row[4],
-                        
-                        'added_by': {
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_entry':         row[7]
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[8],
-                            'name_first':       row[9],
-                            'dt_update':        str(row[10]) if row[10] else None
-                        }
-                    }
                 
+                cur_entry = {
+                    'pig_dead':{
+                        'id':               row[0],
+                        'date_dead':        str(row[1]),
+                        'num_pigs_dead':    row[2],
+                        'notes':            row[3],
+                    },
+                   
+                    
+                    'added_by': {
+                        'name_last':        row[4],
+                        'name_first':       row[5],
+                        'dt_entry':         row[6]
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[7],
+                        'name_first':       row[8],
+                        'dt_update':        str(row[9]) if row[9] else None
+                    }
+                }
+            
                     
                 result.append(cur_entry)
         
