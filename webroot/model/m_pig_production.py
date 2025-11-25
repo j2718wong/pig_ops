@@ -319,14 +319,20 @@ class PigProduction:
             in_user_id              INT,
             
             in_pig_production_id    INT,
-            in_pig_prod_status_id   INT
+            in_pig_prod_status_id   INT,
+            in_notes                VARCHAR(160)
         )  
         """
         
         sql =  'CALL pig_prod_update_status('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_prod_id
-        sql += '%s);'   % data.prod_status_id
+        sql += '%s,'    % data.prod_status_id
+        
+        if data.notes is not None:
+            sql += '"%s");'    % data.notes
+        else:
+            sql += 'NULL);'
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -750,7 +756,13 @@ class PigProduction:
                     a.cost_prestarter,
                     a.cost_starter,
                     a.cost_grower,
-                    a.cost_finisher
+                    a.cost_finisher,
+                    
+                    a.date_booster,
+                    a.date_prestarter,
+                    a.date_starter,
+                    a.date_grower,
+                    a.date_finisher
                     
                    
                 FROM pig_production a
@@ -869,6 +881,12 @@ class PigProduction:
                 cur_prod_cost_starter       = row[51]
                 cur_prod_cost_grower        = row[52]
                 cur_prod_cost_finisher      = row[53]
+                
+                cur_prod_date_booster       = row[54]
+                cur_prod_date_prestarter    = row[55]
+                cur_prod_date_starter       = row[56]
+                cur_prod_date_grower        = row[57]
+                cur_prod_date_finisher      = row[58]
             
                 
                 cur_entry = {
@@ -958,6 +976,14 @@ class PigProduction:
                             'starter':      float(cur_prod_cost_starter)        if cur_prod_cost_starter        is not None else None,
                             'grower':       float(cur_prod_cost_grower)         if cur_prod_cost_grower         is not None else None,
                             'finisher':     float(cur_prod_cost_finisher)       if cur_prod_cost_finisher       is not None else None
+                        },
+                        
+                        'date_change_feed':{
+                            'booster':      float(cur_prod_date_booster)        if cur_prod_date_booster        is not None else None,
+                            'prestarter':   float(cur_prod_date_prestarter)     if cur_prod_date_prestarter     is not None else None,
+                            'starter':      float(cur_prod_date_starter)        if cur_prod_date_starter        is not None else None,
+                            'grower':       float(cur_prod_date_grower)         if cur_prod_date_grower         is not None else None,
+                            'finisher':     float(cur_prod_date_finisher)       if cur_prod_date_finisher       is not None else None
                         }
                     
                     }

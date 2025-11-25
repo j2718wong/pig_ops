@@ -349,7 +349,8 @@ class DataPigProdStatus(BaseModel):
         
     user_id:                int = 0
     pig_prod_id:            int = 0
-    prod_status_id:         int = 0    
+    prod_status_id:         int = 0
+    notes:                  str = None
     
     
 class DataPigProdFattening(BaseModel):

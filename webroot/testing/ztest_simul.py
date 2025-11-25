@@ -41,14 +41,17 @@ class SimulProd:
         
         self.list_semen_source = None
         
-        self.user_hid       = None
+        self.user_uhid       = None
+        
+        
+        self.sow_simul      = None
         
         
     def write_summary_to_file(self,):
         s = json.dumps(self.summary, indent=4)
 
         cur_directory   = os.getcwd()
-        abspath         = os.path.join(cur_directory, 'simul.json')
+        abspath         = os.path.join(cur_directory, simul.json)
             
         file = open(abspath, 'w')
         s = file.write(s)
@@ -56,10 +59,17 @@ class SimulProd:
             
         
     def run(self):
+        sow_name            = self.data_sow['name']
+        if sow_name not in self.summary:
+            self.sow_simul = OrderedDict()
+            self.summary[sow_name] = self.sow_simul
+        else:
+            self.sow_simul = OrderedDict(self.summary[sow_name])
+        
         dt_now              = datetime.now()
         
         date_of_birth       = self.data_sow['date_of_birth']
-        dt_birth            = datetime.strptime(date_insem, '%Y-%m-%d')
+        dt_birth            = datetime.strptime(date_of_birth, '%Y-%m-%d')
         
         """
         Part 1: Insemination simulation 
@@ -71,27 +81,18 @@ class SimulProd:
             return
             
             
-        dt_insem_s      = dt_insem.strftime('%Y-%m-%d')
+        dt_insem_s          = dt_insem.strftime('%Y-%m-%d')
             
         # Get staff
-        len_staff       = len(self.list_staff)
-        index           = random.randint(0, len_staff-1)
-        cur_staff       = self.list_staff[index]
+        len_staff           = len(self.list_staff)
+        index               = random.randint(0, len_staff-1)
+        cur_staff           = self.list_staff[index]
            
-           
-        sow_hid         = self.data_sow['hid']
-        if sow_hid not in self.summary:
-            sow_simul_summary = OrderedDict()
-            self.summary[sow_hid] = sow_simul_summary
-        else:
-            sow_simul_summary = self.summary[sow_hid]
-            
-        
-           
+
         pig_prod_hid    = None
         
             
-        if 'insem' not in sow_simul_summary:
+        if 'insem' not in self.sow_simul:
             
             if self.insem_type == INSEM_TYPE_BOAR:
                 # Get Boar
@@ -102,7 +103,8 @@ class SimulProd:
                 res = self._pig_prod_add_by_boar(cur_boar, cur_staff, dt_insem_s)
                 pig_prod_hid    = res['pig_prod_hid']
                 
-                sow_simul_summary['insem'] = 'OK'
+                self.sow_simul['insem'] = {}
+                self.sow_simul['insem']['by_boar'] = 'OK'
             
             else:
                 # Get Semen Source
@@ -113,63 +115,79 @@ class SimulProd:
                 res = self._pig_prod_add_by_ai(cur_semen_source, cur_staff, dt_insem_s)
                 pig_prod_hid = res['pig_prod_hid']
                 
-                sow_simul_summary['insem'] = 'OK'
+                self.sow_simul['insem'] = {}
+                self.sow_simul['insem']['by_ai'] = 'OK'
+            
+            self.write_summary_to_file()
+            
             
         """
-        Part 2: Gestating Ops simulation 
+        Part 2: Gestating Ops update simulation 
         """
-        if 'gestating_pig_ops' not in sow_simul_summary:
+        if 'gestating_pig_ops' not in self.sow_simul:
             
             list_gestating_ops = self._get_pig_prod_ops(pig_prod_hid, 
                     PIG_OPERATION_TYPE_GESTATING)
             
-            for cur_entry in list_gestating_ops:
-                date_target     = cur_entry['pig_prod_pig_ops']['date_target']
-                dt_target       = datetime.strptime(date_target, '%Y-%m-%d')
-                
-                # Add 30% random chance to add 1 day to target
-                index           = random.randint(0, 9)
-                if index >= 7:
-                    dt_target   = dt_target + timedelta(days=1)
-                
-                if dt_target >= dt_now: 
-                    return
-                
-                dt_target_s     = dt_target.strftime('%Y-%m-%d')
-                
-                account_pig_ops = cur_entry['account_pig_ops']
-                
-                
-                pig_prod_pig_ops_hid = cur_entry['pig_prod_pig_ops']['hid']
-                
-                index           = random.randint(0, len_staff-1)
-                cur_staff       = self.list_staff[index]
-                staff_hid       = cur_staff['hid']
-
-                   
-                notes = 'Updated ' + account_pig_ops['name']
-                   
-                self._update_pig_prod_ops(pig_prod_pig_ops_hid, staff_hid, 
-                            dt_target_s, notes)
+            res = self._update_pig_prod_ops_list(list_gestating_ops, dt_now)
+            if res == False: return
             
-            sow_simul_summary['gestating_pig_ops'] = 'OK'
+            
+            self.sow_simul['gestating_pig_ops'] = 'OK'
+            self.write_summary_to_file()
         
         
         """
         Part 3: Update pig prod birth simulation 
         """
-        if 'update_birth' not in sow_simul_summary:
+        if 'update_birth' not in self.sow_simul:
             random_num_days = random.randint(0, 4)
             num_days = 112 + random_num_days
             dt_actual_birth = dt_insem + timedelta(days = num_days)
             
             if dt_actual_birth > dt_now:
                 return
+            
+            dt_actual_birth_s = dt_actual_birth.strftime('%Y-%m-%d')
                 
-            self._update_pig_prod_birth(pig_prod_hid, staff_hid, date_birth)
+            self._update_pig_prod_birth(pig_prod_hid, staff_hid, dt_actual_birth_s)
             
-            sow_simul_summary['update_birth'] = 'OK'
+            self.sow_simul['update_birth'] = 'OK'
+            self.sow_simul['date_actual_birth'] = dt_actual_birth_s
+            self.write_summary_to_file()
             
+           
+            
+        """
+        Part 4: Lactating Piglets Ops update simulation 
+        """
+        if 'lactating_piglets_ops' not in self.sow_simul:
+            list_lactating_piglets_ops = self._get_pig_prod_ops(pig_prod_hid, 
+                    PIG_OPERATION_TYPE_LACTATING_PIGLETS)
+        
+            res = self._update_pig_prod_ops_list(list_lactating_piglets_ops, dt_now)
+            if res == False: return
+            
+            
+            self.sow_simul['lactating_piglets_ops'] = 'OK'
+            self.write_summary_to_file()
+            
+        
+        
+        """
+        Part 5: Lactating Sow Ops update simulation 
+        """
+        if 'lactating_sow_ops' not in self.sow_simul:
+            list_lactating_sow_ops = self._get_pig_prod_ops(pig_prod_hid, 
+                    PIG_OPERATION_TYPE_LACTATING_SOW)
+        
+            res = self._update_pig_prod_ops_list(list_lactating_sow_ops, dt_now)
+            if res == False: return
+            
+            
+            self.sow_simul['lactating_sow_ops'] = 'OK'
+            self.write_summary_to_file()
+        
             
         
     def _pig_prod_add_by_boar(self, boar, staff, date_insem):
@@ -187,7 +205,7 @@ class SimulProd:
         
 
         print(f'***** Testing adding pig_production via boar insemination; url = {url} ')
-        print(f'sow = {sow['name']}; boar = {boar['name']}')
+        print(f'sow = {self.data_sow['name']}; boar = {boar['name']}')
         pprint.pprint(data)
         
         r = requests.post(url, json = data)
@@ -199,15 +217,6 @@ class SimulProd:
         
         result_num  = res_json['result']['num']
         assert(result_num == 0)
-        
-        if 'pig_prod' not in self.summary:
-            self.summary['pig_prod'] = {}
-            
-        if 'by_boar' not in self.summary['pig_prod']:
-            self.summary['pig_prod']['by_boar']    = {}
-        
-        self.summary['pig_prod']['by_boar']['add'] = 'OK'
-        
         
         
         pig_prod_hid        = res_json['pig_prod']['hid']
@@ -252,15 +261,6 @@ class SimulProd:
         result_num  = res_json['result']['num']
         assert(result_num == 0)
         
-        if 'pig_prod' not in self.summary:
-            self.summary['pig_prod'] = {}
-            
-        if 'by_boar' not in self.summary['pig_prod']:
-            self.summary['pig_prod']['by_boar']    = {}
-        
-        self.summary['pig_prod']['by_ai']['add'] = 'OK'
-        
-        
         
         pig_prod_hid        = res_json['pig_prod']['hid']
         res_decrypt         = hashids_common.decrypt(pig_prod_hid)
@@ -293,6 +293,39 @@ class SimulProd:
         return result
     
     
+    def _update_pig_prod_ops_list(self, prod_ops_list, dt_now):
+         for cur_entry in prod_ops_list:
+            date_target     = cur_entry['pig_prod_pig_ops']['date_target']
+            dt_target       = datetime.strptime(date_target, '%Y-%m-%d')
+            
+            # Add 30% random chance to add 1 day to target
+            index           = random.randint(0, 9)
+            if index >= 7:
+                dt_target   = dt_target + timedelta(days=1)
+            
+            if dt_target >= dt_now: 
+                return False
+            
+            dt_target_s     = dt_target.strftime('%Y-%m-%d')
+            
+            account_pig_ops = cur_entry['account_pig_ops']
+            
+            
+            pig_prod_pig_ops_hid = cur_entry['pig_prod_pig_ops']['hid']
+            
+            index           = random.randint(0, len_staff-1)
+            cur_staff       = self.list_staff[index]
+            staff_hid       = cur_staff['hid']
+
+               
+            notes = 'Updated ' + account_pig_ops['name']
+               
+            self._update_pig_prod_ops(pig_prod_pig_ops_hid, staff_hid, 
+                        dt_target_s, notes)
+        
+        return True
+        
+    
     def _update_pig_prod_ops(self, pig_prod_pig_ops_hid, staff_hid, date_update,
                 notes):
                     
@@ -320,11 +353,10 @@ class SimulProd:
  
         result_num = res_json['result']['num']
         
-        if before_birth > 0:
-            assert(result_num == 0)
-        else:
-            assert(result_num > 0)
+        assert(result_num == 0)
         
+        if 'pig_prod_ops' not in self.summary['pig_prod']:
+            self.summary['pig_prod']['pig_prod_ops'] = {}
         self.summary['pig_prod']['pig_prod_ops']['update'] = 'OK'
         
         
@@ -644,11 +676,11 @@ class TestSimul(TestBase):
         
         count = 0
         for cur_entry in self.data_test['list_sow']:
-            cur_simul = SimulProd(cur_entry, INSEM_TYPE_BOAR)
+            cur_simul = SimulProd({}, cur_entry, INSEM_TYPE_BOAR)
             cur_simul.list_staff     = self.data_test['list_staff']
             cur_simul.list_boar      = self.data_test['list_boar']
             cur_simul.list_semen_source = self.data_test['list_semen_source']
-            cur_simul.user_hid       = None
+            cur_simul.user_uhid      = self.data_test['user_uhid']
             
             cur_simul.run()
     
