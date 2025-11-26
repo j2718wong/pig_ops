@@ -196,25 +196,24 @@ class SimulProd:
         """
         Part 3: Buy lactating feeds few days before expected birth
         """
-        
         if 'buy_lacta' not in self.sow_simul:
             random_num_days = random.randint(3, 7)
             num_days = 114 - random_num_days
             dt_buy_lacta = dt_insem - timedelta(days = num_days)
             
-            if dt_buy_lacta > dt_now:
-                return
+            if dt_buy_lacta < dt_now:
             
-            dt_buy_lacta = dt_buy_lacta.strftime('%Y-%m-%d')
-            
-            self._add_feed_buy(pig_prod_hid, 'LACTATING', dt_buy_lacta, 2)
-            
-            self.sow_simul['buy_lacta'] = 'OK'
-            self.write_summary_to_file()
+                dt_buy_lacta_s = dt_buy_lacta.strftime('%Y-%m-%d')
+                
+                self._add_feed_buy(pig_prod_hid, 'LACTATING', dt_buy_lacta_s, 2)
+                
+                self.sow_simul['buy_lacta'] = 'OK'
+                self.write_summary_to_file()
         
         """
         Part 3: Update pig prod birth simulation 
         """
+        data_birth = None
         if 'update_birth' not in self.sow_simul:
             random_num_days = random.randint(0, 4)
             num_days = 112 + random_num_days
@@ -229,13 +228,45 @@ class SimulProd:
             cur_staff           = self.list_staff[index]
             cur_staff_hid       = cur_staff['hid']
         
-            self._update_pig_prod_birth(pig_prod_hid, cur_staff_hid, dt_actual_birth_s)
+            data_birth = self._update_pig_prod_birth(pig_prod_hid, cur_staff_hid, dt_actual_birth_s)
             
             self.sow_simul['update_birth'] = 'OK'
             self.sow_simul['date_actual_birth'] = dt_actual_birth_s
             self.write_summary_to_file()
             
            
+        
+        """
+        Part 3: Buy booster feeds few days after actual birth
+        """
+        if 'buy_booster' not in self.sow_simul:
+            random_num_days = random.randint(3, 5)
+            num_days = random_num_days
+            dt_buy_booster = dt_actual_birth + timedelta(days = num_days)
+            
+            if dt_buy_booster < dt_now:
+            
+                dt_buy_booster_s = dt_buy_booster.strftime('%Y-%m-%d')
+                
+                self._add_feed_buy(pig_prod_hid, 'BOOSTER', dt_buy_booster_s, 2)
+                
+                self.sow_simul['buy_booster'] = 'OK'
+                self.write_summary_to_file()
+        
+           
+        if 'buy_prestarter' not in self.sow_simul:
+            dt_buy_prestarter = dt_actual_birth + timedelta(days = num_days)
+            
+            if dt_buy_prestarter < dt_now:
+            
+                dt_buy_prestarter_s = dt_buy_prestarter.strftime('%Y-%m-%d')
+                
+                self._add_feed_buy(pig_prod_hid, 'PRE_STARTER', dt_buy_prestarter_s, 2)
+                
+                self.sow_simul['buy_prestarter'] = 'OK'
+                self.write_summary_to_file()
+        
+        
             
         """
         Part 4: Lactating Piglets Ops update simulation 
@@ -268,6 +299,72 @@ class SimulProd:
             self.write_summary_to_file()
         
             
+        """
+        Part 5: Simulate weaning
+        """
+        if 'weaning' not in self.sow_simul:
+            dt_weaning = dt_actual_birth + timedelta(days = 45) # fixed
+            
+            if dt_actual_birth > dt_now:
+                return
+            
+            dt_weaning_s = dt_weaning.strftime('%Y-%m-%d')
+            
+            self._update_pig_prod_weaning(data_birth, dt_weaning_s)
+            
+            
+        if 'buy_starter' not in self.sow_simul:
+            dt_buy_starter = dt_actual_birth + timedelta(days = num_days)
+            
+            if dt_buy_starter < dt_now:
+            
+                dt_buy_starter_s = dt_buy_starter.strftime('%Y-%m-%d')
+                
+                quantity = data_birth.num_pigs_male + data_birth.num_pigs_female
+                self._add_feed_buy(pig_prod_hid, 'STARTER', dt_buy_starter_s, quantity)
+                
+                self.sow_simul['buy_starter'] = 'OK'
+                self.write_summary_to_file()
+                
+            else:
+                return
+                
+        
+        if 'buy_grower' not in self.sow_simul:
+            dt_buy_grower = dt_actual_birth + timedelta(days = num_days)
+            
+            if dt_buy_grower < dt_now:
+            
+                dt_buy_grower_s = dt_buy_grower.strftime('%Y-%m-%d')
+                
+                quantity = 2*(data_birth.num_pigs_male + data_birth.num_pigs_female)
+                self._add_feed_buy(pig_prod_hid, 'GROWER', dt_buy_grower_s, quantity)
+                
+                self.sow_simul['buy_grower'] = 'OK'
+                self.write_summary_to_file()
+                
+            else:
+                return
+        
+        
+        if 'buy_finisher' not in self.sow_simul:
+            dt_buy_finisher = dt_actual_birth + timedelta(days = num_days)
+            
+            if dt_buy_finisher < dt_now:
+            
+                dt_buy_finisher_s = dt_buy_finisher.strftime('%Y-%m-%d')
+                
+                quantity = 2*(data_birth.num_pigs_male + data_birth.num_pigs_female)
+                self._add_feed_buy(pig_prod_hid, 'FINISHER', dt_buy_finisher_s, quantity)
+                
+                self.sow_simul['buy_finisher'] = 'OK'
+                self.write_summary_to_file()
+                
+            else:
+                return
+        
+
+        
         
     def _pig_prod_add_by_boar(self, boar, staff, date_insem):
         url = BASE_URL + 'pig_prod/add'
@@ -479,10 +576,36 @@ class SimulProd:
  
         result_num = res_json['result']['num']
         assert(result_num == 0)
-        
-        
     
         return data_birth
+    
+    
+    def _update_pig_prod_weaning(self, data_birth, date_weaning):
+        url = BASE_URL + 'pig_prod/update_weaning'
+        
+        data_weaning = {
+            "uhid":                 self.user_uhid,
+            "pig_prod_hid":         data_birth.pig_prod_hid,
+            
+            "date_weaning":         date_weaning,
+            "num_pigs_male":        data_birth.num_pigs_male,
+            "num_pigs_female":      data_birth.num_pigs_female
+        }
+        
+        print(f'\n\n***** Testing pig_prod_update_weaning; url = {url} ; data')
+        pprint.pprint(data_birth)
+        
+        r = requests.post(url, json = data_weaning)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        return data_weaning
     
     
     def _get_feed_supplier_preference(self, feed_type_name):
