@@ -5,8 +5,8 @@ import os
 import sys
 
 
-from datetime               import datetime, timedeltafrom collections            
-import OrderedDict
+from datetime               import datetime, timedelta
+from collections            import OrderedDict
 
 sys.path.append('..')
 from common_constants       import *
@@ -1289,15 +1289,6 @@ class TestAPIAccount:
             result['lacta_after_30_days'] = res
             
             
-            # Add lactating sow + 45 days after birth
-            s = "Adding lactating Sow + 45 days"
-            random_num_days = random.randint(1, 2)
-            dt_dob      = dt_now - timedelta(days = (210 + 114 + 45 + random_num_days))
-            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
-                    opt_msg = s, skip_flag = 1)
-            result['lacta_after_45_days'] = res
-            
-            
             # Add growing sow + 50 days after birth
             s = "Adding lactating Sow + 50 days"
             random_num_days = random.randint(1, 2)
@@ -1314,6 +1305,25 @@ class TestAPIAccount:
             res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
                     opt_msg = s, skip_flag = 1)
             result['lacta_after_90_days'] = res
+            
+            
+            # Add growing sow + 135 days after birth
+            s = "Adding lactating Sow + 135 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 135 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s, skip_flag = 1)
+            result['lacta_after_90_days'] = res
+            
+            
+            # Add growing sow + 150 days after birth
+            s = "Adding lactating Sow + 150 days"
+            random_num_days = random.randint(1, 2)
+            dt_dob      = dt_now - timedelta(days = (210 + 114 + 150 + random_num_days))
+            res = self.test_sow_boar_add(user_id, pig_farm_id, 'F', dt_dob = dt_dob, 
+                    opt_msg = s, skip_flag = 1)
+            result['lacta_after_90_days'] = res
+            
             
         return result
         

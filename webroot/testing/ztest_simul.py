@@ -13,6 +13,8 @@ from common_app             import *
 from common_fast_api        import *
 
 
+from sample_data            import *
+
 import requests
 import random
 import json
@@ -25,6 +27,60 @@ BASE_URL = 'http://localhost:8080/'
 
 INSEM_TYPE_BOAR             = 0
 INSEM_TYPE_AI               = 1
+
+
+# This is based on actual data
+FEED_SUPPLIER_PREFERENCE    = [
+    {"supplier_name": "Arnel Sampan",
+      "supplier_hid": "Q92W83",
+      "feed_types": [
+        {
+            "name":         "GESTATING",
+            "unit_weight":  50.0,
+            "prices":       [1460.0]
+        }, 
+        
+        {   "name":         "LACTATING", 
+            "unit_weight":  50.0,
+            "prices":       [1470.0]
+        }, 
+        
+        {   "name":         "BOOSTER", 
+            "unit_weight":  10.0,
+            "prices":       [750.0]
+        },
+
+        {   "name":         "PRE_STARTER", 
+            "unit_weight":  25.0,
+            "prices":       [1350.0,]
+        },
+        
+        {   "name":         "STARTER", 
+            "unit_weight":  50.0,
+            "prices":       [1865.0]
+        }
+        
+      ]
+    },
+    
+    {"supplier_name": "Daphne Panonce",
+      "supplier_hid": "EKQY8R",
+      "feed_types": [
+        {     
+            "name":         "GROWER",
+            "unit_weight":  50.0,
+            "prices":       [1650.0]
+        },
+        
+        {
+            "name":         "FINISHER",
+            "unit_weight":   50.0,
+            "prices":       [1525.0]
+        }
+      ]
+    }
+    
+]
 
 
 class SimulProd:
@@ -138,6 +194,25 @@ class SimulProd:
         
         
         """
+        Part 3: Buy lactating feeds few days before expected birth
+        """
+        
+        if 'buy_lacta' not in self.sow_simul:
+            random_num_days = random.randint(3, 7)
+            num_days = 114 - random_num_days
+            dt_buy_lacta = dt_insem - timedelta(days = num_days)
+            
+            if dt_buy_lacta > dt_now:
+                return
+            
+            dt_buy_lacta = dt_buy_lacta.strftime('%Y-%m-%d')
+            
+            self._add_feed_buy(self, pig_prod_hid, 'LACTATING', dt_buy_lacta, 2)
+            
+            self.sow_simul['buy_lacta'] = 'OK'
+            self.write_summary_to_file()
+        
+        """
         Part 3: Update pig prod birth simulation 
         """
         if 'update_birth' not in self.sow_simul:
@@ -150,7 +225,11 @@ class SimulProd:
             
             dt_actual_birth_s = dt_actual_birth.strftime('%Y-%m-%d')
                 
-            self._update_pig_prod_birth(pig_prod_hid, staff_hid, dt_actual_birth_s)
+            index               = random.randint(0, len_staff-1)
+            cur_staff           = self.list_staff[index]
+            cur_staff_hid       = cur_staff['hid']
+        
+            self._update_pig_prod_birth(pig_prod_hid, cur_staff_hid, dt_actual_birth_s)
             
             self.sow_simul['update_birth'] = 'OK'
             self.sow_simul['date_actual_birth'] = dt_actual_birth_s
@@ -356,9 +435,10 @@ class SimulProd:
         
         assert(result_num == 0)
         
-        if 'pig_prod_ops' not in self.summary['pig_prod']:
-            self.summary['pig_prod']['pig_prod_ops'] = {}
-        self.summary['pig_prod']['pig_prod_ops']['update'] = 'OK'
+        if 'pig_prod_ops' not in self.sow_simul:
+            self.sow_simul['pig_prod_ops'] = {}
+            
+        self.sow_simul['update'] = 'OK'
         
         
     def _update_pig_prod_birth(self, pig_prod_hid, staff_hid, date_birth):
@@ -400,10 +480,81 @@ class SimulProd:
         result_num = res_json['result']['num']
         assert(result_num == 0)
         
-        self.summary['pig_prod']['update_birth'] = 'OK'
         
     
         return data_birth
+    
+    
+    def _get_feed_supplier_preference(self, feed_type_name):
+        for cur_entry in FEED_SUPPLIER_PREFERENCE:
+            for cur_feed_type in cur_entry['feed_types']:
+                if cur_feed_type['name'] == feed_type_name:
+                    return cur_entry
+        return None
+        
+    
+    def _get_feed_type(self, feed_type_name):
+        for cur_entry in G_SAMPLE_DATA_FEED_TYPE:
+            if cur_feed_type['name'] == feed_type_name:
+                return cur_entry
+        return None
+    
+    
+    def _get_supplier_feed_type(self, feed_supplier, feed_type_name):
+        for cur_entry in feed_supplier['feed_types']:
+            if cur_entry['name'] == feed_type_name:
+                return cur_entry
+        
+        return None
+    
+    
+    def _add_feed_buy(self, pig_prod_hid, feed_type_name, date_buy, quantity):
+        feed_type = self._get_feed_type(feed_type_name)
+        feed_supplier_pref = self._get_feed_supplier_preference(feed_type_name)
+        
+        url = BASE_URL + 'feed_buy/add'
+        
+        preffered_brand_hid = 'Q92W83'  # promix
+        
+        supplier_feed_type = self._get_supplier_feed_type(feed_supplier_pref, 
+                feed_type_name)
+        
+        unit_weight = supplier_feed_type['unit_weight']
+        unit_cost   = supplier_feed_type['prices'][0] # need to improve later
+        total_cost  = quantity * unit_cost
+        
+        data_feed_buy = {
+            "uhid":                 self.user_uhid,
+            "pig_prod_hid":         pig_prod_hid,
+            "feed_type_hid":        feed_type['hid'],
+            "feed_brand_hid":       preffered_brand_hid,
+            "feed_supplier_hid":    feed_supplier_pref['supplier_hid'],
+            
+            "date_buy":             date_buy,
+            "quantity":             quantity,
+            "unit_weight":          unit_weight,
+            "unit_cost":            unit_cost,
+            "total_cost":           total_cost
+            
+        }
+        
+        print(f'\n\n***** Testing feed_buy add; url = {url} ; data')
+        pprint.pprint(data_feed_buy)
+        
+        r = requests.post(url, json = data_birth)
+        res_text = str(r.text)
+        res_json = json.loads(res_text)
+        
+        print(f"\n\nResult; status_code = {r.status_code}; result")
+        pprint.pprint(res_json)
+ 
+        result_num = res_json['result']['num']
+        assert(result_num == 0)
+        
+        
+    
+        return data_feed_buy
+            
     
 """
 Typical data_test 
@@ -669,6 +820,23 @@ Typical data_test
 class TestSimul(TestBase):
     def __init__(self, user_id):
         super().__init__(user_id)
+        
+        
+    def test_simul_sow(self, sow_name):
+        cur_sow = None
+        for cur_entry in self.data_test['list_sow']:
+            if cur_entry['name'] == sow_name:
+                cur_sow = cur_entry
+                break
+                
+        cur_simul = SimulProd({}, cur_sow, INSEM_TYPE_BOAR)
+        cur_simul.list_staff     = self.data_test['list_staff']
+        cur_simul.list_boar      = self.data_test['list_boar']
+        cur_simul.list_semen_source = self.data_test['list_semen_source']
+        cur_simul.user_uhid      = self.data_test['user_uhid']
+        
+        cur_simul.run()
+
         
         
     def run(self):
