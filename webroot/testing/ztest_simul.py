@@ -207,7 +207,7 @@ class SimulProd:
             
             dt_buy_lacta = dt_buy_lacta.strftime('%Y-%m-%d')
             
-            self._add_feed_buy(self, pig_prod_hid, 'LACTATING', dt_buy_lacta, 2)
+            self._add_feed_buy(pig_prod_hid, 'LACTATING', dt_buy_lacta, 2)
             
             self.sow_simul['buy_lacta'] = 'OK'
             self.write_summary_to_file()
@@ -495,7 +495,7 @@ class SimulProd:
     
     def _get_feed_type(self, feed_type_name):
         for cur_entry in G_SAMPLE_DATA_FEED_TYPE:
-            if cur_feed_type['name'] == feed_type_name:
+            if cur_entry['name'] == feed_type_name:
                 return cur_entry
         return None
     
@@ -541,7 +541,7 @@ class SimulProd:
         print(f'\n\n***** Testing feed_buy add; url = {url} ; data')
         pprint.pprint(data_feed_buy)
         
-        r = requests.post(url, json = data_birth)
+        r = requests.post(url, json = data_feed_buy)
         res_text = str(r.text)
         res_json = json.loads(res_text)
         

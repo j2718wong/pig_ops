@@ -57,7 +57,7 @@ class FeedBuy:
         sql += '%s,'    % data.feed_brand_id
         sql += '%s,'    % data.feed_supplier_id
         sql += '%s,'    % data.quantity
-        sql += '%s,'    % data.kg_per_unit
+        sql += '%s,'    % data.unit_weight
        
         sql += '%s,'    % data.unit_cost
         sql += '%s)'    % data.total_cost
