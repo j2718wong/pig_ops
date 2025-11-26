@@ -66,6 +66,12 @@ class Account:
         
         result = []
         if rows is not None:
+            # The account.flag_settings will be broken down so that
+            # it will be easier to read in the application level.
+            # See account_register.sql for updated flag bits definition.
+            
+            FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH     = 1
+            FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
             
             for row in rows:
                 cur_acc_id              = row[0]
@@ -82,6 +88,13 @@ class Account:
                 cur_acc_num_days_harvest_from_birth = row[9]
                 cur_acc_num_days_harvest_from_wean  = row[10]
                 
+                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+                cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+                
+                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+                cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+                
+                
                 cur_entry = {
                     'account': {
                         'id':               cur_acc_id,
@@ -91,7 +104,8 @@ class Account:
                     },
                     
                     'settings_operations': {
-                        'flag':             cur_acc_settings_flag,
+                        'day_1_on_date_of_birth': cur_flag_day_1_on_dob,
+                        'day_1_on_date_of_insem': cur_flag_day_1_on_doi,
                         'num_days_wean':    cur_acc_num_days_wean,
                         'num_days_harvest_from_birth': cur_acc_num_days_harvest_from_birth,
                         'num_days_harvest_from_wean':  cur_acc_num_days_harvest_from_wean,

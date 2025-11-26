@@ -177,16 +177,13 @@ class FeedBalance:
         return None
     
     
-    def get_list(self, pig_farm_id, inc_user_audit = 0):
+    def get_list(self, pig_prod_id, inc_user_audit = 0):
         
         sql =   """
                 SELECT 
-                    a.pig_prod_id,
-                    b.prod_status_id, 
-                    
+                    a.id,
                     a.date_balance,
-                    a.num_days_since_birth,
-                    a.num_weeks_since_birth,
+                    
                     a.num_pigs,
                     
                     a.num_lactating,
@@ -196,19 +193,21 @@ class FeedBalance:
                     a.num_grower,
                     a.num_finisher,
                     
-                    a.num_cons_kg_lactating,
-                    a.num_cons_kg_booster,
-                    a.num_cons_kg_prestarter,
-                    a.num_cons_kg_starter,
-                    a.num_cons_kg_grower,
-                    a.num_cons_kg_finisher
-
+                    b.name_last,
+                    b.name_first,
+                    a.dt_entry,
+                    
+                    
+                    c.name_last,
+                    c.name_first,
+                    a.dt_last_update
                     
                 FROM feed_balance a
-                LEFT OUTER JOIN pig_production b ON a.pig_prod_id = b.id 
-                WHERE b.pig_farm_id = %s AND b.prod_status_id = IN (4,5,6)
-                ORDER BY a.pig_prod_id ASC, a.num_days_since_birth 
-                """ % pig_farm_id
+                LEFT OUTER JOIN user b          ON a.added_by_user_id = b.id
+                LEFT OUTER JOIN user c          ON a.last_update_user_id = c.id
+                WHERE a.pig_prod_id = %s
+                ORDER BY a.date_balance DESC
+                """ % pig_prod_id
                     
             
         # Check if still connected to database
@@ -243,75 +242,32 @@ class FeedBalance:
         if rows is not None:
             
             for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'feed_buy': {
-                            'id':               row[0],
-                            'date_buy':         str(row[1]),
-                            'quantity':         row[2],
-                            'kg_per_unit':      float(row[3]),
-                            'kg_total':         float(row[4]),
-                            'unit_cost':        float(row[5]),
-                            'total_cost':       float(row[6]),
-                            'dt_entry':         str(row[7])
-                        },
-                        
-                        'feed_type':{
-                            'id':               row[8],
-                            'name':             row[9],
-                        },
-                        
-                        'feed_brand':{
-                            'id':               row[10],
-                            'name':             row[11],
-                        },
-                        
-                        'feed_supplier':{
-                            'id':               row[12],
-                            'name':             row[13],
-                        }
-                    }
+                cur_entry = {
+                    'feed_balance': {
+                        'id':               row[0],
+                        'date_balance':     str(row[1]),
+                        'num_pigs':         row[2],
+                        'num_lactating':    float(row[3]) if row[3] else None,
+                        'num_booster':      float(row[4]) if row[4] else None,
+                        'num_prestarter':   float(row[5]) if row[5] else None,
+                        'num_starter':      float(row[6]) if row[6] else None,
+                        'num_grower':       float(row[7]) if row[7] else None,
+                        'num_finisher':     float(row[8]) if row[8] else None,
+                    },
                     
-                else:
-                    cur_entry = {
-                        'feed_buy': {
-                            'id':               row[0],
-                            'date_buy':         str(row[1]),
-                            'quantity':         row[2],
-                            'kg_per_unit':      float(row[3]),
-                            'kg_total':         float(row[4]),
-                            'unit_cost':        float(row[5]),
-                            'total_cost':       float(row[6]),
-                            'dt_entry':         str(row[7])
-                        },
-                        
-                        'feed_type':{
-                            'id':               row[8],
-                            'name':             row[9],
-                        },
-                        
-                        'feed_brand':{
-                            'id':               row[10],
-                            'name':             row[11],
-                        },
-                        
-                        'feed_supplier':{
-                            'id':               row[12],
-                            'name':             row[13],
-                        },
-                        
-                        'added_by': {
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_entry':         row[16]
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[17],
-                            'name_first':       row[18],
-                            'dt_update':        str(row[19]) if row[19] else None
-                        }
+                    'added_by': {
+                        'name_last':        row[9],
+                        'name_first':       row[10],
+                        'dt_entry':         row[11]
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[12],
+                        'name_first':       row[13],
+                        'dt_update':        str(row[14]) if row[14] else None
                     }
+                }
+
                 
                     
                 result.append(cur_entry)

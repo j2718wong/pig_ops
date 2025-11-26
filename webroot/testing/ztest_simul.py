@@ -51,7 +51,7 @@ class SimulProd:
         s = json.dumps(self.summary, indent=4)
 
         cur_directory   = os.getcwd()
-        abspath         = os.path.join(cur_directory, simul.json)
+        abspath         = os.path.join(cur_directory, 'simul.json')
             
         file = open(abspath, 'w')
         s = file.write(s)
@@ -294,7 +294,7 @@ class SimulProd:
     
     
     def _update_pig_prod_ops_list(self, prod_ops_list, dt_now):
-         for cur_entry in prod_ops_list:
+        for cur_entry in prod_ops_list:
             date_target     = cur_entry['pig_prod_pig_ops']['date_target']
             dt_target       = datetime.strptime(date_target, '%Y-%m-%d')
             
@@ -313,6 +313,7 @@ class SimulProd:
             
             pig_prod_pig_ops_hid = cur_entry['pig_prod_pig_ops']['hid']
             
+            len_staff       = len(self.list_staff)
             index           = random.randint(0, len_staff-1)
             cur_staff       = self.list_staff[index]
             staff_hid       = cur_staff['hid']
