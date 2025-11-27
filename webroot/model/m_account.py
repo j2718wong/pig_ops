@@ -29,6 +29,13 @@ class Account:
                     
                     a.num_bills_paid,
                     a.last_acc_paid_bill_id,
+                    
+                    a.farm_01_id,
+                    a.farm_02_id,
+                    a.farm_03_id,
+                    a.farm_04_id,
+                    a.farm_05_id,
+                    
                     a.dt_entry
                 FROM account a
                 LEFT OUTER JOIN account_status b ON a.status_id = b.id
@@ -88,11 +95,26 @@ class Account:
                 cur_acc_num_days_harvest_from_birth = row[9]
                 cur_acc_num_days_harvest_from_wean  = row[10]
                 
+                cur_acc_farm_01_id      = 13
+                cur_acc_farm_02_id      = 14
+                cur_acc_farm_03_id      = 15
+                cur_acc_farm_04_id      = 16
+                cur_acc_farm_05_id      = 17
+                
+                
+                
                 temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
                 cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
                 
                 temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
                 cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+                
+                farm_ids = []
+                if cur_acc_farm_01_id > 0: farm_ids.append(cur_acc_farm_01_id)
+                if cur_acc_farm_02_id > 0: farm_ids.append(cur_acc_farm_02_id)
+                if cur_acc_farm_03_id > 0: farm_ids.append(cur_acc_farm_03_id)
+                if cur_acc_farm_04_id > 0: farm_ids.append(cur_acc_farm_04_id)
+                if cur_acc_farm_05_id > 0: farm_ids.append(cur_acc_farm_05_id)
                 
                 
                 cur_entry = {
@@ -109,7 +131,9 @@ class Account:
                         'num_days_wean':    cur_acc_num_days_wean,
                         'num_days_harvest_from_birth': cur_acc_num_days_harvest_from_birth,
                         'num_days_harvest_from_wean':  cur_acc_num_days_harvest_from_wean,
-                    } 
+                    },
+                    
+                    'farm_ids': farm_ids
                 }
                     
                 return cur_entry

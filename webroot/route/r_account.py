@@ -251,6 +251,35 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
     return res_update
     
     
+def get_account_lookup_selection(account_id):
+    res_f_brand = []
+    if sel_f_brand > 0:
+        res = model['account'].get_business_obj_selection(account_id, 
+            BUSINESS_OBJ_ID_FEED_BRAND)
+    
+        res_f_brand = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
+    
+    
+    res_f_supplier = []
+    if sel_f_supplier > 0:
+        res = model['account'].get_business_obj_selection(account_id, 
+            BUSINESS_OBJ_ID_FEED_SUPPLIER)
+    
+        res_f_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
+    
+    res_s_supplier = []
+    if sel_s_supplier > 0:
+        res = model['account'].get_business_obj_selection(account_id, 
+            BUSINESS_OBJ_ID_SEMEN_SUPPLIER)
+    
+        res_s_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
+    
+    return {
+        'f_brand':      res_f_brand,
+        'f_supplier':   res_f_supplier,
+        's_supplier':   res_s_supplier
+    }
+    
  
 @app.get("/account/selection", tags=["Account"])
 async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int = 0,
@@ -279,29 +308,8 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
     
     account_id = res[0]
     
-    res_f_brand = []
-    if sel_f_brand > 0:
-        res = model['account'].get_business_obj_selection(account_id, 
-            BUSINESS_OBJ_ID_FEED_BRAND)
     
-        res_f_brand = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
-    
-    
-    res_f_supplier = []
-    if sel_f_supplier > 0:
-        res = model['account'].get_business_obj_selection(account_id, 
-            BUSINESS_OBJ_ID_FEED_SUPPLIER)
-    
-        res_f_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
-    
-    res_s_supplier = []
-    if sel_s_supplier > 0:
-        res = model['account'].get_business_obj_selection(account_id, 
-            BUSINESS_OBJ_ID_SEMEN_SUPPLIER)
-    
-        res_s_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
-    
-    
+    res = get_account_lookup_selection(account_id) 
     
     
     return {
@@ -311,8 +319,6 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
                 'desc': ''
             },
             
-            'f_brand':      res_f_brand,
-            'f_supplier':   res_f_supplier,
-            's_supplier':   res_s_supplier
+            'account_lookup': res
         }
     

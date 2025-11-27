@@ -5,6 +5,7 @@ from fastapi_offline            import FastAPIOffline
 from fastapi                    import FastAPI, Depends, HTTPException, status
 from fastapi.security           import HTTPBasicCredentials, HTTPBearer
 
+from fastapi.staticfiles        import StaticFiles
 
 
 # Application secret key 
@@ -22,6 +23,12 @@ tags_metadata = [
 ]
 
 app = FastAPIOffline(openapi_tags = tags_metadata)
+
+
+dir_static = 'C:\\Users\\JackWong\\Downloads\\p\\pig_ops_ui\\pig_ops_app\\src\\static'
+app.mount('/static', StaticFiles(directory=dir_static), name='static')
+
+
 
 
 JWT_TOKEN_AUTHENTICATED             = 0

@@ -73,6 +73,9 @@ from model.m_pig_prod_pig_ops   import PigProdPigOps
 
 
 
+from route.controller           import Controller
+
+from view.view                  import View
 
 
 # Models for connecting to database
@@ -123,7 +126,7 @@ model_names = [
 ]
 
 
-USING_PRODUCTION_DB             = 1
+USING_PRODUCTION_DB             = 0
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:
@@ -211,6 +214,9 @@ model = Model(
 model.append_models(model_names)
 
 
+
+
+
 # Create Hashids
 # Letter O is purposely removed so that users will not confused with 0.
 COMMON_HASH_ALPHABET                    = 'ABCDEFGHIJKLMNPQRSTUVWXYZ1234567890'
@@ -248,3 +254,7 @@ ENABLE_HASHIDS          = 1
 ENABLE_BEARER_TOKEN     = 0
 
 
+
+
+controller = Controller(logger, model)
+view = View(controller)

@@ -3,6 +3,7 @@
 
 import os
 import sys
+import json
 import pprint
 
 from pydantic               import BaseModel
@@ -17,6 +18,9 @@ from common_fast_api        import *
 
 
 import data_model           as dm
+
+
+from r_account              import get_account_lookup_selection
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -60,6 +64,197 @@ async def pig_prod_status_list():
         
         'data': res
     }
+    
+
+
+@app.get("/pig_prod"):
+async def pig_prod(pfhid:str = None):
+    # Get the current logged in user;
+    
+    pig_farm_id = None
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            # Just proceed if it is invalid; will get default 
+            # account farm_id if not given
+            test = 1
+            
+            """
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
+            }
+            """
+        else:
+            pig_farm_id = res[0]
+            
+    
+    # temporary
+    user_id = 1
+    
+    res_user = model['user'].get_user_info(user_id)
+    if res_user == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # Get user.account_id 
+    account_id = res_user['user']['account_id']
+    
+    # Get account info
+    data_account = model['account'].get_info(account_id)
+    if data_account == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # TODO Check account free trial period
+        
+    # TODO check account for not paid bill
+    
+        
+    # Check if there is a farm_id list
+    len_items = len(data_account.farm_ids)
+    if len_items = 0:
+        # TODO what to do in case no farm set
+        return None
+        
+    if pig_farm_id is not None:
+        # This is given by user 
+        
+        if pig_farm_id not in data_account.farm_ids:
+            # TODO what to do in case farm_id given is not in account list
+            return None
+    
+    else:
+        # select the first farm_id
+        pig_farm_id = data_account.farm_ids[0]
+        
+    
+    # Get account lookup_selection
+    list_acc_lookup = get_account_lookup_selection(account_id)
+    if list_acc_lookup == None:
+        # TODO what to do in case no result
+        return None
+        
+    
+    # Get account gestating ops
+    list_acc_gestating_ops =  model['account_pig_ops'].get_list(account_id, 
+        PIG_OPERATION_TYPE_GESTATING, 0, 0)
+    if list_acc_gestating_ops == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get account lactating piglets ops
+    list_acc_lactating_piglets_ops =  model['account_pig_ops'].get_list(
+        account_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS, 0, 0)
+    if list_acc_lactating_piglets_ops == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # Get account lactating sow ops
+    list_acc_lactating_sow_ops =  model['account_pig_ops'].get_list(
+        account_id, PIG_OPERATION_TYPE_LACTATING_SOW, 0, 0)
+    if list_acc_lactating_sow_ops == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get pig_farm sow list
+    list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
+        inc_disposed = 0, inc_external = 0, inc_user_audit = 0, order_by = 0)
+    if list_sow_list == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get pig_farm boar list
+    list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
+        inc_disposed = 0, inc_external = 1, inc_user_audit = 0, order_by = 0)
+    if list_boar_list == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get semen_source list
+    list_semen_source = model['semen_source'].get_list(account_id)
+    if list_semen_source == None:
+        # TODO what to do in case no result
+        return None
+        
+    
+    # Get farm_staff list
+    list_staff = model['staff'].get_list(pig_farm_id)
+    if list_staff == None:
+        # TODO what to do in case no result
+        return None
+        
+    
+    # Get feed_type list
+    list_feed_type = model['feed_type'].get_list()
+    if list_feed_type == None:
+        # TODO what to do in case no result
+        return None
+    
+    # Replace feed_type plain id
+    for cur_entry in list_feed_type:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    
+    list_feed_brand = model['feed_brand'].get_list(country_id = 1)
+    if list_feed_brand == None:
+        # TODO what to do in case no result
+        return None
+    
+    # Replace feed_brand plain id
+    for cur_entry in list_feed_brand:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    # Get pig_production list
+    
+    list_pig_prod = get_pig_prod_list(pig_farm_id)
+    if list_feed_brand == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    page_data = {
+        'account':                  data_account,
+        'acc_lookup_selection':		list_acc_lookup,
+        'acc_gestating_ops':        list_acc_gestating_ops,
+        'acc_lactating_piglets_ops': list_acc_lactating_piglets_ops,
+        'acc_lactating_sow_ops':    list_acc_lactating_sow_ops,
+        
+        'sow_list':                 list_sow_list,
+        'boar_list':                list_boar_list,
+        'semen_source_list':        list_semen_source,
+        'staff_list':               list_staff,
+        'feed_type_list':			list_feed_type,
+        'feed_brand_list':			list_feed_brand,
+        
+        'pig_production':           list_pig_prod
+    }
+    
+
+    return controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
+    
+    
     
 
 @app.post("/pig_prod/add")
@@ -327,7 +522,6 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     return res_update
     
     
-
 @app.post("/pig_prod/update_status")
 async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     uhid    = prod_status_data.uhid
@@ -697,9 +891,20 @@ async def pig_prod_list(pfhid):
     
     
     pig_farm_id = res[0]
+    res = get_pig_prod_list(pig_farm_id)
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        res 
+    }
     
     
-    
+def get_pig_prod_list(pig_farm_id):
     res = model['pig_prod'].get_list(pig_farm_id)
     
     
