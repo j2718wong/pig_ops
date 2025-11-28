@@ -3,12 +3,7 @@ __date__ = "$2015-02-09 10:00:00$"
 
 
 from mako.template import Template
-import socket
-import struct
-try:
-    import fcntl
-except Exception,error:
-    fcntl = None
+
 
 
 class PageElement:

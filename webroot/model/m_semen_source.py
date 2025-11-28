@@ -246,7 +246,8 @@ class SemenSource:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0, 
+            minimum_info = 0):
         """
         Will get semen_source list.
         
@@ -265,77 +266,76 @@ class SemenSource:
         
         if inc_user_audit == 0:
             
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.pig_farm_id,
-                        b.name AS farm_name,
+            if minimum_info == 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name,
+                            a.description,
+                            
+                            a.boar_id,
+                            b.number,
+                            b.name AS boar_name,
+                            
+                            a.semen_supplier_id,
+                            c.name AS semen_supplier_name,
+                            
+                            a.pig_race_line_id,
+                            d.name AS pig_race_line_name
+                            
+                        FROM semen_source a 
+                        LEFT OUTER JOIN sow_boar b          ON a.boar_id = b.id
+                        LEFT OUTER JOIN semen_supplier c    ON a.semen_supplier_id = c.id
+                        LEFT OUTER JOIN pig_race_line d     ON a.pig_race_line_id = d.id
                         
-                        a.flag,
-                        
-                        a.boar_id,
-                        c.number,
-                        c.name AS boar_name,
-                        
-                        a.semen_supplier_id,
-                        d.name AS semen_supplier_name,
-                        
-                        a.pig_race_line_id,
-                        e.name AS pig_race_line_name,
-                        
-                        a.name,
-                        a.description,
-                        
-                        a.dt_entry
-                        
-                    FROM semen_source a 
-                    LEFT OUTER JOIN pig_farm b          ON a.pig_farm_id = b.id
-                    LEFT OUTER JOIN sow_boar c          ON a.boar_id = c.id
-                    LEFT OUTER JOIN semen_supplier d    ON a.semen_supplier_id = d.id
-                    LEFT OUTER JOIN pig_race_line e     ON a.pig_race_line_id = e.id
-                    
-                    %s
-                    """ % where_clause
+                        %s
+                        """ % where_clause
+            
+            else:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name,
+                            a.description
+                            
+                        FROM semen_source a 
+                        %s
+                        """ % where_clause
                     
         else:
             
             sql =   """
                     SELECT 
                         a.id,
-                        a.pig_farm_id,
-                        b.name AS farm_name,
-                        
-                        a.flag,
-                        
-                        a.boar_id,
-                        c.number,
-                        c.name AS boar_name,
-                        
-                        a.semen_supplier_id,
-                        d.name AS semen_supplier_name,
-                        
-                        a.pig_race_line_id,
-                        e.name AS pig_race_line_name,
-                        
                         a.name,
                         a.description,
                         
-                        f.name_last,
-                        f.name_first,
+                        a.boar_id,
+                        b.number,
+                        b.name AS boar_name,
+                        
+                        a.semen_supplier_id,
+                        c.name AS semen_supplier_name,
+                        
+                        a.pig_race_line_id,
+                        d.name AS pig_race_line_name,
+                        
+                        
+                        e.name_last,
+                        e.name_first,
                         a.dt_entry,
                         
-                        g.name_last,
-                        g.name_first,
+                        f.name_last,
+                        f.name_first,
                         a.dt_last_update
                         
                     FROM semen_source a 
-                    LEFT OUTER JOIN pig_farm b          ON a.pig_farm_id = b.id
-                    LEFT OUTER JOIN sow_boar c          ON a.boar_id = c.id
-                    LEFT OUTER JOIN semen_supplier d    ON a.semen_supplier_id = d.id
-                    LEFT OUTER JOIN pig_race_line e     ON a.pig_race_line_id = e.id
+                    LEFT OUTER JOIN sow_boar b          ON a.boar_id = b.id
+                    LEFT OUTER JOIN semen_supplier c    ON a.semen_supplier_id = c.id
+                    LEFT OUTER JOIN pig_race_line d     ON a.pig_race_line_id = d.id
                     
-                    LEFT OUTER JOIN user f              ON a.added_by_user_id   = f.id
-                    LEFT OUTER JOIN user g              ON a.last_update_user_id = g.id
+                    LEFT OUTER JOIN user e              ON a.added_by_user_id   = e.id
+                    LEFT OUTER JOIN user f              ON a.last_update_user_id = f.id
                 
                     %s
                     """ % where_clause
@@ -376,96 +376,90 @@ class SemenSource:
             
             for row in rows:
                 if inc_user_audit == 0:
-               
-                    cur_entry = {
-                        'id':                   row[0], 
-                        
-                        'pig_farm': {
-                            'id':               row[1],
-                            'name':             row[2]
-                        },
-                        
-                        'flag':                 row[3],
-                        
-                        'boar': {
-                            'id':               row[4],
-                            'number':           row[5],
-                            'name':             row[6]
-                        },
-                        
-                        'external_semen': {
-                            'supplier_id':      row[7],
-                            'supplier_name':    row[8],
+                    if minimum_info == 0:
+                        cur_entry = {
+                            'semen_source': {
+                                'id':               row[0], 
+                                'name':             row[1],
+                                'description':      row[2]
+                            },
+                            
+                            'boar': {
+                                'id':               row[3],
+                                'number':           row[4],
+                                'name':             row[5]
+                            },
+                            
+                            'external_semen': {
+                                'supplier_id':      row[6],
+                                'supplier_name':    row[7],
+                            },
                             
                             'pig_race_line':{
-                                'id':           row[9],
-                                'name':         row[10]
+                                'id':               row[8],
+                                'name':             row[9]
                             }
-                        },
+                        }
                         
-                        
-                        'name':                 row[11],
-                        'description':          row[12],
-                        
-                        'dt_entry':             row[13]
-                        
-                    }
+                    else:
+                        cur_entry = {
+                            'semen_source': {
+                                'id':               row[0], 
+                                'name':             row[1],
+                                'description':      row[2]
+                            }
+                        }
                     
                 else:
                     
                     cur_entry = {
-                        'id':                   row[0], 
-                        
-                        'pig_farm': {
-                            'id':               row[1],
-                            'name':             row[2]
+                        'semen_source': {
+                            'id':               row[0], 
+                            'name':             row[1],
+                            'description':      row[2]
                         },
                         
-                        'flag':                 row[3],
-                        
                         'boar': {
-                            'id':               row[4],
-                            'number':           row[5],
-                            'name':             row[6]
+                            'id':               row[3],
+                            'number':           row[4],
+                            'name':             row[5]
                         },
                         
                         'external_semen': {
-                            'supplier_id':      row[7],
-                            'supplier_name':    row[8],
-                            
-                            'pig_race_line':{
-                                'id':           row[9],
-                                'name':         row[10]
-                            }
+                            'supplier_id':      row[6],
+                            'supplier_name':    row[7],
                         },
                         
-                        
-                        'name':                 row[11],
-                        'description':          row[12],
+                        'pig_race_line':{
+                            'id':               row[8],
+                            'name':             row[9]
+                        }
                         
                         'added_by': {
-                            'name_last':        row[13],
-                            'name_first':       row[14],
-                            'dt_entry':         row[15]
+                            'name_last':        row[10],
+                            'name_first':       row[11],
+                            'dt_entry':         str(row[12])
                         },
                         
                         'last_update':{
-                            'name_last':        row[16],
-                            'name_first':       row[17],
-                            'dt_update':        str(row[18]) if row[18] else None
+                            'name_last':        row[13],
+                            'name_first':       row[14],
+                            'dt_update':        str(row[15]) if row[15] else None
                         }
                         
                     }
                     
-                
-                cur_boar_id = cur_entry['boar']['id']
-                if cur_boar_id is None or cur_boar_id == 0:
-                    del cur_entry['boar']
                     
-                cur_semen_supplier_id = cur_entry['external_semen']['supplier_id']
-                if cur_semen_supplier_id is None or cur_semen_supplier_id == 0:
-                    del cur_entry['external_semen']
-                   
+                if 'boar' in cur_entry:
+                    cur_id = cur_entry['boar']['id']
+                    if cur_id is None or cur_id == 0:
+                        del cur_entry['boar']
+                    
+                if 'external_semen' in cur_entry:
+                    cur_id = cur_entry['external_semen']['supplier_id']
+                    if cur_id is None or cur_id == 0:
+                        del cur_entry['external_semen']
+                       
                 
                 result.append(cur_entry)
 

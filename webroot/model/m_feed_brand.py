@@ -187,7 +187,7 @@ class FeedBrand:
                         'added_by': {
                             'name_last':        row[4],
                             'name_first':       row[5],
-                            'dt_entry':         row[6]
+                            'dt_entry':         str(row[6])
                         },
                         
                         'last_update':{

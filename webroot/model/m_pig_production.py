@@ -777,7 +777,7 @@ class PigProduction:
                 %s
                 ORDER BY a.date_insemination DESC
                 """ % where_clause
-        
+        print(sql)
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection

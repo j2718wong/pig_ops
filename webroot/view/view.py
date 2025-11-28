@@ -2,9 +2,15 @@ __author__ = "Jack Wong, jack.wong@erg.com.hk, neoaspilet1@gmail.com"
 __date__ = "$2015-02-09 10:00:00$"
 
 
-from mako.template import Template
+import sys
+import os
 
-from view_base          import ViewBase
+
+sys.path.append(os.path.dirname(__file__))
+
+from mako.template      import Template
+
+
 from render             import RenderNode, TopRenderNode
 
 
@@ -36,6 +42,12 @@ class View:
     def __getitem__(self, view_name):
         return self.views[view_name]
 
+
+
+class ViewBase:
+    def __init__(self, view):
+        self.view = view
+        self.controller = view.controller
 
     
 #
@@ -178,9 +190,13 @@ class BusRouteList(ViewBase):
 
 class PigProd(ViewBase):
     def render(self, page_data = None):
-        template = 'templates/pig_prod/pig_prod.html'
+        template = 'templates/pig_prod/pig_production.html'
+        
+        
         text = Template(filename = template).render(
                 controller = self.controller, page_data = page_data)
+        print(text)
+                
         top_node = TopRenderNode(
                 text = text,
                 scripts = [ 'library/pqtouch.min.js', 

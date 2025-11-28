@@ -251,7 +251,9 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
     return res_update
     
     
-def get_account_lookup_selection(account_id):
+def get_account_lookup_selection(account_id, sel_f_brand = 0, 
+        sel_f_supplier = 0, sel_s_supplier = 0):
+            
     res_f_brand = []
     if sel_f_brand > 0:
         res = model['account'].get_business_obj_selection(account_id, 
@@ -309,7 +311,8 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
     account_id = res[0]
     
     
-    res = get_account_lookup_selection(account_id) 
+    res = get_account_lookup_selection(account_id, sel_f_brand, 
+            sel_f_supplier, sel_s_supplier) 
     
     
     return {

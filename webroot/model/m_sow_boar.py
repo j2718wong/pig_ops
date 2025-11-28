@@ -334,7 +334,7 @@ class SowBoar:
 
     
     def get_list(self, farm_id, sex, inc_disposed = 0, inc_external = 0,
-            inc_user_audit = 0, list_ids = None, order_by = 0):
+            inc_user_audit = 0, minimum_info = 0, order_by = 0):
         """
         Will get sow_boar list.
         
@@ -357,43 +357,17 @@ class SowBoar:
         """
         
         where_clause = ''
-        if list_ids is not None:
-            s = ''
-            count = 0
-            for cur_entry in list_ids:
-                if count > 0: s += ','
-                
-                s += str(cur_entry)
-                count += 1
-            
-            if inc_disposed == 0:
-                where_clause = ' WHERE a.id IN (%s) AND (a.flag & 3) = 0 ' % s
-            
+        
+        if inc_disposed == 0:
+            values = (farm_id, sex)
+            if inc_external == 0:
+                where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
             else:
-                where_clause = ' WHERE a.id IN (%s) ' % s
-            
+                where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
         else:
-            if sex is not None:
-                if inc_disposed == 0:
-                    values = (farm_id, sex)
-                    if inc_external == 0:
-                        where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
-                    else:
-                        where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 1) = 0 ' % values
-                else:
-                    values = (farm_id, sex)
-                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
-                
-            else:
-                
-                if inc_disposed == 0:
-                    values = (farm_id, sex)
-                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" AND (a.flag & 3) = 0 ' % values
-                
-                else:
-                    values = (farm_id, sex)
-                    where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
-                
+            values = (farm_id, sex)
+            where_clause = ' WHERE a.pig_farm_id = %s AND a.sex = "%s" ' % values
+            
         
         if order_by == 0:
             order_clause = ' ORDER BY a.date_of_birth DESC '
@@ -402,40 +376,55 @@ class SowBoar:
                
                
         if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.pig_farm_id,
-                        a.farm_sow_id,
-                        a.farm_boar_id,
-                        a.number,
-                        a.name,
-                        a.flag,
-                        a.farm_birth_prod_id,
-                        a.last_prod_id,
-                       
-                        b.name AS status_name,
-                        a.date_of_birth,
-                        a.date_dispose,
-                        c.notes AS add_notes,
-                        d.notes AS dispose_notes,
-                        
-                        a.dt_entry
-                        
-                    FROM sow_boar a
-                    LEFT OUTER JOIN sow_status b        ON a.sow_status_id     = b.id
-                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
-                    LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
-                    %s
-                    %s 
-                    """ % (where_clause, order_clause)
-        
+            if minimum_info == 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.farm_sow_id,
+                            a.farm_boar_id,
+                            a.number,
+                            a.name,
+                            a.flag,
+                            a.farm_birth_prod_id,
+                            a.last_prod_id,
+                           
+                            b.name AS status_name,
+                            a.date_of_birth,
+                            a.date_dispose,
+                            c.notes AS add_notes,
+                            d.notes AS dispose_notes
+                            
+                        FROM sow_boar a
+                        LEFT OUTER JOIN sow_status b        ON a.sow_status_id     = b.id
+                        LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
+                        LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
+                        %s
+                        %s 
+                        """ % (where_clause, order_clause)
+            
+            else:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.farm_sow_id,
+                            a.farm_boar_id,
+                            a.number,
+                            a.name,
+                           
+                            b.name AS status_name,
+                            a.date_of_birth
+                            
+                        FROM sow_boar a
+                        LEFT OUTER JOIN sow_status b        ON a.sow_status_id     = b.id
+                        %s
+                        %s 
+                        """ % (where_clause, order_clause)
+            
         else:
             
             sql =   """
                     SELECT 
                         a.id,
-                        a.pig_farm_id,
                         a.farm_sow_id,
                         a.farm_boar_id,
                         a.number,
@@ -503,54 +492,62 @@ class SowBoar:
             for row in rows:
                 
                 if inc_user_audit == 0:
-                    cur_entry = {
-                        'id':                   row[0],
-                        'pig_farm_id':          row[1],
-                        'farm_sow_id':          row[2],
-                        'farm_boar_id':         row[3],
-                        'number':               row[4], 
-                        'name':                 row[5],
-                        'flag':                 row[6],
-                        'farm_birth_prod_id':   row[7],
-                        'last_prod_id':         row[8],
-                        
-                        'status':               row[9],
-                        'date_of_birth':        str(row[10]) if row[10] else None,
-                        'date_dispose':         str(row[11]) if row[11] else None,
-                        'notes':                row[12],
-                        'dispose_notes':        row[13],
+                    if minimum_info == 0:
+                        cur_entry = {
+                            'id':                   row[0],
+                            'farm_sow_id':          row[1],
+                            'farm_boar_id':         row[2],
+                            'number':               row[3], 
+                            'name':                 row[4],
+                            'flag':                 row[5],
+                            'farm_birth_prod_id':   row[6],
+                            'last_prod_id':         row[7],
+                            
+                            'status':               row[8],
+                            'date_of_birth':        str(row[9])  if row[9] else None,
+                            'date_dispose':         str(row[10]) if row[10] else None,
+                            'notes':                row[11],
+                            'dispose_notes':        row[12]
+                        }
                     
-                        'dt_entry':             str(row[14])
-                    }
+                    else:
+                        cur_entry = {
+                            'id':                   row[0],
+                            'farm_sow_id':          row[1],
+                            'farm_boar_id':         row[2],
+                            'number':               row[3], 
+                            'name':                 row[4],
+                            'status':               row[5],
+                            'date_of_birth':        str(row[6])  if row[6] else None
+                        }
                      
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        'pig_farm_id':          row[1],
-                        'farm_sow_id':          row[2],
-                        'farm_boar_id':         row[3],
-                        'number':               row[4], 
-                        'name':                 row[5],
-                        'flag':                 row[6],
-                        'farm_birth_prod_id':   row[7],
-                        'last_prod_id':         row[8],
+                        'farm_sow_id':          row[1],
+                        'farm_boar_id':         row[2],
+                        'number':               row[3], 
+                        'name':                 row[4],
+                        'flag':                 row[5],
+                        'farm_birth_prod_id':   row[6],
+                        'last_prod_id':         row[7],
                         
-                        'status':               row[9],
-                        'date_of_birth':        str(row[10]) if row[10] else None,
-                        'date_dispose':         str(row[11]) if row[11] else None,
-                        'notes':                row[12],
-                        'dispose_notes':        row[13],
+                        'status':               row[8],
+                        'date_of_birth':        str(row[9])  if row[9] else None,
+                        'date_dispose':         str(row[10]) if row[10] else None,
+                        'notes':                row[11],
+                        'dispose_notes':        row[12],
                         
                         'added_by': {
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_entry':         str(row[16])
+                            'name_last':        row[13],
+                            'name_first':       row[14],
+                            'dt_entry':         str(row[15])
                         },
                         
                         'last_update':{
-                            'name_last':        row[17],
-                            'name_first':       row[18],
-                            'dt_update':        str(row[19]) if row[19] else None
+                            'name_last':        row[16],
+                            'name_first':       row[17],
+                            'dt_update':        str(row[18]) if row[18] else None
                         }                    
                     }
                     

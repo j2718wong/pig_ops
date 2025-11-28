@@ -238,8 +238,7 @@ class AccountPigOps:
                         
                         a.name,
                         a.short_name,
-                        a.description,
-                        a.dt_entry
+                        a.description
                     FROM account_pig_ops a
                     %s
                     ORDER BY a.num_days_since
@@ -311,9 +310,7 @@ class AccountPigOps:
                         'version_num':          row[2],
                         'name':                 row[3],
                         'short_name':           row[4],
-                        'desc':                 row[5],
-                        
-                        'dt_entry':             str(row[6])
+                        'desc':                 row[5]
                     }
                 
                 else:

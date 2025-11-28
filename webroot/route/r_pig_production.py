@@ -17,6 +17,8 @@ from common_app             import *
 from common_fast_api        import *
 
 
+sys.path.append(os.path.dirname(__file__))
+
 import data_model           as dm
 
 
@@ -67,7 +69,7 @@ async def pig_prod_status_list():
     
 
 
-@app.get("/pig_prod"):
+@app.get("/pig_prod")
 async def pig_prod(pfhid:str = None):
     # Get the current logged in user;
     
@@ -95,7 +97,7 @@ async def pig_prod(pfhid:str = None):
     
     # temporary
     user_id = 1
-    
+   
     res_user = model['user'].get_user_info(user_id)
     if res_user == None:
         # TODO what to do in case no result
@@ -118,25 +120,26 @@ async def pig_prod(pfhid:str = None):
     
         
     # Check if there is a farm_id list
-    len_items = len(data_account.farm_ids)
-    if len_items = 0:
+    account_farm_ids = data_account['farm_ids']
+    len_items = len(account_farm_ids)
+    if len_items == 0:
         # TODO what to do in case no farm set
         return None
         
     if pig_farm_id is not None:
         # This is given by user 
         
-        if pig_farm_id not in data_account.farm_ids:
+        if pig_farm_id not in account_farm_ids:
             # TODO what to do in case farm_id given is not in account list
             return None
     
     else:
         # select the first farm_id
-        pig_farm_id = data_account.farm_ids[0]
+        pig_farm_id = account_farm_ids[0]
         
     
     # Get account lookup_selection
-    list_acc_lookup = get_account_lookup_selection(account_id)
+    list_acc_lookup = get_account_lookup_selection(account_id, 1, 1, 1)
     if list_acc_lookup == None:
         # TODO what to do in case no result
         return None
@@ -168,7 +171,8 @@ async def pig_prod(pfhid:str = None):
     
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
-        inc_disposed = 0, inc_external = 0, inc_user_audit = 0, order_by = 0)
+        inc_disposed = 0, inc_external = 0, inc_user_audit = 0, 
+        minimum_info = 1, order_by = 0)
     if list_sow_list == None:
         # TODO what to do in case no result
         return None
@@ -176,21 +180,23 @@ async def pig_prod(pfhid:str = None):
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
-        inc_disposed = 0, inc_external = 1, inc_user_audit = 0, order_by = 0)
+        inc_disposed = 0, inc_external = 1, inc_user_audit = 0, 
+        minimum_info = 1, order_by = 0)
     if list_boar_list == None:
         # TODO what to do in case no result
         return None
     
     
     # Get semen_source list
-    list_semen_source = model['semen_source'].get_list(account_id)
+    list_semen_source = model['semen_source'].get_list(account_id,
+        inc_user_audit = 0, minimum_info = 1)
     if list_semen_source == None:
         # TODO what to do in case no result
         return None
         
     
     # Get farm_staff list
-    list_staff = model['staff'].get_list(pig_farm_id)
+    list_staff = model['pig_farm_staff'].get_list(pig_farm_id)
     if list_staff == None:
         # TODO what to do in case no result
         return None
@@ -202,7 +208,74 @@ async def pig_prod(pfhid:str = None):
         # TODO what to do in case no result
         return None
     
-    # Replace feed_type plain id
+    
+    list_feed_brand = model['feed_brand'].get_list(country_id = 1)
+    if list_feed_brand == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get pig_production list
+    list_pig_prod = get_pig_prod_list(pig_farm_id)
+    if list_pig_prod == None:
+        # TODO what to do in case no result
+        return None
+        
+    
+    # Remove plain_ids and not useful data blocks
+    
+    
+    del data_account['account']
+    del data_account['farm_ids']
+    
+    for cur_entry in list_acc_gestating_ops:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+    
+    for cur_entry in list_acc_lactating_piglets_ops:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    for cur_entry in list_acc_lactating_sow_ops:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    for cur_entry in list_sow_list:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+       
+    for cur_entry in list_semen_source:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+        
+    for cur_entry in list_staff:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
     for cur_entry in list_feed_type:
         cur_id  = cur_entry['id']
         cur_hid = hashids_common.encrypt(cur_id)
@@ -210,33 +283,21 @@ async def pig_prod(pfhid:str = None):
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
-    
-    
-    list_feed_brand = model['feed_brand'].get_list(country_id = 1)
-    if list_feed_brand == None:
-        # TODO what to do in case no result
-        return None
-    
-    # Replace feed_brand plain id
+
     for cur_entry in list_feed_brand:
         cur_id  = cur_entry['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
+
+
+
+
     
-    
-    # Get pig_production list
-    
-    list_pig_prod = get_pig_prod_list(pig_farm_id)
-    if list_feed_brand == None:
-        # TODO what to do in case no result
-        return None
-        
-        
     page_data = {
         'account':                  data_account,
-        'acc_lookup_selection':		list_acc_lookup,
+        'acc_lookup_selection':     list_acc_lookup,
         'acc_gestating_ops':        list_acc_gestating_ops,
         'acc_lactating_piglets_ops': list_acc_lactating_piglets_ops,
         'acc_lactating_sow_ops':    list_acc_lactating_sow_ops,
@@ -245,8 +306,8 @@ async def pig_prod(pfhid:str = None):
         'boar_list':                list_boar_list,
         'semen_source_list':        list_semen_source,
         'staff_list':               list_staff,
-        'feed_type_list':			list_feed_type,
-        'feed_brand_list':			list_feed_brand,
+        'feed_type_list':           list_feed_type,
+        'feed_brand_list':          list_feed_brand,
         
         'pig_production':           list_pig_prod
     }
@@ -900,7 +961,7 @@ async def pig_prod_list(pfhid):
             'desc': ''
         },
         
-        res 
+        'pig_prod': res 
     }
     
     

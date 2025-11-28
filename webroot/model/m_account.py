@@ -95,11 +95,11 @@ class Account:
                 cur_acc_num_days_harvest_from_birth = row[9]
                 cur_acc_num_days_harvest_from_wean  = row[10]
                 
-                cur_acc_farm_01_id      = 13
-                cur_acc_farm_02_id      = 14
-                cur_acc_farm_03_id      = 15
-                cur_acc_farm_04_id      = 16
-                cur_acc_farm_05_id      = 17
+                cur_acc_farm_01_id      = row[13]
+                cur_acc_farm_02_id      = row[14]
+                cur_acc_farm_03_id      = row[15]
+                cur_acc_farm_04_id      = row[16]
+                cur_acc_farm_05_id      = row[17]
                 
                 
                 

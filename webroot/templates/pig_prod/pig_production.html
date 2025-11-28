@@ -677,21 +677,7 @@
 	
     <script type="text/javascript">
     $(document).ready(function(){
-        var PAGE_DATA = 
-            {
-                "account":                  G_SAMPLE_JSON_ACCOUNT,
-				"acc_lookup_selection":		G_SAMPLE_ACCOUNT_LOOKUP_SELECTION,
-                "acc_gestating_ops":        G_SAMPLE_JSON_ACC_GESTATING_OPS,
-                "acc_lactating_sow_ops":    G_SAMPLE_JSON_ACC_LACTATING_SOW_OPS,
-                "acc_lactating_piglets_ops": G_SAMPLE_JSON_ACC_LACTATING_PIGLETS_OPS,
-                "pig_production":           G_SAMPLE_JSON_PIG_PRODUCTION,
-                "sow_list":                 G_SAMPLE_JSON_SOW_LIST,
-                "boar_list":                G_SAMPLE_JSON_BOAR_LIST,
-                "semen_source_list":        G_SAMPLE_JSON_SEMEN_SOURCE,
-                "staff_list":               G_SAMPLE_JSON_STAFF,
-				"feed_type_list":			G_SAMPLE_DATA_FEED_TYPE,
-				"feed_brand_list":			G_SAMPLE_DATA_FEED_BRAND
-            };
+        var PAGE_DATA = ${page_data};
 
         gPagePigProduction.setPageData(PAGE_DATA);
     });
