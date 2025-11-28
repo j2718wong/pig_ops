@@ -433,7 +433,7 @@ class SemenSource:
                         'pig_race_line':{
                             'id':               row[8],
                             'name':             row[9]
-                        }
+                        },
                         
                         'added_by': {
                             'name_last':        row[10],

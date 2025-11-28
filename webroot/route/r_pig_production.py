@@ -7,6 +7,7 @@ import json
 import pprint
 
 from pydantic               import BaseModel
+from fastapi.responses      import HTMLResponse
 
 from datetime               import datetime, timedelta
 
@@ -69,7 +70,7 @@ async def pig_prod_status_list():
     
 
 
-@app.get("/pig_prod")
+@app.get("/pig_prod", response_class = HTMLResponse)
 async def pig_prod(pfhid:str = None):
     # Get the current logged in user;
     
@@ -221,6 +222,8 @@ async def pig_prod(pfhid:str = None):
         # TODO what to do in case no result
         return None
         
+    pprint.pprint(list_pig_prod)
+        
     
     # Remove plain_ids and not useful data blocks
     
@@ -258,14 +261,22 @@ async def pig_prod(pfhid:str = None):
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
-        
-       
-    for cur_entry in list_semen_source:
+    
+    
+    for cur_entry in list_boar_list:
         cur_id  = cur_entry['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
+    
+       
+    for cur_entry in list_semen_source:
+        cur_id  = cur_entry['semen_source']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['semen_source']['id']
+        cur_entry['semen_source']['hid']   = cur_hid
         
         
     for cur_entry in list_staff:
@@ -313,7 +324,9 @@ async def pig_prod(pfhid:str = None):
     }
     
 
-    return controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
+    page_data = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
+    
+    return page_data
     
     
     
@@ -1094,13 +1107,6 @@ def get_pig_prod_list(pig_farm_id):
         cur_entry['insemination']['insem_staff_hid']   = cur_hid
         
         
-        # This can be None 
-        cur_id  = cur_entry['birth']['birth_staff_id']
-        if cur_id is not None: 
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['birth']['birth_staff_id']
-            cur_entry['birth']['birth_staff_hid']   = cur_hid
         
     return res
 

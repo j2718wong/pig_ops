@@ -647,48 +647,22 @@ class PigProduction:
         return None
     
     
-    def get_list(self, pig_farm_id = 0 , list_ids = None, filter_type = 0, 
-            inc_historical = 0):
+    def get_list(self, pig_farm_id = 0 , inc_historical = 0):
         """
         Will get pig_production list.
         
-        filter_type:
-            0 = gestating
-            1 = weaning
+       
         
         Returns
         -------
         list of dictionary
 
         """
+
         
-        where_clause = ''
+        where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4, 5, 6)) ' % pig_farm_id
         
-        if pig_farm_id > 0:
-            where_clause = ' WHERE a.pig_farm_id = %s' % pig_farm_id
-            
-            if filter_type == 0:
-                filter_clause = ' a.prod_status_id = 1'
-                if inc_historical > 0:
-                    filter_clause = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
-            
-            else:
-                filter_clause = ' a.prod_status_id IN (1, 4, 5, 6)'
-                if inc_historical > 0:
-                    filter_clause = ' a.prod_status_id IN (1, 4, 5, 6, 7, 8, 9)'
-        
-            where_clause += ' AND ' + filter_clause
-            
-        else:
-            count = 0
-            s = ''
-            for cur_entry in list_ids:
-                if count > 0 : s += ','
-                
-                s += str(cur_entry)
-            
-            where_clause = ' WHERE a.id IN (%s)' % s
-            
+
         sql =   """
                 SELECT 
                     a.id,
@@ -777,7 +751,8 @@ class PigProduction:
                 %s
                 ORDER BY a.date_insemination DESC
                 """ % where_clause
-        print(sql)
+
+
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -836,13 +811,13 @@ class PigProduction:
                 cur_insem_insemination_cost = float(row[15]) if row[15] else 0.0
                 cur_insem_staff_id          = row[16]
                 cur_insem_notes             = row[17]
-                cur_insem_date_insemination = row[18]
+                cur_insem_date_insemination = str(row[18]) if row[18] else None
                 cur_insem_staff_name        = row[19]
                 
                 cur_prod_status_id          = row[20]
                 cur_prod_status_name        = row[21]
                 
-                cur_prod_date_expected_birth    = row[22]
+                cur_prod_date_expected_birth    = str(row[22]) if row[22] else None
                 cur_prod_date_actual_birth      = str(row[23]) if row[23] else None
                 cur_prod_num_days_actual        = row[24] 
                 cur_prod_num_pigs_dead_at_birth = row[25]

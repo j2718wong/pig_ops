@@ -112,22 +112,29 @@ class TopRenderNode:
     def render(self, controller):
 
         render_index = RenderNode()
-
         render_main = RenderNode(page_element = PageElement(div_id = "main"))
         if self.render_node is not None:
             render_main.add(self.render_node)
 
         render_index.add(render_main)
 
+        print('render test 1')
+        
+        main_render = render_index.render()
+        print(main_render)
+
         # Return page
         template_index = Template(filename = 'templates/index.html',
                         input_encoding = 'utf-8', output_encoding = 'utf-8')
-
+        
+        print('render test 2')
         
         return template_index.render(
                     main            = render_index.render(),
                     scripts         = self.scripts,
-                    cache           = False,
                     controller      = controller,
                     css             = self.css
                     )
+        
+        #return template_index.render()
+        

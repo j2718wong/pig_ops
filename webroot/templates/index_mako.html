@@ -1,3 +1,10 @@
+<%
+from datetime       	import datetime
+
+
+%>
+
+
 <!DOCTYPE html>
 <html>
 
@@ -26,19 +33,23 @@
 	<link type="text/css" 		rel="stylesheet" 	href="/static/css/style.css"/>
 	
 
+<%
+for cur_css in css:
+	context.write('\t<link type="text/css" 			rel="stylesheet" 	href="/static/css/%s"/>\n' % cur_css)
+%>
 	
 	
 	
 	<script type = "text/javascript" src="/static/js/jquery/jquery.min-3.7.1.js"></script>
 	<script type = "text/javascript" src="/static/js/jquery/jquery-ui.min-1.14.1.js"></script>
-	<script type = "text/javascript" src="/static/js/jquery/jAlert.js"></script>
+	<script type = "text/javascript" src="/static/js/jquery/jquery.alerts.js"></script>
 	<script type = "text/javascript" src="/static/js/jquery/jAlert-functions.js"></script>
 	<script type = "text/javascript" src="/static/js/jquery/jquery.confirm.js"></script>
 
 	<script type = "text/javascript" src="static/js/library/bootstrap.bundle.min.js"></script>
 
 	<script type = "application/javascript" src="/static/js/global.js"></script>
-	<script type = "application/javascript" src="/static/js/controller.js"></script>
+	<!--<script type = "application/javascript" src="/static/js/global_constants.js"></script>-->
 	
 	<script>
 	$(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
@@ -56,9 +67,11 @@
     -->
         
 	
-{% for script in scripts %}
-	<script type = "application/javascript" src="/static/js/{{script}}"></script>
-{% endfor %}
+<%
+for script in scripts:
+	s = script
+	context.write('\t<script type = "application/javascript" src="/static/js/%s"></script>\n' % s)
+%>
 </head>
 
 
@@ -80,7 +93,9 @@
 	</script>
 
 
-	{% block content %}{% endblock content %}
+
+${main}
+
 
 	
 	<div id = "footer" class="clearfix">

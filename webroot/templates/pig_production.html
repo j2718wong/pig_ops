@@ -1,5 +1,9 @@
+{% extends "index.html" %}
 
-<div id = "main" style="padding-left:0.5rem;">
+
+{% block content %}
+
+<div style="padding-left:0.5rem;">
 
     <div class="">
       <div><h2>Production Operations</h2></div>
@@ -60,8 +64,8 @@
           
         </div>
         
-		
-		<div class="tab-pane fade" id="tab-prod-change-feed-dates" role="tabpanel" aria-labelledby="btn-prod-change-feed-dates">
+        
+        <div class="tab-pane fade" id="tab-prod-change-feed-dates" role="tabpanel" aria-labelledby="btn-prod-change-feed-dates">
           <h3 class="mb-3">Lactating Piglets Operations</h3>
           <p class="lead">This is the record of change feed dates of each production entry.</p>
           
@@ -73,109 +77,109 @@
         </div>
       </div>
 
-	</div>
+    </div>
     
-	
-	
-	<br>
-	
-	<div id = "div-prod-details" class="" style="display:None;">
+    
+    
+    <br>
+    
+    <div id = "div-prod-details" class="" style="display:None;">
       <div><h3>Production Details P_ID: <span id="span-prod-details-pid"></span></h3></div>
-	  
-	  <ul class="nav nav-tabs" id="tab-prod-details" role="tablist">
+      
+      <ul class="nav nav-tabs" id="tab-prod-details" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="btn-prod-feed-buy-summary" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-buy-summary" type="button" role="tab" aria-controls="tab-prod-feed-buy-summary" aria-selected="false">Feed Buy Summary</button>
         </li>
         
-		<li class="nav-item" role="presentation">
+        <li class="nav-item" role="presentation">
           <button class="nav-link" id="btn-prod-feed-buy" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-buy" type="button" role="tab" aria-controls="tab-prod-feed-buy" aria-selected="false">Feed Buy List</button>
         </li>
         
-		<li id = "li-prod-details-feed-balance" class="nav-item" role="presentation" style="display:None">
+        <li id = "li-prod-details-feed-balance" class="nav-item" role="presentation" style="display:None">
           <button class="nav-link" id="btn-prod-feed-balance" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-balance" type="button" role="tab" aria-controls="tab-prod-feed-balance" aria-selected="false">Feed Balance</button>
         </li>
         
-		<li class="nav-item" role="presentation">
+        <li class="nav-item" role="presentation">
           <button class="nav-link" id="btn-prod-notes" data-bs-toggle="tab" data-bs-target="#tab-prod-notes" type="button" role="tab" aria-controls="tab-prod-notes" aria-selected="false">Notes</button>
         </li>
         
-		<li id = "li-prod-details-dead-pigs" class="nav-item" role="presentation" style="display:None">
+        <li id = "li-prod-details-dead-pigs" class="nav-item" role="presentation" style="display:None">
           <button class="nav-link" id="btn-prod-dead-pigs" data-bs-toggle="tab" data-bs-target="#tab-prod-dead-pigs" type="button" role="tab" aria-controls="tab-prod-dead-pigs" aria-selected="false">Dead Pigs</button>
         </li>
       </ul>
-	
-	  <div class="tab-content mt-3" id="">
-		<div class="tab-pane fade show active" id="tab-prod-feed-buy-summary" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-buy-summary">
-		  
-		  <div class="flex-container">
-			<div id = "div-prod-feed-buy-summary" style="width:400px;">
-			  <div id = "div-top-prod-feed-buy-summary"></div>
-			  <div id = "div-list-prod-feed-buy-summary" class ="auto-table"></div>
-		    </div>
-			
-			<div id="">
-				<br>
-				<br>
-				<h3>Total Feed Cost</h3>
-				<h1><span id="span-feed-total-cost"></span></h1>
-			</div>
-		  </div>
-		  
-		  
+    
+      <div class="tab-content mt-3" id="">
+        <div class="tab-pane fade show active" id="tab-prod-feed-buy-summary" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-buy-summary">
+          
+          <div class="flex-container">
+            <div id = "div-prod-feed-buy-summary" style="width:400px;">
+              <div id = "div-top-prod-feed-buy-summary"></div>
+              <div id = "div-list-prod-feed-buy-summary" class ="auto-table"></div>
+            </div>
+            
+            <div id="">
+                <br>
+                <br>
+                <h3>Total Feed Cost</h3>
+                <h1><span id="span-feed-total-cost"></span></h1>
+            </div>
+          </div>
+          
+          
         </div>
         
 
         <div class="tab-pane fade show" id="tab-prod-feed-buy" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-buy">
-		  
-		  <div id = "div-prod-feed-buy">
-			<div id = "div-top-prod-feed-buy"></div>
-			<div id = "div-list-prod-feed-buy" class ="auto-table"></div>
-		  </div>
+          
+          <div id = "div-prod-feed-buy">
+            <div id = "div-top-prod-feed-buy"></div>
+            <div id = "div-list-prod-feed-buy" class ="auto-table"></div>
+          </div>
         </div>
         
-		<div class="tab-pane fade show" id="tab-prod-feed-balance" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-balance">
-		  Feed Balance
-		  <div id = "div-prod-feed-balance">
-			<div id = "div-top-prod-feed-balance"></div>
-			<div id = "div-list-prod-feed-balance" class ="auto-table"></div>
-		  </div>
+        <div class="tab-pane fade show" id="tab-prod-feed-balance" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-balance">
+          Feed Balance
+          <div id = "div-prod-feed-balance">
+            <div id = "div-top-prod-feed-balance"></div>
+            <div id = "div-list-prod-feed-balance" class ="auto-table"></div>
+          </div>
         </div>
         
         
         <div class="tab-pane fade" id="tab-prod-notes" role="tabpanel" aria-labelledby="btn-prod-notes">
-			<div id = "div-prod-notes">
-				<div id = "div-top-prod-notes"></div>
-				<div id = "div-list-prod-notes" class ="auto-table"></div>
-			</div>
-		  
+            <div id = "div-prod-notes">
+                <div id = "div-top-prod-notes"></div>
+                <div id = "div-list-prod-notes" class ="auto-table"></div>
+            </div>
+          
         </div>
         
         
         <div class="tab-pane fade" id="tab-prod-dead-pigs" role="tabpanel" aria-labelledby="btn-prod-dead-pigs">
-			<div id = "div-prod-dead-pigs">
-				<div id = "div-top-prod-dead-pigs"></div>
-				<div id = "div-list-prod-dead-pigs" class ="auto-table"></div>
-			</div>
+            <div id = "div-prod-dead-pigs">
+                <div id = "div-top-prod-dead-pigs"></div>
+                <div id = "div-list-prod-dead-pigs" class ="auto-table"></div>
+            </div>
           
         </div>
-    	
+        
       </div>
-	
-	</div>
+    
+    </div>
     
     
-	
-	<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-	  <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-		<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-	  </symbol>
-	  <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-		<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-	  </symbol>
-	  <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-		<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-	  </symbol>
-	</svg>
+    
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </symbol>
+      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </symbol>
+      <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+      </symbol>
+    </svg>
     
     
     <!-- Modal -->
@@ -265,7 +269,7 @@
             
             <div class="mb-3">
                 <label for="txt-add-entry-prod-gestating-insem-notes" class="form-label" data-bs-toggle="tooltip" data-bs-placement="left" title="Notes">Notes</label>
-                <textarea class="form-control" rows="2"class="form-control" id="txt-add-entry-prod-gestating-insem-notes"></textarea>
+                <textarea class="form-control" rows="2" id="txt-add-entry-prod-gestating-insem-notes"></textarea>
                 <div class="invalid-feedback">
                     <span class="float-end">Max 160</span>
                 </div>
@@ -307,10 +311,10 @@
           <div class="modal-body">
             <div id = "div-info-prod-insem-cannot-update" class="alert alert-info d-flex align-items-center" role="alert" style="padding:5px; display:none">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
-				<div>
-					Gestating info of a production entry that is already in <b>Lactating Stage</b> cannot be updated.
-				</div>
-			</div>
+                <div>
+                    Gestating info of a production entry that is already in <b>Lactating Stage</b> cannot be updated.
+                </div>
+            </div>
             
             <div class="mb-3">
                 <div>
@@ -438,10 +442,10 @@
             
             <div class="alert alert-info d-flex align-items-center" role="alert" style="padding:5px;">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
-				<div id = "div-info-prod-gestating-birth">
-					Setting an <b>Date Actual Birth</b> of a Gestating production entry will update to Lactating production entry.
-				</div>
-			</div>
+                <div id = "div-info-prod-gestating-birth">
+                    Setting an <b>Date Actual Birth</b> of a Gestating production entry will update to Lactating production entry.
+                </div>
+            </div>
             
             <div class="mb-3">
                 <div>
@@ -463,7 +467,7 @@
             <div class="mb-3">
                 <label for="txt-update-entry-prod-gestating-birth-date-birth" class="form-label" data-bs-toggle="tooltip" data-bs-placement="left" title="Date Actual Birth" style="width:40%;">Date Actual Birth</label>
                 <span id ="span-update-entry-prod-gestating-birth-num-days" class="" data-bs-toggle="tooltip" data-bs-placement="left" title="Number of days Gestation."></span>
-				<input type="text" class="form-control" id="txt-update-entry-prod-gestating-birth-date-birth" required>
+                <input type="text" class="form-control" id="txt-update-entry-prod-gestating-birth-date-birth" required>
                 <div class="invalid-feedback">
                     Please enter a valid date. <span id = "span-update-entry-birth-minimum-days" class="float-end" style="display:none">Minimum 110 days. </span>
                 </div>
@@ -517,10 +521,10 @@
     </div>
     
 
-	<div id="div-container-update-entry-prod-gestating-ops"></div>
-	
-	
-	<div id="div-update-entry-prod-gestating-status" class="modal fade" role="dialog">
+    <div id="div-container-update-entry-prod-gestating-ops"></div>
+    
+    
+    <div id="div-update-entry-prod-gestating-status" class="modal fade" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -530,49 +534,49 @@
           
           <div class="modal-body">
             
-			
+            
             <div id = "div-info-prod-gestating-status" class="alert alert-warning d-flex align-items-center" role="alert" style="padding:5px">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-				<div>
-					This is used in abnormal cases of hog gestation. Updating the production status to any of the status below 
-					will remove this entry from the production list and will be visible only in reports. <b>This cannot be undone.</b>
-				</div>
-			</div>
+                <div>
+                    This is used in abnormal cases of hog gestation. Updating the production status to any of the status below 
+                    will remove this entry from the production list and will be visible only in reports. <b>This cannot be undone.</b>
+                </div>
+            </div>
             
-			<div class="mb-3">
+            <div class="mb-3">
                 <div>
                     <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="left" title="Sow" style="width:40%;">Sow:</label>
                     <span id ="span-update-entry-prod-gestating-status-sow" class=""></span>
                 </div>
                 
             </div>
-			
-			<div class="mb-3">
-				<div class="form-check">
-				  <input class="form-check-input" type="radio" name="radioProdStatus" id="prod-status-not-pregnant">
-				  <label class="form-check-label" for="prod-status-not-pregnant" data-bs-toggle="tooltip" data-bs-placement="right" title="Just try again.">
-					Sow not pregnant. Sow reheat.
-				  </label>
-				</div>
-				
-				<div class="form-check">
-				  <input class="form-check-input" type="radio" name="radioProdStatus" id="prod-status-terminated">
-				  <label class="form-check-label" for="prod-status-terminated" data-bs-toggle="tooltip" data-bs-placement="right" title="Sow will also be removed from sow list.">
-					Sow is Sold or Dead. 
-				  </label>
-				</div>
-				
-				<div class="form-check">
-				  <input class="form-check-input" type="radio" name="radioProdStatus" id="prod-status-no-live-piglets">
-				  <label class="form-check-label" for="prod-status-no-live-piglets" data-bs-toggle="tooltip" data-bs-placement="right" title="No live piglets.">
-					Sow has given birth all mummified/dead piglets. 
-				  </label>
-				</div>
-			</div>
-			
-			<div class="mb-3">
+            
+            <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="radioProdStatus" id="prod-status-not-pregnant">
+                  <label class="form-check-label" for="prod-status-not-pregnant" data-bs-toggle="tooltip" data-bs-placement="right" title="Just try again.">
+                    Sow not pregnant. Sow reheat.
+                  </label>
+                </div>
+                
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="radioProdStatus" id="prod-status-terminated">
+                  <label class="form-check-label" for="prod-status-terminated" data-bs-toggle="tooltip" data-bs-placement="right" title="Sow will also be removed from sow list.">
+                    Sow is Sold or Dead. 
+                  </label>
+                </div>
+                
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="radioProdStatus" id="prod-status-no-live-piglets">
+                  <label class="form-check-label" for="prod-status-no-live-piglets" data-bs-toggle="tooltip" data-bs-placement="right" title="No live piglets.">
+                    Sow has given birth all mummified/dead piglets. 
+                  </label>
+                </div>
+            </div>
+            
+            <div class="mb-3">
                 <label for="txt-update-entry-prod-gestating-status-notes" class="form-label" data-bs-toggle="tooltip" data-bs-placement="left" title="Put some details what happened.">Notes</label>
-                <textarea class="form-control" rows="3"class="form-control" id="txt-update-entry-prod-gestating-status-notes"></textarea>
+                <textarea class="form-control" rows="3" id="txt-update-entry-prod-gestating-status-notes"></textarea>
                 <div class="invalid-feedback">
                     <span class="float-end">Max 160</span>
                 </div>
@@ -589,8 +593,8 @@
     </div>
     
     
-	
-	<div id="div-update-entry-prod-lactating-wean" class="modal fade" role="dialog">
+    
+    <div id="div-update-entry-prod-lactating-wean" class="modal fade" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -663,21 +667,21 @@
     </div>
     
     
-	<div id="div-container-update-entry-prod-lactating-piglets-ops"></div>
+    <div id="div-container-update-entry-prod-lactating-piglets-ops"></div>
     
 
     <div id="div-container-add-entry-notes"></div>
     
-	
-	<div id="div-container-add-entry-feed-buy"></div>
-	
-	<div id="div-container-add-entry-feed-balance"></div>
-	
-	<div id="div-container-add-entry-pig-dead"></div>
-	
+    
+    <div id="div-container-add-entry-feed-buy"></div>
+    
+    <div id="div-container-add-entry-feed-balance"></div>
+    
+    <div id="div-container-add-entry-pig-dead"></div>
+    
     <script type="text/javascript">
     $(document).ready(function(){
-        var PAGE_DATA = ${page_data};
+        var PAGE_DATA = {{page_data}};
 
         gPagePigProduction.setPageData(PAGE_DATA);
     });
@@ -685,3 +689,5 @@
 
     
 </div>
+
+{% endblock %}
