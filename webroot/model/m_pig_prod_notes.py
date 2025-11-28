@@ -217,7 +217,9 @@ class PigProdNotes:
     
     
     def get_list(self, pig_prod_id = 0, sow_boar_id = 0, prod_group_id = 0, 
-        inc_deleted = 0):
+        inc_deleted = 0, inc_user_audit = 0):
+        
+        where_clause = ''
         
         if pig_prod_id > 0:
             where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
@@ -240,15 +242,15 @@ class PigProdNotes:
                     
                     b.name_last,
                     b.name_first,
-                    a.dt_last_update,
-                    
+                    a.dt_entry,
+                
                     c.name_last,
                     c.name_first,
-                    a.dt_entry
-                
+                    a.dt_last_update
+                    
                 FROM pig_prod_notes a 
-                LEFT OUTER JOIN user b ON a.last_update_user_id = c.id
-                LEFT OUTER JOIN user c ON a.added_by_user_id = b.id
+                LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
+                LEFT OUTER JOIN user c ON a.last_update_user_id = c.id
                 
                 %s
                 ORDER BY a.id DESC
@@ -298,6 +300,12 @@ class PigProdNotes:
                         'name_first':       row[3],
                         'name_last':        row[4],
                         'dt_entry':         str(row[5])
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[6],
+                        'name_first':       row[7],
+                        'dt_update':        str(row[8]) if row[8] else None
                     }
                 }
                 

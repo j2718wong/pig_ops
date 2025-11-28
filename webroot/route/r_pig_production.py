@@ -222,9 +222,7 @@ async def pig_prod(pfhid:str = None):
         # TODO what to do in case no result
         return None
         
-    pprint.pprint(list_pig_prod)
-        
-    
+
     # Remove plain_ids and not useful data blocks
     
     

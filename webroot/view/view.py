@@ -51,18 +51,19 @@ class ViewBase:
 #
 
 
-# TODO minify and obfuscate js
+
 
 class PigProd(ViewBase):
     def render(self, page_data = None):
         
         template = env.get_template('pig_production.html')
         
-        scripts = [ 'library/pqtouch.min.js', 
+        js_lib  = [ 'library/pqtouch.min.js', 
                     'library/pqselect.min.js',
-                    'library/pqgrid.min-3.5.1.js',
+                    'library/pqgrid.min-3.5.1.js']
                     
-                    'components/plus_minus_number_input.js',
+        # TODO minify and obfuscate js
+        js_app  = [ 'components/plus_minus_number_input.js',
                     'components/card_prod_pig_ops.js',
                     'components/add_notes_modal.js',
                     'components/add_feed_buy_modal.js',
@@ -88,6 +89,8 @@ class PigProd(ViewBase):
                     'pages/production/prod_gestating.js',
                     'pages/production/prod_lactating.js',
                     'pages/production/page_pig_production.js']
+        
+        scripts = js_lib + js_app
         
         data    = { 'page_data': page_data,
                     'scripts' : scripts}

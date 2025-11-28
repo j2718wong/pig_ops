@@ -204,8 +204,6 @@ class FeedBuy:
                             a.unit_cost,
                             a.total_cost,
                             
-                            a.dt_entry,
-                            
                             a.feed_type_id,
                             b.name AS feed_type_name,
                             
@@ -236,8 +234,6 @@ class FeedBuy:
                             
                             a.unit_cost,
                             a.total_cost,
-                            
-                            a.dt_entry,
                             
                             a.feed_type_id,
                             b.name AS feed_type_name,
@@ -276,8 +272,6 @@ class FeedBuy:
                             
                             a.unit_cost,
                             a.total_cost,
-                            
-                            a.dt_entry,
                             
                             a.feed_type_id,
                             b.name AS feed_type_name,
@@ -321,8 +315,6 @@ class FeedBuy:
                             
                             a.unit_cost,
                             a.total_cost,
-                            
-                            a.dt_entry,
                             
                             a.feed_type_id,
                             b.name AS feed_type_name,
@@ -395,23 +387,22 @@ class FeedBuy:
                             'unit_weight':      float(row[3]),
                             'kg_total':         float(row[4]),
                             'unit_cost':        float(row[5]),
-                            'total_cost':       float(row[6]),
-                            'dt_entry':         str(row[7])
+                            'total_cost':       float(row[6])
                         },
                         
                         'feed_type':{
-                            'id':               row[8],
-                            'name':             row[9],
+                            'id':               row[7],
+                            'name':             row[8],
                         },
                         
                         'feed_brand':{
-                            'id':               row[10],
-                            'name':             row[11],
+                            'id':               row[9],
+                            'name':             row[10],
                         },
                         
                         'feed_supplier':{
-                            'id':               row[12],
-                            'name':             row[13],
+                            'id':               row[11],
+                            'name':             row[12],
                         }
                     }
                     
@@ -424,35 +415,34 @@ class FeedBuy:
                             'kg_per_unit':      float(row[3]),
                             'kg_total':         float(row[4]),
                             'unit_cost':        float(row[5]),
-                            'total_cost':       float(row[6]),
-                            'dt_entry':         str(row[7])
+                            'total_cost':       float(row[6])
                         },
                         
                         'feed_type':{
-                            'id':               row[8],
-                            'name':             row[9],
+                            'id':               row[7],
+                            'name':             row[8],
                         },
                         
                         'feed_brand':{
-                            'id':               row[10],
-                            'name':             row[11],
+                            'id':               row[9],
+                            'name':             row[10],
                         },
                         
                         'feed_supplier':{
-                            'id':               row[12],
-                            'name':             row[13],
+                            'id':               row[11],
+                            'name':             row[12],
                         },
                         
                         'added_by': {
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_entry':         row[16]
+                            'name_last':        row[13],
+                            'name_first':       row[14],
+                            'dt_entry':         str(row[15]) if row[15] else None
                         },
                         
                         'last_update':{
-                            'name_last':        row[17],
-                            'name_first':       row[18],
-                            'dt_update':        str(row[19]) if row[19] else None
+                            'name_last':        row[16],
+                            'name_first':       row[17],
+                            'dt_update':        str(row[18]) if row[18] else None
                         }
                     }
                 
