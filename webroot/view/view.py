@@ -65,28 +65,36 @@ class PigProd(ViewBase):
         # TODO minify and obfuscate js
         js_app  = [ 'components/plus_minus_number_input.js',
                     'components/card_prod_pig_ops.js',
-                    'components/add_notes_modal.js',
-                    'components/add_feed_buy_modal.js',
-                    'components/add_feed_balance_modal.js',
-                    'components/add_pig_dead_modal.js',
                     
                     'models/model_00_master.js',
                     'models/model_01_master.js',
                     
-                    'models/notes/model_notes.js',
-                    'models/model_pig_dead.js',
-                    'models/feed/model_feed_buy.js',
-                    'models/feed/model_feed_balance.js',
+                    'models/prod_details/model_notes.js',
+                    'models/prod_details/model_pig_dead.js',
+                    'models/prod_details/feed/model_feed_buy.js',
+                    'models/prod_details/feed/model_feed_balance.js',
                     'models/production/model_pig_production.js',
                     
-                    'pages/production/prod_notes.js',
-                    'pages/production/prod_pig_dead.js',
-                    'pages/production/prod_feed_buy.js',
-                    'pages/production/prod_feed_balance.js',
+                    'pages/production/details/add_modal/add_modal_notes.js',
+                    'pages/production/details/add_modal/add_modal_feed_buy.js',
+                    'pages/production/details/add_modal/add_modal_feed_balance.js',
+                    'pages/production/details/add_modal/add_modal_pig_dead.js',
+                    
+                    
+                    'pages/production/details/prod_notes.js',
+                    'pages/production/details/prod_pig_dead.js',
+                    'pages/production/details/prod_feed_buy.js',
+                    'pages/production/details/prod_feed_balance.js',
+                    'pages/production/details/prod_details.js',
+                    
                     'pages/production/prod_ops.js',
                     
-                    'pages/production/prod_details.js',
-                    'pages/production/prod_gestating.js',
+                    'pages/production/gestating/gestating_add.js',
+                    'pages/production/gestating/gestating_update_insem.js',
+                    'pages/production/gestating/gestating_update_birth.js',
+                    'pages/production/gestating/gestating_update_status.js',
+                    'pages/production/gestating/prod_gestating.js',
+                    
                     'pages/production/prod_lactating.js',
                     'pages/production/page_pig_production.js']
         

@@ -41,8 +41,9 @@
 	<script type = "application/javascript" src="/static/js/controller.js"></script>
 	
 	<script>
+	var gIsServerAvailable = true;
+		
 	$(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
-		var gIsServerAvailable = true;
 		console.log('\n\ngIsServerAvailable =' + gIsServerAvailable);		
 		//var GLOBAL_DATA = ${global_data};
 		//gGlobal.setGlobalData(GLOBAL_DATA);

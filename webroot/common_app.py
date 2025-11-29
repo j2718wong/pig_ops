@@ -126,7 +126,13 @@ model_names = [
 ]
 
 
+DEV_OFFICE                      = 0
+DEV_HOME                        = 1
+
+
+# Change thee settings for development
 USING_PRODUCTION_DB             = 0
+USING_DEV_AT                    = DEV_HOME
 DB_INFO                         = ''
 
 if USING_PRODUCTION_DB > 0:
@@ -154,6 +160,10 @@ if USING_PRODUCTION_DB > 0:
         'local_port':       3307
     }
     
+    if USING_DEV_AT == DEV_HOME:
+        ssh_tunnel_prod['ssh_host'] = '192.168.0.166'
+    
+    
     print('\n\nWill use PRODUCTION database\n\n')
 else:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
@@ -179,6 +189,10 @@ else:
         'local_hostname':   '127.0.0.1',
         'local_port':       3307
     }
+    
+    if USING_DEV_AT == DEV_HOME:
+        ssh_tunnel_prod['ssh_host'] = '192.168.0.166'
+    
     
     print('\n\nWill use DEVELOPMENT database\n\n')
     

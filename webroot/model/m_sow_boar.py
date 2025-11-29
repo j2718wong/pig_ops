@@ -557,7 +557,7 @@ class SowBoar:
                         del cur_entry['farm_boar_id']
                     else:
                         del cur_entry['farm_sow_id']
-
+                        del cur_entry['status'] # This refers to sow_status
                 
                 result.append(cur_entry)
 

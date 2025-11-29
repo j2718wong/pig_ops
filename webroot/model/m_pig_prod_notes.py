@@ -297,8 +297,8 @@ class PigProdNotes:
                     },
                     
                     'added_by':{
-                        'name_first':       row[3],
-                        'name_last':        row[4],
+                        'name_last':        row[3],
+                        'name_first':       row[4],
                         'dt_entry':         str(row[5])
                     },
                     

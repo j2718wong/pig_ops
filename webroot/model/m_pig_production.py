@@ -807,7 +807,7 @@ class PigProduction:
                 cur_semen_source_description = row[13]
                 
                 
-                cur_insem_semen_cost        = float(row[14]) if row[15] else 0.0
+                cur_insem_semen_cost        = float(row[14]) if row[14] else 0.0
                 cur_insem_insemination_cost = float(row[15]) if row[15] else 0.0
                 cur_insem_staff_id          = row[16]
                 cur_insem_notes             = row[17]

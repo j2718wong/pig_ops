@@ -972,7 +972,7 @@ async def pig_prod_list(pfhid):
             'desc': ''
         },
         
-        'pig_prod': res 
+        'data': res 
     }
     
     
