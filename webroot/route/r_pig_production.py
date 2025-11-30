@@ -550,6 +550,38 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     pig_prod_id = res[0]
 
 
+    boar_id     = 0
+    boar_hid    = pig_prod_data.boar_hid
+    if boar_hid is not None:
+        res = hashids_common.decrypt(boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        boar_id = res[0]
+
+
+    semen_source_id     = 0
+    semen_source_hid    = pig_prod_data.semen_source_hid
+    if semen_source_hid is not None:
+        res = hashids_common.decrypt(semen_source_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_source_id = res[0]
+    
+    
     insem_staff_hid = pig_prod_data.insem_staff_hid
         
     res = hashids_common.decrypt(insem_staff_hid)
@@ -569,6 +601,8 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
 
     pig_prod_data.user_id           = user_id
     pig_prod_data.pig_prod_id       = pig_prod_id
+    pig_prod_data.boar_id           = boar_id
+    pig_prod_data.semen_source_id   = semen_source_id
     pig_prod_data.insem_staff_id    = insem_staff_id
     
     res_update    =  model['pig_prod'].update_insemination(pig_prod_data)

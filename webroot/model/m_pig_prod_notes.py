@@ -253,7 +253,7 @@ class PigProdNotes:
                 LEFT OUTER JOIN user c ON a.last_update_user_id = c.id
                 
                 %s
-                ORDER BY a.id DESC
+                ORDER BY a.date_notes DESC
                 """ % where_clause
        
         # Check if still connected to database

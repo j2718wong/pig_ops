@@ -239,7 +239,7 @@ class PigProduction:
             
             in_semen_cost           DECIMAL(6,2),
             in_insemination_cost    DECIMAL(6,2),
-            in_insem_cost_comments  VARCHAR(200),
+            in_comments             VARCHAR(160),
             
             in_insem_staff_id       INT,
             in_date_insemination    VARCHAR(10)  /* in YYYY-MM-DD format*/
@@ -260,15 +260,15 @@ class PigProduction:
             sql += '%s,'    % data.semen_source_id
             sql += '%s,'    % data.semen_cost
         
-        sql += '%s,'    % data.insemination_cost
+        sql += '%s,'    % data.insem_cost
         
-        if data.insem_cost_comments is not None:
-            sql += '"%s",'    % data.insem_cost_comments
+        if data.insem_notes is not None:
+            sql += '"%s",'    % data.insem_notes
         else:
             sql += 'NULL,'
             
         sql += '%s,'    % data.insem_staff_id
-        sql += '"%s");' % data.date_insemination
+        sql += '"%s");' % data.insem_date
        
         
         # Check if still connected to database
