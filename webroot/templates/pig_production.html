@@ -302,6 +302,7 @@
 	
     <div id="div-container-update-entry-prod-gestating-insem"></div>
     
+    <div id="div-container-update-entry-prod-gestating-birth"></div>
     
     <div id="div-update-entry-prod-gestating-birth" class="modal fade" role="dialog">
       <div class="modal-dialog">
@@ -552,6 +553,23 @@
     
     <div id="div-container-add-entry-pig-dead"></div>
     
+	
+	<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:3000;">
+	  <div id="myConfirmationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+		<div class="toast-header">
+		  <strong class="me-auto">Confirmation</strong>
+		  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
+		<div class="toast-body">
+		  Are you sure you want to proceed?
+		  <div class="mt-2 pt-2 border-top">
+			<button type="button" class="btn btn-primary btn-sm" id="yesButton">Yes</button>
+			<button type="button" class="btn btn-secondary btn-sm" id="noButton" data-bs-dismiss="toast">No</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	
     <script type="text/javascript">
     $(document).ready(function(){
         var PAGE_DATA = {{page_data}};

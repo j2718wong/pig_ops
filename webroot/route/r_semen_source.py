@@ -403,42 +403,39 @@ async def semen_source_list(ahid:str, inc_deleted: int = 0,
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['semen_source']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-        
-        
-        cur_pig_farm_id  = cur_entry['pig_farm']['id']
-        cur_pig_farm_hid = hashids_common.encrypt(cur_pig_farm_id)
-        
-        del cur_entry['pig_farm']['id']
-        cur_entry['pig_farm']['hid']   = cur_pig_farm_hid
+        del cur_entry['semen_source']['id']
+        cur_entry['semen_source']['hid']   = cur_hid
         
         
         if 'boar' in cur_entry:
-            cur_boar_id     = cur_entry['boar']['id']
-            cur_boar_hid    = hashids_common.encrypt(cur_boar_id)
+            cur_id  = cur_entry['boar']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
         
             del cur_entry['boar']['id']
-            cur_entry['boar']['hid']   = cur_boar_hid
+            cur_entry['boar']['hid']   = cur_hid
             
             
         if 'external_semen' in cur_entry:
-            cur_supplier_id     = cur_entry['external_semen']['supplier_id']
-            cur_supplier_hid    = hashids_common.encrypt(cur_supplier_id)
+            cur_id  = cur_entry['external_semen']['supplier_id']
+            cur_hid = hashids_common.encrypt(cur_id)
         
             del cur_entry['external_semen']['supplier_id']
-            cur_entry['external_semen']['supplier_hid']   = cur_supplier_hid
+            cur_entry['external_semen']['supplier_hid']   = cur_hid
     
-            
-            cur_pig_race_line_id  = cur_entry['external_semen']['pig_race_line']['id']
-            cur_pig_race_line_hid = hashids_common.encrypt(cur_pig_race_line_id)
         
-            del cur_entry['external_semen']['pig_race_line']['id']
-            cur_entry['external_semen']['pig_race_line']['hid'] = cur_pig_race_line_hid
-    
+        if 'pig_race_line' in cur_entry:
+            cur_id  = cur_entry['pig_race_line']['id']
+            
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            
+                del cur_entry['pig_race_line']['id']
+                cur_entry['pig_race_line']['hid'] = cur_hid
+            else:
+                del cur_entry['pig_race_line']
             
             
     return {

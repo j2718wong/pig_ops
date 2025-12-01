@@ -320,6 +320,8 @@ class PigProduction:
             
             in_pig_production_id    INT,
             in_pig_prod_status_id   INT,
+            
+            in_date_status          VARCHAR(10),
             in_notes                VARCHAR(160)
         )  
         """
@@ -328,6 +330,9 @@ class PigProduction:
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_prod_id
         sql += '%s,'    % data.prod_status_id
+        
+        sql += '"%s",'  % data.date_status
+        
         
         if data.notes is not None:
             sql += '"%s");'    % data.notes
