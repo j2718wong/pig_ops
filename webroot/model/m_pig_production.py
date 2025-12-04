@@ -589,14 +589,14 @@ class PigProduction:
         return None
 
     
-    def update_feed_type(self, data = None):
+    def update_feed_start_date(self, data = None):
         """
-        PROCEDURE pig_prod_update_feed_type(
+        PROCEDURE pig_prod_update_feed_start_date(
             in_user_id              INT,
            
             in_pig_prod_id          INT,
             in_feed_type_id         INT,
-            in_date                 VARCHAR(10)
+            in_feed_start_date      VARCHAR(10)
         )
         """
         
@@ -606,7 +606,7 @@ class PigProduction:
         sql += '%s,'    % data.pig_prod_id
         
         sql += '%s,'    % data.feed_type_id
-        sql += '"%s");' % data.date
+        sql += '"%s");' % data.date_start
         
       
         
@@ -642,10 +642,6 @@ class PigProduction:
                     'num':              row[0],
                     'code':             row[1],
                     'desc':             row[2],
-                },
-                
-                'pig_prod': {
-                    'id':               row[3]
                 }
             }
 

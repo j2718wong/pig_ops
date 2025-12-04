@@ -299,7 +299,7 @@ class FeedBuy:
                         LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
                         LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
                         WHERE a.pig_prod_id = %s %s
-                        ORDER BY a.id
+                        ORDER BY a.date_buy DESC;
                         """ % (pig_prod_id, s_after_date)
                         
             else:
@@ -342,7 +342,7 @@ class FeedBuy:
                         LEFT OUTER JOIN user e          ON a.added_by_user_id = e.id
                         LEFT OUTER JOIN user f          ON a.last_update_user_id = f.id
                         WHERE a.pig_prod_group_id = %s
-                        ORDER BY a.id
+                        ORDER BY a.date_buy DESC;
                         """ % pig_prod_group_id
             
             
@@ -412,7 +412,7 @@ class FeedBuy:
                             'id':               row[0],
                             'date_buy':         str(row[1]),
                             'quantity':         row[2],
-                            'kg_per_unit':      float(row[3]),
+                            'unit_weight':      float(row[3]),
                             'kg_total':         float(row[4]),
                             'unit_cost':        float(row[5]),
                             'total_cost':       float(row[6])

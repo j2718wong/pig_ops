@@ -186,7 +186,7 @@ class FeedSupplier:
         return None
     
     
-    def get_list(self, address_level_1_id = 0, address_level_2_id = 0):
+    def get_list(self, account_id = 0, address_level_1_id = 0, address_level_2_id = 0):
         
         if address_level_2_id > 0:
             sql =   """
@@ -230,6 +230,28 @@ class FeedSupplier:
                     ORDER BY a.name
                     """ % address_level_1_id
         
+        if account_id > 0:
+            sql =   """
+                    SELECT 
+                        a.feed_supplier_id,
+                        
+                        b.name,
+                        b.contact_number,
+                        b.whatsapp,
+                        b.messenger,
+                        
+                        b.country_id,
+                        c.name AS country_name,
+                        b.address_level_1_id,
+                        b.address_level_2_id,
+                        b.address_level_3_id
+                    FROM account_selection a
+                    LEFT OUTER JOIN feed_supplier b   ON a.feed_supplier_id = b.id
+                    LEFT OUTER JOIN app_country c   ON b.country_id = c.id
+                    WHERE a.account_id = %s AND a.feed_supplier_id IS NOT NULL AND b.name IS NOT NULL
+                    ORDER BY a.id DESC; 
+            """% account_id
+            
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

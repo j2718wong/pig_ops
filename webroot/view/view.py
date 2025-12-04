@@ -67,8 +67,7 @@ class PigProd(ViewBase):
                     'components/card_prod_pig_ops.js',
                     
                     'models/model_00_master.js',
-                    'models/model_01_master.js',
-                    
+ 
                     'models/prod_details/model_notes.js',
                     'models/prod_details/model_pig_dead.js',
                     'models/prod_details/feed/model_feed_buy.js',

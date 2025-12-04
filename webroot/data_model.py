@@ -214,6 +214,22 @@ class DataFeedSupplier(BaseModel, HasAddressLevel, HasContactDetails):
     name:                   str
 
 
+class DataFeedStartDate(BaseModel):
+    uhid:                   str
+    
+    pig_prod_hid:           str = None
+    pig_prod_group_hid:     str = None
+    feed_type_hid:          str = None
+    
+    
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    pig_prod_group_id:      int = 0
+    
+    feed_type_id:           int = 0
+    date_start:             str
+    
+
 class DataFeedBuy(BaseModel):
     uhid:                   str
     
@@ -414,21 +430,6 @@ class DataPigProdPigCount(BaseModel):
     date_notes:             str = None
     notes:                  str
 
-    
-class DataPigProdFeedType(BaseModel):
-    uhid:                   str
-        
-    pig_prod_hid:           str
-    production_group_hid:   str = None
-    feed_type_hid:          str
-        
-        
-    user_id:                int = 0
-    pig_prod_id:            int = 0  
-    feed_type_id:           int = 0
-    
-    date:                   str
-    
     
 class DataPigProdPigOps(BaseModel):
     uhid:                   str

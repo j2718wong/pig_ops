@@ -204,14 +204,25 @@ async def pig_prod(pfhid:str = None):
         
     
     # Get feed_type list
+    # This is the same data for all accounts
     list_feed_type = model['feed_type'].get_list()
     if list_feed_type == None:
         # TODO what to do in case no result
         return None
     
     
+    # Get feed_brand list
+    # This is the same for all accounts by country_id
     list_feed_brand = model['feed_brand'].get_list(country_id = 1)
     if list_feed_brand == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get feed_supplier_list
+    # This is account specific
+    list_feed_supplier = model['feed_supplier'].get_list(account_id = account_id)
+    if list_feed_supplier == None:
         # TODO what to do in case no result
         return None
     
@@ -222,6 +233,9 @@ async def pig_prod(pfhid:str = None):
         # TODO what to do in case no result
         return None
         
+
+
+    
 
     # Remove plain_ids and not useful data blocks
     
@@ -300,8 +314,15 @@ async def pig_prod(pfhid:str = None):
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
 
+    
+    for cur_entry in list_feed_supplier:
+        cur_id  = cur_entry['feed_supplier']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['feed_supplier']['id']
+        cur_entry['feed_supplier']['hid']   = cur_hid
 
-
+        # leave the country_id and address levels as integers
 
     
     page_data = {
@@ -317,6 +338,7 @@ async def pig_prod(pfhid:str = None):
         'staff_list':               list_staff,
         'feed_type_list':           list_feed_type,
         'feed_brand_list':          list_feed_brand,
+        'feed_supplier_list':       list_feed_supplier,
         
         'pig_production':           list_pig_prod
     }
@@ -840,9 +862,9 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     return res_update
     
 
-@app.post("/pig_prod/update_feed_type")
-async def pig_prod_update_feed_type(pig_prod_feed_type_data: dm.DataPigProdFeedType):
-    uhid    = pig_prod_feed_type_data.uhid
+@app.post("/pig_prod/update_feed_start_date")
+async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStartDate):
+    uhid    = feed_start_date_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -857,7 +879,7 @@ async def pig_prod_update_feed_type(pig_prod_feed_type_data: dm.DataPigProdFeedT
     user_id = res[0]
     
 
-    pig_prod_hid    = pig_prod_feed_type_data.pig_prod_hid
+    pig_prod_hid    = feed_start_date_data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -872,7 +894,7 @@ async def pig_prod_update_feed_type(pig_prod_feed_type_data: dm.DataPigProdFeedT
     pig_prod_id = res[0]
     
     
-    feed_type_hid    = pig_prod_feed_type_data.feed_type_hid
+    feed_type_hid    = feed_start_date_data.feed_type_hid
     
     res = hashids_common.decrypt(feed_type_hid)
     if len(res) == 0:
@@ -887,11 +909,11 @@ async def pig_prod_update_feed_type(pig_prod_feed_type_data: dm.DataPigProdFeedT
     feed_type_id = res[0]
     
     
-    pig_prod_feed_type_data.user_id         = user_id
-    pig_prod_feed_type_data.pig_prod_id     = pig_prod_id
-    pig_prod_feed_type_data.feed_type_id    = feed_type_id
+    feed_start_date_data.user_id         = user_id
+    feed_start_date_data.pig_prod_id     = pig_prod_id
+    feed_start_date_data.feed_type_id    = feed_type_id
     
-    res_update    =  model['pig_prod'].update_weaning(pig_weaning_data)
+    res_update    =  model['pig_prod'].update_feed_start_date(feed_start_date_data)
     
     if res_update is None:
         return {
@@ -902,14 +924,6 @@ async def pig_prod_update_feed_type(pig_prod_feed_type_data: dm.DataPigProdFeedT
             }
         }
     
-    pig_prod_id     = res_update['pig_prod']['id']        
-    pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
-    
-   
-    # remove plain id
-    del res_update['pig_prod']['id']
-    res_update['pig_prod']['hid'] = pig_prod_hashid
-
 
     return res_update
     
