@@ -648,11 +648,14 @@ class PigProduction:
         return None
     
     
-    def get_list(self, pig_farm_id = 0 , inc_historical = 0):
+    def get_list(self, pig_farm_id = 0 , is_fattening = 0):
         """
         Will get pig_production list.
         
        
+        is_fattening : int
+            0 = will include gestating and lactating entries only
+            1 = after lactating entries(weaning and growing)
         
         Returns
         -------
@@ -661,8 +664,10 @@ class PigProduction:
         """
 
         
-        where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4, 5, 6)) ' % pig_farm_id
-        
+        if is_fattening == 0:
+            where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4)) ' % pig_farm_id
+        else:
+            where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6)) ' % pig_farm_id
 
         sql =   """
                 SELECT 

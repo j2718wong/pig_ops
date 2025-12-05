@@ -228,7 +228,7 @@ async def pig_prod(pfhid:str = None):
     
     
     # Get pig_production list
-    list_pig_prod = get_pig_prod_list(pig_farm_id)
+    list_pig_prod = get_pig_prod_list(pig_farm_id, 0)
     if list_pig_prod == None:
         # TODO what to do in case no result
         return None
@@ -344,10 +344,95 @@ async def pig_prod(pfhid:str = None):
     }
     
 
-    page_data = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
+    page = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
     
-    return page_data
+    return page
     
+    
+@app.get("/pig_fattening", response_class = HTMLResponse)
+async def pig_fattening(pfhid:str = None):
+    pig_farm_id = None
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            # Just proceed if it is invalid; will get default 
+            # account farm_id if not given
+            test = 1
+            
+            """
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
+            }
+            """
+        else:
+            pig_farm_id = res[0]
+            
+    
+    # temporary
+    user_id = 1
+   
+    res_user = model['user'].get_user_info(user_id)
+    if res_user == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # Get user.account_id 
+    account_id = res_user['user']['account_id']
+    
+    # Get account info
+    data_account = model['account'].get_info(account_id)
+    if data_account == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # TODO Check account free trial period
+        
+    # TODO check account for not paid bill
+    
+        
+    # Check if there is a farm_id list
+    account_farm_ids = data_account['farm_ids']
+    len_items = len(account_farm_ids)
+    if len_items == 0:
+        # TODO what to do in case no farm set
+        return None
+        
+    if pig_farm_id is not None:
+        # This is given by user 
+        
+        if pig_farm_id not in account_farm_ids:
+            # TODO what to do in case farm_id given is not in account list
+            return None
+    
+    else:
+        # select the first farm_id
+        pig_farm_id = account_farm_ids[0]
+        
+        
+        
+        
+    page_data = {
+        'account':                  data_account,
+                
+        'staff_list':               list_staff,
+        'feed_type_list':           list_feed_type,
+        'feed_brand_list':          list_feed_brand,
+        'feed_supplier_list':       list_feed_supplier,
+        
+        'pig_production':           list_pig_prod
+    }
+    
+
+    page = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
+    
+    return page
     
     
 
@@ -986,7 +1071,7 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
 
 
 @app.get("/pig_prod/list")
-async def pig_prod_list(pfhid):
+async def pig_prod_list(pfhid:str, is_fattening:int = 0):
     """
     Will get pig_production list.
     
@@ -1011,7 +1096,7 @@ async def pig_prod_list(pfhid):
     
     
     pig_farm_id = res[0]
-    res = get_pig_prod_list(pig_farm_id)
+    res = get_pig_prod_list(pig_farm_id, is_fattening)
     
     return {
         'result':{
@@ -1024,8 +1109,8 @@ async def pig_prod_list(pfhid):
     }
     
     
-def get_pig_prod_list(pig_farm_id):
-    res = model['pig_prod'].get_list(pig_farm_id)
+def get_pig_prod_list(pig_farm_id, is_fattening):
+    res = model['pig_prod'].get_list(pig_farm_id, is_fattening)
     
     
     for cur_entry in res:
