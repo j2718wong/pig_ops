@@ -71,7 +71,6 @@ class PigProd(ViewBase):
                     'models/prod_details/model_notes.js',
                     'models/prod_details/model_pig_dead.js',
                     'models/prod_details/feed/model_feed_buy.js',
-                    'models/prod_details/feed/model_feed_balance.js',
                     'models/production/model_pig_production.js',
                     
                     'pages/production/details/add_modal/add_modal_notes.js',

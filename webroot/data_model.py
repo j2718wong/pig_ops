@@ -461,15 +461,15 @@ class DataProdFeedBal(BaseModel):
     
     date_balance:           str
     
-    num_pigs:               int
+    num_pigs:               int = None
     
-    
-    num_lactating:          float = 0.0
-    num_booster:            float = 0.0
-    num_prestarter:         float = 0.0
-    num_starter:            float = 0.0
-    num_grower:             float = 0.0
-    num_finisher:           float = 0.0
+    num_gestating:          float = None
+    num_lactating:          float = None
+    num_booster:            float = None
+    num_prestarter:         float = None
+    num_starter:            float = None
+    num_grower:             float = None
+    num_finisher:           float = None
     
     
 class DataProductionHarvest:

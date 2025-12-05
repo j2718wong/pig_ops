@@ -88,15 +88,11 @@
       
       <ul class="nav nav-tabs" id="tab-prod-details" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="btn-prod-feed-buy-summary" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-buy-summary" type="button" role="tab" aria-controls="tab-prod-feed-buy-summary" aria-selected="false">Feed Buy Summary</button>
+          <button class="nav-link active" id="btn-prod-feed-summary" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-summary" type="button" role="tab" aria-controls="tab-prod-feed-summary" aria-selected="false">Feed Summary</button>
         </li>
         
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="btn-prod-feed-buy" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-buy" type="button" role="tab" aria-controls="tab-prod-feed-buy" aria-selected="false">Feed Buy List</button>
-        </li>
-        
-        <li id = "li-prod-details-feed-balance" class="nav-item" role="presentation" style="display:None">
-          <button class="nav-link" id="btn-prod-feed-balance" data-bs-toggle="tab" data-bs-target="#tab-prod-feed-balance" type="button" role="tab" aria-controls="tab-prod-feed-balance" aria-selected="false">Feed Balance</button>
         </li>
         
         <li class="nav-item" role="presentation">
@@ -109,15 +105,15 @@
       </ul>
     
       <div class="tab-content mt-3" id="">
-        <div class="tab-pane fade show active" id="tab-prod-feed-buy-summary" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-buy-summary">
+        <div class="tab-pane fade show active" id="tab-prod-feed-summary" style= "min-height:400px;" role="tabpanel" aria-labelledby="btn-prod-feed-summary">
           
           <div class="flex-container">
-            <div id = "div-prod-feed-buy-summary" style="width:400px;">
-              <div id = "div-top-prod-feed-buy-summary"></div>
-              <div id = "div-list-prod-feed-buy-summary" class ="auto-table"></div>
+            <div id = "div-prod-feed-summary">
+              <div id = "div-top-prod-feed-summary"></div>
+              <div id = "div-list-prod-feed-summary" class ="auto-table"></div>
             </div>
             
-            <div id="">
+            <div id="" style ="padding-left: 20px;">
                 <br>
                 <br>
                 <h3>Total Feed Cost</h3>

@@ -600,7 +600,7 @@ class PigProduction:
         )
         """
         
-        sql =  'CALL pig_prod_update_feed_type('
+        sql =  'CALL pig_prod_update_feed_start_date('
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id
@@ -711,6 +711,7 @@ class PigProduction:
                     
                     a.num_pigs_current,
                     
+                    a.num_b_gestating,
                     a.num_b_lactating,
                     a.num_b_booster,
                     a.num_b_prestarter,
@@ -719,6 +720,7 @@ class PigProduction:
                     a.num_b_finisher,
                     
                     i.date_balance,
+                    i.num_gestating,
                     i.num_lactating,
                     i.num_booster,
                     i.num_prestarter,
@@ -726,6 +728,7 @@ class PigProduction:
                     i.num_grower,
                     i.num_finisher,
                     
+                    a.cost_gestating,
                     a.cost_lactating,
                     a.cost_booster,
                     a.cost_prestarter,
@@ -733,6 +736,8 @@ class PigProduction:
                     a.cost_grower,
                     a.cost_finisher,
                     
+                    a.date_gestating,
+                    a.date_lactating,
                     a.date_booster,
                     a.date_prestarter,
                     a.date_starter,
@@ -836,33 +841,39 @@ class PigProduction:
                 cur_pig_count               = row[34]
                 
                 
-                cur_prod_num_b_lactating    = row[35]
-                cur_prod_num_b_booster      = row[36]
-                cur_prod_num_b_prestarter   = row[37]
-                cur_prod_num_b_starter      = row[38]
-                cur_prod_num_b_grower       = row[39]
-                cur_prod_num_b_finisher     = row[40]
+                cur_prod_num_b_gestating    = row[35]
+                cur_prod_num_b_lactating    = row[36]
+                cur_prod_num_b_booster      = row[37]
+                cur_prod_num_b_prestarter   = row[38]
+                cur_prod_num_b_starter      = row[39]
+                cur_prod_num_b_grower       = row[40]
+                cur_prod_num_b_finisher     = row[41]
                 
-                cur_feed_bal_date_balance   = row[41]
-                cur_feed_bal_lactating      = row[42]
-                cur_feed_bal_booster        = row[43]
-                cur_feed_bal_prestarter     = row[44]
-                cur_feed_bal_starter        = row[45]
-                cur_feed_bal_grower         = row[46]
-                cur_feed_bal_finisher       = row[47]
+                cur_feed_bal_date_balance   = row[42]
                 
-                cur_prod_cost_lactating     = row[48]
-                cur_prod_cost_booster       = row[49]
-                cur_prod_cost_prestarter    = row[50]
-                cur_prod_cost_starter       = row[51]
-                cur_prod_cost_grower        = row[52]
-                cur_prod_cost_finisher      = row[53]
+                cur_feed_bal_gestating      = row[43]
+                cur_feed_bal_lactating      = row[44]
+                cur_feed_bal_booster        = row[45]
+                cur_feed_bal_prestarter     = row[46]
+                cur_feed_bal_starter        = row[47]
+                cur_feed_bal_grower         = row[48]
+                cur_feed_bal_finisher       = row[49]
                 
-                cur_prod_date_booster       = row[54]
-                cur_prod_date_prestarter    = row[55]
-                cur_prod_date_starter       = row[56]
-                cur_prod_date_grower        = row[57]
-                cur_prod_date_finisher      = row[58]
+                cur_prod_cost_gestating     = row[50]
+                cur_prod_cost_lactating     = row[51]
+                cur_prod_cost_booster       = row[52]
+                cur_prod_cost_prestarter    = row[53]
+                cur_prod_cost_starter       = row[54]
+                cur_prod_cost_grower        = row[55]
+                cur_prod_cost_finisher      = row[56]
+                
+                cur_prod_date_gestating     = row[57]
+                cur_prod_date_lactating     = row[58]
+                cur_prod_date_booster       = row[59]
+                cur_prod_date_prestarter    = row[60]
+                cur_prod_date_starter       = row[61]
+                cur_prod_date_grower        = row[62]
+                cur_prod_date_finisher      = row[63]
             
                 
                 cur_entry = {
@@ -927,6 +938,7 @@ class PigProduction:
                     
                     'feeds':{
                         'bought':{
+                            'gestating':    cur_prod_num_b_gestating,
                             'lactating':    cur_prod_num_b_lactating,
                             'booster':      cur_prod_num_b_booster,
                             'prestarter':   cur_prod_num_b_prestarter,
@@ -937,6 +949,8 @@ class PigProduction:
                         
                         'balance':{
                             'date_balance': str(cur_feed_bal_date_balance)      if cur_feed_bal_date_balance    is not None else None,
+                            
+                            'gestating':    float(cur_feed_bal_gestating)       if cur_feed_bal_gestating       is not None else None,
                             'lactating':    float(cur_feed_bal_lactating)       if cur_feed_bal_lactating       is not None else None,
                             'booster':      float(cur_feed_bal_booster)         if cur_feed_bal_booster         is not None else None,
                             'prestarter':   float(cur_feed_bal_prestarter)      if cur_feed_bal_prestarter      is not None else None,
@@ -946,6 +960,7 @@ class PigProduction:
                         },
                         
                         'cost':{
+                            'gestating':    float(cur_prod_cost_gestating)      if cur_prod_cost_gestating      is not None else None,
                             'lactating':    float(cur_prod_cost_lactating)      if cur_prod_cost_lactating      is not None else None,
                             'booster':      float(cur_prod_cost_booster)        if cur_prod_cost_booster        is not None else None,
                             'prestarter':   float(cur_prod_cost_prestarter)     if cur_prod_cost_prestarter     is not None else None,
@@ -955,11 +970,13 @@ class PigProduction:
                         },
                         
                         'date_change_feed':{
-                            'booster':      float(cur_prod_date_booster)        if cur_prod_date_booster        is not None else None,
-                            'prestarter':   float(cur_prod_date_prestarter)     if cur_prod_date_prestarter     is not None else None,
-                            'starter':      float(cur_prod_date_starter)        if cur_prod_date_starter        is not None else None,
-                            'grower':       float(cur_prod_date_grower)         if cur_prod_date_grower         is not None else None,
-                            'finisher':     float(cur_prod_date_finisher)       if cur_prod_date_finisher       is not None else None
+                            'gestating':    str(cur_prod_date_gestating)        if cur_prod_date_gestating      is not None else None,
+                            'lactating':    str(cur_prod_date_lactating)        if cur_prod_date_lactating      is not None else None,
+                            'booster':      str(cur_prod_date_booster)          if cur_prod_date_booster        is not None else None,
+                            'prestarter':   str(cur_prod_date_prestarter)       if cur_prod_date_prestarter     is not None else None,
+                            'starter':      str(cur_prod_date_starter)          if cur_prod_date_starter        is not None else None,
+                            'grower':       str(cur_prod_date_grower)           if cur_prod_date_grower         is not None else None,
+                            'finisher':     str(cur_prod_date_finisher)         if cur_prod_date_finisher       is not None else None
                         }
                     
                     }

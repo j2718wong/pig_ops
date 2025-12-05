@@ -12,16 +12,18 @@ class FeedBalance:
 
     def add(self, data = None):
         """
-        PROCEDURE feed_balance_add(
+        PROCEDURE feed_balance_add_or_update(
             in_user_id              INT,
             
             in_pig_prod_id          INT,
-            in_pig_prod_group_id    INT,
+            in_prod_group_id        INT,
             
             in_date_balance         VARCHAR(10),
             
-            in_num_pigs             INT,
+            in_num_pigs             INT, /* This can be entered null; 
+                                        if entered null, this is computed.*/
             
+            in_num_gestating        DECIMAL(5,1),
             in_num_lactating        DECIMAL(5,1),
             in_num_booster          DECIMAL(5,1),
             in_num_prestarter       DECIMAL(5,1),
@@ -31,7 +33,7 @@ class FeedBalance:
         )  
         """
         
-        sql =  'CALL feed_balance_add('
+        sql =  'CALL feed_balance_add_or_update('
         sql += '%s,'    % data.user_id
         
         
@@ -46,15 +48,43 @@ class FeedBalance:
         
         sql += '"%s",'  % data.date_balance
         
-        sql += '%s,'    % data.num_pigs
+        if data.num_pigs is not None and data.num_pigs > 0:
+            sql += '%s,'    % data.num_pigs
+        else:
+            sql += 'NULL,'
         
-        sql += '%s,'    % data.num_lactating
-        sql += '%s,'    % data.num_booster
-        sql += '%s,'    % data.num_prestarter
-        sql += '%s,'    % data.num_starter
-        sql += '%s,'    % data.num_grower
-        sql += '%s)'    % data.num_finisher
+        if data.num_gestating is not None:
+            sql += '%s,'    % data.num_gestating
+        else:
+            sql += 'NULL,'
+            
+        if data.num_lactating is not None:
+            sql += '%s,'    % data.num_lactating
+        else:
+            sql += 'NULL,'
         
+        if data.num_booster is not None:
+            sql += '%s,'    % data.num_booster
+        
+        if data.num_prestarter is not None:
+            sql += '%s,'    % data.num_prestarter
+        else:
+            sql += 'NULL,'
+        
+        if data.num_starter is not None:
+            sql += '%s,'    % data.num_starter
+        else:
+            sql += 'NULL,'
+        
+        if data.num_grower is not None:
+            sql += '%s,'    % data.num_grower
+        else:
+            sql += 'NULL,'
+        
+        if data.num_finisher is not None:
+            sql += '%s);'    % data.num_finisher
+        else:
+            sql += 'NULL);'
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
