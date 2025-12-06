@@ -8,7 +8,63 @@ class PigProdPigDead:
     def __init__(self, model):
         self.model              = model
         self.TAG                = 'PigProdPigDead'
+    
+    
+    def get_pig_dead_type_list(self):
+        
+      
+        sql =   """
+                SELECT 
+                    id,
+                    name
+                    
+                FROM pig_dead_type 
+                ORDER BY id
+                """ 
+    
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
 
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+
+            
+        except Exception as e:
+            msg = 'get_pig_dead_type_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                
+                cur_entry = {
+                    'id':                   row[0],
+                    'name':                 row[1]
+                }
+
+                result.append(cur_entry)
+        
+        return result
+    
+    
 
     def add(self, data = None):
         """
@@ -19,6 +75,7 @@ class PigProdPigDead:
             in_pig_prod_group_id    INT,
             
             in_date_dead            VARCHAR(10),
+            in_pig_dead_type_id     INT,
             in_num_pigs_dead        INT,
             in_notes                VARCHAR(160)
         )  
@@ -31,10 +88,11 @@ class PigProdPigDead:
         sql += '%s,'    % data.pig_prod_group_id
         
         sql += '"%s",'  % data.date_dead
+        sql += '%s,'    % data.pig_dead_type_id
         sql += '%s,'    % data.num_pigs_dead
         
         if data.notes is not None and len(data.notes) > 0:
-            sql += '"%s");'   % data.comments
+            sql += '"%s");'   % data.notes
         else:
             sql += 'NULL);'
         
@@ -73,7 +131,7 @@ class PigProdPigDead:
                     'desc':             row[2],
                 },
                 
-                'pig_prod_pig_dead': {
+                'prod_pig_dead': {
                     'id':               row[3]
                 }
             }
@@ -89,6 +147,7 @@ class PigProdPigDead:
             in_pig_prod_pig_dead_id     INT,
             
             in_date_dead                VARCHAR(10),
+            in_pig_dead_type_id         INT,
             in_num_pigs_dead            INT,
             in_notes                    VARCHAR(160)
         )
@@ -99,6 +158,7 @@ class PigProdPigDead:
         
         sql += '%s,'    % data.pig_prod_pig_dead_id
         sql += '"%s",'  % data.date_dead
+        sql += '%s,'    % data.pig_dead_type_id
         sql += '%s,'    % data.num_pigs_dead
                 
         if data.notes is not None and len(data.notes) > 0:
@@ -142,7 +202,7 @@ class PigProdPigDead:
                     'desc':             row[2],
                 },
                 
-                'pig_prod_pig_dead': {
+                'prod_pig_dead': {
                     'id':               row[3]
                 }
             }
@@ -216,6 +276,7 @@ class PigProdPigDead:
                 SELECT 
                     a.id,
                     a.date_dead,
+                    a.dead_type_id,
                     a.num_pigs_dead,
                     d.notes,
                     
@@ -232,8 +293,8 @@ class PigProdPigDead:
                 LEFT OUTER JOIN user c          ON a.last_update_user_id = c.id
                 LEFT OUTER JOIN pig_prod_notes d ON a.notes_id = d.id
             
-                WHERE pig_prod_id = %s
-                ORDER a.date_dead DESC
+                WHERE a.pig_prod_id = %s
+                ORDER BY a.date_dead DESC
                 """ % pig_prod_id
     
         # Check if still connected to database
@@ -273,21 +334,22 @@ class PigProdPigDead:
                     'pig_dead':{
                         'id':               row[0],
                         'date_dead':        str(row[1]),
-                        'num_pigs_dead':    row[2],
-                        'notes':            row[3],
+                        'dead_type_id':     row[2],
+                        'num_pigs_dead':    row[3],
+                        'notes':            row[4],
                     },
                    
                     
                     'added_by': {
-                        'name_last':        row[4],
-                        'name_first':       row[5],
-                        'dt_entry':         row[6]
+                        'name_last':        row[5],
+                        'name_first':       row[6],
+                        'dt_entry':         row[7]
                     },
                     
                     'last_update':{
-                        'name_last':        row[7],
-                        'name_first':       row[8],
-                        'dt_update':        str(row[9]) if row[9] else None
+                        'name_last':        row[8],
+                        'name_first':       row[9],
+                        'dt_update':        str(row[10]) if row[10] else None
                     }
                 }
             

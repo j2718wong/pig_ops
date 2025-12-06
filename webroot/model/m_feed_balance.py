@@ -65,6 +65,8 @@ class FeedBalance:
         
         if data.num_booster is not None:
             sql += '%s,'    % data.num_booster
+        else:
+            sql += 'NULL,'
         
         if data.num_prestarter is not None:
             sql += '%s,'    % data.num_prestarter
@@ -120,7 +122,7 @@ class FeedBalance:
                     'desc':             row[2],
                 },
                 
-                'feed_buy': {
+                'feed_balance': {
                     'id':               row[3]
                 }
             }

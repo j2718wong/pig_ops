@@ -994,6 +994,237 @@ class PigProduction:
         return result
     
     
+    def get_feed_summary_by_id(self, pig_prod_id):
+        sql =   """
+                SELECT 
+                    
+                    a.num_b_gestating,
+                    a.num_b_lactating,
+                    a.num_b_booster,
+                    a.num_b_prestarter,
+                    a.num_b_starter,
+                    a.num_b_grower,
+                    a.num_b_finisher,
+                    
+                    i.date_balance,
+                    i.num_gestating,
+                    i.num_lactating,
+                    i.num_booster,
+                    i.num_prestarter,
+                    i.num_starter,
+                    i.num_grower,
+                    i.num_finisher,
+                    
+                    a.cost_gestating,
+                    a.cost_lactating,
+                    a.cost_booster,
+                    a.cost_prestarter,
+                    a.cost_starter,
+                    a.cost_grower,
+                    a.cost_finisher,
+                    
+                    a.date_gestating,
+                    a.date_lactating,
+                    a.date_booster,
+                    a.date_prestarter,
+                    a.date_starter,
+                    a.date_grower,
+                    a.date_finisher
+                    
+                   
+                FROM pig_production a
+                LEFT OUTER JOIN feed_balance i      ON a.last_feed_balance_id = i.id
+                WHERE a.id = %s
+                """ % pig_prod_id
+
+
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_feed_summary_by_id(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+    
+     
+            
+            for row in rows:
+                
+                cur_prod_num_b_gestating    = row[0]
+                cur_prod_num_b_lactating    = row[1]
+                cur_prod_num_b_booster      = row[2]
+                cur_prod_num_b_prestarter   = row[3]
+                cur_prod_num_b_starter      = row[4]
+                cur_prod_num_b_grower       = row[5]
+                cur_prod_num_b_finisher     = row[6]
+                
+                cur_feed_bal_date_balance   = row[7]
+                
+                cur_feed_bal_gestating      = row[8]
+                cur_feed_bal_lactating      = row[9]
+                cur_feed_bal_booster        = row[10]
+                cur_feed_bal_prestarter     = row[11]
+                cur_feed_bal_starter        = row[12]
+                cur_feed_bal_grower         = row[13]
+                cur_feed_bal_finisher       = row[14]
+                
+                cur_prod_cost_gestating     = row[15]
+                cur_prod_cost_lactating     = row[16]
+                cur_prod_cost_booster       = row[17]
+                cur_prod_cost_prestarter    = row[18]
+                cur_prod_cost_starter       = row[19]
+                cur_prod_cost_grower        = row[20]
+                cur_prod_cost_finisher      = row[21]
+                
+                cur_prod_date_gestating     = row[22]
+                cur_prod_date_lactating     = row[23]
+                cur_prod_date_booster       = row[24]
+                cur_prod_date_prestarter    = row[25]
+                cur_prod_date_starter       = row[26]
+                cur_prod_date_grower        = row[27]
+                cur_prod_date_finisher      = row[28]
+            
+                
+                cur_entry = {
+                    
+                    'feeds':{
+                        'bought':{
+                            'gestating':    cur_prod_num_b_gestating,
+                            'lactating':    cur_prod_num_b_lactating,
+                            'booster':      cur_prod_num_b_booster,
+                            'prestarter':   cur_prod_num_b_prestarter,
+                            'starter':      cur_prod_num_b_starter,
+                            'grower':       cur_prod_num_b_grower,
+                            'finisher':     cur_prod_num_b_finisher
+                        },
+                        
+                        'balance':{
+                            'date_balance': str(cur_feed_bal_date_balance)      if cur_feed_bal_date_balance    is not None else None,
+                            
+                            'gestating':    float(cur_feed_bal_gestating)       if cur_feed_bal_gestating       is not None else None,
+                            'lactating':    float(cur_feed_bal_lactating)       if cur_feed_bal_lactating       is not None else None,
+                            'booster':      float(cur_feed_bal_booster)         if cur_feed_bal_booster         is not None else None,
+                            'prestarter':   float(cur_feed_bal_prestarter)      if cur_feed_bal_prestarter      is not None else None,
+                            'starter':      float(cur_feed_bal_starter)         if cur_feed_bal_starter         is not None else None,
+                            'grower':       float(cur_feed_bal_grower)          if cur_feed_bal_grower          is not None else None,
+                            'finisher':     float(cur_feed_bal_finisher)        if cur_feed_bal_finisher        is not None else None
+                        },
+                        
+                        'cost':{
+                            'gestating':    float(cur_prod_cost_gestating)      if cur_prod_cost_gestating      is not None else None,
+                            'lactating':    float(cur_prod_cost_lactating)      if cur_prod_cost_lactating      is not None else None,
+                            'booster':      float(cur_prod_cost_booster)        if cur_prod_cost_booster        is not None else None,
+                            'prestarter':   float(cur_prod_cost_prestarter)     if cur_prod_cost_prestarter     is not None else None,
+                            'starter':      float(cur_prod_cost_starter)        if cur_prod_cost_starter        is not None else None,
+                            'grower':       float(cur_prod_cost_grower)         if cur_prod_cost_grower         is not None else None,
+                            'finisher':     float(cur_prod_cost_finisher)       if cur_prod_cost_finisher       is not None else None
+                        },
+                        
+                        'date_change_feed':{
+                            'gestating':    str(cur_prod_date_gestating)        if cur_prod_date_gestating      is not None else None,
+                            'lactating':    str(cur_prod_date_lactating)        if cur_prod_date_lactating      is not None else None,
+                            'booster':      str(cur_prod_date_booster)          if cur_prod_date_booster        is not None else None,
+                            'prestarter':   str(cur_prod_date_prestarter)       if cur_prod_date_prestarter     is not None else None,
+                            'starter':      str(cur_prod_date_starter)          if cur_prod_date_starter        is not None else None,
+                            'grower':       str(cur_prod_date_grower)           if cur_prod_date_grower         is not None else None,
+                            'finisher':     str(cur_prod_date_finisher)         if cur_prod_date_finisher       is not None else None
+                        }
+                    
+                    }
+                    
+                }
+                
+                return cur_entry
+
+        
+        return None
+    
+    
+    def get_cur_pig_count_by_id(self, pig_prod_id):
+        sql =   """
+                SELECT 
+                    
+                    num_pigs_current
+                    
+                FROM pig_production 
+                WHERE id = %s
+                """ % pig_prod_id
+
+
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_pig_count_current_by_id(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+
+        if rows is not None:
+
+            for row in rows:
+                
+                cur_prod_cur_pig_count    = row[0]
+                
+
+                cur_entry = {
+                    
+                    'pig_production':{
+                        'cur_pig_count': cur_prod_cur_pig_count
+                    }
+                    
+                }
+                
+                return cur_entry
+
+        return None
+    
+    
     def get_pig_prod_ops_list(self, pig_farm_id,  inc_historical = 0):
         
         # Check if still connected to database

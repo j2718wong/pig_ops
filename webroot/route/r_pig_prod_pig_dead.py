@@ -18,17 +18,61 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+@app.get("/pig_dead_type/list")
+async def pig_dead_type_list():
+    """
+    Will get feed_type list.
+    
+    Parameters
+    ----------
+    
+   
+    """
+    
+        
+    res = model['prod_pig_dead'].get_pig_dead_type_list()
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+            
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
+
    
 @app.post("/prod_pig_dead/add")
-async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
-    uhid    = pig_prod_pig_dead_data.uhid
+async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
+    uhid    = prod_pig_dead_data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_DEAD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_DEAD_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -36,7 +80,7 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
     user_id = res[0]
     
     
-    pig_prod_hid        = pig_prod_pig_dead_data.pig_prod_hid
+    pig_prod_hid        = prod_pig_dead_data.pig_prod_hid
     pig_prod_id         = 0
     
     if pig_prod_hid is not None:
@@ -44,8 +88,8 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
                     'desc': ''
                 }
             }
@@ -53,7 +97,7 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         pig_prod_id = res[0]
         
     
-    pig_prod_group_hid  = pig_prod_pig_dead_data.pig_prod_group_hid
+    pig_prod_group_hid  = prod_pig_dead_data.pig_prod_group_hid
     pig_prod_group_id   = 0
     
     if pig_prod_group_hid is not None:
@@ -61,8 +105,8 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
+                    'num':  ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID,
+                    'code': 'ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID',
                     'desc': ''
                 }
             }
@@ -70,12 +114,28 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         pig_prod_group_hid = res[0]
     
     
+    pig_dead_type_hid   = prod_pig_dead_data.pig_dead_type_hid
+    pig_dead_type_id    = 0
     
-    pig_prod_pig_dead_data.user_id          = user_id
-    pig_prod_pig_dead_data.pig_prod_id      = pig_prod_id
-    pig_prod_pig_dead_data.pig_prod_group_id= pig_prod_group_id
+    res = hashids_common.decrypt(pig_dead_type_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_DEAD_INVALID_PIG_DEAD_TYPE_HASHID,
+                'code': 'ERROR_PIG_DEAD_INVALID_PIG_DEAD_TYPE_HASHID',
+                'desc': ''
+            }
+        }
     
-    res_add    =  model['prod_pig_dead'].add(pig_prod_pig_dead_data)
+    pig_dead_type_id = res[0]
+    
+    
+    prod_pig_dead_data.user_id          = user_id
+    prod_pig_dead_data.pig_prod_id      = pig_prod_id
+    prod_pig_dead_data.pig_prod_group_id= pig_prod_group_id
+    prod_pig_dead_data.pig_dead_type_id = pig_dead_type_id
+    
+    res_add    =  model['prod_pig_dead'].add(prod_pig_dead_data)
     
     if res_add is None:
         return {
@@ -87,27 +147,27 @@ async def pig_prod_pig_dead_add(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
         }
     
     
-    pig_prod_pig_dead_id    = res_add['pig_prod_pig_dead']['id']
-    pig_prod_pig_dead_hid   = hashids_common.encrypt(pig_prod_pig_dead_id)
+    prod_pig_dead_id    = res_add['prod_pig_dead']['id']
+    prod_pig_dead_hid   = hashids_common.encrypt(prod_pig_dead_id)
     
     # remove plain id
-    del res_add['pig_prod_pig_dead']['id']
-    res_add['pig_prod_pig_dead']['hid'] = pig_prod_pig_dead_hid
+    del res_add['prod_pig_dead']['id']
+    res_add['prod_pig_dead']['hid'] = prod_pig_dead_hid
 
         
     return res_add
     
 
 @app.post("/prod_pig_dead/update")
-async def pig_prod_pig_dead_update(pig_prod_pig_dead_data: dm.DataPigProdDeadPig):
-    uhid    = pig_prod_pig_dead_data.uhid
+async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
+    uhid    = prod_pig_dead_data.uhid
        
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_USER_HASHID',
+                'num':  ERROR_PIG_DEAD_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_DEAD_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -116,26 +176,26 @@ async def pig_prod_pig_dead_update(pig_prod_pig_dead_data: dm.DataPigProdDeadPig
     
     
 
-    pig_prod_pig_dead_hid = pig_prod_pig_dead_data.pig_prod_pig_dead_hid
+    prod_pig_dead_hid = prod_pig_dead_data.prod_pig_dead_hid
     
-    res = hashids_common.decrypt(pig_prod_pig_dead_hid)
+    res = hashids_common.decrypt(prod_pig_dead_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_PIG_DEAD_HASHID,
-                'code': 'ERROR_PIG_PROD_PIG_DEAD_HASHID',
+                'num':  ERROR_PIG_DEAD_INVALID_HASHID,
+                'code': 'ERROR_PIG_DEAD_INVALID_HASHID',
                 'desc': ''
             }
         }
     
     
-    pig_prod_pig_dead_id = res[0]
+    prod_pig_dead_id = res[0]
     
     
-    pig_prod_pig_dead_data.user_id   = user_id
-    pig_prod_pig_dead_data.pig_prod_pig_dead_id = pig_prod_pig_dead_id
+    prod_pig_dead_data.user_id   = user_id
+    prod_pig_dead_data.prod_pig_dead_id = prod_pig_dead_id
     
-    res_update    =  model['prod_pig_dead'].update(pig_prod_pig_dead_data)
+    res_update    =  model['prod_pig_dead'].update(prod_pig_dead_data)
     
     if res_update is None:
         return {
@@ -148,47 +208,42 @@ async def pig_prod_pig_dead_update(pig_prod_pig_dead_data: dm.DataPigProdDeadPig
         
         
     # remove plain id
-    del res_update['pig_prod_pig_dead']['id']
-    res_update['pig_prod_pig_dead']['hid'] = pig_prod_pig_dead_hid
+    del res_update['prod_pig_dead']['id']
+    res_update['prod_pig_dead']['hid'] = prod_pig_dead_hid
         
     return res_update
     
   
-@app.get("/pig_prod_pig_dead/list")
-async def pig_prod_pig_dead_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+@app.get("/prod_pig_dead/list")
+async def prod_pig_dead_list(pig_prod_hid: str):
     """
-    Will get pig_prod_pig_dead list.
+    Will get prod_pig_dead list.
     
     Parameters
     ----------
     
-    ahid:str
-        account hashid
+    pig_prod_hid:str
+        pir_prod hashid
 
-    inc_deleted: int
-        if > 0, will include deleted entries
     
-    inc_user_audit:
-        if > 0, will include added_by and last_update info
     
     """
     
     
-    res = hashids_account.decrypt(ahid)
+    res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_PIG_DEAD_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_PIG_PROD_PIG_DEAD_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
                 'desc': ''
             }
         }
     
     
-    account_id = res[0]
+    pig_prod_id = res[0]
         
-    res = model['pig_prod_pig_dead'].get_list(account_id, 
-            inc_deleted, inc_user_audit)
+    res = model['prod_pig_dead'].get_list(pig_prod_id)
     
     if res is None:
         return {
@@ -202,19 +257,21 @@ async def pig_prod_pig_dead_list(ahid: str, inc_deleted: int = 0, inc_user_audit
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['pig_dead']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['pig_dead']['id']
+        cur_entry['pig_dead']['hid']   = cur_hid
         
-        cur_pig_race_id  = cur_entry['pig_race']['id']
-        cur_pig_race_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['pig_race']['id']
-        cur_entry['pig_race']['hid']   = cur_hid
+        cur_id  = cur_entry['pig_dead']['dead_type_id']
+        cur_hid = hashids_common.encrypt(cur_id)
         
-    
+        del cur_entry['pig_dead']['dead_type_id']
+        cur_entry['pig_dead']['dead_type_hid']   = cur_hid
+        
+        
+        
     return {
         'result':{
             'num':  0,

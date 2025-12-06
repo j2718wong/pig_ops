@@ -227,6 +227,14 @@ async def pig_prod(pfhid:str = None):
         return None
     
     
+    # Get pig_dead_type list
+    # This is the same for all accounts
+    list_pig_dead_type = model['prod_pig_dead'].get_pig_dead_type_list()
+    if list_pig_dead_type == None:
+        # TODO what to do in case no result
+        return None
+    
+    
     # Get pig_production list
     list_pig_prod = get_pig_prod_list(pig_farm_id, 0)
     if list_pig_prod == None:
@@ -325,6 +333,14 @@ async def pig_prod(pfhid:str = None):
         # leave the country_id and address levels as integers
 
     
+    for cur_entry in list_pig_dead_type:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
     page_data = {
         'account':                  data_account,
         'acc_lookup_selection':     list_acc_lookup,
@@ -339,6 +355,8 @@ async def pig_prod(pfhid:str = None):
         'feed_type_list':           list_feed_type,
         'feed_brand_list':          list_feed_brand,
         'feed_supplier_list':       list_feed_supplier,
+        
+        'pig_dead_type_list':       list_pig_dead_type,
         
         'pig_production':           list_pig_prod
     }
@@ -1069,6 +1087,108 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
     
 
 
+@app.get("/pig_prod/feed_summary")
+async def pig_prod_feed_summary(pig_prod_hid:str):
+    """
+    Will get pig_production feed summary by pig_prod_hid.
+    
+    Parameters
+    ----------
+    
+    pig_prod_hid:str
+        pig_production hashid
+
+
+    """
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    pig_prod_id = res[0]
+    
+    res = model['pig_prod'].get_feed_summary_by_id(pig_prod_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res 
+    }
+
+
+@app.get("/pig_prod/cur_pig_count")
+async def pig_prod_cur_pig_count(pig_prod_hid:str):
+    """
+    Will get pig_production.num_pigs_current.
+    
+    This is a dedicated API just to get this column because
+    every pig_dead entry or pig_add entry to a pig_production 
+    will recompute this number. 
+    
+    Parameters
+    ----------
+    
+    pig_prod_hid:str
+        pig_production hashid
+
+
+    """
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    pig_prod_id = res[0]
+    
+    res = model['pig_prod'].get_cur_pig_count_by_id(pig_prod_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res 
+    }
+
+
 
 @app.get("/pig_prod/list")
 async def pig_prod_list(pfhid:str, is_fattening:int = 0):
@@ -1191,6 +1311,28 @@ def get_pig_prod_list(pig_farm_id, is_fattening):
             cur_ops['account_pig_ops']['hid']   = cur_hid
         
         cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
+        
+        
+        operation_type  = PIG_OPERATION_TYPE_LACTATING_SOW
+        lactating_sow_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+            operation_type, inc_user_audit = 1)
+        
+        for cur_ops in lactating_sow_ops:
+            cur_id  = cur_ops['pig_prod_pig_ops']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_ops['pig_prod_pig_ops']['id']
+            cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_ops['account_pig_ops']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_ops['account_pig_ops']['id']
+            cur_ops['account_pig_ops']['hid']   = cur_hid
+        
+        cur_entry['lactating_sow_ops'] = lactating_sow_ops
+        
         
         
         # Replace plain_id
