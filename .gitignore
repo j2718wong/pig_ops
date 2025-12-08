@@ -10,6 +10,9 @@ dist/
 # Compiled Java class files
 *.class
 
+# Environment variables
+*.env
+
 # Compiled Python bytecode
 *.py[cod]
 
