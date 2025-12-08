@@ -66,7 +66,7 @@ def write_user_flag_bits(user, user_flag):
     
     
 
-@app.post("/user/register")
+@app.post("/user/register", tags=["User"])
 async def user_register(user_data: dm.DataUser):
 
     res_register    =  model['user'].register(user_data)
@@ -157,7 +157,7 @@ MFA_EMAIL_RES_NUM_MFA_INVALID_CODE                  = 2
 MFA_EMAIL_RES_NUM_MFA_EXPIRED                       = 3
 
 
-@app.get("/user/email/verify_code")
+@app.get("/user/email/verify_code", tags=["User"])
 async def user_email_verify_code(uhid:str, code: int):
     """
     After the user registers, a verification code is sent to the user's email.
@@ -215,7 +215,7 @@ async def user_email_verify_code(uhid:str, code: int):
     return res_verify
     
     
-@app.get("/user/email/verify_code/resend")
+@app.get("/user/email/verify_code/resend", tags=["User"])
 async def user_email_verify_resend(uhid:str):
     
     res = hashids_user.decrypt(uhid)
@@ -294,7 +294,7 @@ async def user_email_verify_resend(uhid:str):
     }
     
     
-@app.get("/user/info")
+@app.get("/user/info", tags=["User"])
 async def user_info(uhid:str):
     """
     

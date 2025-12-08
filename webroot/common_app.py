@@ -79,7 +79,7 @@ from view.view                  import View
 
 
 # Models for connecting to database
-model_names = [
+model_names_pig_ops = [
     ('app_analytics',           AppAnalytics),
 
     ('account',                 Account),
@@ -121,19 +121,22 @@ model_names = [
     
     ('sow_act',                 SowActivity)
     
-    
-    
+ 
 ]
+
 
 
 DEV_OFFICE                      = 0
 DEV_HOME                        = 1
 
 
+
 # Change thee settings for development
 USING_PRODUCTION_DB             = 0
 USING_DEV_AT                    = DEV_HOME
 DB_INFO                         = ''
+
+
 
 if USING_PRODUCTION_DB > 0:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
@@ -225,8 +228,83 @@ model = Model(
             tunnel_settings = ssh_tunnel_prod)
 
             
-model.append_models(model_names)
+model.append_models(model_names_pig_ops)
 
+
+
+from model.m_address_level      import AddressLevel
+model_names_la = [
+    ('address_level',           AddressLevel)
+    
+]
+
+
+
+if USING_PRODUCTION_DB > 0:
+    DATABASE_NAME_LOC_ADDRESS = 'loc_address'
+    db_desc     = 'JSysDev Location address'
+
+    credentials_la = {
+        'db_host':      '127.0.0.1',
+        'db_user':      'ladrs_web',
+        'db_password':  '1@LADRS#db$1234.',
+        'database':     DATABASE_NAME_LOC_ADDRESS
+    }
+
+
+
+else:
+    DATABASE_NAME_LOC_ADDRESS = 'loc_address'
+    db_desc     = 'JSysDev Location address' 
+    
+    credentials_la = {
+        'db_host':      '127.0.0.1',
+        'db_user':      'ladrs_web',
+        'db_password':  '1@LADRS#db$1234.',
+        'database':     DATABASE_NAME_LOC_ADDRESS
+    }
+
+
+
+
+ssh_tunnel_la = {
+    'ssh_host':         '192.168.0.166',
+    'ssh_port':         22,
+    'ssh_username':     'dev01',
+    'ssh_password':     '0@DEV12345.',
+    'ssh_pkey':         None,
+
+    'remote_hostname':  '127.0.0.1',
+    'remote_port':      3306,
+    'local_hostname':   '127.0.0.1',
+    'local_port':       3308
+}
+
+
+ssl_la = {'ca': None}
+
+
+# Read PO_DATABASE_LOC environment variable if there is any.
+# This environment variable is used to control what database to access.
+
+ssh_tunnel = ssh_tunnel_la
+try:
+    database_loc = os.environ['PO_DATABASE_LOC']
+    if database_loc == 'LOCAL':
+        ssh_tunnel = None
+except:
+    ssh_tunnel = ssh_tunnel_la
+
+
+model_la = Model(
+            database_id     = 2, 
+            logger          = logger, 
+            credentials     = credentials_la,
+            ssl             = None,
+            tunnel_settings = ssh_tunnel_la)
+
+            
+model_la.append_models(model_names_la)
 
 
 

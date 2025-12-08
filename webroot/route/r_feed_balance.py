@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.post("/feed_balance/add")
+@app.post("/feed_balance/add", tags=["Production Details"])
 async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
     uhid    = feed_balance_data.uhid
     
@@ -98,7 +98,7 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
     return res_add
     
 
-@app.post("/feed_balance/update")
+@app.post("/feed_balance/update", tags=["Production Details"])
 async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
     uhid    = feed_balance_data.uhid
     
@@ -153,7 +153,7 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
     return res_update
  
     
-@app.get("/feed_balance/list")
+@app.get("/feed_balance/list", tags=["Production Details"])
 async def feed_balance_list(pig_prod_hid: str, inc_user_audit:int = 0):
     """
     Will get feed_balance list.

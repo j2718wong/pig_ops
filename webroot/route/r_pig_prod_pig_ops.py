@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-@app.post("/pig_prod_pig_ops/update")
+@app.post("/pig_prod_pig_ops/update", tags=["Production Details"])
 async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     uhid    = pig_prod_pig_ops_data.uhid
     
@@ -92,7 +92,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     return res_update
     
 
-@app.get("/pig_prod_pig_ops/list")
+@app.get("/pig_prod_pig_ops/list", tags=["Production Details"])
 async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int, inc_user_audit:int = 0):
     """
     Will get pig_prod_pig_ops list.

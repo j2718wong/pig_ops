@@ -19,7 +19,22 @@ RELEASE_MODE_PRODUCTION     = 1
 release_mode                = RELEASE_MODE_PRODUCTION
 
 tags_metadata = [
-    {"name": "Account", "description": "Account related operation"}
+    {"name": "User",            "description": "User related operations"},
+
+    {"name": "Common Lookup",   "description": "Common data related operations"},
+
+    {"name": "Account",         "description": "Account related operations"},
+    {"name": "Account Details", "description": "Account Details related operations"},
+    {"name": "Location Address","description": "Location Address related operations"},
+    
+    {"name": "Pig Farm",        "description": "Pig Farm related operations"},
+    
+    {"name": "Sow Boar",        "description": "Sow Boar related operation"},
+    
+    {"name": "Pig Production",  "description": "Pig Production related operations"},
+    {"name": "Production Details",  "description": "Pig Production Details related operations"},
+    
+    {"name": "HashIds",         "description": "HashIds Testing"}
 ]
 
 app = FastAPIOffline(openapi_tags = tags_metadata)

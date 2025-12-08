@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-@app.get("/pig_dead_type/list")
+@app.get("/pig_dead_type/list", tags=["Production Details"])
 async def pig_dead_type_list():
     """
     Will get feed_type list.
@@ -63,7 +63,7 @@ async def pig_dead_type_list():
     }
 
    
-@app.post("/prod_pig_dead/add")
+@app.post("/prod_pig_dead/add", tags=["Production Details"])
 async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
     uhid    = prod_pig_dead_data.uhid
     
@@ -158,7 +158,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
     return res_add
     
 
-@app.post("/prod_pig_dead/update")
+@app.post("/prod_pig_dead/update", tags=["Production Details"])
 async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     uhid    = prod_pig_dead_data.uhid
        
@@ -214,7 +214,7 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     return res_update
     
   
-@app.get("/prod_pig_dead/list")
+@app.get("/prod_pig_dead/list", tags=["Production Details"])
 async def prod_pig_dead_list(pig_prod_hid: str):
     """
     Will get prod_pig_dead list.

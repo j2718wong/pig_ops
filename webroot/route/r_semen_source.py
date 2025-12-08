@@ -22,7 +22,7 @@ from fastapi.responses      import PlainTextResponse
 import data_model           as dm
 
 
-@app.post("/semen_source/add")
+@app.post("/semen_source/add", tags=["Account Details"])
 async def semen_source_add(semen_source_data: dm.DataSemenSource):
     uhid        = semen_source_data.uhid
     
@@ -156,7 +156,7 @@ async def semen_source_add(semen_source_data: dm.DataSemenSource):
     return res_add
     
 
-@app.post("/semen_source/update")
+@app.post("/semen_source/update", tags=["Account Details"])
 async def semen_source_update(semen_source_data: dm.DataSemenSource):
     uhid        = semen_source_data.uhid
     
@@ -302,7 +302,7 @@ async def semen_source_update(semen_source_data: dm.DataSemenSource):
     return res_update
     
 
-@app.get("/semen_source/delete")
+@app.get("/semen_source/delete", tags=["Account Details"])
 async def semen_source_delete(uhid:str, ehid: str):
    
     res = hashids_user.decrypt(uhid)
@@ -354,7 +354,7 @@ async def semen_source_delete(uhid:str, ehid: str):
     return res_delete
 
 
-@app.get("/semen_source/list")
+@app.get("/semen_source/list", tags=["Account Details"])
 async def semen_source_list(ahid:str, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """

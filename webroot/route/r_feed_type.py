@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.get("/feed_type/list")
+@app.get("/feed_type/list", tags=["Common Lookup"])
 async def feed_type_list():
     """
     Will get feed_type list.

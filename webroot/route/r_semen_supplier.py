@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
     
-@app.post("/semen_supplier/add")
+@app.post("/semen_supplier/add", tags=["Common Lookup"])
 async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     name    = semen_supplier_data.name
     uhid    = semen_supplier_data.uhid
@@ -95,7 +95,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     return res_add
     
 
-@app.post("/semen_supplier/update")
+@app.post("/semen_supplier/update", tags=["Common Lookup"])
 async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
     name    = semen_supplier_data.name
     uhid    = semen_supplier_data.uhid
@@ -168,8 +168,7 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
     
 
 
-   
-@app.get("/semen_supplier/list")
+@app.get("/semen_supplier/list", tags=["Common Lookup"])
 async def semen_supplier_list( address_level_1_id: int):
     """
     Will get semen_supplier list.

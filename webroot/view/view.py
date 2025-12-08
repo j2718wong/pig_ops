@@ -75,7 +75,11 @@ class PigProd(ViewBase):
                     'models/production/model_pig_production.js',
                     
                     'pages/production/details/add_modal/add_modal_notes.js',
+                    
+                    'pages/production/details/add_modal/add_new_feed_brand.js',
+                    'pages/production/details/add_modal/add_new_feed_supplier.js',
                     'pages/production/details/add_modal/add_modal_feed_buy.js',
+                    
                     'pages/production/details/add_modal/add_modal_feed_balance.js',
                     'pages/production/details/add_modal/add_modal_pig_dead.js',
                     

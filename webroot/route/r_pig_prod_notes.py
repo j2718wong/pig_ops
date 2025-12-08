@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.post("/pig_prod_notes/add")
+@app.post("/pig_prod_notes/add", tags=["Production Details"])
 async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     uhid    = pig_prod_notes_data.uhid
     
@@ -103,7 +103,7 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     return res_add
     
 
-@app.post("/pig_prod_notes/update")
+@app.post("/pig_prod_notes/update", tags=["Production Details"])
 async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     uhid    = pig_prod_notes_data.uhid
 
@@ -158,7 +158,7 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     return res_update
     
 
-@app.get("/pig_prod_notes/delete")
+@app.get("/pig_prod_notes/delete", tags=["Production Details"])
 async def pig_prod_notes_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -212,7 +212,7 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
     return res_delete
     
     
-@app.get("/pig_prod_notes/list")
+@app.get("/pig_prod_notes/list", tags=["Production Details"])
 async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None,
     prod_group_hid = None, inc_deleted: int = 0, inc_user_audit:int = 0):
     """

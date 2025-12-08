@@ -9,7 +9,7 @@ class PigFarm:
         self.model              = model
         self.TAG                = 'PigFarm'
 
-    
+        
     def add(self, data = None):
         """
         PROCEDURE pig_farm_add(
@@ -300,7 +300,7 @@ class PigFarm:
                                 'id':   cur_farm_address_level_2_id
                             },
                             
-                            'level_3_id': {
+                            'level_3': {
                                 'id':   cur_farm_address_level_3_id
                             }
                         },

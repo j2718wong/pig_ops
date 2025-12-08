@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.get("/user_group/list")
+@app.get("/user_group/list", tags=["Account Details"])
 async def user_group_list(ahid:str):
     """
     Will get user_group list.

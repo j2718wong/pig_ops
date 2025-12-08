@@ -22,7 +22,7 @@ from fastapi.responses      import PlainTextResponse
 import data_model           as dm
 
 
-@app.get("/sow_status/list")
+@app.get("/sow_status/list", tags=["Sow Boar"])
 async def sow_status_list(is_dispose: int = 0):
     """
     Will get sow status list.
@@ -56,7 +56,7 @@ async def sow_status_list(is_dispose: int = 0):
     }
     
     
-@app.post("/sow_boar/add")
+@app.post("/sow_boar/add", tags=["Sow Boar"])
 async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     uhid        = sow_boar_data.uhid
     
@@ -156,7 +156,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     return res_add
     
 
-@app.post("/sow_boar/update")
+@app.post("/sow_boar/update", tags=["Sow Boar"])
 async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     uhid        = sow_boar_data.uhid
     
@@ -208,7 +208,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     return res_update
     
 
-@app.post("/sow_boar/dispose")
+@app.post("/sow_boar/dispose", tags=["Sow Boar"])
 async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     uhid        = sow_boar_data.uhid
     
@@ -264,7 +264,7 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     return res_dispose
 
 
-@app.get("/sow/pt_list", response_class=PlainTextResponse)
+@app.get("/sow/pt_list", response_class=PlainTextResponse, tags=["Sow Boar"])
 async def sow_pt_list(pfhid, full_info: int = 0):
     """
     Will get sow list.
@@ -360,7 +360,7 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     return s
     
 
-@app.get("/sow_boar/list")
+@app.get("/sow_boar/list", tags=["Sow Boar"])
 async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0, 
         inc_external:int = 0, inc_user_audit:int = 0, order_by:int = 0):
     """
@@ -443,8 +443,8 @@ async def sow_boar_list(pfhid:str, sex:str = None, full_info: int = 0,
     }
 
 
-@app.get("/sow/production_output")
-async def sow_boar_list(sowhid:str):
+@app.get("/sow/production_output", tags=["Sow Boar"])
+async def sow_production_output(sowhid:str):
     """
     Will get sow production list.
     

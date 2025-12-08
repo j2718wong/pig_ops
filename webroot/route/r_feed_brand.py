@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
     
-@app.post("/feed_brand/add")
+@app.post("/feed_brand/add", tags=["Common Lookup"])
 async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
     name    = feed_brand_data.name
     uhid    = feed_brand_data.uhid
@@ -76,7 +76,7 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
     
 
    
-@app.get("/feed_brand/list")
+@app.get("/feed_brand/list", tags=["Common Lookup"])
 async def feed_brand_list(country_id: int = 1, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """

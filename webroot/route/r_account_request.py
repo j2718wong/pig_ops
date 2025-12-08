@@ -28,7 +28,7 @@ ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
 ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
 
     
-@app.get("/account_request/add_user")
+@app.get("/account_request/add_user", tags=["Account Details"])
 async def account_request_add_user(uhid: str, ahid:str):
         
     res = hashids_user.decrypt(uhid)
@@ -101,7 +101,7 @@ async def account_request_add_user(uhid: str, ahid:str):
     return res_add
     
 
-@app.get("/account_request/approve_add_user")
+@app.get("/account_request/approve_add_user", tags=["Account Details"])
 async def account_request_approve_add_user(arhid: str, uhid:str):
         
     res = hashids_common.decrypt(arhid)

@@ -24,7 +24,7 @@ PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
   
 
-@app.post("/pig_farm/add")
+@app.post("/pig_farm/add", tags=["Pig Farm"])
 async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     name    = pig_farm_data.name
     uhid    = pig_farm_data.uhid
@@ -91,7 +91,7 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     return res_add
     
     
-@app.post("/pig_farm/update")
+@app.post("/pig_farm/update", tags=["Pig Farm"])
 async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     name    = pig_farm_data.name
     uhid    = pig_farm_data.uhid
@@ -163,7 +163,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     return res_update
     
     
-@app.get("/pig_farm/list")
+@app.get("/pig_farm/list", tags=["Pig Farm"])
 async def pig_farm_list(ahid: str):
     """
     Will get pig farm list.
@@ -191,7 +191,9 @@ async def pig_farm_list(ahid: str):
     
     account_id = res[0]
         
-    res     = model['pig_farm'].get_list(account_id)
+    print('Test 1')
+    res                 = model['pig_farm'].get_list(account_id)
+    print('Test 2')
     
     if res is None:
         return {
@@ -201,6 +203,49 @@ async def pig_farm_list(ahid: str):
                 'desc': ''
             }
         }
+    
+    
+
+    
+    for cur_entry in res:
+        location_address    = cur_entry['location']['address']
+        level_1_id          = location_address['level_1']['id']
+        level_2_id          = location_address['level_2']['id']
+        level_3_id          = location_address['level_3']['id']
+        
+        
+        # Get location address names from another server
+        res_address = model_la['address_level'].get_address_level_names(level_1_id, 
+            level_2_id, level_3_id)
+        
+        if res_address is not None:
+            location_address['level_1']['name'] = res_address['level_1_name']
+            location_address['level_2']['name'] = res_address['level_2_name']
+            location_address['level_3']['name'] = res_address['level_3_name']
+            
+            
+        # replace plain_id 
+        cur_id      = level_1_id
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['location']['address']['level_1']['id']
+        cur_entry['location']['address']['level_1']['hid'] = cur_hid
+        
+        
+        cur_id      = level_2_id
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['location']['address']['level_2']['id']
+        cur_entry['location']['address']['level_2']['hid'] = cur_hid
+        
+        
+        cur_id      = level_3_id
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['location']['address']['level_3']['id']
+        cur_entry['location']['address']['level_3']['hid'] = cur_hid
+        
+        
             
     return {
         'result':{

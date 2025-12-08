@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
    
-@app.post("/pig_farm_staff/add")
+@app.post("/pig_farm_staff/add", tags=["Pig Farm"])
 async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     name    = pig_farm_staff_data.name
     uhid    = pig_farm_staff_data.uhid
@@ -110,7 +110,7 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     return res_add
     
 
-@app.post("/pig_farm_staff/update")
+@app.post("/pig_farm_staff/update", tags=["Pig Farm"])
 async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     name    = pig_farm_staff_data.name
     uhid    = pig_farm_staff_data.uhid
@@ -213,7 +213,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     return res_update
     
 
-@app.get("/pig_farm_staff/delete")
+@app.get("/pig_farm_staff/delete", tags=["Pig Farm"])
 async def pig_farm_staff_delete(uhid:str, ehid: str):
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -267,7 +267,7 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
     return res_delete
     
     
-@app.get("/pig_farm_staff/list")
+@app.get("/pig_farm_staff/list", tags=["Pig Farm"])
 async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get pig_farm_staff list.

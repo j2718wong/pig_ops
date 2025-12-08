@@ -29,7 +29,7 @@ from r_account              import get_account_lookup_selection
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
 
-@app.get("/pig_prod_status/list")
+@app.get("/pig_prod_status/list", tags=["Pig Production"])
 async def pig_prod_status_list():
     """
     Will get pig_production status list.
@@ -70,7 +70,7 @@ async def pig_prod_status_list():
     
 
 
-@app.get("/pig_prod", response_class = HTMLResponse)
+@app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
 async def pig_prod(pfhid:str = None):
     # Get the current logged in user;
     
@@ -252,80 +252,80 @@ async def pig_prod(pfhid:str = None):
     del data_account['farm_ids']
     
     for cur_entry in list_acc_gestating_ops:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
         
     
     for cur_entry in list_acc_lactating_piglets_ops:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
     
     for cur_entry in list_acc_lactating_sow_ops:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
     
     for cur_entry in list_sow_list:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
     
     for cur_entry in list_boar_list:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
        
     for cur_entry in list_semen_source:
-        cur_id  = cur_entry['semen_source']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['semen_source']['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['semen_source']['id']
         cur_entry['semen_source']['hid']   = cur_hid
         
         
     for cur_entry in list_staff:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
     
     for cur_entry in list_feed_type:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
 
     for cur_entry in list_feed_brand:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
 
     
     for cur_entry in list_feed_supplier:
-        cur_id  = cur_entry['feed_supplier']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['feed_supplier']['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['feed_supplier']['id']
         cur_entry['feed_supplier']['hid']   = cur_hid
@@ -334,8 +334,8 @@ async def pig_prod(pfhid:str = None):
 
     
     for cur_entry in list_pig_dead_type:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
@@ -367,7 +367,7 @@ async def pig_prod(pfhid:str = None):
     return page
     
     
-@app.get("/pig_fattening", response_class = HTMLResponse)
+@app.get("/pig_fattening", response_class = HTMLResponse, tags=["Pig Production"])
 async def pig_fattening(pfhid:str = None):
     pig_farm_id = None
     
@@ -454,7 +454,7 @@ async def pig_fattening(pfhid:str = None):
     
     
 
-@app.post("/pig_prod/add")
+@app.post("/pig_prod/add", tags=["Pig Production"])
 async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     uhid    = pig_prod_data.uhid
     
@@ -582,7 +582,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     return res_add
     
 
-@app.post("/pig_prod/fattening/add")
+@app.post("/pig_prod/fattening/add", tags=["Pig Production"])
 async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
     uhid    = pig_fattening_data.uhid
     
@@ -643,7 +643,7 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
     return res_add
 
 
-@app.post("/pig_prod/update_insem")
+@app.post("/pig_prod/update_insem", tags=["Pig Production"])
 async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     uhid    = pig_prod_data.uhid
     
@@ -753,7 +753,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     return res_update
     
     
-@app.post("/pig_prod/update_status")
+@app.post("/pig_prod/update_status", tags=["Pig Production"])
 async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     uhid    = prod_status_data.uhid
     
@@ -829,7 +829,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     return res_update
     
     
-@app.post("/pig_prod/update_birth")
+@app.post("/pig_prod/update_birth", tags=["Pig Production"])
 async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     uhid    = pig_birth_data.uhid
     
@@ -905,7 +905,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     return res_update
     
     
-@app.post("/pig_prod/update_weaning")
+@app.post("/pig_prod/update_weaning", tags=["Pig Production"])
 async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     uhid    = pig_weaning_data.uhid
     
@@ -965,7 +965,7 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     return res_update
     
 
-@app.post("/pig_prod/update_feed_start_date")
+@app.post("/pig_prod/update_feed_start_date", tags=["Pig Production"])
 async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStartDate):
     uhid    = feed_start_date_data.uhid
     
@@ -1031,7 +1031,7 @@ async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStart
     return res_update
     
 
-@app.post("/pig_prod/update_pig_count")
+@app.post("/pig_prod/update_pig_count", tags=["Pig Production"])
 async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
     uhid    = pig_count_data.uhid
     
@@ -1087,7 +1087,7 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
     
 
 
-@app.get("/pig_prod/feed_summary")
+@app.get("/pig_prod/feed_summary", tags=["Pig Production"])
 async def pig_prod_feed_summary(pig_prod_hid:str):
     """
     Will get pig_production feed summary by pig_prod_hid.
@@ -1136,7 +1136,7 @@ async def pig_prod_feed_summary(pig_prod_hid:str):
     }
 
 
-@app.get("/pig_prod/cur_pig_count")
+@app.get("/pig_prod/cur_pig_count", tags=["Pig Production"])
 async def pig_prod_cur_pig_count(pig_prod_hid:str):
     """
     Will get pig_production.num_pigs_current.
@@ -1190,7 +1190,7 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
 
 
 
-@app.get("/pig_prod/list")
+@app.get("/pig_prod/list", tags=["Pig Production"])
 async def pig_prod_list(pfhid:str, is_fattening:int = 0):
     """
     Will get pig_production list.

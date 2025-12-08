@@ -19,7 +19,7 @@ from common_fast_api        import *
 import data_model           as dm
 
     
-@app.post("/feed_supplier/add")
+@app.post("/feed_supplier/add", tags=["Common Lookup"])
 async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     name    = feed_supplier_data.name
     uhid    = feed_supplier_data.uhid
@@ -99,7 +99,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     return res_add
     
 
-@app.post("/feed_supplier/update")
+@app.post("/feed_supplier/update", tags=["Common Lookup"])
 async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     name    = feed_supplier_data.name
     uhid    = feed_supplier_data.uhid
@@ -169,7 +169,7 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     
 
    
-@app.get("/feed_supplier/list")
+@app.get("/feed_supplier/list", tags=["Common Lookup"])
 async def feed_supplier_list(address_level_1_id: int = 0, address_level_2_id: int = 0):
     """
     Will get feed_supplier list.

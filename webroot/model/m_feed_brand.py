@@ -85,13 +85,8 @@ class FeedBrand:
             sql =   """
                     SELECT 
                         a.id,
-                        a.country_id,
-                        b.name AS country_name,
-
-                        a.name,
-                        a.dt_entry
+                        a.name
                     FROM feed_brand a 
-                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                     %s
                     ORDER BY a.name
                     """ % where_clause
@@ -99,9 +94,6 @@ class FeedBrand:
             sql =   """
                     SELECT 
                         a.id,
-                        a.country_id,
-                        b.name AS country_name,
-
                         a.name,
                         
                         c.name_last,
@@ -113,7 +105,6 @@ class FeedBrand:
                         a.dt_last_update
                         
                     FROM feed_brand a 
-                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                 
@@ -138,7 +129,7 @@ class FeedBrand:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql
@@ -156,44 +147,24 @@ class FeedBrand:
                 if inc_user_audit == 0:
                     cur_entry = {
                         'id':                   row[0],
-                        
-                        'location':{
-                            
-                            'country': {
-                                'id':           row[1],
-                                'name':         row[2]
-                            }
-                        },
-                        
-                        'name':                 row[3],
-                        
-                        'dt_entry':             str(row[4])
+                        'name':                 row[1]
                     }
                     
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        
-                        'location':{
-                            
-                            'country': {
-                                'id':           row[1],
-                                'name':         row[2]
-                            }
-                        },
-                        
-                        'name':                 row[3],
+                        'name':                 row[2],
                         
                         'added_by': {
-                            'name_last':        row[4],
-                            'name_first':       row[5],
-                            'dt_entry':         str(row[6])
+                            'name_last':        row[3],
+                            'name_first':       row[4],
+                            'dt_entry':         str(row[5])
                         },
                         
                         'last_update':{
-                            'name_last':        row[7],
-                            'name_first':       row[8],
-                            'dt_update':        str(row[9]) if row[9] else None
+                            'name_last':        row[6],
+                            'name_first':       row[7],
+                            'dt_update':        str(row[8]) if row[8] else None
                         }
                     }
                 
