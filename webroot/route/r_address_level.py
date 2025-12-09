@@ -6,7 +6,7 @@ import sys
 import json
 import pprint
 
-from pydantic               import BaseModel
+
 
 from datetime               import datetime, timedelta
 
@@ -32,7 +32,7 @@ async def address_level_1_list(country_id:int):
     """
     
 
-    res     = model['address_level'].get_address_level_1_list(country_id)
+    res     = model_la['address_level'].get_address_level_1_list(country_id)
     
     if res is None:
         return {
@@ -65,19 +65,34 @@ async def address_level_1_list(country_id:int):
     
 
 @app.get("/address/level_2/list", tags=["Location Address"])
-async def address_level_2_list(adrs_level_1_id:int):
+async def address_level_2_list(level_1_hid:str):
     """
     Will get address_level_2 list.
     
     Parameters
     ----------
-    adrs_level_1_id : int
-        adrs_level_1_id
+    level_1_hid : str
+        adrs_level_1 hashid
     """
     
+    adrs_level_1_id = 0
+    
+            
+    res = hashids_common.decrypt(level_1_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_ADDRESS_LEVEL_1_HID,
+                'code': 'ERROR_ADDRESS_LEVEL_1_HID',
+                'desc': ''
+            }
+        }
+    
+    adrs_level_1_id = res[0]
+    
 
-    res     = model['address_level'].get_address_level_2_list(adrs_level_1_id, 
-        return_tuple)
+    res     = model_la['address_level'].get_address_level_2_list(adrs_level_1_id)
     
     if res is None:
         return {
@@ -110,18 +125,35 @@ async def address_level_2_list(adrs_level_1_id:int):
     
 
 @app.get("/address/level_3/list", tags=["Location Address"])
-async def address_level_3_list(adrs_level_2_id:int):
+async def address_level_3_list(level_2_hid:str):
     """
     Will get address_level_3 list.
     
     Parameters
     ----------
-    adrs_level_2_id : int
-        adrs_level_2_id
+    level_2_hid : str
+        adrs_level_2 hashid
     """
     
+    adrs_level_2_id = 0
+    
+            
+    res = hashids_common.decrypt(level_2_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_ADDRESS_LEVEL_2_HID,
+                'code': 'ERROR_ADDRESS_LEVEL_2_HID',
+                'desc': ''
+            }
+        }
+    
+    adrs_level_2_id = res[0]
+    
 
-    res     = model['address_level'].get_address_level_3_list(adrs_level_2_id)
+
+    res     = model_la['address_level'].get_address_level_3_list(adrs_level_2_id)
     
     if res is None:
         return {
@@ -164,7 +196,7 @@ async def address_level_names(adrs_level_1_id:int = 0,
     adrs_level_1_id : int
         adrs_level_1_id
     """
-    res  = model['address_level'].get_address_level_names(
+    res  = model_la['address_level'].get_address_level_names(
         address_level_1_id = adrs_level_1_id,
         address_level_2_id = adrs_level_2_id,
         address_level_3_id = adrs_level_3_id

@@ -9,9 +9,14 @@ COUNTRY_ID_PHILIPPINES      = 1
 
 class HasAddressLevel:
     country_id:             int = 1     # default to PH
-    address_level_1_id:     int = 0
-    address_level_2_id:     int = 0
-    address_level_3_id:     int = 0
+    level_1_hid:            str = None
+    level_2_hid:            str = None
+    level_3_hid:            str = None
+    
+    level_1_id:             int = 0
+    level_2_id:             int = 0
+    level_3_id:             int = 0
+    
     
     
 class HasContactDetails:
@@ -45,6 +50,19 @@ class DataAccountSettings(BaseModel):
     days_harvest_from_birth:int = 142
     days_harvest_from_wean: int = 100
 
+
+class DataAccountSelection(BaseModel):
+    uhid:                   str
+    
+    feed_brand_hid:         str = None
+    feed_supplier_hid:      str = None
+    semen_supplier_hid:     str = None
+    
+    user_id:                int = 0
+    feed_brand_id:          int = 0
+    feed_supplier_id:       int = 0
+    semen_supplier_id:      int = 0
+    
 
 class DataPigFarm(BaseModel, HasAddressLevel):
     uhid:                   str

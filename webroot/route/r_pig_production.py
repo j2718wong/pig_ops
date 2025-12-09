@@ -221,7 +221,8 @@ async def pig_prod(pfhid:str = None):
     
     # Get feed_supplier_list
     # This is account specific
-    list_feed_supplier = model['feed_supplier'].get_list(account_id = account_id)
+    list_feed_supplier = model['feed_supplier'].get_list(
+        account_id = account_id, minimum_info = 1)
     if list_feed_supplier == None:
         # TODO what to do in case no result
         return None
@@ -324,13 +325,19 @@ async def pig_prod(pfhid:str = None):
 
     
     for cur_entry in list_feed_supplier:
-        cur_id      = cur_entry['feed_supplier']['id']
+        cur_id      = cur_entry['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['feed_supplier']['id']
-        cur_entry['feed_supplier']['hid']   = cur_hid
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
 
-        # leave the country_id and address levels as integers
+
+        cur_id      = cur_entry['level_3_id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['level_3_id']
+        cur_entry['level_3_hid']   = cur_hid
+
 
     
     for cur_entry in list_pig_dead_type:

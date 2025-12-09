@@ -186,71 +186,99 @@ class FeedSupplier:
         return None
     
     
-    def get_list(self, account_id = 0, address_level_1_id = 0, address_level_2_id = 0):
+    def get_list(self, account_id = 0, address_level_1_id = 0, 
+            address_level_2_id = 0, minimum_info = 1):
         
-        if address_level_2_id > 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.name,
-                        a.contact_number,
-                        a.whatsapp,
-                        a.messenger,
-                        
-                        a.country_id,
-                        b.name AS country_name,
-                        a.address_level_1_id,
-                        a.address_level_2_id,
-                        a.address_level_3_id
-                        
-                    FROM feed_supplier a 
-                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                    WHERE  a.address_level_2_id = %s 
-                    ORDER BY a.name
-                    """ % address_level_2_id
+        if minimum_info == 0:
+            if address_level_2_id > 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name,
+                            a.contact_number,
+                            a.whatsapp,
+                            a.messenger,
+                            
+                            a.country_id,
+                            b.name AS country_name,
+                            a.address_level_1_id,
+                            a.address_level_2_id,
+                            a.address_level_3_id
+                            
+                        FROM feed_supplier a 
+                        LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                        WHERE  a.address_level_2_id = %s 
+                        ORDER BY a.name
+                        """ % address_level_2_id
+            
+            if address_level_1_id > 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name,
+                            a.contact_number,
+                            a.whatsapp,
+                            a.messenger,
+                            
+                            a.country_id,
+                            b.name AS country_name,
+                            a.address_level_1_id,
+                            a.address_level_2_id,
+                            a.address_level_3_id
+                            
+                        FROM feed_supplier a 
+                        LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                        WHERE  a.address_level_1_id = %s 
+                        ORDER BY a.name
+                        """ % address_level_1_id
+            
+            if account_id > 0:
+                sql =   """
+                        SELECT 
+                            a.feed_supplier_id,
+                            
+                            b.name,
+                            b.contact_number,
+                            b.whatsapp,
+                            b.messenger,
+                            
+                            b.country_id,
+                            c.name AS country_name,
+                            b.address_level_1_id,
+                            b.address_level_2_id,
+                            b.address_level_3_id
+                        FROM account_selection a
+                        LEFT OUTER JOIN feed_supplier b   ON a.feed_supplier_id = b.id
+                        LEFT OUTER JOIN app_country c   ON b.country_id = c.id
+                        WHERE a.account_id = %s AND a.feed_supplier_id IS NOT NULL AND b.name IS NOT NULL
+                        ORDER BY a.id DESC; 
+                """% account_id
         
-        if address_level_1_id > 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.name,
-                        a.contact_number,
-                        a.whatsapp,
-                        a.messenger,
-                        
-                        a.country_id,
-                        b.name AS country_name,
-                        a.address_level_1_id,
-                        a.address_level_2_id,
-                        a.address_level_3_id
-                        
-                    FROM feed_supplier a 
-                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                    WHERE  a.address_level_1_id = %s 
-                    ORDER BY a.name
-                    """ % address_level_1_id
-        
-        if account_id > 0:
-            sql =   """
-                    SELECT 
-                        a.feed_supplier_id,
-                        
-                        b.name,
-                        b.contact_number,
-                        b.whatsapp,
-                        b.messenger,
-                        
-                        b.country_id,
-                        c.name AS country_name,
-                        b.address_level_1_id,
-                        b.address_level_2_id,
-                        b.address_level_3_id
-                    FROM account_selection a
-                    LEFT OUTER JOIN feed_supplier b   ON a.feed_supplier_id = b.id
-                    LEFT OUTER JOIN app_country c   ON b.country_id = c.id
-                    WHERE a.account_id = %s AND a.feed_supplier_id IS NOT NULL AND b.name IS NOT NULL
-                    ORDER BY a.id DESC; 
-            """% account_id
+        else:
+            if account_id > 0:
+                sql =   """
+                        SELECT 
+                            a.feed_supplier_id,
+                            b.name,
+                            b.address_level_3_id
+                        FROM account_selection a
+                        LEFT OUTER JOIN feed_supplier b   ON a.feed_supplier_id = b.id
+                        WHERE a.account_id = %s AND a.feed_supplier_id IS NOT NULL AND b.name IS NOT NULL
+                        ORDER BY a.id DESC; 
+                """% account_id
+         
+            
+            if address_level_2_id > 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name,
+                            a.address_level_3_id
+                            
+                        FROM feed_supplier a 
+                        WHERE  a.address_level_2_id = %s 
+                        ORDER BY a.name
+                        """ % address_level_2_id
             
         
         # Check if still connected to database
@@ -270,7 +298,7 @@ class FeedSupplier:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql
@@ -285,38 +313,46 @@ class FeedSupplier:
         if rows is not None:
             
             for row in rows:
-                cur_entry = {
-                    'feed_supplier': {
-                        'id':               row[0],
-                        'name':             row[1],
-                        'contact_number':   row[2],
-                        'whatsapp':         row[3],
-                        'messenger':        row[4]
-                    },
-                    
-                    'location':{
-                        
-                        'country': {
-                            'id':           row[5],
-                            'name':         row[6]
+                if minimum_info == 0:
+                    cur_entry = {
+                        'feed_supplier': {
+                            'id':               row[0],
+                            'name':             row[1],
+                            'contact_number':   row[2],
+                            'whatsapp':         row[3],
+                            'messenger':        row[4]
                         },
                         
-                        'address': {
-                            'level_1':{
-                                'id':       row[7]
-                            },
-                        
-                            'level_2':{
-                                'id':       row[8]
+                        'location':{
+                            
+                            'country': {
+                                'id':           row[5],
+                                'name':         row[6]
                             },
                             
-                            'level_3':{
-                                'id':       row[8]
+                            'address': {
+                                'level_1':{
+                                    'id':       row[7]
+                                },
+                            
+                                'level_2':{
+                                    'id':       row[8]
+                                },
+                                
+                                'level_3':{
+                                    'id':       row[8]
+                                }
+                                
                             }
-                            
                         }
                     }
-                }
+                    
+                else: 
+                    cur_entry = {
+                        'id':               row[0],
+                        'name':             row[1],
+                        'level_3_id':       row[2]
+                    }
                     
                 result.append(cur_entry)
         

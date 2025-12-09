@@ -141,7 +141,6 @@ class Account:
         return None
     
     
-    
     def register(self, data = None):
         """
         PROCEDURE account_register(
@@ -514,6 +513,78 @@ class Account:
                 result.append(cur_entry)
         
         return result
+    
+    
+    def add_account_selection(self, data):
+        """
+        PROCEDURE account_selection_add(
+            in_user_id              INT,
+            
+            in_feed_brand_id        INT,
+            in_feed_supplier_id     INT,
+            in_semen_supplier_id    INT
+        )  
+        """
+        
+        sql =  'CALL account_selection_add('
+        sql += '%s,'    % data.user_id
+        
+        if data.feed_brand_id > 0:
+            sql += '%s,'    % data.feed_brand_id
+        else:
+            sql += 'NULL,'
+        
+        if data.feed_supplier_id > 0:
+            sql += '%s,'    % data.feed_supplier_id
+        else:
+            sql += 'NULL,'
+        
+        if data.semen_supplier_id > 0:
+            sql += '%s);'    % data.semen_supplier_id
+        else:
+            sql += 'NULL);'
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'account': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
     
     
     def get_business_obj_selection(self, account_id, business_obj_id):

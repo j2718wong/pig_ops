@@ -249,6 +249,86 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
 
         
     return res_update
+
+
+@app.post("/account/selection/add", tags=["Account"])
+async def account_selection_add(account_selection_data: dm.DataAccountSelection):
+    uhid    = account_selection_data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+
+    
+    feed_supplier_id    = 0
+    semen_supplier_id   = 0
+    
+    feed_supplier_hid =  account_selection_data.feed_supplier_hid
+    if feed_supplier_hid is not None:
+        res = hashids_common.decrypt(feed_supplier_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_INVALID_FEED_SUPPLIER_HASHID,
+                    'code': 'ERROR_ACCOUNT_INVALID_FEED_SUPPLIER_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        feed_supplier_id = res[0]
+    
+
+    semen_supplier_hid = account_selection_data.semen_supplier_hid
+    if semen_supplier_hid is not None:
+        res = hashids_common.decrypt(semen_supplier_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_INVALID_SEMEN_SUPPLIER_HASHID,
+                    'code': 'ERROR_ACCOUNT_INVALID_SEMEN_SUPPLIER_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_supplier_id = res[0]
+    
+    
+    
+    account_selection_data.user_id              = user_id
+    account_selection_data.feed_supplier_id     = feed_supplier_id
+    account_selection_data.semen_supplier_id    = semen_supplier_id
+    
+        
+    res_add =  model['account'].add_account_selection(account_selection_data)
+    
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    cur_id      = res_update['account']['id']
+    cur_hashid  = hashids_account.encrypt(cur_id)
+    
+    # remove plain id
+    del res_add['account']['id']
+    res_add['account']['hid'] = cur_hashid
+
+        
+    return res_add
+    
+
     
     
 def get_account_lookup_selection(account_id, sel_f_brand = 0, 

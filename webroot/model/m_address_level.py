@@ -141,7 +141,7 @@ class AddressLevel:
             for row in rows:
                 cur_entry = {
                     'id':               row[0], 
-                    'name':             row[3]
+                    'name':             row[1]
                 }
                 
                 result.append(cur_entry)
