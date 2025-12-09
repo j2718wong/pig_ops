@@ -31,9 +31,9 @@ class FeedSupplier:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.address_level_1_id
-        sql += '%s,'    % data.address_level_2_id
-        sql += '%s,'    % data.address_level_3_id
+        sql += '%s,'    % data.level_1_id
+        sql += '%s,'    % data.level_2_id
+        sql += '%s,'    % data.level_3_id
         
         sql += '"%s",'  % data.name
         
@@ -121,7 +121,7 @@ class FeedSupplier:
         sql += '%s,'    % data.feed_supplier_id
         
        
-        sql += '%s,'    % data.address_level_3_id
+        sql += '%s,'    % data.level_3_id
         
         sql += '"%s",'  % data.name
         
