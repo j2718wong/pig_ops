@@ -19,7 +19,8 @@ env = Environment(loader=FileSystemLoader('templates'))
 
 view_names = [              
            
-            ('pig_prod',            'PigProd')
+            ('pig_prod',            'PigProd'),
+            ('sow_boar',            'SowBoar')
            
             
         ]

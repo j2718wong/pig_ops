@@ -166,8 +166,17 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
             }
         }
     
+    #Replace Plain Id
+    cur_id      = res_add['feed_supplier']['id']
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
+    del res_add['feed_supplier']['id']
+    res_add['feed_supplier']['hid']   = cur_hid
+    
+    
     _get_location_address_names_and_replace_ids(res_add)
         
+    
     return res_add
     
 

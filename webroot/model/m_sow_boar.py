@@ -436,21 +436,23 @@ class SowBoar:
                         b.name AS status_name,
                         a.date_of_birth,
                         a.date_dispose,
-                        a.notes,
-                        a.dispose_notes,
+                        c.notes AS add_notes,
+                        d.notes AS dispose_notes,
                         
-                        c.name_last,
-                        c.name_first,
+                        e.name_last,
+                        e.name_first,
                         a.dt_entry,
                         
-                        d.name_last,
-                        d.name_first,
+                        f.name_last,
+                        f.name_first,
                         a.dt_last_update
                         
                     FROM sow_boar a
-                    LEFT OUTER JOIN sow_status b    ON a.sow_status_id      = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                    LEFT OUTER JOIN sow_status b        ON a.sow_status_id      = b.id
+                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
+                    LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
+                    LEFT OUTER JOIN user e              ON a.added_by_user_id   = e.id
+                    LEFT OUTER JOIN user f              ON a.last_update_user_id = f.id
                     %s
                     %s 
                     """ % (where_clause, order_clause)
@@ -488,18 +490,34 @@ class SowBoar:
         result = []
         if rows is not None:
             
+            FLAG_BIT_SOW_BOAR_IS_DISPOSED       = 1
+            FLAG_BIT_SOW_BOAR_IS_EXTERNAL       = 2
             
             for row in rows:
                 
                 if inc_user_audit == 0:
                     if minimum_info == 0:
+                        cur_flag = row[5]
+                        
+                        is_disposed = 0 
+                        if cur_flag & FLAG_BIT_SOW_BOAR_IS_DISPOSED > 0:
+                            is_disposed = 1
+                            
+                        is_external = 0 
+                        if cur_flag & FLAG_BIT_SOW_BOAR_IS_EXTERNAL > 0:
+                            is_external = 1
+                        
+                        
                         cur_entry = {
                             'id':                   row[0],
                             'farm_sow_id':          row[1],
                             'farm_boar_id':         row[2],
                             'number':               row[3], 
                             'name':                 row[4],
-                            'flag':                 row[5],
+                            
+                            'is_disposed':          is_disposed,
+                            'is_external':          is_external,
+                            
                             'farm_birth_prod_id':   row[6],
                             'last_prod_id':         row[7],
                             
@@ -522,13 +540,27 @@ class SowBoar:
                         }
                      
                 else:
+                    
+                    cur_flag = row[5]
+                        
+                    is_disposed = 0 
+                    if cur_flag & FLAG_BIT_SOW_BOAR_IS_DISPOSED > 0:
+                        is_disposed = 1
+                        
+                    is_external = 0 
+                    if cur_flag & FLAG_BIT_SOW_BOAR_IS_EXTERNAL > 0:
+                        is_external = 1
+                
                     cur_entry = {
                         'id':                   row[0],
                         'farm_sow_id':          row[1],
                         'farm_boar_id':         row[2],
                         'number':               row[3], 
                         'name':                 row[4],
-                        'flag':                 row[5],
+                        
+                        'is_disposed':          is_disposed,
+                        'is_external':          is_external,
+                        
                         'farm_birth_prod_id':   row[6],
                         'last_prod_id':         row[7],
                         

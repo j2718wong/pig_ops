@@ -27,6 +27,8 @@ import data_model           as dm
 async def sow_boar(pfhid:str = None):
     # Get the current logged in user;
     
+    pig_farm_id = None
+    
     if pfhid is not None:
         res = hashids_common.decrypt(pfhid)
         if len(res) == 0:
