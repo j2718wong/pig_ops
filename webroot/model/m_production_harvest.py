@@ -43,8 +43,17 @@ class ProductionHarvest:
         sql =  'CALL production_harvest_add('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.pig_prod_id
-        sql += '%s,'    % data.pig_prod_group_id
+        
+        if data.pig_prod_id is not None and data.pig_prod_id > 0:
+            sql += '%s,'    % data.pig_prod_id
+        else:
+            sql += 'NULL,'
+        
+        if data.pig_prod_group_id is not None and data.pig_prod_group_id > 0:
+            sql += '%s,'    % data.pig_prod_group_id
+        else:
+            sql += 'NULL,'
+            
         sql += '%s,'    % data.acc_pig_buyer_id
         
         sql += '"%s",'  % data.date_harvest
@@ -76,9 +85,16 @@ class ProductionHarvest:
         else:
             sql += 'NULL,'
         
-
-        sql += '%s,'    % data.net_sales
-        sql += '%s,'    % data.harvest_cost
+        if data.net_sales is not None:
+            sql += '%s,'    % data.net_sales
+        else:
+            sql += 'NULL,'
+            
+        if data.harvest_cost is not None:
+            sql += '%s,'    % data.harvest_cost
+        else:
+            sql += 'NULL,'
+        
         
         if data.comments is not None:
             sql += '"%s");'  % data.comments
@@ -241,9 +257,14 @@ class ProductionHarvest:
     
     def get_list(self, pig_prod_id = 0, production_group_id = 0,  inc_user_audit = 0):
         
-        where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
-        
         if pig_prod_id > 0:
+            where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
+        
+        if production_group_id > 0:
+            where_clause = 'WHERE a.production_group_id = %s ' % production_group_id
+        
+        
+        if inc_user_audit == 0:
             sql =   """
                     SELECT 
                         a.id,
@@ -252,20 +273,26 @@ class ProductionHarvest:
                         a.num_pigs_harvest,
                         
                         a.live_weight,
+                        a.live_weight_ave,
+                        a.live_price_per_unit,
+                        
                         a.slaugther_weight,
+                        a.slaughter_weight_ave,
+                        a.slaughter_net_weight,
+                        a.slaughter_price_per_unit,
                         
                         a.sales,
                         a.harvest_cost,
                         a.comments,
                         
-                        a.acc_pig_buyer_id
-                        b.name
+                        a.acc_pig_buyer_id,
+                        b.name AS acc_pig_buyer_name
                     
                     FROM production_harvest a 
                     LEFT OUTER JOIN acc_pig_buyer b ON a.acc_pig_buyer_id = b.id
-                    WHERE a.pig_prod_id = %s
+                    %s
                     ORDER BY a.id DESC
-                    """ % pig_prod_id
+                    """ % where_clause
                     
         else:
             sql =   """
@@ -276,20 +303,36 @@ class ProductionHarvest:
                         a.num_pigs_harvest,
                         
                         a.live_weight,
+                        a.live_weight_ave,
+                        a.live_price_per_unit,
+                        
                         a.slaugther_weight,
+                        a.slaughter_weight_ave,
+                        a.slaughter_net_weight,
+                        a.slaughter_price_per_unit,
                         
                         a.sales,
                         a.harvest_cost,
-                        a.cost_comments,
+                        a.comments,
                         
-                        a.acc_pig_buyer_id
-                        b.name
+                        a.acc_pig_buyer_id,
+                        b.name AS acc_pig_buyer_name,
+                        
+                        c.name_last,
+                        c.name_first,
+                        a.dt_entry,
+                        
+                        d.name_last,
+                        d.name_first,
+                        a.dt_last_update
                     
                     FROM production_harvest a 
                     LEFT OUTER JOIN acc_pig_buyer b ON a.acc_pig_buyer_id = b.id
-                    WHERE a.production_group_id = %s
+                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
+                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                    %s
                     ORDER BY a.id DESC
-                    """ % production_group_id
+                    """ % where_clause
             
            
         # Check if still connected to database
@@ -328,7 +371,22 @@ class ProductionHarvest:
                     'pig_harvest'{
                         'id':               row[0],
                         'date_harvest':     str(row[1]),
-                        'num_pigs':         row[1]
+                        'num_pigs':         row[2],
+                        
+                        'live_weight':      float(row[3])   if row[3] is not None else None,
+                        'live_weight_ave':  float(row[4])   if row[4] is not None else None, 
+                        'live_ppu':         float(row[5])   if row[5] is not None else None,
+                        
+                        'slaugther_weight': float(row[6])   if row[6] is not None else None,
+                        'slaughter_weight_ave':float(row[7])if row[7] is not None else None,
+                        'slaughter_net_weight':float(row[8])if row[8] is not None else None,
+                        'slaughter_ppu':    float(row[9])   if row[9] is not None else None,
+                        
+                        'sales':            float(row[10])   if row[10] is not None else None,
+                        'harvest_cost':     float(row[11])   if row[11] is not None else None,
+                        'comments':,
+                        
+                        
                     }
                    
                 }

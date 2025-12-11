@@ -74,10 +74,12 @@ class PigProd(ViewBase):
                     'models/prod_details/feed/model_feed_balance.js',
                     'models/production/model_pig_production.js',
                     
+                    'pages/production/common/tr_add_new_farm_staff.js',
+                    
                     'pages/production/details/add_modal/add_modal_notes.js',
                     
-                    'pages/production/details/add_modal/add_new_feed_brand.js',
-                    'pages/production/details/add_modal/add_new_feed_supplier.js',
+                    'pages/production/details/add_modal/tr_add_new_feed_brand.js',
+                    'pages/production/details/add_modal/tr_add_new_feed_supplier.js',
                     'pages/production/details/add_modal/add_modal_feed_buy.js',
                     
                     'pages/production/details/add_modal/add_modal_feed_balance.js',

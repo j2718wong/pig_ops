@@ -16,14 +16,15 @@ class AccountPigBuyer:
             in_user_id              INT,
     
             in_country_id           INT,
-            in_address_level_1_id      INT,
-            in_address_level_2_id      INT,
-            in_address_level_3_id      INT,
+            in_address_level_1_id   INT,
+            in_address_level_2_id   INT,
+            in_address_level_3_id   INT,
             
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
-            in_messenger            VARCHAR(50)
+            in_messenger            VARCHAR(50),
+            in_description          VARCHAR(160)
         )  
         """
         
@@ -49,7 +50,13 @@ class AccountPigBuyer:
             sql += 'NULL,'
         
         if data.messenger is not None:
-            sql += '"%s");'   % data.messenger
+            sql += '"%s",'   % data.messenger
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.description is not None:
+            sql += '"%s");'   % data.description
         else:
             sql += 'NULL);'
         
@@ -106,14 +113,15 @@ class AccountPigBuyer:
             in_account_pig_buyer_id INT,
     
             in_country_id           INT,
-            in_address_level_1_id      INT,
-            in_address_level_2_id      INT,
-            in_address_level_3_id      INT,
+            in_address_level_1_id   INT,
+            in_address_level_2_id   INT,
+            in_address_level_3_id   INT,
             
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
-            in_messenger            VARCHAR(50)
+            in_messenger            VARCHAR(50),
+            in_description          VARCHAR(160)
         )  
         """
         
@@ -141,9 +149,16 @@ class AccountPigBuyer:
             sql += 'NULL,'
         
         if data.messenger is not None:
-            sql += '"%s");'   % data.messenger
+            sql += '"%s",'   % data.messenger
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.description is not None:
+            sql += '"%s");'   % data.description
         else:
             sql += 'NULL);'
+        
         
         
         # Check if still connected to database
@@ -272,7 +287,8 @@ class AccountPigBuyer:
                         a.name,
                         a.contact_number,
                         a.whatsapp,
-                        a.messenger
+                        a.messenger,
+                        a.description
                         
                     FROM account_pig_buyer a
                     LEFT OUTER JOIN app_country b ON a.country_id = b.id
@@ -295,6 +311,7 @@ class AccountPigBuyer:
                         a.contact_number,
                         a.whatsapp,
                         a.messenger,
+                        a.description,
                         
                         c.name_last,
                         c.name_first,
@@ -359,6 +376,7 @@ class AccountPigBuyer:
                 cur_contact_number      = row[7]
                 cur_whatsapp            = row[8]
                 cur_messenger           = row[9]
+                cur_description         = row[10]
                         
                 
                 
@@ -370,7 +388,8 @@ class AccountPigBuyer:
                             'name':         cur_name,
                             'contact_number': cur_contact_number,
                             'whatsapp':     cur_whatsapp,
-                            'messenger':    cur_messenger
+                            'messenger':    cur_messenger,
+                            'description':  cur_description
                             
                         },
                         
@@ -405,8 +424,8 @@ class AccountPigBuyer:
                             'name':         cur_name,
                             'contact_number': cur_contact_number,
                             'whatsapp':     cur_whatsapp,
-                            'messenger':    cur_messenger
-                            
+                            'messenger':    cur_messenger,
+                            'description':  cur_description
                         },
                         
                         'location':{
@@ -431,15 +450,15 @@ class AccountPigBuyer:
                         },
                         
                         'added_by': {
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_entry':         str(row[12])
+                            'name_last':        row[11],
+                            'name_first':       row[12],
+                            'dt_entry':         str(row[13])
                         },
                         
                         'last_update':{
-                            'name_last':        row[13],
-                            'name_first':       row[14],
-                            'dt_update':        str(row[15]) if row[15] else None
+                            'name_last':        row[14],
+                            'name_first':       row[15],
+                            'dt_update':        str(row[16]) if row[17] else None
                         }
                         
                     }

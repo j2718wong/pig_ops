@@ -222,10 +222,34 @@ async def pig_prod(pfhid:str = None):
     # Get feed_supplier_list
     # This is account specific
     list_feed_supplier = model['feed_supplier'].get_list(
-        account_id = account_id, minimum_info = 1)
+        account_id = account_id, minimum_info = 0)
     if list_feed_supplier == None:
         # TODO what to do in case no result
         return None
+        
+    # Get location address names for each feed supplier from a different database
+    for cur_entry in list_feed_supplier:
+        location_address = cur_entry['location']['address']
+        
+        level_1_id = location_address['level_1']['id']
+        level_2_id = location_address['level_2']['id']
+        level_3_id = location_address['level_3']['id']
+        
+        if level_3_id is None:
+            level_3_id = 0
+        
+        address_names = model_la['address_level'].get_address_level_names(
+            address_level_1_id = level_1_id, 
+            address_level_2_id = level_2_id,
+            address_level_3_id = level_3_id
+        )
+        
+        if address_names is not None:
+            location_address['level_1']['name'] = address_names['level_1_name']
+            location_address['level_2']['name'] = address_names['level_2_name']
+            location_address['level_3']['name'] = address_names['level_3_name']
+            
+            
     
     
     # Get pig_dead_type list
@@ -325,20 +349,35 @@ async def pig_prod(pfhid:str = None):
 
     
     for cur_entry in list_feed_supplier:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['feed_supplier']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['feed_supplier']['id']
+        cur_entry['feed_supplier']['hid']   = cur_hid
 
 
-        cur_id      = cur_entry['level_3_id']
+        cur_id      = cur_entry['location']['address']['level_1']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['level_3_id']
-        cur_entry['level_3_hid']   = cur_hid
+        del cur_entry['location']['address']['level_1']['id']
+        cur_entry['location']['address']['level_1']['hid']   = cur_hid
 
-
+        
+        cur_id      = cur_entry['location']['address']['level_2']['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['location']['address']['level_2']['id']
+        cur_entry['location']['address']['level_2']['hid']   = cur_hid
+    
+    
+        cur_id      = cur_entry['location']['address']['level_3']['id']
+        if cur_id is not None:
+            cur_hid     = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['location']['address']['level_3']['id']
+            cur_entry['location']['address']['level_3']['hid']   = cur_hid
+    
+        
     
     for cur_entry in list_pig_dead_type:
         cur_id      = cur_entry['id']

@@ -108,6 +108,7 @@ class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
     contact_number:         str = None
     whatsapp:               str = None
     messenger:              str = None
+    description:            str = None
     
     
     
@@ -512,14 +513,14 @@ class DataProductionHarvest:
     harvest_type_id:        int
     
     live_weight:            float = None
+    live_price_per_unit:    float = None
+    
     slaughter_weight:       float = None
     slaughter_net_weight:   float = None
-    
-    live_price_per_unit:    float = None
     slaughter_price_per_unit: float = None
     
-    net_sales:              float
-    harvest_cost:           float = 0.0
+    net_sales:              float = None
+    harvest_cost:           float = None
     comments:               str = None
     
     

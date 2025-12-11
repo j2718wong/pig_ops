@@ -18,6 +18,54 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+def _get_location_address_names_and_replace_ids(cur_entry):
+    # Get location address names for the feed supplier from a different database
+    location_address = cur_entry['location']['address']
+        
+    level_1_id = location_address['level_1']['id']
+    level_2_id = location_address['level_2']['id']
+    level_3_id = location_address['level_3']['id']
+    
+    if level_3_id is None:
+        level_3_id = 0
+    
+    address_names = model_la['address_level'].get_address_level_names(
+        address_level_1_id = level_1_id, 
+        address_level_2_id = level_2_id,
+        address_level_3_id = level_3_id
+    )
+    
+    if address_names is not None:
+        location_address['level_1']['name'] = address_names['level_1_name']
+        location_address['level_2']['name'] = address_names['level_2_name']
+        location_address['level_3']['name'] = address_names['level_3_name']
+        
+    
+    
+    
+    cur_id      = cur_entry['location']['address']['level_1']['id']
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['location']['address']['level_1']['id']
+    cur_entry['location']['address']['level_1']['hid']   = cur_hid
+
+    
+    cur_id      = cur_entry['location']['address']['level_2']['id']
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['location']['address']['level_2']['id']
+    cur_entry['location']['address']['level_2']['hid']   = cur_hid
+
+
+    cur_id      = cur_entry['location']['address']['level_3']['id']
+    if cur_id is not None:
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['location']['address']['level_3']['id']
+        cur_entry['location']['address']['level_3']['hid']   = cur_hid
+
+
     
 @app.post("/feed_supplier/add", tags=["Common Lookup"])
 async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
@@ -118,14 +166,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
             }
         }
     
-    
-    feed_supplier_id    = res_add['feed_supplier']['id']
-    feed_supplier_hid   = hashids_common.encrypt(feed_supplier_id)
-    
-    # remove plain id
-    del res_add['feed_supplier']['id']
-    res_add['feed_supplier']['hid'] = feed_supplier_hid
-
+    _get_location_address_names_and_replace_ids(res_add)
         
     return res_add
     
@@ -248,7 +289,27 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
                 }
             }
                 
-    
+        
+        # Replace plain id
+        for cur_entry in res:
+            cur_id      = cur_entry['id']
+            cur_hid     = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['id']
+            cur_entry['hid']   = cur_hid
+                
+                
+        return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': ''
+            },
+            
+            'data': res
+        }
+            
+        
     
     if ahid is not None:
         res = hashids_account.decrypt(ahid)
@@ -266,7 +327,7 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
         
         
         res = model['feed_supplier'].get_list(account_id = account_id, 
-                minimum_info = 1)
+                minimum_info = 0)
 
         
         if res is None:
@@ -278,36 +339,22 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
                 }
             }
         
-    
 
+            # Replace plain id
+            for cur_entry in res:
+                _get_location_address_names_and_replace_ids(cur_entry)
+                    
+                    
+            return {
+                'result':{
+                    'num':  0,
+                    'code': 'SUCCESS',
+                    'desc': ''
+                },
                 
-    # Replace plain id
-    for cur_entry in res:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-        
-        
-        cur_id  = cur_entry['level_3_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['level_3_id']
-        cur_entry['level_3_hid']   = cur_hid
-        
+                'data': res
+            }
             
             
-    return {
-        'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
-        },
-        
-        'data': res
-    }
-    
-    
 
     
