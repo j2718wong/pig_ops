@@ -6,6 +6,7 @@ import sys
 import pprint
 
 from pydantic               import BaseModel
+from fastapi.responses      import HTMLResponse
 
 from datetime               import datetime, timedelta
 
@@ -22,6 +23,125 @@ from fastapi.responses      import PlainTextResponse
 import data_model           as dm
 
 
+@app.get("/sow_boar", response_class = HTMLResponse, tags=["Sow Boar"])
+async def sow_boar(pfhid:str = None):
+    # Get the current logged in user;
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            # Just proceed if it is invalid; will get default 
+            # account farm_id if not given
+            test = 1
+            
+            """
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
+            }
+            """
+        else:
+            pig_farm_id = res[0]
+            
+    
+    # temporary
+    user_id = 1
+   
+    res_user = model['user'].get_user_info(user_id)
+    if res_user == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # Get user.account_id 
+    account_id = res_user['user']['account_id']
+    
+    # Get account info
+    data_account = model['account'].get_info(account_id)
+    if data_account == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # TODO Check account free trial period
+        
+    # TODO check account for not paid bill
+    
+        
+    # Check if there is a farm_id list
+    account_farm_ids = data_account['farm_ids']
+    len_items = len(account_farm_ids)
+    if len_items == 0:
+        # TODO what to do in case no farm set
+        return None
+        
+    if pig_farm_id is not None:
+        # This is given by user 
+        
+        if pig_farm_id not in account_farm_ids:
+            # TODO what to do in case farm_id given is not in account list
+            return None
+    
+    else:
+        # select the first farm_id
+        pig_farm_id = account_farm_ids[0]
+        
+    
+    
+    # Get pig_farm sow list
+    list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
+        inc_disposed = 0, inc_external = 0, inc_user_audit = 1, 
+        minimum_info = 0, order_by = 0)
+    if list_sow_list == None:
+        # TODO what to do in case no result
+        return None
+    
+    
+    # Get pig_farm boar list
+    list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
+        inc_disposed = 0, inc_external = 1, inc_user_audit = 1, 
+        minimum_info = 0, order_by = 0)
+    if list_boar_list == None:
+        # TODO what to do in case no result
+        return None
+    
+
+    for cur_entry in list_sow_list:
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    for cur_entry in list_boar_list:
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+
+    
+    page_data = {
+        'account':                  data_account,
+        
+        'sow_list':                 list_sow_list,
+        'boar_list':                list_boar_list
+      
+    }
+    
+
+    page = controller.view['sow_boar'].render(page_data = json.dumps(page_data, indent=4))
+    
+    return page
+    
+
+    
+    
+    
 @app.get("/sow_status/list", tags=["Sow Boar"])
 async def sow_status_list(is_dispose: int = 0):
     """

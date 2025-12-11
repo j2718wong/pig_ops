@@ -51,6 +51,44 @@ class ViewBase:
 #
 
 
+class SowBoar(ViewBase):
+    def render(self, page_data = None):
+        
+        template = env.get_template('sow_boar.html')
+        
+        js_lib  = [ 'library/pqtouch.min.js', 
+                    'library/pqselect.min.js',
+                    'library/pqgrid.min-3.5.1.js']
+                    
+        # TODO minify and obfuscate js
+        js_app  = [ 'models/model_00_master.js',
+ 
+                    'models/prod_details/model_notes.js',
+                    'models/sow_boar/model_sow_boar.js',
+                    'models/sow_boar/model_sow_production.js',
+                    
+                    'pages/production/common/tr_add_new_farm_staff.js',
+                    
+                    'pages/production/details/modal/add_modal_notes.js',
+                    
+                    'pages/production/details/modal/add_modal_pig_dead.js',
+                    
+                    
+                    'pages/production/details/prod_notes.js',
+                    
+                    'pages/production/details/prod_details.js',
+                    
+                    'pages/sow_boar/modal/add_modal_sow_boar.js',
+                    'pages/sow_boar/page_pig_sow_boar.js']
+        
+        scripts = js_lib + js_app
+        
+        data    = { 'page_data': page_data,
+                    'scripts' : scripts}
+        
+                
+        return template.render(data)
+
 
 
 class PigProd(ViewBase):
@@ -76,14 +114,14 @@ class PigProd(ViewBase):
                     
                     'pages/production/common/tr_add_new_farm_staff.js',
                     
-                    'pages/production/details/add_modal/add_modal_notes.js',
+                    'pages/production/details/modal/add_modal_notes.js',
                     
-                    'pages/production/details/add_modal/tr_add_new_feed_brand.js',
-                    'pages/production/details/add_modal/tr_add_new_feed_supplier.js',
-                    'pages/production/details/add_modal/add_modal_feed_buy.js',
+                    'pages/production/details/modal/tr_add_new_feed_brand.js',
+                    'pages/production/details/modal/tr_add_new_feed_supplier.js',
+                    'pages/production/details/modal/add_modal_feed_buy.js',
                     
-                    'pages/production/details/add_modal/add_modal_feed_balance.js',
-                    'pages/production/details/add_modal/add_modal_pig_dead.js',
+                    'pages/production/details/modal/add_modal_feed_balance.js',
+                    'pages/production/details/modal/add_modal_pig_dead.js',
                     
                     
                     'pages/production/details/prod_notes.js',

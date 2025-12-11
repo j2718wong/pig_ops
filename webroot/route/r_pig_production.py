@@ -29,47 +29,6 @@ from r_account              import get_account_lookup_selection
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
 
-@app.get("/pig_prod_status/list", tags=["Pig Production"])
-async def pig_prod_status_list():
-    """
-    Will get pig_production status list.
-    
-    Parameters
-    ----------
-
-    """
-    
-    res = model['pig_prod'].get_pig_prod_status_list()
-    
-    if res_add is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
-            }
-        }
-        
-        
-    for cur_entry in res:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-    
-    return {
-        'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
-        },
-        
-        'data': res
-    }
-    
-
-
 @app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
 async def pig_prod(pfhid:str = None):
     # Get the current logged in user;
@@ -412,7 +371,8 @@ async def pig_prod(pfhid:str = None):
     
     return page
     
-    
+
+
 @app.get("/pig_fattening", response_class = HTMLResponse, tags=["Pig Production"])
 async def pig_fattening(pfhid:str = None):
     pig_farm_id = None
@@ -498,7 +458,48 @@ async def pig_fattening(pfhid:str = None):
     
     return page
     
+
+
+@app.get("/pig_prod_status/list", tags=["Pig Production"])
+async def pig_prod_status_list():
+    """
+    Will get pig_production status list.
     
+    Parameters
+    ----------
+
+    """
+    
+    res = model['pig_prod'].get_pig_prod_status_list()
+    
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+        
+        
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
+    
+
 
 @app.post("/pig_prod/add", tags=["Pig Production"])
 async def pig_prod_add(pig_prod_data: dm.DataPigProd):
