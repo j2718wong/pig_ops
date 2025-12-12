@@ -133,6 +133,7 @@ class PigProd(ViewBase):
                     
                     'pages/production/prod_ops.js',
                     
+                    'pages/production/gestating/tr_add_new_sow_boar.js',
                     'pages/production/gestating/gestating_add.js',
                     'pages/production/gestating/gestating_update_insem.js',
                     'pages/production/gestating/gestating_update_birth.js',
