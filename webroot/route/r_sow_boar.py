@@ -216,34 +216,19 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     sow_boar_number     = sow_boar_data.number
     if sow_boar_number is not None:
         number      = sow_boar_number.strip()
-        if len(number) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_SOW_BOAR_INVALID_SOW_BOAR_NUMBER,
-                    'code': 'ERROR_SOW_BOAR_INVALID_SOW_BOAR_NUMBER',
-                    'desc': ''
-                }
-            }
+       
             
             
     sow_boar_name       = sow_boar_data.name
     if sow_boar_name is not None:
         name        = sow_boar_name.strip()
-        if len(name) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_SOW_BOAR_INVALID_SOW_BOAR_NAME,
-                    'code': 'ERROR_SOW_BOAR_INVALID_SOW_BOAR_NAME',
-                    'desc': ''
-                }
-            }
-    
+        
     
     if name is None and number is None:
         return {
             'result':{
-                'num':  ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_AND_NAME,
-                'code': 'ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_AND_NAME',
+                'num':  ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_OR_NAME,
+                'code': 'ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_OR_NAME',
                 'desc': ''
             }
         }
@@ -406,8 +391,8 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_INVALID_PIG_FARM_HASHID',
+                'num':  ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID',
                 'desc': ''
             }
         }
@@ -521,8 +506,8 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_INVALID_PIG_FARM_HASHID',
+                'num':  ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID',
                 'desc': ''
             }
         }
@@ -530,13 +515,12 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
     pig_farm_id = res[0]
     
     
-    inc_disposed = 0
-    if full_info > 0:
-        inc_disposed = 1
+
     
     res = model['sow_boar'].get_list(pig_farm_id, sex, 
-            inc_disposed    = inc_disposed,
+            is_disposed     = is_disposed,
             inc_external    = inc_external,
+            is_production_ready = is_production_ready,
             inc_user_audit  = inc_user_audit,
             order_by        = order_by)
     
@@ -589,8 +573,8 @@ async def sow_production_output(sowhid:str):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_SOW_INVALID_SOW_HASHID,
-                'code': 'ERROR_SOW_INVALID_SOW_HASHID',
+                'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID',
                 'desc': ''
             }
         }

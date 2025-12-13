@@ -126,12 +126,12 @@ class SowBoar:
         sql += '%s,'    % data.is_external
         sql += '%s,'    % data.is_production_ready
         
-        if data.number is not None:
+        if data.number is not None and len(data.number) > 0:
             sql += '"%s",'  % data.number
         else:
             sql += 'NULL,'
         
-        if data.name is not None:
+        if data.name is not None and len(data.name) > 0:
             sql += '"%s",'    % data.name
         else:
             sql += 'NULL,'
@@ -189,7 +189,9 @@ class SowBoar:
                 'sow_boar': {
                     'id':               row[3],
                     'farm_sow_id':      row[4],
-                    'farm_boar_id':     row[5]
+                    'farm_boar_id':     row[5],
+                    'is_external':      data.is_external,
+                    'is_production_ready': data.is_production_ready
                 }
             }
 
@@ -225,12 +227,12 @@ class SowBoar:
         sql += '%s,'    % data.is_external
         sql += '%s,'    % data.is_production_ready
         
-        if data.number is not None:
+        if data.number is not None and len(data.number) > 0:
             sql += '"%s",'  % data.number
         else:
             sql += 'NULL,'
         
-        if data.name is not None:
+        if data.name is not None and len(data.name) > 0:
             sql += '"%s",'    % data.name
         else:
             sql += 'NULL,'
