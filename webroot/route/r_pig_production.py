@@ -131,8 +131,8 @@ async def pig_prod(pfhid:str = None):
     
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
-        inc_disposed = 0, inc_external = 0, inc_user_audit = 0, 
-        minimum_info = 1, order_by = 0)
+        is_disposed = 0, inc_external = 0, is_production_ready = 1,
+        inc_user_audit = 0, minimum_info = 1, order_by = 0)
     if list_sow_list == None:
         # TODO what to do in case no result
         return None
@@ -140,8 +140,8 @@ async def pig_prod(pfhid:str = None):
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
-        inc_disposed = 0, inc_external = 1, inc_user_audit = 0, 
-        minimum_info = 1, order_by = 0)
+        is_disposed = 0, inc_external = 1, is_production_ready = 1,
+        inc_user_audit = 0, minimum_info = 1, order_by = 0)
     if list_boar_list == None:
         # TODO what to do in case no result
         return None

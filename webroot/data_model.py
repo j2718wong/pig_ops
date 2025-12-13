@@ -144,14 +144,16 @@ class DataSowBoar(BaseModel):
         
     farm_birth_prod_id:     int = 0
     line_id:                int = 0
-    sow_status_id:          int = 2
+    sow_status_id:          int = 2 # This needs to be properly set
         
     sex:                    str = 'F' # Sow = 'F';  Boar = 'M'
-    is_external:            int = 0 # not owned by the farm
-        
+    is_external:            int = 0 # > 0 = not owned by the farm
+    is_production_ready:    int = 0 # Needs to be explicitly set
+    
     number:                 str = None
     name:                   str = None
     date_of_birth:          str = None
+    date_eartag:            str = None
     notes:                  str = None
     
     

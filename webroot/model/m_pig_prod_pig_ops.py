@@ -27,9 +27,17 @@ class PigProdPigOps:
         sql += '%s,'    % data.pig_prod_pig_ops_id
         sql += '%s,'    % data.staff_id
         sql += '"%s",'  % data.date
-    
-        sql += '"%s");'  % data.notes
         
+        if data.notes is not None:
+            data.notes = data.notes.strip()
+            
+            if len(data.notes) > 0:
+                sql += '"%s");'  % data.notes
+            else:
+                sql += 'NULL);'
+        else:
+            sql += 'NULL);'
+            
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

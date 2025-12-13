@@ -113,6 +113,8 @@ class PigProd(ViewBase):
                     'models/prod_details/feed/model_feed_balance.js',
                     'models/production/model_pig_production.js',
                     
+                    'models/sow_boar/model_sow_boar.js',
+                    
                     'pages/production/common/tr_add_new_farm_staff.js',
                     
                     'pages/production/details/modal/add_modal_notes.js',
