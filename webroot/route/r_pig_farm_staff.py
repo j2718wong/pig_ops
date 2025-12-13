@@ -315,13 +315,20 @@ async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:i
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['farm_staff']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['farm_staff']['id']
+        cur_entry['farm_staff']['hid']   = cur_hid
         
-    
+        
+        cur_id  = cur_entry['farm_staff']['user_id']
+        cur_hid = hashids_user.encrypt(cur_id)
+        
+        del cur_entry['farm_staff']['user_id']
+        cur_entry['farm_staff']['user_hid']   = cur_hid
+        
+        
     return {
         'result':{
             'num':  0,

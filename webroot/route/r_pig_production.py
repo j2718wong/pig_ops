@@ -284,11 +284,11 @@ async def pig_prod(pfhid:str = None):
         
         
     for cur_entry in list_staff:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['farm_staff']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['farm_staff']['id']
+        cur_entry['farm_staff']['hid']   = cur_hid
     
     
     for cur_entry in list_feed_type:

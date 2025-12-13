@@ -1,5 +1,5 @@
-__author__ = "Jack Wong, jack.wong@erg.com.hk, neoaspilet1@gmail.com"
-__date__ = "$2015-02-09 10:00:00$"
+__author__ = "Jack Wong j2718wong@gmail.com"
+__date__ = "2025-10-01 10:00:00"
 
 
 import sys
@@ -64,6 +64,8 @@ class SowBoar(ViewBase):
         # TODO minify and obfuscate js
         js_app  = [ 'models/model_00_master.js',
  
+                    'models/model_farm_staff.js',
+                    
                     'models/prod_details/model_notes.js',
                     'models/sow_boar/model_sow_boar.js',
                     'models/sow_boar/model_sow_production.js',
@@ -107,6 +109,7 @@ class PigProd(ViewBase):
                     
                     'models/model_00_master.js',
  
+                    'models/operations/model_farm_staff.js',
                     'models/prod_details/model_notes.js',
                     'models/prod_details/model_pig_dead.js',
                     'models/prod_details/feed/model_feed_buy.js',

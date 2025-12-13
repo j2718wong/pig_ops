@@ -211,7 +211,7 @@ class PigFarmStaff:
                     SELECT 
                         a.id,
                         a.name,
-                        a.dt_entry
+                        a.user_id
                     FROM pig_farm_staff a 
                     %s
                     ORDER BY a.name
@@ -221,6 +221,7 @@ class PigFarmStaff:
                     SELECT 
                         a.id,
                         a.name,
+                        a.user_id,
                         
                         c.name_last,
                         c.name_first,
@@ -272,26 +273,31 @@ class PigFarmStaff:
             for row in rows:
                 if inc_user_audit == 0:
                     cur_entry = {
-                        'id':                   row[0],
-                        'name':                 row[1],
-                        'dt_entry':             str(row[2])
+                        'farm_staff': {
+                            'id':               row[0],
+                            'name':             row[1],
+                            'user_id':          row[2]
+                        }
                     }
                     
                 else:
                     cur_entry = {
-                        'id':                   row[0],
-                        'name':                 row[1],
+                        'farm_staff': {
+                            'id':               row[0],
+                            'name':             row[1],
+                            'user_id':          row[2]
+                        },
                         
                         'added_by': {
-                            'name_last':        row[2],
-                            'name_first':       row[3],
-                            'dt_entry':         row[4]
+                            'name_last':        row[3],
+                            'name_first':       row[4],
+                            'dt_entry':         row[5]
                         },
                         
                         'last_update':{
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_update':        str(row[7]) if row[7] else None
+                            'name_last':        row[6],
+                            'name_first':       row[7],
+                            'dt_update':        str(row[8]) if row[8] else None
                         }
                     }
                 

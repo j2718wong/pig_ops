@@ -209,7 +209,7 @@ class FeedSupplier:
     
     
     def get_list(self, account_id = 0, address_level_1_id = 0, 
-            address_level_2_id = 0, minimum_info = 1):
+            address_level_2_id = 0, list_ids = None, minimum_info = 1):
         
         if minimum_info == 0:
             if address_level_2_id > 0:
@@ -273,8 +273,33 @@ class FeedSupplier:
                         LEFT OUTER JOIN feed_supplier b   ON a.feed_supplier_id = b.id
                         LEFT OUTER JOIN app_country c   ON b.country_id = c.id
                         WHERE a.account_id = %s AND a.feed_supplier_id IS NOT NULL AND b.name IS NOT NULL
-                        ORDER BY a.id DESC; 
+                        ORDER BY b.name; 
                 """% account_id
+        
+            if list_ids is not None:
+                
+                list_str_ids = [str(cur_id) for cur_id in list_ids]
+                ids = ','.join(list_str_ids)
+                
+                sql =   """
+                        SELECT 
+                            a.id,
+                            
+                            a.name,
+                            a.contact_number,
+                            a.whatsapp,
+                            a.messenger,
+                            
+                            a.country_id,
+                            b.name AS country_name,
+                            a.address_level_1_id,
+                            a.address_level_2_id,
+                            a.address_level_3_id
+                        FROM feed_supplier a
+                        LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                        WHERE a.id IN (%s)
+                        ORDER BY a.id DESC; 
+                """% ids
         
         else:
             if account_id > 0:

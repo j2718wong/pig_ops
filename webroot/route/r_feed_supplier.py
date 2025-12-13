@@ -308,6 +308,14 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
             cur_entry['hid']   = cur_hid
                 
                 
+            cur_id      = cur_entry['level_3_id']
+            cur_hid     = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['level_3_id']
+            cur_entry['level_3_hid']   = cur_hid
+            
+            
+                
         return {
             'result':{
                 'num':  0,

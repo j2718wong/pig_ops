@@ -19,6 +19,15 @@ from common_fast_api        import *
 import data_model           as dm
 
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_feed_supplier        import _get_location_address_names_and_replace_ids
 
 
 
@@ -318,7 +327,40 @@ async def account_selection_add(account_selection_data: dm.DataAccountSelection)
             }
         }
     
-    cur_id      = res_update['account']['id']
+    
+    
+    if res_add['result']['num'] == 0:
+    
+        if feed_supplier_id > 0:
+            list_ids = [feed_supplier_id]
+            
+            res_suppliers = model['feed_supplier'].get_list(list_ids = list_ids, 
+                minimum_info = 0)
+            feed_supplier = res_suppliers[0]
+            
+            #Replace Plain Id
+            cur_id      = feed_supplier['feed_supplier']['id']
+            cur_hid     = hashids_common.encrypt(cur_id)
+            
+            del feed_supplier['feed_supplier']['id']
+            feed_supplier['feed_supplier']['hid']   = cur_hid
+            
+            
+            _get_location_address_names_and_replace_ids(feed_supplier)
+        
+            result = {
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': ''
+            }
+            
+            feed_supplier['result'] = result
+            
+            return feed_supplier
+            
+    
+    
+    cur_id      = res_add['account']['id']
     cur_hashid  = hashids_account.encrypt(cur_id)
     
     # remove plain id
