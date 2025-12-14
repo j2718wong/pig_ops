@@ -64,7 +64,7 @@ class SowBoar(ViewBase):
         # TODO minify and obfuscate js
         js_app  = [ 'models/model_00_master.js',
  
-                    'models/model_farm_staff.js',
+                    'models/operations/model_farm_staff.js',
                     
                     'models/prod_details/model_notes.js',
                     'models/sow_boar/model_sow_boar.js',
@@ -73,16 +73,13 @@ class SowBoar(ViewBase):
                     'pages/production/common/tr_add_new_farm_staff.js',
                     
                     'pages/production/details/modal/add_modal_notes.js',
+                    'pages/production/details/modal/add_modal_pig_dead.js',                   
                     
-                    'pages/production/details/modal/add_modal_pig_dead.js',
-                    
-                    
-                    'pages/production/details/prod_notes.js',
-                    
+                    'pages/production/details/prod_notes.js',                    
                     'pages/production/details/prod_details.js',
                     
                     'pages/sow_boar/modal/add_modal_sow_boar.js',
-                    'pages/sow_boar/page_pig_sow_boar.js']
+                    'pages/sow_boar/page_sow_boar.js']
         
         scripts = js_lib + js_app
         

@@ -95,7 +95,7 @@ async def sow_boar(pfhid:str = None):
     
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
-        inc_disposed = 0, inc_external = 0, inc_user_audit = 1, 
+        is_disposed = 0, inc_external = 0, inc_user_audit = 1, 
         minimum_info = 0, order_by = 0)
     if list_sow_list == None:
         # TODO what to do in case no result
@@ -104,7 +104,7 @@ async def sow_boar(pfhid:str = None):
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
-        inc_disposed = 0, inc_external = 1, inc_user_audit = 1, 
+        is_disposed = 0, inc_external = 1, inc_user_audit = 1, 
         minimum_info = 0, order_by = 0)
     if list_boar_list == None:
         # TODO what to do in case no result
@@ -112,19 +112,19 @@ async def sow_boar(pfhid:str = None):
     
 
     for cur_entry in list_sow_list:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['sow_boar']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['sow_boar']['id']
+        cur_entry['sow_boar']['hid']   = cur_hid
     
     
     for cur_entry in list_boar_list:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['sow_boar']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['sow_boar']['id']
+        cur_entry['sow_boar']['hid']   = cur_hid
 
     
     page_data = {

@@ -16,7 +16,7 @@ class PigFarmStaff:
             in_user_id                  INT,
 
             in_pig_farm_id              INT,
-            in_staff_user_id            INT,
+            in_set_user_as_staff        INT,
             in_name                     VARCHAR(50)
         )  
         """
@@ -25,9 +25,12 @@ class PigFarmStaff:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_farm_id
-        sql += '%s,'    % data.staff_user_id
-        sql += '"%s");' % data.name
+        sql += '%s,'    % data.set_user_as_staff
         
+        if data.name is not None:
+            sql += '"%s");' % data.name
+        else:
+            sql += 'NULL);'
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -273,7 +276,7 @@ class PigFarmStaff:
             for row in rows:
                 if inc_user_audit == 0:
                     cur_entry = {
-                        'farm_staff': {
+                        'pig_farm_staff': {
                             'id':               row[0],
                             'name':             row[1],
                             'user_id':          row[2]
@@ -282,7 +285,7 @@ class PigFarmStaff:
                     
                 else:
                     cur_entry = {
-                        'farm_staff': {
+                        'pig_farm_staff': {
                             'id':               row[0],
                             'name':             row[1],
                             'user_id':          row[2]

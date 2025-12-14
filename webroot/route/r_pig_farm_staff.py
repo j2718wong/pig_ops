@@ -26,15 +26,16 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     
     name    = name.strip() if name else None 
     
-    if name is None or len(name) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_FARM_STAFF_INVALID_NAME,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_NAME',
-                'desc': ''
+    if pig_farm_staff_data.set_user_as_staff == 0:
+        if name is None or len(name) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_FARM_STAFF_INVALID_NAME,
+                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_NAME',
+                    'desc': ''
+                }
             }
-        }
-    
+        
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -63,30 +64,11 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
        
     pig_farm_id = res[0]
    
-    
-    staff_user_hid  = pig_farm_staff_data.staff_user_hid
-    staff_user_id   = 0
-    
-    if staff_user_hid is not None:
-        res = hashids_user.decrypt(uhid)
-        if len(res) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
-                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
-                    'desc': ''
-                }
-            }
-        
-        staff_user_id = res[0]
-    
-    
-    
+
     pig_farm_staff_data.name            = name
     pig_farm_staff_data.user_id         = user_id
     pig_farm_staff_data.pig_farm_id     = pig_farm_id
-    pig_farm_staff_data.staff_user_id   = staff_user_id
-    
+  
     res_add    =  model['pig_farm_staff'].add(pig_farm_staff_data)
     
     if res_add is None:
@@ -315,18 +297,18 @@ async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:i
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['farm_staff']['id']
+        cur_id  = cur_entry['pig_farm_staff']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['farm_staff']['id']
-        cur_entry['farm_staff']['hid']   = cur_hid
+        del cur_entry['pig_farm_staff']['id']
+        cur_entry['pig_farm_staff']['hid']   = cur_hid
         
         
-        cur_id  = cur_entry['farm_staff']['user_id']
+        cur_id  = cur_entry['pig_farm_staff']['user_id']
         cur_hid = hashids_user.encrypt(cur_id)
         
-        del cur_entry['farm_staff']['user_id']
-        cur_entry['farm_staff']['user_hid']   = cur_hid
+        del cur_entry['pig_farm_staff']['user_id']
+        cur_entry['pig_farm_staff']['user_hid']   = cur_hid
         
         
     return {

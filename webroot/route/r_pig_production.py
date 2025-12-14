@@ -132,7 +132,7 @@ async def pig_prod(pfhid:str = None):
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
         is_disposed = 0, inc_external = 0, is_production_ready = 1,
-        inc_user_audit = 0, minimum_info = 1, order_by = 0)
+        inc_user_audit = 0, minimum_info = 1, order_by = 1)
     if list_sow_list == None:
         # TODO what to do in case no result
         return None
@@ -141,7 +141,7 @@ async def pig_prod(pfhid:str = None):
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
         is_disposed = 0, inc_external = 1, is_production_ready = 1,
-        inc_user_audit = 0, minimum_info = 1, order_by = 0)
+        inc_user_audit = 0, minimum_info = 1, order_by = 1)
     if list_boar_list == None:
         # TODO what to do in case no result
         return None
@@ -284,11 +284,23 @@ async def pig_prod(pfhid:str = None):
         
         
     for cur_entry in list_staff:
-        cur_id      = cur_entry['farm_staff']['id']
+        cur_id      = cur_entry['pig_farm_staff']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['farm_staff']['id']
-        cur_entry['farm_staff']['hid']   = cur_hid
+        del cur_entry['pig_farm_staff']['id']
+        cur_entry['pig_farm_staff']['hid']   = cur_hid
+        
+        
+        cur_id      = cur_entry['pig_farm_staff']['user_id']
+        
+        if cur_id > 0:
+            cur_hid     = hashids_user.encrypt(cur_id)
+            
+            del cur_entry['pig_farm_staff']['user_id']
+            cur_entry['pig_farm_staff']['user_hid']   = cur_hid
+        else:
+            cur_entry['pig_farm_staff']['user_hid']   = '';
+        
     
     
     for cur_entry in list_feed_type:

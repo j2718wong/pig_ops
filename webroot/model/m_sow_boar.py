@@ -392,8 +392,9 @@ class SowBoar:
         
         order_by : int
             0 = ORDER BY date_of_birth DESC
-            1 = ORDER BY id ASC
+            1 = ORDER BY name ASC, number ASC
 
+            
         
         Returns
         -------
@@ -437,7 +438,7 @@ class SowBoar:
         if order_by == 0:
             order_clause = ' ORDER BY a.date_of_birth DESC '
         else:
-            order_clause = ' ORDER BY a.id ASC '
+            order_clause = ' ORDER BY a.name ASC, a.number ASC'
                
                
         if inc_user_audit == 0:
