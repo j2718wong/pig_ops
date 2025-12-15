@@ -61,6 +61,7 @@ async def pig_prod(pfhid:str = None):
     res_user = model['user'].get_user_info(user_id)
     if res_user == None:
         # TODO what to do in case no result
+        print('Error 1')
         return None
         
         
@@ -71,6 +72,7 @@ async def pig_prod(pfhid:str = None):
     data_account = model['account'].get_info(account_id)
     if data_account == None:
         # TODO what to do in case no result
+        print('Error 2')
         return None
         
         
@@ -84,6 +86,7 @@ async def pig_prod(pfhid:str = None):
     len_items = len(account_farm_ids)
     if len_items == 0:
         # TODO what to do in case no farm set
+        print('Error 3')
         return None
         
     if pig_farm_id is not None:
@@ -91,6 +94,7 @@ async def pig_prod(pfhid:str = None):
         
         if pig_farm_id not in account_farm_ids:
             # TODO what to do in case farm_id given is not in account list
+            print('Error 4')
             return None
     
     else:
@@ -102,6 +106,7 @@ async def pig_prod(pfhid:str = None):
     list_acc_lookup = get_account_lookup_selection(account_id, 1, 1, 1)
     if list_acc_lookup == None:
         # TODO what to do in case no result
+        print('Error 5')
         return None
         
     
@@ -110,6 +115,7 @@ async def pig_prod(pfhid:str = None):
         PIG_OPERATION_TYPE_GESTATING, 0, 0)
     if list_acc_gestating_ops == None:
         # TODO what to do in case no result
+        print('Error 6')
         return None
     
     
@@ -118,6 +124,7 @@ async def pig_prod(pfhid:str = None):
         account_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS, 0, 0)
     if list_acc_lactating_piglets_ops == None:
         # TODO what to do in case no result
+        print('Error 7')
         return None
         
         
@@ -126,6 +133,7 @@ async def pig_prod(pfhid:str = None):
         account_id, PIG_OPERATION_TYPE_LACTATING_SOW, 0, 0)
     if list_acc_lactating_sow_ops == None:
         # TODO what to do in case no result
+        print('Error 8')
         return None
     
     
@@ -135,6 +143,7 @@ async def pig_prod(pfhid:str = None):
         inc_user_audit = 0, minimum_info = 1, order_by = 1)
     if list_sow_list == None:
         # TODO what to do in case no result
+        print('Error 9')
         return None
     
     
@@ -144,6 +153,7 @@ async def pig_prod(pfhid:str = None):
         inc_user_audit = 0, minimum_info = 1, order_by = 1)
     if list_boar_list == None:
         # TODO what to do in case no result
+        print('Error 10')
         return None
     
     
@@ -152,6 +162,7 @@ async def pig_prod(pfhid:str = None):
         inc_user_audit = 0, minimum_info = 1)
     if list_semen_source == None:
         # TODO what to do in case no result
+        print('Error 11')
         return None
         
     
@@ -159,6 +170,7 @@ async def pig_prod(pfhid:str = None):
     list_staff = model['pig_farm_staff'].get_list(pig_farm_id)
     if list_staff == None:
         # TODO what to do in case no result
+        print('Error 12')
         return None
         
     
@@ -167,6 +179,7 @@ async def pig_prod(pfhid:str = None):
     list_feed_type = model['feed_type'].get_list()
     if list_feed_type == None:
         # TODO what to do in case no result
+        print('Error 13')
         return None
     
     
@@ -175,6 +188,7 @@ async def pig_prod(pfhid:str = None):
     list_feed_brand = model['feed_brand'].get_list(country_id = 1)
     if list_feed_brand == None:
         # TODO what to do in case no result
+        print('Error 14')
         return None
     
     
@@ -184,6 +198,7 @@ async def pig_prod(pfhid:str = None):
         account_id = account_id, minimum_info = 0)
     if list_feed_supplier == None:
         # TODO what to do in case no result
+        print('Error 15')
         return None
         
     # Get location address names for each feed supplier from a different database
@@ -216,6 +231,7 @@ async def pig_prod(pfhid:str = None):
     list_pig_dead_type = model['prod_pig_dead'].get_pig_dead_type_list()
     if list_pig_dead_type == None:
         # TODO what to do in case no result
+        print('Error 16')
         return None
     
     
@@ -223,6 +239,7 @@ async def pig_prod(pfhid:str = None):
     list_pig_prod = get_pig_prod_list(pig_farm_id, 0)
     if list_pig_prod == None:
         # TODO what to do in case no result
+        print('Error 17')
         return None
         
 

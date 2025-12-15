@@ -365,7 +365,8 @@ class SowBoar:
 
     
     def get_list(self, farm_id, sex = None, is_disposed = 0, inc_external = 0,
-            is_production_ready = 1, inc_user_audit = 0, minimum_info = 0, order_by = 0):
+            is_production_ready = None, inc_user_audit = 0,
+            minimum_info = 0, order_by = 0):
         """
         Will get sow_boar list.
         
@@ -386,6 +387,7 @@ class SowBoar:
             1 = include external
         
         is_production_ready : int
+            None = will include both growing and production ready sow, boar
             0 = still growing gilts, boar 
             1 = ready for mating
             
@@ -409,19 +411,29 @@ class SowBoar:
         if is_disposed == 0:
             where_clause += ' AND a.is_disposed = 0 '
             
-            if is_production_ready == 0:
-                where_clause += ' AND a.is_production_ready = 0 '
-                
+            if is_production_ready is not None:
+            
+                if is_production_ready == 0:
+                    where_clause += ' AND a.is_production_ready = 0 '
+                    
+                    if sex is not None:
+                        where_clause += ' AND a.sex = "%s" ' % sex
+                else:
+                    # production_ready >0, sex is not optional
+                    where_clause += ' AND a.is_production_ready = 1 AND a.sex = "%s" '% sex
+                    
+
+                    if inc_external == 0:
+                        where_clause += ' AND a.is_external = 0 '
+                    
+                    # if inc_external == 1, sow_boar.is_external will not matter
+            else:
                 if sex is not None:
                     where_clause += ' AND a.sex = "%s" ' % sex
-            else:
-                # production_ready >0, sex is not optional
-                where_clause += ' AND a.is_production_ready = 1 AND a.sex = "%s" '% sex
                 
-
                 if inc_external == 0:
                     where_clause += ' AND a.is_external = 0 '
-                
+                    
                 # if inc_external == 1, sow_boar.is_external will not matter
                 
         else:
