@@ -146,6 +146,7 @@ class DataSowBoar(BaseModel):
     sow_status_id:          int = 2 # This needs to be properly set
         
     sex:                    str = 'F' # Sow = 'F';  Boar = 'M'
+    num_nipples             int = None
     is_external:            int = 0 # > 0 = not owned by the farm
     is_production_ready:    int = 0 # Needs to be explicitly set
     

@@ -6,6 +6,8 @@ import sys
 import pprint
 
 from pydantic               import BaseModel
+from fastapi.responses      import HTMLResponse
+from fastapi                import Request
 
 from datetime               import datetime, timedelta
 
@@ -26,6 +28,75 @@ PIG_OPERATION_TYPES = [
     PIG_OPERATION_TYPE_LACTATING_PIGLETS,
     PIG_OPERATION_TYPE_GROWING
 ]
+
+
+@app.get("/acc_pig_ops", response_class = HTMLResponse, tags=["Account"])
+async def account_pig_ops(ahid:str = None, request: Request)):
+    # Get the current logged in user;
+    
+    request_path = request.url.path
+    
+    account_id = 0
+    
+    if ahid is not None:
+        res = hashids_account.decrypt(ahid)
+        if len(res) == 0:
+            # Just proceed if it is invalid; will get default 
+            # account hid from user if not given
+            test = 1
+            
+            """
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
+            }
+            """
+        else:
+            account_id = res[0]
+            
+    
+    # Get account info
+    data_account = model['account'].get_info(account_id)
+    if data_account == None:
+        # TODO what to do in case no result
+        return None
+        
+        
+    # TODO Check account free trial period
+        
+    # TODO check account for not paid bill
+    
+        
+    # Get all account pig ops order by operation_type ASC, num_days ASC
+    acc_pig_ops = model['acc_pig_ops'].get_list(account_id, None, inc_user_audit = 1)
+    
+    
+    # Replace plain_ids
+    
+    for cur_entry in acc_pig_ops:
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    
+    page_data = {
+        'account':                  data_account,
+        'request_path':             request_path,
+        'acc_pig_ops':              acc_pig_ops,
+    }
+    
+
+    page = controller.view['acc_pig_ops'].render(page_data = json.dumps(page_data, indent=4))
+    
+    return page
+
+
 
 
     

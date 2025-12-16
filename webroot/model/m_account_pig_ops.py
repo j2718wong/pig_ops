@@ -222,12 +222,19 @@ class AccountPigOps:
     
     def get_list(self, account_id, operation_type, inc_deleted = 0, inc_user_audit = 0):
         
-        values= (account_id, operation_type)
-        where_clause = 'WHERE a.account_id = %s AND a.operation_type =%s' % values
+        if operation_type is not None:
+            values= (account_id, operation_type)
+            where_clause = 'WHERE a.account_id = %s AND a.operation_type =%s' % values
+            order_clause = 'ORDER BY a.num_days_since'
         
+        else:
+            where_clause = 'WHERE a.account_id = %s ' % account_id
+            order_clause = 'ORDER BY a.operation_type, a.num_days_since'
+            
+            
         if inc_deleted == 0:
             where_clause += ' AND (a.flag & 1) = 0' 
-        
+            
         
         if inc_user_audit == 0:
             sql =   """
@@ -235,14 +242,15 @@ class AccountPigOps:
                         a.id,
                         a.num_days_since,
                         a.version_num,
+                        a.operation_type,
                         
                         a.name,
                         a.short_name,
                         a.description
                     FROM account_pig_ops a
                     %s
-                    ORDER BY a.num_days_since
-                    """ % where_clause
+                    %s
+                    """ % (where_clause, order_clause)
         else:
             
             sql =   """
@@ -250,6 +258,7 @@ class AccountPigOps:
                         a.id,
                         a.num_days_since,
                         a.version_num,
+                        a.operation_type,
                         
                         a.name,
                         a.short_name,
@@ -288,7 +297,7 @@ class AccountPigOps:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+            
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql
@@ -308,9 +317,10 @@ class AccountPigOps:
                         'id':                   row[0],
                         'num_days_since':       row[1],
                         'version_num':          row[2],
-                        'name':                 row[3],
-                        'short_name':           row[4],
-                        'desc':                 row[5]
+                        'operation_type':       row[3],
+                        'name':                 row[4],
+                        'short_name':           row[5],
+                        'desc':                 row[6]
                     }
                 
                 else:
@@ -318,21 +328,22 @@ class AccountPigOps:
                         'id':                   row[0],
                         'num_days_since':       row[1],
                         'version_num':          row[2],
+                        'operation_type':       row[3],
                         
-                        'name':                 row[3],
-                        'short_name':           row[4],
-                        'desc':                 row[5],
+                        'name':                 row[4],
+                        'short_name':           row[5],
+                        'desc':                 row[6],
                         
                         'added_by': {
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_entry':         row[8]
+                            'name_last':        row[7],
+                            'name_first':       row[8],
+                            'dt_entry':         row[9]
                         },
                         
                         'last_update':{
-                            'name_last':        row[9],
-                            'name_first':       row[10],
-                            'dt_update':        str(row[11]) if row[11] else None
+                            'name_last':        row[10],
+                            'name_first':       row[11],
+                            'dt_update':        str(row[12]) if row[12] else None
                         }
                     }
                     

@@ -142,6 +142,8 @@ class PigProd(ViewBase):
                     'pages/production/gestating/gestating_update_status.js',
                     'pages/production/gestating/prod_gestating.js',
                     
+                    'pages/production/lactating/add_modal_eartag_piglet.js',
+                    
                     'pages/production/prod_lactating.js',
                     'pages/production/page_pig_production.js']
         

@@ -1,0 +1,206 @@
+{% extends "index.html" %}
+
+
+{% block content %}
+
+<div style="padding-left:0.5rem;">
+
+	<div class="">
+		<div>
+			<h2>Account Pig Operations Settings</h2>
+		</div>
+	
+		<div id = "" class="alert alert-info" role="alert">
+			This application only records your data. We do not recommend settings, number of days when to do
+			a pig operation, or  brand of vaccines or injectables to your pigs. 
+			However,since these pig operations are visible to the staff working in your farm,
+			it is recommended you put a description of what to do and correct dosages in a pig operation 
+			to deliver consistent results to your pigs. The default settings are generally what 
+			the majority of pig farms are using.
+        </div>
+		  
+	  
+	  <ul class="nav nav-tabs" id="myTab" role="tablist">
+		<li class="nav-item" role="presentation">
+		  <button class="nav-link active" id="btn-acc-settings" data-bs-toggle="tab" data-bs-target="#tab-acc-settings" type="button" role="tab" aria-controls="tab-acc-settings" aria-selected="true">Settings</button>
+		</li>
+		<li class="nav-item" role="presentation">
+		  <button class="nav-link" id="btn-acc-gestating-ops" data-bs-toggle="tab" data-bs-target="#tab-acc-gestating-ops" type="button" role="tab" aria-controls="tab-acc-gestating-ops" aria-selected="false">Gestating Sow Ops</button>
+		</li>
+		<li class="nav-item" role="presentation">
+		  <button class="nav-link" id="btn-acc-lactating-sow-ops" data-bs-toggle="tab" data-bs-target="#tab-acc-lactating-sow-ops" type="button" role="tab" aria-controls="tab-acc-lactating-sow-ops" aria-selected="false">Lactating Sow Ops</button>
+		</li>
+		<li class="nav-item" role="presentation">
+		  <button class="nav-link" id="btn-acc-lactating-piglets-ops" data-bs-toggle="tab" data-bs-target="#tab-acc-lactating-piglets-ops" type="button" role="tab" aria-controls="tab-acc-lactating-piglets-ops" aria-selected="false">Lactating Piglets Ops</button>
+		</li>
+		<li class="nav-item" role="presentation">
+		  <button class="nav-link" id="btn-acc-gilt-ops" data-bs-toggle="tab" data-bs-target="#tab-acc-gilt-ops" type="button" role="tab" aria-controls="tab-acc-gilt-ops" aria-selected="false">Gilt Ops</button>
+		</li>
+	  </ul>
+
+	  <div class="tab-content mt-3" id="myTabContent">
+		<div class="tab-pane fade show active" id="tab-acc-settings" role="tabpanel" aria-labelledby="btn-acc-settings">
+			
+			<div class="modal-body" style="width:600px;">
+				
+				<table class="table">
+					
+					<tr>
+						<td colspan="2">
+							<table style = "width:100%;">
+								<tr>
+									<td colspan="2">
+										<p class = "note-box type3">Note: Changing this setting will update 
+										scheduled gestating operations of <b>Production Gestating</b> entries that 
+										have not yet given birth. 
+										</p>
+					
+									</td>
+								</tr>
+								
+								<tr>
+									<td style = "padding-top:11px;">
+										<label for="sel-acc-settings-gestating-day-1" class="form-label" data-toggle="tooltip" data-placement="top" title="Date of Mating is Day 0 of Gestation. Day 1 is next day.">Date of Mating</label>
+									</td>
+									<td>
+										<select id="sel-acc-settings-gestating-day-1" class="form-select" aria-label="Select Sex" >
+											<option value="F" selected title="This is industry standard.">Day 0 of Gestation.</option>
+											<option value="M" title="Can be set this way if needed.">Day 1 of gestation</option>
+										</select>
+									</td>
+								</tr>
+								
+							</table>
+						</td>
+					</tr>
+					
+					<tr>
+						<td colspan="2">
+							<table style = "width:100%;">
+								<tr>
+									<td colspan="2">
+										<p class = "note-box type3">Note: Changing this setting will update 
+										scheduled lactating operations of <b>Production lactating</b> entries that 
+										have not yet weaned. 
+										</p>
+					
+									</td>
+								</tr>
+								
+								<tr>
+									<td style = "padding-top:11px;">
+										<label for="sel-acc-settings-lactating-day-1" class="form-label" data-toggle="tooltip" data-placement="top" title="Date of Birth is Day 1 of Lactation. ">Date of Birth</label>
+									</td>
+									<td>
+										<select id="sel-acc-settings-lactating-day-1" class="form-select" aria-label="Select Sex" >
+											<option value="F" selected title="This is industry standard.">Day 1 of piglets age.</option>
+											<option value="M" title="Can be set this way if needed.">Day 0 of piglets age</option>
+										</select>
+									</td>
+								</tr>
+								
+							</table>
+						</td>
+					</tr>
+					
+					<tr>
+						<td colspan="2">
+							<table style = "width:100%;">
+								<tr>
+									<td colspan="2">
+										<p class = "note-box type3">Note: Changing this number will update weaning dates of all existing <b>Production Lactating</b> entries that are not yet weaned. 
+										Day 1 is counted on the date of piglets birth. </p>
+									</td>
+								</tr>
+								
+								<tr>
+									<td style = "padding-top:11px;">
+										<label for="txt-acc-settings-numdays-weaning" class="form-label" data-toggle="tooltip" data-placement="top" title="Number of days since piglets birth.">Number of Days Weaning</label>
+									</td>
+									
+									<td>
+										<input type="number" min = "25" max = "45" class="form-control" id="txt-acc-settings-numdays-weaning" required>
+										<div class="invalid-feedback">
+											Please enter an integer between 25 to 45.
+										</div>
+									</td>
+								</tr>
+									
+								
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div>
+			
+		</div>
+		
+		<div class="tab-pane fade" id="tab-acc-gestating-ops" style= "min-height:700px;" role="tabpanel" aria-labelledby="btn-acc-gestating-ops">
+		  <h3 class="mb-3">Gestating Sow Operations</h3>
+		  <p class="lead">This is a list of activities to be performed on a gestating sow in every production cycle.<br>
+		    Every new production entry will create these operations and send alerts to designated people 
+			as the number of days from gestation is reached or if not yet done. </p>
+		  
+		  
+		  <div id = "div-acc-gestating-sow-ops" class = "">
+			<div id = "div-top-gestating-sow-ops"></div>
+			<div id = "div-list-gestating-sow-ops" class ="auto-table "></div>
+		  </div>
+	
+		</div>
+		
+		<div class="tab-pane fade" id="tab-acc-lactating-sow-ops" role="tabpanel" aria-labelledby="btn-acc-lactating-sow-ops">
+		  <h3 class="mb-3">Lactating Sow Operations</h3>
+		  <p class="lead">This is a list of activities to be performed on a lactating sow in every production cycle. <br>
+		    Every new production entry will create these operations and send alerts as the number of days 
+			from piglets birth is reached.</p>
+		
+		  <div id = "div-acc-lactating-sow-ops" class = "">
+			<div id = "div-top-lactating-sow-ops"></div>
+			<div id = "div-list-lactating-sow-ops" class ="auto-table "></div>
+		  </div>
+		  
+		</div>
+		
+		<div class="tab-pane fade" id="tab-acc-lactating-piglets-ops" role="tabpanel" aria-labelledby="btn-acc-lactating-piglets-ops">
+		  <h3 class="mb-3">Lactating Piglets Operations</h3>
+		  <p class="lead">This is a list of activities to be performed on a lactating piglets in every production cycle.</p>
+		  
+		  <div id = "div-acc-lactating-piglets-ops" class = "">
+			<div id = "div-top-lactating-piglets-ops"></div>
+			<div id = "div-list-lactating-piglets-ops" class ="auto-table "></div>
+		  </div>
+		  
+		</div>
+		
+		<div class="tab-pane fade" id="tab-acc-gilt-ops" role="tabpanel" aria-labelledby="btn-acc-gilt-ops">
+		  <h3 class="mb-3">Gilts Operations</h3>
+		  <p class="lead">This is a list of activities to be performed on Gilts before production ready.</p>
+		  
+		  <div id = "div-acc-gilt-ops" class = "">
+			<div id = "div-top-gilt-ops"></div>
+			<div id = "div-list-gilt-ops" class ="auto-table "></div>
+		  </div>
+		  
+		</div>
+		
+		
+	  </div>
+
+	</div>
+	
+	
+	<div id="div-container-add-entry-acc-pig-ops"></div>
+	
+	<script type="text/javascript">
+	$(document).ready(function(){
+		var PAGE_DATA = {{page_data}};
+		
+		gPageAccPigOps.setPageData(PAGE_DATA);
+	});
+	</script>
+
+	
+</div>
+
+{% endblock %}

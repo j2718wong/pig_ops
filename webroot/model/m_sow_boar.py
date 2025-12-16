@@ -104,6 +104,7 @@ class SowBoar:
             in_sow_status_id        INT,
             
             in_sex                  CHAR(1),
+            in_num_nipples          INT,
             in_is_external          INT,
             in_is_production_ready  INT,
                     
@@ -123,6 +124,13 @@ class SowBoar:
         sql += '%s,'    % data.sow_status_id
         
         sql += '"%s",'  % data.sex
+        
+        if data.num_nipples is not None:
+            sql += '%s,'  % data.num_nipples
+        else:
+            sql += 'NULL,'
+        
+        
         sql += '%s,'    % data.is_external
         sql += '%s,'    % data.is_production_ready
         
