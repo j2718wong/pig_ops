@@ -147,6 +147,7 @@ class PigProd(ViewBase):
                     'models/sow_boar/model_sow_boar.js',
                     
                     'pages/production/common/tr_add_new_farm_staff.js',
+                    'pages/common/tr_add_new_item_with_adrs_level.js',
                     
                     'pages/production/details/modal/add_modal_notes.js',
                     

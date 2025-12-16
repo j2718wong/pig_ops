@@ -31,7 +31,7 @@ PIG_OPERATION_TYPES = [
 
 
 @app.get("/acc_pig_ops", response_class = HTMLResponse, tags=["Account"])
-async def account_pig_ops(ahid:str = None, request: Request)):
+async def account_pig_ops(ahid:str = None, request: Request = None):
     # Get the current logged in user;
     
     request_path = request.url.path
@@ -71,17 +71,18 @@ async def account_pig_ops(ahid:str = None, request: Request)):
     
         
     # Get all account pig ops order by operation_type ASC, num_days ASC
-    acc_pig_ops = model['acc_pig_ops'].get_list(account_id, None, inc_user_audit = 1)
+    acc_pig_ops = model['account_pig_ops'].get_list(account_id, None, 
+            inc_user_audit = 1)
     
     
     # Replace plain_ids
     
     for cur_entry in acc_pig_ops:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['acc_pig_ops']['id']
+        cur_entry['acc_pig_ops']['hid']   = cur_hid
     
     
     
@@ -384,7 +385,7 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
         account hashid
         
     operation_type :int
-        1 = GESTATING; 2 = LACTATING_PIGLETS; 3 = LACTATING_SOW
+        1 = GESTATING; 2 = LACTATING_PIGLETS; 3 = LACTATING_SOW; 4 = GILTS
     
     inc_deleted: int
         if > 0, will include deleted entries
@@ -422,11 +423,11 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
+        cur_id  = cur_entry['acc_pig_ops']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['acc_pig_ops']['id']
+        cur_entry['acc_pig_ops']['hid']   = cur_hid
         
             
     return {

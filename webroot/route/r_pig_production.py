@@ -253,27 +253,27 @@ async def pig_prod(pfhid:str = None):
     del data_account['farm_ids']
     
     for cur_entry in list_acc_gestating_ops:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['acc_pig_ops']['id']
+        cur_entry['acc_pig_ops']['hid']   = cur_hid
         
     
     for cur_entry in list_acc_lactating_piglets_ops:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['acc_pig_ops']['id']
+        cur_entry['acc_pig_ops']['hid']   = cur_hid
     
     
     for cur_entry in list_acc_lactating_sow_ops:
-        cur_id      = cur_entry['id']
+        cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['acc_pig_ops']['id']
+        cur_entry['acc_pig_ops']['hid']   = cur_hid
     
     
     for cur_entry in list_sow_list:

@@ -314,30 +314,34 @@ class AccountPigOps:
             for row in rows:
                 if inc_user_audit == 0:
                     cur_entry = {
-                        'id':                   row[0],
-                        'num_days_since':       row[1],
-                        'version_num':          row[2],
-                        'operation_type':       row[3],
-                        'name':                 row[4],
-                        'short_name':           row[5],
-                        'desc':                 row[6]
+                        'acc_pig_ops': {
+                            'id':               row[0],
+                            'num_days_since':   row[1],
+                            'version_num':      row[2],
+                            'operation_type':   row[3],
+                            'name':             row[4],
+                            'short_name':       row[5],
+                            'desc':             row[6]
+                        }
                     }
                 
                 else:
                     cur_entry = {
-                        'id':                   row[0],
-                        'num_days_since':       row[1],
-                        'version_num':          row[2],
-                        'operation_type':       row[3],
-                        
-                        'name':                 row[4],
-                        'short_name':           row[5],
-                        'desc':                 row[6],
+                        'acc_pig_ops': {
+                            'id':               row[0],
+                            'num_days_since':   row[1],
+                            'version_num':      row[2],
+                            'operation_type':   row[3],
+                            
+                            'name':                 row[4],
+                            'short_name':       row[5],
+                            'desc':             row[6]
+                        },
                         
                         'added_by': {
                             'name_last':        row[7],
                             'name_first':       row[8],
-                            'dt_entry':         row[9]
+                            'dt_entry':         str(row[9]) if row[9] else None
                         },
                         
                         'last_update':{
