@@ -18,9 +18,11 @@ env = Environment(loader=FileSystemLoader('templates'))
 
 
 view_names = [              
-           
-            ('pig_prod',            'PigProd'),
-            ('sow_boar',            'SowBoar')
+            
+            ('acc_pig_ops',         'AccPigOps'),
+            ('sow_boar',            'SowBoar'),
+            ('pig_prod',            'PigProd')
+            
            
             
         ]
@@ -50,6 +52,35 @@ class ViewBase:
 #
 # Views
 #
+
+
+class AccPigOps(ViewBase):
+    def render(self, page_data = None):
+        
+        template = env.get_template('acc_pig_ops.html')
+        
+        js_lib  = [ 'library/pqtouch.min.js', 
+                    'library/pqselect.min.js',
+                    'library/pqgrid.min-3.5.1.js']
+                    
+        # TODO minify and obfuscate js
+        js_app  = [ 'models/model_00_master.js',
+ 
+                    'models/account/model_acc_pig_ops.js',
+                    
+                    'pages/acc_pig_ops/add_acc_pig_ops_modal.js',
+                    'pages/acc_pig_ops/page_acc_pig_ops.js']
+        
+        scripts = js_lib + js_app
+        
+        data    = { 'page_data': page_data,
+                    'scripts' : scripts}
+        
+                
+        return template.render(data)
+
+
+
 
 
 class SowBoar(ViewBase):
