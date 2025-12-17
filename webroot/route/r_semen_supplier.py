@@ -10,13 +10,24 @@ from pydantic               import BaseModel
 from datetime               import datetime, timedelta
 
     
-sys.path.append('..')
 from common_constants       import *
 from common_app             import *
 from common_fast_api        import *
 
 
 import data_model           as dm
+
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_utils                import _get_location_address_names_and_replace_ids
+
 
     
 @app.post("/semen_supplier/add", tags=["Common Lookup"])
@@ -49,7 +60,15 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     user_id = res[0]
     
     
-    if semen_supplier_data.address_level_1_id == 0:
+    
+    level_1_id  = 0
+    level_2_id  = 0
+    level_3_id  = 0
+    
+    
+    level_1_hid = feed_supplier_data.level_1_hid
+    res = hashids_common.decrypt(level_1_hid)
+    if len(res) == 0:
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
@@ -57,9 +76,13 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
                 'desc': ''
             }
         }
+        
+    level_1_id = res[0]
     
     
-    if semen_supplier_data.address_level_2_id == 0:
+    level_2_hid = feed_supplier_data.level_2_hid
+    res = hashids_common.decrypt(level_2_hid)
+    if len(res) == 0:
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
@@ -67,10 +90,32 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
                 'desc': ''
             }
         }
-        
     
-    semen_supplier_data.name      = name
-    semen_supplier_data.user_id   = user_id
+    level_2_id = res[0]
+    
+    
+    level_3_hid = feed_supplier_data.level_3_hid
+    
+    if level_3_hid is not None:
+        res = hashids_common.decrypt(level_3_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
+                    'code': 'ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_3',
+                    'desc': ''
+                }
+            }
+        
+        level_3_id = res[0]
+    
+
+    
+    semen_supplier_data.name        = name
+    semen_supplier_data.user_id     = user_id
+    semen_supplier_data.level_1_id  = level_1_id
+    semen_supplier_data.level_2_id  = level_2_id
+    semen_supplier_data.level_3_id  = level_3_id
     
     res_add    =  model['semen_supplier'].add(semen_supplier_data)
     
@@ -169,7 +214,7 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
 
 
 @app.get("/semen_supplier/list", tags=["Common Lookup"])
-async def semen_supplier_list( address_level_1_id: int):
+async def semen_supplier_list(address_level_1_id: int = 0, address_level_2_id: int = 0):
     """
     Will get semen_supplier list.
     
@@ -184,7 +229,7 @@ async def semen_supplier_list( address_level_1_id: int):
     """
     
         
-    res = model['semen_supplier'].get_list(address_level_1_id)
+    res = model['semen_supplier'].get_list(address_level_1_id, address_level_2_id)
     
     if res is None:
         return {

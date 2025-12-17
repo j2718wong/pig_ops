@@ -10,7 +10,6 @@ from pydantic               import BaseModel
 from datetime               import datetime, timedelta
 
     
-sys.path.append('..')
 from common_constants       import *
 from common_app             import *
 from common_fast_api        import *
@@ -27,7 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_feed_supplier        import _get_location_address_names_and_replace_ids
+from r_utils                import _get_location_address_names_and_replace_ids
 
 
 

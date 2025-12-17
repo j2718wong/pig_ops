@@ -210,6 +210,20 @@ class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):
     name:                   str
 
 
+class DataSemenSupplierSemen(BaseModel):
+    uhid:                   str
+    semen_supplier_hid:     str = None
+    ss_semen_hid            str = None
+    
+    user_id:                int = 0
+    semen_supplier_id:      int = 0
+    ss_semen_id             int = 0
+        
+    name:                   str
+
+    
+
+
 class DataFeedBrand(BaseModel):
     uhid:                   str
     feed_brand_hid:         str = None

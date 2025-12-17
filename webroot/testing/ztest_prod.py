@@ -6,7 +6,7 @@ import sys
 
 from datetime               import datetime, timedelta
 
-sys.path.append('..')
+
 from common_constants       import *
 from common_app             import *
 from common_fast_api        import *

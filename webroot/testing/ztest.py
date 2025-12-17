@@ -8,7 +8,7 @@ import sys
 from datetime               import datetime, timedelta
 from collections            import OrderedDict
 
-sys.path.append('..')
+
 from common_constants       import *
 from common_app             import *
 from common_fast_api        import *

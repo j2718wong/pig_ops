@@ -10,7 +10,6 @@ from pydantic               import BaseModel
 from datetime               import datetime, timedelta
 
     
-sys.path.append('..')
 from common_constants       import *
 from common_app             import *
 from common_fast_api        import *
@@ -19,51 +18,15 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-def _get_location_address_names_and_replace_ids(cur_entry):
-    # Get location address names for the feed supplier from a different database
-    location_address = cur_entry['location']['address']
-        
-    level_1_id = location_address['level_1']['id']
-    level_2_id = location_address['level_2']['id']
-    level_3_id = location_address['level_3']['id']
-    
-    if level_3_id is None:
-        level_3_id = 0
-    
-    address_names = model_la['address_level'].get_address_level_names(
-        address_level_1_id = level_1_id, 
-        address_level_2_id = level_2_id,
-        address_level_3_id = level_3_id
-    )
-    
-    if address_names is not None:
-        location_address['level_1']['name'] = address_names['level_1_name']
-        location_address['level_2']['name'] = address_names['level_2_name']
-        location_address['level_3']['name'] = address_names['level_3_name']
-        
-    
-    
-    
-    cur_id      = cur_entry['location']['address']['level_1']['id']
-    cur_hid     = hashids_common.encrypt(cur_id)
-    
-    del cur_entry['location']['address']['level_1']['id']
-    cur_entry['location']['address']['level_1']['hid']   = cur_hid
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
-    
-    cur_id      = cur_entry['location']['address']['level_2']['id']
-    cur_hid     = hashids_common.encrypt(cur_id)
-    
-    del cur_entry['location']['address']['level_2']['id']
-    cur_entry['location']['address']['level_2']['hid']   = cur_hid
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
 
 
-    cur_id      = cur_entry['location']['address']['level_3']['id']
-    if cur_id is not None:
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['location']['address']['level_3']['id']
-        cur_entry['location']['address']['level_3']['hid']   = cur_hid
+from r_utils                import _get_location_address_names_and_replace_ids
 
 
     
@@ -97,9 +60,9 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     user_id = res[0]
     
     
-    level_1_id  = 0;
-    level_2_id  = 0;
-    level_3_id  = 0;
+    level_1_id  = 0
+    level_2_id  = 0
+    level_3_id  = 0
     
     
     level_1_hid = feed_supplier_data.level_1_hid

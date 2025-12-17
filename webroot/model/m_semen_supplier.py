@@ -185,9 +185,14 @@ class SemenSupplier:
         return None
     
 
-    def get_list(self, address_level_1_id):
+    def get_list(self, address_level_1_id = 0, address_level_2_id = 0):
+        if address_level_1_id > 0:
+            where_clause = 'WHERE a.address_level_1_id = %s' % address_level_1_id
         
-       
+        if address_level_2_id > 0:
+            where_clause = 'WHERE a.address_level_2_id = %s' % address_level_2_id
+        
+      
         sql =   """
                 SELECT 
                     a.id,
@@ -204,9 +209,9 @@ class SemenSupplier:
                     
                 FROM semen_supplier a 
                 LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                WHERE a.address_level_1_id = %s
+                %s
                 ORDER BY a.name
-                """ % address_level_1_id
+                """ % where_clause
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

@@ -10,7 +10,6 @@ import pandas               as pd
 from datetime               import datetime, timedelta
 
     
-sys.path.append('..')
 from common_constants       import *
 from common_app             import *
 
