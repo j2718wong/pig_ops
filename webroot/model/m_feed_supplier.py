@@ -233,6 +233,7 @@ class FeedSupplier:
                         ORDER BY a.name
                         """ % address_level_2_id
             
+            
             if address_level_1_id > 0:
                 sql =   """
                         SELECT 
@@ -253,6 +254,7 @@ class FeedSupplier:
                         WHERE  a.address_level_1_id = %s 
                         ORDER BY a.name
                         """ % address_level_1_id
+            
             
             if account_id > 0:
                 sql =   """

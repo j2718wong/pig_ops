@@ -213,11 +213,11 @@ class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):
 class DataSemenSupplierSemen(BaseModel):
     uhid:                   str
     semen_supplier_hid:     str = None
-    ss_semen_hid            str = None
+    semen_sup_semen_hid:    str = None
     
     user_id:                int = 0
     semen_supplier_id:      int = 0
-    ss_semen_id             int = 0
+    semen_sup_semen_id:     int = 0
         
     name:                   str
 
@@ -326,16 +326,23 @@ class DataPigProd(BaseModel):
     pig_prod_hid:           str = None
     sow_hid:                str = None
     boar_hid:               str = None
-    semen_source_hid:       str = None
+    
+    semen_supplier_hid:     str = None
+    semen_sup_semen_hid:    str = None
+    semen_ai_boar_hid:      str = None
+    
     insem_staff_hid:        str = None
         
     user_id:                int = 0
     pig_prod_id:            int = 0
     sow_id:                 int = 0
     boar_id:                int = None
-    semen_source_id:        int = None
+    
+    semen_supplier_id:      int = None
+    semen_sup_semen_id:     int = None
+    semen_ai_boar_id:       int = None
         
-    semen_cost:             float = 0.0
+    semen_cost:             float = None
     insem_cost:             float = 0.0
     insem_notes:            str = None
         

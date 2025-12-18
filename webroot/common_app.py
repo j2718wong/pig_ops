@@ -50,6 +50,7 @@ from model.m_account_pig_buyer  import AccountPigBuyer
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
 from model.m_semen_supplier     import SemenSupplier
+from model.m_semen_supplier_semen import SemenSupplierSemen
 
 from model.m_feed_type          import FeedType
 from model.m_feed_brand         import FeedBrand
@@ -99,6 +100,7 @@ model_names_pig_ops = [
     ('pig_race_line',           PigRaceLine),
     
     ('semen_supplier',          SemenSupplier),
+    ('semen_sup_semen',         SemenSupplierSemen),
     
     ('feed_type',               FeedType),
     ('feed_brand',              FeedBrand),

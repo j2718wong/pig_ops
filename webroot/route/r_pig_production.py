@@ -17,12 +17,19 @@ from common_app             import *
 from common_fast_api        import *
 
 
-sys.path.append(os.path.dirname(__file__))
-
 import data_model           as dm
 
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
 from r_account              import get_account_lookup_selection
+from r_utils                import get_location_address_names_and_replace_ids
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -156,10 +163,10 @@ async def pig_prod(pfhid:str = None):
         return None
     
     
-    # Get semen_source list
-    list_semen_source = model['semen_source'].get_list(account_id,
-        inc_user_audit = 0, minimum_info = 1)
-    if list_semen_source == None:
+    # Get semen_supplier list
+    list_semen_supplier = model['semen_supplier'].get_list(
+        account_id = account_id, minimum_info = 0)
+    if list_semen_supplier == None:
         # TODO what to do in case no result
         print('Error 11')
         return None
@@ -200,30 +207,7 @@ async def pig_prod(pfhid:str = None):
         print('Error 15')
         return None
         
-    # Get location address names for each feed supplier from a different database
-    for cur_entry in list_feed_supplier:
-        location_address = cur_entry['location']['address']
         
-        level_1_id = location_address['level_1']['id']
-        level_2_id = location_address['level_2']['id']
-        level_3_id = location_address['level_3']['id']
-        
-        if level_3_id is None:
-            level_3_id = 0
-        
-        address_names = model_la['address_level'].get_address_level_names(
-            address_level_1_id = level_1_id, 
-            address_level_2_id = level_2_id,
-            address_level_3_id = level_3_id
-        )
-        
-        if address_names is not None:
-            location_address['level_1']['name'] = address_names['level_1_name']
-            location_address['level_2']['name'] = address_names['level_2_name']
-            location_address['level_3']['name'] = address_names['level_3_name']
-            
-            
-    
     
     # Get pig_dead_type list
     # This is the same for all accounts
@@ -291,12 +275,12 @@ async def pig_prod(pfhid:str = None):
         cur_entry['hid']   = cur_hid
     
        
-    for cur_entry in list_semen_source:
-        cur_id      = cur_entry['semen_source']['id']
+    for cur_entry in list_semen_supplier:
+        cur_id      = cur_entry['semen_supplier']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['semen_source']['id']
-        cur_entry['semen_source']['hid']   = cur_hid
+        del cur_entry['semen_supplier']['id']
+        cur_entry['semen_supplier']['hid']   = cur_hid
         
         
     for cur_entry in list_staff:
@@ -342,29 +326,13 @@ async def pig_prod(pfhid:str = None):
         del cur_entry['feed_supplier']['id']
         cur_entry['feed_supplier']['hid']   = cur_hid
 
-
-        cur_id      = cur_entry['location']['address']['level_1']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['location']['address']['level_1']['id']
-        cur_entry['location']['address']['level_1']['hid']   = cur_hid
-
-        
-        cur_id      = cur_entry['location']['address']['level_2']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['location']['address']['level_2']['id']
-        cur_entry['location']['address']['level_2']['hid']   = cur_hid
+        get_location_address_names_and_replace_ids(cur_entry)
     
     
-        cur_id      = cur_entry['location']['address']['level_3']['id']
-        if cur_id is not None:
-            cur_hid     = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['location']['address']['level_3']['id']
-            cur_entry['location']['address']['level_3']['hid']   = cur_hid
+    for cur_entry in list_semen_supplier:
+        get_location_address_names_and_replace_ids(cur_entry)
     
-        
     
     for cur_entry in list_pig_dead_type:
         cur_id      = cur_entry['id']
@@ -383,7 +351,7 @@ async def pig_prod(pfhid:str = None):
         
         'sow_list':                 list_sow_list,
         'boar_list':                list_boar_list,
-        'semen_source_list':        list_semen_source,
+        'semen_supplier_list':      list_semen_supplier,
         'staff_list':               list_staff,
         'feed_type_list':           list_feed_type,
         'feed_brand_list':          list_feed_brand,
@@ -561,9 +529,13 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     sow_id = res[0]
     
     
+    boar_id             = None
+    semen_supplier_id   = None
+    semen_sup_semen_id  = None
+    semen_ai_boar_id    = None
+    
+    
     boar_hid        = pig_prod_data.boar_hid
-    boar_id         = None
-    semen_source_id = None
     
     if boar_hid is not None:
         
@@ -583,9 +555,9 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
     else:
         
-        semen_source_hid = pig_prod_data.semen_source_hid
+        semen_supplier_hid = pig_prod_data.semen_supplier_hid
         
-        res = hashids_common.decrypt(semen_source_hid)
+        res = hashids_common.decrypt(semen_supplier_hid)
         if len(res) == 0:
         
             return {
@@ -596,7 +568,40 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
                 }
             }
         
-        semen_source_id = res[0]
+        semen_supplier_id = res[0]
+        
+        
+        semen_sup_semen_hid = pig_prod_data.semen_sup_semen_hid
+        
+        res = hashids_common.decrypt(semen_sup_semen_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_sup_semen_id = res[0]
+        
+        
+        semen_ai_boar_hid = pig_prod_data.semen_ai_boar_hid
+        
+        res = hashids_common.decrypt(semen_ai_boar_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_ai_boar_id = res[0]
+        
         
     
     insem_staff_hid = pig_prod_data.insem_staff_hid
@@ -622,7 +627,9 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     pig_prod_data.user_id           = user_id
     pig_prod_data.sow_id            = sow_id
     pig_prod_data.boar_id           = boar_id
-    pig_prod_data.semen_source_id   = semen_source_id
+    pig_prod_data.semen_supplier_id = semen_supplier_id
+    pig_prod_data.semen_sup_semen_id = semen_sup_semen_id
+    pig_prod_data.semen_ai_boar_id  = semen_ai_boar_id
     pig_prod_data.insem_staff_id    = insem_staff_id
     
     
@@ -750,36 +757,79 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     pig_prod_id = res[0]
 
 
-    boar_id     = 0
-    boar_hid    = pig_prod_data.boar_hid
+    boar_id             = None
+    semen_supplier_id   = None
+    semen_sup_semen_id  = None
+    semen_ai_boar_id    = None
+    
+    
+    boar_hid        = pig_prod_data.boar_hid
+    
     if boar_hid is not None:
+        
         res = hashids_common.decrypt(boar_hid)
         if len(res) == 0:
+        
             return {
                 'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                    'num':  ERROR_PIG_PROD_INVALID_BOAR_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_BOAR_HASHID',
                     'desc': ''
                 }
             }
         
         boar_id = res[0]
-
-
-    semen_source_id     = 0
-    semen_source_hid    = pig_prod_data.semen_source_hid
-    if semen_source_hid is not None:
-        res = hashids_common.decrypt(semen_source_hid)
+        
+    
+    else:
+        
+        semen_supplier_hid = pig_prod_data.semen_supplier_hid
+        
+        res = hashids_common.decrypt(semen_supplier_hid)
         if len(res) == 0:
+        
             return {
                 'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_HASHID',
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
                     'desc': ''
                 }
             }
         
-        semen_source_id = res[0]
+        semen_supplier_id = res[0]
+        
+        
+        semen_sup_semen_hid = pig_prod_data.semen_sup_semen_hid
+        
+        res = hashids_common.decrypt(semen_sup_semen_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_sup_semen_id = res[0]
+        
+        
+        semen_ai_boar_hid = pig_prod_data.semen_ai_boar_hid
+        
+        res = hashids_common.decrypt(semen_ai_boar_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        semen_ai_boar_id = res[0]
+    
     
     
     insem_staff_hid = pig_prod_data.insem_staff_hid
@@ -802,7 +852,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     pig_prod_data.user_id           = user_id
     pig_prod_data.pig_prod_id       = pig_prod_id
     pig_prod_data.boar_id           = boar_id
-    pig_prod_data.semen_source_id   = semen_source_id
+    pig_prod_data.semen_supplier_id   = semen_supplier_id
     pig_prod_data.insem_staff_id    = insem_staff_id
     
     res_update    =  model['pig_prod'].update_insemination(pig_prod_data)
@@ -1310,8 +1360,8 @@ def get_pig_prod_list(pig_farm_id, is_fattening):
     
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
-        operation_type  = PIG_OPERATION_TYPE_GESTATING
         
+        operation_type  = PIG_OPERATION_TYPE_GESTATING
         gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
             operation_type, inc_user_audit = 1)
         
@@ -1430,23 +1480,48 @@ def get_pig_prod_list(pig_farm_id, is_fattening):
         cur_id  = cur_entry['insemination']['boar']['id']
         if cur_id is None:
             del cur_entry['insemination']['boar']
+            
+            
+            # If semen_supplier_id is None, delete whole semen_supplier block
+            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
+            if cur_id is None:
+                del cur_entry['insemination']['ai']['semen_supplier']
+            
+                cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
+                if cur_id is None:
+                    del cur_entry['insemination']['ai']['internal_boar']
+                else:
+                    cur_hid = hashids_common.encrypt(cur_id)
+                    
+                    del cur_entry['insemination']['ai']['internal_boar']['id']
+                    cur_entry['insemination']['ai']['internal_boar']['hid'] = cur_hid
+            else:
+                # encrypt semen_supplier.id
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['semen_supplier']['id']
+                cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
+                
+                # encrypt semen_supplier.semen.id
+                cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+                cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
+                
+                
+            
         else:
             cur_hid = hashids_common.encrypt(cur_id)
             
             del cur_entry['insemination']['boar']['id']
             cur_entry['insemination']['boar']['hid']   = cur_hid
-    
-    
-        # If semen_source_id is None, delete whole semen_source block
-        cur_id  = cur_entry['insemination']['semen_source']['id']
-        if cur_id is None:
-            del cur_entry['insemination']['semen_source']
-        else:
-            cur_hid = hashids_common.encrypt(cur_id)
             
-            del cur_entry['insemination']['semen_source']['id']
-            cur_entry['insemination']['semen_source']['hid']   = cur_hid
-        
+            
+            # delete whole ai block
+            del cur_entry['insemination']['ai']
+    
+    
         
         cur_id  = cur_entry['insemination']['insem_staff_id']
         cur_hid = hashids_common.encrypt(cur_id)

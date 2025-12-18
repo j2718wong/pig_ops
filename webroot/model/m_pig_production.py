@@ -80,10 +80,12 @@ class PigProduction:
         PROCEDURE pig_prod_add(
             in_user_id              INT,
            
-            in_sow_id               INT,
+            in_sow_id               INT,    /* Cannot be updated*/
             in_boar_id              INT,
-            in_semen_source_id      INT,
-            
+            in_semen_supplier_id    INT,
+            in_semen_sup_semen_id   INT,    /* semen supplier semen_id*/
+            in_semen_ai_boar_id     INT,    /* semen coming from one of farm's boar*/
+    
             in_semen_cost           DECIMAL(6,2),
             in_insemination_cost    DECIMAL(6,2),
             in_comments             VARCHAR(160),
@@ -101,11 +103,31 @@ class PigProduction:
         if data.boar_id is not None and data.boar_id > 0:
             sql += '%s,'    % data.boar_id
             sql += 'NULL,'
-            sql += '0.0,'
+            sql += 'NULL,'
+            sql += 'NULL,'
+            sql += 'NULL,'
         else:
             sql += 'NULL,'
-            sql += '%s,'    % data.semen_source_id
-            sql += '%s,'    % data.semen_cost
+            
+            if data.semen_supplier_id is not None:
+                sql += '%s,'    % data.semen_supplier_id
+            else:
+                sql += 'NULL,'
+                
+            if data.semen_sup_semen_id is not None:
+                sql += '%s,'    % data.semen_sup_semen_id
+            else:
+                sql += 'NULL,'
+            
+            if data.semen_ai_boar_id is not None:
+                sql += '%s,'    % data.semen_ai_boar_id
+            else:
+                sql += 'NULL,'
+            
+            if data.semen_cost is not None:
+                sql += '%s,'    % data.semen_cost
+            else:
+                sql += 'NULL,'
             
             
         sql += '%s,'    % data.insem_cost
@@ -235,7 +257,11 @@ class PigProduction:
             
             in_pig_prod_id          INT,
             in_boar_id              INT,
-            in_semen_source_id      INT,
+            
+            in_semen_supplier_id    INT,
+            in_semen_sup_semen_id  	INT,    /* semen supplier semen_id*/
+            in_semen_ai_boar_id     INT,    /* semen coming from one of farm's boar*/
+            
             
             in_semen_cost           DECIMAL(6,2),
             in_insemination_cost    DECIMAL(6,2),
@@ -254,11 +280,31 @@ class PigProduction:
         if data.boar_id is not None and data.boar_id > 0:
             sql += '%s,'    % data.boar_id
             sql += 'NULL,'
-            sql += '0.0,'
+            sql += 'NULL,'
+            sql += 'NULL,'
+            sql += 'NULL,'
         else:
             sql += 'NULL,'
-            sql += '%s,'    % data.semen_source_id
-            sql += '%s,'    % data.semen_cost
+            
+            if data.semen_supplier_id is not None:
+                sql += '%s,'    % data.semen_supplier_id
+            else:
+                sql += 'NULL,'
+                
+            if data.semen_sup_semen_id is not None:
+                sql += '%s,'    % data.semen_sup_semen_id
+            else:
+                sql += 'NULL,'
+            
+            if data.semen_ai_boar_id is not None:
+                sql += '%s,'    % data.semen_ai_boar_id
+            else:
+                sql += 'NULL,'
+                
+            if data.semen_cost is not None:
+                sql += '%s,'    % data.semen_cost
+            else:
+                sql += 'NULL,'
         
         sql += '%s,'    % data.insem_cost
         
@@ -686,19 +732,30 @@ class PigProduction:
                     c.number,
                     c.name,
                     
-                    a.semen_source_id,
-                    d.name AS semen_source_name,
-                    d.description,
+                    a.semen_supplier_id,
+                    d.name AS semen_supplier_name,
+                    
+                    a.semen_sup_semen_id,
+                    e.name as semen_supplier_semen_name,
+                    
+                    a.semen_ai_boar_id,
+                    f.farm_boar_id,
+                    f.number,
+                    f.name,
                     
                     a.semen_cost,
                     a.insemination_cost,
-                    a.insem_staff_id,
-                    e.notes AS insem_notes,
                     a.date_insemination,
-                    f.name AS insem_staff_name,
+                    
+                    
+                    g.notes AS insem_notes,
+                    
+                    
+                    a.insem_staff_id,
+                    h.name AS insem_staff_name,
                     
                     a.prod_status_id,
-                    g.name AS prod_status_name,
+                    i.name AS prod_status_name,
                     
                     a.date_expected_birth,
                     a.date_actual_birth,
@@ -707,7 +764,7 @@ class PigProduction:
                     a.num_pigs_live_m,
                     a.num_pigs_live_f,
                     a.birth_staff_id,
-                    h.name AS birth_staff_name,
+                    j.name AS birth_staff_name,
                     
                     a.date_weaning,
                     a.num_pigs_weaning_m,
@@ -724,14 +781,14 @@ class PigProduction:
                     a.num_b_grower,
                     a.num_b_finisher,
                     
-                    i.date_balance,
-                    i.num_gestating,
-                    i.num_lactating,
-                    i.num_booster,
-                    i.num_prestarter,
-                    i.num_starter,
-                    i.num_grower,
-                    i.num_finisher,
+                    k.date_balance,
+                    k.num_gestating,
+                    k.num_lactating,
+                    k.num_booster,
+                    k.num_prestarter,
+                    k.num_starter,
+                    k.num_grower,
+                    k.num_finisher,
                     
                     a.cost_gestating,
                     a.cost_lactating,
@@ -753,12 +810,16 @@ class PigProduction:
                 FROM pig_production a
                 LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
                 LEFT OUTER JOIN sow_boar c          ON a.boar_id = c.id
-                LEFT OUTER JOIN semen_source d      ON a.semen_source_id = d.id
-                LEFT OUTER JOIN pig_prod_notes e    ON a.insem_notes_id = e.id
-                LEFT OUTER JOIN pig_farm_staff f    ON a.insem_staff_id = f.id
-                LEFT OUTER JOIN pig_prod_status g   ON a.prod_status_id = g.id
-                LEFT OUTER JOIN pig_farm_staff h    ON a.birth_staff_id = h.id
-                LEFT OUTER JOIN feed_balance i      ON a.last_feed_balance_id = i.id
+                
+                LEFT OUTER JOIN semen_supplier d    ON a.semen_supplier_id = d.id
+                LEFT OUTER JOIN semen_supplier_semen e ON a.semen_sup_semen_id = e.id
+                LEFT OUTER JOIN sow_boar f          ON a.semen_ai_boar_id = f.id
+                
+                LEFT OUTER JOIN pig_prod_notes g    ON a.insem_notes_id = g.id
+                LEFT OUTER JOIN pig_farm_staff h    ON a.insem_staff_id = h.id
+                LEFT OUTER JOIN pig_prod_status i   ON a.prod_status_id = i.id
+                LEFT OUTER JOIN pig_farm_staff j    ON a.birth_staff_id = j.id
+                LEFT OUTER JOIN feed_balance k      ON a.last_feed_balance_id = k.id
                 %s
                 ORDER BY a.date_insemination DESC
                 """ % where_clause
@@ -813,72 +874,82 @@ class PigProduction:
                 cur_boar_number             = row[9]
                 cur_boar_name               = row[10]
                 
-                cur_semen_source_id         = row[11]
-                cur_semen_source_name       = row[12]
-                cur_semen_source_description = row[13]
+                cur_semen_supplier_id       = row[11]
+                cur_semen_supplier_name     = row[12]
+                
+                cur_semen_sup_semen_id      = row[13]
+                cur_semen_sup_semen_name    = row[14]
+                
+                cur_semen_ai_boar_id        = row[15]
+                cur_semen_ai_farm_boar_id   = row[16]
+                cur_semen_ai_boar_number    = row[17]
+                cur_semen_ai_boar_name      = row[18]
+                
+                cur_insem_semen_cost        = float(row[19]) if row[19] else 0.0
+                cur_insem_insemination_cost = float(row[20]) if row[20] else 0.0
+                cur_insem_date_insemination = str(row[21]) if row[21] else None
                 
                 
-                cur_insem_semen_cost        = float(row[14]) if row[14] else 0.0
-                cur_insem_insemination_cost = float(row[15]) if row[15] else 0.0
-                cur_insem_staff_id          = row[16]
-                cur_insem_notes             = row[17]
-                cur_insem_date_insemination = str(row[18]) if row[18] else None
-                cur_insem_staff_name        = row[19]
-                
-                cur_prod_status_id          = row[20]
-                cur_prod_status_name        = row[21]
-                
-                cur_prod_date_expected_birth    = str(row[22]) if row[22] else None
-                cur_prod_date_actual_birth      = str(row[23]) if row[23] else None
-                cur_prod_num_days_actual        = row[24] 
-                cur_prod_num_pigs_dead_at_birth = row[25]
-                cur_prod_num_pigs_live_m    = row[26]
-                cur_prod_num_pigs_live_f    = row[27]
-                cur_prod_birth_staff_id     = row[28]
-                cur_prod_birth_staff_name   = row[29]
-                
-                cur_weaning_date            = row[30]
-                cur_weaning_num_pigs_m      = row[31]
-                cur_weaning_num_pigs_f      = row[32]
-                cur_weaning_weight          = row[33]
+                cur_insem_notes             = row[22]
                 
                 
-                cur_pig_count               = row[34]
+                cur_insem_staff_id          = row[23]
+                cur_insem_staff_name        = row[24]
+                
+                cur_prod_status_id          = row[25]
+                cur_prod_status_name        = row[26]
+                
+                cur_prod_date_expected_birth    = str(row[27]) if row[27] else None
+                cur_prod_date_actual_birth      = str(row[28]) if row[28] else None
+                cur_prod_num_days_actual        = row[29] 
+                cur_prod_num_pigs_dead_at_birth = row[30]
+                cur_prod_num_pigs_live_m    = row[31]
+                cur_prod_num_pigs_live_f    = row[32]
+                cur_prod_birth_staff_id     = row[33]
+                cur_prod_birth_staff_name   = row[34]
+                
+                cur_weaning_date            = row[35]
+                cur_weaning_num_pigs_m      = row[36]
+                cur_weaning_num_pigs_f      = row[37]
+                cur_weaning_weight          = row[38]
                 
                 
-                cur_prod_num_b_gestating    = row[35]
-                cur_prod_num_b_lactating    = row[36]
-                cur_prod_num_b_booster      = row[37]
-                cur_prod_num_b_prestarter   = row[38]
-                cur_prod_num_b_starter      = row[39]
-                cur_prod_num_b_grower       = row[40]
-                cur_prod_num_b_finisher     = row[41]
+                cur_pig_count               = row[39]
                 
-                cur_feed_bal_date_balance   = row[42]
                 
-                cur_feed_bal_gestating      = row[43]
-                cur_feed_bal_lactating      = row[44]
-                cur_feed_bal_booster        = row[45]
-                cur_feed_bal_prestarter     = row[46]
-                cur_feed_bal_starter        = row[47]
-                cur_feed_bal_grower         = row[48]
-                cur_feed_bal_finisher       = row[49]
+                cur_prod_num_b_gestating    = row[40]
+                cur_prod_num_b_lactating    = row[41]
+                cur_prod_num_b_booster      = row[42]
+                cur_prod_num_b_prestarter   = row[43]
+                cur_prod_num_b_starter      = row[44]
+                cur_prod_num_b_grower       = row[45]
+                cur_prod_num_b_finisher     = row[46]
                 
-                cur_prod_cost_gestating     = row[50]
-                cur_prod_cost_lactating     = row[51]
-                cur_prod_cost_booster       = row[52]
-                cur_prod_cost_prestarter    = row[53]
-                cur_prod_cost_starter       = row[54]
-                cur_prod_cost_grower        = row[55]
-                cur_prod_cost_finisher      = row[56]
+                cur_feed_bal_date_balance   = row[47]
+               
+                cur_feed_bal_gestating      = row[48]
+                cur_feed_bal_lactating      = row[49]
+                cur_feed_bal_booster        = row[50]
+                cur_feed_bal_prestarter     = row[51]
+                cur_feed_bal_starter        = row[52]
+                cur_feed_bal_grower         = row[53]
+                cur_feed_bal_finisher       = row[54]
                 
-                cur_prod_date_gestating     = row[57]
-                cur_prod_date_lactating     = row[58]
-                cur_prod_date_booster       = row[59]
-                cur_prod_date_prestarter    = row[60]
-                cur_prod_date_starter       = row[61]
-                cur_prod_date_grower        = row[62]
-                cur_prod_date_finisher      = row[63]
+                cur_prod_cost_gestating     = row[55]
+                cur_prod_cost_lactating     = row[56]
+                cur_prod_cost_booster       = row[57]
+                cur_prod_cost_prestarter    = row[58]
+                cur_prod_cost_starter       = row[59]
+                cur_prod_cost_grower        = row[60]
+                cur_prod_cost_finisher      = row[61]
+                
+                cur_prod_date_gestating     = row[62]
+                cur_prod_date_lactating     = row[63]
+                cur_prod_date_booster       = row[64]
+                cur_prod_date_prestarter    = row[65]
+                cur_prod_date_starter       = row[66]
+                cur_prod_date_grower        = row[67]
+                cur_prod_date_finisher      = row[68]
             
                 
                 cur_entry = {
@@ -907,10 +978,24 @@ class PigProduction:
                             'name':         cur_boar_name
                         },
                         
-                        'semen_source': {
-                            'id':           cur_semen_source_id,
-                            'name':         cur_semen_source_name,
-                            'description':  cur_semen_source_description,
+                        'ai': {
+                            'semen_supplier':{
+                                'id':       cur_semen_supplier_id,
+                                'name':     cur_semen_supplier_name,
+                                
+                                'semen': {
+                                    'id':   cur_semen_sup_semen_id,
+                                    'name': cur_semen_sup_semen_name
+                                }
+                            },
+                            
+                            'internal_boar':{
+                                'id':           cur_semen_ai_boar_id,
+                                'farm_sow_id':  cur_semen_ai_farm_boar_id,
+                                'number':       cur_semen_ai_boar_number,
+                                'name':         cur_semen_ai_boar_name
+                            },
+                            
                             'semen_cost':   cur_insem_semen_cost
                         },
                         
@@ -988,6 +1073,7 @@ class PigProduction:
                     
                 }
                 
+                 
                 result.append(cur_entry)
 
         

@@ -26,7 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import _get_location_address_names_and_replace_ids
+from r_utils                import get_location_address_names_and_replace_ids
 
 
 
@@ -345,7 +345,7 @@ async def account_selection_add(account_selection_data: dm.DataAccountSelection)
             feed_supplier['feed_supplier']['hid']   = cur_hid
             
             
-            _get_location_address_names_and_replace_ids(feed_supplier)
+            get_location_address_names_and_replace_ids(feed_supplier)
         
             result = {
                 'num':  0,

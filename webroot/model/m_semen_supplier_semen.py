@@ -62,7 +62,7 @@ class SemenSupplierSemen:
                     'desc':             row[2],
                 },
                 
-                'ss_semen': {
+                'semen_sup_semen': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -77,7 +77,7 @@ class SemenSupplierSemen:
         PROCEDURE semen_supplier_semen_update(
             in_user_id              INT,
             
-            in_ss_semen_id    		INT, 
+            in_semen_sup_semen_id   INT, 
 
             in_name                 VARCHAR(50)
         )  
@@ -86,7 +86,7 @@ class SemenSupplierSemen:
         sql =  'CALL semen_supplier_semen_update('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.ss_semen_id
+        sql += '%s,'    % data.semen_sup_semen_id
         
         sql += '"%s");'  % data.name
         
@@ -126,7 +126,7 @@ class SemenSupplierSemen:
                     'desc':             row[2],
                 },
                 
-                'ss_semen': {
+                'semen_sup_semen': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]

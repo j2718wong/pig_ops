@@ -1,9 +1,23 @@
 # December 17, 2025
 # Jack Wong
 
+import os
+import sys
+import pprint
 
-def _get_location_address_names_and_replace_ids(cur_entry):
-    # Get location address names for the feed supplier from a different database
+from pydantic               import BaseModel
+
+from datetime               import datetime, timedelta
+
+    
+from common_constants       import *
+from common_app             import *
+from common_fast_api        import *
+
+
+
+def get_location_address_names_and_replace_ids(cur_entry):
+    # Get location address names from a different database
     location_address = cur_entry['location']['address']
         
     level_1_id = location_address['level_1']['id']
@@ -42,7 +56,7 @@ def _get_location_address_names_and_replace_ids(cur_entry):
 
 
     cur_id      = cur_entry['location']['address']['level_3']['id']
-    if cur_id is not None:
+    if cur_id is not None and cur_id > 0:
         cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['location']['address']['level_3']['id']

@@ -26,7 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import _get_location_address_names_and_replace_ids
+from r_utils                import get_location_address_names_and_replace_ids
 
 
     
@@ -137,7 +137,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     res_add['feed_supplier']['hid']   = cur_hid
     
     
-    _get_location_address_names_and_replace_ids(res_add)
+    get_location_address_names_and_replace_ids(res_add)
         
     
     return res_add
@@ -231,7 +231,7 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
     
             
             
-    if level_2_hid is not None:        
+    if level_2_hid is not None:
             
         res = hashids_common.decrypt(level_2_hid)
         if len(res) == 0:
@@ -322,7 +322,7 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
 
             # Replace plain id
             for cur_entry in res:
-                _get_location_address_names_and_replace_ids(cur_entry)
+                get_location_address_names_and_replace_ids(cur_entry)
                     
                     
             return {

@@ -26,7 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import _get_location_address_names_and_replace_ids
+from r_utils                import get_location_address_names_and_replace_ids
 
 
     
@@ -214,7 +214,7 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
 
 
 @app.get("/semen_supplier/list", tags=["Common Lookup"])
-async def semen_supplier_list(address_level_1_id: int = 0, address_level_2_id: int = 0):
+async def semen_supplier_list(ahid:str = None, level_2_hid: str = None):
     """
     Will get semen_supplier list.
     
@@ -227,6 +227,40 @@ async def semen_supplier_list(address_level_1_id: int = 0, address_level_2_id: i
     inc_user_audit:
         if > 0, will include added_by and last_update info
     """
+    
+    account_id      = 0
+    adrs_level_2_id = 0
+    
+    if level_2_hid is not None:
+            
+        res = hashids_common.decrypt(level_2_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_LEVEL_2_HID,
+                    'code': 'ERROR_ADDRESS_LEVEL_2_HID',
+                    'desc': ''
+                }
+            }
+        
+        adrs_level_2_id = res[0]
+        
+        
+        res = model['semen_supplier'].get_list(
+                address_level_2_id  = adrs_level_2_id,
+                minimum_info        = 1)
+
+        
+        if res is None:
+            return {
+                'result':{
+                    'num':  ERROR_DATABASE_ERROR,
+                    'code': 'ERROR_DATABASE_ERROR',
+                    'desc': ''
+                }
+            }
+    
     
         
     res = model['semen_supplier'].get_list(address_level_1_id, address_level_2_id)
@@ -248,6 +282,7 @@ async def semen_supplier_list(address_level_1_id: int = 0, address_level_2_id: i
         
         del cur_entry['semen_supplier']['id']
         cur_entry['semen_supplier']['hid']   = cur_hid
+        
         
     
     return {
