@@ -28,7 +28,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_account              import get_account_lookup_selection
+from r_account_selection    import get_account_lookup_selection
 from r_utils                import get_location_address_names_and_replace_ids
 
 

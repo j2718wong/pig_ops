@@ -31,11 +31,11 @@ class SemenSupplier:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.address_level_1_id
-        sql += '%s,'    % data.address_level_2_id
+        sql += '%s,'    % data.level_1_id
+        sql += '%s,'    % data.level_2_id
         
-        if data.address_level_3_id is not None and data.address_level_3_id > 0:
-            sql += '%s,'    % data.address_level_3_id
+        if data.level_3_id is not None and data.level_3_id > 0:
+            sql += '%s,'    % data.level_3_id
         else:
             sql += 'NULL,'
         
@@ -97,6 +97,28 @@ class SemenSupplier:
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
+                },
+                
+                'location':{
+                            
+                    'country': {
+                        'id':           data.country_id
+                    },
+                    
+                    'address': {
+                        'level_1':{
+                            'id':       data.level_1_id
+                        },
+                    
+                        'level_2':{
+                            'id':       data.level_2_id
+                        },
+                        
+                        'level_3':{
+                            'id':       data.level_3_id
+                        }
+                        
+                    }
                 }
             }
 
@@ -340,7 +362,7 @@ class SemenSupplier:
                                 },
                                 
                                 'level_3':{
-                                    'id':       row[8]
+                                    'id':       row[9]
                                 }
                                 
                             }

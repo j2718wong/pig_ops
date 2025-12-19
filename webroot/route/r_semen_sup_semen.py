@@ -47,10 +47,26 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
     
     user_id = res[0]
     
-  
     
-    semen_data.name      = name
-    semen_data.user_id   = user_id
+    semen_supplier_id   = 0
+    semen_supplier_hid  = semen_data.semen_supplier_hid
+    
+    res = hashids_common.decrypt(semen_supplier_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_SEMEN_HASHID,
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID',
+                'desc': ''
+            }
+        }
+    
+    semen_supplier_id = res[0]
+    
+    
+    semen_data.name             = name
+    semen_data.user_id          = user_id
+    semen_data.semen_supplier_id = semen_supplier_id
     
     res_add    =  model['semen_sup_semen'].add(semen_data)
     
@@ -105,7 +121,8 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
     user_id = res[0]
     
     
-    semen_supplier_hid = semen_data.semen_supplier_hid
+    semen_supplier_id   = 0
+    semen_supplier_hid  = semen_data.semen_supplier_hid
     
     res = hashids_common.decrypt(semen_supplier_hid)
     if len(res) == 0:

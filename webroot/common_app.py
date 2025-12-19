@@ -44,6 +44,7 @@ from model.m_user_group         import UserGroup
 from model.m_pig_farm           import PigFarm
 from model.m_pig_farm_staff     import PigFarmStaff
 
+from model.m_account_selection  import AccountSelection
 from model.m_account_pig_ops    import AccountPigOps
 from model.m_account_pig_buyer  import AccountPigBuyer
 
@@ -93,6 +94,8 @@ model_names_pig_ops = [
     ('pig_farm',                PigFarm),
     ('pig_farm_staff',          PigFarmStaff),
     
+    
+    ('account_selection',       AccountSelection),
     ('account_pig_ops',         AccountPigOps),
     ('account_pig_buyer',       AccountPigBuyer),
     

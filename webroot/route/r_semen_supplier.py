@@ -66,7 +66,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     level_3_id  = 0
     
     
-    level_1_hid = feed_supplier_data.level_1_hid
+    level_1_hid = semen_supplier_data.level_1_hid
     res = hashids_common.decrypt(level_1_hid)
     if len(res) == 0:
         return {
@@ -80,7 +80,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     level_1_id = res[0]
     
     
-    level_2_hid = feed_supplier_data.level_2_hid
+    level_2_hid = semen_supplier_data.level_2_hid
     res = hashids_common.decrypt(level_2_hid)
     if len(res) == 0:
         return {
@@ -94,7 +94,7 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
     level_2_id = res[0]
     
     
-    level_3_hid = feed_supplier_data.level_3_hid
+    level_3_hid = semen_supplier_data.level_3_hid
     
     if level_3_hid is not None:
         res = hashids_common.decrypt(level_3_hid)
@@ -128,14 +128,15 @@ async def semen_supplier_add(semen_supplier_data: dm.DataSemenSupplier):
             }
         }
     
-    
+    #Replace Plain Id
     semen_supplier_id    = res_add['semen_supplier']['id']
     semen_supplier_hid   = hashids_common.encrypt(semen_supplier_id)
     
-    # remove plain id
     del res_add['semen_supplier']['id']
     res_add['semen_supplier']['hid'] = semen_supplier_hid
 
+    get_location_address_names_and_replace_ids(res_add)
+     
         
     return res_add
     
@@ -260,41 +261,79 @@ async def semen_supplier_list(ahid:str = None, level_2_hid: str = None):
                     'desc': ''
                 }
             }
-    
-    
         
-    res = model['semen_supplier'].get_list(address_level_1_id, address_level_2_id)
-    
-    if res is None:
+        
+        # Replace plain id
+        for cur_entry in res:
+            cur_id  = cur_entry['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['id']
+            cur_entry['hid']   = cur_hid
+            
+            
+        
         return {
             'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
+                'num':  0,
+                'code': 'SUCCESS',
                 'desc': ''
-            }
+            },
+            
+            'data': res
         }
-    
-    
-    # Replace plain id
-    for cur_entry in res:
-        cur_id  = cur_entry['semen_supplier']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['semen_supplier']['id']
-        cur_entry['semen_supplier']['hid']   = cur_hid
-        
+
         
     
-    return {
-        'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
-        },
+    if ahid is not None:
+        res = hashids_account.decrypt(ahid)
+        if len(res) == 0:
         
-        'data': res
-    }
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_LEVEL_2_HID,
+                    'code': 'ERROR_ADDRESS_LEVEL_2_HID',
+                    'desc': ''
+                }
+            }
+        
+        account_id = res[0]
+        
+        
+        res = model['semen_supplier'].get_list(
+                account_id = account_id)
+        
+        if res is None:
+            return {
+                'result':{
+                    'num':  ERROR_DATABASE_ERROR,
+                    'code': 'ERROR_DATABASE_ERROR',
+                    'desc': ''
+                }
+            }
+        
     
+        # Replace plain id
+        for cur_entry in res:
+            cur_id  = cur_entry['semen_supplier']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['semen_supplier']['id']
+            cur_entry['semen_supplier']['hid']   = cur_hid
+            
+            
+        
+        return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS',
+                'desc': ''
+            },
+            
+            'data': res
+        }
+        
     
 
     
