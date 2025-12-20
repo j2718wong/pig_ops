@@ -17,6 +17,9 @@ class HasAddressLevel:
     level_2_id:             int = 0
     level_3_id:             int = 0
     
+    latitude:               float = None
+    longitude:              float = None
+    
     
     
 class HasContactDetails:

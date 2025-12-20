@@ -290,6 +290,16 @@ async def semen_supplier_list(ahid:str = None, level_2_hid: str = None):
             cur_entry['hid']   = cur_hid
             
             
+            cur_id  = cur_entry['level_3_id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+                
+            del cur_entry['level_3_id']
+            cur_entry['level_3_hid']   = cur_hid
+            
+            
         
         return {
             'result':{
@@ -355,5 +365,70 @@ async def semen_supplier_list(ahid:str = None, level_2_hid: str = None):
         }
         
     
+@app.get("/semen_supplier/count", tags=["Common Lookup"])
+async def semen_supplier_count(country_id: int = 1, level_1_hid: str = None):
+    """
+    Will get semen_supplier count.
+    
+    Parameters
+    ----------
+    
+    level_1_hid: str
+        address level 1 hashhid
+    
+    """
+    
+    level_1_id = None
+    
+    if level_1_hid is not None:
+            
+        res = hashids_common.decrypt(level_1_hid)
+        if len(res) == 0:
+        
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_LEVEL_1_HID,
+                    'code': 'ERROR_ADDRESS_LEVEL_1_HID',
+                    'desc': ''
+                }
+            }
+        
+        level_1_id = res[0]
+        
+        
+    res = model['semen_supplier'].get_supplier_count(
+        country_id          = country_id,
+        address_level_1_id  = level_1_id)
 
     
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+    
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+        
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
+    
+

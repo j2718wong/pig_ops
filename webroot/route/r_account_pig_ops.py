@@ -35,14 +35,14 @@ async def account_pig_ops(ahid:str = None, request: Request = None):
     
     request_path = request.url.path
     
-    account_id = 0
+    account_id = 1
     
     if ahid is not None:
         res = hashids_account.decrypt(ahid)
         if len(res) == 0:
             # Just proceed if it is invalid; will get default 
             # account hid from user if not given
-            test = 1
+            account_id = 1
             
             """
             return {
