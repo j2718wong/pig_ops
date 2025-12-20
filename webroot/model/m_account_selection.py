@@ -93,7 +93,7 @@ class AccountSelection:
         )  
         """
         
-        sql =  'CALL account_selection_add('
+        sql =  'CALL account_selection_delete('
         sql += '%s,'    % data.user_id
         
         if data.feed_brand_id is not None and data.feed_brand_id > 0:

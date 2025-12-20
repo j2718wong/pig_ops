@@ -186,9 +186,26 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
     semen_supplier_id = res[0]
     
     
+    level_3_hid = semen_supplier_data.level_3_hid
+    
+    res = hashids_common.decrypt(level_3_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
+                'code': 'ERROR_SEMEN_SUPPLIER_INVALID_ADDRESS_LEVEL_3',
+                'desc': ''
+            }
+        }
+    
+    level_3_id = res[0]
+    
+    
+    
     semen_supplier_data.name      = name
     semen_supplier_data.user_id   = user_id
     semen_supplier_data.semen_supplier_id = semen_supplier_id
+    semen_supplier_data.level_3_id = level_3_id
     
     res_update    =  model['semen_supplier'].update(semen_supplier_data)
     
@@ -209,6 +226,7 @@ async def semen_supplier_update(semen_supplier_data: dm.DataSemenSupplier):
     del res_update['semen_supplier']['id']
     res_update['semen_supplier']['hid'] = semen_supplier_hid
 
+    get_location_address_names_and_replace_ids(res_update)
         
     return res_update
     
@@ -302,7 +320,8 @@ async def semen_supplier_list(ahid:str = None, level_2_hid: str = None):
         
         
         res = model['semen_supplier'].get_list(
-                account_id = account_id)
+                account_id          = account_id,
+                minimum_info        = 0)
         
         if res is None:
             return {
@@ -322,6 +341,7 @@ async def semen_supplier_list(ahid:str = None, level_2_hid: str = None):
             del cur_entry['semen_supplier']['id']
             cur_entry['semen_supplier']['hid']   = cur_hid
             
+            get_location_address_names_and_replace_ids(cur_entry)
             
         
         return {

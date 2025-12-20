@@ -3,6 +3,7 @@
 
 from common_constants       import *
 
+FLAG_BIT_SEMEN_SUPPLIER_IS_VERIFIED = 2
 
 class SemenSupplier:
     def __init__(self, model):
@@ -86,6 +87,12 @@ class SemenSupplier:
             row = None
 
         if row is not None:
+            cur_flag = row[4]
+                    
+            is_verified = 0
+            if cur_flag & FLAG_BIT_SEMEN_SUPPLIER_IS_VERIFIED > 0:
+                is_verified = 1
+            
             return {
                 'result':{
                     'num':              row[0],
@@ -95,8 +102,8 @@ class SemenSupplier:
                 
                 'semen_supplier': {
                     'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                    'name':             row[5],
+                    'is_verified':      is_verified
                 },
                 
                 'location':{
@@ -132,6 +139,8 @@ class SemenSupplier:
             
             in_semen_supplier_id    INT,
             
+            in_address_level_3_id   INT,
+            
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
@@ -144,7 +153,13 @@ class SemenSupplier:
         
         sql += '%s,'    % data.semen_supplier_id
         
+        if data.level_3_id is not None and data.level_3_id > 0:
+            sql += '%s,'    % data.level_3_id
+        else:
+            sql += 'NULL,'
+        
         sql += '"%s",'  % data.name
+        
         
         if data.contact_number is not None and len(data.contact_number) > 0:
             sql += '"%s",'  % data.contact_number
@@ -190,6 +205,13 @@ class SemenSupplier:
             row = None
 
         if row is not None:
+            cur_flag = row[8]
+                    
+            is_verified = 0
+            if cur_flag & FLAG_BIT_SEMEN_SUPPLIER_IS_VERIFIED > 0:
+                is_verified = 1
+          
+            
             return {
                 'result':{
                     'num':              row[0],
@@ -198,9 +220,34 @@ class SemenSupplier:
                 },
                 
                 'semen_supplier': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                    'id':               row[7],
+                    'name':             row[9],
+                    'contact_number':   row[10],
+                    'whatsapp':         row[11],
+                    'messenger':        row[12],
+                    'is_verified':      is_verified
+                },
+                
+                'location':{
+                            
+                    'country': {
+                        'id':           row[3]
+                    },
+                    
+                    'address': {
+                        'level_1':{
+                            'id':       row[4]
+                        },
+                    
+                        'level_2':{
+                            'id':       row[5]
+                        },
+                        
+                        'level_3':{
+                            'id':       row[6]
+                        }
+                        
+                    }
                 }
             }
 
@@ -209,6 +256,13 @@ class SemenSupplier:
 
     def get_list(self, account_id = 0, address_level_1_id = 0, 
             address_level_2_id = 0, minimum_info = 1):
+                
+        """
+        account_selection.flag bits
+        FLAG_BIT_ACCOUNT_SELECTION_IS_DELETED = 1
+        
+        """
+        
                 
         if minimum_info == 0:
             
@@ -225,7 +279,10 @@ class SemenSupplier:
                             b.name AS country_name,
                             a.address_level_1_id,
                             a.address_level_2_id,
-                            a.address_level_3_id
+                            a.address_level_3_id,
+                            
+                            a.flag
+                            
                             
                         FROM semen_supplier a 
                         LEFT OUTER JOIN app_country b   ON a.country_id = b.id
@@ -247,7 +304,9 @@ class SemenSupplier:
                             b.name AS country_name,
                             a.address_level_1_id,
                             a.address_level_2_id,
-                            a.address_level_3_id
+                            a.address_level_3_id,
+                            
+                            a.flag
                             
                         FROM semen_supplier a 
                         LEFT OUTER JOIN app_country b   ON a.country_id = b.id
@@ -270,11 +329,17 @@ class SemenSupplier:
                             c.name AS country_name,
                             b.address_level_1_id,
                             b.address_level_2_id,
-                            b.address_level_3_id
+                            b.address_level_3_id,
+                            
+                            b.flag
+                            
                         FROM account_selection a
                         LEFT OUTER JOIN semen_supplier b   ON a.semen_supplier_id = b.id
                         LEFT OUTER JOIN app_country c   ON b.country_id = c.id
-                        WHERE a.account_id = %s AND a.semen_supplier_id IS NOT NULL AND b.name IS NOT NULL
+                        WHERE   a.account_id = %s AND 
+                                a.semen_supplier_id IS NOT NULL AND 
+                                (a.flag & 1) = 0 AND 
+                                b.name IS NOT NULL
                         ORDER BY b.name; 
                 """% account_id
                 
@@ -287,7 +352,10 @@ class SemenSupplier:
                             b.address_level_3_id
                         FROM account_selection a
                         LEFT OUTER JOIN semen_supplier b   ON a.semen_supplier_id = b.id
-                        WHERE a.account_id = %s AND a.semen_supplier_id IS NOT NULL AND b.name IS NOT NULL
+                        WHERE   a.account_id = %s AND 
+                                a.semen_supplier_id IS NOT NULL AND 
+                                (a.flag & 1) = 0 AND
+                                b.name IS NOT NULL
                         ORDER BY a.id DESC; 
                 """% account_id
          
@@ -336,13 +404,20 @@ class SemenSupplier:
             
             for row in rows:
                 if minimum_info == 0:
+                    cur_flag = row[10]
+                    
+                    is_verified = 0
+                    if cur_flag & FLAG_BIT_SEMEN_SUPPLIER_IS_VERIFIED > 0:
+                        is_verified = 1
+                    
                     cur_entry = {
                         'semen_supplier': {
                             'id':               row[0],
                             'name':             row[1],
                             'contact_number':   row[2],
                             'whatsapp':         row[3],
-                            'messenger':        row[4]
+                            'messenger':        row[4],
+                            'is_verified':      is_verified
                         },
                         
                         'location':{

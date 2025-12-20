@@ -136,7 +136,7 @@ def get_account_lookup_selection(account_id, sel_f_brand = 0,
             
     res_f_brand = []
     if sel_f_brand > 0:
-        res = model['account'].get_business_obj_selection(account_id, 
+        res = model['account_selection'].get_business_obj_selection(account_id, 
             BUSINESS_OBJ_ID_FEED_BRAND)
     
         res_f_brand = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
@@ -144,14 +144,14 @@ def get_account_lookup_selection(account_id, sel_f_brand = 0,
     
     res_f_supplier = []
     if sel_f_supplier > 0:
-        res = model['account'].get_business_obj_selection(account_id, 
+        res = model['account_selection'].get_business_obj_selection(account_id, 
             BUSINESS_OBJ_ID_FEED_SUPPLIER)
     
         res_f_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
     
     res_s_supplier = []
     if sel_s_supplier > 0:
-        res = model['account'].get_business_obj_selection(account_id, 
+        res = model['account_selection'].get_business_obj_selection(account_id, 
             BUSINESS_OBJ_ID_SEMEN_SUPPLIER)
     
         res_s_supplier = [hashids_common.encrypt(cur_id) for cur_id in res] if res else []
