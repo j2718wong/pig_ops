@@ -156,8 +156,14 @@ async def pig_prod(pfhid:str = None):
     
     
     # Get semen_supplier list
-    list_semen_supplier = model['semen_supplier'].get_list(
-        account_id = account_id, minimum_info = 0)
+    #list_semen_supplier = model['semen_supplier'].get_list(
+    #    account_id = account_id, minimum_info = 0)
+    
+    list_semen_supplier = model['supplier'].get_list(
+        account_id          = account_id, 
+        is_semen_supplier   = 1,
+        minimum_info        = 0)
+    
     if list_semen_supplier == None:
         # TODO what to do in case no result
         print('Error 11')
@@ -191,9 +197,14 @@ async def pig_prod(pfhid:str = None):
     
     
     # Get feed_supplier_list
-    # This is account specific
-    list_feed_supplier = model['feed_supplier'].get_list(
-        account_id = account_id, minimum_info = 0)
+    #list_feed_supplier = model['feed_supplier'].get_list(
+    #    account_id = account_id, minimum_info = 0)
+    
+    list_feed_supplier = model['supplier'].get_list(
+        account_id          = account_id, 
+        is_feed_supplier    = 1,
+        minimum_info        = 0)
+    
     if list_feed_supplier == None:
         # TODO what to do in case no result
         print('Error 15')
@@ -269,11 +280,11 @@ async def pig_prod(pfhid:str = None):
     
        
     for cur_entry in list_semen_supplier:
-        cur_id      = cur_entry['semen_supplier']['id']
+        cur_id      = cur_entry['supplier']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['semen_supplier']['id']
-        cur_entry['semen_supplier']['hid']   = cur_hid
+        del cur_entry['supplier']['id']
+        cur_entry['supplier']['hid']   = cur_hid
         
         
     for cur_entry in list_staff:
@@ -313,11 +324,11 @@ async def pig_prod(pfhid:str = None):
 
     
     for cur_entry in list_feed_supplier:
-        cur_id      = cur_entry['feed_supplier']['id']
+        cur_id      = cur_entry['supplier']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
-        del cur_entry['feed_supplier']['id']
-        cur_entry['feed_supplier']['hid']   = cur_hid
+        del cur_entry['supplier']['id']
+        cur_entry['supplier']['hid']   = cur_hid
 
         
         get_location_address_names_and_replace_ids(cur_entry)

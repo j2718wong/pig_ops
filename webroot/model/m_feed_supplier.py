@@ -20,6 +20,9 @@ class FeedSupplier:
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
             
+            in_latitude             DECIMAL(10,5),
+            in_longitude            DECIMAL(10,5),
+            
             in_name                 VARCHAR(50)
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
@@ -33,7 +36,23 @@ class FeedSupplier:
         sql += '%s,'    % data.country_id
         sql += '%s,'    % data.level_1_id
         sql += '%s,'    % data.level_2_id
-        sql += '%s,'    % data.level_3_id
+        
+        if data.level_3_id is not None and data.level_3_id > 0:
+            sql += '%s,'    % data.level_3_id
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.latitude is not None and data.latitude > 0:
+            sql += '%s,'    % data.latitude
+        else:
+            sql += 'NULL,'
+        
+        if data.longitude is not None and data.longitude > 0:
+            sql += '%s,'    % data.longitude
+        else:
+            sql += 'NULL,'
+        
         
         sql += '"%s",'  % data.name
         
@@ -129,7 +148,9 @@ class FeedSupplier:
             in_feed_supplier_id     INT,
             
             in_address_level_3_id   INT,
-    
+            in_latitude             DECIMAL(10,5),
+            in_longitude            DECIMAL(10,5),
+            
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
@@ -143,7 +164,20 @@ class FeedSupplier:
         sql += '%s,'    % data.feed_supplier_id
         
        
-        sql += '%s,'    % data.level_3_id
+        if data.level_3_id is not None and data.level_3_id > 0:
+            sql += '%s,'    % data.level_3_id
+        else:
+            sql += 'NULL,'
+        
+        if data.latitude is not None and data.latitude > 0:
+            sql += '%s,'    % data.latitude
+        else:
+            sql += 'NULL,'
+        
+        if data.longitude is not None and data.longitude > 0:
+            sql += '%s,'    % data.longitude
+        else:
+            sql += 'NULL,'
         
         sql += '"%s",'  % data.name
         
@@ -191,17 +225,73 @@ class FeedSupplier:
             row = None
 
         if row is not None:
+            cur_res_num             = row[0]
+            cur_res_code            = row[1]
+            cur_res_desc            = row[2]
+            
+            cur_id                  = row[3]
+            cur_flag                = row[4]
+            cur_name                = row[5]
+            cur_contact_number      = row[6]
+            cur_whatsapp            = row[7]
+            cur_messenger           = row[8]
+            
+            cur_country_id          = row[9]
+            cur_address_level_1_id  = row[10]
+            cur_address_level_2_id  = row[11]
+            cur_address_level_3_id  = row[12]
+            
+            cur_address_latitude    = float(row[13]) if row[13] is not None else None
+            cur_address_longitude   = float(row[14]) if row[14] is not None else None
+            
+            
+            
+                    
+            is_verified = 0
+            if cur_flag & FLAG_BIT_SEMEN_SUPPLIER_IS_VERIFIED > 0:
+                is_verified = 1
+          
             return {
                 'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
+                    'num':              cur_res_num,
+                    'code':             cur_res_code,
+                    'desc':             cur_res_desc,
                 },
                 
                 'feed_supplier': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                    'id':               cur_id,
+                    'name':             cur_name,
+                    'contact_number':   cur_contact_number,
+                    'whatsapp':         cur_whatsapp,
+                    'messenger':        cur_messenger,
+                    'is_verified':      is_verified
+                },
+                
+                'location':{
+                            
+                    'country': {
+                        'id':           cur_country_id
+                    },
+                    
+                    'address': {
+                        'level_1':{
+                            'id':       cur_address_level_1_id
+                        },
+                    
+                        'level_2':{
+                            'id':       cur_address_level_2_id
+                        },
+                        
+                        'level_3':{
+                            'id':       cur_address_level_3_id
+                        }
+                        
+                    },
+                    
+                    'geoloc':{
+                        'latitude':     cur_address_latitude,
+                        'longitude':    cur_address_longitude
+                    }
                 }
             }
 

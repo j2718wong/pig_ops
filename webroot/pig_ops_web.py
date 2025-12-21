@@ -23,9 +23,10 @@ from route.r_account_selection  import *
 from route.r_account_pig_ops    import *
 from route.r_account_pig_buyer  import *
 
+from route.r_common_supplier    import *
+
 from route.r_pig_race           import *
 from route.r_pig_race_line      import *
-from route.r_semen_supplier     import *
 from route.r_semen_sup_semen    import *
 
 from route.r_feed_type          import *
@@ -35,7 +36,6 @@ from route.r_feed_buy           import *
 from route.r_feed_balance       import *
 from route.r_feed_calc          import *
 
-from route.r_semen_source       import *
 from route.r_sow_boar           import *
 
 from route.r_pig_production     import *

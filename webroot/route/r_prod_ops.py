@@ -299,7 +299,7 @@ class ReportGenPigProdOps:
         
         
         for cur_entry in acc_pig_ops:
-            s_temp      = cur_entry['name']
+            s_temp      = cur_entry['acc_pig_ops']['name']
             
             num_chars   = len(s_temp)
             if num_chars > max_chars_per_date_col:

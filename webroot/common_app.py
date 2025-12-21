@@ -48,6 +48,8 @@ from model.m_account_selection  import AccountSelection
 from model.m_account_pig_ops    import AccountPigOps
 from model.m_account_pig_buyer  import AccountPigBuyer
 
+from model.m_common_supplier    import CommonSupplier
+
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
 from model.m_semen_supplier     import SemenSupplier
@@ -98,6 +100,8 @@ model_names_pig_ops = [
     ('account_selection',       AccountSelection),
     ('account_pig_ops',         AccountPigOps),
     ('account_pig_buyer',       AccountPigBuyer),
+    
+    ('supplier',                CommonSupplier),
     
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),

@@ -811,7 +811,7 @@ class PigProduction:
                 LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
                 LEFT OUTER JOIN sow_boar c          ON a.boar_id = c.id
                 
-                LEFT OUTER JOIN semen_supplier d    ON a.semen_supplier_id = d.id
+                LEFT OUTER JOIN common_supplier d   ON a.semen_supplier_id = d.id
                 LEFT OUTER JOIN semen_supplier_semen e ON a.semen_sup_semen_id = e.id
                 LEFT OUTER JOIN sow_boar f          ON a.semen_ai_boar_id = f.id
                 

@@ -203,6 +203,22 @@ class DataPigPen(BaseModel):
     name:                   str
 
 
+class DataCommonSupplier(BaseModel, HasAddressLevel, HasContactDetails):
+    uhid:                   str
+    supplier_hid:           str = None
+        
+        
+    user_id:                int = 0
+    supplier_id:            int = 0
+    
+    is_feed_supplier:       int = 0
+    is_gilt_supplier:       int = 0
+    is_semen_supplier:      int = 0
+        
+    name:                   str
+
+
+
 class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):
     uhid:                   str
     semen_supplier_hid:     str = None
