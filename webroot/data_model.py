@@ -48,8 +48,10 @@ class DataAccount(BaseModel):
 class DataAccountSettings(BaseModel):
     uhid:                   str
     user_id:                int = 0
-    day_1_on_date_of_birth: int = 0
-    days_wean:              int = 45
+    
+    day_1_on_date_of_birth: int = 1
+    day_1_on_date_insem:    int = 0
+    days_wean:              int = 42
     days_harvest_from_birth:int = 142
     days_harvest_from_wean: int = 100
 

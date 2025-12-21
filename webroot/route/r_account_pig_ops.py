@@ -33,7 +33,6 @@ PIG_OPERATION_TYPES = [
 async def account_pig_ops(ahid:str = None, request: Request = None):
     # Get the current logged in user;
     
-    request_path = request.url.path
     
     account_id = 1
     
@@ -74,20 +73,29 @@ async def account_pig_ops(ahid:str = None, request: Request = None):
             inc_user_audit = 1)
     
     
-    # Replace plain_ids
+    # Remove not useful blocks
+    del data_account['account']
+    del data_account['farm_ids']
     
+    if data_account['settings_operations']['last_update']['name_last'] is None:
+        del data_account['settings_operations']['last_update']
+    
+    
+    # Replace plain_ids
     for cur_entry in acc_pig_ops:
         cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['acc_pig_ops']['id']
         cur_entry['acc_pig_ops']['hid']   = cur_hid
-    
+        
+        # Remove not useful blocks
+        if cur_entry['last_update']['name_last'] is None:
+            del cur_entry['last_update']
     
     
     page_data = {
         'account':                  data_account,
-        'request_path':             request_path,
         'acc_pig_ops':              acc_pig_ops,
     }
     

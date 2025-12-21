@@ -69,6 +69,7 @@ class AccPigOps(ViewBase):
                     'models/account/model_acc_pig_ops.js',
                     
                     'pages/acc_pig_ops/add_acc_pig_ops_modal.js',
+                    'pages/acc_pig_ops/update_acc_pig_ops_settings.js',
                     'pages/acc_pig_ops/page_acc_pig_ops.js']
         
         scripts = js_lib + js_app

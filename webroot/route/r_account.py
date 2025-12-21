@@ -247,14 +247,6 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
             }
         }
     
-    account_id      = res_update['account']['id']
-        
-    account_hashid  = hashids_account.encrypt(account_id)
-    
-    # remove plain id
-    del res_update['account']['id']
-    res_update['account']['hid'] = account_hashid
-
         
     return res_update
 

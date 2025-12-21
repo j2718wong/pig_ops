@@ -108,14 +108,6 @@ async def pig_prod(pfhid:str = None):
         pig_farm_id = account_farm_ids[0]
         
     
-    # Get account lookup_selection
-    list_acc_lookup = get_account_lookup_selection(account_id, 1, 1, 1)
-    if list_acc_lookup == None:
-        # TODO what to do in case no result
-        print('Error 5')
-        return None
-        
-    
     # Get account gestating ops
     list_acc_gestating_ops =  model['account_pig_ops'].get_list(account_id, 
         PIG_OPERATION_TYPE_GESTATING, 0, 0)
@@ -234,6 +226,7 @@ async def pig_prod(pfhid:str = None):
     
     del data_account['account']
     del data_account['farm_ids']
+    del data_account['settings_operations']['last_update']
     
     for cur_entry in list_acc_gestating_ops:
         cur_id      = cur_entry['acc_pig_ops']['id']
@@ -344,7 +337,6 @@ async def pig_prod(pfhid:str = None):
     
     page_data = {
         'account':                  data_account,
-        'acc_lookup_selection':     list_acc_lookup,
         'acc_gestating_ops':        list_acc_gestating_ops,
         'acc_lactating_piglets_ops': list_acc_lactating_piglets_ops,
         'acc_lactating_sow_ops':    list_acc_lactating_sow_ops,

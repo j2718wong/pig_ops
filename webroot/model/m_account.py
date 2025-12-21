@@ -4,6 +4,29 @@
 from common_constants       import *
 
 
+# The account.flag_settings will be broken down so that
+# it will be easier to read in the application level.
+# See account_register.sql for updated flag bits definition.
+
+"""
+/* account.flag_setting bits
+FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+0 = Date of birth is counted as DAY 0
+1 = Date of birth is counted as DAY 1; default
+
+FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+0 = Date of insemination is counted as DAY 0; default
+1 = Date of insemination is counted as DAY 1;
+
+
+*/
+
+"""
+
+FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH     = 1
+FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
+            
+
 class Account:
     def __init__(self, model):
         self.model              = model
@@ -36,9 +59,13 @@ class Account:
                     a.farm_04_id,
                     a.farm_05_id,
                     
-                    a.dt_entry
+                    c.name_last,
+                    c.name_first,
+                    a.dt_last_update_settings
                 FROM account a
                 LEFT OUTER JOIN account_status b ON a.status_id = b.id
+                LEFT OUTER JOIN user c          ON a.last_update_settings_user_id = c.id
+                
                 WHERE a.id = %s
                 """ % account_id
         
@@ -73,12 +100,6 @@ class Account:
         
         result = []
         if rows is not None:
-            # The account.flag_settings will be broken down so that
-            # it will be easier to read in the application level.
-            # See account_register.sql for updated flag bits definition.
-            
-            FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH     = 1
-            FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
             
             for row in rows:
                 cur_acc_id              = row[0]
@@ -100,6 +121,11 @@ class Account:
                 cur_acc_farm_03_id      = row[15]
                 cur_acc_farm_04_id      = row[16]
                 cur_acc_farm_05_id      = row[17]
+                
+                cur_user_name_last      = row[18]
+                cur_user_name_first     = row[19]
+                cur_settings_last_update= str(row[20]) if row[20] else None
+                
                 
                 
                 
@@ -131,6 +157,12 @@ class Account:
                         'num_days_wean':    cur_acc_num_days_wean,
                         'num_days_harvest_from_birth': cur_acc_num_days_harvest_from_birth,
                         'num_days_harvest_from_wean':  cur_acc_num_days_harvest_from_wean,
+                    
+                        'last_update':{
+                            'name_last':    cur_user_name_last,
+                            'name_first':   cur_user_name_first,
+                            'dt_update':    cur_settings_last_update
+                        }
                     },
                     
                     'farm_ids': farm_ids
@@ -288,7 +320,10 @@ class Account:
             in_user_id                  INT,
     
             in_day_1_on_dob             INT,
+            in_day_1_on_insem           INT,
+            
             in_days_wean                INT,
+            
             in_days_harvest_from_birth  INT,
             in_days_harvest_from_wean   INT
         )  
@@ -297,6 +332,7 @@ class Account:
         sql =  'CALL account_update_settings('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.day_1_on_date_of_birth
+        sql += '%s,'    % data.day_1_on_date_insem
         sql += '%s,'    % data.days_wean
         sql += '%s,'    % data.days_harvest_from_birth
         sql += '%s);'   % data.days_harvest_from_wean
@@ -328,15 +364,48 @@ class Account:
             row = None
 
         if row is not None:
+            cur_res_num                 = row[0]
+            cur_res_code                = row[1]
+            cur_res_desc                = row[2]
+            
+            cur_acc_settings_flag       = row[3]
+             
+            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+            cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+            
+            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+            cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+            
+            
+            cur_acc_num_days_wean       = row[4]
+            cur_acc_num_days_harvest_from_birth = row[5]
+            cur_acc_num_days_harvest_from_wean  = row[6]
+            
+            
+            cur_user_name_last          = row[7]
+            cur_user_name_first         = row[8]
+            cur_settings_last_update    = str(row[9]) if row[9] is not None else None
+            
+            
             return {
                 'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
+                    'num':              cur_res_num,
+                    'code':             cur_res_code,
+                    'desc':             cur_res_desc
                 },
                 
-                'account': {
-                    'id':               row[3]
+                'settings_operations': {
+                    'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
+                    'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
+                    'num_days_wean':                cur_acc_num_days_wean,
+                    'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
+                    'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
+                
+                    'last_update':{
+                        'name_last':    cur_user_name_last,
+                        'name_first':   cur_user_name_first,
+                        'dt_update':    cur_settings_last_update
+                    }
                 }
             }
 
