@@ -51,8 +51,62 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     user_id = res[0]
     
     
-    account_pig_buyer_data.name      = name
-    account_pig_buyer_data.user_id   = user_id
+    level_1_id  = 0
+    level_2_id  = 0
+    level_3_id  = 0
+    
+    
+    level_1_hid = supplier_data.level_1_hid
+    res = hashids_common.decrypt(level_1_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
+                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1',
+                'desc': ''
+            }
+        }
+        
+    level_1_id = res[0]
+    
+    
+    level_2_hid = supplier_data.level_2_hid
+    res = hashids_common.decrypt(level_2_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
+                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2',
+                'desc': ''
+            }
+        }
+    
+    level_2_id = res[0]
+    
+    
+    level_3_hid = supplier_data.level_3_hid
+    
+    if level_3_hid is not None:
+        res = hashids_common.decrypt(level_3_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
+                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3',
+                    'desc': ''
+                }
+            }
+        
+        level_3_id = res[0]
+    
+
+    
+    account_pig_buyer_data.name         = name
+    account_pig_buyer_data.user_id      = user_id
+    account_pig_buyer_data.level_1_id   = level_1_id
+    account_pig_buyer_data.level_2_id   = level_2_id
+    account_pig_buyer_data.level_3_id   = level_3_id
+    
     
     res_add    =  model['account_pig_buyer'].add(account_pig_buyer_data)
     

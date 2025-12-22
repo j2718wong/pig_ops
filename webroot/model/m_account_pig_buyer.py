@@ -195,10 +195,31 @@ class AccountPigBuyer:
                     'desc':             row[2],
                 },
                 
-                'account_pig_buyer': {
+                'pig_buyer': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
+                },
+                
+                'location':{
+                            
+                    'country': {
+                        'id':           data.country_id
+                    },
+                    
+                    'address': {
+                        'level_1':{
+                            'id':       data.level_1_id
+                        },
+                    
+                        'level_2':{
+                            'id':       data.level_2_id
+                        },
+                        
+                        'level_3':{
+                            'id':       data.level_3_id
+                        }
+                    }
                 }
             }
 

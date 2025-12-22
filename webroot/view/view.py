@@ -137,7 +137,9 @@ class PigProd(ViewBase):
                     'components/card_prod_pig_ops.js',
                     
                     'models/model_00_master.js',
- 
+                    
+                    'models/common/model_with_address_and_contact.js',
+                    
                     'models/operations/model_farm_staff.js',
                     'models/prod_details/model_notes.js',
                     'models/prod_details/model_pig_dead.js',
@@ -150,6 +152,7 @@ class PigProd(ViewBase):
                     'pages/production/common/tr_add_new_farm_staff.js',
                     
                     'pages/common/address_manager.js',
+                    'pages/common/contact_details.js',
                     
                     'pages/common/tr_field_with_adrs_level_edit.js',
                     'pages/common/tr_field_with_adrs_level.js',

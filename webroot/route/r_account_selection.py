@@ -69,13 +69,22 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         semen_supplier_id = res[0]
     
     
+    if feed_supplier_id == 0 and semen_supplier_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_SELECTION_NOTHING_SELECTED,
+                'code': 'ERROR_ACCOUNT_SELECTION_NOTHING_SELECTED',
+                'desc': ''
+            }
+        }
+    
     
     selection_data.user_id              = user_id
     selection_data.feed_supplier_id     = feed_supplier_id
     selection_data.semen_supplier_id    = semen_supplier_id
     
         
-    res_add =  model['account'].add_account_selection(selection_data)
+    res_add =  model['account_selection'].add(selection_data)
     
     if res_add is None:
         return {

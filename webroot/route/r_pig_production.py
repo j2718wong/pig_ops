@@ -565,8 +565,8 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
         
             return {
                 'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID',
                     'desc': ''
                 }
             }
@@ -581,8 +581,8 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
         
             return {
                 'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_HASHID',
                     'desc': ''
                 }
             }
@@ -597,8 +597,8 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
         
             return {
                 'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
+                    'num':  ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID',
                     'desc': ''
                 }
             }

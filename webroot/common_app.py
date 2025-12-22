@@ -52,7 +52,6 @@ from model.m_common_supplier    import CommonSupplier
 
 from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
-from model.m_semen_supplier     import SemenSupplier
 from model.m_semen_supplier_semen import SemenSupplierSemen
 
 from model.m_feed_type          import FeedType
@@ -65,7 +64,6 @@ from model.m_feed_calc          import FeedCalc
 
 
 from model.m_sow_boar           import SowBoar
-from model.m_semen_source       import SemenSource
 
 from model.m_sow_act            import SowActivity
 
@@ -106,7 +104,6 @@ model_names_pig_ops = [
     ('pig_race',                PigRace),
     ('pig_race_line',           PigRaceLine),
     
-    ('semen_supplier',          SemenSupplier),
     ('semen_sup_semen',         SemenSupplierSemen),
     
     ('feed_type',               FeedType),
@@ -118,8 +115,7 @@ model_names_pig_ops = [
     
     
     ('sow_boar',                SowBoar),
-    ('semen_source',            SemenSource),
-    
+   
     
     ('pig_prod',                PigProduction),
     ('prod_notes',              PigProdNotes),

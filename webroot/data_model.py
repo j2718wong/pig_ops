@@ -110,9 +110,7 @@ class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
         
         
     name:                   str
-    contact_number:         str = None
-    whatsapp:               str = None
-    messenger:              str = None
+    
     description:            str = None
     
     
