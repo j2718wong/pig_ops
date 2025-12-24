@@ -23,6 +23,7 @@ from route.r_account_selection  import *
 from route.r_account_pig_ops    import *
 from route.r_account_pig_buyer  import *
 
+from route.r_public_report      import *
 from route.r_common_supplier    import *
 
 from route.r_pig_race           import *

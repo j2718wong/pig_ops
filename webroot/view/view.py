@@ -6,6 +6,23 @@ import sys
 import os
 
 
+"""
+2025-12-23 Notes
+1.) Up until to this date, the focus of development was desktop web recycling 
+old front end technologies.
+
+2.) After this date, the new fouse will be on mobile web first which is 
+drastically a different version of the desktop version.
+
+3.) There will be two repos to be maintained until both the mobile and desktop 
+versions are integrated.
+
+
+ 
+"""
+
+
+
 sys.path.append(os.path.dirname(__file__))
 
 
@@ -124,79 +141,98 @@ class SowBoar(ViewBase):
 
 
 class PigProd(ViewBase):
-    def render(self, page_data = None):
+    def render(self, page_data = None, is_mobile = 0):
         
-        template = env.get_template('pig_production.html')
+        if is_mobile == 0:
+            #Desktop version
+            template = env.get_template('pig_production.html')
+            
+            js_lib  = [ 'library/pqtouch.min.js', 
+                        'library/pqselect.min.js',
+                        'library/pqgrid.min-3.5.1.js']
+                        
+            # TODO minify and obfuscate js
+            js_app  = [ 'components/plus_minus_number_input.js',
+                        'components/card_prod_pig_ops.js',
+                        
+                        'models/model_00_master.js',
+                        
+                        'models/common/model_with_address_and_contact.js',
+                        
+                        'models/operations/model_farm_staff.js',
+                        'models/prod_details/model_notes.js',
+                        'models/prod_details/model_pig_dead.js',
+                        'models/prod_details/feed/model_feed_buy.js',
+                        'models/prod_details/feed/model_feed_balance.js',
+                        'models/production/model_pig_production.js',
+                        
+                        'models/sow_boar/model_sow_boar.js',
+                        
+                        'pages/production/common/tr_add_new_farm_staff.js',
+                        
+                        'pages/common/address_manager.js',
+                        'pages/common/contact_details.js',
+                        
+                        'pages/common/tr_field_with_adrs_level_edit.js',
+                        'pages/common/tr_field_with_adrs_level.js',
+                        
+                        
+                        'pages/common/tr_add_new_item_with_adrs_level.js',
+                        
+                        'pages/production/details/modal/add_modal_notes.js',
+                        
+                        'pages/production/details/modal/tr_add_new_feed_brand.js',
+                        'pages/production/details/modal/tr_add_new_feed_supplier.js',
+                        'pages/production/details/modal/add_modal_feed_buy.js',
+                        
+                        'pages/production/details/modal/add_modal_feed_balance.js',
+                        'pages/production/details/modal/add_modal_pig_dead.js',
+                        
+                        
+                        'pages/production/details/prod_notes.js',
+                        'pages/production/details/prod_pig_dead.js',
+                        'pages/production/details/prod_feed_buy.js',
+                        'pages/production/details/prod_feed_summary.js',
+                        'pages/production/details/prod_details.js',
+                        
+                        'pages/production/prod_ops.js',
+                        
+                        'pages/production/gestating/tr_add_new_sow_boar.js',
+                        'pages/production/gestating/tr_add_new_semen.js',
+                        
+                        'pages/production/gestating/gestating_add.js',
+                        'pages/production/gestating/gestating_update_insem.js',
+                        'pages/production/gestating/gestating_update_birth.js',
+                        'pages/production/gestating/gestating_update_status.js',
+                        'pages/production/gestating/prod_gestating.js',
+                        
+                        'pages/production/lactating/add_modal_eartag_piglet.js',
+                        
+                        'pages/production/prod_lactating.js',
+                        'pages/production/page_pig_production.js']
+            
+            scripts = js_lib + js_app
+            
+            data    = { 'page_data': page_data,
+                        'scripts' : scripts}
+            
+                    
+            return template.render(data)
+
         
-        js_lib  = [ 'library/pqtouch.min.js', 
-                    'library/pqselect.min.js',
-                    'library/pqgrid.min-3.5.1.js']
+        
+        # Mobile version
+        template = env.get_template('pig_production_mob.html')
+            
+        js_lib  = [ ]
                     
         # TODO minify and obfuscate js
-        js_app  = [ 'components/plus_minus_number_input.js',
-                    'components/card_prod_pig_ops.js',
-                    
-                    'models/model_00_master.js',
-                    
-                    'models/common/model_with_address_and_contact.js',
-                    
-                    'models/operations/model_farm_staff.js',
-                    'models/prod_details/model_notes.js',
-                    'models/prod_details/model_pig_dead.js',
-                    'models/prod_details/feed/model_feed_buy.js',
-                    'models/prod_details/feed/model_feed_balance.js',
-                    'models/production/model_pig_production.js',
-                    
-                    'models/sow_boar/model_sow_boar.js',
-                    
-                    'pages/production/common/tr_add_new_farm_staff.js',
-                    
-                    'pages/common/address_manager.js',
-                    'pages/common/contact_details.js',
-                    
-                    'pages/common/tr_field_with_adrs_level_edit.js',
-                    'pages/common/tr_field_with_adrs_level.js',
-                    
-                    
-                    'pages/common/tr_add_new_item_with_adrs_level.js',
-                    
-                    'pages/production/details/modal/add_modal_notes.js',
-                    
-                    'pages/production/details/modal/tr_add_new_feed_brand.js',
-                    'pages/production/details/modal/tr_add_new_feed_supplier.js',
-                    'pages/production/details/modal/add_modal_feed_buy.js',
-                    
-                    'pages/production/details/modal/add_modal_feed_balance.js',
-                    'pages/production/details/modal/add_modal_pig_dead.js',
-                    
-                    
-                    'pages/production/details/prod_notes.js',
-                    'pages/production/details/prod_pig_dead.js',
-                    'pages/production/details/prod_feed_buy.js',
-                    'pages/production/details/prod_feed_summary.js',
-                    'pages/production/details/prod_details.js',
-                    
-                    'pages/production/prod_ops.js',
-                    
-                    'pages/production/gestating/tr_add_new_sow_boar.js',
-                    'pages/production/gestating/tr_add_new_semen.js',
-                    
-                    'pages/production/gestating/gestating_add.js',
-                    'pages/production/gestating/gestating_update_insem.js',
-                    'pages/production/gestating/gestating_update_birth.js',
-                    'pages/production/gestating/gestating_update_status.js',
-                    'pages/production/gestating/prod_gestating.js',
-                    
-                    'pages/production/lactating/add_modal_eartag_piglet.js',
-                    
-                    'pages/production/prod_lactating.js',
-                    'pages/production/page_pig_production.js']
-        
+        js_app  = [ 'models/model_master.js']
+    
         scripts = js_lib + js_app
-        
+            
         data    = { 'page_data': page_data,
                     'scripts' : scripts}
         
                 
         return template.render(data)
-

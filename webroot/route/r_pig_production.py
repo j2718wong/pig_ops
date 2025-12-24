@@ -36,7 +36,7 @@ PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
 
 @app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
-async def pig_prod(pfhid:str = None):
+async def pig_prod(pfhid:str = None, m:int =0):
     # Get the current logged in user;
     
     pig_farm_id = None
@@ -366,7 +366,8 @@ async def pig_prod(pfhid:str = None):
     }
     
 
-    page = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4))
+    page = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4),
+        is_mobile = m)
     
     return page
     

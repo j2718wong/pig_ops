@@ -201,6 +201,18 @@ class DataPigPen(BaseModel):
     name:                   str
 
 
+class DataPublicReport(BaseModel):
+    uhid:                   str
+    supplier_hid:           str = None
+        
+        
+    user_id:                int = 0
+    supplier_id:            int = 0
+    
+    report_type:            int 
+    notes:                  str = None
+
+
 class DataCommonSupplier(BaseModel, HasAddressLevel, HasContactDetails):
     uhid:                   str
     supplier_hid:           str = None

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type"             content="text/html; charset=utf-8"/>
+	<meta http-equiv="cache-control" 			content="no-cache">
+	<meta name="description"                    content="Jackson Systems"/>
+    <meta name="keywords" 						content="Pig production analytics"/>
+    <meta name="author" 						content="Jack Wong"/>
+    <meta name="viewport" 						content="width=device-width, initial-scale=1.0">
+    
+
+    <title>PiggyProd</title>
+
+	<link type="image/x-icon" 	rel="icon" 			href="/static_m/images/favicon.ico" >
+	
+	
+	
+	<link type="text/css" 		rel="stylesheet" 	href="/static_m/css/jquery-ui.min-1.14.1.css"/>
+	<link type="text/css" 		rel="stylesheet" 	href="/static_m/css/bootstrap.min.css"/>
+	<link type="text/css"		rel="stylesheet"  	href="/static_m/css/bootstrap-icons.css">
+	
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/jAlert.css"/>
+	<link type="text/css" 		rel="stylesheet" 	href="/static_m/css/style.css"/>
+	
+
+	
+	
+	
+	<script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
+	<script type = "text/javascript" src="/static_m/js/jquery/jquery-ui.min-1.14.1.js"></script>
+	<script type = "text/javascript" src="/static_m/js/jquery/jAlert.js"></script>
+	<script type = "text/javascript" src="/static_m/js/jquery/jAlert-functions.js"></script>
+	<script type = "text/javascript" src="/static_m/js/jquery/jquery.confirm.js"></script>
+
+	<script type = "text/javascript" src="/static_m/js/library/bootstrap.bundle.min.js"></script>
+
+	<script type = "application/javascript" src="/static_m/js/controller.js"></script>
+	
+	<script>
+	var gIsServerAvailable = true;
+		
+	$(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
+		console.log('\n\ngIsServerAvailable =' + gIsServerAvailable);		
+		//var GLOBAL_DATA = ${global_data};
+		//gGlobal.setGlobalData(GLOBAL_DATA);
+	});
+	</script>
+	
+	<!--Login function is available to all pages particularly for session expiry during any saving action.-->
+	<!--
+	<script type = "application/javascript" src="/static_m/js/others/webtoolkit.sha256.js"></script>
+	<script type = "application/javascript" src="/static_m/js/user_login.js"></script>
+        
+	<script type = "application/javascript" src="/static_m/js/navigation.js"></script>
+    -->
+        
+	
+{% for script in scripts %}
+	<script type = "module" src="/static_m/js/{{script}}"></script>
+{% endfor %}
+</head>
+
+
+<body>
+	
+<div id="main-wrapper">
+
+	<div id = "header">
+		<div id = "hd-top-nav"></div>
+		<div id = "hd-main-nav"></div>
+	</div>
+
+
+	<script type="text/javascript">
+	$(document).ready(function(){
+		//var USER_DATA = ${user_data};
+		//gNavigation.setUser(USER_DATA);
+	});
+	</script>
+
+
+	{% block content %}{% endblock content %}
+
+	
+	<div id = "footer" class="clearfix">
+		<span id= "txt-version"></span>
+	</div>
+	
+</div>
+  
+
+   
+</body>
+
+</html>

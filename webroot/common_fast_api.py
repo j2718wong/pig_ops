@@ -7,6 +7,14 @@ from fastapi.security           import HTTPBasicCredentials, HTTPBearer
 
 from fastapi.staticfiles        import StaticFiles
 
+import mimetypes
+
+
+# Add JavaScript MIME type if not already registered
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('text/javascript', '.js')
+
+
 
 # Application secret key 
 APP_SECRET_KEY = b'\xf2Pu\xcf\xbe\x88\x80\xac\x8e\xf1\xc6\xa7\xa4`Ae\x84\x10f\x9a|\xff\xe1r'
@@ -40,8 +48,15 @@ tags_metadata = [
 app = FastAPIOffline(openapi_tags = tags_metadata)
 
 
+# Old desktop first static directory
 dir_static = 'C:\\Users\\JackWong\\Downloads\\p\\pig_ops_ui\\pig_ops_app\\src\\static'
 app.mount('/static', StaticFiles(directory=dir_static), name='static')
+
+
+# New mobile first static directory
+dir_static_m = 'C:\\Users\\JackWong\\Downloads\\p\\pig_ops_mob\\src\\static'
+app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
+
 
 
 
