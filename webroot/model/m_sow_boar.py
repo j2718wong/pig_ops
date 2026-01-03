@@ -502,17 +502,16 @@ class SowBoar:
                             a.number,
                             a.name,
                            
-                            b.name AS status_name,
+                            a.sow_status_id,
                             a.date_of_birth,
                             
                             a.is_external,
                             
-                            c.date_insemination,
-                            c.date_expected_birth
+                            b.date_insemination,
+                            b.date_expected_birth
                             
                         FROM sow_boar a
-                        LEFT OUTER JOIN sow_status b        ON a.sow_status_id      = b.id
-                        LEFT OUTER JOIN pig_production c    ON a.last_prod_id       = c.id
+                        LEFT OUTER JOIN pig_production b    ON a.last_prod_id       = b.id
                         
                         %s
                         %s 
@@ -629,7 +628,7 @@ class SowBoar:
                             'farm_boar_id':         row[2],
                             'number':               row[3], 
                             'name':                 row[4],
-                            'status':               row[5],
+                            'status_id':            row[5],
                             'date_of_birth':        str(row[6])  if row[6] else None,
                             'is_external':          row[7],
                             'date_insemination':    str(row[8])  if row[8] else None

@@ -70,6 +70,21 @@ class ViewBase:
 # Views
 #
 
+"""
+2026-01-03
+1.) The is_mobile parameter in the view pages below is a temporary solution
+to serve static files for mobile web page.
+
+2.) As of this writing there are  two  separate locations for 
+    - initial development web focused; mostly data is presented as tables.
+    
+    - development shift to Mobile first, desktop next
+    
+3.) The desktop version should work regardless of status of the mobile version.
+    
+    
+    
+"""
 
 class AccPigOps(ViewBase):
     def render(self, page_data = None):
@@ -223,16 +238,23 @@ class PigProd(ViewBase):
         
         # Mobile version
         template = env.get_template('pig_production_mob.html')
-            
-        js_lib  = [ ]
-                    
+        
+        # These should have type= text/javascript
+        js_lib  = []
+        
+        
         # TODO minify and obfuscate js
-        js_app  = [ 'models/model_master.js']
+        
+        # These should have type= text/javascript
+        js_app_text     = []
     
-        scripts = js_lib + js_app
+        # These should have type= module
+        js_app_modules = []
             
-        data    = { 'page_data': page_data,
-                    'scripts' : scripts}
+        data    = { 'page_data':        page_data,
+                    'js_lib':           js_lib,
+                    'js_app_text':  
+                    'js_app_modules':   js_app_modules}
         
                 
         return template.render(data)

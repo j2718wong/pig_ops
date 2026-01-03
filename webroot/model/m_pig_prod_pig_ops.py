@@ -17,6 +17,8 @@ class PigProdPigOps:
            
             in_pig_prod_pig_ops_id      INT,
             in_staff_id                 INT,
+            in_done_by_user             INT,
+            
             in_date                     VARCHAR(10),
             in_notes                    VARCHAR(160)
         )
@@ -26,6 +28,7 @@ class PigProdPigOps:
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_prod_pig_ops_id
         sql += '%s,'    % data.staff_id
+        sql += '%s,'    % data.done_by_user
         sql += '"%s",'  % data.date
         
         if data.notes is not None:
@@ -81,13 +84,42 @@ class PigProdPigOps:
         return None
     
     
-    def get_list(self, pig_prod_id, operation_type, inc_user_audit = 0):
+    def get_list(self, pig_prod_id, operation_type, inc_user_audit = 0,
+            order_by = 0):
         
+        """
+        Paremeters
+        ----------
+        pig_prod_id : int
+            pig_production id
+            
+        operation_type : can be an integer or tuple
+            
+        
+        
+        order_by : int
+            0 = ORDER BY num_days_since ASC
+            1 = ORDER BY num_days_since DESC
+        """
+        
+        if isinstance(operation_type, tuple):
+            s_operation_type = tuple(str(x) for x in operation_type)
+            op_types = ','.join(s_operation_type)
+            
+            filter_clause = 'a.operation_type IN (%s )' % op_types
+        else:
+            filter_clause = 'a.operation_type = %s ' % operation_type
+        
+        
+        order_clause = ''
+        if order_by > 0:
+            order_clause += ' DESC'
                
         if inc_user_audit == 0:
             sql =   """
                     SELECT 
                         a.id,
+                        a.operation_type,
                         a.date_target,
                         a.date_actual,
                         a.dt_entry,
@@ -109,13 +141,14 @@ class PigProdPigOps:
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
                     LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
                     LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
-                    WHERE a.pig_prod_id = %s AND a.operation_type = %s
-                    ORDER BY b.num_days_since
-                    """ % (pig_prod_id, operation_type)
+                    WHERE a.pig_prod_id = %s AND %s
+                    ORDER BY b.num_days_since %s
+                    """ % (pig_prod_id, filter_clause, order_clause)
         else:
             sql =   """
                     SELECT 
                         a.id,
+                        a.operation_type,
                         a.date_target,
                         a.date_actual,
                         a.dt_entry,
@@ -142,9 +175,9 @@ class PigProdPigOps:
                     LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
                     LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
                     
-                    WHERE a.pig_prod_id = %s AND a.operation_type =%s
-                    ORDER BY b.num_days_since
-                    """ % (pig_prod_id, operation_type)
+                    WHERE a.pig_prod_id = %s AND %s
+                    ORDER BY b.num_days_since %s
+                    """ % (pig_prod_id, filter_clause, order clause)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -183,27 +216,28 @@ class PigProdPigOps:
                     
                         'pig_prod_pig_ops': {
                             'id':               row[0],
-                            'date_target':      str(row[1]),
-                            'date_actual':      str(row[2]) if row[2] else None,
-                            'dt_entry':         str(row[3])
+                            'operation_type':   row[1],
+                            'date_target':      str(row[2]),
+                            'date_actual':      str(row[3]) if row[3] else None,
+                            'dt_entry':         str(row[4])
                         },
                         
                         'account_pig_ops':{
-                            'id':               row[4],
-                            'name':             row[5],
-                            'num_days_since':   row[6],
-                            'flag':             row[7],
-                            'description':      row[8]
+                            'id':               row[5],
+                            'name':             row[6],
+                            'num_days_since':   row[7],
+                            'flag':             row[8],
+                            'description':      row[9]
                         },
                         
                         'staff': {
-                            'id':               row[9],
-                            'name':             row[10]
+                            'id':               row[10],
+                            'name':             row[11]
                         },
                         
                         'notes': {
-                            'id':               row[11],
-                            'notes':            row[12]
+                            'id':               row[12],
+                            'notes':            row[13]
                         }
                     }
                     
@@ -211,33 +245,34 @@ class PigProdPigOps:
                     cur_entry = {
                         'pig_prod_pig_ops': {
                             'id':               row[0],
-                            'date_target':      str(row[1]),
-                            'date_actual':      str(row[2]) if row[2] else None,
-                            'dt_entry':         str(row[3])
+                            'operation_type':   row[1],
+                            'date_target':      str(row[2]),
+                            'date_actual':      str(row[3]) if row[3] else None,
+                            'dt_entry':         str(row[4])
                         },
                         
                         'account_pig_ops': {
-                            'id':               row[4],
-                            'name':             row[5],
-                            'num_days_since':   row[6],
-                            'flag':             row[7],
-                            'description':      row[8]
+                            'id':               row[5],
+                            'name':             row[6],
+                            'num_days_since':   row[7],
+                            'flag':             row[8],
+                            'description':      row[9]
                         },
                         
                         'staff': {
-                            'id':               row[9],
-                            'name':             row[10]
+                            'id':               row[10],
+                            'name':             row[11]
                         },
                         
                         'notes': {
-                            'id':               row[11],
-                            'notes':            row[12]
+                            'id':               row[12],
+                            'notes':            row[13]
                         },
                         
                         'last_update': {
-                            'name_last':        row[13],
-                            'name_first':       row[14],
-                            'dt_update':        str(row[15]) if row[15] else None
+                            'name_last':        row[14],
+                            'name_first':       row[15],
+                            'dt_update':        str(row[16]) if row[16] else None
                         }
                     }
                 

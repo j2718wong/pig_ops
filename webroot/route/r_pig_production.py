@@ -34,9 +34,20 @@ from r_utils                import get_location_address_names_and_replace_ids
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
+COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS, 
+                                PIG_OPERATION_TYPE_LACTATING_SOW)
+
 
 @app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
 async def pig_prod(pfhid:str = None, m:int =0):
+    """
+    Parameters
+    ----------
+    m : int
+        temporary distinction to request from mobile page.
+        if == 0, request for web version
+        if > 0, request for mobile version
+    """
     # Get the current logged in user;
     
     pig_farm_id = None
@@ -1358,16 +1369,18 @@ async def pig_prod_list(pfhid:str, is_fattening:int = 0):
     }
     
     
-def get_pig_prod_list(pig_farm_id, is_fattening):
+def get_pig_prod_list(pig_farm_id, is_fattening, is_mobile_view = 0):
     res = model['pig_prod'].get_list(pig_farm_id, is_fattening)
     
     
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
         
+        order_by = 0 if is_mobile_view == 0 else 1
+        
         operation_type  = PIG_OPERATION_TYPE_GESTATING
         gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-            operation_type, inc_user_audit = 1)
+            operation_type, inc_user_audit = 1, order_by)
         
         # Replace plain_id
         
@@ -1420,48 +1433,76 @@ def get_pig_prod_list(pig_farm_id, is_fattening):
         
         cur_entry['gestating_ops'] = gestating_ops
         
-    
-        operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
-        lactating_piglets_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-            operation_type, inc_user_audit = 1)
         
-        for cur_ops in lactating_piglets_ops:
-            cur_id  = cur_ops['pig_prod_pig_ops']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_ops['pig_prod_pig_ops']['id']
-            cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
-            
-            
-            cur_id  = cur_ops['account_pig_ops']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_ops['account_pig_ops']['id']
-            cur_ops['account_pig_ops']['hid']   = cur_hid
+        # Get Lactating Pig Operations
+        # Initially, the piglets and sow pig operations are requested 
+        # separately. But in mobile web, this is shown as one list.
         
-        cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
-        
-        
-        operation_type  = PIG_OPERATION_TYPE_LACTATING_SOW
-        lactating_sow_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-            operation_type, inc_user_audit = 1)
-        
-        for cur_ops in lactating_sow_ops:
-            cur_id  = cur_ops['pig_prod_pig_ops']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
+        if is_mobile_view == 0:
+            operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
+            lactating_piglets_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+                operation_type, inc_user_audit = 1)
             
-            del cur_ops['pig_prod_pig_ops']['id']
-            cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+            for cur_ops in lactating_piglets_ops:
+                cur_id  = cur_ops['pig_prod_pig_ops']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_ops['pig_prod_pig_ops']['id']
+                cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+                
+                
+                cur_id  = cur_ops['account_pig_ops']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_ops['account_pig_ops']['id']
+                cur_ops['account_pig_ops']['hid']   = cur_hid
+            
+            cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
             
             
-            cur_id  = cur_ops['account_pig_ops']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
+            operation_type  = PIG_OPERATION_TYPE_LACTATING_SOW
+            lactating_sow_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+                operation_type, inc_user_audit = 1)
             
-            del cur_ops['account_pig_ops']['id']
-            cur_ops['account_pig_ops']['hid']   = cur_hid
+            for cur_ops in lactating_sow_ops:
+                cur_id  = cur_ops['pig_prod_pig_ops']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_ops['pig_prod_pig_ops']['id']
+                cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+                
+                
+                cur_id  = cur_ops['account_pig_ops']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_ops['account_pig_ops']['id']
+                cur_ops['account_pig_ops']['hid']   = cur_hid
+            
+            cur_entry['lactating_sow_ops'] = lactating_sow_ops
         
-        cur_entry['lactating_sow_ops'] = lactating_sow_ops
-        
+        else:
+            # Combine lactating pig_ops
+            
+            operation_type  = COMBINED_LACTATING_PIG_OPS
+            lactating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
+                operation_type, inc_user_audit = 1, order_by = 1)
+            
+            for cur_ops in lactating_ops:
+                cur_id  = cur_ops['pig_prod_pig_ops']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_ops['pig_prod_pig_ops']['id']
+                cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
+                
+                
+                cur_id  = cur_ops['account_pig_ops']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_ops['account_pig_ops']['id']
+                cur_ops['account_pig_ops']['hid']   = cur_hid
+            
+            cur_entry['lactating_ops'] = lactating_ops
+            
         
         
         # Replace plain_id
