@@ -6,6 +6,7 @@ import uvicorn
 from common_fast_api            import *
 from common_app                 import *
 
+
 from route.r_sow_act            import *
 from route.r_prod_ops           import *
 
@@ -45,14 +46,14 @@ from route.r_pig_prod_pig_dead  import *
 from route.r_pig_prod_pig_ops   import *
 
 
-
-
-
 from route.r_testing            import *
 
 
+from route.r_a0_root            import *
+
+
 @app.get("/test")
-async def root():
+async def test():
     return {"message": "Hello World"}
 
 

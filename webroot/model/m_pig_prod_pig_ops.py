@@ -177,7 +177,7 @@ class PigProdPigOps:
                     
                     WHERE a.pig_prod_id = %s AND %s
                     ORDER BY b.num_days_since %s
-                    """ % (pig_prod_id, filter_clause, order clause)
+                    """ % (pig_prod_id, filter_clause, order_clause)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

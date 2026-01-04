@@ -38,43 +38,8 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
                                 PIG_OPERATION_TYPE_LACTATING_SOW)
 
 
-@app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
-async def pig_prod(pfhid:str = None, m:int =0):
-    """
-    Parameters
-    ----------
-    m : int
-        temporary distinction to request from mobile page.
-        if == 0, request for web version
-        if > 0, request for mobile version
-    """
-    # Get the current logged in user;
-    
-    pig_farm_id = None
-    
-    if pfhid is not None:
-        res = hashids_common.decrypt(pfhid)
-        if len(res) == 0:
-            # Just proceed if it is invalid; will get default 
-            # account farm_id if not given
-            test = 1
-            
-            """
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
-                    'desc': ''
-                }
-            }
-            """
-        else:
-            pig_farm_id = res[0]
-            
-    
-    # temporary
-    user_id = 1
-   
+
+def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
     res_user = model['user'].get_user_info(user_id)
     if res_user == None:
         # TODO what to do in case no result
@@ -154,6 +119,21 @@ async def pig_prod(pfhid:str = None, m:int =0):
         # TODO what to do in case no result
         print('Error 9')
         return None
+    
+    
+    # Get sow production output list
+    list_sow_output_list = model['pig_prod'].get_production_output(
+        pig_farm_id = pig_farm_id);
+    
+    for cur_sow in list_sow_list:
+        cur_sow_id = cur_sow['id']
+        
+        for cur_sow_output in list_sow_output_list:
+            if cur_sow_output['sow_id'] == cur_sow_id:
+                cur_sow['num_births'] = cur_sow_output['num_births']
+                cur_sow['num_piglets'] = cur_sow_output['num_piglets']
+                
+                break
     
     
     # Get pig_farm boar list
@@ -376,6 +356,47 @@ async def pig_prod(pfhid:str = None, m:int =0):
         'pig_production':           list_pig_prod
     }
     
+    return page_data
+
+
+@app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
+async def pig_prod(pfhid:str = None, m:int =0):
+    """
+    Parameters
+    ----------
+    m : int
+        temporary distinction to request from mobile page.
+        if == 0, request for web version
+        if > 0, request for mobile version
+    """
+    # Get the current logged in user;
+    
+    pig_farm_id = None
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            # Just proceed if it is invalid; will get default 
+            # account farm_id if not given
+            test = 1
+            
+            """
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
+                    'desc': ''
+                }
+            }
+            """
+        else:
+            pig_farm_id = res[0]
+            
+    
+    # temporary
+    user_id = 1
+   
+    page_data = get_user_account_pig_prod_page_data(user_id, pig_farm_id)
 
     page = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4),
         is_mobile = m)
@@ -1380,7 +1401,7 @@ def get_pig_prod_list(pig_farm_id, is_fattening, is_mobile_view = 0):
         
         operation_type  = PIG_OPERATION_TYPE_GESTATING
         gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-            operation_type, inc_user_audit = 1, order_by)
+            operation_type, inc_user_audit = 1, order_by = order_by)
         
         # Replace plain_id
         

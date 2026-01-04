@@ -11,7 +11,7 @@ import os
 1.) Up until to this date, the focus of development was desktop web recycling 
 old front end technologies.
 
-2.) After this date, the new fouse will be on mobile web first which is 
+2.) After this date, the new focus will be on mobile web first which is 
 drastically a different version of the desktop version.
 
 3.) There will be two repos to be maintained until both the mobile and desktop 
@@ -35,6 +35,7 @@ env = Environment(loader=FileSystemLoader('templates'))
 
 
 view_names = [              
+            ('root',                'Root'),
             
             ('acc_pig_ops',         'AccPigOps'),
             ('sow_boar',            'SowBoar'),
@@ -86,6 +87,73 @@ to serve static files for mobile web page.
     
 """
 
+class Root(ViewBase):
+    def render(self, page_data = None):
+        # Mobile version
+        template = env.get_template('index_mob.html')
+        
+        # These should have type= text/javascript
+        js_lib  = []
+        
+        
+        # TODO minify and obfuscate js
+        
+        # These should have type= text/javascript
+        js_app_text     = []
+    
+        # These should have type= module
+        js_app_modules = [
+            "constants.js",
+            "utils.js",
+            
+            
+            "models/model_basic.js",
+            "models/model_acc_pig_ops.js",
+            "models/model_pig_production.js",
+            
+            
+            "pages/common/page_view_basic.js",
+            "pages/navigation/text_substitute_control.js",
+            
+            "pages/acc_pig_ops/add_modal_acc_pig_ops.js",
+            "pages/acc_pig_ops/edit_modal_acc_pig_ops.js",
+            "pages/acc_pig_ops/page_acc_pig_ops.js",
+            
+            
+            "pages/sow_boar/page_sow_boar_list.js",
+            "pages/sow_boar/page_sow_boar_add_edit.js",
+            
+            
+            
+            "pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
+            
+            
+            "pages/production/gesta_lacta/insem_data_select.js",
+            "pages/production/gesta_lacta/page_prod_gestating_add.js",
+            
+            "pages/production/gesta_lacta/prod_entry_notes.js",
+            "pages/production/gesta_lacta/prod_entry_pig_ops.js",
+            "pages/production/gesta_lacta/prod_entry_insem.js",
+            "pages/production/gesta_lacta/prod_entry_birth.js",
+            "pages/production/gesta_lacta/page_prod_gestating_entry.js",
+            
+            
+            
+            "pages/production/gesta_lacta/page_mob_gesta_lacta.js",
+            
+            
+            "pages/navigation/navigation.js"
+        ]
+            
+        data    = { 'page_data':        page_data,
+                    'js_lib':           js_lib,
+                    'js_app_text':      js_app_text,
+                    'js_app_modules':   js_app_modules}
+        
+                
+        return template.render(data)
+
+
 class AccPigOps(ViewBase):
     def render(self, page_data = None):
         
@@ -111,8 +179,6 @@ class AccPigOps(ViewBase):
         
                 
         return template.render(data)
-
-
 
 
 
@@ -249,11 +315,52 @@ class PigProd(ViewBase):
         js_app_text     = []
     
         # These should have type= module
-        js_app_modules = []
+        js_app_modules = [
+            "/static_m/js/constants.js",
+            "/static_m/js/utils.js",
+            
+            
+            "/static_m/js/models/model_basic.js",
+            "/static_m/js/models/model_acc_pig_ops.js",
+            "/static_m/js/models/model_pig_production.js",
+            
+            
+            "/static_m/js/pages/common/page_view_basic.js",
+            "/static_m/js/pages/navigation/text_substitute_control.js",
+            
+            "/static_m/js/pages/acc_pig_ops/add_modal_acc_pig_ops.js",
+            "/static_m/js/pages/acc_pig_ops/edit_modal_acc_pig_ops.js",
+            "/static_m/js/pages/acc_pig_ops/page_acc_pig_ops.js",
+            
+            
+            "/static_m/js/pages/sow_boar/page_sow_boar_list.js",
+            "/static_m/js/pages/sow_boar/page_sow_boar_add_edit.js",
+            
+            
+            
+            "/static_m/js/pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
+            
+            
+            "/static_m/js/pages/production/gesta_lacta/insem_data_select.js",
+            "/static_m/js/pages/production/gesta_lacta/page_prod_gestating_add.js",
+            
+            "/static_m/js/pages/production/gesta_lacta/prod_entry_notes.js",
+            "/static_m/js/pages/production/gesta_lacta/prod_entry_pig_ops.js",
+            "/static_m/js/pages/production/gesta_lacta/prod_entry_insem.js",
+            "/static_m/js/pages/production/gesta_lacta/prod_entry_birth.js",
+            "/static_m/js/pages/production/gesta_lacta/page_prod_gestating_entry.js",
+            
+            
+            
+            "/static_m/js/pages/production/gesta_lacta/page_mob_gesta_lacta.js",
+            
+            
+            "/static_m/js/pages/navigation/navigation.js"
+        ]
             
         data    = { 'page_data':        page_data,
                     'js_lib':           js_lib,
-                    'js_app_text':  
+                    'js_app_text':      js_app_text,
                     'js_app_modules':   js_app_modules}
         
                 

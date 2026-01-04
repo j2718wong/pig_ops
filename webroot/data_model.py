@@ -80,8 +80,7 @@ class DataPigFarm(BaseModel, HasAddressLevel):
         
     name:                   str
     
-    latitude:               float = None
-    longitude:              float = None
+
 
 
 class DataAccountPigOps(BaseModel):

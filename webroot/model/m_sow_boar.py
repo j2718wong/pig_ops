@@ -508,7 +508,10 @@ class SowBoar:
                             a.is_external,
                             
                             b.date_insemination,
-                            b.date_expected_birth
+                            b.date_expected_birth,
+                            
+                            a.mate_count,
+                            a.date_last_mate
                             
                         FROM sow_boar a
                         LEFT OUTER JOIN pig_production b    ON a.last_prod_id       = b.id
@@ -631,7 +634,7 @@ class SowBoar:
                             'status_id':            row[5],
                             'date_of_birth':        str(row[6])  if row[6] else None,
                             'is_external':          row[7],
-                            'date_insemination':    str(row[8])  if row[8] else None
+                            'date_insemination':    str(row[8])  if row[8] else None,
                             'date_expected_birth':  str(row[9])  if row[9] else None
                         }
                     
@@ -640,7 +643,7 @@ class SowBoar:
                             del cur_entry['farm_boar_id']
                         else:
                             del cur_entry['farm_sow_id']
-                            del cur_entry['status'] # This refers to sow_status
+                            
                 
                 else:
                     

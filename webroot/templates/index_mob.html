@@ -3,94 +3,871 @@
 
 <head>
     <meta http-equiv="content-type"             content="text/html; charset=utf-8"/>
-	<meta http-equiv="cache-control" 			content="no-cache">
-	<meta name="description"                    content="Jackson Systems"/>
-    <meta name="keywords" 						content="Pig production analytics"/>
-    <meta name="author" 						content="Jack Wong"/>
-    <meta name="viewport" 						content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="cache-control"            content="no-cache">
+    <meta name="description"                    content="Jackson Systems"/>
+    <meta name="keywords"                       content="Pig production analytics"/>
+    <meta name="author"                         content="J Systems"/>
+    <meta name="viewport"                       content="width=device-width, initial-scale=1.0">
     
 
-    <title>PiggyProd</title>
+    <title>PiggyProd - Pig Farm Management System</title>
 
-	<link type="image/x-icon" 	rel="icon" 			href="/static_m/images/favicon.ico" >
-	
-	
-	
-	<link type="text/css" 		rel="stylesheet" 	href="/static_m/css/jquery-ui.min-1.14.1.css"/>
-	<link type="text/css" 		rel="stylesheet" 	href="/static_m/css/bootstrap.min.css"/>
-	<link type="text/css"		rel="stylesheet"  	href="/static_m/css/bootstrap-icons.css">
-	
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/jAlert.css"/>
-	<link type="text/css" 		rel="stylesheet" 	href="/static_m/css/style.css"/>
-	
+    <link type="image/x-icon"   rel="icon"          href="/static_m/images/favicon.ico" >
+    
+    
+    
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/all.min.css"/>
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/bootstrap.min.css"/>
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/bootstrap-datepicker.min.css"/>
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/bootstrap-icons.css">
+    
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/css2.css"/>
+    <link type="text/css"       rel="stylesheet"    href="/static_m/css/main.css"/>
+    
 
-	
-	
-	
-	<script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
-	<script type = "text/javascript" src="/static_m/js/jquery/jquery-ui.min-1.14.1.js"></script>
-	<script type = "text/javascript" src="/static_m/js/jquery/jAlert.js"></script>
-	<script type = "text/javascript" src="/static_m/js/jquery/jAlert-functions.js"></script>
-	<script type = "text/javascript" src="/static_m/js/jquery/jquery.confirm.js"></script>
+    
+    
+    
+    <script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
+    <script type = "text/javascript" src="/static_m/js/jquery/jquery-ui.min-1.14.1.js"></script>
+    <script type = "text/javascript" src="/static_m/js/library/bootstrap.bundle.min.js"></script>
+    <script type = "text/javascript" src="/static_m/js/library/bootstrap-datepicker.min.js"></script>
 
-	<script type = "text/javascript" src="/static_m/js/library/bootstrap.bundle.min.js"></script>
-
-	<script type = "application/javascript" src="/static_m/js/controller.js"></script>
-	
-	<script>
-	var gIsServerAvailable = true;
-		
-	$(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
-		console.log('\n\ngIsServerAvailable =' + gIsServerAvailable);		
-		//var GLOBAL_DATA = ${global_data};
-		//gGlobal.setGlobalData(GLOBAL_DATA);
-	});
-	</script>
-	
-	<!--Login function is available to all pages particularly for session expiry during any saving action.-->
-	<!--
-	<script type = "application/javascript" src="/static_m/js/others/webtoolkit.sha256.js"></script>
-	<script type = "application/javascript" src="/static_m/js/user_login.js"></script>
+    
+    <script>
+    var gIsServerAvailable = true;
         
-	<script type = "application/javascript" src="/static_m/js/navigation.js"></script>
+    $(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
+        console.log('\n\ngIsServerAvailable =' + gIsServerAvailable);       
+        //var GLOBAL_DATA = ${global_data};
+        //gGlobal.setGlobalData(GLOBAL_DATA);
+    });
+    </script>
+    
+    <!--Login function is available to all pages particularly for session expiry during any saving action.-->
+    <!--
+    <script type = "application/javascript" src="/static_m/js/others/webtoolkit.sha256.js"></script>
+    <script type = "application/javascript" src="/static_m/js/user_login.js"></script>
+        
+    <script type = "application/javascript" src="/static_m/js/navigation.js"></script>
     -->
-        
-	
-{% for script in scripts %}
-	<script type = "module" src="/static_m/js/{{script}}"></script>
+
+{% for script in js_app_text %}
+    <script type = "application/javascript" src="/static_m/js/{{script}}"></script>
+{% endfor %}
+    
+{% for script in js_app_modules %}
+    <script type = "module" src="/static_m/js/{{script}}"></script>
 {% endfor %}
 </head>
 
 
 <body>
-	
-<div id="main-wrapper">
+<!-- Top Navigation Container -->
+    <div class="top-nav-container">
+        <!-- First Line Navigation -->
+        <div class="nav-first-line">
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-left">
+                <div class="company-logo">J</div>
+                <div class="product-name">PiggyProd</div>
+            </div>
+            
+            <div class="nav-center">
+                <div class="pig-farm-name" id="pigFarmName">Sunrise Pig Farm Management</div>
+            </div>
+            
+            <div class="nav-right">
+                <!-- Alerts -->
+                <div class="alerts-container" id="alertsContainer">
+                    <div class="alert-icon" id="alertIcon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="alert-count" id="alertCount">6</div>
+                </div>
+                
+                <!-- User Control - Single instance for both desktop and mobile -->
+                <div class="user-control" id="userControl">
+                    <div class="user-avatar" id="desktop-user-initials">JD</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <!-- User Profile Header with Full Name -->
+                        <div class="user-dropdown-header">
+                            <div class="user-avatar-large" id="desktop-user-initials-large">JD</div>
+                            <div class="user-info">
+                                <div class="user-full-name" id="desktop-user-full-name">John Doe</div>
+                                <div class="user-role" id="desktop-user-role">Farm Manager</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown Items -->
+                        <div class="user-dropdown-item">
+                            <i class="fas fa-user-circle" style="color: var(--icon-blue);"></i>
+                            <span>My Account</span>
+                        </div>
+                        <div class="user-dropdown-item dropdown-alert">
+                            <i class="fas fa-exclamation-circle" style="color: var(--icon-red);"></i>
+                            <span>New Bill Available</span>
+                        </div>
+                        <div class="user-dropdown-item">
+                            <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
+                            <span>Billing</span>
+                        </div>
+                        <div class="user-dropdown-item">
+                            <i class="fas fa-sign-out-alt" style="color: var(--icon-red);"></i>
+                            <span>Logout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Second Line Navigation -->
+        <div class="nav-second-line">
+            <button class="special-button" id="desktop-nav-special-btn-summary">
+                <i class="fas fa-file-pdf"></i>
+                <span>Summary</span>
+            </button>
+            
+            <div class="nav-menus">
+                <!-- Settings Menu -->
+                <div class="nav-menu" id="desktop-nav-settings">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-cogs" style="color: var(--icon-blue);"></i>
+                        <span>Settings</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'op-settings');">          <i class="fas fa-sliders-h" style="color: var(--icon-purple);"></i>Ops Settings</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gesta-sow-ops');">        <i class="fas fa-syringe" style="color: var(--gestating-color);"></i>Gestating Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'lacta-piglets-ops');">    <i class="fas fa-syringe" style="color: var(--lactating-piglets-color);"></i>Lactating Piglets Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'lacta-sow-ops');">        <i class="fas fa-syringe" style="color: var(--lactating-sow-color);"></i>Lactating Sow Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilt-ops');">             <i class="fas fa-syringe" style="color: var(--gilt-color);"></i>Gilt Ops</div>
+                    </div>
+                </div>
+                
+                <!-- Sow Boar Gilt Menu -->
+                <div class="nav-menu" id="desktop-nav-sow-boar-gilt">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>
+                        <span>Sow Boar Gilt</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'sows');">                 <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Sows</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'boars');">                <i class="fas fa-mars" style="color: var(--icon-blue);"></i>Boars</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilts');">                <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Gilts</div>
+                    </div>
+                </div>
+                
+                <!-- Production Menu -->
+                <div class="nav-menu" id="desktop-nav-production">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-chart-line" style="color: var(--icon-green);"></i>
+                        <span>Production</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-gesta');">           <i class="fas fa-chart-bar" style="color: var(--icon-indigo);"></i>Prod Gestating</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-lacta-piglets');">   <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating Piglets</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-lacta-sows');">      <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating Sows</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-fattening');">       <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>Fattening</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-feeds');">           <i class="fas fa-weight" style="color: var(--icon-red);"></i>Feeds</div>
+                    </div>
+                </div>
+                
+                <!-- Operations Menu -->
+                <div class="nav-menu" id="desktop-nav-operations">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-tasks" style="color: var(--icon-teal);"></i>
+                        <span>Operations</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'pig-harvest');">      <i class="fas fa-paw" style="color: var(--icon-orange);"></i><i class="fas fa-paw" style="color: var(--icon-orange); margin-left: -8px;"></i> Pig Harvests</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'reports');">          <i class="fas fa-clipboard-list" style="color: var(--icon-blue);"></i>Reports</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'feed-caculator');">   <i class="fas fa-calculator" style="color: var(--icon-green);"></i>Feed Calculator</div>
+                    </div>
+                </div>
+                
+                <!-- Financials Menu -->
+                <div class="nav-menu" id="desktop-nav-financials">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-money-bill-wave" style="color: var(--icon-green);"></i>
+                        <span>Financials</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'feeds-expenses');">       <i class="fas fa-seedling" style="color: var(--icon-teal);"></i>Feeds Expenses</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'nonfeeds-expenses');">    <i class="fas fa-receipt" style="color: var(--icon-purple);"></i>Non Feeds Expenses</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'sales');">                <i class="fas fa-cash-register" style="color: var(--icon-indigo);"></i>Sales</div>
+                    </div>
+                </div>
+                
+                <!-- Account Lists Menu -->
+                <div class="nav-menu" id="desktop-nav-account-lists">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-address-book" style="color: var(--icon-purple);"></i>
+                        <span>Account Lists</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'staff');">                <i class="fas fa-users" style="color: var(--icon-blue);"></i>Staff</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'pig-buyers');">           <i class="fas fa-user-tag" style="color: var(--icon-teal);"></i>Pig Buyers</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'feed-suppliers');">       <i class="fas fa-truck" style="color: var(--icon-orange);"></i>Feed Suppliers</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'semen-suppliers');">  <i class="fas fa-flask" style="color: var(--icon-indigo);"></i>Semen Suppliers</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilt-suppliers');">       <i class="fas fa-shipping-fast" style="color: var(--icon-red);"></i>Gilt Suppliers</div>
+                    </div>
+                </div>
+                
+                <!-- Admin Menu -->
+                <div class="nav-menu" id="desktop-nav-admin">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-user-friends" style="color: var(--icon-blue);"></i>
+                        Admin</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'users');">                <i class="fas fa-user" style="color: var(--icon-indigo);"></i>Users</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'users-requests');">       <i class="fas fa-user-plus" style="color: var(--icon-green);"></i>User Request</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Modal -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-header">
+                <div class="alert-modal-title">Farm Alerts & Notifications</div>
+                <button class="close-alert-modal" id="closeAlertModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body">
+                <!-- Critical Alerts -->
+                <h3 style="color: var(--critical-color); margin-bottom: 15px;"><i class="fas fa-exclamation-circle"></i> Critical Alerts</h3>
+                <div class="alert-item">
+                    <div class="alert-icon-small" style="color: var(--critical-color);">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div>
+                            <span class="alert-category alert-critical">CRITICAL</span>
+                            <span class="alert-title">Pig Health Issue Reported</span>
+                        </div>
+                        <div class="alert-description">Multiple piglets in Nursery Section 3 showing signs of respiratory distress. Immediate veterinary attention required.</div>
+                        <div class="alert-time">Reported 2 hours ago by Farm Staff</div>
+                    </div>
+                </div>
+                
+                <!-- Warning Alerts -->
+                <h3 style="color: var(--warning-color); margin-bottom: 15px; margin-top: 25px;"><i class="fas fa-exclamation-triangle"></i> Warning Alerts</h3>
+                
+                <div class="alert-item">
+                    <div class="alert-icon-small" style="color: var(--warning-color);">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div>
+                            <span class="alert-category alert-warning">WARNING</span>
+                            <span class="alert-title">Vaccination Due for Piglets</span>
+                        </div>
+                        <div class="alert-description">45 piglets in Nursery Section 2 due for parvovirus vaccination today. Vaccine inventory available.</div>
+                        <div class="alert-time">Due today</div>
+                    </div>
+                </div>
+                
+                <div class="alert-item">
+                    <div class="alert-icon-small" style="color: var(--warning-color);">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div>
+                            <span class="alert-category alert-warning">WARNING</span>
+                            <span class="alert-title">Feeds for Production Almost Depleted</span>
+                        </div>
+                        <div class="alert-description">Starter feed inventory at 15% capacity. Only 2 days of supply remaining for piglets.</div>
+                        <div class="alert-time">Updated 4 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="alert-item">
+                    <div class="alert-icon-small" style="color: var(--warning-color);">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div>
+                            <span class="alert-category alert-warning">WARNING</span>
+                            <span class="alert-title">Sow Birth Checklist Alert</span>
+                        </div>
+                        <div class="alert-description">Sow #2345 (Bertha) due in 3 days. Farrowing crate needs preparation and equipment sterilization.</div>
+                        <div class="alert-time">Due in 3 days</div>
+                    </div>
+                </div>
+                
+                <!-- Info Alerts -->
+                <h3 style="color: var(--info-color); margin-bottom: 15px; margin-top: 25px;"><i class="fas fa-info-circle"></i> Information Alerts</h3>
+                
+                <div class="alert-item">
+                    <div class="alert-icon-small" style="color: var(--info-color);">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div>
+                            <span class="alert-category alert-info">INFO</span>
+                            <span class="alert-title">Upcoming Pig Birth</span>
+                        </div>
+                        <div class="alert-description">Sow #2312 (Daisy) expected to farrow tomorrow morning. Monitor for farrowing signs tonight.</div>
+                        <div class="alert-time">Expected tomorrow</div>
+                    </div>
+                </div>
+                
+                <div class="alert-item">
+                    <div class="alert-icon-small" style="color: var(--info-color);">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div>
+                            <span class="alert-category alert-info">INFO</span>
+                            <span class="alert-title">Missed Feed Inventory Entry</span>
+                        </div>
+                        <div class="alert-description">Yesterday's feed consumption for Grower Section B was not recorded. Please update inventory logs.</div>
+                        <div class="alert-time">Missed yesterday</div>
+                    </div>
+                </div>
+                
+                <div class="alert-actions">
+                    <button class="alert-btn alert-btn-mark-all" id="markAllAsRead">Mark All as Read</button>
+                    <button class="alert-btn alert-btn-close" id="closeAlertModalBtn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="mobile-logo-container">
+                <div class="company-logo">J</div>
+                <div class="product-name">PiggyProd</div>
+            </div>
+            
+            <!-- Alerts in mobile header (alerts at left side of user control) -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="alerts-container" id="mobileAlertsContainer">
+                    <div class="alert-icon" id="mobileAlertIcon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="alert-count" id="mobileAlertCount">6</div>
+                </div>
+                
+                <!-- Single User Control in Mobile -->
+                <div class="user-control" id="mobileUserControl">
+                    <div class="user-avatar" id="mobile-user-initials">JD</div>
+                    <div class="user-dropdown" id="mobileUserDropdown">
+                        <!-- User Profile Header with Full Name (Mobile) -->
+                        <div class="user-dropdown-header">
+                            <div class="user-avatar-large" id="mobile-user-initials-large">JD</div>
+                            <div class="user-info">
+                                <div class="user-full-name" id="mobile-user-full-name">John Doe</div>
+                                <div class="user-role" id="mobile-user-role">Farm Manager</div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-dropdown-item">
+                            <i class="fas fa-user-circle" style="color: var(--icon-blue);"></i>
+                            <span>My Account</span>
+                        </div>
+                        <div class="user-dropdown-item dropdown-alert">
+                            <i class="fas fa-exclamation-circle" style="color: var(--icon-red);"></i>
+                            <span>New Bill Available</span>
+                        </div>
+                        <div class="user-dropdown-item">
+                            <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
+                            <span>Billing</span>
+                        </div>
+                        <div class="user-dropdown-item">
+                            <i class="fas fa-sign-out-alt" style="color: var(--icon-red);"></i>
+                            <span>Logout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pig Farm Name with Close Button (Second Line) -->
+        <div class="mobile-pig-farm-name">
+            <div class="mobile-pig-farm-name-text" id="mobilePigFarmName">Sunrise Pig Farm Management</div>
+            <button class="close-mobile-nav" id="closeMobileNav">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <button class="mobile-special-button" id="mobile-nav-special-btn-summary">
+            <i class="fas fa-file-pdf"></i>
+            <span>Generate Summary PDF</span>
+        </button>
+        
+        
+        <!-- Mobile Menu Sections -->
+        <div class="mobile-menu-section" id="mobile-nav-production">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-production">
+                <span><i class="fas fa-chart-line" style="color: var(--icon-green); margin-right:10px;"></i>Production</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-production">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-gesta');">            <i class="fas fa-chart-bar" style="color: var(--icon-indigo);"></i>Prod Gestating</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-lacta-piglets');">    <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating</div>
+                <!--<div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-lacta-sows');">       <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating Sows</div>-->
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-fattening');">        <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>Fattening</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-feeds');">            <i class="fas fa-weight" style="color: var(--icon-red);"></i>Feeds</div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-section" id="mobile-nav-sow-boar-gilt">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-sow-boar-gilt">
+                <span><i class="fas fa-piggy-bank" style="color: var(--icon-orange); margin-right:10px;"></i>Sow Boar Gilt</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-sow-boar-gilt">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'sows');">              <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Sows</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'boars');">             <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Boars</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gilts');">             <i class="fas fa-mars" style="color: var(--icon-blue);"></i>Gilts</div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-operations">
+                <span><i class="fas fa-tasks" style="color: var(--icon-teal); margin-right:10px;"></i>Operations</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-operations">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'pig-harvest');">
+                    <div style="position: relative; width: 20px;">
+                        <i class="fas fa-paw" style="color: var(--icon-orange); position: absolute; left: 0;"></i>
+                        <i class="fas fa-paw" style="color: var(--icon-orange); position: absolute; left: 8px;"></i>
+                    </div>
+                    <span>Pig Harvests</span>
+                </div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'reports');">               <i class="fas fa-clipboard-list" style="color: var(--icon-blue);"></i>Reports</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'feed-caculator');">            <i class="fas fa-calculator" style="color: var(--icon-green);"></i>Feed Calculator</div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-financials">
+                <span><i class="fas fa-money-bill-wave" style="color: var(--icon-green); margin-right:10px;"></i>Financials</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-financials">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'feeds-expenses');">        <i class="fas fa-seedling" style="color: var(--icon-teal);"></i>Feeds Expenses</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'nonfeeds-expenses');"> <i class="fas fa-receipt" style="color: var(--icon-purple);"></i>Non Feeds Expenses</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'sales');">             <i class="fas fa-cash-register" style="color: var(--icon-indigo);"></i>Sales</div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-account-lists">
+                <span><i class="fas fa-address-book" style="color: var(--icon-purple); margin-right:10px;"></i>Account Lists</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-account-lists">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'staff');">         <i class="fas fa-users" style="color: var(--icon-blue);"></i>Staff</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'pig-buyers');">        <i class="fas fa-user-tag" style="color: var(--icon-teal);"></i>Pig Buyers</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'feed-suppliers');">    <i class="fas fa-truck" style="color: var(--icon-orange);"></i>Feed Suppliers</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'semen-suppliers');">   <i class="fas fa-flask" style="color: var(--icon-indigo);"></i>Semen Suppliers</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gilt-suppliers');">    <i class="fas fa-shipping-fast" style="color: var(--icon-red);"></i>Gilt Suppliers</div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-section" id="mobile-nav-settings">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-settings">
+                <span><i class="fas fa-cogs" style="color: var(--icon-blue); margin-right:10px;"></i>Settings</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-settings">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'op-settings');">       <i class="fas fa-sliders-h" style="color: var(--icon-purple);"></i>Ops Settings</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gesta-sow-ops');">     <i class="fas fa-syringe" style="color: var(--gestating-color);"></i>Gestating Ops</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'lacta-piglets-ops');"> <i class="fas fa-syringe" style="color: var(--lactating-piglets-color);"></i>Lactating Piglets Ops</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'lacta-sow-ops');">     <i class="fas fa-syringe" style="color: var(--lactating-sow-color);"></i>Lactating Sow Ops</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gilt-ops');">          <i class="fas fa-syringe" style="color: var(--gilt-color);"></i>Gilt Ops</div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title" data-submenu="mobile-subnav-admin">
+                <span><i class="fas fa-user-friends" style="color: var(--icon-blue); margin-right:10px;"></i>Admin</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-submenu" id="mobile-subnav-admin">
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'users');">         <i class="fas fa-user" style="color: var(--icon-indigo);"></i>Users</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'users-requests');">    <i class="fas fa-user-plus" style="color: var(--icon-green);"></i>User Request</div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Main Content - Dashboard -->
+    <div class="main-content">
+        <div id="container-acc-pig-ops"      class="hidden-container" style="display:none;"></div>
+        
+        <div id="container-sow-boar-list"   class="hidden-container" style="display:none;"></div>
+        <div id="container-sow-boar-add-edit" class="hidden-container" style="display:none;"></div>
+        
+        
+        
+        <div id="container-prod-gesta-list"  class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-lacta-list"  class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-gesta-add"   class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-gesta-entry" class="hidden-container" style="display:none;"></div>
+    
+    
+        <div id="container-dashboard"        class="hidden-container" style="display:none"> 
+            <div class="content-card">
+                <h1>Pig Farm Dashboard</h1>
+                <p>Welcome back, John! Here's an overview of your farm operations at Sunrise Pig Farm Management.</p>
+                
+                <div class="dashboard-cards">
+                    <!-- Gestating Sows Card -->
+                    <div class="dashboard-card card-gestating">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-venus"></i>
+                        </div>
+                        <div class="dashboard-card-value">124</div>
+                        <div class="dashboard-card-label">Gestating Sows</div>
+                    </div>
+                    
+                    <!-- Lactating Sows Card -->
+                    <div class="dashboard-card card-lactating">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-female"></i>
+                        </div>
+                        <div class="dashboard-card-value">68</div>
+                        <div class="dashboard-card-label">Lactating Sows</div>
+                    </div>
+                    
+                    <!-- Gilts Card -->
+                    <div class="dashboard-card card-gilts">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-venus"></i>
+                        </div>
+                        <div class="dashboard-card-value">45</div>
+                        <div class="dashboard-card-label">Gilts</div>
+                    </div>
+                    
+                    <!-- Boars Card -->
+                    <div class="dashboard-card card-boars">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-mars"></i>
+                        </div>
+                        <div class="dashboard-card-value">12</div>
+                        <div class="dashboard-card-label">Boars</div>
+                    </div>
+                    
+                    <!-- Production Piglets Card -->
+                    <div class="dashboard-card card-piglets">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-baby"></i>
+                        </div>
+                        <div class="dashboard-card-value">842</div>
+                        <div class="dashboard-card-label">Production Piglets</div>
+                    </div>
+                    
+                    <!-- Fattening Pigs Card -->
+                    <div class="dashboard-card card-fattening">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="dashboard-card-value">312</div>
+                        <div class="dashboard-card-label">Fattening Pigs</div>
+                    </div>
+                    
+                    <!-- Feeds Left Card -->
+                    <div class="dashboard-card card-feeds">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="dashboard-card-value">18.5</div>
+                        <div class="dashboard-card-label">Feeds Left (tons)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h2>Recent Activity & Alerts</h2>
+                <p><strong>Click the alert bell icon</strong> in the top right corner to view detailed farm alerts including:</p>
+                <ul style="padding-left: 20px; font-size: 18px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 10px;"><span class="alert-category alert-critical" style="margin-right: 8px;">CRITICAL</span> Pig health issues requiring immediate attention</li>
+                    <li style="margin-bottom: 10px;"><span class="alert-category alert-warning" style="margin-right: 8px;">WARNING</span> Vaccination schedules and feed inventory alerts</li>
+                    <li style="margin-bottom: 10px;"><span class="alert-category alert-info" style="margin-right: 8px;">INFO</span> Upcoming births and missed inventory entries</li>
+                </ul>
+                <p>The alert system helps you stay on top of critical farm operations with visual categorization for quick prioritization.</p>
+            </div>
+            
+            <div class="content-card">
+                <h2>Quick Actions</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <button class="special-button" style="width: 100%;">
+                        <i class="fas fa-plus"></i>
+                        <span>Add New Entry</span>
+                    </button>
+                    <button class="special-button" style="width: 100%; background-color: var(--icon-green);">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Today's Tasks</span>
+                    </button>
+                    <button class="special-button" style="width: 100%; background-color: var(--icon-purple);">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>View Reports</span>
+                    </button>
+                    <button class="special-button" style="width: 100%; background-color: var(--icon-teal);">
+                        <i class="fas fa-calculator"></i>
+                        <span>Feed Calculator</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    
+    
+        <div id="container-edit-modal-prod-pig-ops"></div>
+    </div>
+    
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">J Systems Development</h3>
+                <p style="color: #cccccc; font-size: 18px;">Providing innovative software solutions for agricultural management since 2010.</p>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">About Us</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Our Company</a></li>
+                    <li><a href="#">Our Team</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Testimonials</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">Contact Us</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Support Center</a></li>
+                    <li><a href="#">Contact Form</a></li>
+                    <li><a href="#">Phone: +1 (555) 123-4567</a></li>
+                    <li><a href="#">Email: support@piggyprod.com</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">Social Media</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fab fa-facebook" style="margin-right: 8px;"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fab fa-twitter" style="margin-right: 8px;"></i> Twitter</a></li>
+                    <li><a href="#"><i class="fab fa-linkedin" style="margin-right: 8px;"></i> LinkedIn</a></li>
+                    <li><a href="#"><i class="fab fa-youtube" style="margin-right: 8px;"></i> YouTube</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2023 J Systems Development. All rights reserved. PiggyProd is a registered trademark.
+        </div>
+    </footer>
 
-	<div id = "header">
-		<div id = "hd-top-nav"></div>
-		<div id = "hd-main-nav"></div>
-	</div>
+    <script type="module">
+        import {Navigation} from './static_m/js/pages/navigation/navigation.js';
+        
+        var gNavigation = null;
+        
+        var PAGE_DATA = {{page_data}};
+        
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            const gNavigation = new Navigation();
+            gNavigation.init();         
+            
+            globalThis.gNavigation = gNavigation;
+            
+            gNavigation.setPageData(PAGE_DATA);
+            
+            
+        });
+    </script>
 
 
-	<script type="text/javascript">
-	$(document).ready(function(){
-		//var USER_DATA = ${user_data};
-		//gNavigation.setUser(USER_DATA);
-	});
-	</script>
+    <script>
+        // Mobile navigation toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const closeMobileNav = document.getElementById('closeMobileNav');
+        const mobileNav = document.getElementById('mobileNav');
+        
+        mobileToggle.addEventListener('click', () => {
+            mobileNav.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+        });
+        
+        closeMobileNav.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        });
+        
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', (event) => {
+            if (mobileNav.classList.contains('active') && 
+                !mobileNav.contains(event.target) && 
+                !mobileToggle.contains(event.target)) {
+                mobileNav.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Desktop user control dropdown
+        const userControl = document.getElementById('userControl');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userControl) {
+            userControl.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent closing immediately
+                userDropdown.classList.toggle('active');
+            });
+        }
+        
+        // Mobile user control dropdown
+        const mobileUserControl = document.getElementById('mobileUserControl');
+        const mobileUserDropdown = document.getElementById('mobileUserDropdown');
+        
+        if (mobileUserControl) {
+            mobileUserControl.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent closing immediately
+                mobileUserDropdown.classList.toggle('active');
+            });
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            if (userDropdown) userDropdown.classList.remove('active');
+            if (mobileUserDropdown) mobileUserDropdown.classList.remove('active');
+        });
+        
+        // Prevent dropdown from closing when clicking inside it
+        if (userDropdown) {
+            userDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+        
+        if (mobileUserDropdown) {
+            mobileUserDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+        
+        // Alert Modal Functionality
+        const alertIcon = document.getElementById('alertIcon');
+        const mobileAlertIcon = document.getElementById('mobileAlertIcon');
+        const alertModal = document.getElementById('alertModal');
+        const closeAlertModal = document.getElementById('closeAlertModal');
+        const closeAlertModalBtn = document.getElementById('closeAlertModalBtn');
+        const markAllAsRead = document.getElementById('markAllAsRead');
+        const alertCount = document.getElementById('alertCount');
+        const mobileAlertCount = document.getElementById('mobileAlertCount');
+        
+        // Open alert modal from desktop
+        alertIcon.addEventListener('click', () => {
+            alertModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Open alert modal from mobile
+        mobileAlertIcon.addEventListener('click', () => {
+            alertModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Close mobile nav if open
+            mobileNav.classList.remove('active');
+        });
+        
+        // Close alert modal
+        closeAlertModal.addEventListener('click', () => {
+            alertModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        closeAlertModalBtn.addEventListener('click', () => {
+            alertModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close alert modal when clicking outside
+        alertModal.addEventListener('click', (e) => {
+            if (e.target === alertModal) {
+                alertModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Mark all alerts as read
+        markAllAsRead.addEventListener('click', () => {
+            alertCount.textContent = '0';
+            mobileAlertCount.textContent = '0';
+            alertModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Show confirmation
+            alert('All alerts have been marked as read. The alert counter has been reset.');
+        });
+        
+        
+        
+
+        
+        // Summary button functionality
+        const summaryButtons = document.querySelectorAll('.special-button, .mobile-special-button');
+        
+        summaryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                alert('Generating PDF summary report of your pig farm operation...\n\nThis would normally generate and download a comprehensive PDF report.');
+            });
+        });
+        
+        // Close mobile nav when clicking on a menu item (optional)
+        const mobileMenuItems = document.querySelectorAll('.mobile-submenu-item');
+        mobileMenuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                mobileNav.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+        
+        // Quick action buttons
+        const quickActionButtons = document.querySelectorAll('.content-card .special-button');
+        quickActionButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                const actions = [
+                    "Opening new entry form...",
+                    "Loading today's tasks...",
+                    "Generating farm reports...",
+                    "Opening feed calculator..."
+                ];
+                
+                if (index < actions.length) {
+                    alert(actions[index]);
+                }
+            });
+        });
+    </script>
 
 
-	{% block content %}{% endblock content %}
-
-	
-	<div id = "footer" class="clearfix">
-		<span id= "txt-version"></span>
-	</div>
-	
-</div>
-  
-
-   
+ 
 </body>
+
+
+ 
 
 </html>

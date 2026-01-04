@@ -1588,48 +1588,16 @@ class PigProduction:
     def get_production_output(self, pig_farm_id = 0, sow_id = 0):
         sql =   """
                 SELECT 
-                    a.id,
-                    a.farm_prod_id,
-                    
-                    a.insemination_type,
-                    
                     a.sow_id,
-                    b.farm_sow_id,
-                    b.number,
-                    b.name,
                     
-                    a.boar_id,
-                    c.farm_boar_id,
-                    c.number,
-                    c.name,
-                    
-                    a.semen_source_id,
-                    d.name AS semen_source_name,
-                    d.description,
-                    
-                    
-                    a.date_insemination,
-                    a.date_expected_birth,
-                    a.date_actual_birth,
-                    a.num_days_actual,
-                    a.num_pigs_dead_at_birth,
-                    a.num_pigs_live_m,
-                    a.num_pigs_live_f,
-                   
-                    
-                    a.date_weaning,
                     a.num_pigs_weaning_m,
-                    a.num_pigs_weaning_f,
-                    a.total_pigs_weight_weaning
+                    a.num_pigs_weaning_f
                     
                 FROM pig_production a
-                LEFT OUTER JOIN sow_boar b          ON a.sow_id = b.id
-                LEFT OUTER JOIN sow_boar c          ON a.boar_id = c.id
-                LEFT OUTER JOIN semen_source d      ON a.semen_source_id = d.id
-               
-                %s
-                ORDER BY a.date_actual_birth
-                """ % where_clause
+                
+                WHERE a.pig_farm_id = %s AND a.date_weaning IS NOT NULL
+                ORDER BY a.sow_id
+                """ % pig_farm_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -1651,7 +1619,7 @@ class PigProduction:
             #conn.close()
             
         except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
+            msg = 'get_production_output(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -1662,114 +1630,44 @@ class PigProduction:
 
         result = []
         if rows is not None:
-    
-     
             
+            cur_sow             = None
+            cur_sow_birth       = 0
+            cur_sow_num_piglets = 0
+            prev_sow_id         = None
+     
             for row in rows:
-                cur_prod_id                 = row[0]
-                cur_prod_farm_prod_id       = row[1]
-                cur_prod_insemination_type  = row[2]
                 
-                cur_sow_id                  = row[3]
-                cur_sow_farm_sow_id         = row[4]
-                cur_sow_number              = row[5]
-                cur_sow_name                = row[6]
+                cur_sow_id                  = row[0]
+                cur_pig_weaning_m           = row[1]
+                cur_pig_weaning_f           = row[2]
                 
-                cur_boar_id                 = row[7]
-                cur_boar_farm_boar_id       = row[8]
-                cur_boar_number             = row[9]
-                cur_boar_name               = row[10]
+                total_piglets   = 0
+                if cur_pig_weaning_m is not None:
+                    total_piglets += cur_pig_weaning_m
                 
-                cur_semen_source_id         = row[11]
-                cur_semen_source_name       = row[12]
-                cur_semen_source_description = row[13]
+                if cur_pig_weaning_m is not None:
+                    total_piglets += cur_pig_weaning_f
                 
+                if total_piglets ==  0:
+                    continue
                 
-                cur_insem_semen_cost        = row[14]
-                cur_insem_insemination_cost = float(row[15]) if row[15] else None
-                cur_insem_cost_comments     = row[16]
-                    
-                cur_insem_staff_id          = row[17]
-                cur_insem_date_insemination = row[18]
-                cur_insem_staff_name        = row[19]
-                
-                cur_prod_status_id          = row[20]
-                cur_prod_status_name        = row[21]
-                
-                cur_prod_date_expected_birth    = row[22]
-                cur_prod_date_actual_birth      = str(row[23]) if row[23] else None
-                cur_prod_num_days_actual        = row[24] 
-                cur_prod_num_pigs_dead_at_birth = row[25]
-                cur_prod_num_pigs_live_m    = row[26]
-                cur_prod_num_pigs_live_f    = row[27]
-                cur_prod_birth_staff_name   = row[28]
-                
-                cur_weaning_date            = row[29]
-                cur_weaning_num_pigs_m      = row[30]
-                cur_weaning_num_pigs_f      = row[31]
-                cur_weaning_weight          = row[32]
-                
-                
-                cur_pig_count               = row[33]
-                
-                
-                cur_entry = {
-                    'pig_production' :{
-                        'id':               cur_prod_id, 
-                        'farm_prod_id':     cur_prod_farm_prod_id,
-                        'prod_status_id':   cur_prod_status_id,
-                        'prod_status_name': cur_prod_status_name
-                    },
-                    
-                    'sow': {
-                        'id':               cur_sow_id,
-                        'farm_sow_id':      cur_sow_farm_sow_id,
-                        'number':           cur_sow_number,
-                        'name':             cur_sow_name,
-                    },
-                    
-                    'insemination': {
-                        'insem_type':       cur_prod_insemination_type,
-                        
-                        'boar': {
-                            'id':           cur_boar_id,
-                            'farm_sow_id':  cur_boar_farm_boar_id,
-                            'number':       cur_boar_number,
-                            'name':         cur_boar_name
-                        },
-                        
-                        'semen_source': {
-                            'id':           cur_semen_source_id,
-                            'name':         cur_semen_source_name,
-                            'description':  cur_semen_source_description,
-                            'semen_cost':   cur_insem_semen_cost
-                        },
-                        
-                       
-                        'insem_date':       cur_insem_date_insemination
-                    },
-                    
-                    'birth': {
-                        'date_expected':    cur_prod_date_expected_birth,
-                        'date_actual':      cur_prod_date_actual_birth,
-                        'num_days_actual':  cur_prod_num_days_actual,
-                        'num_dead_at_birth':cur_prod_num_pigs_dead_at_birth,
-                        
-                        'pigs_live_m':      cur_prod_num_pigs_live_m,
-                        'pigs_live_f':      cur_prod_num_pigs_live_f,
-                        'birth_staff_name': cur_prod_birth_staff_name
-                    },
-                    
-                    'weaning': {
-                        'date_weaning':     cur_weaning_date,
-                        'num_pigs_m':       cur_weaning_num_pigs_m,
-                        'num_pigs_f':       cur_weaning_num_pigs_f,
-                        'weight':           cur_weaning_weight    
+                if cur_sow is None or cur_sow_id != prev_sow_id:
+                    cur_sow = {
+                        'sow_id':       cur_sow_id,
+                        'num_births':   1,
+                        'num_piglets':  total_piglets
                     }
-                }
+                    
+                    result.append(cur_sow)
+                    
+                else:
+                    cur_sow['num_births'] += 1
+                    cur_sow['num_piglets'] += total_piglets
                 
-                result.append(cur_entry)
-
+                
+                prev_sow_id = cur_sow_id
+                
         
         return result
     
