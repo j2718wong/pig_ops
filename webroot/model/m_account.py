@@ -53,12 +53,6 @@ class Account:
                     a.num_bills_paid,
                     a.last_acc_paid_bill_id,
                     
-                    a.farm_01_id,
-                    a.farm_02_id,
-                    a.farm_03_id,
-                    a.farm_04_id,
-                    a.farm_05_id,
-                    
                     c.name_last,
                     c.name_first,
                     a.dt_last_update_settings
@@ -116,15 +110,10 @@ class Account:
                 cur_acc_num_days_harvest_from_birth = row[9]
                 cur_acc_num_days_harvest_from_wean  = row[10]
                 
-                cur_acc_farm_01_id      = row[13]
-                cur_acc_farm_02_id      = row[14]
-                cur_acc_farm_03_id      = row[15]
-                cur_acc_farm_04_id      = row[16]
-                cur_acc_farm_05_id      = row[17]
-                
-                cur_user_name_last      = row[18]
-                cur_user_name_first     = row[19]
-                cur_settings_last_update= str(row[20]) if row[20] else None
+                               
+                cur_user_name_last      = row[11]
+                cur_user_name_first     = row[12]
+                cur_settings_last_update= str(row[13]) if row[13] else None
                 
                 
                 
@@ -134,13 +123,6 @@ class Account:
                 
                 temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
                 cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
-                
-                farm_ids = []
-                if cur_acc_farm_01_id > 0: farm_ids.append(cur_acc_farm_01_id)
-                if cur_acc_farm_02_id > 0: farm_ids.append(cur_acc_farm_02_id)
-                if cur_acc_farm_03_id > 0: farm_ids.append(cur_acc_farm_03_id)
-                if cur_acc_farm_04_id > 0: farm_ids.append(cur_acc_farm_04_id)
-                if cur_acc_farm_05_id > 0: farm_ids.append(cur_acc_farm_05_id)
                 
                 
                 cur_entry = {
@@ -163,10 +145,16 @@ class Account:
                             'name_first':   cur_user_name_first,
                             'dt_update':    cur_settings_last_update
                         }
-                    },
-                    
-                    'farm_ids': farm_ids
+                    }
                 }
+                
+                
+                # Get Farm List
+                account_farms = self.model['pig_farm'].get_list(account_id)
+                
+                if account_farms:
+                    cur_entry['pig_farms'] = account_farms
+                
                     
                 return cur_entry
         

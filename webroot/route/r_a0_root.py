@@ -3,6 +3,7 @@
 
 import os
 import sys
+import time
 
 from pydantic               import BaseModel
 from fastapi.responses      import HTMLResponse
@@ -26,7 +27,9 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_pig_production       import get_user_account_pig_prod_page_data
+from r_utils                import (get_user_account_info,
+                                    clean_data_user_account)
+from r_pig_production       import get_farm_account_pig_prod_page_data
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -53,6 +56,8 @@ async def root(pfhid:str = None):
         pig farm hid;  if this is given, wll decode pig_farm_id
     """
     
+    time_init = time.time()
+    
     
     data_app = get_application_data()
     
@@ -62,6 +67,11 @@ async def root(pfhid:str = None):
     
     
     # At this point user must be logged in
+    # temporary
+    user_id = 1
+    
+    user_account = get_user_account_info(user_id)
+    
     
     pig_farm_id = None
     
@@ -84,14 +94,23 @@ async def root(pfhid:str = None):
         else:
             pig_farm_id = res[0]
     
+    else:
+        # Get use user assigned farm id
+        pig_farm_id = 1
     
-    # temporary
-    user_id = 1
-    
-    
-    page_data = get_user_account_pig_prod_page_data(user_id, pig_farm_id)
-    page_data['application'] = data_app
 
+    
+    page_data = get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 0)
+        
+    page_data['application'] = data_app
+    page_data['user_account'] = clean_data_user_account(user_account)
+
+    time_final  = time.time()
+    delta_secs  = time_final - time_init
+    s_time      = '%.2f' % delta_secs
+    
+    print('\n\nroot page_data time(secs): %s' %s_time)
+    
     page = controller.view['root'].render(page_data = json.dumps(page_data, indent=4))
     
     return page

@@ -40,6 +40,8 @@ from model.m_mfa                import Mfa
 
 from model.m_user               import User
 from model.m_user_group         import UserGroup
+from model.m_user_pig_farm      import UserPigFarm
+
 
 from model.m_pig_farm           import PigFarm
 from model.m_pig_farm_staff     import PigFarmStaff
@@ -91,6 +93,8 @@ model_names_pig_ops = [
     
     ('user',                    User),
     ('user_group',              UserGroup),
+    ('user_farm',               UserPigFarm),
+    
     
     ('pig_farm',                PigFarm),
     ('pig_farm_staff',          PigFarmStaff),

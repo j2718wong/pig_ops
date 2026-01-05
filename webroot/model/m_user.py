@@ -84,6 +84,11 @@ class User:
                         'name':             row[11]
                     }
                 }
+                
+                user_pig_farm_ids = self.model['user_farm'].get_list(user_id = user_id)
+                
+                if user_pig_farm_ids:
+                    cur_entry['pig_farms'] = user_pig_farm_ids
                     
                 return cur_entry
                 

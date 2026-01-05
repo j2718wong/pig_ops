@@ -4,6 +4,30 @@
 from common_constants       import *
 
 
+
+# The account.flag_settings will be broken down so that
+# it will be easier to read in the application level.
+# See account_register.sql for updated flag bits definition.
+
+"""
+/* account.flag_setting bits
+FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+0 = Date of birth is counted as DAY 0
+1 = Date of birth is counted as DAY 1; default
+
+FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+0 = Date of insemination is counted as DAY 0; default
+1 = Date of insemination is counted as DAY 1;
+
+
+*/
+
+"""
+
+FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH     = 1
+FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
+            
+
 class PigFarm:
     def __init__(self, model):
         self.model              = model
@@ -187,6 +211,106 @@ class PigFarm:
         return None
         
     
+    def get_pig_farm_account_info(self, pig_farm_id):
+        sql =   """
+                SELECT 
+                    a.account_id,
+                    
+                    b.flag_settings,
+                    b.num_days_wean,
+                    b.num_days_harvest_from_birth,
+                    b.num_days_harvest_from_wean,
+                    
+                    c.name_last,
+                    c.name_first,
+                    b.dt_last_update_settings
+                FROM pig_farm a
+                LEFT OUTER JOIN account b ON a.account_id = b.id
+                LEFT OUTER JOIN user c ON b.last_update_settings_user_id = c.id
+                WHERE a.id = %s
+                """ % pig_farm_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except get_sow_boar_balance as e:
+            msg = 'get_pig_farm_account_info(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        if rows is not None:
+            
+            for row in rows:
+                cur_acc_id              = row[0]
+                
+                cur_acc_settings_flag   = row[1]
+                cur_acc_num_days_wean   = row[2]
+                cur_acc_num_days_harvest_from_birth = row[3]
+                cur_acc_num_days_harvest_from_wean  = row[4]
+                
+                               
+                cur_user_name_last      = row[5]
+                cur_user_name_first     = row[6]
+                cur_settings_last_update= str(row[7]) if row[7] else None
+                
+                
+                
+                
+                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+                cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+                
+                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+                cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+                
+                
+                
+                cur_entry = {
+                    'account': {
+                        'id':               cur_acc_id
+                    },
+                    
+                    'settings_operations': {
+                        'day_1_on_date_of_birth': cur_flag_day_1_on_dob,
+                        'day_1_on_date_of_insem': cur_flag_day_1_on_doi,
+                        'num_days_wean':    cur_acc_num_days_wean,
+                        'num_days_harvest_from_birth': cur_acc_num_days_harvest_from_birth,
+                        'num_days_harvest_from_wean':  cur_acc_num_days_harvest_from_wean,
+                    
+                        'last_update':{
+                            'name_last':    cur_user_name_last,
+                            'name_first':   cur_user_name_first,
+                            'dt_update':    cur_settings_last_update
+                        }
+                    }
+                }
+                
+                return cur_entry
+        
+        return None
+        
+    
     def get_list(self, account_id = 0, id_list = None):
         """
         Will get pig farm list.
@@ -214,7 +338,7 @@ class PigFarm:
             
         sql =   """
                 SELECT 
-                    a.hashid,
+                    a.id,
                     a.flag,
                     a.name,
                     a.country_id,
@@ -264,7 +388,7 @@ class PigFarm:
             
             
             for row in rows:
-                cur_farm_hashid         = row[0]
+                cur_farm_id             = row[0]
                 cur_farm_flag           = row[1]
                 cur_farm_name           = row[2]
                 
@@ -280,7 +404,7 @@ class PigFarm:
                
                 cur_entry = {
                     'pig_farm': {
-                        'hid':          cur_farm_hashid, 
+                        'id':           cur_farm_id, 
                         'flag':         cur_farm_flag,
                         'name':         cur_farm_name
                     },

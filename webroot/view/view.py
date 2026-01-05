@@ -23,11 +23,22 @@ versions are integrated.
 
 
 
-sys.path.append(os.path.dirname(__file__))
+# Include the directory where this file is located 
+module_file_path        = os.path.abspath(__file__)
+module_directory        = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+# Include the directory one level up from this script
+sys.path.append(os.path.join(module_directory, '..')) 
+
 
 
 from jinja2             import Environment, FileSystemLoader
 
+from common_fast_api    import dir_static, dir_static_m
 
 
 # Set up the Jinja environment to load templates from the current directory
@@ -45,6 +56,68 @@ view_names = [
             
         ]
 
+
+MODULES_ROOT = [
+    "constants.js",
+    "utils.js",
+    
+    
+    "models/model_basic.js",
+    "models/model_acc_pig_ops.js",
+    "models/model_pig_production.js",
+    
+    
+    "pages/common/page_view_basic.js",
+    "pages/navigation/text_substitute_control.js",
+    
+    "pages/acc_pig_ops/add_modal_acc_pig_ops.js",
+    "pages/acc_pig_ops/edit_modal_acc_pig_ops.js",
+    "pages/acc_pig_ops/page_acc_pig_ops.js",
+    
+    
+    "pages/sow_boar/page_sow_boar_list.js",
+    "pages/sow_boar/page_sow_boar_add_edit.js",
+    
+    
+    
+    "pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
+    
+    
+    "pages/production/gesta_lacta/insem_data_select.js",
+    "pages/production/gesta_lacta/page_prod_gestating_add.js",
+    
+    "pages/production/gesta_lacta/prod_entry_notes.js",
+    "pages/production/gesta_lacta/prod_entry_pig_ops.js",
+    "pages/production/gesta_lacta/prod_entry_insem.js",
+    "pages/production/gesta_lacta/prod_entry_birth.js",
+    "pages/production/gesta_lacta/page_prod_gestating_entry.js",
+    
+    
+    
+    "pages/production/gesta_lacta/page_mob_gesta_lacta.js",
+    
+    
+    "pages/navigation/navigation.js"
+]
+
+
+
+class MinifyScripts:
+    def minify(self, js_root_dir, js_scripts_list ):
+        
+        # Combine first all js files into 1 file
+        
+        s = ''
+        
+        for cur_entry in js_scripts_list:
+            cur_path = os.path.join(js_root_dir, cur_entry)
+            
+            with open(cur_path, 'r') as file:
+                js_code = file.read()
+                s += js_code
+           
+        
+           
 
 class View:
     def __init__(self, controller):
@@ -102,48 +175,7 @@ class Root(ViewBase):
         js_app_text     = []
     
         # These should have type= module
-        js_app_modules = [
-            "constants.js",
-            "utils.js",
-            
-            
-            "models/model_basic.js",
-            "models/model_acc_pig_ops.js",
-            "models/model_pig_production.js",
-            
-            
-            "pages/common/page_view_basic.js",
-            "pages/navigation/text_substitute_control.js",
-            
-            "pages/acc_pig_ops/add_modal_acc_pig_ops.js",
-            "pages/acc_pig_ops/edit_modal_acc_pig_ops.js",
-            "pages/acc_pig_ops/page_acc_pig_ops.js",
-            
-            
-            "pages/sow_boar/page_sow_boar_list.js",
-            "pages/sow_boar/page_sow_boar_add_edit.js",
-            
-            
-            
-            "pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
-            
-            
-            "pages/production/gesta_lacta/insem_data_select.js",
-            "pages/production/gesta_lacta/page_prod_gestating_add.js",
-            
-            "pages/production/gesta_lacta/prod_entry_notes.js",
-            "pages/production/gesta_lacta/prod_entry_pig_ops.js",
-            "pages/production/gesta_lacta/prod_entry_insem.js",
-            "pages/production/gesta_lacta/prod_entry_birth.js",
-            "pages/production/gesta_lacta/page_prod_gestating_entry.js",
-            
-            
-            
-            "pages/production/gesta_lacta/page_mob_gesta_lacta.js",
-            
-            
-            "pages/navigation/navigation.js"
-        ]
+        js_app_modules = MODULES_ROOT
             
         data    = { 'page_data':        page_data,
                     'js_lib':           js_lib,

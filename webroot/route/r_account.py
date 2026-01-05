@@ -33,6 +33,29 @@ from r_utils                import get_location_address_names_and_replace_ids
 ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
 
 
+def replace_account_plain_ids(data):
+    cur_id  = data['account']['id']
+    cur_hid = hashids_account.encrypt(cur_id)
+    
+    del data['account']['id']
+    data['account']['hid']   = cur_hid
+    
+    
+    pig_farms = data['pig_farms']
+    
+    for cur_entry in pig_farms:
+        cur_id  = cur_entry['pig_farm']['id']
+        cur_hid = hashids_account.encrypt(cur_id)
+        
+        del cur_entry['pig_farm']['id']
+        cur_entry['pig_farm']['hid']   = cur_hid
+        
+        
+        get_location_address_names_and_replace_ids(cur_entry)
+        
+        
+    
+    
 
 @app.get("/account/info", tags=["Account"])
 async def user_account_info(ahid: str):
@@ -72,11 +95,8 @@ async def user_account_info(ahid: str):
             }
         }
     
-    cur_id  = res['account']['id']
-    cur_hid = hashids_account.encrypt(cur_id)
     
-    del res['account']['id']
-    res['account']['hid']   = cur_hid
+    replace_account_plain_ids(res)
     
         
     result = {

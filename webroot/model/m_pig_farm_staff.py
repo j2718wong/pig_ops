@@ -201,7 +201,7 @@ class PigFarmStaff:
     
     
     def get_list(self, pig_farm_id, inc_deleted = 0,
-            inc_user_audit = 0):
+            inc_user_audit = 0, minimum_info = 0):
         
         if inc_deleted > 0:
             where_clause = 'WHERE a.pig_farm_id = %s' % pig_farm_id 
@@ -210,15 +210,25 @@ class PigFarmStaff:
         
         
         if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.name,
-                        a.user_id
-                    FROM pig_farm_staff a 
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
+            if minimum_info == 0:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name,
+                            a.user_id
+                        FROM pig_farm_staff a 
+                        %s
+                        ORDER BY a.name
+                        """ % where_clause
+            else:
+                sql =   """
+                        SELECT 
+                            a.id,
+                            a.name
+                        FROM pig_farm_staff a 
+                        %s
+                        ORDER BY a.name
+                        """ % where_clause
         else:
             sql =   """
                     SELECT 
@@ -241,7 +251,7 @@ class PigFarmStaff:
                     %s
                     ORDER BY a.name
                     """ % where_clause
-        
+            
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -275,13 +285,21 @@ class PigFarmStaff:
             
             for row in rows:
                 if inc_user_audit == 0:
-                    cur_entry = {
-                        'pig_farm_staff': {
-                            'id':               row[0],
-                            'name':             row[1],
-                            'user_id':          row[2]
+                    if minimum_info == 0:
+                        cur_entry = {
+                            'pig_farm_staff': {
+                                'id':               row[0],
+                                'name':             row[1],
+                                'user_id':          row[2]
+                            }
                         }
-                    }
+                    else:
+                        cur_entry = {
+                            'pig_farm_staff': {
+                                'id':               row[0],
+                                'name':             row[1]
+                            }
+                        }
                     
                 else:
                     cur_entry = {

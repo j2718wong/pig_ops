@@ -4,6 +4,7 @@
 import os
 import sys
 import json
+import time
 import pprint
 
 from pydantic               import BaseModel
@@ -29,7 +30,8 @@ if module_directory not in sys.path:
 
 
 from r_account_selection    import get_account_lookup_selection
-from r_utils                import get_location_address_names_and_replace_ids
+from r_utils                import (get_user_account_info,
+                                   get_location_address_names_and_replace_ids)
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -39,40 +41,56 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
 
 
 
-def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
-    res_user = model['user'].get_user_info(user_id)
-    if res_user == None:
-        # TODO what to do in case no result
-        print('Error 1')
-        return None
-        
-        
-    # Get user.account_id 
-    account_id = res_user['user']['account_id']
+def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None,
+        inc_pig_prod = 0):
+            
+    """
+    Will get user account pig_prod_page data. 
+    This is a large data block getting data from several tables.
+    To minimize execution time, it is possible to request 
+    the actual pig_prod data later via separate request.
     
-    # Get account info
-    data_account = model['account'].get_info(account_id)
-    if data_account == None:
-        # TODO what to do in case no result
+    Parameters
+    ----------
+    user_id : int
+    
+    pig_farm_id: int
+    
+    inc_pig_prod : int
+        flag to include pig_prod data.
+        
+    """
+            
+    user_account    = get_user_account_info(user_id)
+    
+    data_user       = user_account['user']
+    data_account    = user_account['account']
+        
+    # Check if there are account farms
+    
+    if 'pig_farms' not in data_account:
+        # TODO what to do here
         print('Error 2')
-        return None
-        
-        
-    # TODO Check account free trial period
-        
-    # TODO check account for not paid bill
+        return None   
     
-        
-    # Check if there is a farm_id list
-    account_farm_ids = data_account['farm_ids']
-    len_items = len(account_farm_ids)
+    
+    account_pig_farms = data_account['pig_farms']
+    
+    print('data_user')
+    pprint.pprint(data_user)
+    
+    print('data_account')
+    pprint.pprint(data_account)
+    
+    len_items = len(account_pig_farms)
     if len_items == 0:
         # TODO what to do in case no farm set
         print('Error 3')
         return None
         
+        
     if pig_farm_id is not None:
-        # This is given by user 
+        # This is given by user; This is possible.
         
         if pig_farm_id not in account_farm_ids:
             # TODO what to do in case farm_id given is not in account list
@@ -81,8 +99,35 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
     
     else:
         # select the first farm_id
-        pig_farm_id = account_farm_ids[0]
+        pig_farm_id = account_pig_farms[0]['pig_farm']['id']
         
+    
+    account_id = data_account['account']['id']
+    
+    
+def get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 0):
+    pig_farm_account= model['pig_farm'].get_pig_farm_account_info(pig_farm_id)
+    
+    if pig_farm_account == None: return None
+    
+    account_id = pig_farm_account['account']['id']
+    
+    pig_prod_page_data  = get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod)
+    
+    
+    # Replace plain id
+    cur_id      = account_id
+    cur_hid     = hashids_account.encrypt(cur_id)
+    
+    del pig_farm_account['account']['id']
+    pig_farm_account['account']['hid']   = cur_hid
+
+    pig_prod_page_data['account'] = pig_farm_account
+    
+    return pig_prod_page_data
+
+    
+def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
     
     # Get account gestating ops
     list_acc_gestating_ops =  model['account_pig_ops'].get_list(account_id, 
@@ -147,9 +192,6 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
     
     
     # Get semen_supplier list
-    #list_semen_supplier = model['semen_supplier'].get_list(
-    #    account_id = account_id, minimum_info = 0)
-    
     list_semen_supplier = model['supplier'].get_list(
         account_id          = account_id, 
         is_semen_supplier   = 1,
@@ -162,7 +204,7 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
         
     
     # Get farm_staff list
-    list_staff = model['pig_farm_staff'].get_list(pig_farm_id)
+    list_staff = model['pig_farm_staff'].get_list(pig_farm_id, minimum_info = 1)
     if list_staff == None:
         # TODO what to do in case no result
         print('Error 12')
@@ -188,9 +230,7 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
     
     
     # Get feed_supplier_list
-    #list_feed_supplier = model['feed_supplier'].get_list(
-    #    account_id = account_id, minimum_info = 0)
-    
+   
     list_feed_supplier = model['supplier'].get_list(
         account_id          = account_id, 
         is_feed_supplier    = 1,
@@ -212,24 +252,22 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
         return None
     
     
-    # Get pig_production list
-    list_pig_prod = get_pig_prod_list(pig_farm_id, 0)
-    if list_pig_prod == None:
-        # TODO what to do in case no result
-        print('Error 17')
-        return None
-        
+    list_pig_prod = None
+    if inc_pig_prod > 0:
+    
+        # Get pig_production list
+        list_pig_prod = get_pig_prod_list(pig_farm_id, 0)
+        if list_pig_prod == None:
+            # TODO what to do in case no result
+            print('Error 17')
+            return None
+            
 
 
     
 
     # Remove plain_ids and not useful data blocks
-    
-    
-    del data_account['account']
-    del data_account['farm_ids']
-    del data_account['settings_operations']['last_update']
-    
+
     for cur_entry in list_acc_gestating_ops:
         cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
@@ -285,17 +323,6 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
         del cur_entry['pig_farm_staff']['id']
         cur_entry['pig_farm_staff']['hid']   = cur_hid
         
-        
-        cur_id      = cur_entry['pig_farm_staff']['user_id']
-        
-        if cur_id > 0:
-            cur_hid     = hashids_user.encrypt(cur_id)
-            
-            del cur_entry['pig_farm_staff']['user_id']
-            cur_entry['pig_farm_staff']['user_hid']   = cur_hid
-        else:
-            cur_entry['pig_farm_staff']['user_hid']   = '';
-        
     
     
     for cur_entry in list_feed_type:
@@ -338,7 +365,6 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
     
     
     page_data = {
-        'account':                  data_account,
         'acc_gestating_ops':        list_acc_gestating_ops,
         'acc_lactating_piglets_ops': list_acc_lactating_piglets_ops,
         'acc_lactating_sow_ops':    list_acc_lactating_sow_ops,
@@ -351,10 +377,11 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None):
         'feed_brand_list':          list_feed_brand,
         'feed_supplier_list':       list_feed_supplier,
         
-        'pig_dead_type_list':       list_pig_dead_type,
-        
-        'pig_production':           list_pig_prod
+        'pig_dead_type_list':       list_pig_dead_type
     }
+    
+    if inc_pig_prod > 0:
+        page_data['pig_production']  = list_pig_prod
     
     return page_data
 
@@ -392,14 +419,36 @@ async def pig_prod(pfhid:str = None, m:int =0):
         else:
             pig_farm_id = res[0]
             
+    else:
+        pig_farm_id = 1 # temporary
     
-    # temporary
-    user_id = 1
-   
-    page_data = get_user_account_pig_prod_page_data(user_id, pig_farm_id)
+    
+    t0 = time.time()
+    
+    page_data = get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 1)
 
+    t1 = time.time()
+    
     page = controller.view['pig_prod'].render(page_data = json.dumps(page_data, indent=4),
         is_mobile = m)
+    
+    t2 = time.time()
+    
+    
+    delta_t1 = t1 - t0
+    delta_t2 = t2 - t1
+    
+    delta_t  = t2 - t0
+    
+    s_delta_t1      = '%.2f' % delta_t1
+    s_delta_t2      = '%.2f' % delta_t2
+    s_delta_t       = '%.2f' % delta_t
+    
+    
+    
+    print('\n\npig_prod page_data time(secs): %s' %s_delta_t)
+    print('getting  page_data time(secs): %s' %s_delta_t1)
+    print('rendering page_data time(secs): %s' %s_delta_t2)
     
     return page
     
