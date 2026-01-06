@@ -91,6 +91,8 @@ class PigProduction:
             in_comments             VARCHAR(160),
             
             in_insem_staff_id       INT,
+            in_done_by_user         INT, 
+            
             in_date_insemination    VARCHAR(10)  /* in YYYY-MM-DD format*/
         )  
         """
@@ -138,6 +140,9 @@ class PigProduction:
             sql += 'NULL,'
             
         sql += '%s,'    % data.insem_staff_id
+        sql += '%s,'    % data.done_by_user
+        
+        
         sql += '"%s");' % data.insem_date
         
         
@@ -694,7 +699,7 @@ class PigProduction:
         return None
     
     
-    def get_list(self, pig_farm_id = 0 , is_fattening = 0):
+    def get_list(self, pig_farm_id = 0 , pig_prod_type = 0):
         """
         Will get pig_production list.
         
@@ -709,10 +714,16 @@ class PigProduction:
 
         """
 
+        if pig_prod_type == 1:
+            where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 1 ' % pig_farm_id
         
-        if is_fattening == 0:
+        if pig_prod_type == 2:
+            where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 4 ' % pig_farm_id
+        
+        if pig_prod_type == 3:
             where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4)) ' % pig_farm_id
-        else:
+        
+        if pig_prod_type == 4:
             where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6)) ' % pig_farm_id
 
         sql =   """

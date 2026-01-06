@@ -100,10 +100,15 @@ async def root(pfhid:str = None):
     
 
     
-    page_data = get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 0)
-        
+    farm_account = get_farm_account_pig_prod_page_data(
+        pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
+    
+    page_data = {}
     page_data['application'] = data_app
     page_data['user_account'] = clean_data_user_account(user_account)
+    page_data['pig_farm_account'] = farm_account  
+
+
 
     time_final  = time.time()
     delta_secs  = time_final - time_init

@@ -691,6 +691,7 @@ class SowBoar:
                             del cur_entry['sow_boar']['is_external']
                         else:
                             del cur_entry['sow_boar']['farm_sow_id'] # This is for boar only
+                            del cur_entry['sow_boar']['status_id'] # This refers to sow_status
                             del cur_entry['sow_boar']['status'] # This refers to sow_status
                             del cur_entry['sow_boar']['date_insemination'] # This is for sow only
                             del cur_entry['sow_boar']['date_expected_birth'] # This is for sow only

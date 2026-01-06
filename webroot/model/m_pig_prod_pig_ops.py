@@ -69,7 +69,10 @@ class PigProdPigOps:
             row = None
 
         if row is not None:
-            return {
+            added_new_staff = row[4]
+            pig_farm_id     = row[5]
+            
+            cur_entry = {
                 'result':{
                     'num':              row[0],
                     'code':             row[1],
@@ -80,7 +83,13 @@ class PigProdPigOps:
                     'id':               row[3]
                 }
             }
-
+            
+            if added_new_staff > 0:
+                cur_entry['added_new_staff']= 1
+                cur_entry['pig_farm_id']    = pig_farm_id  
+        
+            return cur_entry
+        
         return None
     
     

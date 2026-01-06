@@ -20,7 +20,7 @@ from common_fast_api        import *
 
 
 @app.get("/address/level_1/list", tags=["Location Address"])
-async def address_level_1_list(country_id:int):
+async def address_level_1_list(country_hid:str):
     """
     Will get address_level_1 list.
     
@@ -29,6 +29,23 @@ async def address_level_1_list(country_id:int):
     country_id : int
         country_id
     """
+    
+    country_id = 0
+    
+            
+    res = hashids_common.decrypt(country_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_ADDRESS_COUNTRY_HID,
+                'code': 'ERROR_ADDRESS_COUNTRY_HID',
+                'desc': ''
+            }
+        }
+    
+    country_id = res[0]
+
     
 
     res     = model_la['address_level'].get_address_level_1_list(country_id)

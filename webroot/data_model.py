@@ -376,8 +376,12 @@ class DataPigProd(BaseModel):
     insem_cost:             float = 0.0
     insem_notes:            str = None
         
-    insem_staff_id:         int = None
+    insem_staff_id:         int = 0
+    done_by_user:           int = 0
+    
     insem_date:             str
+    
+    
     
     
 class DataPigProdAI(BaseModel):
@@ -509,7 +513,7 @@ class DataPigProdPigOps(BaseModel):
     uhid:                   str
     
     pig_prod_pig_ops_hid:   str = None
-    staff_hid:              str
+    staff_hid:              str = None
     
     user_id:                int = 0
     pig_prod_pig_ops_id:    int = 0

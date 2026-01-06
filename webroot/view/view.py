@@ -68,6 +68,9 @@ MODULES_ROOT = [
     
     
     "pages/common/page_view_basic.js",
+    "pages/common/address_manager.js",
+    "pages/common/common_app.js",
+    
     "pages/navigation/text_substitute_control.js",
     
     "pages/acc_pig_ops/add_modal_acc_pig_ops.js",

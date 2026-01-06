@@ -53,20 +53,22 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     
     staff_hid = pig_prod_pig_ops_data.staff_hid
     staff_id  = None
+    
+    # Needs staff info if not done_by_user
+    if pig_prod_pig_ops_data.done_by_user == 0:
+        res = hashids_common.decrypt(staff_hid)
+        if len(res) == 0:
         
-    res = hashids_common.decrypt(staff_hid)
-    if len(res) == 0:
-    
-        return {
-            'result':{
-                'num':  ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID,
-                'code': 'ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID',
-                'desc': ''
+            return {
+                'result':{
+                    'num':  ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID,
+                    'code': 'ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID',
+                    'desc': ''
+                }
             }
-        }
-    
-    staff_id = res[0]
-    
+        
+        staff_id = res[0]
+        
     
     pig_prod_pig_ops_data.user_id               = user_id
     pig_prod_pig_ops_data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
@@ -87,6 +89,26 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     # remove plain id
     del res_update['pig_prod_pig_ops']['id']
     res_update['pig_prod_pig_ops']['hid'] = pig_prod_pig_ops_hid
+        
+        
+    if 'added_new_staff' in res_update:
+        # Get new staff list fo refresh client staff_list
+        
+        pig_farm_id = res_update['pig_farm_id']
+        del res_update['pig_farm_id']
+        del res_update['added_new_staff']
+        list_staff = model['pig_farm_staff'].get_list(pig_farm_id, minimum_info = 1)
+        
+        if list_staff is not None:
+            for cur_entry in list_staff:
+                cur_id      = cur_entry['pig_farm_staff']['id']
+                cur_hid     = hashids_common.encrypt(cur_id)
+            
+                del cur_entry['pig_farm_staff']['id']
+                cur_entry['pig_farm_staff']['hid']   = cur_hid
+            
+            res_update['staff_list'] = list_staff
+            
         
     return res_update
     

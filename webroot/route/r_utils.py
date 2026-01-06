@@ -61,7 +61,7 @@ def clean_data_user_account(user_account):
     
     user_pig_farms = user_account['user']['pig_farms']
     
-    farm_hash_ids = [hashids_user.encrypt(cur_id) for cur_id in user_pig_farms]
+    farm_hash_ids = [hashids_common.encrypt(cur_id) for cur_id in user_pig_farms]
     user_account['user']['pig_farms'] = farm_hash_ids
     
     
@@ -98,6 +98,14 @@ def get_location_address_names_and_replace_ids(data):
     
     if level_3_id is None:
         level_3_id = 0
+    
+    
+    cur_id      = data['location']['country']['id']
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
+    del data['location']['country']['id']
+    data['location']['country']['hid']   = cur_hid
+    
     
     address_names = model_la['address_level'].get_address_level_names(
         address_level_1_id = level_1_id, 

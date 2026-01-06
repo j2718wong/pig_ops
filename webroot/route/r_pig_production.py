@@ -105,14 +105,17 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None,
     account_id = data_account['account']['id']
     
     
-def get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 0):
+def get_farm_account_pig_prod_page_data(pig_farm_id, 
+        inc_pig_prod = 0, inc_user_audit = 0):
+    
     pig_farm_account= model['pig_farm'].get_pig_farm_account_info(pig_farm_id)
     
     if pig_farm_account == None: return None
     
     account_id = pig_farm_account['account']['id']
     
-    pig_prod_page_data  = get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod)
+    pig_prod_page_data  = get_pig_prod_page_data(account_id, pig_farm_id, 
+            inc_pig_prod, inc_user_audit = inc_user_audit)
     
     
     # Replace plain id
@@ -127,33 +130,18 @@ def get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 0):
     return pig_prod_page_data
 
     
-def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
+def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
+        inc_user_audit = 0):
     
-    # Get account gestating ops
-    list_acc_gestating_ops =  model['account_pig_ops'].get_list(account_id, 
-        PIG_OPERATION_TYPE_GESTATING, 0, 0)
-    if list_acc_gestating_ops == None:
-        # TODO what to do in case no result
-        print('Error 6')
-        return None
-    
-    
-    # Get account lactating piglets ops
-    list_acc_lactating_piglets_ops =  model['account_pig_ops'].get_list(
-        account_id, PIG_OPERATION_TYPE_LACTATING_PIGLETS, 0, 0)
-    if list_acc_lactating_piglets_ops == None:
-        # TODO what to do in case no result
-        print('Error 7')
-        return None
-        
-        
-    # Get account lactating sow ops
-    list_acc_lactating_sow_ops =  model['account_pig_ops'].get_list(
-        account_id, PIG_OPERATION_TYPE_LACTATING_SOW, 0, 0)
-    if list_acc_lactating_sow_ops == None:
+    list_acc_pig_ops =  model['account_pig_ops'].get_list(account_id, None, 
+        inc_deleted = 0, inc_user_audit = inc_user_audit)
+    if list_acc_pig_ops == None:
         # TODO what to do in case no result
         print('Error 8')
         return None
+    
+    
+    
     
     
     # Get pig_farm sow list
@@ -210,24 +198,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
         print('Error 12')
         return None
         
-    
-    # Get feed_type list
-    # This is the same data for all accounts
-    list_feed_type = model['feed_type'].get_list()
-    if list_feed_type == None:
-        # TODO what to do in case no result
-        print('Error 13')
-        return None
-    
-    
-    # Get feed_brand list
-    # This is the same for all accounts by country_id
-    list_feed_brand = model['feed_brand'].get_list(country_id = 1)
-    if list_feed_brand == None:
-        # TODO what to do in case no result
-        print('Error 14')
-        return None
-    
+
     
     # Get feed_supplier_list
    
@@ -241,22 +212,15 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
         print('Error 15')
         return None
         
-        
-    
-    # Get pig_dead_type list
-    # This is the same for all accounts
-    list_pig_dead_type = model['prod_pig_dead'].get_pig_dead_type_list()
-    if list_pig_dead_type == None:
-        # TODO what to do in case no result
-        print('Error 16')
-        return None
     
     
     list_pig_prod = None
     if inc_pig_prod > 0:
     
+        pig_prod_type = PIG_PROD_TYPE.GESTATING | PIG_PROD_TYPE.LACTATING
+    
         # Get pig_production list
-        list_pig_prod = get_pig_prod_list(pig_farm_id, 0)
+        list_pig_prod = get_pig_prod_list(pig_farm_id, pig_prod_type)
         if list_pig_prod == None:
             # TODO what to do in case no result
             print('Error 17')
@@ -267,29 +231,14 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
     
 
     # Remove plain_ids and not useful data blocks
-
-    for cur_entry in list_acc_gestating_ops:
-        cur_id      = cur_entry['acc_pig_ops']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['acc_pig_ops']['id']
-        cur_entry['acc_pig_ops']['hid']   = cur_hid
-        
     
-    for cur_entry in list_acc_lactating_piglets_ops:
+    for cur_entry in list_acc_pig_ops:
         cur_id      = cur_entry['acc_pig_ops']['id']
         cur_hid     = hashids_common.encrypt(cur_id)
         
         del cur_entry['acc_pig_ops']['id']
         cur_entry['acc_pig_ops']['hid']   = cur_hid
     
-    
-    for cur_entry in list_acc_lactating_sow_ops:
-        cur_id      = cur_entry['acc_pig_ops']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['acc_pig_ops']['id']
-        cur_entry['acc_pig_ops']['hid']   = cur_hid
     
     
     for cur_entry in list_sow_list:
@@ -323,22 +272,6 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
         del cur_entry['pig_farm_staff']['id']
         cur_entry['pig_farm_staff']['hid']   = cur_hid
         
-    
-    
-    for cur_entry in list_feed_type:
-        cur_id      = cur_entry['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-    
-
-    for cur_entry in list_feed_brand:
-        cur_id      = cur_entry['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
 
     
     for cur_entry in list_feed_supplier:
@@ -355,35 +288,23 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0):
     for cur_entry in list_semen_supplier:
         get_location_address_names_and_replace_ids(cur_entry)
     
-    
-    for cur_entry in list_pig_dead_type:
-        cur_id      = cur_entry['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-    
-    
-    page_data = {
-        'acc_gestating_ops':        list_acc_gestating_ops,
-        'acc_lactating_piglets_ops': list_acc_lactating_piglets_ops,
-        'acc_lactating_sow_ops':    list_acc_lactating_sow_ops,
+
+    pig_farm_account = {
+        'acc_pig_ops':              list_acc_pig_ops,
         
         'sow_list':                 list_sow_list,
         'boar_list':                list_boar_list,
         'semen_supplier_list':      list_semen_supplier,
         'staff_list':               list_staff,
-        'feed_type_list':           list_feed_type,
-        'feed_brand_list':          list_feed_brand,
-        'feed_supplier_list':       list_feed_supplier,
         
-        'pig_dead_type_list':       list_pig_dead_type
+        'feed_supplier_list':       list_feed_supplier
+        
     }
     
     if inc_pig_prod > 0:
-        page_data['pig_production']  = list_pig_prod
+        pig_farm_account['pig_production']  = list_pig_prod
     
-    return page_data
+    return pig_farm_account
 
 
 @app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
@@ -581,6 +502,100 @@ async def pig_prod_status_list():
     }
     
 
+@app.get("/pig_prod/public", tags=["Pig Production"])
+async def pig_prod_public(country_hid:str):
+    """
+    Will get pig_production public data.
+    
+    Parameters
+    ----------
+
+    """
+    
+    country_id = 0
+    
+            
+    res = hashids_common.decrypt(country_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_ADDRESS_COUNTRY_HID,
+                'code': 'ERROR_ADDRESS_COUNTRY_HID',
+                'desc': ''
+            }
+        }
+    
+    country_id = res[0]
+
+    
+    
+    # Get feed_type list
+    # This is the same data for all accounts
+    list_feed_type = model['feed_type'].get_list()
+    if list_feed_type == None:
+        # TODO what to do in case no result
+        print('Error 13')
+        return None
+    
+    
+    # Get feed_brand list
+    # This is the same for all accounts by country_id
+    list_feed_brand = model['feed_brand'].get_list(country_id = country_id)
+    if list_feed_brand == None:
+        # TODO what to do in case no result
+        print('Error 14')
+        return None
+    
+
+    # Get pig_dead_type list
+    # This is the same for all accounts
+    list_pig_dead_type = model['prod_pig_dead'].get_pig_dead_type_list()
+    if list_pig_dead_type == None:
+        # TODO what to do in case no result
+        print('Error 16')
+        return None
+
+    
+    for cur_entry in list_feed_type:
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+
+    for cur_entry in list_feed_brand:
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    
+    for cur_entry in list_pig_dead_type:
+        cur_id      = cur_entry['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+    
+    return {
+        
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+    
+        'data': {
+            'feed_type_list':           list_feed_type,
+            'feed_brand_list':          list_feed_brand,
+            'pig_dead_type_list':       list_pig_dead_type
+        }
+    }
+    
+    
 
 @app.post("/pig_prod/add", tags=["Pig Production"])
 async def pig_prod_add(pig_prod_data: dm.DataPigProd):
@@ -1401,7 +1416,7 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
 
 
 @app.get("/pig_prod/list", tags=["Pig Production"])
-async def pig_prod_list(pfhid:str, is_fattening:int = 0):
+async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     """
     Will get pig_production list.
     
@@ -1410,6 +1425,15 @@ async def pig_prod_list(pfhid:str, is_fattening:int = 0):
     
     pfhid:str
         pig_farm hashid
+
+
+    pig_prod_type: int
+        combination of flag bits
+        
+        1 = PROD_TYPE_GESTA
+        2 = PROD_TYPE_LACTA
+        4 = PROD_TYPE_FATTENING
+    
 
 
     """
@@ -1426,7 +1450,7 @@ async def pig_prod_list(pfhid:str, is_fattening:int = 0):
     
     
     pig_farm_id = res[0]
-    res = get_pig_prod_list(pig_farm_id, is_fattening)
+    res = get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view)
     
     return {
         'result':{
@@ -1439,14 +1463,14 @@ async def pig_prod_list(pfhid:str, is_fattening:int = 0):
     }
     
     
-def get_pig_prod_list(pig_farm_id, is_fattening, is_mobile_view = 0):
-    res = model['pig_prod'].get_list(pig_farm_id, is_fattening)
+def get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view = 0):
+    res = model['pig_prod'].get_list(pig_farm_id, pig_prod_type)
     
     
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
         
-        order_by = 0 if is_mobile_view == 0 else 1
+        order_by = 0 if is_mob_view == 0 else 1
         
         operation_type  = PIG_OPERATION_TYPE_GESTATING
         gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
@@ -1508,7 +1532,7 @@ def get_pig_prod_list(pig_farm_id, is_fattening, is_mobile_view = 0):
         # Initially, the piglets and sow pig operations are requested 
         # separately. But in mobile web, this is shown as one list.
         
-        if is_mobile_view == 0:
+        if is_mob_view == 0:
             operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
             lactating_piglets_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
                 operation_type, inc_user_audit = 1)

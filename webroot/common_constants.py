@@ -61,6 +61,12 @@ PROD_STATUS_ID_HARVESTED                            = 8
 PROD_STATUS_ID_CLOSED                               = 9
 
 
+PIG_PROD_TYPE = {
+    'GESTATING':        1,
+    'LACTATING':        2,
+    'FATTENING':        4
+}
+
 
 
 
@@ -97,6 +103,7 @@ DEFAULT_KG_PER_FEED_UNIT = {
 ERROR_DATABASE_ERROR                                = 0x01
 ERROR_SERVER_ERROR                                  = 0x02
 
+ERROR_ADDRESS_COUNTRY_HID                           = 0x07
 ERROR_ADDRESS_LEVEL_1_HID                           = 0x08
 ERROR_ADDRESS_LEVEL_2_HID                           = 0x09
 ERROR_ADDRESS_LEVEL_3_HID                           = 0x0A
