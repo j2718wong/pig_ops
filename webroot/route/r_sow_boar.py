@@ -468,8 +468,8 @@ async def sow_pt_list(pfhid, full_info: int = 0):
 
 @app.get("/sow_boar/list", tags=["Sow Boar"])
 async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0, 
-        inc_external:int = 0, is_production_ready:int = 1, 
-        inc_user_audit:int = 0, order_by:int = 0):
+        inc_external:int = 0, is_production_ready:int = None, 
+        inc_user_audit:int = 0, minimum_info = 1, order_by:int = 0):
     """
     Will get sow list.
     
@@ -488,8 +488,9 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
         1 = will include externally owned sow/boar
     
     is_production_ready: int
-        0 = will  return gilts, junior boar
-        1 = will return productin ready sowboar
+        None = will include both growing and production ready sow, boar
+        0 = still growing gilts, boar 
+        1 = ready for mating
         
     inc_user_audit:
         if > 0, will include added_by and last_update info
@@ -521,6 +522,7 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
             inc_external    = inc_external,
             is_production_ready = is_production_ready,
             inc_user_audit  = inc_user_audit,
+            minimum_info    = minimum_info,
             order_by        = order_by)
     
     if res is None:

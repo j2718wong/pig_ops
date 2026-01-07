@@ -478,6 +478,7 @@ class SowBoar:
                             a.farm_birth_prod_id,
                             a.last_prod_id,
                            
+                            a.status_id,
                             b.name AS status_name,
                             a.date_of_birth,
                             a.date_eartag,
@@ -618,12 +619,13 @@ class SowBoar:
                             'farm_birth_prod_id':   row[8],
                             'last_prod_id':         row[9],
                             
-                            'status':               row[10],
-                            'date_of_birth':        str(row[11])  if row[11] else None,
-                            'date_eartag':          str(row[12])  if row[12] else None,
-                            'date_dispose':         str(row[13])  if row[13] else None,
-                            'notes':                row[14],
-                            'dispose_notes':        row[15]
+                            'status_id':            row[10],
+                            'status':               row[11],
+                            'date_of_birth':        str(row[12])  if row[12] else None,
+                            'date_eartag':          str(row[13])  if row[13] else None,
+                            'date_dispose':         str(row[14])  if row[14] else None,
+                            'notes':                row[15],
+                            'dispose_notes':        row[16]
                         }
                     
                     else:

@@ -131,7 +131,7 @@ def get_farm_account_pig_prod_page_data(pig_farm_id,
 
     
 def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
-        inc_user_audit = 0):
+        inc_user_audit = 0, minimum_info = 1):
     
     list_acc_pig_ops =  model['account_pig_ops'].get_list(account_id, None, 
         inc_deleted = 0, inc_user_audit = inc_user_audit)
@@ -140,14 +140,11 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         print('Error 8')
         return None
     
-    
-    
-    
-    
+
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
         is_disposed = 0, inc_external = 0, 
-        inc_user_audit = 0, minimum_info = 1, order_by = 1)
+        inc_user_audit = 0, minimum_info = minimum_info, order_by = 1)
     if list_sow_list == None:
         # TODO what to do in case no result
         print('Error 9')
@@ -172,7 +169,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
         is_disposed = 0, inc_external = 1, 
-        inc_user_audit = 0, minimum_info = 1, order_by = 1)
+        inc_user_audit = 0, minimum_info = minimum_info, order_by = 1)
     if list_boar_list == None:
         # TODO what to do in case no result
         print('Error 10')
@@ -180,7 +177,8 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
 
     
     # Get farm_staff list
-    list_staff = model['pig_farm_staff'].get_list(pig_farm_id, minimum_info = 1)
+    list_staff = model['pig_farm_staff'].get_list(pig_farm_id, 
+        minimum_info = minimum_info)
     if list_staff == None:
         # TODO what to do in case no result
         print('Error 12')
