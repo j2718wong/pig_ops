@@ -125,7 +125,7 @@ class SowBoar:
         
         sql += '"%s",'  % data.sex
         
-        if data.num_nipples is not None:
+        if data.num_nipples is not None and data.num_nipples > 0:
             sql += '%s,'  % data.num_nipples
         else:
             sql += 'NULL,'
@@ -506,7 +506,9 @@ class SowBoar:
                             a.date_of_birth,
                             
                             a.is_external,
+                            a.is_production_ready,
                             
+                            b.farm_prod_id,
                             b.date_insemination,
                             b.date_expected_birth,
                             
@@ -634,8 +636,10 @@ class SowBoar:
                             'status_id':            row[5],
                             'date_of_birth':        str(row[6])  if row[6] else None,
                             'is_external':          row[7],
-                            'date_insemination':    str(row[8])  if row[8] else None,
-                            'date_expected_birth':  str(row[9])  if row[9] else None
+                            'is_production_ready':  row[8],
+                            'last_farm_prod_id':    row[9],
+                            'date_insemination':    str(row[10])  if row[10] else None,
+                            'date_expected_birth':  str(row[11])  if row[11] else None
                         }
                     
                     if sex is not None:

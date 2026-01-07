@@ -145,7 +145,7 @@ class DataSowBoar(BaseModel):
         
     farm_birth_prod_id:     int = 0
     line_id:                int = 0
-    sow_status_id:          int = 2 # This needs to be properly set
+    sow_status_id:          int = 1
         
     sex:                    str = 'F' # Sow = 'F';  Boar = 'M'
     num_nipples:            int = None

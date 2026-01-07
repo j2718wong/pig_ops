@@ -73,6 +73,11 @@ MODULES_ROOT = [
     
     "pages/navigation/text_substitute_control.js",
     
+    
+    "pages/farm_account/pig_farm.js",
+    "pages/farm_account/account_lists.js",
+    
+    
     "pages/acc_pig_ops/add_modal_acc_pig_ops.js",
     "pages/acc_pig_ops/edit_modal_acc_pig_ops.js",
     "pages/acc_pig_ops/page_acc_pig_ops.js",

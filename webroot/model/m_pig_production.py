@@ -832,7 +832,7 @@ class PigProduction:
                 LEFT OUTER JOIN pig_farm_staff j    ON a.birth_staff_id = j.id
                 LEFT OUTER JOIN feed_balance k      ON a.last_feed_balance_id = k.id
                 %s
-                ORDER BY a.date_insemination DESC
+                ORDER BY a.date_insemination
                 """ % where_clause
 
 

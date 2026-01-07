@@ -146,7 +146,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
-        is_disposed = 0, inc_external = 0, is_production_ready = 1,
+        is_disposed = 0, inc_external = 0, 
         inc_user_audit = 0, minimum_info = 1, order_by = 1)
     if list_sow_list == None:
         # TODO what to do in case no result
@@ -171,25 +171,13 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
-        is_disposed = 0, inc_external = 1, is_production_ready = 1,
+        is_disposed = 0, inc_external = 1, 
         inc_user_audit = 0, minimum_info = 1, order_by = 1)
     if list_boar_list == None:
         # TODO what to do in case no result
         print('Error 10')
         return None
-    
-    
-    # Get semen_supplier list
-    list_semen_supplier = model['supplier'].get_list(
-        account_id          = account_id, 
-        is_semen_supplier   = 1,
-        minimum_info        = 0)
-    
-    if list_semen_supplier == None:
-        # TODO what to do in case no result
-        print('Error 11')
-        return None
-        
+
     
     # Get farm_staff list
     list_staff = model['pig_farm_staff'].get_list(pig_farm_id, minimum_info = 1)
@@ -198,21 +186,6 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         print('Error 12')
         return None
         
-
-    
-    # Get feed_supplier_list
-   
-    list_feed_supplier = model['supplier'].get_list(
-        account_id          = account_id, 
-        is_feed_supplier    = 1,
-        minimum_info        = 0)
-    
-    if list_feed_supplier == None:
-        # TODO what to do in case no result
-        print('Error 15')
-        return None
-        
-    
     
     list_pig_prod = None
     if inc_pig_prod > 0:
@@ -227,8 +200,6 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
             return None
             
 
-
-    
 
     # Remove plain_ids and not useful data blocks
     
@@ -257,13 +228,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         cur_entry['hid']   = cur_hid
     
        
-    for cur_entry in list_semen_supplier:
-        cur_id      = cur_entry['supplier']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['supplier']['id']
-        cur_entry['supplier']['hid']   = cur_hid
-        
+
         
     for cur_entry in list_staff:
         cur_id      = cur_entry['pig_farm_staff']['id']
@@ -273,31 +238,13 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         cur_entry['pig_farm_staff']['hid']   = cur_hid
         
 
-    
-    for cur_entry in list_feed_supplier:
-        cur_id      = cur_entry['supplier']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['supplier']['id']
-        cur_entry['supplier']['hid']   = cur_hid
-
-        
-        get_location_address_names_and_replace_ids(cur_entry)
-    
-    
-    for cur_entry in list_semen_supplier:
-        get_location_address_names_and_replace_ids(cur_entry)
-    
 
     pig_farm_account = {
         'acc_pig_ops':              list_acc_pig_ops,
         
         'sow_list':                 list_sow_list,
         'boar_list':                list_boar_list,
-        'semen_supplier_list':      list_semen_supplier,
-        'staff_list':               list_staff,
-        
-        'feed_supplier_list':       list_feed_supplier
+        'staff_list':               list_staff
         
     }
     
