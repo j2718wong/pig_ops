@@ -1,48 +1,73 @@
-# September 1, 2025
+# January 8, 2026
 # Jack Wong
 
 from common_constants       import *
 
-# /* account_pig_ops.flag bits*/
-FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC      = 2
 
-
-class AccountPigOps:
+class PigMedvac:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'AccountPigOps'
+        self.TAG                = 'PigMedvac'
 
 
     def add(self, data = None):
         """
-        PROCEDURE account_pig_ops_add(
+        PROCEDURE pig_medvac_add(
             in_user_id              INT,
-            in_operation_type       INT,
-            in_num_days_since       INT,
             
-            is_medvac               INT,
+            in_sow_boar_id          INT,
+            in_pig_prod_id          INT,
             
-            in_name                 VARCHAR(50),
-            in_short_name           VARCHAR(15),
-            in_description          VARCHAR(160)
-        )  
+            in_date_medvac          VARCHAR(10),
+            in_medvac_type_id       INT,
+            in_medvac_brand_id      INT,
+            in_medvac_name          VARCHAR(80),
+            
+            in_quantity             INT,
+            in_unit                 VARCHAR(20),
+            
+            in_staff_id             INT,
+            in_done_by_user         INT,
+            in_notes                VARCHAR(160)
+        )    
         """
         
-        sql =  'CALL account_pig_ops_add('
+        sql =  'CALL pig_medvac_add('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.operation_type
-        sql += '%s,'    % data.num_days_since
-        sql += '%s,'    % data.is_medvac
         
-        sql += '"%s",'  % data.name
-        
-        if data.short_name is not None and len(data.short_name) > 0:
-            sql += '"%s",'   % data.short_name
+        if data.sow_boar_id is not None and data.sow_boar_id > 0:
+            sql += '%s,'    % data.sow_boar_id
         else:
             sql += 'NULL,'
         
-        if data.description is not None and len(data.description) > 0:
-            sql += '"%s");'   % data.description
+        if data.pig_prod_id is not None and data.pig_prod_id > 0:
+            sql += '%s,'    % data.pig_prod_id
+        else:
+            sql += 'NULL,'
+        
+        
+        sql += '"%s",'  % data.date_medvac
+        
+        
+        if data.medvac_type_id is not None and data.medvac_type_id > 0:
+            sql += '%s,'    % data.medvac_type_id
+        else:
+            sql += 'NULL,'
+        
+        
+        sql += '%s,'    % data.medvac_brand_id
+        
+        sql += '"%s",'  % data.medvac_name
+        
+        sql += '%s,'    % data.quantity
+        sql += '"%s",'  % data.unit
+        
+        sql += '%s,'    % data.staff_id
+        sql += '%s,'    % data.done_by_user
+        
+        if data.notes is not None and len(data.notes) > 0:
+            sql += '"%s");'  % data.notes
+        
         else:
             sql += 'NULL);'
         
@@ -81,7 +106,7 @@ class AccountPigOps:
                     'desc':             row[2],
                 },
                 
-                'account_pig_ops': {
+                'pig_race_line': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -93,32 +118,23 @@ class AccountPigOps:
     
     def update(self, data = None):
         """
-        PROCEDURE account_pig_ops_update(
-            in_user_id              INT,
-    
-            in_account_pig_ops_id   INT,
-            in_num_days_since       INT,
+        PROCEDURE pig_race_line_update(
+            in_user_id                  INT,
             
-            is_medvac               INT,
+            in_pig_race_line_id         INT,
+            in_pig_race_id              INT,
             
-            in_name                 VARCHAR(50),
-            in_short_name           VARCHAR(15),
-            in_description          VARCHAR(160)
+            in_name                     VARCHAR(50),
+            in_description              VARCHAR(160)
         )
         """
        
-        sql =  'CALL account_pig_ops_update('
+        sql =  'CALL pig_race_line_update('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.account_pig_ops_id
-        sql += '%s,'    % data.num_days_since
-        sql += '%s,'    % data.is_medvac
+        sql += '%s,'    % data.pig_race_line_id
+        sql += '%s,'    % data.pig_race_id
         
         sql += '"%s",'  % data.name
-        
-        if data.short_name is not None and len(data.short_name) > 0:
-            sql += '"%s",'   % data.short_name
-        else:
-            sql += 'NULL,'
         
         if data.description is not None:
             sql += '"%s");'   % data.description
@@ -160,7 +176,7 @@ class AccountPigOps:
                     'desc':             row[2],
                 },
                 
-                'account_pig_ops': {
+                'pig_race_line': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -172,19 +188,19 @@ class AccountPigOps:
     
     def delete(self, data = None):
         user_id             = data['user_id']
-        account_pig_ops_id  = data['account_pig_ops_id']
+        pig_race_line_id    = data['pig_race_line_id']
         
         """
-        PROCEDURE account_pig_ops_delete(
+        PROCEDURE pig_race_line_delete(
             in_user_id                  INT,
             
-            in_account_pig_ops_id     INT
+            in_pig_race_line_id         INT
         )
         """
        
-        sql =  'CALL account_pig_ops_delete('
+        sql =  'CALL pig_race_line_delete('
         sql += '%s,'    % user_id
-        sql += '%s);'   % account_pig_ops_id
+        sql += '%s);'   % pig_race_line_id
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -220,7 +236,7 @@ class AccountPigOps:
                     'desc':             row[2],
                 },
                 
-                'account_pig_ops': {
+                'pig_race_line': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -230,50 +246,38 @@ class AccountPigOps:
         return None
     
     
-    def get_list(self, account_id, operation_type, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self, account_id, inc_deleted = 0,
+            inc_user_audit = 0):
         
-        if operation_type is not None:
-            values= (account_id, operation_type)
-            where_clause = 'WHERE a.account_id = %s AND a.operation_type =%s' % values
-            order_clause = 'ORDER BY a.num_days_since'
-        
+        if inc_deleted > 0:
+            where_clause = 'WHERE a.account_id = %s' % account_id 
         else:
-            where_clause = 'WHERE a.account_id = %s ' % account_id
-            order_clause = 'ORDER BY a.operation_type, a.num_days_since'
-            
-            
-        if inc_deleted == 0:
-            where_clause += ' AND (a.flag & 1) = 0' 
-            
+            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
+        
         
         if inc_user_audit == 0:
             sql =   """
                     SELECT 
                         a.id,
-                        a.num_days_since,
-                        a.version_num,
-                        a.operation_type,
-                        a.flag,
+                        a.pig_race_id,
+                        b.name AS pig_race_name,
                         
                         a.name,
-                        a.short_name,
-                        a.description
-                    FROM account_pig_ops a
+                        a.description,
+                        a.dt_entry
+                    FROM pig_race_line a 
+                    LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
                     %s
-                    %s
-                    """ % (where_clause, order_clause)
+                    ORDER BY a.name
+                    """ % where_clause
         else:
-            
             sql =   """
                     SELECT 
                         a.id,
-                        a.num_days_since,
-                        a.version_num,
-                        a.operation_type,
-                        a.flag,
+                        a.pig_race_id,
+                        b.name AS pig_race_name,
                         
                         a.name,
-                        a.short_name,
                         a.description,
                         
                         c.name_last,
@@ -284,13 +288,14 @@ class AccountPigOps:
                         d.name_first,
                         a.dt_last_update
                         
-                    FROM account_pig_ops a
+                    FROM pig_race_line a 
+                    LEFT OUTER JOIN pig_race b      ON a.pig_race_id = b.id
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
+                
                     %s
-                    ORDER BY a.num_days_since
+                    ORDER BY a.name
                     """ % where_clause
-
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -309,7 +314,7 @@ class AccountPigOps:
             
             rows = cursor.fetchall()
             cursor.close()
-            
+            #conn.close()
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql
@@ -324,56 +329,46 @@ class AccountPigOps:
         if rows is not None:
             
             for row in rows:
-                cur_flag = row[4]
-                    
-                is_medvac   = 0
-                if cur_flag & FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC > 0:
-                    is_medvac   =   1
-                    
-                
                 if inc_user_audit == 0:
-                    
                     cur_entry = {
-                        'acc_pig_ops': {
-                            'id':               row[0],
-                            'num_days_since':   row[1],
-                            'version_num':      row[2],
-                            'operation_type':   row[3],
-                            'is_medvac':        is_medvac,
-                            
-                            'name':             row[5],
-                            'short_name':       row[6],
-                            'desc':             row[7]
-                        }
-                    }
-                
-                else:
-                    
-                    cur_entry = {
-                        'acc_pig_ops': {
-                            'id':               row[0],
-                            'num_days_since':   row[1],
-                            'version_num':      row[2],
-                            'operation_type':   row[3],
-                            'is_medvac':        is_medvac,
-                            
-                            'name':             row[5],
-                            'short_name':       row[6],
-                            'desc':             row[7]
+                        'id':                   row[0],
+                        
+                        'pig_race':{
+                            'id':               row[1],
+                            'name':             row[2],
                         },
                         
+                        'name':                 row[3],
+                        'desc':                 row[4],
+                        
+                        'dt_entry':             str(row[5])
+                    }
+                    
+                else:
+                    cur_entry = {
+                        'id':                   row[0],
+                        
+                        'pig_race':{
+                            'id':               row[1],
+                            'name':             row[2],
+                        },
+                        
+                        'name':                 row[3],
+                        'description':          row[4],
+                        
                         'added_by': {
-                            'name_last':        row[8],
-                            'name_first':       row[9],
-                            'dt_entry':         str(row[10]) if row[10] else None
+                            'name_last':        row[5],
+                            'name_first':       row[6],
+                            'dt_entry':         row[7]
                         },
                         
                         'last_update':{
-                            'name_last':        row[11],
-                            'name_first':       row[12],
-                            'dt_update':        str(row[13]) if row[13] else None
+                            'name_last':        row[8],
+                            'name_first':       row[9],
+                            'dt_update':        str(row[10]) if row[10] else None
                         }
                     }
+                
                     
                 result.append(cur_entry)
         

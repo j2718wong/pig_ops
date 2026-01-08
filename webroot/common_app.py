@@ -64,7 +64,7 @@ from model.m_feed_buy           import FeedBuy
 from model.m_feed_balance       import FeedBalance
 from model.m_feed_calc          import FeedCalc
 
-
+from model.m_medvac_brand       import MedvacBrand
 
 from model.m_sow_boar           import SowBoar
 
@@ -76,7 +76,7 @@ from model.m_pig_prod_notes     import PigProdNotes
 from model.m_pig_prod_pig_dead  import PigProdPigDead
 from model.m_pig_prod_pig_ops   import PigProdPigOps
 
-
+from model.m_pig_medvac         import PigMedvac
 
 from route.controller           import Controller
 
@@ -119,6 +119,7 @@ model_names_pig_ops = [
     ('feed_balance',            FeedBalance),
     ('feed_calc',               FeedCalc),
     
+    ('medvac_brand',            MedvacBrand),
     
     ('sow_boar',                SowBoar),
    
@@ -128,7 +129,7 @@ model_names_pig_ops = [
     ('prod_pig_dead',           PigProdPigDead),
     ('pig_prod_pig_ops',        PigProdPigOps),
     
-    
+    ('pig_medvac',              PigMedvac),
     
     ('sow_act',                 SowActivity)
     

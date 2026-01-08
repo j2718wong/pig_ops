@@ -91,6 +91,8 @@ class DataAccountPigOps(BaseModel):
     user_id:                int = 0
     account_pig_ops_id:     int = 0
     operation_type:         int
+    
+    is_medvac:              int = 0
         
         
     num_days_since:         int
@@ -486,6 +488,7 @@ class DataPigProdNotes(BaseModel):
     sow_boar_hid:           str = None
     pig_prod_notes_hid:     str = None
         
+    is_health_issue:        int = 0
         
     user_id:                int = 0
     pig_prod_id:            int = 0
@@ -495,7 +498,32 @@ class DataPigProdNotes(BaseModel):
     date_notes:             str = None
     notes:                  str
     
+
+class DataPigMedvac(BaseModel):
+    uhid:                   str
+        
+    sow_boar_hid:           str = None
+    pig_prod_hid:           str = None
+    staff_hid:              str = None
+    medvac_brand_hid:       str = None
     
+    date_medvac:            str
+    
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    sow_boar_id:            int = 0
+    medvac_type_id:         int = None
+    medvac_brand_id:        int = 0
+    medvac_name:            str
+        
+    quantity:               int
+    unit:                   str
+    
+    staff_id:               int = 0
+    done_by_user:           int = 0
+   
+
+
 class DataPigProdPigCount(BaseModel):
     uhid:                   str
         
