@@ -23,13 +23,7 @@ BUSINESS_OBJ_ID_FEED_BRAND                          = 15
 
 
 
-# user.flag bits
-FLAG_BIT_USER_IS_ACTIVE                             = 1
-FLAG_BIT_USER_EMAIL_VERIFIED                        = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED                   = 4
-FLAG_BIT_USER_IS_DELETED                            = 8
 
-FLAG_BIT_USER_IS_ACCOUNT_ADMIN                      = 16
 
 
 MFA_CHANNEL_ID_EMAIL                                = 1
@@ -47,6 +41,13 @@ NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY            = 5
 
 
 INS_STATUS_ID_TERMINATED                            = 2
+
+
+ACC_BILL_STATUS = {
+    'NEW':      1,
+    'OVERDUE':  2,
+    'PAID':     3
+}
 
 
 PROD_STATUS_ID_GESTATING                            = 1
@@ -100,13 +101,20 @@ DEFAULT_KG_PER_FEED_UNIT = {
 
 
 
+
+
 ERROR_DATABASE_ERROR                                = 0x01
 ERROR_SERVER_ERROR                                  = 0x02
 
-ERROR_ADDRESS_COUNTRY_HID                           = 0x07
-ERROR_ADDRESS_LEVEL_1_HID                           = 0x08
-ERROR_ADDRESS_LEVEL_2_HID                           = 0x09
-ERROR_ADDRESS_LEVEL_3_HID                           = 0x0A
+ERROR_USER_INACTIVE                                 = 0x03
+ERROR_ACCOUNT_DISABLED                              = 0x04
+ERROR_ACCOUNT_BILL_OVERDUE                          = 0x05
+
+
+ERROR_ADDRESS_COUNTRY_HID                           = 0x0A
+ERROR_ADDRESS_LEVEL_1_HID                           = 0x0B
+ERROR_ADDRESS_LEVEL_2_HID                           = 0x0C
+ERROR_ADDRESS_LEVEL_3_HID                           = 0x0D
 
 
 

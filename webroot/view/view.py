@@ -71,6 +71,12 @@ MODULES_ROOT = [
     "pages/common/address_manager.js",
     "pages/common/common_app.js",
     
+    "pages/a_user_control/page_account_disabled.js",
+    "pages/a_user_control/page_user_disabled.js",
+    "pages/a_user_control/page_account_unpaid_bill.js",
+    
+    
+    
     "pages/navigation/text_substitute_control.js",
     
     

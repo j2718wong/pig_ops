@@ -22,6 +22,20 @@ from fastapi.responses      import PlainTextResponse
 import data_model           as dm
 
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks               import check_if_valid_user_account
+
+
+
+
+
 @app.get("/sow_boar", response_class = HTMLResponse, tags=["Sow Boar"])
 async def sow_boar(pfhid:str = None):
     # Get the current logged in user;
@@ -186,25 +200,35 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         return {
             'result':{
                 'num':  ERROR_SOW_BOAR_INVALID_USER_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SOW_BOAR_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
     
     
+    res_check = check_if_valid_user_account(user_id)
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
     pfhid       = sow_boar_data.pfhid
     
     res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
-        return {
+        result =  {
             'result':{
                 'num':  ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID',
-                'desc': ''
+                'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID'
             }
         }
+    
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+    
+        return result
     
     pig_farm_id = res[0]
     
@@ -224,13 +248,18 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         
     
     if name is None and number is None:
-        return {
+        result = {
             'result':{
                 'num':  ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_OR_NAME,
-                'code': 'ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_OR_NAME',
-                'desc': ''
+                'code': 'ERROR_SOW_BOAR_NO_SOW_BOAR_NUMBER_OR_NAME'
             }
         }
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+    
+        return result
+        
     
     
     sow_boar_data.user_id       = user_id
@@ -245,8 +274,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -257,7 +285,16 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     
     del res_add['sow_boar']['id']
     res_add['sow_boar']['hid'] = sow_boar_hid
-
+    
+    
+    # Add new_bill_hid
+    if new_bill_hid is not None:
+        res_add['result']['new_bill_hid'] = new_bill_hid
+        
+        
+    # Remove optional desc coming from database
+    if 'desc' in res_add['result'] and len(res_add['result']['desc'] == 0):
+        del res_add['result']['desc']
         
     return res_add
     
@@ -271,25 +308,21 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
     
-        
-    sow_boar_number   = sow_boar_data.number.strip()
-    if len(sow_boar_number) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_BOAR_INVALID_SOW_NUMBER,
-                'code': 'ERROR_SOW_BOAR_INVALID_SOW_NUMBER',
-                'desc': ''
-            }
-        }
     
-    sow_boar_data.number        = sow_boar_number
+    res_check = check_if_valid_user_account(user_id)
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
+    
     sow_boar_data.user_id       = user_id
     
     res_update  =  model['sow_boar'].update(sow_boar_data)
@@ -298,8 +331,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -310,7 +342,17 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
     del res_update['sow_boar']['id']
     res_update['sow_boar']['hid'] = sow_boar_hid
+    
+    # Add new_bill_hid
+    if new_bill_hid is not None:
+        res_update['result']['new_bill_hid'] = new_bill_hid
         
+        
+    # Remove optional desc coming from database
+    if 'desc' in res_update['result'] and len(res_update['result']['desc'] == 0):
+        del res_update['result']['desc']
+    
+    
     return res_update
     
 
@@ -323,12 +365,18 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
         return {
             'result':{
                 'num':  ERROR_SOW_BOAR_INVALID_USER_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SOW_BOAR_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    res_check = check_if_valid_user_account(user_id)
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
     
     
     sow_boar_hid    = sow_boar_data.sow_boar_hid
@@ -337,8 +385,7 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -354,8 +401,7 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -367,6 +413,17 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     del res_dispose['sow_boar']['id']
     res_dispose['sow_boar']['hid'] = sow_boar_hid
         
+    
+    # Add new_bill_hid
+    if new_bill_hid is not None:
+        res_dispose['result']['new_bill_hid'] = new_bill_hid
+        
+        
+    # Remove optional desc coming from database
+    if 'desc' in res_dispose['result'] and len(res_dispose['result']['desc'] == 0):
+        del res_dispose['result']['desc']
+    
+    
     return res_dispose
 
 
@@ -547,8 +604,7 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

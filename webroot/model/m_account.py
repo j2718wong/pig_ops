@@ -4,17 +4,42 @@
 from common_constants       import *
 
 
+FLAG_BIT_ACCOUNT_ENABLE                 = 1
+FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 1<<4
+
+
+FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED       = 1<<16
+
+
+"""
+account.flag bits
+
+bit 0: FLAG_BIT_ACCOUNT_ENABLE
+bit 1:
+bit 2:
+bit 3:  
+
+bit 4:  FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
+0 = not exempted has to pay bill
+1 = exempted
+
+
+
+bit 16: COMPANY_OWNED ACCOUNT
+"""
+
+
 # The account.flag_settings will be broken down so that
 # it will be easier to read in the application level.
 # See account_register.sql for updated flag bits definition.
 
 """
 /* account.flag_setting bits
-FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+bit 0: FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
 0 = Date of birth is counted as DAY 0
 1 = Date of birth is counted as DAY 1; default
 
-FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+bit 1: FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
 0 = Date of insemination is counted as DAY 0; default
 1 = Date of insemination is counted as DAY 1;
 
@@ -45,20 +70,24 @@ class Account:
                     a.date_trial_start,
                     a.date_trial_end,
                     
+                    a.current_bill_id,
+                    c.status_id,
+                    
+                    
                     a.flag_settings,
                     a.num_days_wean,
                     a.num_days_harvest_from_birth,
                     a.num_days_harvest_from_wean,
                     
-                    a.num_bills_paid,
-                    a.last_acc_paid_bill_id,
                     
-                    c.name_last,
-                    c.name_first,
+                    
+                    d.name_last,
+                    d.name_first,
                     a.dt_last_update_settings
                 FROM account a
                 LEFT OUTER JOIN account_status b ON a.status_id = b.id
-                LEFT OUTER JOIN user c          ON a.last_update_settings_user_id = c.id
+                LEFT OUTER JOIN account_bill c ON a.current_bill_id = c.id
+                LEFT OUTER JOIN user d          ON a.last_update_settings_user_id = d.id
                 
                 WHERE a.id = %s
                 """ % account_id
@@ -104,17 +133,30 @@ class Account:
                 cur_acc_date_trial_start = row[5]
                 cur_acc_date_trial_end  = row[6]
                 
+                cur_acc_current_bill_id = row[7]
+                cur_acc_current_bill_status = row[8]
                 
-                cur_acc_settings_flag   = row[7]
-                cur_acc_num_days_wean   = row[8]
-                cur_acc_num_days_harvest_from_birth = row[9]
-                cur_acc_num_days_harvest_from_wean  = row[10]
+                cur_acc_settings_flag   = row[9]
+                cur_acc_num_days_wean   = row[10]
+                cur_acc_num_days_harvest_from_birth = row[11]
+                cur_acc_num_days_harvest_from_wean  = row[12]
                 
                                
-                cur_user_name_last      = row[11]
-                cur_user_name_first     = row[12]
-                cur_settings_last_update= str(row[13]) if row[13] else None
+                cur_user_name_last      = row[13]
+                cur_user_name_first     = row[14]
+                cur_settings_last_update= str(row[15]) if row[15] else None
                 
+                
+                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
+                cur_flag_acc_is_enabled = 1 if temp > 0 else 0
+                
+                
+                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
+                cur_flag_acc_is_bill_exempt = 1 if temp > 0 else 0
+                
+                
+                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED
+                cur_flag_acc_is_company_owned = 1 if temp > 0 else 0
                 
                 
                 
@@ -130,7 +172,16 @@ class Account:
                         'id':               cur_acc_id,
                         'flag':             cur_acc_flag,
                         'status_id':        cur_acc_status_id,
-                        'status_name':      cur_acc_status_name
+                        'status_name':      cur_acc_status_name,
+                        
+                        'is_enabled':       cur_flag_acc_is_enabled,
+                        'is_bill_exempt':   cur_flag_acc_is_bill_exempt,
+                        'is_company_owned': cur_flag_acc_is_company_owned,
+                        
+                        'current_bill':{
+                            'id':           cur_acc_current_bill_id,
+                            'status_id':    cur_acc_current_bill_status
+                        }
                     },
                     
                     'settings_operations': {

@@ -521,6 +521,8 @@ class DataPigMedvac(BaseModel):
     
     staff_id:               int = 0
     done_by_user:           int = 0
+    
+    notes:                  str = None
    
 
 

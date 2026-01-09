@@ -3,11 +3,145 @@
 
 from common_constants       import *
 
+"""
+/* user.flag bits*/
+DECLARE FLAG_BIT_USER_IS_ACTIVE                 INT             DEFAULT 1;
+DECLARE FLAG_BIT_USER_EMAIL_VERIFIED            INT             DEFAULT 2;
+DECLARE FLAG_BIT_USER_MOBILE_NUM_VERIFIED       INT             DEFAULT 4;
+DECLARE FLAG_BIT_USER_IS_DELETED                INT             DEFAULT 8;
+
+DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
+"""
+
+FLAG_BIT_USER_IS_ACTIVE             = 1
+FLAG_BIT_USER_EMAIL_VERIFIED        = 2
+FLAG_BIT_USER_MOBILE_NUM_VERIFIED   = 4
+FLAG_BIT_USER_IS_DELETED            = 8
+
+FLAG_BIT_USER_IS_ACCOUNT_ADMIN      = 16
+
+
+"""
+/* account.flag bits
+bit 0: FLAG_BIT_ACCOUNT_ENABLE
+bit 1:
+bit 2:
+bit 3:  
+
+bit 4:  FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
+0 = not exempted has to pay bill
+1 = exempted
+
+
+
+bit 16: FLAG_BIT_COMPANY_OWNED_ACCOUNT
+
+*/
+"""
+FLAG_BIT_ACCOUNT_ENABLE             = 1
+FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT = 16
+
+
 
 class User:
     def __init__(self, model):
         self.model              = model
         self.TAG                = 'User'
+    
+    
+    def get_user_account_info(self, user_id):
+        sql =   """
+                SELECT 
+                    a.account_id,
+                    a.flag AS user_flag,
+                    b.flag AS account_flag,
+                    b.current_bill_id,
+                    c.status_id 
+               
+                FROM user a
+                LEFT OUTER JOIN account b ON a.account_id = b.id
+                LEFT OUTER JOIN account_bill c ON b.current_bill_id = c.id
+                WHERE a.id = %s
+                """ % user_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_user_account_info(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        if rows is not None:
+            
+            for row in rows:
+                cur_user_account_id         = row[0]
+                cur_user_flag               = row[1]
+                cur_account_flag            = row[2]
+                cur_account_bill_id         = row[3]
+                cur_account_bill_status_id  = row[4]
+                
+                
+                user_is_active              = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACTIVE > 0 else 0
+                user_is_email_verified      = 1 if cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED  > 0 else 0
+                user_is_mobile_verified     = 1 if cur_user_flag & FLAG_BIT_USER_MOBILE_NUM_VERIFIED  > 0 else 0
+                
+                user_is_deleted             = 1 if cur_user_flag & FLAG_BIT_USER_IS_DELETED  > 0 else 0
+                user_is_account_admin       = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN  > 0 else 0
+                
+                acc_is_enabled              = 1 if cur_account_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN  > 0 else 0
+                         
+                acc_is_company_owned        = 1 if cur_account_flag & FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT  > 0 else 0
+                   
+                
+                cur_entry = {
+                    'user': {
+                        'id':               user_id,
+                        'is_active':        user_is_active,
+                        'is_email_verified':  user_is_email_verified,
+                        'is_mobile_verified': user_is_mobile_verified
+                    },
+                    
+                    'account': {
+                        'id':               cur_user_account_id,
+                        'is_enabled':       acc_is_enabled,
+                        'is_company_owned': acc_is_company_owned,
+                        
+                        'cur_bill_id':      cur_account_bill_id,
+                        'cur_bill_status_id':  cur_account_bill_id
+                    }
+                }
+                    
+                return cur_entry
+                
+
+        
+        return None
+    
+    
+    
     
     
     def get_user_info(self, user_id):

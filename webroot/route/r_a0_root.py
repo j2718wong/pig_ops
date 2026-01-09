@@ -47,9 +47,28 @@ def get_application_data():
 
 
 
+
 @app.get("/", response_class = HTMLResponse)
 async def root(pfhid:str = None):
     """
+    2026-01-09 Notes:
+    
+    
+    1.) An account can have several users. 
+        The user who registered the account is always admin.
+        There can be more than 1 admin user in an account.
+        
+        Non admin users cannot see billing info.
+        
+    2.) Company  users
+        These users are connected to the company. 
+        They are connected to a special company account 
+        but the company account has no pig farm.
+        These users can READ ONLY any account 
+        but cannot write any data to the account.  
+    
+    
+    
     Parameters
     ----------
     pfhid : str
@@ -59,18 +78,27 @@ async def root(pfhid:str = None):
     time_init = time.time()
     
     
+    
+    
+    
     data_app = get_application_data()
     
     
     # Get the current logged in user;
     # If not logged in, redirect to HOME_PAGE_USER_NOT_LOGGED_IN
     
+    if pfhid is not None:
+        test = 1
     
     # At this point user must be logged in
     # temporary
     user_id = 1
     
     user_account = get_user_account_info(user_id)
+    
+    account = user_account['account']
+  
+    
     
     
     pig_farm_id = None
