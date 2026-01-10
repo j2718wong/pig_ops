@@ -101,6 +101,19 @@
                                 <div class="user-role" id="desktop-user-role">Farm Manager</div>
                             </div>
                         </div>
+						
+						<!-- Language Switch -->
+                        <div class="language-switch">
+                            <div class="language-label">
+                                <i class="fas fa-globe" style="color: var(--icon-blue);"></i>
+                                <span>Language</span>
+                            </div>
+                            <div class="language-options">
+								<span class="language-name">English</span>
+                            </div>
+                        </div>
+                        
+						
                         
                         <!-- Dropdown Items -->
                         <div class="user-dropdown-item">
@@ -372,6 +385,26 @@
                             </div>
                         </div>
                         
+                        <!-- Language Switch -->
+                        <div class="language-switch">
+                            <div class="language-label">
+                                <i class="fas fa-globe" style="color: var(--icon-blue);"></i>
+                                <span>Language</span>
+                            </div>
+                            <div class="language-options">
+                                <div class="language-option active" data-lang="en" title="English">
+                                    <div class="language-flag" style="background: linear-gradient(to bottom, #012169 0%, #012169 50%, #C8102E 50%, #C8102E 100%);"></div>
+                                </div>
+                                <div class="language-option" data-lang="es" title="Español">
+                                    <div class="language-flag" style="background: linear-gradient(to right, #AA151B 0%, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%, #AA151B 100%);"></div>
+                                </div>
+                                <div class="language-option" data-lang="fr" title="Français">
+                                    <div class="language-flag" style="background: linear-gradient(to right, #002395 0%, #002395 33%, #FFFFFF 33%, #FFFFFF 66%, #ED2939 66%, #ED2939 100%);"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown Items -->
                         <div class="user-dropdown-item">
                             <i class="fas fa-user-circle" style="color: var(--icon-blue);"></i>
                             <span>My Account</span>
@@ -429,8 +462,9 @@
             </div>
             <div class="mobile-submenu" id="mobile-subnav-sow-boar-gilt">
                 <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'sows');">              <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Sows</div>
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'boars');">             <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Boars</div>
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gilts');">             <i class="fas fa-mars" style="color: var(--icon-blue);"></i>Gilts</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'boars');">             <i class="fas fa-mars" style="color: var(--icon-blue);"></i>Boars</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gilts');">             <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Gilts</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'disposed');">          <i class="fas fa-bacon" style="color: var(--icon-red);"></i>Disposed</div>
             </div>
         </div>
         
@@ -507,27 +541,27 @@
     
     <!-- Main Content - Dashboard -->
     <div class="main-content">
-		<!-- User control pages -->
-        <div id="container-account-disabled"   	class="hidden-container" style="display:none;"></div>
-		<div id="container-user-disabled"   	class="hidden-container" style="display:none;"></div>
+        <!-- User control pages -->
+        <div id="container-account-disabled"    class="hidden-container" style="display:none;"></div>
+        <div id="container-user-disabled"       class="hidden-container" style="display:none;"></div>
         <div id="container-account-bill-unpaid" class="hidden-container" style="display:none;"></div>
         
-		
-        <!-- Production pages -->
-        <div id="container-prod-gesta-list"  	class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-lacta-list"  	class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-gesta-add"   	class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-gesta-entry" 	class="hidden-container" style="display:none;"></div>
-		
-		
-		<div id="container-sow-boar-list"   	class="hidden-container" style="display:none;"></div>
-        <div id="container-sow-boar-add-edit" 	class="hidden-container" style="display:none;"></div>
         
-		
-		<div id="container-acc-pig-ops"      	class="hidden-container" style="display:none;"></div>
+        <!-- Production pages -->
+        <div id="container-prod-gesta-list"     class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-lacta-list"     class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-gesta-add"      class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-gesta-entry"    class="hidden-container" style="display:none;"></div>
+        
+        
+        <div id="container-sow-boar-list"       class="hidden-container" style="display:none;"></div>
+        <div id="container-sow-boar-add-edit"   class="hidden-container" style="display:none;"></div>
+        
+        
+        <div id="container-acc-pig-ops"         class="hidden-container" style="display:none;"></div>
         
     
-        <div id="container-dashboard"        	class="hidden-container" style="display:none"> 
+        <div id="container-dashboard"           class="hidden-container" style="display:none"> 
             <div class="content-card">
                 <h1>Pig Farm Dashboard</h1>
                 <p>Welcome back, John! Here's an overview of your farm operations at Sunrise Pig Farm Management.</p>

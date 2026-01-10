@@ -125,6 +125,18 @@ def get_farm_account_pig_prod_page_data(pig_farm_id,
     del pig_farm_account['account']['id']
     pig_farm_account['account']['hid']   = cur_hid
 
+    
+    cur_id = pig_farm_account['account_bill']['id']
+    if cur_id == 0:
+        del pig_farm_account['account_bill']
+
+    else:
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del pig_farm_account['account_bill']['id']
+        pig_farm_account['account_bill']['hid']   = cur_hid
+
+    
     pig_prod_page_data['account'] = pig_farm_account
     
     return pig_prod_page_data
@@ -143,8 +155,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
 
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
-        is_disposed = 0, inc_external = 0, 
-        inc_user_audit = 0, minimum_info = minimum_info, order_by = 1)
+        inc_user_audit = 0, order_by = 1)
     if list_sow_list == None:
         # TODO what to do in case no result
         print('Error 9')
@@ -154,6 +165,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     # Get sow production output list
     list_sow_output_list = model['pig_prod'].get_production_output(
         pig_farm_id = pig_farm_id);
+    
     
     for cur_sow in list_sow_list:
         cur_sow_id = cur_sow['id']
@@ -168,8 +180,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
-        is_disposed = 0, inc_external = 1, 
-        inc_user_audit = 0, minimum_info = minimum_info, order_by = 1)
+        inc_user_audit = 0, order_by = 1)
     if list_boar_list == None:
         # TODO what to do in case no result
         print('Error 10')
@@ -216,7 +227,17 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
-    
+        
+        
+        cur_id      = cur_entry['last_mate_sow_boar_id']
+        if cur_id is not None:
+            cur_hid     = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+            
+        del cur_entry['last_mate_sow_boar_id']
+        cur_entry['last_mate_sow_boar_hid']   = cur_hid
+        
     
     for cur_entry in list_boar_list:
         cur_id      = cur_entry['id']
@@ -225,7 +246,16 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
     
-       
+    
+        cur_id      = cur_entry['last_mate_sow_boar_id']
+        if cur_id is not None:
+            cur_hid     = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+            
+        del cur_entry['last_mate_sow_boar_id']
+        cur_entry['last_mate_sow_boar_hid']   = cur_hid
+        
 
         
     for cur_entry in list_staff:

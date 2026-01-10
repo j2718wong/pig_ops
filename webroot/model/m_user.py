@@ -111,7 +111,8 @@ class User:
                 user_is_deleted             = 1 if cur_user_flag & FLAG_BIT_USER_IS_DELETED  > 0 else 0
                 user_is_account_admin       = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN  > 0 else 0
                 
-                acc_is_enabled              = 1 if cur_account_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN  > 0 else 0
+                
+                acc_is_enabled              = 1 if cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE  > 0 else 0
                          
                 acc_is_company_owned        = 1 if cur_account_flag & FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT  > 0 else 0
                    
@@ -130,7 +131,7 @@ class User:
                         'is_company_owned': acc_is_company_owned,
                         
                         'cur_bill_id':      cur_account_bill_id,
-                        'cur_bill_status_id':  cur_account_bill_id
+                        'cur_bill_status_id':  cur_account_bill_status_id
                     }
                 }
                     

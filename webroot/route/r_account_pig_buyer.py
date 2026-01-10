@@ -32,8 +32,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_NAME'
             }
         }
         
@@ -43,8 +42,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID'
             }
         }
     
@@ -62,8 +60,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
-                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1'
             }
         }
         
@@ -76,8 +73,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
-                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2'
             }
         }
     
@@ -92,8 +88,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
             return {
                 'result':{
                     'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
-                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3',
-                    'desc': ''
+                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3'
                 }
             }
         
@@ -114,8 +109,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -141,8 +135,7 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_NAME'
             }
         }
         
@@ -152,8 +145,7 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID'
             }
         }
     
@@ -166,8 +158,7 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_HASHID'
             }
         }
     
@@ -184,8 +175,7 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -204,8 +194,7 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_USER_HASHID'
             }
         }
     
@@ -217,8 +206,7 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_HASHID'
             }
         }
     
@@ -237,8 +225,7 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -275,8 +262,7 @@ async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0,
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_BUYER_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_ACCOUNT_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_BUYER_INVALID_ACCOUNT_HASHID'
             }
         }
     
@@ -289,8 +275,7 @@ async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0,
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
             
@@ -307,8 +292,7 @@ async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0,
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

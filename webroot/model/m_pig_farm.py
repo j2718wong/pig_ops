@@ -215,18 +215,30 @@ class PigFarm:
         sql =   """
                 SELECT 
                     a.account_id,
+                    b.name,
+                    
+                    b.current_bill_id,
+                    c.status_id,
+                    c.bill_reference,
+                    c.date_bill_start,
+                    c.date_bill_end,
+                    c.date_issue,
+                    c.date_due,
+                    c.currency_code,
+                    c.amount,
                     
                     b.flag_settings,
                     b.num_days_wean,
                     b.num_days_harvest_from_birth,
                     b.num_days_harvest_from_wean,
                     
-                    c.name_last,
-                    c.name_first,
+                    d.name_last,
+                    d.name_first,
                     b.dt_last_update_settings
                 FROM pig_farm a
-                LEFT OUTER JOIN account b ON a.account_id = b.id
-                LEFT OUTER JOIN user c ON b.last_update_settings_user_id = c.id
+                LEFT OUTER JOIN account b       ON a.account_id = b.id
+                LEFT OUTER JOIN account_bill c  ON b.current_bill_id = c.id
+                LEFT OUTER JOIN user d          ON b.last_update_settings_user_id = d.id
                 WHERE a.id = %s
                 """ % pig_farm_id
         
@@ -250,7 +262,7 @@ class PigFarm:
             cursor.close()
             #conn.close()
             
-        except get_sow_boar_balance as e:
+        except Exception as e:
             msg = 'get_pig_farm_account_info(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
@@ -264,16 +276,29 @@ class PigFarm:
             
             for row in rows:
                 cur_acc_id              = row[0]
+                cur_acc_name            = row[1]
                 
-                cur_acc_settings_flag   = row[1]
-                cur_acc_num_days_wean   = row[2]
-                cur_acc_num_days_harvest_from_birth = row[3]
-                cur_acc_num_days_harvest_from_wean  = row[4]
+                
+                cur_bill_id             = row[2]
+                cur_bill_status_id      = row[3]
+                cur_bill_reference      = row[4]
+                cur_bill_date_bill_start= str(row[5]) if row[5] else None
+                cur_bill_date_bill_end  = str(row[6]) if row[6] else None
+                cur_bill_date_issue     = str(row[7]) if row[7] else None
+                cur_bill_date_due       = str(row[8]) if row[8] else None
+                cur_bill_currency_code  = row[9]
+                cur_bill_amount         = float(row[10]) if row[10] is not None else None
+                
+                
+                cur_acc_settings_flag   = row[11]
+                cur_acc_num_days_wean   = row[12]
+                cur_acc_num_days_harvest_from_birth = row[13]
+                cur_acc_num_days_harvest_from_wean  = row[14]
                 
                                
-                cur_user_name_last      = row[5]
-                cur_user_name_first     = row[6]
-                cur_settings_last_update= str(row[7]) if row[7] else None
+                cur_user_name_last      = row[15]
+                cur_user_name_first     = row[16]
+                cur_settings_last_update= str(row[17]) if row[17] else None
                 
                 
                 
@@ -288,7 +313,20 @@ class PigFarm:
                 
                 cur_entry = {
                     'account': {
-                        'id':               cur_acc_id
+                        'id':               cur_acc_id,
+                        'name':             cur_acc_name
+                    },
+                    
+                    'account_bill':{
+                        'id':               cur_bill_id,
+                        'status_id':        cur_bill_status_id,
+                        'reference':        cur_bill_reference,
+                        'date_bill_start':  cur_bill_date_bill_start,
+                        'date_bill_end':    cur_bill_date_bill_end,
+                        'date_issue':       cur_bill_date_issue,
+                        'date_due':         cur_bill_date_due,
+                        'currency_code':    cur_bill_currency_code,
+                        'amount':           cur_bill_amount
                     },
                     
                     'settings_operations': {

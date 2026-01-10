@@ -28,8 +28,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_SELECTION_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_SELECTION_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_SELECTION_INVALID_USER_HASHID'
             }
         }
     
@@ -46,8 +45,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_SELECTION_INVALID_FEED_SUPPLIER_HASHID,
-                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_FEED_SUPPLIER_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_FEED_SUPPLIER_HASHID'
                 }
             }
         
@@ -61,8 +59,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_SELECTION_INVALID_SEMEN_SUPPLIER_HASHID,
-                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_SEMEN_SUPPLIER_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_SEMEN_SUPPLIER_HASHID'
                 }
             }
         
@@ -73,8 +70,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_SELECTION_NOTHING_SELECTED,
-                'code': 'ERROR_ACCOUNT_SELECTION_NOTHING_SELECTED',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_SELECTION_NOTHING_SELECTED'
             }
         }
     
@@ -90,8 +86,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -118,8 +113,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         
             result = {
                 'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'code': 'SUCCESS'
             }
             
             feed_supplier['result'] = result
@@ -191,8 +185,7 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_SELECTION_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_SELECTION_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_SELECTION_INVALID_HASHID'
             }
         }
     
@@ -207,8 +200,7 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
     return {
             'result':{
                 'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'code': 'SUCCESS'
             },
             
             'account_lookup': res
@@ -225,8 +217,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_SELECTION_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_SELECTION_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_SELECTION_INVALID_USER_HASHID'
             }
         }
     
@@ -244,8 +235,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_SELECTION_INVALID_FEED_BRAND_HASHID,
-                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_FEED_BRAND_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_FEED_BRAND_HASHID'
                 }
             }
         
@@ -259,8 +249,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_SELECTION_INVALID_FEED_SUPPLIER_HASHID,
-                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_SUPPLIER_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_SUPPLIER_HASHID'
                 }
             }
         
@@ -274,8 +263,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_SELECTION_INVALID_FEED_SUPPLIER_HASHID,
-                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_SUPPLIER_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_SELECTION_INVALID_SUPPLIER_HASHID'
                 }
             }
         
@@ -295,8 +283,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     

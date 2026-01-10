@@ -208,6 +208,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     
     
     res_check = check_if_valid_user_account(user_id)
+
     if res_check['inv_result'] != None:
         return res_check['inv_result']
         
@@ -293,7 +294,10 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         
         
     # Remove optional desc coming from database
-    if 'desc' in res_add['result'] and len(res_add['result']['desc'] == 0):
+    if 'desc' in res_add['result']  and \
+        res_add['result']['desc']   and \
+        len(res_add['result']['desc']) == 0:
+        
         del res_add['result']['desc']
         
     return res_add
@@ -420,7 +424,10 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
         
         
     # Remove optional desc coming from database
-    if 'desc' in res_dispose['result'] and len(res_dispose['result']['desc'] == 0):
+    if 'desc' in res_dispose['result']  and \
+        res_dispose['result']['desc']   and \
+        len(res_dispose['result']['desc']) == 0:
+            
         del res_dispose['result']['desc']
     
     
@@ -524,9 +531,8 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     
 
 @app.get("/sow_boar/list", tags=["Sow Boar"])
-async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0, 
-        inc_external:int = 0, is_production_ready:int = None, 
-        inc_user_audit:int = 0, minimum_info = 1, order_by:int = 0):
+async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
+        inc_user_audit:int = 0, order_by:int = 0):
     """
     Will get sow list.
     
@@ -540,21 +546,13 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
         0 = will return active sows, boars only; 
         1 = will return disposed sows, boars
         
-    inc_external: int
-        0 = will not include externally owned sow/boar
-        1 = will include externally owned sow/boar
-    
-    is_production_ready: int
-        None = will include both growing and production ready sow, boar
-        0 = still growing gilts, boar 
-        1 = ready for mating
-        
+
     inc_user_audit:
         if > 0, will include added_by and last_update info
     
     order_by : int
             0 = ORDER BY date_of_birth DESC
-            1 = ORDER BY id ASC
+            1 = ORDER BY name ASC
 
     """
     
@@ -564,8 +562,7 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
         return {
             'result':{
                 'num':  ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID',
-                'desc': ''
+                'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID'
             }
         }
     
@@ -573,34 +570,58 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
     
     
 
-    
-    res = model['sow_boar'].get_list(pig_farm_id, sex, 
-            is_disposed     = is_disposed,
-            inc_external    = inc_external,
-            is_production_ready = is_production_ready,
-            inc_user_audit  = inc_user_audit,
-            minimum_info    = minimum_info,
-            order_by        = order_by)
+    if is_disposed > 0:
+        res = model['sow_boar'].get_list_disposed(pig_farm_id)
+    else:
+        res = model['sow_boar'].get_list(pig_farm_id,
+                sex, inc_user_audit = inc_user_audit, order_by = order_by)
     
     if res is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
         
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+        if 'sow_boar' in cur_entry:
+            cur_id  = cur_entry['sow_boar']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['sow_boar']['id']
+            cur_entry['sow_boar']['hid']   = cur_hid
+
+            
+            cur_id      = cur_entry['sow_boar']['last_mate_sow_boar_id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['sow_boar']['last_mate_sow_boar_id']
+            cur_entry['sow_boar']['last_mate_sow_boar_hid']   = cur_hid
         
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
+        else:
+            cur_id  = cur_entry['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['id']
+            cur_entry['hid']   = cur_hid
         
-        
+            
+            cur_id      = cur_entry['last_mate_sow_boar_id']
+            if cur_id is not None:
+                cur_hid     = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid     = None
+            
+            del cur_entry['last_mate_sow_boar_id']
+            cur_entry['last_mate_sow_boar_hid']   = cur_hid
+            
+            
     return {
         'result':{
             'num':  0,
@@ -631,8 +652,7 @@ async def sow_production_output(sowhid:str):
         return {
             'result':{
                 'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID',
-                'desc': ''
+                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
             }
         }
     
@@ -645,8 +665,7 @@ async def sow_production_output(sowhid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -666,8 +685,7 @@ async def sow_production_output(sowhid:str):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

@@ -75,8 +75,7 @@ async def user_account_info(ahid: str):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID'
             }
         }
     
@@ -90,8 +89,7 @@ async def user_account_info(ahid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -102,8 +100,7 @@ async def user_account_info(ahid: str):
     result = {
             'result':{
                 'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'code': 'SUCCESS'
             }
         }
         
@@ -126,8 +123,7 @@ async def account_register(account_data: dm.DataAccount):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_INVALID_NAME'
             }
         }
         
@@ -137,8 +133,7 @@ async def account_register(account_data: dm.DataAccount):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -154,8 +149,7 @@ async def account_register(account_data: dm.DataAccount):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -191,8 +185,7 @@ async def account_update(account_data: dm.DataAccount):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_INVALID_NAME'
             }
         }
         
@@ -202,8 +195,7 @@ async def account_update(account_data: dm.DataAccount):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID'
             }
         }
     
@@ -219,8 +211,7 @@ async def account_update(account_data: dm.DataAccount):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -246,8 +237,7 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_INVALID_USER_HASHID'
             }
         }
     
@@ -262,8 +252,7 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     

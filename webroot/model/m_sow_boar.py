@@ -372,9 +372,7 @@ class SowBoar:
         return None
 
     
-    def get_list(self, farm_id, sex = None, is_disposed = 0, inc_external = 0,
-            is_production_ready = None, inc_user_audit = 0,
-            minimum_info = 0, order_by = 0):
+    def get_list(self, farm_id, sex, inc_user_audit = 0, order_by = 0):
         """
         Will get sow_boar list.
         
@@ -385,21 +383,7 @@ class SowBoar:
             M = returns boar
             F = returns gilts/sows
             
-        is_disposed : int
-            0 = returns active sow/boar
-            1 = returns disposed sow/boar
-            
-        inc_external : int
-            include external sow/ boar
-            0 = do not include external
-            1 = include external
-        
-        is_production_ready : int
-            None = will include both growing and production ready sow, boar
-            0 = still growing gilts, boar 
-            1 = ready for mating
-            
-        
+
         order_by : int
             0 = ORDER BY date_of_birth DESC
             1 = ORDER BY name ASC, number ASC
@@ -415,45 +399,11 @@ class SowBoar:
         
        
         where_clause = 'WHERE a.pig_farm_id = %s ' % farm_id
+        where_clause += ' AND a.is_disposed = 0 '
         
-        if is_disposed == 0:
-            where_clause += ' AND a.is_disposed = 0 '
-            
-            if is_production_ready is not None:
-            
-                if is_production_ready == 0:
-                    where_clause += ' AND a.is_production_ready = 0 '
-                    
-                    if sex is not None:
-                        where_clause += ' AND a.sex = "%s" ' % sex
-                else:
-                    # production_ready >0, sex is not optional
-                    where_clause += ' AND a.is_production_ready = 1 AND a.sex = "%s" '% sex
-                    
-
-                    if inc_external == 0:
-                        where_clause += ' AND a.is_external = 0 '
-                    
-                    # if inc_external == 1, sow_boar.is_external will not matter
-            else:
-                if sex is not None:
-                    where_clause += ' AND a.sex = "%s" ' % sex
-                
-                if inc_external == 0:
-                    where_clause += ' AND a.is_external = 0 '
-                    
-                # if inc_external == 1, sow_boar.is_external will not matter
-                
-        else:
-            # is_disposed > 0
-            
-            if sex is None:
-                where_clause += ' AND a.is_disposed = 1' 
-                
-            else:
-                values = (sex)
-                where_clause += ' AND a.sex = "%s" AND a.is_disposed = 1' % values
-                
+        if sex is not None:
+            where_clause += ' AND a.sex = "%s" ' % sex
+        
         
         if order_by == 0:
             order_clause = ' ORDER BY a.date_of_birth DESC '
@@ -462,74 +412,43 @@ class SowBoar:
                
                
         if inc_user_audit == 0:
-            if minimum_info == 0:
-                sql =   """
-                        SELECT 
-                            a.id,
-                            a.farm_sow_id,
-                            a.farm_boar_id,
-                            a.number,
-                            a.name,
-                            
-                            a.is_disposed,
-                            a.is_external,
-                            a.is_production_ready,
-                            
-                            a.farm_birth_prod_id,
-                            a.last_prod_id,
-                            
-                            a.num_nipples,
-                           
-                            a.status_id,
-                            b.name AS status_name,
-                            a.date_of_birth,
-                            a.date_eartag,
-                            a.date_dispose,
-                            c.notes AS add_notes,
-                            d.notes AS dispose_notes
-                            
-                        FROM sow_boar a
-                        LEFT OUTER JOIN sow_status b        ON a.sow_status_id     = b.id
-                        LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
-                        LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
-                        %s
-                        %s 
-                        """ % (where_clause, order_clause)
             
-            else:
-                sql =   """
-                        SELECT 
-                            a.id,
-                            a.farm_sow_id,
-                            a.farm_boar_id,
-                            a.number,
-                            a.name,
-                           
-                            a.sow_status_id,
-                            a.date_of_birth,
-                            
-                            a.is_external,
-                            a.is_production_ready,
-                            
-                            a.num_nipples,
-                            
-                            c.notes AS add_notes,
-                            
-                            b.farm_prod_id,
-                            b.date_insemination,
-                            b.date_expected_birth,
-                            
-                            a.mate_count,
-                            a.date_last_mate
-                            
-                            
-                            
-                        FROM sow_boar a
-                        LEFT OUTER JOIN pig_production b    ON a.last_prod_id       = b.id
-                        LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
-                        %s
-                        %s 
-                        """ % (where_clause, order_clause)
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.farm_sow_id,
+                        a.farm_boar_id,
+                        a.number,
+                        a.name,
+                       
+                        a.sow_status_id,
+                        a.birth_farm_prod_id,
+                        a.date_of_birth,
+                        a.date_eartag,
+                        
+                        a.is_external,
+                        a.is_production_ready,
+                        
+                        a.num_nipples,
+                        
+                        b.farm_prod_id,
+                        b.date_insemination,
+                        b.date_expected_birth,
+                        
+                        a.last_mate_sow_boar_id,
+                        a.mate_count,
+                        a.date_last_mate,
+                        
+                        c.notes AS add_notes
+                        
+                        
+                        
+                    FROM sow_boar a
+                    LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id  = b.id
+                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
+                    %s
+                    %s 
+                    """ % (where_clause, order_clause)
             
         else:
             
@@ -540,38 +459,41 @@ class SowBoar:
                         a.farm_boar_id,
                         a.number,
                         a.name,
+                       
+                        a.sow_status_id,
+                        a.birth_farm_prod_id,
+                        a.date_of_birth,
+                        a.date_eartag,
                         
-                        a.is_disposed,
                         a.is_external,
                         a.is_production_ready,
                         
-                        a.farm_birth_prod_id,
-                        a.last_prod_id,
-                        
                         a.num_nipples,
-                       
-                        a.status_id,
-                        b.name AS status_name,
-                        a.date_of_birth,
-                        a.date_eartag,
-                        a.date_dispose,
-                        c.notes AS add_notes,
-                        d.notes AS dispose_notes,
+                        
+                        b.farm_prod_id,
+                        b.date_insemination,
+                        b.date_expected_birth,
+                        
+                        a.last_mate_sow_boar_id,
+                        a.mate_count,
+                        a.date_last_mate,
+                        
+                        c.notes AS add_notes
+                        
+                        
+                        d.name_last,
+                        d.name_first,
+                        a.dt_entry,
                         
                         e.name_last,
                         e.name_first,
-                        a.dt_entry,
-                        
-                        f.name_last,
-                        f.name_first,
                         a.dt_last_update
                         
                     FROM sow_boar a
-                    LEFT OUTER JOIN sow_status b        ON a.sow_status_id      = b.id
-                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
-                    LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
-                    LEFT OUTER JOIN user e              ON a.added_by_user_id   = e.id
-                    LEFT OUTER JOIN user f              ON a.last_update_user_id = f.id
+                    LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id = b.id
+                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
+                    LEFT OUTER JOIN user d              ON a.added_by_user_id   = d.id
+                    LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
                     %s
                     %s 
                     """ % (where_clause, order_clause)
@@ -609,129 +531,235 @@ class SowBoar:
         result = []
         if rows is not None:
             
-            
             for row in rows:
-                
-                if inc_user_audit == 0:
-                    if minimum_info == 0:
-                              
-                        
-                        cur_entry = {
-                            'id':                   row[0],
-                            'farm_sow_id':          row[1],
-                            'farm_boar_id':         row[2],
-                            'number':               row[3], 
-                            'name':                 row[4],
-                            
-                            'is_disposed':          row[5],
-                            'is_external':          row[6],
-                            'is_production_ready':  row[7],
-                            
-                            'num_nipples':          row[8],
-                            
-                            'farm_birth_prod_id':   row[9],
-                            'last_prod_id':         row[10],
-                            
-                            'status_id':            row[11],
-                            'status':               row[12],
-                            'date_of_birth':        str(row[13])  if row[13] else None,
-                            'date_eartag':          str(row[14])  if row[14] else None,
-                            'date_dispose':         str(row[15])  if row[15] else None,
-                            'notes':                row[16],
-                            'dispose_notes':        row[17]
-                        }
+               
+                sow_boar = {
+                    'id':                   row[0],
+                    'farm_sow_id':          row[1],
+                    'farm_boar_id':         row[2],
+                    'number':               row[3], 
+                    'name':                 row[4],
                     
+                    'status_id':            row[5],
+                    'birth_farm_prod_id':   row[6],
+                    'date_of_birth':        str(row[7])  if row[7] else None,
+                    'date_eartag':          str(row[8])  if row[8] else None,
+                    
+                    'is_external':          row[9],
+                    'is_production_ready':  row[10],
+                    
+                    'num_nipples':          row[11],
+                    
+                    'last_farm_prod_id':    row[12],
+                    'date_insemination':    str(row[13]) if row[13] else None,
+                    'date_expected_birth':  str(row[14]) if row[14] else None,
+                    
+                    'last_mate_sow_boar_id': row[15],
+                    'mate_count':           row[16],
+                    'date_last_mate':       str(row[17]) if row[17] else None,
+                  
+                    'add_notes':            row[18]
+                }
+                
+                if sex is not None:
+                    if sex == 'F':
+                        del sow_boar['farm_boar_id']
+                        del sow_boar['is_external']
                     else:
-                        cur_entry = {
-                            'id':                   row[0],
-                            'farm_sow_id':          row[1],
-                            'farm_boar_id':         row[2],
-                            'number':               row[3], 
-                            'name':                 row[4],
-                            'status_id':            row[5],
-                            'date_of_birth':        str(row[6])  if row[6] else None,
-                            'is_external':          row[7],
-                            'is_production_ready':  row[8],
-                            
-                            'num_nipples':          row[9],
-                            
-                            'add_notes':            row[10],
-                            
-                            'last_farm_prod_id':    row[11],
-                            'date_insemination':    str(row[12])  if row[12] else None,
-                            'date_expected_birth':  str(row[13])  if row[13] else None,
-                            
-                            'mate_count':           row[14],
-                            'date_last_mate':       str(row[15])  if row[15] else None
-                            
-                        }
-                    
-                    if sex is not None:
-                        if sex == 'F':
-                            del cur_entry['farm_boar_id']
-                            del cur_entry['mate_count']
-                            del cur_entry['date_last_mate']
-                        else:
-                            del cur_entry['farm_sow_id']
-                            del cur_entry['last_farm_prod_id']
-                            del cur_entry['date_insemination']
-                            del cur_entry['date_expected_birth']
+                        # These are for sow only
+                        del sow_boar['farm_sow_id'] 
+                        del sow_boar['status_id']
+                        del sow_boar['num_nipples'] 
+                        del sow_boar['date_insemination'] 
+                        del sow_boar['date_expected_birth']
+            
                 
-                else:
+                
+                if inc_user_audit > 0:
                     
+                    cur_entry = {'sow_boar': sow_boar}
                     
-                    cur_entry = {
-                        'sow_boar': {
-                            'id':                   row[0],
-                            'farm_sow_id':          row[1],
-                            'farm_boar_id':         row[2],
-                            'number':               row[3], 
-                            'name':                 row[4],
-                            
-                            'is_disposed':          row[5],
-                            'is_external':          row[6],
-                            'is_production_ready':  row[7],
-                            
-                            'num_nipples':          row[8],
-                            
-                            'farm_birth_prod_id':   row[9],
-                            'last_prod_id':         row[10],
-                            
-                            'status_id':            row[11],
-                            'status':               row[12],
-                            'date_of_birth':        str(row[13])  if row[13] else None,
-                            'date_eartag':          str(row[14])  if row[14] else None,
-                            'date_dispose':         str(row[15])  if row[15] else None,
-                            'notes':                row[16],
-                            'dispose_notes':        row[17]
-                        },
-                        
-                        'added_by': {
-                            'name_last':        row[18],
-                            'name_first':       row[19],
-                            'dt_entry':         str(row[20])
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[21],
-                            'name_first':       row[22],
-                            'dt_update':        str(row[23]) if row[23] else None
-                        }                    
+                    added_by = {
+                        'name_last':        row[19],
+                        'name_first':       row[20],
+                        'dt_entry':         str(row[21])
                     }
                     
-            
-                    if sex is not None:
-                        if sex == 'F':
-                            del cur_entry['sow_boar']['farm_boar_id']
-                            del cur_entry['sow_boar']['is_external']
-                        else:
-                            del cur_entry['sow_boar']['farm_sow_id'] # This is for boar only
-                            del cur_entry['sow_boar']['status_id'] # This refers to sow_status
-                            del cur_entry['sow_boar']['status'] # This refers to sow_status
-                            del cur_entry['sow_boar']['num_nipples'] # This is for sow only
-                            del cur_entry['sow_boar']['date_insemination'] # This is for sow only
-                            del cur_entry['sow_boar']['date_expected_birth'] # This is for sow only
+                    last_update:{
+                        'name_last':        row[22],
+                        'name_first':       row[23],
+                        'dt_update':        str(row[24]) if row[24] else None
+                    }
+                
+                    cur_entry['added_by']    = added_by
+                    cur_entry['last_update'] = last_update
                             
+                else:
+                    cur_entry = sow_boar 
+                    
+                result.append(cur_entry)
+
+        
+        return result
+
+
+    def get_list_disposed(self, farm_id):
+        """
+        Dedicated query for disposed pigs. This will return maximum information
+        bacuse the user edit is also returned. This will return both sows and 
+        boars.
+        
+        Parameters
+        ----------
+        
+        
+        Returns
+        -------
+        list of dictionary
+        
+        
+        """
+        
+       
+            
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.farm_sow_id,
+                    a.farm_boar_id,
+                    a.number,
+                    a.name,
+                    a.sex,
+                    
+                    a.is_external,
+                    a.is_production_ready,
+                    
+                    b.farm_prod_id,
+                    
+                    a.num_nipples,
+                    
+                    a.last_mate_sow_boar_id,
+                    a.mate_count, 
+                   
+                    a.sow_status_id,
+                    a.dispose_status_id,
+                    
+                    a.date_of_birth,
+                    a.date_eartag,
+                    a.date_dispose,
+                    a.date_last_mate,
+                    
+                    c.notes AS add_notes,
+                    d.notes AS dispose_notes,
+                    
+                    e.name_last,
+                    e.name_first,
+                    a.dt_entry,
+                    
+                    f.name_last,
+                    f.name_first,
+                    a.dt_last_update
+                    
+                FROM sow_boar a
+                LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id = b.id
+                LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id      = c.id
+                LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
+                LEFT OUTER JOIN user e              ON a.added_by_user_id   = e.id
+                LEFT OUTER JOIN user f              ON a.last_update_user_id = f.id
+                WHERE a.pig_farm_id = %s
+                ORDER BY a.date_dispose DESC;
+                """ % farm_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_sex     = row[5]
+                
+                cur_entry = {
+                    'sow_boar': {
+                        'id':                   row[0],
+                        'farm_sow_id':          row[1],
+                        'farm_boar_id':         row[2],
+                        'number':               row[3], 
+                        'name':                 row[4],
+                        'sex':                  row[5],
+                        
+                        'is_external':          row[6],
+                        'is_production_ready':  row[7],
+                        
+                        
+                        'last_prod_id':         row[8],
+                        
+                        'num_nipples':          row[9],
+                        
+                        'last_mate_sow_boar_id':row[10],
+                        'mate_count':           row[11],
+                                                
+                        'status_id':            row[12],
+                        'dispose_status_id':    row[13],
+                        
+                        'date_of_birth':        str(row[14])  if row[14] else None,
+                        'date_eartag':          str(row[15])  if row[15] else None,
+                        'date_dispose':         str(row[16])  if row[16] else None,
+                        'date_last_mate':       str(row[17])  if row[17] else None,
+                        
+                        'add_notes':            row[18],
+                        'dispose_notes':        row[19]
+                    },
+                    
+                    'added_by': {
+                        'name_last':        row[20],
+                        'name_first':       row[21],
+                        'dt_entry':         str(row[22])
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[23],
+                        'name_first':       row[24],
+                        'dt_update':        str(row[25]) if row[25] else None
+                    }                    
+                }
+                
+                if cur_sex == 'F':
+                    del cur_entry['sow_boar']['farm_boar_id']
+                    del cur_entry['sow_boar']['is_external']
+                else:
+                    # These are for sow only
+                    del cur_entry['sow_boar']['farm_sow_id'] 
+                    del cur_entry['sow_boar']['num_nipples'] 
+                    
                 
                 result.append(cur_entry)
 

@@ -48,8 +48,7 @@ async def account_pig_ops(ahid:str = None, request: Request = None):
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID'
                 }
             }
             """
@@ -132,8 +131,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE'
             }
         }
         
@@ -145,8 +143,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
                 }
             }
             
@@ -156,8 +153,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
                 }
             }
     
@@ -167,8 +163,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
                 }
             }
     
@@ -178,8 +173,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID'
             }
         }
     
@@ -195,8 +189,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -222,8 +215,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NAME'
             }
         }
         
@@ -234,8 +226,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE'
             }
         }
         
@@ -269,8 +260,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
             return {
                 'result':{
                     'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS',
-                    'desc': ''
+                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
                 }
             }
     
@@ -281,8 +271,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID'
             }
         }
     
@@ -295,8 +284,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID'
             }
         }
     
@@ -313,8 +301,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -333,8 +320,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_USER_HASHID'
             }
         }
     
@@ -346,8 +332,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_HASHID'
             }
         }
     
@@ -367,8 +352,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -408,8 +392,7 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_ACCOUNT_HASHID',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_ACCOUNT_HASHID'
             }
         }
     
@@ -423,8 +406,7 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
             
@@ -441,8 +423,7 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

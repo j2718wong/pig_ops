@@ -17,7 +17,7 @@ from common_fast_api        import *
 
 def check_if_valid_user_account(user_id):
     res_user = model['user'].get_user_account_info(user_id)
-    
+
     if res_user is None:
         inv_result = {
             'result':{
@@ -61,10 +61,10 @@ def check_if_valid_user_account(user_id):
         }
     
     
-    if res_user['account']['cur_bill_status_id'] == ACC_BILL_STATUS.OVERDUE:
+    if res_user['account']['cur_bill_status_id'] == ACC_BILL_STATUS['OVERDUE']:
         # remove plain id
         cur_id          = res_user['account']['cur_bill_id']
-        cur_bill_hid    = hashids_common.encrypt(cur_id)
+        cur_hid         = hashids_common.encrypt(cur_id)
         
         
         inv_result = {
@@ -86,7 +86,7 @@ def check_if_valid_user_account(user_id):
     
     new_bill_hid = None 
     
-    if res_user['account']['cur_bill_status_id'] == ACC_BILL_STATUS.NEW:
+    if res_user['account']['cur_bill_status_id'] == ACC_BILL_STATUS['NEW']:
         # remove plain id
         cur_id          = res_user['account']['cur_bill_id']
         new_bill_hid    = hashids_common.encrypt(cur_id)
