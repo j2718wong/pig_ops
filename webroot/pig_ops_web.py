@@ -45,6 +45,7 @@ from route.r_pig_prod_notes     import *
 from route.r_pig_prod_pig_dead  import *
 from route.r_pig_prod_pig_ops   import *
 
+from route.r_medvac_brand       import * 
 from route.r_pig_medvac         import *
 
 from route.r_testing            import *

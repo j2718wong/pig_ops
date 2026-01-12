@@ -1,10 +1,10 @@
 # January 8, 2026
 
-class MedvacBrand:
+class MedVacBrand:
 
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'MedvacBrand'
+        self.TAG                = 'MedVacBrand'
 
 
     def add(self, data = None):

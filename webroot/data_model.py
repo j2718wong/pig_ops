@@ -497,7 +497,34 @@ class DataPigProdNotes(BaseModel):
     pig_prod_notes_id:      int = 0
     date_notes:             str = None
     notes:                  str
-    
+
+
+class DataMedVacBrand(BaseModel):
+    uhid:                   str
+    medvac_brand_hid:       str = None
+    country_hid             str = None
+        
+    user_id:                int = 0
+    medvac_brand_id:        int = 0
+        
+        
+    country_id:             int = COUNTRY_ID_PHILIPPINES
+    name:                   str
+
+
+class DataMedVacType(BaseModel):
+    uhid:                   str
+    medvac_type_hid:        str = None
+        
+    user_id:                int = 0
+    medvac_type_id:        int = 0
+        
+        
+    name:                   str
+
+
+
+
 
 class DataPigMedvac(BaseModel):
     uhid:                   str
