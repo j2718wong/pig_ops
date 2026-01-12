@@ -99,7 +99,6 @@ class SowBoar:
             in_user_id              INT,
             
             in_pig_farm_id          INT,
-            in_farm_birth_prod_id   INT,
             in_line_id              INT,
             in_sow_status_id        INT,
             
@@ -111,7 +110,6 @@ class SowBoar:
             in_number               VARCHAR(10),
             in_name                 VARCHAR(20),
             in_date_of_birth        VARCHAR(10),
-            in_date_eartag          VARCHAR(10),
             in_description          VARCHAR(160)
         )    
         """
@@ -119,7 +117,6 @@ class SowBoar:
         sql =  'CALL sow_boar_add('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.pig_farm_id
-        sql += '%s,'    % data.farm_birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
         
@@ -149,10 +146,6 @@ class SowBoar:
         else:
             sql += 'NULL,'            
             
-        if data.date_eartag is not None and len(data.date_eartag) > 0:
-            sql += '"%s",'    % data.date_eartag
-        else:
-            sql += 'NULL,'
         
         if data.notes is not None:
             sql += '"%s");'   % data.notes
@@ -212,7 +205,6 @@ class SowBoar:
             in_user_id              INT,
             
             in_sow_boar_id          INT,
-            in_farm_birth_prod_id   INT,
             in_line_id              INT,
             in_sow_status_id        INT,
             in_is_external          INT,
@@ -229,7 +221,6 @@ class SowBoar:
         sql =  'CALL sow_boar_update('
         sql += '%s,'    % data.user_id
         sql += '%s,'    % data.sow_boar_id
-        sql += '%s,'    % data.farm_birth_prod_id
         sql += '%s,'    % data.line_id
         sql += '%s,'    % data.sow_status_id
         sql += '%s,'    % data.is_external
@@ -260,7 +251,7 @@ class SowBoar:
         else:
             sql += 'NULL);'
         
-        
+        print(sql)
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -666,7 +657,7 @@ class SowBoar:
                 LEFT OUTER JOIN pig_prod_notes d    ON a.dispose_notes_id  = d.id
                 LEFT OUTER JOIN user e              ON a.added_by_user_id   = e.id
                 LEFT OUTER JOIN user f              ON a.last_update_user_id = f.id
-                WHERE a.pig_farm_id = %s
+                WHERE a.pig_farm_id = %s AND is_disposed = 1
                 ORDER BY a.date_dispose DESC;
                 """ % farm_id
         

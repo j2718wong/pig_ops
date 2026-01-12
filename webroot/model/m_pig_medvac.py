@@ -4,10 +4,10 @@
 from common_constants       import *
 
 
-class PigMedvac:
+class PigMedVac:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'PigMedvac'
+        self.TAG                = 'PigMedVac'
 
 
     def add(self, data = None):
@@ -246,55 +246,57 @@ class PigMedvac:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0,
-            inc_user_audit = 0):
+    def get_list(self, sow_boar_id, inc_deleted = 0, inc_user_audit = 0):
         
         if inc_deleted > 0:
-            where_clause = 'WHERE a.account_id = %s' % account_id 
+            where_clause = 'WHERE a.sow_boar_id = %s' % sow_boar_id 
         else:
-            where_clause = 'WHERE a.account_id = %s AND (a.flag & 1) = 0' % account_id 
+            where_clause = 'WHERE a.sow_boar_id = %s AND (a.flag & 1) = 0' % sow_boar_id 
         
         
         if inc_user_audit == 0:
             sql =   """
                     SELECT 
                         a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
+                        a.date_medvac,
+                        a.medvac_brand_id,
+                        b.name AS medvac_brand,
+                        a.medvac_type_id,
+                        c.name AS medvac_type,
                         a.name,
-                        a.description,
-                        a.dt_entry
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b ON a.pig_race_id = b.id
+                        a.notes
+                    FROM pig_medvac a 
+                    LEFT OUTER JOIN medvac_brand b  ON a.medvac_brand_id = b.id
+                    LEFT OUTER JOIN medvac_type c   ON a.medvac_type_id = c.id
                     %s
-                    ORDER BY a.name
+                    ORDER BY a.date_medvac DESC
                     """ % where_clause
         else:
             sql =   """
                     SELECT 
                         a.id,
-                        a.pig_race_id,
-                        b.name AS pig_race_name,
-                        
+                        a.date_medvac,
+                        a.medvac_brand_id,
+                        b.name AS medvac_brand,
+                        a.medvac_type_id,
+                        c.name AS medvac_type,
                         a.name,
-                        a.description,
-                        
-                        c.name_last,
-                        c.name_first,
-                        a.dt_entry,
+                        a.notes
                         
                         d.name_last,
                         d.name_first,
+                        a.dt_entry,
+                        
+                        e.name_last,
+                        e.name_first,
                         a.dt_last_update
                         
-                    FROM pig_race_line a 
-                    LEFT OUTER JOIN pig_race b      ON a.pig_race_id = b.id
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
-                
+                    FROM pig_medvac a 
+                    LEFT OUTER JOIN medvac_brand b  ON a.medvac_brand_id = b.id
+                    LEFT OUTER JOIN medvac_type c   ON a.medvac_type_id = c.id
+                    
                     %s
-                    ORDER BY a.name
+                    ORDER BY a.date_medvac DESC
                     """ % where_clause
         
         # Check if still connected to database
@@ -331,41 +333,55 @@ class PigMedvac:
             for row in rows:
                 if inc_user_audit == 0:
                     cur_entry = {
-                        'id':                   row[0],
+                        'medvac': {
+                            'id':               row[0],
+                            'date_medvac':      str(row[1]),
                         
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
-                        },
-                        
-                        'name':                 row[3],
-                        'desc':                 row[4],
-                        
-                        'dt_entry':             str(row[5])
+                            'brand':{
+                                'id':           row[2],
+                                'name':         row[3]
+                            },
+                            
+                            'type':{
+                                'id':           row[3],
+                                'name':         row[4]
+                            },
+                            
+                            'name':             row[5],
+                            'notes':            row[6]
+                        }
                     }
                     
                 else:
                     cur_entry = {
-                        'id':                   row[0],
+                        'medvac': {
+                            'id':               row[0],
+                            'date_medvac':      str(row[1]),
                         
-                        'pig_race':{
-                            'id':               row[1],
-                            'name':             row[2],
+                            'brand':{
+                                'id':           row[2],
+                                'name':         row[3]
+                            },
+                            
+                            'type':{
+                                'id':           row[3],
+                                'name':         row[4]
+                            },
+                            
+                            'name':             row[5],
+                            'notes':            row[6]
                         },
                         
-                        'name':                 row[3],
-                        'description':          row[4],
-                        
                         'added_by': {
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_entry':         row[7]
+                            'name_last':        row[7],
+                            'name_first':       row[8],
+                            'dt_entry':         row[9]
                         },
                         
                         'last_update':{
-                            'name_last':        row[8],
-                            'name_first':       row[9],
-                            'dt_update':        str(row[10]) if row[10] else None
+                            'name_last':        row[10],
+                            'name_first':       row[11],
+                            'dt_update':        str(row[12]) if row[12] else None
                         }
                     }
                 

@@ -38,6 +38,7 @@ tags_metadata = [
     {"name": "Pig Farm",        "description": "Pig Farm related operations"},
     
     {"name": "Sow Boar",        "description": "Sow Boar related operation"},
+    {"name": "Pig Details",     "description": "Pig Details related operation"},
     
     {"name": "Pig Production",  "description": "Pig Production related operations"},
     {"name": "Production Details",  "description": "Pig Production Details related operations"},

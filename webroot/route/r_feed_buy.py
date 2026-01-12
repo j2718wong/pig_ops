@@ -27,8 +27,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_USER_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID'
             }
         }
     
@@ -44,8 +43,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
             return {
                 'result':{
                     'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -61,8 +59,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
             return {
                 'result':{
                     'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -76,8 +73,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_FEED_TYPE_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_FEED_TYPE_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_TYPE_HASHID'
             }
         }
     
@@ -91,8 +87,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_FEED_BRAND_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_FEED_BRAND_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_BRAND_HASHID'
             }
         }
     
@@ -106,8 +101,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID'
             }
         }
     
@@ -128,8 +122,7 @@ async def feed_buy_add(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -154,8 +147,7 @@ async def feed_buy_update(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_USER_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_USER_HASHID'
             }
         }
     
@@ -169,8 +161,7 @@ async def feed_buy_update(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_HASHID'
             }
         }
     
@@ -187,8 +178,7 @@ async def feed_buy_update(feed_buy_data: dm.DataFeedBuy):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -221,8 +211,7 @@ async def feed_buy_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_HASHID'
             }
         }
     
@@ -242,8 +231,7 @@ async def feed_buy_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -279,8 +267,7 @@ async def feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
         return {
             'result':{
                 'num':  ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BUY_INVALID_PIG_PROD_HASHID'
             }
         }
     
@@ -294,8 +281,7 @@ async def feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -333,8 +319,7 @@ async def feed_buy_list(pig_prod_hid: str, inc_user_audit:int = 0):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

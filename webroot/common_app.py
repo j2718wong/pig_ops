@@ -76,7 +76,7 @@ from model.m_pig_prod_notes     import PigProdNotes
 from model.m_pig_prod_pig_dead  import PigProdPigDead
 from model.m_pig_prod_pig_ops   import PigProdPigOps
 
-from model.m_pig_medvac         import PigMedvac
+from model.m_pig_medvac         import PigMedVac
 
 from route.controller           import Controller
 
@@ -129,7 +129,7 @@ model_names_pig_ops = [
     ('prod_pig_dead',           PigProdPigDead),
     ('pig_prod_pig_ops',        PigProdPigOps),
     
-    ('pig_medvac',              PigMedvac),
+    ('pig_medvac',              PigMedVac),
     
     ('sow_act',                 SowActivity)
     

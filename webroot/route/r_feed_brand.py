@@ -29,8 +29,7 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
         return {
             'result':{
                 'num':  ERROR_FEED_BRAND_INVALID_NAME,
-                'code': 'ERROR_FEED_BRAND_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_FEED_BRAND_INVALID_NAME'
             }
         }
     
@@ -40,8 +39,7 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
         return {
             'result':{
                 'num':  ERROR_FEED_BRAND_INVALID_USER_HASHID,
-                'code': 'ERROR_FEED_BRAND_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BRAND_INVALID_USER_HASHID'
             }
         }
     
@@ -57,8 +55,7 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -102,8 +99,7 @@ async def feed_brand_list(country_id: int = 1, inc_deleted: int = 0,
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
             
@@ -120,8 +116,7 @@ async def feed_brand_list(country_id: int = 1, inc_deleted: int = 0,
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

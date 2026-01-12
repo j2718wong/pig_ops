@@ -327,7 +327,22 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
     
     
+    sow_boar_hid    = sow_boar_data.sow_boar_hid
+    res = hashids_common.decrypt(sow_boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_HASHID'
+            }
+        }
+    
+    sow_boar_id = res[0]
+    
+    
+    
     sow_boar_data.user_id       = user_id
+    sow_boar_data.sow_boar_id   = sow_boar_id
     
     res_update  =  model['sow_boar'].update(sow_boar_data)
     
@@ -353,7 +368,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         
         
     # Remove optional desc coming from database
-    if 'desc' in res_update['result'] and len(res_update['result']['desc'] == 0):
+    if 'desc' in res_update['result'] and res_update['result']['desc'] and len(res_update['result']['desc']) == 0:
         del res_update['result']['desc']
     
     
@@ -388,8 +403,8 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID'
+                'num':  ERROR_SOW_BOAR_INVALID_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_HASHID'
             }
         }
     

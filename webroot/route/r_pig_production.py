@@ -199,8 +199,8 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     list_pig_prod = None
     if inc_pig_prod > 0:
     
-        pig_prod_type = PIG_PROD_TYPE.GESTATING | PIG_PROD_TYPE.LACTATING
-    
+        pig_prod_type = PIG_PROD_TYPE['GESTATING']
+        
         # Get pig_production list
         list_pig_prod = get_pig_prod_list(pig_farm_id, pig_prod_type)
         if list_pig_prod == None:
