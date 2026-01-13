@@ -502,7 +502,7 @@ class DataPigProdNotes(BaseModel):
 class DataMedVacBrand(BaseModel):
     uhid:                   str
     medvac_brand_hid:       str = None
-    country_hid             str = None
+    country_hid:            str = None
         
     user_id:                int = 0
     medvac_brand_id:        int = 0
@@ -531,20 +531,28 @@ class DataPigMedvac(BaseModel):
         
     sow_boar_hid:           str = None
     pig_prod_hid:           str = None
+    pig_prod_pig_ops_hid:   str = None
+    health_issue_hid:       str = None
+    
     staff_hid:              str = None
+    
     medvac_brand_hid:       str = None
+    medvac_type_hid:        str = None
+    
     
     date_medvac:            str
     
     user_id:                int = 0
-    pig_prod_id:            int = 0
     sow_boar_id:            int = 0
-    medvac_type_id:         int = None
+    pig_prod_id:            int = 0
+    pig_prod_pig_ops_id:    int = 0
+    health_issue_id:        int = 0
+    
+    
     medvac_brand_id:        int = 0
+    medvac_type_id:         int = 0
+    
     medvac_name:            str
-        
-    quantity:               int
-    unit:                   str
     
     staff_id:               int = 0
     done_by_user:           int = 0

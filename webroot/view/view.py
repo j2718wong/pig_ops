@@ -68,8 +68,9 @@ MODULES_ROOT = [
     
     
     "pages/common/page_view_basic.js",
-    "pages/common/address_manager.js",
+    "pages/common/manager_address.js",
     "pages/common/common_app.js",
+    "pages/common/common_select_options.js",
     
     "pages/a_user_control/page_account_disabled.js",
     "pages/a_user_control/page_user_disabled.js",
@@ -97,7 +98,7 @@ MODULES_ROOT = [
     "pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
     
     
-    "pages/production/gesta_lacta/insem_data_select.js",
+    
     "pages/production/gesta_lacta/page_prod_gestating_add.js",
     
     "pages/production/gesta_lacta/prod_entry_notes.js",

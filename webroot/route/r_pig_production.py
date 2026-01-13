@@ -532,6 +532,8 @@ async def pig_prod_public(country_hid:str):
         return None
 
     
+    
+    
     for cur_entry in list_feed_type:
         cur_id      = cur_entry['id']
         cur_hid     = hashids_common.encrypt(cur_id)

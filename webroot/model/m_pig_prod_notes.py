@@ -4,6 +4,8 @@
 from common_constants       import *
 
 
+FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE      = 2
+
 class PigProdNotes:
     def __init__(self, model):
         self.model              = model
@@ -18,6 +20,8 @@ class PigProdNotes:
             in_pig_prod_id          INT,
             in_sow_boar_id          INT,
             in_prod_group_id        INT,
+            
+            in_is_health_issue      INT,
             
             in_date_notes           VARCHAR(10),
             in_notes                VARCHAR(160)
@@ -42,6 +46,10 @@ class PigProdNotes:
             sql += '%s,'    % data.production_group_id
         else:
             sql += 'NULL,'
+        
+        
+        sql += '%s,'    % data.is_health_issue
+        
         
         if data.date_notes is not None:
             sql += '"%s",'  % data.date_notes
@@ -219,6 +227,10 @@ class PigProdNotes:
     def get_list(self, pig_prod_id = 0, sow_boar_id = 0, prod_group_id = 0, 
         inc_deleted = 0, inc_user_audit = 0):
         
+        # Note: pig_prod_notes and health_issue is merged;
+        # pig_prod_notes.flag.FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE
+        # is the indicator that it is a pig health issue;
+        
         where_clause = ''
         
         if pig_prod_id > 0:
@@ -238,6 +250,7 @@ class PigProdNotes:
                 SELECT 
                     a.id,
                     a.date_notes,
+                    a.flag,
                     a.notes,
                     
                     b.name_last,
@@ -288,26 +301,37 @@ class PigProdNotes:
         if rows is not None:
             
             for row in rows:
+                
+                cur_flag = row[2]
+                
+                is_health_issue = 0
+                if cur_flag & FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE > 0:
+                    is_health_issue = 1
+                
                 cur_entry = {
                     'prod_notes': {
                         'id':               row[0],
                         'date_notes':       str(row[1]),
-                        'notes':            row[2],
+                        'notes':            row[3],
                         
                     },
                     
                     'added_by':{
-                        'name_last':        row[3],
-                        'name_first':       row[4],
-                        'dt_entry':         str(row[5])
+                        'name_last':        row[4],
+                        'name_first':       row[5],
+                        'dt_entry':         str(row[6])
                     },
                     
                     'last_update':{
-                        'name_last':        row[6],
-                        'name_first':       row[7],
-                        'dt_update':        str(row[8]) if row[8] else None
+                        'name_last':        row[7],
+                        'name_first':       row[8],
+                        'dt_update':        str(row[9]) if row[9] else None
                     }
                 }
+                
+                
+                if is_health_issue > 0:
+                    cur_entry['prod_notes']['is_health_issue'] = 1
                 
                 result.append(cur_entry)
         

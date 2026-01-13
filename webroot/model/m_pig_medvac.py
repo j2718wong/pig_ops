@@ -17,14 +17,14 @@ class PigMedVac:
             
             in_sow_boar_id          INT,
             in_pig_prod_id          INT,
+            in_pig_prod_pig_ops_id	INT,
+            in_health_issue_id		INT,
+    
             
             in_date_medvac          VARCHAR(10),
             in_medvac_type_id       INT,
             in_medvac_brand_id      INT,
             in_medvac_name          VARCHAR(80),
-            
-            in_quantity             INT,
-            in_unit                 VARCHAR(20),
             
             in_staff_id             INT,
             in_done_by_user         INT,
@@ -45,6 +45,18 @@ class PigMedVac:
         else:
             sql += 'NULL,'
         
+        if data.pig_prod_pig_ops_id is not None and data.pig_prod_pig_ops_id > 0:
+            sql += '%s,'    % data.pig_prod_pig_ops_id
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.health_issue_id is not None and data.health_issue_id > 0:
+            sql += '%s,'    % data.health_issue_id
+        else:
+            sql += 'NULL,'
+        
+        
         
         sql += '"%s",'  % data.date_medvac
         
@@ -58,9 +70,7 @@ class PigMedVac:
         sql += '%s,'    % data.medvac_brand_id
         
         sql += '"%s",'  % data.medvac_name
-        
-        sql += '%s,'    % data.quantity
-        sql += '"%s",'  % data.unit
+       
         
         sql += '%s,'    % data.staff_id
         sql += '%s,'    % data.done_by_user
@@ -106,10 +116,8 @@ class PigMedVac:
                     'desc':             row[2],
                 },
                 
-                'pig_race_line': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                'pig_medvac': {
+                    'id':               row[3]
                 }
             }
 
@@ -258,6 +266,10 @@ class PigMedVac:
             sql =   """
                     SELECT 
                         a.id,
+                        
+                        a.prod_pig_ops_id,
+                        a.health_issue_id,
+                        
                         a.date_medvac,
                         a.medvac_brand_id,
                         b.name AS medvac_brand,
@@ -275,6 +287,10 @@ class PigMedVac:
             sql =   """
                     SELECT 
                         a.id,
+                        
+                        a.prod_pig_ops_id,
+                        a.health_issue_id,
+                        
                         a.date_medvac,
                         a.medvac_brand_id,
                         b.name AS medvac_brand,
@@ -335,20 +351,24 @@ class PigMedVac:
                     cur_entry = {
                         'medvac': {
                             'id':               row[0],
-                            'date_medvac':      str(row[1]),
+                            
+                            'prod_pig_ops_id':  row[1],
+                            'health_issue_id':  row[2],
+                            
+                            'date_medvac':      str(row[3]),
                         
                             'brand':{
-                                'id':           row[2],
-                                'name':         row[3]
+                                'id':           row[4],
+                                'name':         row[5]
                             },
                             
                             'type':{
-                                'id':           row[3],
-                                'name':         row[4]
+                                'id':           row[6],
+                                'name':         row[7]
                             },
                             
-                            'name':             row[5],
-                            'notes':            row[6]
+                            'name':             row[8],
+                            'notes':            row[9]
                         }
                     }
                     
@@ -356,32 +376,37 @@ class PigMedVac:
                     cur_entry = {
                         'medvac': {
                             'id':               row[0],
-                            'date_medvac':      str(row[1]),
+                            
+                            'prod_pig_ops_id':  row[1],
+                            'health_issue_id':  row[2],
+                            
+                            
+                            'date_medvac':      str(row[3]),
                         
                             'brand':{
-                                'id':           row[2],
-                                'name':         row[3]
+                                'id':           row[4],
+                                'name':         row[5]
                             },
                             
                             'type':{
-                                'id':           row[3],
-                                'name':         row[4]
+                                'id':           row[6],
+                                'name':         row[7]
                             },
                             
-                            'name':             row[5],
-                            'notes':            row[6]
+                            'name':             row[8],
+                            'notes':            row[9]
                         },
                         
                         'added_by': {
-                            'name_last':        row[7],
-                            'name_first':       row[8],
-                            'dt_entry':         row[9]
+                            'name_last':        row[10],
+                            'name_first':       row[11],
+                            'dt_entry':         row[12]
                         },
                         
                         'last_update':{
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_update':        str(row[12]) if row[12] else None
+                            'name_last':        row[13],
+                            'name_first':       row[14],
+                            'dt_update':        str(row[15]) if row[15] else None
                         }
                     }
                 
