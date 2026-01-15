@@ -101,6 +101,19 @@ class DataAccountPigOps(BaseModel):
     description:            str = None 
     
     
+class DataAccountMedVac(BaseModel):
+    uhid:                   str
+    account_medvac_hid:     str = None
+    
+    
+    user_id:                int = 0
+    account_medvac_id:      int = 0
+    
+    
+    name:                   str
+    
+    
+    
 class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
     uhid:                   str
     account_pig_buyer_hid:  str = None
@@ -528,6 +541,7 @@ class DataMedVacType(BaseModel):
 
 class DataPigMedvac(BaseModel):
     uhid:                   str
+    pig_medvac_hid:         str = None
         
     sow_boar_hid:           str = None
     pig_prod_hid:           str = None
@@ -538,11 +552,12 @@ class DataPigMedvac(BaseModel):
     
     medvac_brand_hid:       str = None
     medvac_type_hid:        str = None
-    
+    acc_medvac_hid:         str = None
     
     date_medvac:            str
     
     user_id:                int = 0
+    pig_medvac_id:          int = 0
     sow_boar_id:            int = 0
     pig_prod_id:            int = 0
     pig_prod_pig_ops_id:    int = 0
@@ -551,8 +566,8 @@ class DataPigMedvac(BaseModel):
     
     medvac_brand_id:        int = 0
     medvac_type_id:         int = 0
+    acc_medvac_id:          int = 0
     
-    medvac_name:            str
     
     staff_id:               int = 0
     done_by_user:           int = 0

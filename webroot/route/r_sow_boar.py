@@ -609,6 +609,30 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
             del cur_entry['sow_boar']['id']
             cur_entry['sow_boar']['hid']   = cur_hid
 
+
+            
+            cur_id  = cur_entry['sow_boar']['parent_sow_id']
+            if cur_id != None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['sow_boar']['parent_sow_id']
+            cur_entry['sow_boar']['parent_sow_hid']   = cur_hid
+
+            
+            
+            cur_id  = cur_entry['sow_boar']['parent_boar_id']
+            if cur_id != None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['sow_boar']['parent_boar_id']
+            cur_entry['sow_boar']['parent_boar_hid']   = cur_hid
+
+            
+
             
             cur_id      = cur_entry['sow_boar']['last_mate_sow_boar_id']
             if cur_id is not None:
@@ -625,6 +649,28 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
             
             del cur_entry['id']
             cur_entry['hid']   = cur_hid
+        
+        
+            cur_id  = cur_entry['parent_sow_id']
+            if cur_id != None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['parent_sow_id']
+            cur_entry['parent_sow_hid']   = cur_hid
+
+            
+            
+            cur_id  = cur_entry['parent_boar_id']
+            if cur_id != None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['parent_boar_id']
+            cur_entry['parent_boar_hid']   = cur_hid
+        
         
             
             cur_id      = cur_entry['last_mate_sow_boar_id']

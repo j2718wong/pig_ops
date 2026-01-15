@@ -17,6 +17,16 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_utils                import remove_database_null_description
    
 @app.post("/pig_farm_staff/add", tags=["Pig Farm"])
 async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
@@ -30,8 +40,7 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
             return {
                 'result':{
                     'num':  ERROR_PIG_FARM_STAFF_INVALID_NAME,
-                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_NAME',
-                    'desc': ''
+                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_NAME'
                 }
             }
         
@@ -41,8 +50,7 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID'
             }
         }
     
@@ -56,8 +64,7 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_PIG_FARM_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_PIG_FARM_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_PIG_FARM_HASHID'
             }
         }
        
@@ -74,8 +81,7 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -87,7 +93,10 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     del res_add['pig_farm_staff']['id']
     res_add['pig_farm_staff']['hid'] = pig_farm_staff_hid
 
-        
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
+    
     return res_add
     
 
@@ -102,8 +111,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_NAME,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_NAME'
             }
         }
         
@@ -113,8 +121,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID'
             }
         }
     
@@ -128,8 +135,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID'
             }
         }
         
@@ -143,8 +149,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_HASHID'
             }
         }
     
@@ -160,8 +165,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
             return {
                 'result':{
                     'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
-                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID'
                 }
             }
         
@@ -181,8 +185,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -190,7 +193,11 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     # remove plain id
     del res_update['pig_farm_staff']['id']
     res_update['pig_farm_staff']['hid'] = pig_farm_staff_hid
-        
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+    
     return res_update
     
 
@@ -201,8 +208,7 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_USER_HASHID'
             }
         }
     
@@ -214,8 +220,7 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_HASHID'
             }
         }
     
@@ -235,8 +240,7 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -244,6 +248,10 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
     # remove plain id
     del res_delete['pig_farm_staff']['id']
     res_delete['pig_farm_staff']['hid'] = ehid
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_delete)
         
     return res_delete
     

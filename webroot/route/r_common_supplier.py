@@ -40,8 +40,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_NAME,
-                'code': 'ERROR_SUPPLIER_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_NAME'
             }
         }
     
@@ -52,8 +51,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_MUST_HAVE_AT_LEAST_SUPPLIER_FLAG,
-                'code': 'ERROR_SUPPLIER_MUST_HAVE_AT_LEAST_SUPPLIER_FLAG',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_MUST_HAVE_AT_LEAST_SUPPLIER_FLAG'
             }
         }
     
@@ -62,8 +60,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_USER_HASHID,
-                'code': 'ERROR_SUPPLIER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_USER_HASHID'
             }
         }
     
@@ -81,8 +78,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
-                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1'
             }
         }
         
@@ -95,8 +91,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
-                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2'
             }
         }
     
@@ -111,8 +106,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
             return {
                 'result':{
                     'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
-                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3',
-                    'desc': ''
+                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3'
                 }
             }
         
@@ -134,8 +128,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -164,8 +157,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_NAME,
-                'code': 'ERROR_SUPPLIER_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_NAME'
             }
         }
     
@@ -175,8 +167,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_INVALID_USER_HASHID,
-                'code': 'ERROR_SUPPLIER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_INVALID_USER_HASHID'
             }
         }
     
@@ -190,8 +181,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_HASHID,
-                'code': 'ERROR_SUPPLIER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_HASHID'
             }
         }
     
@@ -207,8 +197,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
             return {
                 'result':{
                     'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
-                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3',
-                    'desc': ''
+                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3'
                 }
             }
         
@@ -222,8 +211,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_SUPPLIER_MUST_HAVE_AT_LEAST_SUPPLIER_FLAG,
-                'code': 'ERROR_SUPPLIER_MUST_HAVE_AT_LEAST_SUPPLIER_FLAG',
-                'desc': ''
+                'code': 'ERROR_SUPPLIER_MUST_HAVE_AT_LEAST_SUPPLIER_FLAG'
             }
         }
     
@@ -241,8 +229,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -297,8 +284,7 @@ async def supplier_list(ahid:str = None, level_2_hid: str = None,
             return {
                 'result':{
                     'num':  ERROR_ADDRESS_LEVEL_2_HID,
-                    'code': 'ERROR_ADDRESS_LEVEL_2_HID',
-                    'desc': ''
+                    'code': 'ERROR_ADDRESS_LEVEL_2_HID'
                 }
             }
         
@@ -317,8 +303,7 @@ async def supplier_list(ahid:str = None, level_2_hid: str = None,
             return {
                 'result':{
                     'num':  ERROR_DATABASE_ERROR,
-                    'code': 'ERROR_DATABASE_ERROR',
-                    'desc': ''
+                    'code': 'ERROR_DATABASE_ERROR'
                 }
             }
                 
@@ -346,8 +331,7 @@ async def supplier_list(ahid:str = None, level_2_hid: str = None,
         return {
             'result':{
                 'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'code': 'SUCCESS'
             },
             
             'data': res
@@ -362,8 +346,7 @@ async def supplier_list(ahid:str = None, level_2_hid: str = None,
             return {
                 'result':{
                     'num':  ERROR_SUPPLIER_INVALID_ACCOUNT_HASHID,
-                    'code': 'ERROR_SUPPLIER_INVALID_ACCOUNT_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_SUPPLIER_INVALID_ACCOUNT_HASHID'
                 }
             }
         
@@ -382,8 +365,7 @@ async def supplier_list(ahid:str = None, level_2_hid: str = None,
             return {
                 'result':{
                     'num':  ERROR_DATABASE_ERROR,
-                    'code': 'ERROR_DATABASE_ERROR',
-                    'desc': ''
+                    'code': 'ERROR_DATABASE_ERROR'
                 }
             }
         
@@ -396,8 +378,7 @@ async def supplier_list(ahid:str = None, level_2_hid: str = None,
         return {
             'result':{
                 'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'code': 'SUCCESS'
             },
             
             'data': res
@@ -428,8 +409,7 @@ async def supplier_count(country_id: int = 1, level_1_hid: str = None,
             return {
                 'result':{
                     'num':  ERROR_ADDRESS_LEVEL_1_HID,
-                    'code': 'ERROR_ADDRESS_LEVEL_1_HID',
-                    'desc': ''
+                    'code': 'ERROR_ADDRESS_LEVEL_1_HID'
                 }
             }
         
@@ -445,8 +425,7 @@ async def supplier_count(country_id: int = 1, level_1_hid: str = None,
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -464,8 +443,7 @@ async def supplier_count(country_id: int = 1, level_1_hid: str = None,
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

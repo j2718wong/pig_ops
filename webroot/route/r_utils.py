@@ -15,6 +15,13 @@ from common_app             import *
 from common_fast_api        import *
 
 
+def remove_database_null_description(database_result):
+    if 'desc' in database_result['result']:
+        if database_result['result']['desc'] is not None:
+            if len(database_result['result']['desc']) == 0:
+                del database_result['result']['desc']
+
+
 def check_if_valid_user_account(user_id):
     res_user = model['user'].get_user_account_info(user_id)
     

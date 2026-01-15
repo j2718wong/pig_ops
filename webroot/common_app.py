@@ -48,6 +48,7 @@ from model.m_pig_farm_staff     import PigFarmStaff
 
 from model.m_account_selection  import AccountSelection
 from model.m_account_pig_ops    import AccountPigOps
+from model.m_account_medvac     import AccountMedVac
 from model.m_account_pig_buyer  import AccountPigBuyer
 
 from model.m_common_supplier    import CommonSupplier
@@ -103,6 +104,8 @@ model_names_pig_ops = [
     
     ('account_selection',       AccountSelection),
     ('account_pig_ops',         AccountPigOps),
+    ('account_medvac',          AccountMedVac),
+    
     ('account_pig_buyer',       AccountPigBuyer),
     
     ('supplier',                CommonSupplier),

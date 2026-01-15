@@ -1,29 +1,27 @@
-# January 8, 2026
+# January 12, 2026
 
 from common_constants       import *
 
-class MedVacBrand:
+class MedVacType:
 
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'MedVacBrand'
+        self.TAG                = 'MedVacType'
 
 
     def add(self, data = None):
         """
-        PROCEDURE medvac_brand_add(
+        PROCEDURE medvac_type_add(
             in_user_id              INT,
 
-            in_country_id           INT,
-            
+           
             in_name                 VARCHAR(50)
         )  
         """
         
-        sql =  'CALL medvac_brand_add('
+        sql =  'CALL medvac_type_add('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.country_id
         
         sql += '"%s")'  % data.name
         
@@ -62,7 +60,7 @@ class MedVacBrand:
                     'desc':             row[2],
                 },
                 
-                'medvac_brand': {
+                'medvac_type': {
                     'id':               row[3],
                     'flag':             row[4],
                     'name':             row[5]
@@ -72,12 +70,11 @@ class MedVacBrand:
         return None
     
         
-    def get_list(self, country_id, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self,  inc_deleted = 0, inc_user_audit = 0):
         
-        where_clause = 'WHERE a.country_id = %s ' % country_id
-                
+        where_clause  = ''
         if inc_deleted == 0:
-            where_clause += 'AND (a.flag & 1) = 0'  
+            where_clause += 'WHERE (a.flag & 1) = 0'  
         
         
         if inc_user_audit == 0:
@@ -85,7 +82,7 @@ class MedVacBrand:
                     SELECT 
                         a.id,
                         a.name
-                    FROM medvac_brand a 
+                    FROM medvac_type a 
                     %s
                     ORDER BY a.name
                     """ % where_clause
@@ -103,7 +100,7 @@ class MedVacBrand:
                         d.name_first,
                         a.dt_last_update
                         
-                    FROM medvac_brand a 
+                    FROM medvac_type a 
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                 
@@ -152,18 +149,18 @@ class MedVacBrand:
                 else:
                     cur_entry = {
                         'id':                   row[0],
-                        'name':                 row[2],
+                        'name':                 row[1],
                         
                         'added_by': {
-                            'name_last':        row[3],
-                            'name_first':       row[4],
-                            'dt_entry':         str(row[5])
+                            'name_last':        row[2],
+                            'name_first':       row[3],
+                            'dt_entry':         str(row[4])
                         },
                         
                         'last_update':{
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_update':        str(row[8]) if row[8] else None
+                            'name_last':        row[5],
+                            'name_first':       row[6],
+                            'dt_update':        str(row[7]) if row[7] else None
                         }
                     }
                 

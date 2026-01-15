@@ -414,6 +414,8 @@ class SowBoar:
                        
                         a.sow_status_id,
                         a.birth_farm_prod_id,
+                        a.parent_sow_id,
+                        a.parent_boar_id,
                         a.date_of_birth,
                         a.date_eartag,
                         
@@ -453,6 +455,8 @@ class SowBoar:
                        
                         a.sow_status_id,
                         a.birth_farm_prod_id,
+                        a.parent_sow_id,
+                        a.parent_boar_id,
                         a.date_of_birth,
                         a.date_eartag,
                         
@@ -533,23 +537,25 @@ class SowBoar:
                     
                     'status_id':            row[5],
                     'birth_farm_prod_id':   row[6],
-                    'date_of_birth':        str(row[7])  if row[7] else None,
-                    'date_eartag':          str(row[8])  if row[8] else None,
+                    'parent_sow_id':        row[7],
+                    'parent_boar_id':       row[8],
+                    'date_of_birth':        str(row[9])   if row[9] else None,
+                    'date_eartag':          str(row[10])  if row[10] else None,
                     
-                    'is_external':          row[9],
-                    'is_production_ready':  row[10],
+                    'is_external':          row[11],
+                    'is_production_ready':  row[12],
                     
-                    'num_nipples':          row[11],
+                    'num_nipples':          row[13],
                     
-                    'last_farm_prod_id':    row[12],
-                    'date_insemination':    str(row[13]) if row[13] else None,
-                    'date_expected_birth':  str(row[14]) if row[14] else None,
+                    'last_farm_prod_id':    row[14],
+                    'date_insemination':    str(row[15]) if row[15] else None,
+                    'date_expected_birth':  str(row[16]) if row[16] else None,
                     
-                    'last_mate_sow_boar_id': row[15],
-                    'mate_count':           row[16],
-                    'date_last_mate':       str(row[17]) if row[17] else None,
+                    'last_mate_sow_boar_id': row[17],
+                    'mate_count':           row[18],
+                    'date_last_mate':       str(row[19]) if row[19] else None,
                   
-                    'add_notes':            row[18]
+                    'add_notes':            row[20]
                 }
                 
                 if sex is not None:
@@ -571,15 +577,15 @@ class SowBoar:
                     cur_entry = {'sow_boar': sow_boar}
                     
                     added_by = {
-                        'name_last':        row[19],
-                        'name_first':       row[20],
-                        'dt_entry':         str(row[21])
+                        'name_last':        row[21],
+                        'name_first':       row[22],
+                        'dt_entry':         str(row[23])
                     }
                     
                     last_update:{
-                        'name_last':        row[22],
-                        'name_first':       row[23],
-                        'dt_update':        str(row[24]) if row[24] else None
+                        'name_last':        row[24],
+                        'name_first':       row[25],
+                        'dt_update':        str(row[26]) if row[26] else None
                     }
                 
                     cur_entry['added_by']    = added_by

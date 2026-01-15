@@ -17,6 +17,18 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_utils                import remove_database_null_description
+
+
     
 @app.post("/medvac_brand/add", tags=["Common Lookup"])
 async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
@@ -84,7 +96,11 @@ async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
     # remove plain id
     del res_add['medvac_brand']['id']
     res_add['medvac_brand']['hid'] = medvac_brand_hid
-
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
+        
         
     return res_add
     
