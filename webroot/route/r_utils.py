@@ -20,6 +20,8 @@ def remove_database_null_description(database_result):
         if database_result['result']['desc'] is not None:
             if len(database_result['result']['desc']) == 0:
                 del database_result['result']['desc']
+        else:
+            del database_result['result']['desc']
 
 
 def check_if_valid_user_account(user_id):

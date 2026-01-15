@@ -250,7 +250,13 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
         
         pig_medvac_id = res[0]
     
-    
+    else:
+        return {
+            'result':{
+                'num':  ERROR_PIG_MEDVAC_INVALID_HASHID,
+                'code': 'ERROR_PIG_MEDVAC_INVALID_HASHID'
+            }
+        }
     
     
     staff_id            = 0
@@ -319,7 +325,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     
    
     pig_medvac_data.user_id         = user_id
-    pig_medvac_data.pig_medvac_id     = pig_medvac_id
+    pig_medvac_data.pig_medvac_id   = pig_medvac_id
     
     pig_medvac_data.medvac_brand_id = medvac_brand_id
     pig_medvac_data.medvac_type_id  = medvac_type_id
