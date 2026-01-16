@@ -260,11 +260,57 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
             result['result']['new_bill_hid'] = new_bill_hid
     
         return result
+    
+    
+    parent_sow_id       = 0
+    parent_sow_hid      = sow_boar_data.parent_sow_hid
+    
+    if parent_sow_hid is not None:
+        res = hashids_common.decrypt(parent_sow_hid)
+        
+        if len(res) == 0:
+            result =  {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_PARENT_SOW_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_PARENT_SOW_HASHID'
+                }
+            }
+        
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+        
+            return result
+        
+        parent_sow_id = res[0]
+        
+    
+    parent_boar_id      = 0
+    parent_boar_hid     = sow_boar_data.parent_boar_hid
+    
+    if parent_boar_hid is not None:
+        res = hashids_common.decrypt(parent_boar_hid)
+        
+        if len(res) == 0:
+            result =  {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_PARENT_BOAR_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_PARENT_BOAR_HASHID'
+                }
+            }
+        
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+        
+            return result
+        
+        parent_boar_id = res[0]
         
     
     
     sow_boar_data.user_id       = user_id
     sow_boar_data.pig_farm_id   = pig_farm_id
+    sow_boar_data.parent_sow_id = parent_sow_id
+    sow_boar_data.parent_boar_id= parent_boar_id
     sow_boar_data.number        = number
     sow_boar_data.name          = name
     
@@ -741,6 +787,142 @@ async def sow_production_output(sowhid:str):
         
         if sow_id > 0:
             del cur_entry['sow']
+        
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+    
+@app.get("/sow_boar/get_parent_trace", tags=["Sow Boar"])
+async def sow_boar_get_parent_trace(sow_hid:str, boar_hid):
+    """
+    Will get sow and boar parent trace from their birth_pig_prod_id.
+    
+    Note:
+    1.) sow_boar entries that have a specified birth_pig_prod_id cannot
+        update the parent_sow_id and parent_boar_id because the parent
+        details is taken from pig_production.
+        
+    2.) The user can set the parent_sow_id and parent_boar_id if only 
+        sow_boar.birth_pig_prod_id is NULL;
+        
+    3.) If either the given sow_hid or boar_hid has a user specified
+        parent_sow_id and parent_boar_id, this function will still read
+        the parents details from birth_pig_prod_id.
+    
+    Parameters
+    ----------
+    sow_hid: str
+        sow hash id
+    
+    boar_hid: str
+        boar hash id
+    
+
+    """
+    
+    
+    res = hashids_common.decrypt(sow_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+            }
+        }
+    
+    sow_id = res[0]
+    
+    
+    res = hashids_common.decrypt(boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+            }
+        }
+    
+    boar_id = res[0]
+    
+    
+    
+    
+    res = model['sow_boar'].get_parent_trace(sow_id, boar_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+        
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['sow_boar_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['sow_boar_id']['id']
+        cur_entry['sow_boar_hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['birth_pig_prod_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['birth_pig_prod_id']
+        cur_entry['birth_pig_prod_hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['parent_sow_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+            
+        del cur_entry['parent_sow_id']
+        cur_entry['parent_sow_hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['parent_boar_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['parent_boar_id']
+        cur_entry['parent_sow_hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['semen_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['semen_id']
+        cur_entry['semen_hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['semen_ai_boar_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['semen_ai_boar_id']
+        cur_entry['semen_ai_boar_hid']   = cur_hid
+        
         
         
     return {

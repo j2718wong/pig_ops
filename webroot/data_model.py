@@ -151,11 +151,15 @@ class DataSowBoar(BaseModel):
     uhid:                   str
     pfhid:                  str = None
     sow_boar_hid:           str = None
+    parent_sow_hid:         str = None
+    parent_boar_hid:        str = None
         
         
     user_id:                int = 0
     sow_boar_id:            int = 0
     pig_farm_id:            int = 0
+    parent_sow_id:          int = 0
+    parent_boar_id:         int = 0
         
         
     farm_birth_prod_id:     int = 0

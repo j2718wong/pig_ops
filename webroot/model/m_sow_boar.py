@@ -106,6 +106,10 @@ class SowBoar:
             in_num_nipples          INT,
             in_is_external          INT,
             in_is_production_ready  INT,
+            
+            in_parent_sow_id        INT,
+            in_parent_boar_id       INT,
+    
                     
             in_number               VARCHAR(10),
             in_name                 VARCHAR(20),
@@ -130,6 +134,17 @@ class SowBoar:
         
         sql += '%s,'    % data.is_external
         sql += '%s,'    % data.is_production_ready
+        
+        if data.parent_sow_id > 0:
+            sql += '%s,'    % data.parent_sow_id
+        else:
+            sql += 'NULL,'
+            
+        if data.parent_boar_id > 0:
+            sql += '%s,'    % data.parent_boar_id
+        else:
+            sql += 'NULL,'
+        
         
         if data.number is not None and len(data.number) > 0:
             sql += '"%s",'  % data.number
@@ -763,5 +778,87 @@ class SowBoar:
         
         return result
 
+    
+    def get_parent_trace(self, sow_id, boar_id):
+        """
+        Parameters
+        ----------
+        
+        
+        Returns
+        -------
+        
+        
+        """
+        
+       
+            
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.birth_pig_prod_id,
+                    b.sow_id,
+                    b.boar_id,
+                    b.semen_sup_semen_id,
+                    b.semen_ai_boar_id,
+                    
+                    c.name 
+                    
+                FROM sow_boar a
+                LEFT OUTER JOIN pig_production b        ON a.birth_pig_prod_id = b.id
+                LEFT OUTER JOIN semen_supplier_semen c  ON b.semen_sup_semen_id = c.id
+                
+                WHERE a.id IN(%s, %s)  
+                """ % (sow_id, boar_id)
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
 
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_parent_trace(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                
+                cur_entry = {
+                    'sow_boar_id':          row[0],
+                    'birth_pig_prod_id':    row[1],
+                    'parent_sow_id':        row[2],
+                    'parent_boar_id':       row[3],
+                    'semen_id':             row[4], 
+                    'semen_ai_boar_id':     row[5],
+                    'semen_name':           row[6]
+                }
+                
+                result.append(cur_entry)
+
+        return result
+
+    
     
