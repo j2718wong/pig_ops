@@ -225,6 +225,9 @@ class SowBoar:
             in_is_external          INT,
             in_is_production_ready  INT,
             
+            in_parent_sow_id        INT,
+            in_parent_boar_id       INT,
+    
             in_number               VARCHAR(10),
             in_name                 VARCHAR(20),
             in_date_of_birth        VARCHAR(10),
@@ -240,6 +243,18 @@ class SowBoar:
         sql += '%s,'    % data.sow_status_id
         sql += '%s,'    % data.is_external
         sql += '%s,'    % data.is_production_ready
+        
+        
+        if data.parent_sow_id > 0:
+            sql += '%s,'    % data.parent_sow_id
+        else:
+            sql += 'NULL,'
+            
+        if data.parent_boar_id > 0:
+            sql += '%s,'    % data.parent_boar_id
+        else:
+            sql += 'NULL,'
+        
         
         if data.number is not None and len(data.number) > 0:
             sql += '"%s",'  % data.number
@@ -294,17 +309,25 @@ class SowBoar:
             row = None
 
         if row is not None:
-            return {
+            
+            sow_boar_id = row[3]
+            
+            res_update = {
                 'result':{
                     'num':              row[0],
                     'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'sow_boar': {
-                    'id':               row[3]
+                    'desc':             row[2]
                 }
             }
+            
+            sow_boar_list = self.get_list(sow_boar_id = sow_boar_id)
+            
+            # return whole sow_boar
+            if sow_boar_list is not None:
+                res_update['sow_boar'] = sow_boar_list[0]['sow_boar']
+            
+            
+            return res_update;
 
         return None
 
@@ -378,7 +401,8 @@ class SowBoar:
         return None
 
     
-    def get_list(self, farm_id, sex, inc_user_audit = 0, order_by = 0):
+    def get_list(self, pig_farm_id = None, sex = None, sow_boar_id = None, 
+            inc_user_audit = 0, order_by = 0):
         """
         Will get sow_boar list.
         
@@ -402,20 +426,23 @@ class SowBoar:
         
         
         """
-        
        
-        where_clause = 'WHERE a.pig_farm_id = %s ' % farm_id
-        where_clause += ' AND a.is_disposed = 0 '
+        if sow_boar_id is None:
+            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
+            where_clause += ' AND a.is_disposed = 0 '
+            
+            if sex is not None:
+                where_clause += ' AND a.sex = "%s" ' % sex
+            
+            
+            if order_by == 0:
+                order_clause = ' ORDER BY a.date_of_birth DESC '
+            else:
+                order_clause = ' ORDER BY a.name ASC, a.number ASC'
         
-        if sex is not None:
-            where_clause += ' AND a.sex = "%s" ' % sex
-        
-        
-        if order_by == 0:
-            order_clause = ' ORDER BY a.date_of_birth DESC '
         else:
-            order_clause = ' ORDER BY a.name ASC, a.number ASC'
-               
+            where_clause = 'WHERE a.id = %s ' % sow_boar_id
+            order_clause = ''
                
         if inc_user_audit == 0:
             
@@ -577,6 +604,17 @@ class SowBoar:
                     if sex == 'F':
                         del sow_boar['farm_boar_id']
                         del sow_boar['is_external']
+                        
+                        if sow_boar['num_nipples'] is None:
+                            del sow_boar['num_nipples']
+                            
+                        if sow_boar['date_insemination'] is None:
+                            del sow_boar['date_insemination']
+                            
+                        if sow_boar['date_expected_birth'] is None:
+                            del sow_boar['date_expected_birth']
+                            
+                        
                     else:
                         # These are for sow only
                         del sow_boar['farm_sow_id'] 
@@ -585,6 +623,29 @@ class SowBoar:
                         del sow_boar['date_insemination'] 
                         del sow_boar['date_expected_birth']
             
+                
+                # Remove null entries if possible
+                if sow_boar['parent_sow_id'] is None:
+                    del sow_boar['parent_sow_id']
+                    
+                if sow_boar['parent_boar_id'] is None:
+                    del sow_boar['parent_boar_id']
+                
+                if sow_boar['date_eartag'] is None:
+                    del sow_boar['date_eartag']
+                
+                if sow_boar['last_farm_prod_id'] is None:
+                   del sow_boar['last_farm_prod_id']
+                
+                if sow_boar['last_mate_sow_boar_id'] is None:
+                    del sow_boar['last_mate_sow_boar_id']
+                
+                if sow_boar['date_last_mate'] is None:
+                    del sow_boar['date_last_mate']
+                
+                if sow_boar['add_notes'] is None:
+                    del sow_boar['add_notes']
+                
                 
                 
                 if inc_user_audit > 0:
@@ -606,8 +667,8 @@ class SowBoar:
                     cur_entry['added_by']    = added_by
                     cur_entry['last_update'] = last_update
                             
-                else:
-                    cur_entry = sow_boar 
+                
+                cur_entry = {'sow_boar': sow_boar}
                     
                 result.append(cur_entry)
 

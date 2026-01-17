@@ -33,6 +33,8 @@ from r_account_selection    import get_account_lookup_selection
 from r_utils                import (get_user_account_info,
                                    get_location_address_names_and_replace_ids)
 
+from r_sow_boar             import clean_sow_boar_entry
+
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
@@ -154,7 +156,8 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     
 
     # Get pig_farm sow list
-    list_sow_list = model['sow_boar'].get_list(pig_farm_id, 'F', 
+    list_sow_list = model['sow_boar'].get_list(
+        pig_farm_id = pig_farm_id, sex = 'F', 
         inc_user_audit = 0, order_by = 1)
     if list_sow_list == None:
         # TODO what to do in case no result
@@ -168,18 +171,19 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     
     
     for cur_sow in list_sow_list:
-        cur_sow_id = cur_sow['id']
+        cur_sow_id = cur_sow['sow_boar']['id']
         
         for cur_sow_output in list_sow_output_list:
             if cur_sow_output['sow_id'] == cur_sow_id:
-                cur_sow['num_births'] = cur_sow_output['num_births']
-                cur_sow['num_piglets'] = cur_sow_output['num_piglets']
+                cur_sow['sow_boar']['num_births'] = cur_sow_output['num_births']
+                cur_sow['sow_boar']['num_piglets'] = cur_sow_output['num_piglets']
                 
                 break
     
     
     # Get pig_farm boar list
-    list_boar_list = model['sow_boar'].get_list(pig_farm_id, 'M', 
+    list_boar_list = model['sow_boar'].get_list(
+        pig_farm_id = pig_farm_id, sex = 'M', 
         inc_user_audit = 0, order_by = 1)
     if list_boar_list == None:
         # TODO what to do in case no result
@@ -222,42 +226,13 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
     
     
     for cur_entry in list_sow_list:
-        cur_id      = cur_entry['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-        
-        
-        cur_id      = cur_entry['last_mate_sow_boar_id']
-        if cur_id is not None:
-            cur_hid     = hashids_common.encrypt(cur_id)
-        else:
-            cur_hid = None
-            
-        del cur_entry['last_mate_sow_boar_id']
-        cur_entry['last_mate_sow_boar_hid']   = cur_hid
-        
-    
-    for cur_entry in list_boar_list:
-        cur_id      = cur_entry['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-    
-    
-        cur_id      = cur_entry['last_mate_sow_boar_id']
-        if cur_id is not None:
-            cur_hid     = hashids_common.encrypt(cur_id)
-        else:
-            cur_hid = None
-            
-        del cur_entry['last_mate_sow_boar_id']
-        cur_entry['last_mate_sow_boar_hid']   = cur_hid
+        clean_sow_boar_entry(cur_entry)
         
 
+    for cur_entry in list_boar_list:
+        clean_sow_boar_entry(cur_entry)
         
+
     for cur_entry in list_staff:
         cur_id      = cur_entry['pig_farm_staff']['id']
         cur_hid     = hashids_common.encrypt(cur_id)

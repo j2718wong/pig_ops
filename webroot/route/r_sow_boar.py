@@ -30,9 +30,8 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_a0_security_checks               import check_if_valid_user_account
-
-
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
 
 
 
@@ -340,11 +339,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         
         
     # Remove optional desc coming from database
-    if 'desc' in res_add['result']  and \
-        res_add['result']['desc']   and \
-        len(res_add['result']['desc']) == 0:
-        
-        del res_add['result']['desc']
+    remove_database_null_description(res_add)
         
     return res_add
     
@@ -387,8 +382,58 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
     
     
+    parent_sow_id       = 0
+    parent_sow_hid      = sow_boar_data.parent_sow_hid
+    
+    if parent_sow_hid is not None:
+        res = hashids_common.decrypt(parent_sow_hid)
+        
+        if len(res) == 0:
+            result =  {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_PARENT_SOW_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_PARENT_SOW_HASHID'
+                }
+            }
+        
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+        
+            return result
+        
+        parent_sow_id = res[0]
+        
+    
+    parent_boar_id      = 0
+    parent_boar_hid     = sow_boar_data.parent_boar_hid
+    
+    if parent_boar_hid is not None:
+        res = hashids_common.decrypt(parent_boar_hid)
+        
+        if len(res) == 0:
+            result =  {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_PARENT_BOAR_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_PARENT_BOAR_HASHID'
+                }
+            }
+        
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+        
+            return result
+        
+        parent_boar_id = res[0]
+        
+    
+    
+    
     sow_boar_data.user_id       = user_id
     sow_boar_data.sow_boar_id   = sow_boar_id
+    sow_boar_data.parent_sow_id = parent_sow_id
+    sow_boar_data.parent_boar_id= parent_boar_id
+    
+    
     
     res_update  =  model['sow_boar'].update(sow_boar_data)
     
@@ -402,11 +447,8 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         
     
     # remove plain id
-    sow_boar_id     = res_update['sow_boar']['id']
-    sow_boar_hid    = hashids_common.encrypt(sow_boar_id)
+    clean_sow_boar_entry(res_update)
     
-    del res_update['sow_boar']['id']
-    res_update['sow_boar']['hid'] = sow_boar_hid
     
     # Add new_bill_hid
     if new_bill_hid is not None:
@@ -414,8 +456,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         
         
     # Remove optional desc coming from database
-    if 'desc' in res_update['result'] and res_update['result']['desc'] and len(res_update['result']['desc']) == 0:
-        del res_update['result']['desc']
+    remove_database_null_description(res_update)
     
     
     return res_update
@@ -485,11 +526,8 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
         
         
     # Remove optional desc coming from database
-    if 'desc' in res_dispose['result']  and \
-        res_dispose['result']['desc']   and \
-        len(res_dispose['result']['desc']) == 0:
-            
-        del res_dispose['result']['desc']
+    remove_database_null_description(res_dispose)
+    
     
     
     return res_dispose
@@ -591,14 +629,110 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     return s
     
 
+
+def clean_sow_boar_entry(cur_sow_boar_entry):
+    cur_entry = cur_sow_boar_entry['sow_boar']
+    
+    cur_id  = cur_entry['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['id']
+    cur_entry['hid']   = cur_hid
+
+
+    if 'parent_sow_id' in cur_entry:
+        cur_id  = cur_entry['parent_sow_id']
+        if cur_id != None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['parent_sow_id']
+        cur_entry['parent_sow_hid']   = cur_hid
+
+    
+    if 'parent_boar_id' in cur_entry:
+        cur_id  = cur_entry['parent_boar_id']
+        if cur_id != None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid = None
+        
+        del cur_entry['parent_boar_id']
+        cur_entry['parent_boar_hid']   = cur_hid
+
+
+    if 'last_mate_sow_boar_id' in cur_entry:
+        cur_id      = cur_entry['last_mate_sow_boar_id']
+        if cur_id is not None:
+            cur_hid     = hashids_common.encrypt(cur_id)
+        else:
+            cur_hid     = None
+        
+        del cur_entry['last_mate_sow_boar_id']
+        cur_entry['last_mate_sow_boar_hid']   = cur_hid
+            
+
+@app.get("/sow_boar/entry", tags=["Sow Boar"])
+async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
+    res = hashids_common.decrypt(sow_boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_HASHID'
+            }
+        }
+    
+    sow_boar_id = res[0]
+    
+    res = model['sow_boar'].get_list(sow_boar_id = sow_boar_id, 
+        inc_user_audit = inc_user_audit)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+        
+       
+        
+    # Replace plain id
+    for cur_entry in res:
+        clean_sow_boar_entry(cur_entry)
+    
+    
+    data = None
+    if len(res) > 0:
+        data = res[0]
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': data
+    }
+
+    
+
+
 @app.get("/sow_boar/list", tags=["Sow Boar"])
-async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
-        inc_user_audit:int = 0, order_by:int = 0):
+async def sow_boar_list(pfhid:str, sex:str = None,
+        is_disposed: int = 0, inc_user_audit:int = 0, order_by:int = 0):
     """
-    Will get sow list.
+    Will get sow boar list.
     
     Parameters
     ----------
+    pfhid:str
+        pig farm hid; 
+    
+    
     sex: str
         F = sow entries
         M = boar entries
@@ -634,8 +768,8 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
     if is_disposed > 0:
         res = model['sow_boar'].get_list_disposed(pig_farm_id)
     else:
-        res = model['sow_boar'].get_list(pig_farm_id,
-                sex, inc_user_audit = inc_user_audit, order_by = order_by)
+        res = model['sow_boar'].get_list(pig_farm_id = pig_farm_id,
+                sex = sex, inc_user_audit = inc_user_audit, order_by = order_by)
     
     if res is None:
         return {
@@ -648,87 +782,9 @@ async def sow_boar_list(pfhid:str, sex:str = None, is_disposed: int = 0,
         
     # Replace plain id
     for cur_entry in res:
-        if 'sow_boar' in cur_entry:
-            cur_id  = cur_entry['sow_boar']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['sow_boar']['id']
-            cur_entry['sow_boar']['hid']   = cur_hid
+        clean_sow_boar_entry(cur_entry)
 
-
-            
-            cur_id  = cur_entry['sow_boar']['parent_sow_id']
-            if cur_id != None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_entry['sow_boar']['parent_sow_id']
-            cur_entry['sow_boar']['parent_sow_hid']   = cur_hid
-
-            
-            
-            cur_id  = cur_entry['sow_boar']['parent_boar_id']
-            if cur_id != None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_entry['sow_boar']['parent_boar_id']
-            cur_entry['sow_boar']['parent_boar_hid']   = cur_hid
-
-            
-
-            
-            cur_id      = cur_entry['sow_boar']['last_mate_sow_boar_id']
-            if cur_id is not None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_entry['sow_boar']['last_mate_sow_boar_id']
-            cur_entry['sow_boar']['last_mate_sow_boar_hid']   = cur_hid
         
-        else:
-            cur_id  = cur_entry['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['id']
-            cur_entry['hid']   = cur_hid
-        
-        
-            cur_id  = cur_entry['parent_sow_id']
-            if cur_id != None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_entry['parent_sow_id']
-            cur_entry['parent_sow_hid']   = cur_hid
-
-            
-            
-            cur_id  = cur_entry['parent_boar_id']
-            if cur_id != None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_entry['parent_boar_id']
-            cur_entry['parent_boar_hid']   = cur_hid
-        
-        
-            
-            cur_id      = cur_entry['last_mate_sow_boar_id']
-            if cur_id is not None:
-                cur_hid     = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid     = None
-            
-            del cur_entry['last_mate_sow_boar_id']
-            cur_entry['last_mate_sow_boar_hid']   = cur_hid
-            
-            
     return {
         'result':{
             'num':  0,
