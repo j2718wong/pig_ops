@@ -172,13 +172,21 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
         return {
             'result':{
                 'num':  ERROR_PIG_MEDVAC_INVALID_ACC_MEDVAC_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_INVALID_INVALID_ACC_MEDVAC_HASHID'
+                'code': 'ERROR_PIG_MEDVAC_INVALID_ACC_MEDVAC_HASHID'
             }
         }
     
     acc_medvac_id = res[0]
     
     
+    # Check for valid keys
+    if sow_boar_id == 0 and pig_prod_id == 0 and pig_prod_pig_ops_id == 0 and health_issue_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_MEDVAC_NO_VALID_KEY,
+                'code': 'ERROR_PIG_MEDVAC_NO_VALID_KEY'
+            }
+        }
    
     pig_medvac_data.user_id         = user_id
     pig_medvac_data.sow_boar_id     = sow_boar_id
@@ -438,6 +446,8 @@ async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audi
     
     
     sow_boar_id = res[0]
+    
+    
         
     res = model['pig_medvac'].get_list(sow_boar_id, 
             inc_deleted, inc_user_audit)

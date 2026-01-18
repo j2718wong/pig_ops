@@ -17,6 +17,19 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_utils                import remove_database_null_description
+
+
+
    
 @app.post("/pig_prod_notes/add", tags=["Production Details"])
 async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
@@ -31,16 +44,15 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
     
     
-    pig_prod_id     = None
-    sow_boar_id     = None
+    pig_prod_id     = 0
+    sow_boar_id     = 0
     
     pig_prod_hid    = pig_prod_notes_data.pig_prod_hid
     
@@ -66,14 +78,21 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID,
-                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID'
                 }
             }
         
         sow_boar_id = res[0]
     
     
+    # check valid keys
+    if sow_boar_id == 0 and pig_prod_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_NOTES_NO_VALID_KEY,
+                'code': 'ERROR_PIG_PROD_NOTES_NO_VALID_KEY'
+            }
+        }
     
     pig_prod_notes_data.user_id     = user_id
     pig_prod_notes_data.pig_prod_id = pig_prod_id
@@ -85,8 +104,7 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -98,7 +116,11 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     del res_add['pig_prod_notes']['id']
     res_add['pig_prod_notes']['hid'] = pig_prod_notes_hid
 
-        
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
+
+    
     return res_add
     
 
@@ -111,8 +133,7 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID'
             }
         }
     
@@ -126,8 +147,7 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_NOTES_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_HASHID'
             }
         }
     
@@ -144,8 +164,7 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -153,7 +172,12 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     # remove plain id
     del res_update['pig_prod_notes']['id']
     res_update['pig_prod_notes']['hid'] = pig_prod_notes_hid
-        
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+
+    
     return res_update
     
 
@@ -164,8 +188,7 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_USER_HASHID'
             }
         }
     
@@ -177,8 +200,7 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_NOTES_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_NOTES_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_NOTES_INVALID_HASHID'
             }
         }
     
@@ -198,8 +220,7 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -207,7 +228,12 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
     # remove plain id
     del res_delete['pig_prod_notes']['id']
     res_delete['pig_prod_notes']['hid'] = ehid
-        
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_delete)
+    
+    
     return res_delete
     
     
@@ -242,8 +268,7 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PIG_PROD_HASHID'
                 }
             }
             
@@ -256,8 +281,7 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID,
-                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_SOW_BOAR_HASHID'
                 }
             }
         
@@ -270,8 +294,7 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID,
-                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID'
                 }
             }
         
@@ -286,8 +309,7 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -299,13 +321,20 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
         
         del cur_entry['prod_notes']['id']
         cur_entry['prod_notes']['hid']   = cur_hid
+
         
+        if 'last_pig_medvac_id' in cur_entry['prod_notes']:
+            cur_id  = cur_entry['prod_notes']['last_pig_medvac_id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['prod_notes']['last_pig_medvac_id']
+            cur_entry['prod_notes']['last_pig_medvac_hid']   = cur_hid
+
     
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

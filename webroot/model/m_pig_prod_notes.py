@@ -240,7 +240,7 @@ class PigProdNotes:
             where_clause = 'WHERE a.sow_boar_id = %s ' % sow_boar_id
         
         if prod_group_id > 0:
-            where_clause = 'WHERE a.prod_group_id = %s ' % sow_boar_id
+            where_clause = 'WHERE a.prod_group_id = %s ' % prod_group_id
         
         
         if inc_deleted == 0:
@@ -251,6 +251,7 @@ class PigProdNotes:
                     a.id,
                     a.date_notes,
                     a.flag,
+                    a.last_pig_medvac_id,
                     a.notes,
                     
                     b.name_last,
@@ -302,7 +303,8 @@ class PigProdNotes:
             
             for row in rows:
                 
-                cur_flag = row[2]
+                cur_flag            = row[2]
+                cur_pig_medvac_id   = row[3]
                 
                 is_health_issue = 0
                 if cur_flag & FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE > 0:
@@ -312,26 +314,32 @@ class PigProdNotes:
                     'prod_notes': {
                         'id':               row[0],
                         'date_notes':       str(row[1]),
-                        'notes':            row[3],
+                        'notes':            row[4]
                         
                     },
                     
                     'added_by':{
-                        'name_last':        row[4],
-                        'name_first':       row[5],
-                        'dt_entry':         str(row[6])
+                        'name_last':        row[5],
+                        'name_first':       row[6],
+                        'dt_entry':         str(row[7])
                     },
                     
                     'last_update':{
-                        'name_last':        row[7],
-                        'name_first':       row[8],
-                        'dt_update':        str(row[9]) if row[9] else None
+                        'name_last':        row[8],
+                        'name_first':       row[9],
+                        'dt_update':        str(row[10]) if row[10] else None
                     }
                 }
                 
+                if cur_pig_medvac_id is not None:
+                    cur_entry['prod_notes']['last_pig_medvac_id'] = cur_pig_medvac_id
                 
                 if is_health_issue > 0:
                     cur_entry['prod_notes']['is_health_issue'] = 1
+                
+                if cur_entry['last_update']['dt_update'] is None:
+                    del cur_entry['last_update']
+                    
                 
                 result.append(cur_entry)
         
