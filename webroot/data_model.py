@@ -104,11 +104,14 @@ class DataAccountPigOps(BaseModel):
 class DataAccountMedVac(BaseModel):
     uhid:                   str
     account_medvac_hid:     str = None
+    medvac_brand_hid:       str = None
+    medvac_type_hid:        str = None
     
     
     user_id:                int = 0
     account_medvac_id:      int = 0
-    
+    medvac_brand_id:        int = 0
+    medvac_type_id:         int = 0
     
     name:                   str
     

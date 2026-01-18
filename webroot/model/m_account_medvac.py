@@ -15,13 +15,19 @@ class AccountMedVac:
         """
         PROCEDURE account_medvac_add(
             in_user_id              INT,
-            
+            in_medvac_brand_id      INT,
+            in_medvac_type_id       INT,
+    
             in_medvac_name          VARCHAR(50)
         )  
         """
         
         sql =  'CALL account_medvac_add('
         sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.medvac_brand_id
+        sql += '%s,'    % data.medvac_type_id
+        
+        
         sql += '"%s")'  % data.name
         
         

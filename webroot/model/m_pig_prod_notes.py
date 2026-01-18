@@ -251,20 +251,27 @@ class PigProdNotes:
                     a.id,
                     a.date_notes,
                     a.flag,
-                    a.last_pig_medvac_id,
                     a.notes,
                     
-                    b.name_last,
-                    b.name_first,
+                    a.last_pig_medvac_id,
+                    b.acc_medvac_id,
+                    c.name AS acc_medvac_name,
+                    b.notes AS medvac_notes,
+                    
+                    
+                    d.name_last,
+                    d.name_first,
                     a.dt_entry,
                 
-                    c.name_last,
-                    c.name_first,
+                    e.name_last,
+                    e.name_first,
                     a.dt_last_update
                     
                 FROM pig_prod_notes a 
-                LEFT OUTER JOIN user b ON a.added_by_user_id = b.id
-                LEFT OUTER JOIN user c ON a.last_update_user_id = c.id
+                LEFT OUTER JOIN pig_medvac b        ON a.last_pig_medvac_id = b.id
+                LEFT OUTER JOIN account_medvac c    ON b.acc_medvac_id = c.id
+                LEFT OUTER JOIN user d              ON a.added_by_user_id = b.id
+                LEFT OUTER JOIN user e              ON a.last_update_user_id = c.id
                 
                 %s
                 ORDER BY a.date_notes DESC
@@ -302,9 +309,16 @@ class PigProdNotes:
         if rows is not None:
             
             for row in rows:
+                cur_id                  = row[0]
+                cur_date_notes          = str(row[1])
+                cur_flag                = row[2]
+                cur_notes               = row[3]
                 
-                cur_flag            = row[2]
-                cur_pig_medvac_id   = row[3]
+                cur_pig_medvac_id       = row[4]
+                cur_acc_medvac_id       = row[5]
+                cur_acc_medvac_name     = row[6]
+                cur_pig_medvac_notes    = row[7]
+                
                 
                 is_health_issue = 0
                 if cur_flag & FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE > 0:
@@ -312,30 +326,38 @@ class PigProdNotes:
                 
                 cur_entry = {
                     'prod_notes': {
-                        'id':               row[0],
-                        'date_notes':       str(row[1]),
-                        'notes':            row[4]
-                        
+                        'id':               cur_id,
+                        'date_notes':       cur_date_notes,
+                        'notes':            cur_notes
                     },
                     
                     'added_by':{
-                        'name_last':        row[5],
-                        'name_first':       row[6],
-                        'dt_entry':         str(row[7])
+                        'name_last':        row[8],
+                        'name_first':       row[9],
+                        'dt_entry':         str(row[10])
                     },
                     
                     'last_update':{
-                        'name_last':        row[8],
-                        'name_first':       row[9],
-                        'dt_update':        str(row[10]) if row[10] else None
+                        'name_last':        row[11],
+                        'name_first':       row[12],
+                        'dt_update':        str(row[13]) if row[13] else None
                     }
                 }
                 
                 if cur_pig_medvac_id is not None:
-                    cur_entry['prod_notes']['last_pig_medvac_id'] = cur_pig_medvac_id
+                    pig_medvac = {
+                        'id':               cur_pig_medvac_id,
+                        'acc_medvac_name':  cur_acc_medvac_name,
+                        'medvac_notes':     cur_pig_medvac_notes
+                    }
+                    
+                    cur_entry['pig_medvac'] = pig_medvac
+                
                 
                 if is_health_issue > 0:
                     cur_entry['prod_notes']['is_health_issue'] = 1
+                
+                
                 
                 if cur_entry['last_update']['dt_update'] is None:
                     del cur_entry['last_update']

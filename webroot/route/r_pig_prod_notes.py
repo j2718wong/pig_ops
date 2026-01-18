@@ -323,12 +323,12 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
         cur_entry['prod_notes']['hid']   = cur_hid
 
         
-        if 'last_pig_medvac_id' in cur_entry['prod_notes']:
-            cur_id  = cur_entry['prod_notes']['last_pig_medvac_id']
+        if 'pig_medvac' in cur_entry:
+            cur_id  = cur_entry['pig_medvac']['id']
             cur_hid = hashids_common.encrypt(cur_id)
             
-            del cur_entry['prod_notes']['last_pig_medvac_id']
-            cur_entry['prod_notes']['last_pig_medvac_hid']   = cur_hid
+            del cur_entry['pig_medvac']['id']
+            cur_entry['pig_medvac']['hid']   = cur_hid
 
     
     return {

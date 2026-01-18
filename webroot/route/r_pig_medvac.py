@@ -470,6 +470,27 @@ async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audi
         cur_entry['medvac']['hid']   = cur_hid
         
         
+        cur_id  = cur_entry['medvac']['health_issue_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        
+            del cur_entry['medvac']['health_issue_id']
+            cur_entry['medvac']['health_issue_hid']   = cur_hid
+        else:
+            del cur_entry['medvac']['health_issue_id']
+            
+        
+        cur_id  = cur_entry['medvac']['prod_pig_ops_id']
+        if cur_id is not None:
+            cur_hid = hashids_common.encrypt(cur_id)
+        
+            del cur_entry['medvac']['prod_pig_ops_id']
+            cur_entry['medvac']['prod_pig_ops_hid']   = cur_hid
+        else:
+            del cur_entry['medvac']['prod_pig_ops_id']
+        
+        
+        
         cur_id  = cur_entry['medvac']['brand']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         

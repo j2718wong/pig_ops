@@ -62,8 +62,44 @@ async def account_medvac_add(account_medvac_data: dm.DataAccountMedVac):
     user_id = res[0]
     
     
-    account_medvac_data.name      = name
-    account_medvac_data.user_id   = user_id
+    medvac_brand_id     = 0
+    medvac_brand_hid    = account_medvac_data.medvac_brand_hid
+    
+    if medvac_brand_hid is not None:
+        res = hashids_common.decrypt(medvac_brand_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_MEDVAC_INVALID_MEDVAC_BRAND_HASHID,
+                    'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_MEDVAC_BRAND_HASHID'
+                }
+            }
+        
+        medvac_brand_id = res[0]
+    
+    
+    medvac_type_id     = 0
+    medvac_type_hid    = account_medvac_data.medvac_type_hid
+    
+    if medvac_type_hid is not None:
+        res = hashids_common.decrypt(medvac_type_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ACCOUNT_MEDVAC_INVALID_MEDVAC_TYPE_HASHID,
+                    'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_MEDVAC_TYPE_HASHID'
+                }
+            }
+        
+        medvac_type_id = res[0]
+    
+    
+    
+    
+    account_medvac_data.name            = name
+    account_medvac_data.user_id         = user_id
+    account_medvac_data.medvac_brand_id = medvac_brand_id
+    account_medvac_data.medvac_type_id  = medvac_type_id
     
     res_add    =  model['account_medvac'].add(account_medvac_data)
     
