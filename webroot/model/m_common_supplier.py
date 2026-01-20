@@ -685,8 +685,8 @@ class CommonSupplier:
                     cur_address_level_2_id  = row[8]
                     cur_address_level_3_id  = row[9]
                     
-                    cur_address_latitude    = row[10]
-                    cur_address_longitude   = row[11]
+                    cur_address_latitude    = float(row[10]) if row[10] is not None else None
+                    cur_address_longitude   = float(row[11]) if row[11] is not None else None
                 
                     cur_is_feed_supplier    = row[12]
                     cur_is_gilt_supplier    = row[13]

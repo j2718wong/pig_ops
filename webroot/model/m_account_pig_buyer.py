@@ -4,6 +4,15 @@
 from common_constants       import *
 
 
+"""
+
+/* account_pig_buyer.flag bits*/
+DECLARE FLAG_BIT_ACCOUNT_PIG_BUYER_IS_DELETED   INT             DEFAULT 1;
+DECLARE FLAG_BIT_PIG_BUYER_IS_BOAR_CUSTOMER     INT             DEFAULT 2;
+"""
+FLAG_BIT_PIG_BUYER_IS_BOAR_CUSTOMER     = 2
+
+
 class AccountPigBuyer:
     def __init__(self, model):
         self.model              = model
@@ -20,6 +29,13 @@ class AccountPigBuyer:
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
             
+            in_latitude             DECIMAL(10,5),
+            in_longitude            DECIMAL(10,5),
+            
+            in_is_boar_customer     INT,
+            
+            
+            
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
@@ -31,10 +47,42 @@ class AccountPigBuyer:
         sql =  'CALL account_pig_buyer_add('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.address_level_1_id
-        sql += '%s,'    % data.address_level_2_id
-        sql += '%s,'    % data.address_level_3_id
+        if data.country_id > 0:
+            sql += '%s,'    % data.country_id
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.address_level_1_id:
+            sql += '%s,'    % data.address_level_1_id
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.address_level_2_id > 0:
+            sql += '%s,'    % data.address_level_2_id
+        else:
+            sql += 'NULL,'
+        
+        if data.address_level_3_id:
+            sql += '%s,'    % data.address_level_3_id
+        else:
+            sql += 'NULL,'
+            
+        
+        if data.latitude is not None:
+            sql += '%s,'    % data.latitude
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.longitude is not None:
+            sql += '%s,'    % data.longitude
+        else:
+            sql += 'NULL,'
+        
+        
+        sql += '%s,'    % data.is_boar_customer
         
         
         sql += '"%s",'  % data.name
@@ -117,6 +165,12 @@ class AccountPigBuyer:
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
             
+            in_latitude             DECIMAL(10,5),
+            in_longitude            DECIMAL(10,5),
+            
+            in_is_boar_customer     INT,
+            
+            
             in_name                 VARCHAR(50),
             in_contact_number       VARCHAR(20),
             in_whatsapp             VARCHAR(20),
@@ -130,10 +184,43 @@ class AccountPigBuyer:
         
         sql += '%s,'    % data.account_pig_buyer_id
         
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.address_level_1_id
-        sql += '%s,'    % data.address_level_2_id
-        sql += '%s,'    % data.address_level_3_id
+        if data.country_id > 0:
+            sql += '%s,'    % data.country_id
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.address_level_1_id:
+            sql += '%s,'    % data.address_level_1_id
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.address_level_2_id > 0:
+            sql += '%s,'    % data.address_level_2_id
+        else:
+            sql += 'NULL,'
+        
+        if data.address_level_3_id:
+            sql += '%s,'    % data.address_level_3_id
+        else:
+            sql += 'NULL,'
+            
+        
+        if data.latitude is not None:
+            sql += '%s,'    % data.latitude
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.longitude is not None:
+            sql += '%s,'    % data.longitude
+        else:
+            sql += 'NULL,'
+        
+        
+        sql += '%s,'    % data.is_boar_customer
+        
         
         
         sql += '"%s",'  % data.name
@@ -305,6 +392,11 @@ class AccountPigBuyer:
                         a.address_level_2_id,
                         a.address_level_3_id,
                         
+                        a.latitude,
+                        a.longitude,
+                        
+                        a.flag,
+                        
                         a.name,
                         a.contact_number,
                         a.whatsapp,
@@ -327,6 +419,11 @@ class AccountPigBuyer:
                         a.address_level_1_id,
                         a.address_level_2_id,
                         a.address_level_3_id,
+                        
+                        a.latitude,
+                        a.longitude,
+                        
+                        a.flag,
                         
                         a.name,
                         a.contact_number,
@@ -393,96 +490,88 @@ class AccountPigBuyer:
                 cur_address_level_2_id  = row[4]
                 cur_address_level_3_id  = row[5]
                 
-                cur_name                = row[6]
-                cur_contact_number      = row[7]
-                cur_whatsapp            = row[8]
-                cur_messenger           = row[9]
-                cur_description         = row[10]
+                cur_address_latitude    = float(row[6]) if row[6] is not None else None
+                cur_address_longitude   = float(row[7]) if row[7] is not None else None
+                
+                cur_flag                = row[8]
+                
+                cur_name                = row[9]
+                cur_contact_number      = row[10]
+                cur_whatsapp            = row[11]
+                cur_messenger           = row[12]
+                cur_description         = row[13]
                         
                 
+                is_boar_customer = 0
+                if cur_flag & FLAG_BIT_PIG_BUYER_IS_BOAR_CUSTOMER > 0:
+                    is_boar_customer = 1
+                    
                 
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'pig_buyer': {
-                            'id':           cur_pig_buyer_id,
-                            
-                            'name':         cur_name,
-                            'contact_number': cur_contact_number,
-                            'whatsapp':     cur_whatsapp,
-                            'messenger':    cur_messenger,
-                            'description':  cur_description
-                            
+                cur_entry = {
+                    'pig_buyer': {
+                        'id':           cur_pig_buyer_id,
+                        
+                        'is_boar_customer': is_boar_customer,
+                        
+                        'name':         cur_name,
+                        'contact_number': cur_contact_number,
+                        'whatsapp':     cur_whatsapp,
+                        'messenger':    cur_messenger,
+                        'description':  cur_description
+                        
+                    },
+                    
+                    'location':{
+                        'country': {
+                            'id':       cur_country_id,
+                            'name':     cur_country_name
                         },
                         
-                        'location':{
-                            'country': {
-                                'id':       cur_country_id,
-                                'name':     cur_country_name
+                        'address':{
+                            'level_1':  {
+                                'id':   cur_address_level_1_id
                             },
                             
-                            'address':{
-                                'level_1':  {
-                                    'id':   cur_address_level_1_id
-                                },
-                                
-                                'level_2':  {
-                                    'id':   cur_address_level_2_id
-                                },
-                                
-                                'level_3_id': {
-                                    'id':   cur_address_level_3_id
-                                }
-                            }
-                        }
-                        
-                    }
-                
-                else:
-                    cur_entry = {
-                        'pig_buyer': {
-                            'id':           cur_pig_buyer_id,
-                            
-                            'name':         cur_name,
-                            'contact_number': cur_contact_number,
-                            'whatsapp':     cur_whatsapp,
-                            'messenger':    cur_messenger,
-                            'description':  cur_description
-                        },
-                        
-                        'location':{
-                            'country': {
-                                'id':       cur_country_id,
-                                'name':     cur_country_name
+                            'level_2':  {
+                                'id':   cur_address_level_2_id
                             },
                             
-                            'address':{
-                                'level_1':  {
-                                    'id':   cur_address_level_1_id
-                                },
-                                
-                                'level_2':  {
-                                    'id':   cur_address_level_2_id
-                                },
-                                
-                                'level_3_id': {
-                                    'id':   cur_address_level_3_id
-                                }
+                            'level_3_id': {
+                                'id':   cur_address_level_3_id
                             }
-                        },
-                        
-                        'added_by': {
-                            'name_last':        row[11],
-                            'name_first':       row[12],
-                            'dt_entry':         str(row[13])
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_update':        str(row[16]) if row[17] else None
                         }
-                        
                     }
+                    
+                }
+                
+                if cur_address_latitude is not None and cur_address_longitude is not None:
+                    geoloc = {
+                        'latitude':     cur_address_latitude,
+                        'longitude':    cur_address_longitude
+                    }
+                    
+                cur_entry['location']['geoloc'] = geoloc
+                    
+                
+                if inc_user_audit > 0:
+                        
+                    added_by = {
+                        'name_last':        row[14],
+                        'name_first':       row[15],
+                        'dt_entry':         str(row[16])
+                    }
+                    
+                    last_update = {
+                        'name_last':        row[17],
+                        'name_first':       row[18],
+                        'dt_update':        str(row[19]) if row[19] else None
+                    }
+                    
+                    cur_entry['added_by'] =  added_by
+                    
+                    if last_update['dt_update'] is not None:
+                        cur_entry['last_update'] = last_update
+                    
                     
                 result.append(cur_entry)
         

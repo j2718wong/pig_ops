@@ -125,6 +125,7 @@ class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
     user_id:                int = 0
     account_pig_buyer_id:   int = 0
         
+    is_boar_customer:       int = 0
         
     name:                   str
     
@@ -179,6 +180,25 @@ class DataSowBoar(BaseModel):
     date_of_birth:          str = None
     date_eartag:            str = None
     notes:                  str = None
+
+
+class DataBoarExternalMate(BaseModel):
+    uhid:                   str
+    sow_boar_hid:           str = None
+    sow_boar_mate_hid:      str = None
+    boar_customer_hid:      str = None
+        
+        
+    user_id:                int = 0
+    sow_boar_id:            int = 0
+    sow_boar_mate_id:       int = 0
+    boar_customer_id:       int = 0
+    
+    customer_sow_name:      str    
+    date_mate:              str
+    notes:                  str = None
+
+
     
     
 class DataSowBoarDispose(BaseModel):

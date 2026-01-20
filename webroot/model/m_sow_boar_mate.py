@@ -304,7 +304,7 @@ class SowBoarMate:
                             'id':           row[2],
                             'name':         row[3],
                             'sow_name':     row[4]
-                        }
+                        },
                         
                         'notes':            row[5]
                     }

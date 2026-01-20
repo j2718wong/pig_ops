@@ -35,8 +35,8 @@ from r_utils                import remove_database_null_description
 
    
    
-@app.post("/sow_boar_mate/add", tags=["Sow Boar"])
-async def sow_boar_mate_add(sow_boar_mate_data: dm.DataSowBoarMate):
+@app.post("/boar_external_mate/add", tags=["Sow Boar"])
+async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
     uhid        = sow_boar_mate_data.uhid
     
     res = hashids_user.decrypt(uhid)
@@ -59,14 +59,14 @@ async def sow_boar_mate_add(sow_boar_mate_data: dm.DataSowBoarMate):
     new_bill_hid = res_check['new_bill_hid']
     
     
-    pfhid       = sow_boar_mate_data.pfhid
+    sow_boar_hid       = sow_boar_mate_data.sow_boar_hid
     
-    res = hashids_common.decrypt(pfhid)
+    res = hashids_common.decrypt(sow_boar_hid)
     if len(res) == 0:
         result =  {
             'result':{
-                'num':  ERROR_SOW_BOAR_MATE_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_SOW_BOAR_MATE_INVALID_PIG_FARM_HASHID'
+                'num':  ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID,
+                'code': 'ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID'
             }
         }
     
@@ -75,91 +75,36 @@ async def sow_boar_mate_add(sow_boar_mate_data: dm.DataSowBoarMate):
     
         return result
     
-    pig_farm_id = res[0]
+    sow_boar_id = res[0]
     
     
-    number  = None
-    name    = None
+    boar_customer_hid       = sow_boar_mate_data.boar_customer_hid
     
-    sow_boar_mate_number     = sow_boar_mate_data.number
-    if sow_boar_mate_number is not None:
-        number      = sow_boar_mate_number.strip()
-       
-            
-            
-    sow_boar_mate_name       = sow_boar_mate_data.name
-    if sow_boar_mate_name is not None:
-        name        = sow_boar_mate_name.strip()
-        
-    
-    if name is None and number is None:
-        result = {
+    res = hashids_common.decrypt(boar_customer_hid)
+    if len(res) == 0:
+        result =  {
             'result':{
-                'num':  ERROR_SOW_BOAR_MATE_NO_SOW_BOAR_NUMBER_OR_NAME,
-                'code': 'ERROR_SOW_BOAR_MATE_NO_SOW_BOAR_NUMBER_OR_NAME'
+                'num':  ERROR_SOW_BOAR_MATE_INVALID_BOAR_CUSTOMER_HASHID,
+                'code': 'ERROR_SOW_BOAR_MATE_INVALID_BOAR_CUSTOMER_HASHID'
             }
         }
-        
+    
         if new_bill_hid is not None:
             result['result']['new_bill_hid'] = new_bill_hid
     
         return result
     
-    
-    parent_sow_id       = 0
-    parent_sow_hid      = sow_boar_mate_data.parent_sow_hid
-    
-    if parent_sow_hid is not None:
-        res = hashids_common.decrypt(parent_sow_hid)
-        
-        if len(res) == 0:
-            result =  {
-                'result':{
-                    'num':  ERROR_SOW_BOAR_MATE_INVALID_PARENT_SOW_HASHID,
-                    'code': 'ERROR_SOW_BOAR_MATE_INVALID_PARENT_SOW_HASHID'
-                }
-            }
-        
-            if new_bill_hid is not None:
-                result['result']['new_bill_hid'] = new_bill_hid
-        
-            return result
-        
-        parent_sow_id = res[0]
-        
-    
-    parent_boar_id      = 0
-    parent_boar_hid     = sow_boar_mate_data.parent_boar_hid
-    
-    if parent_boar_hid is not None:
-        res = hashids_common.decrypt(parent_boar_hid)
-        
-        if len(res) == 0:
-            result =  {
-                'result':{
-                    'num':  ERROR_SOW_BOAR_MATE_INVALID_PARENT_BOAR_HASHID,
-                    'code': 'ERROR_SOW_BOAR_MATE_INVALID_PARENT_BOAR_HASHID'
-                }
-            }
-        
-            if new_bill_hid is not None:
-                result['result']['new_bill_hid'] = new_bill_hid
-        
-            return result
-        
-        parent_boar_id = res[0]
-        
+    boar_customer_id = res[0]
     
     
-    sow_boar_mate_data.user_id       = user_id
-    sow_boar_mate_data.pig_farm_id   = pig_farm_id
-    sow_boar_mate_data.parent_sow_id = parent_sow_id
-    sow_boar_mate_data.parent_boar_id= parent_boar_id
-    sow_boar_mate_data.number        = number
-    sow_boar_mate_data.name          = name
     
     
-    res_add    =  model['sow_boar_mate'].add(sow_boar_mate_data)
+    sow_boar_mate_data.user_id          = user_id
+    sow_boar_mate_data.sow_boar_id      = sow_boar_id
+    sow_boar_mate_data.boar_customer_id = boar_customer_id
+    
+    
+    res_add    =  model['sow_boar_mate'].add_boar_external_mate(sow_boar_mate_data)
     
     if res_add is None:
         return {
@@ -189,8 +134,8 @@ async def sow_boar_mate_add(sow_boar_mate_data: dm.DataSowBoarMate):
     return res_add
     
 
-@app.post("/sow_boar_mate/update", tags=["Sow Boar"])
-async def sow_boar_mate_update(sow_boar_mate_data: dm.DataSowBoarMate):
+@app.post("/boar_external_mate/update", tags=["Sow Boar"])
+async def boar_external_mate_update(sow_boar_mate_data: dm.DataBoarExternalMate):
     uhid        = sow_boar_mate_data.uhid
     
     res = hashids_user.decrypt(uhid)
@@ -227,60 +172,13 @@ async def sow_boar_mate_update(sow_boar_mate_data: dm.DataSowBoarMate):
     
     
     
-    parent_sow_id       = 0
-    parent_sow_hid      = sow_boar_mate_data.parent_sow_hid
     
-    if parent_sow_hid is not None:
-        res = hashids_common.decrypt(parent_sow_hid)
-        
-        if len(res) == 0:
-            result =  {
-                'result':{
-                    'num':  ERROR_SOW_BOAR_MATE_INVALID_PARENT_SOW_HASHID,
-                    'code': 'ERROR_SOW_BOAR_MATE_INVALID_PARENT_SOW_HASHID'
-                }
-            }
-        
-            if new_bill_hid is not None:
-                result['result']['new_bill_hid'] = new_bill_hid
-        
-            return result
-        
-        parent_sow_id = res[0]
-        
-    
-    parent_boar_id      = 0
-    parent_boar_hid     = sow_boar_mate_data.parent_boar_hid
-    
-    if parent_boar_hid is not None:
-        res = hashids_common.decrypt(parent_boar_hid)
-        
-        if len(res) == 0:
-            result =  {
-                'result':{
-                    'num':  ERROR_SOW_BOAR_MATE_INVALID_PARENT_BOAR_HASHID,
-                    'code': 'ERROR_SOW_BOAR_MATE_INVALID_PARENT_BOAR_HASHID'
-                }
-            }
-        
-            if new_bill_hid is not None:
-                result['result']['new_bill_hid'] = new_bill_hid
-        
-            return result
-        
-        parent_boar_id = res[0]
-        
+    sow_boar_mate_data.user_id          = user_id
+    sow_boar_mate_data.sow_boar_mate_id = sow_boar_mate_id
     
     
     
-    sow_boar_mate_data.user_id       = user_id
-    sow_boar_mate_data.sow_boar_mate_id   = sow_boar_mate_id
-    sow_boar_mate_data.parent_sow_id = parent_sow_id
-    sow_boar_mate_data.parent_boar_id= parent_boar_id
-    
-    
-    
-    res_update  =  model['sow_boar_mate'].update(sow_boar_mate_data)
+    res_update  =  model['sow_boar_mate'].update_boar_external_mate(sow_boar_mate_data)
     
     if res_update is None:
         return {
