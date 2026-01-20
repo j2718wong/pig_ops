@@ -35,6 +35,7 @@ from r_utils                import remove_database_null_description
 
 from r_pig_medvac           import get_data_pig_medvac
 from r_pig_prod_notes       import get_data_pig_prod_notes 
+from r_sow_boar_mate        import get_data_sow_boar_mate_list
 
 
 @app.get("/sow_boar", response_class = HTMLResponse, tags=["Sow Boar"])
@@ -693,7 +694,7 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     
     
     data_pig_medvac     = get_data_pig_medvac(sow_boar_id, 0, 0)
-    data_pig_prod_notes = get_data_pig_prod_notes(0, sow_boar_id, 0, 0)
+    data_pig_prod_notes = get_data_pig_prod_notes(0, sow_boar_id, 0, 0, 0)
     
     
     data_health_issues  = []
@@ -720,14 +721,15 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     
     
     data = {
-        'list_pig_medvac':  data_pig_medvac,
+        'list_medvac':      data_pig_medvac,
         'list_health_issues': data_health_issues,
-        'lsit_notes':       data_notes,
+        'list_notes':       data_notes,
         'list_output':      data_output,
-        'list_mates':       data_mates,
-        'list_mates_ext':   data_mates_ext
+        'list_mates':       data_mates
     }
     
+    if cur_sow_boar_data['sex'] == 'M':
+        data['list_mates_ext'] = data_mates_ext
     
     return {
         'result':{

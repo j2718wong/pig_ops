@@ -216,7 +216,7 @@ class SowBoarMate:
                         a.pig_prod_id,
                         
                         a.mate_sow_boar_id,
-                        a.date_mate
+                        a.date_mate,
                         
                         b.name,
                         b.number
@@ -233,7 +233,7 @@ class SowBoarMate:
                     SELECT 
                         a.id,
                         
-                        a.date_mate
+                        a.date_mate,
                         a.boar_customer_id,
                         b.name,
                         
