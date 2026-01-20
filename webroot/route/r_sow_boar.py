@@ -856,7 +856,7 @@ async def sow_production_output(sowhid:str):
     
     
 @app.get("/sow_boar/get_parent_trace", tags=["Sow Boar"])
-async def sow_boar_get_parent_trace(sow_hid:str, boar_hid):
+async def sow_boar_get_parent_trace(sow_hid:str = None, boar_hid: str = None, pfhid:str = None):
     """
     Will get sow and boar parent trace from their birth_pig_prod_id.
     
@@ -880,37 +880,57 @@ async def sow_boar_get_parent_trace(sow_hid:str, boar_hid):
     boar_hid: str
         boar hash id
     
-
+    pfhid:str
+        it is possible to parent trace all not disposed pigs in the farm 
     """
     
+    sow_id = 0
     
-    res = hashids_common.decrypt(sow_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+    if sow_hid is not None:
+        res = hashids_common.decrypt(sow_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+                }
             }
-        }
+        
+        sow_id = res[0]
     
-    sow_id = res[0]
     
+    boar_id = 0
     
-    res = hashids_common.decrypt(boar_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+    if boar_hid is not None:
+        res = hashids_common.decrypt(boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+                }
             }
-        }
+        
+        boar_id = res[0]
+        
     
-    boar_id = res[0]
+    pig_farm_id = 0
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+                }
+            }
+        
+        pig_farm_id = res[0]
+        
     
     
-    
-    
-    res = model['sow_boar'].get_parent_trace(sow_id, boar_id)
+    res = model['sow_boar'].get_parent_trace(sow_id, boar_id, pig_farm_id)
     
     if res is None:
         return {
@@ -923,63 +943,88 @@ async def sow_boar_get_parent_trace(sow_hid:str, boar_hid):
         
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['sow_boar_id']
+        cur_id  = cur_entry['sow_boar']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['sow_boar_id']['id']
-        cur_entry['sow_boar_hid']   = cur_hid
+        del cur_entry['sow_boar']['id']
+        cur_entry['sow_boar']['hid']   = cur_hid
         
+
         
-        cur_id  = cur_entry['birth_pig_prod_id']
-        if cur_id is not None:
-            cur_hid = hashids_common.encrypt(cur_id)
-        else:
-            cur_hid = None
-        
-        del cur_entry['birth_pig_prod_id']
-        cur_entry['birth_pig_prod_hid']   = cur_hid
-        
-        
-        cur_id  = cur_entry['parent_sow_id']
+        cur_id  = cur_entry['parent_sow']['id']
         if cur_id is not None:
             cur_hid = hashids_common.encrypt(cur_id)
         else:
             cur_hid = None
             
-        del cur_entry['parent_sow_id']
-        cur_entry['parent_sow_hid']   = cur_hid
+        del cur_entry['parent_sow']['id']
+        cur_entry['parent_sow']['hid']   = cur_hid
         
         
-        cur_id  = cur_entry['parent_boar_id']
+        cur_id  = cur_entry['parent_boar']['id']
         if cur_id is not None:
             cur_hid = hashids_common.encrypt(cur_id)
         else:
             cur_hid = None
         
-        del cur_entry['parent_boar_id']
-        cur_entry['parent_sow_hid']   = cur_hid
+        del cur_entry['parent_boar']['id']
+        cur_entry['parent_boar']['hid']   = cur_hid
         
         
-        cur_id  = cur_entry['semen_id']
+        cur_id  = cur_entry['insemination']['sow_id']
         if cur_id is not None:
             cur_hid = hashids_common.encrypt(cur_id)
         else:
             cur_hid = None
         
-        del cur_entry['semen_id']
-        cur_entry['semen_hid']   = cur_hid
+        del cur_entry['insemination']['sow_id']
+        cur_entry['insemination']['sow_hid']   = cur_hid
         
         
-        cur_id  = cur_entry['semen_ai_boar_id']
-        if cur_id is not None:
-            cur_hid = hashids_common.encrypt(cur_id)
-        else:
-            cur_hid = None
         
-        del cur_entry['semen_ai_boar_id']
-        cur_entry['semen_ai_boar_hid']   = cur_hid
+        if 'boar_id' in cur_entry['insemination']:
+            cur_id  = cur_entry['insemination']['boar_id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['insemination']['boar_id']
+            cur_entry['insemination']['boar_hid']   = cur_hid
         
         
+        if 'ai_boar_id' in cur_entry['insemination']:
+            cur_id  = cur_entry['insemination']['ai_boar_id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['insemination']['ai_boar_id']
+            cur_entry['insemination']['ai_boar_hid']   = cur_hid
+        
+        
+        if 'semen_supplier' in cur_entry['insemination']:
+        
+            cur_id  = cur_entry['insemination']['semen_supplier']['id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['insemination']['semen_supplier']['id']
+            cur_entry['insemination']['semen_supplier']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_entry['insemination']['semen_supplier']['semen']['id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['insemination']['semen_supplier']['semen']['id']
+            cur_entry['insemination']['semen_supplier']['semen']['hid']   = cur_hid
+            
         
     return {
         'result':{

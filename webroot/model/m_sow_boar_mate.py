@@ -17,149 +17,43 @@ FLAG_BIT_SOW_BOAR_IS_EXTERNAL           = 2
 FLAG_BIT_SOW_BOAR_IS_PRODUCTION_READY   = 4
         
 
-class SowBoar:
+class SowBoarMate:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'SowBoar'
+        self.TAG                = 'SowBoarMate'
 
     
-    def get_sow_status_list(self, is_dispose = 0):
+    def add_boar_external_mate(self, data = None):
         """
-        Will get sow_status list.
+        Adding an external mate for a farm owned boar will not 
+        create a pig_production entry.
         
+        This should not be used when a farm owned sow is mated to an external boar.
         
-        Returns
-        -------
-        list of dictionary
-
-        """
-        
-        where_clause = ''
-        if is_dispose > 0:
-            where_clause = 'WHERE flag = 1'
-        
-        sql =   """
-                SELECT 
-                    id,
-                    name
-                FROM sow_status
-                %s
-                """ % where_clause 
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_sow_status_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-        result = []
-        if rows is not None:
-            
-            for row in rows:
-                cur_status_id           = row[0]
-                cur_status_name         = row[1]
-                
-                cur_entry = {
-                    'id':               cur_status_id, 
-                    'name':             cur_status_name
-                }
-                
-                result.append(cur_entry)
-
-        return result
-
-    
-    def add(self, data = None):
-        """
-        PROCEDURE sow_boar_add(
+        PROCEDURE boar_external_mate_add(
             in_user_id              INT,
             
-            in_pig_farm_id          INT,
-            in_line_id              INT,
-            in_sow_status_id        INT,
+            in_boar_id              INT,
+            in_boar_customer_id     INT,    /* This is mapped to account_pig_buyer*/
             
-            in_sex                  CHAR(1),
-            in_num_nipples          INT,
-            in_is_external          INT,
-            in_is_production_ready  INT,
+            in_customer_sow_name    VARCHAR(50),
             
-            in_parent_sow_id        INT,
-            in_parent_boar_id       INT,
-    
-                    
-            in_number               VARCHAR(10),
-            in_name                 VARCHAR(20),
-            in_date_of_birth        VARCHAR(10),
-            in_description          VARCHAR(160)
+            in_date_mate            VARCHAR(10),
+            in_notes                VARCHAR(160)
         )    
         """
         
-        sql =  'CALL sow_boar_add('
+        sql =  'CALL boar_external_mate_add('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_farm_id
-        sql += '%s,'    % data.line_id
-        sql += '%s,'    % data.sow_status_id
+        sql += '%s,'    % data.boar_id
+        sql += '%s,'    % data.boar_customer_id
         
-        sql += '"%s",'  % data.sex
-        
-        if data.num_nipples is not None and data.num_nipples > 0:
-            sql += '%s,'  % data.num_nipples
+        if data.customer_sow_name is not None and len(data.customer_sow_name) > 0:
+            sql += '"%s",'  % data.customer_sow_name
         else:
             sql += 'NULL,'
         
-        
-        sql += '%s,'    % data.is_external
-        sql += '%s,'    % data.is_production_ready
-        
-        if data.parent_sow_id > 0:
-            sql += '%s,'    % data.parent_sow_id
-        else:
-            sql += 'NULL,'
-            
-        if data.parent_boar_id > 0:
-            sql += '%s,'    % data.parent_boar_id
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.number is not None and len(data.number) > 0:
-            sql += '"%s",'  % data.number
-        else:
-            sql += 'NULL,'
-        
-        if data.name is not None and len(data.name) > 0:
-            sql += '"%s",'    % data.name
-        else:
-            sql += 'NULL,'
-            
-        if data.date_of_birth is not None and len(data.date_of_birth) > 0:
-            sql += '"%s",'    % data.date_of_birth
-        else:
-            sql += 'NULL,'            
+        sql += '"%s",'    % data.date_mate
             
         
         if data.notes is not None:
@@ -186,7 +80,7 @@ class SowBoar:
             cursor.close()
 
         except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
+            msg = 'add_boar_external_mate(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -202,19 +96,15 @@ class SowBoar:
                     'desc':             row[2],
                 },
                 
-                'sow_boar': {
-                    'id':               row[3],
-                    'farm_sow_id':      row[4],
-                    'farm_boar_id':     row[5],
-                    'is_external':      data.is_external,
-                    'is_production_ready': data.is_production_ready
+                'sow_boar_mate': {
+                    'id':               row[3]
                 }
             }
 
         return None
 
     
-    def update(self, data = None):
+    def update_boar_external_mate(self, data = None):
         """
         PROCEDURE sow_boar_update(
             in_user_id              INT,
@@ -331,76 +221,7 @@ class SowBoar:
 
         return None
 
-    
-    def dispose(self, data = None):
-        """
-        PROCEDURE sow_boar_dispose(
-            in_user_id              INT,
-            
-            in_sow_boar_id          INT,
-            in_dispose_status_id    INT,
-            
-            in_date_dispose         VARCHAR(10),
-            in_dispose_notes        VARCHAR(160)
-        )
-        """
-        
-        sql =  'CALL sow_boar_dispose('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.sow_boar_id
-        sql += '%s,'    % data.dispose_status_id
-        
-        
-        sql += '"%s",'  % data.date_dispose
-            
-        if data.dispose_notes is not None:
-            sql += '"%s");'   % data.dispose_notes
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'dispose(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'sow_boar': {
-                    'id':               row[3]
-                }
-            }
-
-        return None
-
-    
+     
     def get_list(self, pig_farm_id = None, sex = None, sow_boar_id = None, 
             inc_user_audit = 0, order_by = 0):
         """

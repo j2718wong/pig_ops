@@ -461,3 +461,140 @@ class PigMedVac:
         return result
     
     
+    def get_search_keywords(self, account_id, search_str):
+        """
+        This is used when typing the first few characters of the search keys.
+        """
+        
+        """
+        PROCEDURE pig_medvac_search_keys(
+            IN p_account_id INT,
+            IN p_search_str VARCHAR(255)
+        )  
+        """
+        
+        
+        sql =  'CALL pig_medvac_search_keys('
+        sql += '%s,'    % account_id
+        sql += '"%s");' % search_str
+        
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'get_search_top_keys; error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_entry = {
+                    'key':              row[0],
+                    'hits':             row[1]
+                }
+                
+                result.append(cur_entry)
+
+        return result
+    
+    
+    def get_search_result(self, account_id, search_str):
+        """
+        This is used when geting the searched rows.
+        """
+        
+        
+        
+        sql =   f"""
+                SELECT 
+                    id,
+                    date_medvac,
+                    sow_boar_id,
+                    health_issue_id,
+                    
+                    u_brand_name,
+                    u_type_name,
+                    u_acc_medvac_name,
+                    notes
+                FROM pig_medvac
+                WHERE account_id = {account_id}
+                    AND (
+                        u_brand_name LIKE CONCAT('%', p_search_str, '%') OR
+                        u_type_name LIKE CONCAT('%', p_search_str, '%') OR
+                        u_acc_medvac_name LIKE CONCAT('%', p_search_str, '%')
+                    )
+                ORDER BY 
+                    CASE 
+                        WHEN u_brand_name LIKE CONCAT(p_search_str, '%') THEN 1
+                        WHEN u_type_name LIKE CONCAT(p_search_str, '%') THEN 1
+                        WHEN u_acc_medvac_name LIKE CONCAT(p_search_str, '%') THEN 1
+                        ELSE 2
+                    END ASC,
+                    id ASC;
+                
+                """
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'get_search_top_keys; error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_entry = {
+                    'key':              row[0],
+                    'hits':             row[1]
+                }
+                
+                result.append(cur_entry)
+
+        return result
+    
+    
+    

@@ -46,6 +46,16 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     user_id = res[0]
     
     
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
+    
+    
     sow_boar_id         = 0
     pig_prod_id         = 0         
     pig_prod_pig_ops_id = 0
@@ -62,13 +72,16 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     if sow_boar_hid is not None:
         res = hashids_common.decrypt(sow_boar_hid)
         if len(res) == 0:
-            return {
+            result =  {
                 'result':{
                     'num':  ERROR_PIG_MEDVAC_INVALID_SOW_BOAR_HASHID,
                     'code': 'ERROR_PIG_MEDVAC_INVALID_SOW_BOAR_HASHID'
                 }
             }
-        
+            
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+            
         sow_boar_id = res[0]
     
     
@@ -78,13 +91,18 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     if pig_prod_hid is not None:
         res = hashids_common.decrypt(pig_prod_hid)
         if len(res) == 0:
-            return {
+            result =  {
                 'result':{
                     'num':  ERROR_PIG_MEDVAC_INVALID_PIG_PROD_HASHID,
                     'code': 'ERROR_PIG_MEDVAC_INVALID_PIG_PROD_HASHID'
                 }
             }
-        
+            
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+            
+            return result
+            
         pig_prod_id = res[0]
     
     
@@ -94,12 +112,17 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     if pig_prod_pig_ops_hid is not None:
         res = hashids_common.decrypt(pig_prod_pig_ops_hid)
         if len(res) == 0:
-            return {
+            result =  {
                 'result':{
                     'num':  ERROR_PIG_MEDVAC_INVALID_PIG_PROD_PIG_OPS_HASHID,
                     'code': 'ERROR_PIG_MEDVAC_INVALID_PIG_PROD_PIG_OPS_HASHID'
                 }
             }
+            
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+            
+            return result
         
         pig_prod_id = res[0]
     
@@ -110,12 +133,17 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     if health_issue_hid is not None:
         res = hashids_common.decrypt(health_issue_hid)
         if len(res) == 0:
-            return {
+            result = {
                 'result':{
                     'num':  ERROR_PIG_MEDVAC_INVALID_HEALTH_ISSUE_HASHID,
                     'code': 'ERROR_PIG_MEDVAC_INVALID_HEALTH_ISSUE_HASHID'
                 }
             }
+            
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+            
+            return result
         
         health_issue_id = res[0]
     
@@ -127,13 +155,18 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     if staff_hid is not None:
         res = hashids_common.decrypt(staff_hid)
         if len(res) == 0:
-            return {
+            result = {
                 'result':{
                     'num':  ERROR_PIG_MEDVAC_INVALID_STAFF_HASHID,
                     'code': 'ERROR_PIG_MEDVAC_INVALID_STAFF_HASHID'
                 }
             }
-        
+            
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+            
+            return result
+            
         staff_id = res[0]
     
     
@@ -141,26 +174,37 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
     res = hashids_common.decrypt(medvac_brand_hid)
     if len(res) == 0:
-        return {
+        result = {
             'result':{
                 'num':  ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID,
                 'code': 'ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID'
             }
         }
-    
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        
+        return result
+        
     medvac_brand_id = res[0]
     
+
     
     medvac_type_hid = pig_medvac_data.medvac_type_hid
     
     res = hashids_common.decrypt(medvac_type_hid)
     if len(res) == 0:
-        return {
+        result = {
             'result':{
                 'num':  ERROR_PIG_MEDVAC_INVALID_MEDVAC_TYPE_HASHID,
                 'code': 'ERROR_PIG_MEDVAC_INVALID_MEDVAC_TYPE_HASHID'
             }
         }
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        
+        return result
     
     medvac_type_id = res[0]
     
@@ -169,24 +213,36 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
     res = hashids_common.decrypt(acc_medvac_hid)
     if len(res) == 0:
-        return {
+        result = {
             'result':{
                 'num':  ERROR_PIG_MEDVAC_INVALID_ACC_MEDVAC_HASHID,
                 'code': 'ERROR_PIG_MEDVAC_INVALID_ACC_MEDVAC_HASHID'
             }
         }
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        
+        return result
     
     acc_medvac_id = res[0]
     
     
     # Check for valid keys
     if sow_boar_id == 0 and pig_prod_id == 0 and pig_prod_pig_ops_id == 0 and health_issue_id == 0:
-        return {
+        result = {
             'result':{
                 'num':  ERROR_PIG_MEDVAC_NO_VALID_KEY,
                 'code': 'ERROR_PIG_MEDVAC_NO_VALID_KEY'
             }
         }
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        
+        return result
+        
+        
    
     pig_medvac_data.user_id         = user_id
     pig_medvac_data.sow_boar_id     = sow_boar_id
@@ -218,7 +274,13 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     del res_add['pig_medvac']['id']
     res_add['pig_medvac']['hid'] = cur_hid
 
-
+    
+    # Add new_bill_hid
+    if new_bill_hid is not None:
+        res_add['result']['new_bill_hid'] = new_bill_hid
+    
+    
+    
     # Remove optional desc coming from database
     remove_database_null_description(res_add)
 
@@ -530,5 +592,64 @@ async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audi
     }
     
     
+@app.get("/pig_medvac/search_keys", tags=["Pig Details"])
+async def pig_medvac_search_keys(ahid: str, search_keyword: None):
+    """
+    Will return pig_medvac search keys from given pig_farm account hid and a keyword;.
+    This is used in searching pig_medvac. Note this will search 
+    all pig_medvac of the account not just for a specific sow_boar. 
+    This is because this feature is much more useful if all sow_boar of the
+    account is searched to know which pigs have taken a particular medvac.
+    
+    This is requested in every keyboard stroke in a search input, 
+    so this has to execute as fast as possible.
+    
+    Parameters
+    ----------
+    
+    ahid:str
+        pig farm account hashid
 
+    search_keyword: str
+        keyword
+    
+    
+    """
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_MEDVAC_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_MEDVAC_INVALID_USER_HASHID'
+            }
+        }
+    
+    account_id = res[0]
+    
+    
+        
+    res = model['pig_medvac'].get_search_keywords(account_id, search_keyword)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+    
+
+    
     
