@@ -237,6 +237,37 @@ async def pig_prod_notes_delete(uhid:str, ehid: str):
     return res_delete
     
     
+def get_data_pig_prod_notes(pig_prod_id, sow_boar_id, prod_group_id, 
+        inc_deleted, inc_user_audit):
+            
+    res = model['prod_notes'].get_list(pig_prod_id, sow_boar_id, prod_group_id, 
+        inc_deleted, inc_user_audit)
+    
+    if res is None:
+        return None
+    
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['prod_notes']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['prod_notes']['id']
+        cur_entry['prod_notes']['hid']   = cur_hid
+
+        
+        if 'pig_medvac' in cur_entry:
+            cur_id  = cur_entry['pig_medvac']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_medvac']['id']
+            cur_entry['pig_medvac']['hid']   = cur_hid
+    
+    
+    return res
+    
+    
+    
 @app.get("/pig_prod_notes/list", tags=["Production Details"])
 async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None,
     prod_group_hid = None, inc_deleted: int = 0, inc_user_audit:int = 0):
@@ -302,8 +333,9 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
     
     
         
-    res = model['prod_notes'].get_list(pig_prod_id, sow_boar_id, prod_group_id, 
+    res = get_data_pig_prod_notes(pig_prod_id, sow_boar_id, prod_group_id, 
         inc_deleted, inc_user_audit)
+    
     
     if res is None:
         return {
@@ -313,22 +345,6 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
             }
         }
     
-    
-    # Replace plain id
-    for cur_entry in res:
-        cur_id  = cur_entry['prod_notes']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['prod_notes']['id']
-        cur_entry['prod_notes']['hid']   = cur_hid
-
-        
-        if 'pig_medvac' in cur_entry:
-            cur_id  = cur_entry['pig_medvac']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['pig_medvac']['id']
-            cur_entry['pig_medvac']['hid']   = cur_hid
 
     
     return {

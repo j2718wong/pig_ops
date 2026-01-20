@@ -401,6 +401,70 @@ class SowBoar:
         return None
 
     
+    def get_entry(self, sow_boar_id):
+        sql =   """
+                SELECT 
+                    id,
+                    farm_sow_id,
+                    farm_boar_id,
+                    number,
+                    name,
+                    sex
+                    
+                FROM sow_boar 
+                WHERE id = %s
+                """ % sow_boar_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+        
+        
+        except Exception as e:
+            msg = 'get_entry(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:                
+                cur_entry = {
+                    'id':                   row[0],
+                    'farm_sow_id':          row[1],
+                    'farm_boar_id':         row[2],
+                    'number':               row[3], 
+                    'name':                 row[4],
+                    'sex':                  row[5]
+                }
+                
+                return cur_entry
+
+        
+        return None
+
+    
     def get_list(self, pig_farm_id = None, sex = None, sow_boar_id = None, 
             inc_user_audit = 0, order_by = 0):
         """

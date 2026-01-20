@@ -1597,18 +1597,54 @@ class PigProduction:
         
     
     def get_production_output(self, pig_farm_id = 0, sow_id = 0):
-        sql =   """
-                SELECT 
-                    a.sow_id,
+        
+        if pig_farm_id > 0:
+            # The result should be grouped by sow_id
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.farm_prod_id,
+                        a.sow_id,
+                        
+                        a.date_actual_birth,
+                        a.num_pigs_live_m,
+                        a.num_pigs_live_f
+                        
+                        a.date_weaning,
+                        a.num_pigs_weaning_m,
+                        a.num_pigs_weaning_f,
+                        a.total_pigs_weight_weaning
+                        
+                    FROM pig_production a
                     
-                    a.num_pigs_weaning_m,
-                    a.num_pigs_weaning_f
+                    WHERE a.pig_farm_id = %s AND a.date_weaning IS NOT NULL
+                    ORDER BY a.sow_id ASC, a.date_weaning DESC
+                    """ % pig_farm_id
+        
+        
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.farm_prod_id,
+                        a.sow_id,
+                        
+                        a.date_actual_birth,
+                        a.num_pigs_live_m,
+                        a.num_pigs_live_f
+                        
+                        a.date_weaning,
+                        a.num_pigs_weaning_m,
+                        a.num_pigs_weaning_f,
+                        a.total_pigs_weight_weaning
+                        
+                    FROM pig_production a
                     
-                FROM pig_production a
-                
-                WHERE a.pig_farm_id = %s AND a.date_weaning IS NOT NULL
-                ORDER BY a.sow_id
-                """ % pig_farm_id
+                    WHERE a.sow_id = %s AND a.date_weaning IS NOT NULL
+                    ORDER BY a.date_weaning DESC
+                    """ % sow_id
+        
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -1642,42 +1678,45 @@ class PigProduction:
         result = []
         if rows is not None:
             
-            cur_sow             = None
-            cur_sow_birth       = 0
-            cur_sow_num_piglets = 0
-            prev_sow_id         = None
-     
+          
             for row in rows:
                 
-                cur_sow_id                  = row[0]
-                cur_pig_weaning_m           = row[1]
-                cur_pig_weaning_f           = row[2]
+                cur_pig_prod_id             = row[0]
+                cur_farm_prod_id            = row[1]
+                cur_sow_id                  = row[2]
                 
-                total_piglets   = 0
-                if cur_pig_weaning_m is not None:
-                    total_piglets += cur_pig_weaning_m
+                cur_date_actual_birth       = str(row[3])
+                cur_pigs_live_m             = row[4]
+                cur_pigs_live__f            = row[5]
                 
-                if cur_pig_weaning_m is not None:
-                    total_piglets += cur_pig_weaning_f
                 
-                if total_piglets ==  0:
-                    continue
+                cur_date_weaning            = row[6]
+                cur_pigs_weaning_m          = row[7]
+                cur_pigs_weaning_f          = row[8]
+                cur_pigs_weaning_weight     = float(row[9]) if row[9] is not None else None
+               
                 
-                if cur_sow is None or cur_sow_id != prev_sow_id:
-                    cur_sow = {
-                        'sow_id':       cur_sow_id,
-                        'num_births':   1,
-                        'num_piglets':  total_piglets
+                cur_entry = {
+                    'pig_prod':{
+                        'id':               cur_pig_prod_id,
+                        'farm_prod_id':     cur_farm_prod_id,
+                        'sow_id':           cur_sow_id
+                    },
+                    
+                    'birth':{
+                        'date_actual':      date_actual_birth,
+                        'pigs_m':           cur_pigs_live_m,
+                        'pigs_f':           cur_pigs_live_f
+                    },
+                    
+                    'wean':{
+                        'date_wean':        cur_date_weaning,
+                        'pigs_m':           cur_pigs_weaning_m,
+                        'pigs_f':           cur_pigs_weaning_f,
+                        'total_weight':     cur_pigs_weaning_weight
                     }
                     
-                    result.append(cur_sow)
-                    
-                else:
-                    cur_sow['num_births'] += 1
-                    cur_sow['num_piglets'] += total_piglets
-                
-                
-                prev_sow_id = cur_sow_id
+                }
                 
         
         return result

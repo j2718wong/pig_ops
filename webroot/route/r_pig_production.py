@@ -43,7 +43,7 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
 
 
 
-def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None,
+def get_page_data_user_account_pig_prod(user_id, pig_farm_id = None,
         inc_pig_prod = 0):
             
     """
@@ -107,7 +107,7 @@ def get_user_account_pig_prod_page_data(user_id, pig_farm_id = None,
     account_id = data_account['account']['id']
     
     
-def get_farm_account_pig_prod_page_data(pig_farm_id, 
+def get_page_data_farm_account_pig_prod(pig_farm_id, 
         inc_pig_prod = 0, inc_user_audit = 0):
     
     pig_farm_account= model['pig_farm'].get_pig_farm_account_info(pig_farm_id)
@@ -116,7 +116,7 @@ def get_farm_account_pig_prod_page_data(pig_farm_id,
     
     account_id = pig_farm_account['account']['id']
     
-    pig_prod_page_data  = get_pig_prod_page_data(account_id, pig_farm_id, 
+    pig_prod_page_data  = get_page_data_pig_prod(account_id, pig_farm_id, 
             inc_pig_prod, inc_user_audit = inc_user_audit)
     
     
@@ -144,7 +144,7 @@ def get_farm_account_pig_prod_page_data(pig_farm_id,
     return pig_prod_page_data
 
     
-def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
+def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
         inc_user_audit = 0, minimum_info = 1):
     
     list_acc_pig_ops =  model['account_pig_ops'].get_list(account_id, None, 
@@ -165,6 +165,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
         return None
     
     
+    """
     # Get sow production output list
     list_sow_output_list = model['pig_prod'].get_production_output(
         pig_farm_id = pig_farm_id);
@@ -179,7 +180,7 @@ def get_pig_prod_page_data(account_id, pig_farm_id, inc_pig_prod = 0,
                 cur_sow['sow_boar']['num_piglets'] = cur_sow_output['num_piglets']
                 
                 break
-    
+    """
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(
@@ -296,7 +297,7 @@ async def pig_prod(pfhid:str = None, m:int =0):
     
     t0 = time.time()
     
-    page_data = get_farm_account_pig_prod_page_data(pig_farm_id, inc_pig_prod = 1)
+    page_data = get_page_data_farm_account_pig_prod(pig_farm_id, inc_pig_prod = 1)
 
     t1 = time.time()
     

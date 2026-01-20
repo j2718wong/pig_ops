@@ -33,6 +33,8 @@ if module_directory not in sys.path:
 from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
 
+from r_pig_medvac           import get_data_pig_medvac
+from r_pig_prod_notes       import get_data_pig_prod_notes 
 
 
 @app.get("/sow_boar", response_class = HTMLResponse, tags=["Sow Boar"])
@@ -686,29 +688,47 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     
     sow_boar_id = res[0]
     
-    res = model['sow_boar'].get_list(sow_boar_id = sow_boar_id, 
-        inc_user_audit = inc_user_audit)
-    
-    if res is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR'
-            }
-        }
-        
-        
-       
-        
-    # Replace plain id
-    for cur_entry in res:
-        clean_sow_boar_entry(cur_entry)
+    # Get quick sow_boar data
+    cur_sow_boar_data   = model['sow_boar'].get_entry(sow_boar_id)
     
     
-    data = None
-    if len(res) > 0:
-        data = res[0]
-        
+    data_pig_medvac     = get_data_pig_medvac(sow_boar_id, 0, 0)
+    data_pig_prod_notes = get_data_pig_prod_notes(0, sow_boar_id, 0, 0)
+    
+    
+    data_health_issues  = []
+    data_notes          = []
+    
+    for cur_entry in data_pig_prod_notes:
+        if 'is_health_issue' in cur_entry['prod_notes']:
+            data_health_issues.append(cur_entry)
+        else:
+            data_notes.append(cur_entry)
+    
+    
+    
+    data_output         = None
+    if cur_sow_boar_data['sex'] == 'F':
+        data_output = model['pig_prod'].get_production_output(sow_id = sow_boar_id)
+    
+    
+    data_mates          = get_data_sow_boar_mate_list(sow_boar_id)
+    
+    data_mates_ext  = None
+    if cur_sow_boar_data['sex'] == 'M':
+        data_mates_ext  = get_data_sow_boar_mate_list(sow_boar_id, is_external = 1)
+    
+    
+    data = {
+        'list_pig_medvac':  data_pig_medvac,
+        'list_health_issues': data_health_issues,
+        'lsit_notes':       data_notes,
+        'list_output':      data_output,
+        'list_mates':       data_mates,
+        'list_mates_ext':   data_mates_ext
+    }
+    
+    
     return {
         'result':{
             'num':  0,
@@ -796,7 +816,7 @@ async def sow_boar_list(pfhid:str, sex:str = None,
 
 
 @app.get("/sow/production_output", tags=["Sow Boar"])
-async def sow_production_output(sowhid:str):
+async def sow_production_output(sow_hid:str):
     """
     Will get sow production list.
     

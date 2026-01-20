@@ -307,49 +307,12 @@ async def sow_boar_mate_update(sow_boar_mate_data: dm.DataSowBoarMate):
     return res_update
     
 
-@app.get("/sow_boar_mate/list", tags=["Sow Boar"])
-async def sow_boar_mate_list(sow_boar_hid:str, is_external:int = 0):
-    """
-    Will get sow boar list.
-    
-    Parameters
-    ----------
-    sow_boar_hid:str
-        sow_boar_hid; 
-    
-    
-
-    is_external:
-        only applicable if sow_boar_hid is a boar
-        if > 0, will get external mates only
-        if == 0, will get farm owned sows mated by the boar
-
-    """
-    
-    sow_boar_id = 0
-    
-    res = hashids_common.decrypt(sow_boar_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID,
-                'code': 'ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID'
-            }
-        }
-    
-    sow_boar_id = res[0]
-    
-    
+def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0):
     res = model['sow_boar_mate'].get_list(sow_boar_id, is_external)
     
     
     if res is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR'
-            }
-        }
+        return None
         
     
     if is_external == 0:
@@ -393,8 +356,54 @@ async def sow_boar_mate_list(sow_boar_hid:str, is_external:int = 0):
             del cur_entry['boar_customer']['id']
             cur_entry['boar_customer']['hid'] = cur_hid
 
+    return res
+
+
+@app.get("/sow_boar_mate/list", tags=["Sow Boar"])
+async def sow_boar_mate_list(sow_boar_hid:str, is_external:int = 0):
+    """
+    Will get sow boar list.
+    
+    Parameters
+    ----------
+    sow_boar_hid:str
+        sow_boar_hid; 
+    
+    
+
+    is_external:
+        only applicable if sow_boar_hid is a boar
+        if > 0, will get external mates only
+        if == 0, will get farm owned sows mated by the boar
+
+    """
+    
+    sow_boar_id = 0
+    
+    res = hashids_common.decrypt(sow_boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID,
+                'code': 'ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID'
+            }
+        }
+    
+    sow_boar_id = res[0]
+    
+    
+    res = get_data_sow_boar_mate_list(sow_boar_id, is_external)
             
-            
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
         
     return {
         'result':{

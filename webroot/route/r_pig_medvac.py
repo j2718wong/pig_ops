@@ -477,50 +477,12 @@ async def pig_medvac_delete(uhid:str, ehid: str):
     return res_delete
     
     
-@app.get("/pig_medvac/list", tags=["Pig Details"])
-async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
-    """
-    Will get pig medvac list.
-    
-    Parameters
-    ----------
-    
-    sow_boar_hid:str
-        account hashid
-
-    inc_deleted: int
-        if > 0, will include deleted entries
-    
-    inc_user_audit:
-        if > 0, will include added_by and last_update info
-    
-    """
-    
-    
-    res = hashids_common.decrypt(sow_boar_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_MEDVAC_SOW_BOAR_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_SOW_BOAR_HASHID'
-            }
-        }
-    
-    
-    sow_boar_id = res[0]
-    
-    
-        
+def get_data_pig_medvac(sow_boar_id, inc_deleted, inc_user_audit):
     res = model['pig_medvac'].get_list(sow_boar_id, 
             inc_deleted, inc_user_audit)
     
-    if res is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR'
-            }
-        }
+    if res is None: 
+        return None
     
     
     # Replace plain id
@@ -579,8 +541,54 @@ async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audi
         
         del cur_entry['medvac']['staff']['id']
         cur_entry['medvac']['staff']['hid']   = cur_hid
+    
+    return res
+    
+    
+@app.get("/pig_medvac/list", tags=["Pig Details"])
+async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+    """
+    Will get pig medvac list.
+    
+    Parameters
+    ----------
+    
+    sow_boar_hid:str
+        account hashid
+
+    inc_deleted: int
+        if > 0, will include deleted entries
+    
+    inc_user_audit:
+        if > 0, will include added_by and last_update info
+    
+    """
+    
+    
+    res = hashids_common.decrypt(sow_boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_MEDVAC_SOW_BOAR_HASHID,
+                'code': 'ERROR_PIG_MEDVAC_SOW_BOAR_HASHID'
+            }
+        }
+    
+    
+    sow_boar_id = res[0]
+    
+    
         
-        
+    res = get_data_pig_medvac(sow_boar_id, inc_deleted, inc_user_audit)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
     
     return {
         'result':{

@@ -29,7 +29,7 @@ if module_directory not in sys.path:
 
 from r_utils                import (get_user_account_info,
                                     clean_data_user_account)
-from r_pig_production       import get_farm_account_pig_prod_page_data
+from r_pig_production       import get_page_data_farm_account_pig_prod
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -128,7 +128,7 @@ async def root(pfhid:str = None):
     
 
     
-    farm_account = get_farm_account_pig_prod_page_data(
+    farm_account = get_page_data_farm_account_pig_prod(
         pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
     
     page_data = {}
