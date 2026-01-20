@@ -69,6 +69,7 @@ from model.m_medvac_brand       import MedVacBrand
 from model.m_medvac_type        import MedVacType
 
 from model.m_sow_boar           import SowBoar
+from model.m_sow_boar_mate      import SowBoarMate
 
 from model.m_sow_act            import SowActivity
 
@@ -128,6 +129,8 @@ model_names_pig_ops = [
     
     
     ('sow_boar',                SowBoar),
+    ('sow_boar_mate',           SowBoarMate),
+    
    
     
     ('pig_prod',                PigProduction),

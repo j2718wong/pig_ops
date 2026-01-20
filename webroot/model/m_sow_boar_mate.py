@@ -1,4 +1,4 @@
-# January 3, 2024
+# January 20, 2026
 # Jack Wong
 
 from common_constants       import *
@@ -106,72 +106,39 @@ class SowBoarMate:
     
     def update_boar_external_mate(self, data = None):
         """
-        PROCEDURE sow_boar_update(
+        PROCEDURE boar_external_mate_update(
             in_user_id              INT,
+            in_sow_boar_mate_id     INT,
             
-            in_sow_boar_id          INT,
-            in_line_id              INT,
-            in_sow_status_id        INT,
-            in_is_external          INT,
-            in_is_production_ready  INT,
+            in_boar_customer_id     INT,    /* This is mapped to account_pig_buyer*/
             
-            in_parent_sow_id        INT,
-            in_parent_boar_id       INT,
-    
-            in_number               VARCHAR(10),
-            in_name                 VARCHAR(20),
-            in_date_of_birth        VARCHAR(10),
-            in_date_eartag          VARCHAR(10),
+            in_customer_sow_name    VARCHAR(50),
+            
+            in_date_mate            VARCHAR(10),
             in_notes                VARCHAR(160)
         )    
         """
         
-        sql =  'CALL sow_boar_update('
+        sql =  'CALL boar_external_mate_update('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.sow_boar_id
-        sql += '%s,'    % data.line_id
-        sql += '%s,'    % data.sow_status_id
-        sql += '%s,'    % data.is_external
-        sql += '%s,'    % data.is_production_ready
+        sql += '%s,'    % data.sow_boar_mate_id
         
+        sql += '%s,'    % data.boar_customer_id
         
-        if data.parent_sow_id > 0:
-            sql += '%s,'    % data.parent_sow_id
+        if data.customer_sow_name is not None and len(data.customer_sow_name) > 0:
+            sql += '"%s",'  % data.customer_sow_name
         else:
             sql += 'NULL,'
+        
+        sql += '"%s",'    % data.date_mate
             
-        if data.parent_boar_id > 0:
-            sql += '%s,'    % data.parent_boar_id
-        else:
-            sql += 'NULL,'
         
-        
-        if data.number is not None and len(data.number) > 0:
-            sql += '"%s",'  % data.number
-        else:
-            sql += 'NULL,'
-        
-        if data.name is not None and len(data.name) > 0:
-            sql += '"%s",'    % data.name
-        else:
-            sql += 'NULL,'
-            
-        if data.date_of_birth is not None:
-            sql += '"%s",'    % data.date_of_birth
-        else:
-            sql += 'NULL,'            
-            
-        if data.date_eartag is not None and len(data.date_eartag) > 0:
-            sql += '"%s",'    % data.date_eartag
-        else:
-            sql += 'NULL,'
-            
         if data.notes is not None:
             sql += '"%s");'   % data.notes
         else:
             sql += 'NULL);'
         
-        print(sql)
+        
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -190,7 +157,7 @@ class SowBoarMate:
             cursor.close()
 
         except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
+            msg = 'update_boar_external_mate(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -200,8 +167,6 @@ class SowBoarMate:
 
         if row is not None:
             
-            sow_boar_id = row[3]
-            
             res_update = {
                 'result':{
                     'num':              row[0],
@@ -210,151 +175,78 @@ class SowBoarMate:
                 }
             }
             
-            sow_boar_list = self.get_list(sow_boar_id = sow_boar_id)
-            
-            # return whole sow_boar
-            if sow_boar_list is not None:
-                res_update['sow_boar'] = sow_boar_list[0]['sow_boar']
-            
-            
             return res_update;
 
         return None
 
      
-    def get_list(self, pig_farm_id = None, sex = None, sow_boar_id = None, 
-            inc_user_audit = 0, order_by = 0):
+    def get_list(self, sow_boar_id, is_external: int = 0):
         """
-        Will get sow_boar list.
+        Will get sow_boar_mate list.
         
         Parameters
         ----------
         
-        sex : char
-            M = returns boar
-            F = returns gilts/sows
-            
-
-        order_by : int
-            0 = ORDER BY date_of_birth DESC
-            1 = ORDER BY name ASC, number ASC
-
-            
+        sow_id : int
+            will get all sow_boar_mate data of the sow
         
+        boar_id:
+            will get all sow_boar_mate data of the boar
+            
+        is_external: int
+            this is ignored if sow_id is given
+            
+            if is_external 0, will return mated farm owned sows 
+            if is_external > 0, will return mated external sows(not farm owned)
+        
+            
         Returns
         -------
         list of dictionary
         
         
         """
-       
-        if sow_boar_id is None:
-            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
-            where_clause += ' AND a.is_disposed = 0 '
-            
-            if sex is not None:
-                where_clause += ' AND a.sex = "%s" ' % sex
-            
-            
-            if order_by == 0:
-                order_clause = ' ORDER BY a.date_of_birth DESC '
-            else:
-                order_clause = ' ORDER BY a.name ASC, a.number ASC'
         
-        else:
-            where_clause = 'WHERE a.id = %s ' % sow_boar_id
-            order_clause = ''
-               
-        if inc_user_audit == 0:
+        if is_external == 0:
             
             sql =   """
                     SELECT 
                         a.id,
-                        a.farm_sow_id,
-                        a.farm_boar_id,
-                        a.number,
-                        a.name,
-                       
-                        a.sow_status_id,
-                        a.birth_pig_prod_id,
-                        a.parent_sow_id,
-                        a.parent_boar_id,
-                        a.date_of_birth,
-                        a.date_eartag,
                         
-                        a.is_external,
-                        a.is_production_ready,
+                        a.pig_prod_id,
                         
-                        a.num_nipples,
+                        a.mate_sow_boar_id,
+                        a.date_mate
                         
-                        b.farm_prod_id,
-                        b.date_insemination,
-                        b.date_expected_birth,
+                        b.name,
+                        b.number
                         
-                        a.last_mate_sow_boar_id,
-                        a.mate_count,
-                        a.date_last_mate,
-                        
-                        c.notes AS add_notes
-                        
-                        
-                        
-                    FROM sow_boar a
-                    LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id  = b.id
-                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
-                    %s
-                    %s 
-                    """ % (where_clause, order_clause)
+                    FROM sow_boar_mate a
+                    LEFT OUTER JOIN sow_boar b          ON a.mate_sow_boar_id  = b.id
+                    WHERE a.sow_boar_id = %s 
+                    ORDER BY a.date_mate DESC 
+                    """ % sow_boar_id
             
         else:
             
             sql =   """
                     SELECT 
                         a.id,
-                        a.farm_sow_id,
-                        a.farm_boar_id,
-                        a.number,
-                        a.name,
-                       
-                        a.sow_status_id,
-                        a.birth_pig_prod_id,
-                        a.parent_sow_id,
-                        a.parent_boar_id,
-                        a.date_of_birth,
-                        a.date_eartag,
                         
-                        a.is_external,
-                        a.is_production_ready,
+                        a.date_mate
+                        a.boar_customer_id,
+                        b.name,
                         
-                        a.num_nipples,
+                        a.customer_sow_name,
                         
-                        b.farm_prod_id,
-                        b.date_insemination,
-                        b.date_expected_birth,
+                        c.notes
                         
-                        a.last_mate_sow_boar_id,
-                        a.mate_count,
-                        a.date_last_mate,
-                        
-                        c.notes AS add_notes
-                        
-                        
-                        d.name_last,
-                        d.name_first,
-                        a.dt_entry,
-                        
-                        e.name_last,
-                        e.name_first,
-                        a.dt_last_update
-                        
-                    FROM sow_boar a
-                    LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id = b.id
-                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
-                    LEFT OUTER JOIN user d              ON a.added_by_user_id   = d.id
-                    LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
-                    %s
-                    %s 
-                    """ % (where_clause, order_clause)
+                    FROM sow_boar_mate a
+                    LEFT OUTER JOIN account_pig_buyer b     ON a.boar_customer_id = b.id
+                    LEFT OUTER JOIN pig_prod_notes c        ON a.notes_id = c.id
+                    WHERE a.sow_boar_id = %s
+                    ORDER BY a.date_mate DESC 
+                    """ % sow_boar_id
         
         
         # Check if still connected to database
@@ -390,106 +282,32 @@ class SowBoarMate:
         if rows is not None:
             
             for row in rows:
-               
-                sow_boar = {
-                    'id':                   row[0],
-                    'farm_sow_id':          row[1],
-                    'farm_boar_id':         row[2],
-                    'number':               row[3], 
-                    'name':                 row[4],
-                    
-                    'status_id':            row[5],
-                    'birth_pig_prod_id':    row[6],
-                    'parent_sow_id':        row[7],
-                    'parent_boar_id':       row[8],
-                    'date_of_birth':        str(row[9])   if row[9] else None,
-                    'date_eartag':          str(row[10])  if row[10] else None,
-                    
-                    'is_external':          row[11],
-                    'is_production_ready':  row[12],
-                    
-                    'num_nipples':          row[13],
-                    
-                    'last_farm_prod_id':    row[14],
-                    'date_insemination':    str(row[15]) if row[15] else None,
-                    'date_expected_birth':  str(row[16]) if row[16] else None,
-                    
-                    'last_mate_sow_boar_id': row[17],
-                    'mate_count':           row[18],
-                    'date_last_mate':       str(row[19]) if row[19] else None,
-                  
-                    'add_notes':            row[20]
-                }
-                
-                if sex is not None:
-                    if sex == 'F':
-                        del sow_boar['farm_boar_id']
-                        del sow_boar['is_external']
+                if is_external == 0:
+                    cur_entry = {
+                        'id':               row[0],
+                        'pig_prod_id':      row[1],
+                        'date_mate':        str(row[3]),
                         
-                        if sow_boar['num_nipples'] is None:
-                            del sow_boar['num_nipples']
-                            
-                        if sow_boar['date_insemination'] is None:
-                            del sow_boar['date_insemination']
-                            
-                        if sow_boar['date_expected_birth'] is None:
-                            del sow_boar['date_expected_birth']
-                            
-                        
-                    else:
-                        # These are for sow only
-                        del sow_boar['farm_sow_id'] 
-                        del sow_boar['status_id']
-                        del sow_boar['num_nipples'] 
-                        del sow_boar['date_insemination'] 
-                        del sow_boar['date_expected_birth']
-            
-                
-                # Remove null entries if possible
-                if sow_boar['parent_sow_id'] is None:
-                    del sow_boar['parent_sow_id']
-                    
-                if sow_boar['parent_boar_id'] is None:
-                    del sow_boar['parent_boar_id']
-                
-                if sow_boar['date_eartag'] is None:
-                    del sow_boar['date_eartag']
-                
-                if sow_boar['last_farm_prod_id'] is None:
-                   del sow_boar['last_farm_prod_id']
-                
-                if sow_boar['last_mate_sow_boar_id'] is None:
-                    del sow_boar['last_mate_sow_boar_id']
-                
-                if sow_boar['date_last_mate'] is None:
-                    del sow_boar['date_last_mate']
-                
-                if sow_boar['add_notes'] is None:
-                    del sow_boar['add_notes']
-                
-                
-                
-                if inc_user_audit > 0:
-                    
-                    cur_entry = {'sow_boar': sow_boar}
-                    
-                    added_by = {
-                        'name_last':        row[21],
-                        'name_first':       row[22],
-                        'dt_entry':         str(row[23])
+                        'mate_sow_boar':{
+                            'id':           row[2],
+                            'name':         row[4],
+                            'number':       row[5]
+                        }
                     }
                     
-                    last_update:{
-                        'name_last':        row[24],
-                        'name_first':       row[25],
-                        'dt_update':        str(row[26]) if row[26] else None
+                else:
+                    cur_entry = {
+                        'id':               row[0],
+                        'date_mate':        str(row[1]),
+                        
+                        'boar_customer':{
+                            'id':           row[2],
+                            'name':         row[3],
+                            'sow_name':     row[4]
+                        }
+                        
+                        'notes':            row[5]
                     }
-                
-                    cur_entry['added_by']    = added_by
-                    cur_entry['last_update'] = last_update
-                            
-                
-                cur_entry = {'sow_boar': sow_boar}
                     
                 result.append(cur_entry)
 

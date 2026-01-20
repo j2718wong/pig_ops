@@ -40,6 +40,7 @@ from route.r_feed_balance       import *
 from route.r_feed_calc          import *
 
 from route.r_sow_boar           import *
+from route.r_sow_boar_mate      import *
 
 from route.r_pig_production     import *
 from route.r_pig_prod_notes     import *
