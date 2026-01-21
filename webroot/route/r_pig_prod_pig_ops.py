@@ -146,8 +146,8 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int, inc_user_aud
     
     pig_prod_id = res[0]
         
-    res = model['pig_prod_pig_ops'].get_list(pig_prod_id, operation_type, 
-        inc_user_audit)
+    res = model['pig_prod_pig_ops'].get_list(operation_type, 
+        pig_prod_id = pig_prod_id, inc_user_audit = inc_user_audit)
     
     if res is None:
         return {

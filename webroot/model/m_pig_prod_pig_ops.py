@@ -93,18 +93,20 @@ class PigProdPigOps:
         return None
     
     
-    def get_list(self, pig_prod_id, operation_type, inc_user_audit = 0,
-            order_by = 0):
+    def get_list(self, operation_type, pig_prod_id = None,  sow_boar_id = None,
+            inc_user_audit = 0, order_by = 0):
         
         """
         Paremeters
         ----------
-        pig_prod_id : int
-            pig_production id
             
         operation_type : can be an integer or tuple
             
+        pig_prod_id : int
+            pig_production id
         
+        sow_boar_id : int
+            
         
         order_by : int
             0 = ORDER BY num_days_since ASC
@@ -119,6 +121,10 @@ class PigProdPigOps:
         else:
             filter_clause = 'a.operation_type = %s ' % operation_type
         
+        if pig_prod_id is not None:
+            where_clause =  'WHERE a.pig_prod_id = %s AND %s' %(pig_prod_id, filter_clause)
+        else:
+            where_clause =  'WHERE a.sow_boar_id = %s AND %s' %(sow_boar_id, filter_clause)
         
         order_clause = ''
         if order_by > 0:
@@ -150,7 +156,7 @@ class PigProdPigOps:
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
                     LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
                     LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
-                    WHERE a.pig_prod_id = %s AND %s
+                   
                     ORDER BY b.num_days_since %s
                     """ % (pig_prod_id, filter_clause, order_clause)
         else:

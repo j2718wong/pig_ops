@@ -282,7 +282,7 @@ class ReportGenPigProdOps:
             
             # This is the actual pig operations on the gestating sow.
             list_pig_ops  = model['pig_prod_pig_ops'].get_list(
-                cur_pig_prod_id, PIG_OPERATION_TYPE_GESTATING
+                PIG_OPERATION_TYPE_GESTATING, pig_prod_id = cur_pig_prod_id 
             )
             
             cur_entry['gestating_ops'] = list_pig_ops

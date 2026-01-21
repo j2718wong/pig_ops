@@ -709,9 +709,21 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     
     
     data_output         = None
+    data_gilt_ops       = None
+    
     if cur_sow_boar_data['sex'] == 'F':
         data_output = model['pig_prod'].get_production_output(sow_id = sow_boar_id)
-    
+        
+        # Check if Gilt
+        # Gilt if sow_status = SOW_STATUS_GROWING
+        # get Gilt pig_prod_pig_ops
+        operation_type = PIG_OPERATION_TYPE_GILT
+        if cur_sow_boar_data['sow_status_id'] == SOW_STATUS_GROWING:
+            res_gilt_ops = model['pig_prod_pig_ops'].get_list(operation_type, 
+                sow_boar_id = sow_boar_id,
+                inc_user_audit = 1, order_by = 0)
+            
+            data_gilt_ops = res_gilt_ops
     
     data_mates          = get_data_sow_boar_mate_list(sow_boar_id)
     
@@ -721,6 +733,7 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     
     
     data = {
+        'sow_boar':         cur_sow_boar_data,
         'list_medvac':      data_pig_medvac,
         'list_health_issues': data_health_issues,
         'list_notes':       data_notes,
@@ -730,6 +743,13 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     
     if cur_sow_boar_data['sex'] == 'M':
         data['list_mates_ext'] = data_mates_ext
+    
+    
+    if cur_sow_boar_data['sex'] == 'F':
+        if cur_sow_boar_data['sow_status_id'] == SOW_STATUS_GROWING:
+            data['list_gilt_ops'] = data_gilt_ops
+    
+    
     
     return {
         'result':{

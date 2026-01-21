@@ -50,6 +50,14 @@ ACC_BILL_STATUS = {
 }
 
 
+SOW_STATUS_GROWING                                  = 1
+SOW_STATUS_GESTATING                                = 2
+SOW_STATUS_LACTATING                                = 3
+SOW_STATUS_WEANING                                  = 4
+
+
+
+
 PROD_STATUS_ID_GESTATING                            = 1
 PROD_STATUS_ID_TERMINATED                           = 2
 PROD_STATUS_ID_NOT_PREGNANT                         = 3

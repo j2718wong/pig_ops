@@ -409,7 +409,8 @@ class SowBoar:
                     farm_boar_id,
                     number,
                     name,
-                    sex
+                    sex,
+                    sow_status_id
                     
                 FROM sow_boar 
                 WHERE id = %s
@@ -456,7 +457,8 @@ class SowBoar:
                     'farm_boar_id':         row[2],
                     'number':               row[3], 
                     'name':                 row[4],
-                    'sex':                  row[5]
+                    'sex':                  row[5],
+                    'sow_status_id':        row[6]
                 }
                 
                 return cur_entry

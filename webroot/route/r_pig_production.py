@@ -1426,8 +1426,8 @@ def get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view = 0):
         order_by = 0 if is_mob_view == 0 else 1
         
         operation_type  = PIG_OPERATION_TYPE_GESTATING
-        gestating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-            operation_type, inc_user_audit = 1, order_by = order_by)
+        gestating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
+            pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = order_by)
         
         # Replace plain_id
         
@@ -1487,8 +1487,8 @@ def get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view = 0):
         
         if is_mob_view == 0:
             operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
-            lactating_piglets_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-                operation_type, inc_user_audit = 1)
+            lactating_piglets_ops = model['pig_prod_pig_ops'].get_list( 
+                operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
             
             for cur_ops in lactating_piglets_ops:
                 cur_id  = cur_ops['pig_prod_pig_ops']['id']
@@ -1508,8 +1508,8 @@ def get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view = 0):
             
             
             operation_type  = PIG_OPERATION_TYPE_LACTATING_SOW
-            lactating_sow_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-                operation_type, inc_user_audit = 1)
+            lactating_sow_ops = model['pig_prod_pig_ops'].get_list( 
+                operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
             
             for cur_ops in lactating_sow_ops:
                 cur_id  = cur_ops['pig_prod_pig_ops']['id']
@@ -1531,8 +1531,8 @@ def get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view = 0):
             # Combine lactating pig_ops
             
             operation_type  = COMBINED_LACTATING_PIG_OPS
-            lactating_ops = model['pig_prod_pig_ops'].get_list(pig_prod_id, 
-                operation_type, inc_user_audit = 1, order_by = 1)
+            lactating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
+                pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = 1)
             
             for cur_ops in lactating_ops:
                 cur_id  = cur_ops['pig_prod_pig_ops']['id']

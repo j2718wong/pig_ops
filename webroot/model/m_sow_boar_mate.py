@@ -214,15 +214,17 @@ class SowBoarMate:
                         a.id,
                         
                         a.pig_prod_id,
+                        b.farm_prod_id,
                         
                         a.mate_sow_boar_id,
                         a.date_mate,
                         
-                        b.name,
-                        b.number
+                        c.name,
+                        c.number
                         
                     FROM sow_boar_mate a
-                    LEFT OUTER JOIN sow_boar b          ON a.mate_sow_boar_id  = b.id
+                    LEFT OUTER JOIN pig_production b    ON a.pig_prod_id = b.id 
+                    LEFT OUTER JOIN sow_boar c          ON a.mate_sow_boar_id  = c.id
                     WHERE a.sow_boar_id = %s 
                     ORDER BY a.date_mate DESC 
                     """ % sow_boar_id
@@ -286,12 +288,13 @@ class SowBoarMate:
                     cur_entry = {
                         'id':               row[0],
                         'pig_prod_id':      row[1],
-                        'date_mate':        str(row[3]),
+                        'farm_prod_id':     row[2],
+                        'date_mate':        str(row[4]),
                         
                         'mate_sow_boar':{
-                            'id':           row[2],
-                            'name':         row[4],
-                            'number':       row[5]
+                            'id':           row[3],
+                            'name':         row[5],
+                            'number':       row[6]
                         }
                     }
                     
