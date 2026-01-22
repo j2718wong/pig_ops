@@ -522,8 +522,15 @@ class SowBoar:
                        
                         a.sow_status_id,
                         a.birth_pig_prod_id,
+                        
                         a.parent_sow_id,
+                        b.number,
+                        b.name,
+                       
                         a.parent_boar_id,
+                        c.number,
+                        c.name,
+                        
                         a.date_of_birth,
                         a.date_eartag,
                         
@@ -532,21 +539,23 @@ class SowBoar:
                         
                         a.num_nipples,
                         
-                        b.farm_prod_id,
-                        b.date_insemination,
-                        b.date_expected_birth,
+                        d.farm_prod_id,
+                        d.date_insemination,
+                        d.date_expected_birth,
                         
                         a.last_mate_sow_boar_id,
                         a.mate_count,
                         a.date_last_mate,
                         
-                        c.notes AS add_notes
+                        e.notes AS add_notes
                         
                         
                         
                     FROM sow_boar a
-                    LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id  = b.id
-                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
+                    LEFT OUTER JOIN sow_boar b          ON a.parent_sow_id          = b.id
+                    LEFT OUTER JOIN sow_boar c          ON a.parent_boar_id         = c.id
+                    LEFT OUTER JOIN pig_production d    ON a.last_pig_production_id  = d.id
+                    LEFT OUTER JOIN pig_prod_notes e    ON a.add_notes_id           = e.id
                     %s
                     %s 
                     """ % (where_clause, order_clause)
@@ -563,8 +572,15 @@ class SowBoar:
                        
                         a.sow_status_id,
                         a.birth_pig_prod_id,
+                        
                         a.parent_sow_id,
+                        b.number,
+                        b.name,
+                       
                         a.parent_boar_id,
+                        c.number,
+                        c.name,
+                        
                         a.date_of_birth,
                         a.date_eartag,
                         
@@ -573,30 +589,32 @@ class SowBoar:
                         
                         a.num_nipples,
                         
-                        b.farm_prod_id,
-                        b.date_insemination,
-                        b.date_expected_birth,
+                        d.farm_prod_id,
+                        d.date_insemination,
+                        d.date_expected_birth,
                         
                         a.last_mate_sow_boar_id,
                         a.mate_count,
                         a.date_last_mate,
                         
-                        c.notes AS add_notes
+                        e.notes AS add_notes
                         
                         
-                        d.name_last,
-                        d.name_first,
+                        f.name_last,
+                        f.name_first,
                         a.dt_entry,
                         
-                        e.name_last,
-                        e.name_first,
+                        g.name_last,
+                        g.name_first,
                         a.dt_last_update
                         
                     FROM sow_boar a
-                    LEFT OUTER JOIN pig_production b    ON a.last_pig_production_id = b.id
-                    LEFT OUTER JOIN pig_prod_notes c    ON a.add_notes_id       = c.id
-                    LEFT OUTER JOIN user d              ON a.added_by_user_id   = d.id
-                    LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
+                    LEFT OUTER JOIN sow_boar b          ON a.parent_sow_id          = b.id
+                    LEFT OUTER JOIN sow_boar c          ON a.parent_boar_id         = c.id
+                    LEFT OUTER JOIN pig_production d    ON a.last_pig_production_id = d.id
+                    LEFT OUTER JOIN pig_prod_notes e    ON a.add_notes_id       = e.id
+                    LEFT OUTER JOIN user f              ON a.added_by_user_id   = f.id
+                    LEFT OUTER JOIN user g              ON a.last_update_user_id = g.id
                     %s
                     %s 
                     """ % (where_clause, order_clause)
@@ -645,25 +663,32 @@ class SowBoar:
                     
                     'status_id':            row[5],
                     'birth_pig_prod_id':    row[6],
+                    
                     'parent_sow_id':        row[7],
-                    'parent_boar_id':       row[8],
-                    'date_of_birth':        str(row[9])   if row[9] else None,
-                    'date_eartag':          str(row[10])  if row[10] else None,
+                    'parent_sow_name':      row[8],
+                    'parent_sow_number':    row[9],
                     
-                    'is_external':          row[11],
-                    'is_production_ready':  row[12],
+                    'parent_boar_id':       row[10],
+                    'parent_boar_name':     row[11],
+                    'parent_boar_number':   row[12],
                     
-                    'num_nipples':          row[13],
+                    'date_of_birth':        str(row[13])  if row[13] else None,
+                    'date_eartag':          str(row[14])  if row[14] else None,
                     
-                    'last_farm_prod_id':    row[14],
-                    'date_insemination':    str(row[15]) if row[15] else None,
-                    'date_expected_birth':  str(row[16]) if row[16] else None,
+                    'is_external':          row[15],
+                    'is_production_ready':  row[16],
                     
-                    'last_mate_sow_boar_id': row[17],
-                    'mate_count':           row[18],
-                    'date_last_mate':       str(row[19]) if row[19] else None,
+                    'num_nipples':          row[17],
+                    
+                    'last_farm_prod_id':    row[18],
+                    'date_insemination':    str(row[19]) if row[19] else None,
+                    'date_expected_birth':  str(row[20]) if row[20] else None,
+                    
+                    'last_mate_sow_boar_id': row[21],
+                    'mate_count':           row[22],
+                    'date_last_mate':       str(row[23]) if row[23] else None,
                   
-                    'add_notes':            row[20]
+                    'add_notes':            row[24]
                 }
                 
                 if sex is not None:
@@ -693,10 +718,16 @@ class SowBoar:
                 # Remove null entries if possible
                 if sow_boar['parent_sow_id'] is None:
                     del sow_boar['parent_sow_id']
+                    del sow_boar['parent_sow_name']
+                    del sow_boar['parent_sow_number']
+                    
                     
                 if sow_boar['parent_boar_id'] is None:
                     del sow_boar['parent_boar_id']
-                
+                    del sow_boar['parent_boar_name']
+                    del sow_boar['parent_boar_number']
+                    
+                    
                 if sow_boar['date_eartag'] is None:
                     del sow_boar['date_eartag']
                 
@@ -719,15 +750,15 @@ class SowBoar:
                     cur_entry = {'sow_boar': sow_boar}
                     
                     added_by = {
-                        'name_last':        row[21],
-                        'name_first':       row[22],
-                        'dt_entry':         str(row[23])
+                        'name_last':        row[25],
+                        'name_first':       row[26],
+                        'dt_entry':         str(row[27])
                     }
                     
                     last_update:{
-                        'name_last':        row[24],
-                        'name_first':       row[25],
-                        'dt_update':        str(row[26]) if row[26] else None
+                        'name_last':        row[28],
+                        'name_first':       row[29],
+                        'dt_update':        str(row[30]) if row[30] else None
                     }
                 
                     cur_entry['added_by']    = added_by
