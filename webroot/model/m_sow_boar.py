@@ -468,17 +468,25 @@ class SowBoar:
 
     
     def get_list(self, pig_farm_id = None, sex = None, sow_boar_id = None, 
-            inc_user_audit = 0, order_by = 0):
+            is_disposed = 0, inc_user_audit = 0, order_by = 0):
         """
         Will get sow_boar list.
         
         Parameters
         ----------
         
+        pig_farm_id : integer
+            farm_id
+        
         sex : char
             M = returns boar
             F = returns gilts/sows
             
+        is_disposed: int 
+            if > 0, will get disposed sow_boar only; user_audit will always be returned
+            
+        inc_user_audit : int 
+            0 = will not include user audit
 
         order_by : int
             0 = ORDER BY date_of_birth DESC
@@ -493,22 +501,34 @@ class SowBoar:
         
         """
        
-        if sow_boar_id is None:
-            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
-            where_clause += ' AND a.is_disposed = 0 '
+        if is_disposed == 0:
+       
+            if sow_boar_id is None:
+                where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
+                where_clause += ' AND a.is_disposed = 0 '
+                
+                if sex is not None:
+                    where_clause += ' AND a.sex = "%s" ' % sex
+                
+                
+                if order_by == 0:
+                    order_clause = ' ORDER BY a.date_of_birth DESC '
+                else:
+                    order_clause = ' ORDER BY a.name ASC, a.number ASC'
             
-            if sex is not None:
-                where_clause += ' AND a.sex = "%s" ' % sex
-            
-            
-            if order_by == 0:
-                order_clause = ' ORDER BY a.date_of_birth DESC '
             else:
-                order_clause = ' ORDER BY a.name ASC, a.number ASC'
-        
+                where_clause = 'WHERE a.id = %s ' % sow_boar_id
+                order_clause = ''
+                   
         else:
-            where_clause = 'WHERE a.id = %s ' % sow_boar_id
-            order_clause = ''
+            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
+            where_clause += ' AND a.is_disposed = 1 '
+            
+            order_clause = ' ORDER BY a.date_dispose DESC'
+            
+            inc_user_audit = 1
+            
+            
                
         if inc_user_audit == 0:
             
@@ -522,6 +542,9 @@ class SowBoar:
                        
                         a.sow_status_id,
                         a.birth_pig_prod_id,
+                        
+                        a.dispose_status_id,
+                        a.date_dispose,
                         
                         a.parent_sow_id,
                         b.number,
@@ -572,6 +595,9 @@ class SowBoar:
                        
                         a.sow_status_id,
                         a.birth_pig_prod_id,
+                        
+                        a.dispose_status_id,
+                        a.date_dispose,
                         
                         a.parent_sow_id,
                         b.number,
@@ -664,32 +690,43 @@ class SowBoar:
                     'status_id':            row[5],
                     'birth_pig_prod_id':    row[6],
                     
-                    'parent_sow_id':        row[7],
-                    'parent_sow_name':      row[8],
-                    'parent_sow_number':    row[9],
                     
-                    'parent_boar_id':       row[10],
-                    'parent_boar_name':     row[11],
-                    'parent_boar_number':   row[12],
+                    'dispose_status_id':    row[7],
+                    'date_dispose':         row[8],
+                        
                     
-                    'date_of_birth':        str(row[13])  if row[13] else None,
-                    'date_eartag':          str(row[14])  if row[14] else None,
+                    'parent_sow_id':        row[9],
+                    'parent_sow_name':      row[10],
+                    'parent_sow_number':    row[11],
                     
-                    'is_external':          row[15],
-                    'is_production_ready':  row[16],
+                    'parent_boar_id':       row[12],
+                    'parent_boar_name':     row[13],
+                    'parent_boar_number':   row[14],
                     
-                    'num_nipples':          row[17],
+                    'date_of_birth':        str(row[15])  if row[15] else None,
+                    'date_eartag':          str(row[16])  if row[16] else None,
                     
-                    'last_farm_prod_id':    row[18],
-                    'date_insemination':    str(row[19]) if row[19] else None,
-                    'date_expected_birth':  str(row[20]) if row[20] else None,
+                    'is_external':          row[17],
+                    'is_production_ready':  row[18],
                     
-                    'last_mate_sow_boar_id': row[21],
-                    'mate_count':           row[22],
-                    'date_last_mate':       str(row[23]) if row[23] else None,
+                    'num_nipples':          row[19],
+                    
+                    'last_farm_prod_id':    row[20],
+                    'date_insemination':    str(row[21]) if row[21] else None,
+                    'date_expected_birth':  str(row[22]) if row[22] else None,
+                    
+                    'last_mate_sow_boar_id': row[23],
+                    'mate_count':           row[24],
+                    'date_last_mate':       str(row[25]) if row[25] else None,
                   
-                    'add_notes':            row[24]
+                    'add_notes':            row[26]
                 }
+                 
+                
+                if is_disposed == 0:
+                    del sow_boar['dispose_status_id']
+                    del sow_boar['date_dispose']
+                
                 
                 if sex is not None:
                     if sex == 'F':
@@ -750,15 +787,15 @@ class SowBoar:
                     cur_entry = {'sow_boar': sow_boar}
                     
                     added_by = {
-                        'name_last':        row[25],
-                        'name_first':       row[26],
-                        'dt_entry':         str(row[27])
+                        'name_last':        row[27],
+                        'name_first':       row[28],
+                        'dt_entry':         str(row[29])
                     }
                     
                     last_update:{
-                        'name_last':        row[28],
-                        'name_first':       row[29],
-                        'dt_update':        str(row[30]) if row[30] else None
+                        'name_last':        row[30],
+                        'name_first':       row[31],
+                        'dt_update':        str(row[32]) if row[32] else None
                     }
                 
                     cur_entry['added_by']    = added_by
