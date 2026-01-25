@@ -17,6 +17,18 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
+    
     
 @app.post("/semen_sup_semen/add", tags=["Common Lookup"])
 async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
@@ -29,8 +41,7 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_NAME,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_NAME'
             }
         }
     
@@ -40,12 +51,21 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_USER_HASHID,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     semen_supplier_id   = 0
@@ -56,8 +76,7 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_HASHID,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID'
             }
         }
     
@@ -74,8 +93,7 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -87,6 +105,9 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
     del res_add['semen_sup_semen']['id']
     res_add['semen_sup_semen']['hid'] = cur_hid
 
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
         
     return res_add
     
@@ -102,8 +123,7 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_NAME,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_NAME'
             }
         }
     
@@ -113,12 +133,21 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_USER_HASHID,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     semen_supplier_id   = 0
@@ -129,8 +158,7 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_HASHID,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID'
             }
         }
     
@@ -147,8 +175,7 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -160,7 +187,11 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
     del res_update['semen_supplier']['id']
     res_update['semen_supplier']['hid'] = semen_supplier_hid
 
-        
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+    
+    
     return res_update
     
 
@@ -173,8 +204,7 @@ async def semen_supplier_semen_list(semen_supplier_hid: str):
         return {
             'result':{
                 'num':  ERROR_SEMEN_SUPPLIER_SEMEN_HASHID,
-                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID',
-                'desc': ''
+                'code': 'ERROR_SEMEN_SUPPLIER_SEMEN_HASHID'
             }
         }
     
@@ -186,8 +216,7 @@ async def semen_supplier_semen_list(semen_supplier_hid: str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -204,8 +233,7 @@ async def semen_supplier_semen_list(semen_supplier_hid: str):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

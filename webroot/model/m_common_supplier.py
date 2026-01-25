@@ -354,291 +354,193 @@ class CommonSupplier:
             
             is_feed_supplier    = 0, 
             is_gilt_supplier    = 0, 
-            is_semen_supplier   = 0, 
-            
-            minimum_info        = 1):
+            is_semen_supplier   = 0):
         
-        if minimum_info == 0:
-            if address_level_2_id > 0:
-                
-                # Only include not deleted 
-                
-                where_clause = 'WHERE a.address_level_2_id = %s ' % address_level_2_id
-                where_clause += ' AND (a.flag & 1) = 0'
-                
-                if is_feed_supplier > 0:
-                    where_clause += ' AND a.is_feed_supplier > 0 '
-                
-                elif is_gilt_supplier > 0:
-                    where_clause += ' AND a.is_gilt_supplier > 0 '
-                    
-                elif is_semen_supplier > 0:
-                    where_clause += ' AND a.is_semen_supplier > 0 '
-                
-                sql =   """
-                        SELECT 
-                            a.id,
-                            a.flag,
-                            a.name,
-                            a.contact_number,
-                            a.whatsapp,
-                            a.messenger,
-                            
-                            a.country_id,
-                            a.address_level_1_id,
-                            a.address_level_2_id,
-                            a.address_level_3_id,
-                            
-                            a.latitude,
-                            a.longitude,
-                            
-                            a.is_feed_supplier,
-                            a.is_gilt_supplier,
-                            a.is_semen_supplier
-                                                    
-                        FROM common_supplier a 
-                        %s 
-                        ORDER BY a.name
-                        """ % where_clause
+       
+        if address_level_1_id > 0:
             
+            # Only include not deleted 
             
-            if address_level_1_id > 0:
-                
-                # Only include not deleted 
-                
-                where_clause = 'WHERE a.address_level_1_id = %s ' % address_level_1_id
-                where_clause += ' AND (a.flag & 1) = 0'
-                
-                if is_feed_supplier > 0:
-                    where_clause += ' AND a.is_feed_supplier > 0 '
-                
-                elif is_gilt_supplier > 0:
-                    where_clause += ' AND a.is_gilt_supplier > 0 '
-                    
-                elif is_semen_supplier > 0:
-                    where_clause += ' AND a.is_semen_supplier > 0 '
-                    
-                sql =   """
-                        SELECT 
-                            a.id,
-                            a.flag,
-                            a.name,
-                            a.contact_number,
-                            a.whatsapp,
-                            a.messenger,
-                            
-                            a.country_id,
-                            a.address_level_1_id,
-                            a.address_level_2_id,
-                            a.address_level_3_id,
-                            
-                            a.latitude,
-                            a.longitude,
-                            
-                            a.is_feed_supplier,
-                            a.is_gilt_supplier,
-                            a.is_semen_supplier
-                            
-                        FROM common_supplier a 
-                        LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                        WHERE  a.address_level_1_id = %s 
-                        ORDER BY a.name
-                        """ % address_level_1_id
+            where_clause = 'WHERE address_level_1_id = %s ' % address_level_1_id
+            where_clause += ' AND (flag & 1) = 0'
             
+            if is_feed_supplier > 0:
+                where_clause += ' AND is_feed_supplier > 0 '
             
-            if account_id > 0:
+            elif is_gilt_supplier > 0:
+                where_clause += ' AND is_gilt_supplier > 0 '
                 
-                if is_feed_supplier > 0:
-                    sql =   """
-                            SELECT 
-                                a.feed_supplier_id,
-                                
-                                b.flag,
-                                b.name,
-                                b.contact_number,
-                                b.whatsapp,
-                                b.messenger,
-                                
-                                b.country_id,
-                                b.address_level_1_id,
-                                b.address_level_2_id,
-                                b.address_level_3_id,
-                                
-                                b.latitude,
-                                b.longitude,
-                            
-                                b.is_feed_supplier,
-                                b.is_gilt_supplier,
-                                b.is_semen_supplier
-                                
-                            FROM account_selection a
-                            LEFT OUTER JOIN common_supplier b   ON a.feed_supplier_id = b.id
-                            WHERE   a.account_id = %s AND 
-                                    a.feed_supplier_id IS NOT NULL  AND 
-                                    (a.flag & 1) = 0 
-                            ORDER BY b.name; 
-                    """% account_id
+            elif is_semen_supplier > 0:
+                where_clause += ' AND is_semen_supplier > 0 '
+                
+            sql =   """
+                    SELECT 
+                        id,
+                        flag,
+                        name,
+                        contact_number,
+                        whatsapp,
+                        messenger,
                         
-                
-                elif is_gilt_supplier > 0:
-                    sql =   """
-                            SELECT 
-                                a.gilt_supplier_id,
-                                
-                                b.flag,
-                                b.name,
-                                b.contact_number,
-                                b.whatsapp,
-                                b.messenger,
-                                
-                                b.country_id,
-                                b.address_level_1_id,
-                                b.address_level_2_id,
-                                b.address_level_3_id,
-                                
-                                b.latitude,
-                                b.longitude,
-                            
-                                b.is_feed_supplier,
-                                b.is_gilt_supplier,
-                                b.is_semen_supplier
-                                
-                            FROM account_selection a
-                            LEFT OUTER JOIN common_supplier b   ON a.gilt_supplier_id = b.id
-                            WHERE   a.account_id = %s AND 
-                                    a.gilt_supplier_id IS NOT NULL AND 
-                                    (a.flag & 1) = 0 
-                            ORDER BY b.name; 
-                    """% account_id
+                        country_id,
+                        address_level_1_id,
+                        address_level_2_id,
+                        address_level_3_id,
                         
-                    
-                elif is_semen_supplier > 0:
-                    sql =   """
-                            SELECT 
-                                a.semen_supplier_id,
-                                
-                                b.flag,
-                                b.name,
-                                b.contact_number,
-                                b.whatsapp,
-                                b.messenger,
-                                
-                                b.country_id,
-                                b.address_level_1_id,
-                                b.address_level_2_id,
-                                b.address_level_3_id,
-                                
-                                b.latitude,
-                                b.longitude,
-                            
-                                b.is_feed_supplier,
-                                b.is_gilt_supplier,
-                                b.is_semen_supplier
-                                
-                            FROM account_selection a
-                            LEFT OUTER JOIN common_supplier b   ON a.semen_supplier_id = b.id
-                            WHERE   a.account_id = %s AND 
-                                    a.semen_supplier_id IS NOT NULL AND 
-                                    (a.flag & 1) = 0 
-                            ORDER BY b.name; 
-                    """% account_id
-                
-                
+                        latitude,
+                        longitude,
+                        
+                        is_feed_supplier,
+                        is_gilt_supplier,
+                        is_semen_supplier
+                        
+                    FROM common_supplier
+                    %s
+                    ORDER BY name
+                    """ % where_clause
         
         
-        else:
-            if account_id > 0:
-                if is_feed_supplier > 0:
-                    sql =   """
-                            SELECT 
-                                a.feed_supplier_id,
-                                b.flag,
-                                b.name,
-                                b.address_level_3_id,
-                                
-                                b.is_feed_supplier,
-                                b.is_gilt_supplier,
-                                b.is_semen_supplier
-                                
-                            FROM account_selection a
-                            LEFT OUTER JOIN common_supplier b   ON a.feed_supplier_id = b.id
-                            WHERE   a.account_id = %s AND 
-                                    a.feed_supplier_id IS NOT NULL AND 
-                                    (a.flag & 1 = 0)
-                            ORDER BY b.name ASC; 
-                    """% account_id
-                    
-                elif is_gilt_supplier > 0:
-                    sql =   """
-                            SELECT 
-                                a.gilt_supplier_id,
-                                b.flag,
-                                b.name,
-                                b.address_level_3_id,
-                                
-                                b.is_feed_supplier,
-                                b.is_gilt_supplier,
-                                b.is_semen_supplier
-                                
-                            FROM account_selection a
-                            LEFT OUTER JOIN common_supplier b   ON a.gilt_supplier_id = b.id
-                            WHERE   a.account_id = %s AND 
-                                    a.gilt_supplier_id IS NOT NULL AND 
-                                    (a.flag & 1 = 0)
-                            ORDER BY b.name ASC; 
-                    """% account_id
-                    
-                elif is_semen_supplier > 0:
-                    sql =   """
-                            SELECT 
-                                a.semen_supplier_id,
-                                b.flag,
-                                b.name,
-                                b.address_level_3_id,
-                                
-                                b.is_feed_supplier,
-                                b.is_gilt_supplier,
-                                b.is_semen_supplier
-                                
-                            FROM account_selection a
-                            LEFT OUTER JOIN common_supplier b   ON a.semen_supplier_id = b.id
-                            WHERE   a.account_id = %s AND 
-                                    a.semen_supplier_id IS NOT NULL AND 
-                                    (a.flag & 1 = 0)
-                            ORDER BY b.name ASC; 
-                    """% account_id
-                
+        if address_level_2_id > 0:
             
-            if address_level_2_id > 0:
-                where_clause = 'WHERE a.address_level_2_id = %s ' % address_level_2_id
-                where_clause += ' AND (a.flag & 1) = 0'
+            # Only include not deleted 
+            
+            where_clause = 'WHERE address_level_2_id = %s ' % address_level_2_id
+            where_clause += ' AND (flag & 1) = 0'
+            
+            if is_feed_supplier > 0:
+                where_clause += ' AND is_feed_supplier > 0 '
+            
+            elif is_gilt_supplier > 0:
+                where_clause += ' AND is_gilt_supplier > 0 '
                 
-                if is_feed_supplier > 0:
-                    where_clause += ' AND a.is_feed_supplier > 0 '
-                
-                elif is_gilt_supplier > 0:
-                    where_clause += ' AND a.is_gilt_supplier > 0 '
-                    
-                elif is_semen_supplier > 0:
-                    where_clause += ' AND a.is_semen_supplier > 0 '
-                
+            elif is_semen_supplier > 0:
+                where_clause += ' AND is_semen_supplier > 0 '
+            
+            sql =   """
+                    SELECT 
+                        id,
+                        flag,
+                        name,
+                        contact_number,
+                        whatsapp,
+                        messenger,
+                        
+                        country_id,
+                        address_level_1_id,
+                        address_level_2_id,
+                        address_level_3_id,
+                        
+                        latitude,
+                        longitude,
+                        
+                        is_feed_supplier,
+                        is_gilt_supplier,
+                        is_semen_supplier
+                                                
+                    FROM common_supplier 
+                    %s 
+                    ORDER BY name
+                    """ % where_clause
+        
+        
+        if account_id > 0:
+            
+            if is_feed_supplier > 0:
                 sql =   """
                         SELECT 
-                            a.id,
-                            a.flag,
-                            a.name,
-                            a.address_level_3_id,
+                            a.feed_supplier_id,
                             
-                            a.is_feed_supplier,
-                            a.is_gilt_supplier,
-                            a.is_semen_supplier
+                            b.flag,
+                            b.name,
+                            b.contact_number,
+                            b.whatsapp,
+                            b.messenger,
                             
-                        FROM common_supplier a 
-                        %s
-                        ORDER BY a.name
-                        """ % where_clause
+                            b.country_id,
+                            b.address_level_1_id,
+                            b.address_level_2_id,
+                            b.address_level_3_id,
+                            
+                            b.latitude,
+                            b.longitude,
+                        
+                            b.is_feed_supplier,
+                            b.is_gilt_supplier,
+                            b.is_semen_supplier
+                            
+                        FROM account_selection a
+                        LEFT OUTER JOIN common_supplier b   ON a.feed_supplier_id = b.id
+                        WHERE   a.account_id = %s AND 
+                                a.feed_supplier_id IS NOT NULL  AND 
+                                (a.flag & 1) = 0 
+                        ORDER BY b.name; 
+                """% account_id
+                    
             
-        
+            elif is_gilt_supplier > 0:
+                sql =   """
+                        SELECT 
+                            a.gilt_supplier_id,
+                            
+                            b.flag,
+                            b.name,
+                            b.contact_number,
+                            b.whatsapp,
+                            b.messenger,
+                            
+                            b.country_id,
+                            b.address_level_1_id,
+                            b.address_level_2_id,
+                            b.address_level_3_id,
+                            
+                            b.latitude,
+                            b.longitude,
+                        
+                            b.is_feed_supplier,
+                            b.is_gilt_supplier,
+                            b.is_semen_supplier
+                            
+                        FROM account_selection a
+                        LEFT OUTER JOIN common_supplier b   ON a.gilt_supplier_id = b.id
+                        WHERE   a.account_id = %s AND 
+                                a.gilt_supplier_id IS NOT NULL AND 
+                                (a.flag & 1) = 0 
+                        ORDER BY b.name; 
+                """% account_id
+                    
+                
+            elif is_semen_supplier > 0:
+                sql =   """
+                        SELECT 
+                            a.semen_supplier_id,
+                            
+                            b.flag,
+                            b.name,
+                            b.contact_number,
+                            b.whatsapp,
+                            b.messenger,
+                            
+                            b.country_id,
+                            b.address_level_1_id,
+                            b.address_level_2_id,
+                            b.address_level_3_id,
+                            
+                            b.latitude,
+                            b.longitude,
+                        
+                            b.is_feed_supplier,
+                            b.is_gilt_supplier,
+                            b.is_semen_supplier
+                            
+                        FROM account_selection a
+                        LEFT OUTER JOIN common_supplier b   ON a.semen_supplier_id = b.id
+                        WHERE   a.account_id = %s AND 
+                                a.semen_supplier_id IS NOT NULL AND 
+                                (a.flag & 1) = 0 
+                        ORDER BY b.name; 
+                """% account_id
+            
+       
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -671,99 +573,97 @@ class CommonSupplier:
         if rows is not None:
             
             for row in rows:
-                if minimum_info == 0:
                     
-                    cur_supplier_id         = row[0]
-                    cur_flag                = row[1]
-                    cur_name                = row[2]
-                    cur_contact_number      = row[3]
-                    cur_whatsapp            = row[4]
-                    cur_messenger           = row[5]
-                        
-                    cur_country_id          = row[6]
-                    cur_address_level_1_id  = row[7]
-                    cur_address_level_2_id  = row[8]
-                    cur_address_level_3_id  = row[9]
+                cur_supplier_id         = row[0]
+                cur_flag                = row[1]
+                cur_name                = row[2]
+                cur_contact_number      = row[3]
+                cur_whatsapp            = row[4]
+                cur_messenger           = row[5]
                     
-                    cur_address_latitude    = float(row[10]) if row[10] is not None else None
-                    cur_address_longitude   = float(row[11]) if row[11] is not None else None
+                cur_country_id          = row[6]
+                cur_address_level_1_id  = row[7]
+                cur_address_level_2_id  = row[8]
+                cur_address_level_3_id  = row[9]
                 
-                    cur_is_feed_supplier    = row[12]
-                    cur_is_gilt_supplier    = row[13]
-                    cur_is_semen_supplier   = row[14]
-                    
-                    is_verified = 0
-                    if cur_flag & FLAG_BIT_COMMON_SUPPLIER_IS_VERIFIED > 0:
-                        is_verified = 1
-                    
-                    cur_entry = {
-                        'supplier': {
-                            'id':               cur_supplier_id,
-                            'name':             cur_name,
-                            'contact_number':   cur_contact_number,
-                            'whatsapp':         cur_whatsapp,
-                            'messenger':        cur_messenger,
-                            
-                            'is_verified':      is_verified,
-                            
-                            'is_fs':            cur_is_feed_supplier,
-                            'is_gs':            cur_is_gilt_supplier,
-                            'is_ss':            cur_is_semen_supplier
-                        },
-                        
-                        'location':{
-                            
-                            'country': {
-                                'id':           cur_country_id
-                            },
-                            
-                            'address': {
-                                'level_1':{
-                                    'id':       cur_address_level_1_id
-                                },
-                            
-                                'level_2':{
-                                    'id':       cur_address_level_2_id
-                                },
-                                
-                                'level_3':{
-                                    'id':       cur_address_level_3_id
-                                },
-                                
-                                'geoloc':{
-                                    'latitude':     cur_address_latitude,
-                                    'longitude':    cur_address_longitude
-                                }
-                                
-                            }
-                        }
-                    }
-                    
-                else: 
-                    cur_supplier_id         = row[0]
-                    cur_flag                = row[1]
-                    cur_name                = row[2]
-                    cur_address_level_3_id  = row[3]
-                    
-                    cur_is_feed_supplier    = row[4]
-                    cur_is_gilt_supplier    = row[5]
-                    cur_is_semen_supplier   = row[6]
-                    
-                    is_verified = 0
-                    if cur_flag & FLAG_BIT_COMMON_SUPPLIER_IS_VERIFIED > 0:
-                        is_verified = 1
-                    
-                    cur_entry = {
+                cur_address_latitude    = float(row[10]) if row[10] is not None else None
+                cur_address_longitude   = float(row[11]) if row[11] is not None else None
+            
+                cur_is_feed_supplier    = row[12]
+                cur_is_gilt_supplier    = row[13]
+                cur_is_semen_supplier   = row[14]
+                
+                is_verified = 0
+                if cur_flag & FLAG_BIT_COMMON_SUPPLIER_IS_VERIFIED > 0:
+                    is_verified = 1
+                
+                cur_entry = {
+                    'supplier': {
                         'id':               cur_supplier_id,
                         'name':             cur_name,
-                        'level_3_id':       cur_address_level_3_id,
+                        'contact_number':   cur_contact_number,
+                        'whatsapp':         cur_whatsapp,
+                        'messenger':        cur_messenger,
                         
                         'is_verified':      is_verified,
                         
                         'is_fs':            cur_is_feed_supplier,
                         'is_gs':            cur_is_gilt_supplier,
                         'is_ss':            cur_is_semen_supplier
+                    },
+                    
+                    'location':{
+                        
+                        'country': {
+                            'id':           cur_country_id
+                        },
+                        
+                        'address': {
+                            'level_1':{
+                                'id':       cur_address_level_1_id
+                            },
+                        
+                            'level_2':{
+                                'id':       cur_address_level_2_id
+                            },
+                            
+                            'level_3':{
+                                'id':       cur_address_level_3_id
+                            },
+                            
+                            'geoloc':{
+                                'latitude':     cur_address_latitude,
+                                'longitude':    cur_address_longitude
+                            }
+                            
+                        }
                     }
+                }
+                
+                
+                if cur_entry['supplier']['contact_number'] is None:
+                    del cur_entry['supplier']['contact_number']
+                else:
+                    if len(cur_entry['supplier']['contact_number']) == 0:
+                        del cur_entry['supplier']['contact_number']
+                   
+                   
+                if cur_entry['supplier']['whatsapp'] is None:
+                    del cur_entry['supplier']['whatsapp']
+                else:
+                    if len(cur_entry['supplier']['whatsapp']) == 0:
+                        del cur_entry['supplier']['whatsapp']
+                
+                
+                if cur_entry['supplier']['messenger'] is None:
+                    del cur_entry['supplier']['messenger']
+                else:
+                    if len(cur_entry['supplier']['messenger']) == 0:
+                        del cur_entry['supplier']['messenger']
+                
+                
+                if cur_entry['location']['address']['geoloc']['latitude'] is None:
+                    del cur_entry['location']['address']['geoloc']
                     
                 result.append(cur_entry)
         

@@ -59,6 +59,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     user_id = res[0]
     
     
+    # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
     if res_check['inv_result'] != None:

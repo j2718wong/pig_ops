@@ -40,9 +40,9 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
 
 def get_application_data():
     return {
-        "product_name":     "PiggyProd",
+        "product_name":     "SuperPig",
         "contact_whatsapp": "+85260615575",
-        "contact_email":    "support@piggyprod.jsysdev.com"
+        "contact_email":    "support@superpig.jsysdev.com"
     }
 
 

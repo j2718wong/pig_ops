@@ -623,7 +623,7 @@ class SowBoar:
                         a.mate_count,
                         a.date_last_mate,
                         
-                        e.notes AS add_notes
+                        e.notes AS add_notes,
                         
                         
                         f.name_last,
@@ -784,7 +784,6 @@ class SowBoar:
                 
                 if inc_user_audit > 0:
                     
-                    cur_entry = {'sow_boar': sow_boar}
                     
                     added_by = {
                         'name_last':        row[27],
@@ -792,14 +791,14 @@ class SowBoar:
                         'dt_entry':         str(row[29])
                     }
                     
-                    last_update:{
+                    last_update = {
                         'name_last':        row[30],
                         'name_first':       row[31],
                         'dt_update':        str(row[32]) if row[32] else None
                     }
                 
-                    cur_entry['added_by']    = added_by
-                    cur_entry['last_update'] = last_update
+                    sow_boar['added_by']    = added_by
+                    sow_boar['last_update'] = last_update
                             
                 
                 cur_entry = {'sow_boar': sow_boar}

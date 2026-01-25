@@ -126,10 +126,12 @@ class PigProdPigOps:
         else:
             where_clause =  'WHERE a.sow_boar_id = %s AND %s' %(sow_boar_id, filter_clause)
         
+        
         order_clause = ''
         if order_by > 0:
             order_clause += ' DESC'
-               
+        
+        
         if inc_user_audit == 0:
             sql =   """
                     SELECT 
@@ -156,9 +158,9 @@ class PigProdPigOps:
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
                     LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
                     LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
-                   
+                    %s
                     ORDER BY b.num_days_since %s
-                    """ % (pig_prod_id, filter_clause, order_clause)
+                    """ % (where_clause, order_clause)
         else:
             sql =   """
                     SELECT 
@@ -190,9 +192,9 @@ class PigProdPigOps:
                     LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
                     LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
                     
-                    WHERE a.pig_prod_id = %s AND %s
+                    %s
                     ORDER BY b.num_days_since %s
-                    """ % (pig_prod_id, filter_clause, order_clause)
+                    """ % (where_clause, order_clause)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:

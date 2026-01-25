@@ -51,6 +51,7 @@ async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
     user_id = res[0]
     
     
+    # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
     if res_check['inv_result'] != None:
@@ -150,6 +151,7 @@ async def boar_external_mate_update(sow_boar_mate_data: dm.DataBoarExternalMate)
     user_id = res[0]
     
     
+    # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
     if res_check['inv_result'] != None:
         return res_check['inv_result']
