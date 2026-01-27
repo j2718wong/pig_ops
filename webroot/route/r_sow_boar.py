@@ -816,6 +816,24 @@ async def sow_boar_list(pfhid:str, sex:str = None,
         res = model['sow_boar'].get_list(pig_farm_id = pig_farm_id,
                 sex = sex, inc_user_audit = inc_user_audit, order_by = order_by)
     
+        if pig_farm_id > 0 and sex == 'F':
+            list_sow_output_list = model['pig_prod'].get_production_output(
+                pig_farm_id = pig_farm_id, group_per_sow = 1);
+    
+            
+            for cur_sow in res:
+                cur_sow_id = cur_sow['sow_boar']['id']
+                
+                for cur_sow_output in list_sow_output_list:
+                    if cur_sow_output['sow_id'] == cur_sow_id:
+                        cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
+                        cur_sow['sow_boar']['num_pig_wean_f']   = cur_sow_output['num_pig_wean_f']
+                        cur_sow['sow_boar']['num_pig_wean_m']   = cur_sow_output['num_pig_wean_m']
+                        
+                        break
+                    
+            
+            
     if res is None:
         return {
             'result':{

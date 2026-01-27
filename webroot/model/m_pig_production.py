@@ -699,33 +699,36 @@ class PigProduction:
         return None
     
     
-    def get_list(self, pig_farm_id = 0 , pig_prod_type = 0):
+    def get_list(self, pig_farm_id = 0 , pig_prod_type = 0, pig_prod_id = None):
         """
         Will get pig_production list.
         
        
-        is_fattening : int
-            0 = will include gestating and lactating entries only
-            1 = after lactating entries(weaning and growing)
         
         Returns
         -------
         list of dictionary
 
         """
+        
+        if pig_farm_id > 0:
 
-        if pig_prod_type == 1:
-            where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 1 ' % pig_farm_id
-        
-        if pig_prod_type == 2:
-            where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 4 ' % pig_farm_id
-        
-        if pig_prod_type == 3:
-            where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4)) ' % pig_farm_id
-        
-        if pig_prod_type == 4:
-            where_clause = 'WHERE (a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6)) ' % pig_farm_id
-
+            if pig_prod_type == 1:
+                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 1 ' % pig_farm_id
+            
+            if pig_prod_type == 2:
+                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 4 ' % pig_farm_id
+            
+            if pig_prod_type == 3:
+                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4) ' % pig_farm_id
+            
+            if pig_prod_type == 4:
+                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6) ' % pig_farm_id
+    
+        else:
+            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
+            
+    
         sql =   """
                 SELECT 
                     a.id,
@@ -1596,55 +1599,69 @@ class PigProduction:
         return result
         
     
-    def get_production_output(self, pig_farm_id = 0, sow_id = 0):
+    def get_production_output(self, pig_farm_id = 0, sow_id = 0, group_per_sow = 0):
         
-        if pig_farm_id > 0:
-            # The result should be grouped by sow_id
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.farm_prod_id,
-                        a.sow_id,
+        if group_per_sow == 0:
+            if pig_farm_id > 0:
+                # The result should be grouped by sow_id
+                sql =   """
+                        SELECT 
+                            id,
+                            farm_prod_id,
+                            sow_id,
+                            
+                            date_actual_birth,
+                            num_pigs_live_m,
+                            num_pigs_live_f,
+                            
+                            date_weaning,
+                            num_pigs_weaning_m,
+                            num_pigs_weaning_f,
+                            total_pigs_weight_weaning
+                            
+                        FROM pig_production 
                         
-                        a.date_actual_birth,
-                        a.num_pigs_live_m,
-                        a.num_pigs_live_f
+                        WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
+                        ORDER BY sow_id ASC, date_weaning DESC
+                        """ % pig_farm_id
+            
+            
+            else:
+                sql =   """
+                        SELECT 
+                            id,
+                            farm_prod_id,
+                            sow_id,
+                            
+                            date_actual_birth,
+                            num_pigs_live_m,
+                            num_pigs_live_f,
+                            
+                            date_weaning,
+                            num_pigs_weaning_m,
+                            num_pigs_weaning_f,
+                            total_pigs_weight_weaning
+                            
+                        FROM pig_production 
                         
-                        a.date_weaning,
-                        a.num_pigs_weaning_m,
-                        a.num_pigs_weaning_f,
-                        a.total_pigs_weight_weaning
-                        
-                    FROM pig_production a
-                    
-                    WHERE a.pig_farm_id = %s AND a.date_weaning IS NOT NULL
-                    ORDER BY a.sow_id ASC, a.date_weaning DESC
-                    """ % pig_farm_id
-        
-        
+                        WHERE sow_id = %s AND date_weaning IS NOT NULL
+                        ORDER BY date_weaning DESC
+                        """ % sow_id
         else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.farm_prod_id,
-                        a.sow_id,
-                        
-                        a.date_actual_birth,
-                        a.num_pigs_live_m,
-                        a.num_pigs_live_f
-                        
-                        a.date_weaning,
-                        a.num_pigs_weaning_m,
-                        a.num_pigs_weaning_f,
-                        a.total_pigs_weight_weaning
-                        
-                    FROM pig_production a
-                    
-                    WHERE a.sow_id = %s AND a.date_weaning IS NOT NULL
-                    ORDER BY a.date_weaning DESC
-                    """ % sow_id
-        
-        
+            sql = """
+                SELECT
+                    sow_id,
+                    COUNT(*) AS cnt,
+                    CAST(SUM(num_pigs_weaning_m) AS INTEGER) as num_pigs_weaning_m,
+                    CAST(SUM(num_pigs_weaning_f) AS INTEGER) as num_pigs_weaning_f
+
+                FROM pig_production 
+
+                WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
+                GROUP BY sow_id
+                ORDER BY sow_id ASC
+            """ % pig_farm_id
+
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -1681,43 +1698,59 @@ class PigProduction:
           
             for row in rows:
                 
-                cur_pig_prod_id             = row[0]
-                cur_farm_prod_id            = row[1]
-                cur_sow_id                  = row[2]
-                
-                cur_date_actual_birth       = str(row[3])
-                cur_pigs_live_m             = row[4]
-                cur_pigs_live__f            = row[5]
-                
-                
-                cur_date_weaning            = row[6]
-                cur_pigs_weaning_m          = row[7]
-                cur_pigs_weaning_f          = row[8]
-                cur_pigs_weaning_weight     = float(row[9]) if row[9] is not None else None
-               
-                
-                cur_entry = {
-                    'pig_prod':{
-                        'id':               cur_pig_prod_id,
-                        'farm_prod_id':     cur_farm_prod_id,
-                        'sow_id':           cur_sow_id
-                    },
+                if group_per_sow == 0:
+                    cur_pig_prod_id             = row[0]
+                    cur_farm_prod_id            = row[1]
+                    cur_sow_id                  = row[2]
                     
-                    'birth':{
-                        'date_actual':      date_actual_birth,
-                        'pigs_m':           cur_pigs_live_m,
-                        'pigs_f':           cur_pigs_live_f
-                    },
+                    cur_date_actual_birth       = str(row[3])
+                    cur_pigs_live_m             = row[4]
+                    cur_pigs_live_f             = row[5]
                     
-                    'wean':{
-                        'date_wean':        cur_date_weaning,
-                        'pigs_m':           cur_pigs_weaning_m,
-                        'pigs_f':           cur_pigs_weaning_f,
-                        'total_weight':     cur_pigs_weaning_weight
+                    
+                    cur_date_weaning            = row[6]
+                    cur_pigs_weaning_m          = row[7]
+                    cur_pigs_weaning_f          = row[8]
+                    cur_pigs_weaning_weight     = float(row[9]) if row[9] is not None else None
+                   
+                    
+                    cur_entry = {
+                        'pig_prod':{
+                            'id':               cur_pig_prod_id,
+                            'farm_prod_id':     cur_farm_prod_id,
+                            'sow_id':           cur_sow_id
+                        },
+                        
+                        'birth':{
+                            'date_actual':      cur_date_actual_birth,
+                            'pigs_m':           cur_pigs_live_m,
+                            'pigs_f':           cur_pigs_live_f
+                        },
+                        
+                        'wean':{
+                            'date_wean':        cur_date_weaning,
+                            'pigs_m':           cur_pigs_weaning_m,
+                            'pigs_f':           cur_pigs_weaning_f,
+                            'total_weight':     cur_pigs_weaning_weight
+                        }
+                        
                     }
                     
-                }
-                
+                else:
+                    cur_sow_id                  = row[0]
+                    cur_birth_count             = row[1]
+                    cur_pigs_weaning_m          = row[2]
+                    cur_pigs_weaning_f          = row[3]
+                    
+                    cur_entry ={
+                        'sow_id':               cur_sow_id,
+                        'num_births':           cur_birth_count,
+                        'num_pig_wean_m':       cur_pigs_weaning_m,
+                        'num_pig_wean_f':       cur_pigs_weaning_f
+                    }
+                    
+            
+                result.append(cur_entry)
         
         return result
     

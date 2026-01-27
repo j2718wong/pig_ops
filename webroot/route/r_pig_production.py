@@ -30,7 +30,8 @@ if module_directory not in sys.path:
 
 
 from r_account_selection    import get_account_lookup_selection
-from r_utils                import (get_user_account_info,
+from r_utils                import (remove_database_null_description,
+                                    get_user_account_info,
                                    get_location_address_names_and_replace_ids)
 
 from r_sow_boar             import clean_sow_boar_entry
@@ -78,11 +79,6 @@ def get_page_data_user_account_pig_prod(user_id, pig_farm_id = None,
     
     account_pig_farms = data_account['pig_farms']
     
-    print('data_user')
-    pprint.pprint(data_user)
-    
-    print('data_account')
-    pprint.pprint(data_account)
     
     len_items = len(account_pig_farms)
     if len_items == 0:
@@ -165,10 +161,11 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
         return None
     
     
-    """
+
     # Get sow production output list
     list_sow_output_list = model['pig_prod'].get_production_output(
-        pig_farm_id = pig_farm_id);
+        pig_farm_id = pig_farm_id, group_per_sow = 1);
+    
     
     
     for cur_sow in list_sow_list:
@@ -176,11 +173,12 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
         
         for cur_sow_output in list_sow_output_list:
             if cur_sow_output['sow_id'] == cur_sow_id:
-                cur_sow['sow_boar']['num_births'] = cur_sow_output['num_births']
-                cur_sow['sow_boar']['num_piglets'] = cur_sow_output['num_piglets']
+                cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
+                cur_sow['sow_boar']['num_pig_wean_f']   = cur_sow_output['num_pig_wean_f']
+                cur_sow['sow_boar']['num_pig_wean_m']   = cur_sow_output['num_pig_wean_m']
                 
                 break
-    """
+
     
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(
@@ -598,8 +596,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_INVALID_BOAR_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_BOAR_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_INVALID_BOAR_HASHID'
                 }
             }
         
@@ -610,51 +607,64 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
         
         semen_supplier_hid = pig_prod_data.semen_supplier_hid
         
-        res = hashids_common.decrypt(semen_supplier_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID',
-                    'desc': ''
+        if semen_supplier_hid is not None:
+            res = hashids_common.decrypt(semen_supplier_hid)
+            if len(res) == 0:
+            
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID'
+                    }
                 }
-            }
-        
-        semen_supplier_id = res[0]
+            
+            semen_supplier_id = res[0]
         
         
         semen_sup_semen_hid = pig_prod_data.semen_sup_semen_hid
         
-        res = hashids_common.decrypt(semen_sup_semen_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_HASHID',
-                    'desc': ''
+        if semen_sup_semen_hid is not None:
+            res = hashids_common.decrypt(semen_sup_semen_hid)
+            if len(res) == 0:
+            
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_SEMEN_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_SEMEN_HASHID'
+                    }
                 }
-            }
-        
-        semen_sup_semen_id = res[0]
+            
+            semen_sup_semen_id = res[0]
         
         
         semen_ai_boar_hid = pig_prod_data.semen_ai_boar_hid
         
-        res = hashids_common.decrypt(semen_ai_boar_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID',
-                    'desc': ''
+        if semen_ai_boar_hid is not None:
+            res = hashids_common.decrypt(semen_ai_boar_hid)
+            if len(res) == 0:
+            
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID'
+                    }
                 }
-            }
+            
+            semen_ai_boar_id = res[0]
         
-        semen_ai_boar_id = res[0]
         
+        # Additional validation
+        if semen_ai_boar_id is None:
+            if semen_supplier_id is None  or semen_sup_semen_hid is None:
+                
+                # either semen_supplier or semen_sup_semen is error
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID'
+                    }
+                }
+                
         
     
     insem_staff_hid = pig_prod_data.insem_staff_hid
@@ -668,8 +678,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID'
                 }
             }
         
@@ -692,8 +701,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -713,7 +721,9 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     else:
         del res_add['pig_prod_ai']
   
-  
+    
+    remove_database_null_description(res_add)
+    
     return res_add
     
 
@@ -726,8 +736,7 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -743,8 +752,7 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID'
             }
         }
     
@@ -762,8 +770,7 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -774,7 +781,9 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
     # remove plain id
     del res_add['pig_prod']['id']
     res_add['pig_prod']['hid'] = pig_prod_hashid
-
+    
+    remove_database_null_description(res_add)
+    
     return res_add
 
 
@@ -787,8 +796,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -802,8 +810,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -826,8 +833,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
             return {
                 'result':{
                     'num':  ERROR_PIG_PROD_INVALID_BOAR_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_BOAR_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_PROD_INVALID_BOAR_HASHID'
                 }
             }
         
@@ -838,52 +844,64 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
         
         semen_supplier_hid = pig_prod_data.semen_supplier_hid
         
-        res = hashids_common.decrypt(semen_supplier_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
-                    'desc': ''
+        if semen_supplier_hid is not None:
+            res = hashids_common.decrypt(semen_supplier_hid)
+            if len(res) == 0:
+            
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID'
+                    }
                 }
-            }
-        
-        semen_supplier_id = res[0]
+            
+            semen_supplier_id = res[0]
         
         
         semen_sup_semen_hid = pig_prod_data.semen_sup_semen_hid
         
-        res = hashids_common.decrypt(semen_sup_semen_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
-                    'desc': ''
+        if semen_sup_semen_hid is not None:
+            res = hashids_common.decrypt(semen_sup_semen_hid)
+            if len(res) == 0:
+            
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID'
+                    }
                 }
-            }
-        
-        semen_sup_semen_id = res[0]
-        
+            
+            semen_sup_semen_id = res[0]
+            
         
         semen_ai_boar_hid = pig_prod_data.semen_ai_boar_hid
         
-        res = hashids_common.decrypt(semen_ai_boar_hid)
-        if len(res) == 0:
-        
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SOURCE_HASHID',
-                    'desc': ''
+        if semen_ai_boar_hid is not None:
+            res = hashids_common.decrypt(semen_ai_boar_hid)
+            if len(res) == 0:
+            
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_AI_BOAR_HASHID'
+                    }
                 }
-            }
+            
+            semen_ai_boar_id = res[0]
         
-        semen_ai_boar_id = res[0]
-    
-    
+        
+        # Additional validation
+        if semen_ai_boar_id is None:
+            if semen_supplier_id is None  or semen_sup_semen_hid is None:
+                
+                # either semen_supplier or semen_sup_semen is error
+                return {
+                    'result':{
+                        'num':  ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID,
+                        'code': 'ERROR_PIG_PROD_INVALID_SEMEN_SUPPLIER_HASHID'
+                    }
+                }
+        
     
     insem_staff_hid = pig_prod_data.insem_staff_hid
         
@@ -893,8 +911,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID'
             }
         }
     
@@ -906,7 +923,9 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     pig_prod_data.pig_prod_id       = pig_prod_id
     pig_prod_data.boar_id           = boar_id
     pig_prod_data.semen_supplier_id   = semen_supplier_id
+    pig_prod_data.semen_sup_semen_id  = semen_sup_semen_id
     pig_prod_data.insem_staff_id    = insem_staff_id
+    pig_prod_data.semen_ai_boar_id  = semen_ai_boar_id
     
     res_update    =  model['pig_prod'].update_insemination(pig_prod_data)
     
@@ -914,8 +933,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -927,6 +945,8 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+    
+    remove_database_null_description(res_update)
 
     return res_update
     
@@ -940,8 +960,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -955,8 +974,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -971,8 +989,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID'
             }
         }
     
@@ -990,8 +1007,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -1003,6 +1019,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+    remove_database_null_description(res_update)
 
     return res_update
     
@@ -1016,8 +1033,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -1031,8 +1047,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -1047,8 +1062,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID'
             }
         }
     
@@ -1066,8 +1080,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -1079,6 +1092,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+    remove_database_null_description(res_update)
 
     return res_update
     
@@ -1092,8 +1106,7 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -1107,8 +1120,7 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -1126,8 +1138,7 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -1139,6 +1150,7 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+    remove_database_null_description(res_update)
 
     return res_update
     
@@ -1368,6 +1380,55 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
 
 
 
+@app.get("/pig_prod/entry/{entry_hid}", tags=["Pig Production"])
+async def pig_prod_entry(entry_hid:str):
+    """
+    Will get pig_production list.
+    
+    Parameters
+    ----------
+    
+    entry_hid:str
+        pig_prod hashid
+
+
+
+    """
+    
+    res = hashids_common.decrypt(entry_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
+            }
+        }
+    
+    
+    pig_prod_id = res[0]
+    res = get_pig_prod_list(pig_prod_id = pig_prod_id, is_mob_view = 1)
+    
+    if len(res) != 1:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res[0]
+    }
+
+
+
+
 @app.get("/pig_prod/list", tags=["Pig Production"])
 async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     """
@@ -1396,8 +1457,7 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID'
             }
         }
     
@@ -1408,18 +1468,20 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res 
     }
     
     
-def get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view = 0):
-    res = model['pig_prod'].get_list(pig_farm_id, pig_prod_type)
+def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
+    res = model['pig_prod'].get_list(
+            pig_farm_id = pig_farm_id, 
+            pig_prod_type = pig_prod_type,
+            pig_prod_id = pig_prod_id)
     
-    
+     
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
         
