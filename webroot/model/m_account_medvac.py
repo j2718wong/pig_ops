@@ -224,6 +224,10 @@ class AccountMedVac:
             sql =   """
                     SELECT 
                         a.id,
+                        
+                        a.medvac_brand_id,
+                        a.medvac_type_id,
+                        
                         a.name
                     FROM account_medvac a
                     %s
@@ -234,9 +238,12 @@ class AccountMedVac:
             sql =   """
                     SELECT 
                         a.id,
+                        
+                        a.medvac_brand_id,
+                        a.medvac_type_id,
+                        
                         a.name
                     
-                        
                         c.name_last,
                         c.name_first,
                         a.dt_entry,
@@ -286,34 +293,32 @@ class AccountMedVac:
             
             for row in rows:
                     
-                
-                if inc_user_audit == 0:
-                    
-                    cur_entry = {
-                        'acc_medvac': {
-                            'id':               row[0],
-                            'name':             row[1]
-                        }
+                cur_entry = {
+                    'acc_medvac': {
+                        'id':               row[0],
+                        'brand_id'          row[1],
+                        'type_id'           row[2],
+                        'name':             row[3]
                     }
+                }
                 
-                else:
-                    
-                    cur_entry = {
-                        'acc_medvac': {
-                            'id':               row[0],
-                            'name':             row[1]
-                        },
+                if inc_user_audit > 0:
                         
-                        'added_by': {
-                            'name_last':        row[2],
-                            'name_first':       row[3]
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[4],
-                            'name_first':       row[5]
-                        }
+                    added_by = {
+                        'name_last':        row[4],
+                        'name_first':       row[5],
+                        'dt_entry':         str(row[6])
                     }
+                    
+                    last_update = {
+                        'name_last':        row[7],
+                        'name_first':       row[8],
+                        'dt_update':        str(row[9]) if row[9] else None
+                    }
+                    
+                    cur_entry['added_by']   = added_by 
+                    cur_entry['last_update'] = last_update
+                    
                     
                 result.append(cur_entry)
         

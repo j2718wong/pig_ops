@@ -27,8 +27,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
         return {
             'result':{
                 'num':  ERROR_pig_prod_pig_ops_INVALID_USER_HASHID,
-                'code': 'ERROR_pig_prod_pig_ops_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_USER_HASHID'
             }
         }
     
@@ -42,8 +41,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
         return {
             'result':{
                 'num':  ERROR_pig_prod_pig_ops_INVALID_HASHID,
-                'code': 'ERROR_pig_prod_pig_ops_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_HASHID'
             }
         }
     
@@ -62,8 +60,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
             return {
                 'result':{
                     'num':  ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID,
-                    'code': 'ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_pig_prod_pig_ops_INVALID_STAFF_HASHID'
                 }
             }
         
@@ -80,8 +77,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -138,8 +134,7 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int, inc_user_aud
         return {
             'result':{
                 'num':  ERROR_pig_prod_pig_ops_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_pig_prod_pig_ops_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+                'code': 'ERROR_pig_prod_pig_ops_INVALID_PIG_PROD_HASHID'
             }
         }
     
@@ -153,8 +148,7 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int, inc_user_aud
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -172,6 +166,38 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int, inc_user_aud
         
         del cur_entry['account_pig_ops']['id']
         cur_entry['account_pig_ops']['hid']   = acc_gestating_ops_hid
+        
+        
+        if 'pig_medvac' in cur_entry:
+            pig_medvac = cur_entry['pig_medvac']
+            
+            cur_id  = pig_medvac['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_medvac']['id']
+            cur_entry['pig_medvac'] = cur_hid
+        
+        
+            cur_id  = pig_medvac['brand']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_medvac']['brand']['id']
+            cur_entry['pig_medvac']['brand'] = cur_hid
+        
+            
+            cur_id  = pig_medvac['type']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_medvac']['type']['id']
+            cur_entry['pig_medvac']['type'] = cur_hid
+        
+        
+            cur_id  = pig_medvac['acc_medvac']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_medvac']['acc_medvac']['id']
+            cur_entry['pig_medvac']['acc_medvac'] = cur_hid
+        
         
     
     return {

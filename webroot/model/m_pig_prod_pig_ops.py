@@ -4,6 +4,15 @@
 from common_constants       import *
 
 
+"""
+/* account_pig_ops.flag bits*/
+DECLARE FLAG_BIT_ACCOUNT_PIG_OPS_IS_DELETED     INT             DEFAULT 1;
+DECLARE FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC      INT             DEFAULT 2;
+"""
+
+FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC      = 2
+
+
 class PigProdPigOps:
     def __init__(self, model):
         self.model              = model
@@ -147,17 +156,33 @@ class PigProdPigOps:
                         b.flag AS account_pig_ops_flag,
                         b.description,
                         
+                        a.pig_medvac_id,
+                        c.medvac_brand_id,
+                        d.name AS medvac_brand,
+                        
+                        c.medvac_type_id,
+                        e.name AS medvac_type,
+                        
+                        c.acc_medvac_id,
+                        f.name AS medvac_name,
+                        
                         a.staff_id,
-                        c.name  AS staff_name,
+                        g.name  AS staff_name,
                         
                         a.notes_id,
-                        d.notes
+                        h.notes
                         
                         
                     FROM pig_prod_pig_ops a 
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
-                    LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
-                    LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
+                    
+                    LEFT OUTER JOIN pig_medvac c        ON a.pig_medvac_id = c.id
+                    LEFT OUTER JOIN medvac_brand d      ON c.medvac_brand_id = d.id
+                    LEFT OUTER JOIN medvac_type e       ON c.medvac_type_id = e.id
+                    LEFT OUTER JOIN account_medvac f    ON c.acc_medvac_id = f.id
+                    
+                    LEFT OUTER JOIN pig_farm_staff g    ON a.staff_id = g.id
+                    LEFT OUTER JOIN pig_prod_notes h    ON a.notes_id = h.id
                     %s
                     ORDER BY b.num_days_since %s
                     """ % (where_clause, order_clause)
@@ -176,21 +201,38 @@ class PigProdPigOps:
                         b.flag AS account_pig_ops_flag,
                         b.description,
                         
+                        a.pig_medvac_id,
+                        c.medvac_brand_id,
+                        d.name AS medvac_brand,
+                        
+                        c.medvac_type_id,
+                        e.name AS medvac_type,
+                        
+                        c.acc_medvac_id,
+                        f.name AS medvac_name,
+                        
                         a.staff_id,
-                        c.name  AS staff_name,
+                        g.name  AS staff_name,
                         
                         a.notes_id,
-                        d.notes,
+                        h.notes,
                         
-                        e.name_last,
-                        e.name_first,
-                        a.dt_last_update
+                        i.name_last,
+                        i.name_first,
+                        i.dt_last_update
                         
                     FROM pig_prod_pig_ops a 
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
-                    LEFT OUTER JOIN pig_farm_staff c    ON a.staff_id = c.id
-                    LEFT OUTER JOIN pig_prod_notes d    ON a.notes_id = d.id
-                    LEFT OUTER JOIN user e              ON a.last_update_user_id = e.id
+                    
+                    LEFT OUTER JOIN pig_medvac c        ON a.pig_medvac_id = c.id
+                    LEFT OUTER JOIN medvac_brand d      ON c.medvac_brand_id = d.id
+                    LEFT OUTER JOIN medvac_type e       ON c.medvac_type_id = e.id
+                    LEFT OUTER JOIN account_medvac f    ON c.acc_medvac_id = f.id
+                    
+                    LEFT OUTER JOIN pig_farm_staff g    ON a.staff_id = g.id
+                    LEFT OUTER JOIN pig_prod_notes h    ON a.notes_id = h.id
+                    
+                    LEFT OUTER JOIN user i              ON a.last_update_user_id = i.id
                     
                     %s
                     ORDER BY b.num_days_since %s
@@ -228,70 +270,82 @@ class PigProdPigOps:
         if rows is not None:
             
             for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
+                is_medvac  = 0
+                cur_acc_pig_ops_flag = row[8]
+                
+                
+                if cur_acc_pig_ops_flag & FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC > 0:
+                    is_medvac  = 1
+                        
+                
+                cur_entry = {
                     
-                        'pig_prod_pig_ops': {
-                            'id':               row[0],
-                            'operation_type':   row[1],
-                            'date_target':      str(row[2]),
-                            'date_actual':      str(row[3]) if row[3] else None,
-                            'dt_entry':         str(row[4])
-                        },
-                        
-                        'account_pig_ops':{
-                            'id':               row[5],
-                            'name':             row[6],
-                            'num_days_since':   row[7],
-                            'flag':             row[8],
-                            'description':      row[9]
-                        },
-                        
-                        'staff': {
-                            'id':               row[10],
-                            'name':             row[11]
-                        },
-                        
-                        'notes': {
-                            'id':               row[12],
-                            'notes':            row[13]
-                        }
-                    }
                     
-                else:
-                    cur_entry = {
-                        'pig_prod_pig_ops': {
-                            'id':               row[0],
-                            'operation_type':   row[1],
-                            'date_target':      str(row[2]),
-                            'date_actual':      str(row[3]) if row[3] else None,
-                            'dt_entry':         str(row[4])
+                    'pig_prod_pig_ops': {
+                        'id':               row[0],
+                        'operation_type':   row[1],
+                        'date_target':      str(row[2]),
+                        'date_actual':      str(row[3]) if row[3] else None,
+                        'dt_entry':         str(row[4])
+                    },
+                    
+                    'account_pig_ops':{
+                        'id':               row[5],
+                        'name':             row[6],
+                        'num_days_since':   row[7],
+                        'is_medvac':        is_medvac,
+                        'description':      row[9]
+                    },
+                    
+                    
+                    'pig_medvac':{
+                        'id':               row[10],
+                        
+                        'brand': {
+                            'id':           row[11],
+                            'name':         row[12]
                         },
                         
-                        'account_pig_ops': {
-                            'id':               row[5],
-                            'name':             row[6],
-                            'num_days_since':   row[7],
-                            'flag':             row[8],
-                            'description':      row[9]
+                        'type': {
+                            'id':           row[13],
+                            'name':         row[14]
                         },
                         
-                        'staff': {
-                            'id':               row[10],
-                            'name':             row[11]
-                        },
-                        
-                        'notes': {
-                            'id':               row[12],
-                            'notes':            row[13]
-                        },
-                        
-                        'last_update': {
-                            'name_last':        row[14],
-                            'name_first':       row[15],
-                            'dt_update':        str(row[16]) if row[16] else None
+                        'acc_medvac':{
+                            'id':           row[15],
+                            'name':         row[16]
                         }
+                    
+                    },
+                    
+                    
+                    'staff': {
+                        'id':               row[17],
+                        'name':             row[18]
+                    },
+                    
+                    'notes': {
+                        'id':               row[19],
+                        'notes':            row[20]
                     }
+                }
+                
+                
+                if inc_user_audit > 0:
+                    
+                    if row[21] is not None:
+                        
+                        last_update = {
+                            'name_last':        row[21],
+                            'name_first':       row[22],
+                            'dt_update':        str(row[23]) if row[23] else None
+                        }
+                
+                        cur_entry['last_update'] = last_update
+                
+                
+                if cur_entry['pig_medvac']['id'] is None:
+                    del cur_entry['pig_medvac']
                 
                     
                 result.append(cur_entry)
