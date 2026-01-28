@@ -246,7 +246,7 @@ class SowBoarMate:
                     FROM sow_boar_mate a
                     LEFT OUTER JOIN account_pig_buyer b     ON a.boar_customer_id = b.id
                     LEFT OUTER JOIN pig_prod_notes c        ON a.notes_id = c.id
-                    WHERE a.sow_boar_id = %s
+                    WHERE a.sow_boar_id = %s AND a.boar_customer_id IS NOT NULL
                     ORDER BY a.date_mate DESC 
                     """ % sow_boar_id
         

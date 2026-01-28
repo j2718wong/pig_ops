@@ -402,24 +402,24 @@ def clean_pig_prod_pig_ops(prod_pig_ops):
         cur_entry['account_pig_ops']['hid']   = acc_gestating_ops_hid
         
         
-        cur_id  = cur_ops['staff']['id']
+        cur_id  = cur_entry['staff']['id']
         if cur_id is not None:
             cur_hid = hashids_common.encrypt(cur_id)
         else:
             cur_hid = None
         
-        del cur_ops['staff']['id']
-        cur_ops['staff']['hid']   = cur_hid
+        del cur_entry['staff']['id']
+        cur_entry['staff']['hid']   = cur_hid
         
         
-        cur_id  = cur_ops['notes']['id']
+        cur_id  = cur_entry['notes']['id']
         if cur_id is not None:
             cur_hid = hashids_common.encrypt(cur_id)
         else:
             cur_hid = None
         
-        del cur_ops['notes']['id']
-        cur_ops['notes']['hid']   = cur_hid
+        del cur_entry['notes']['id']
+        cur_entry['notes']['hid']   = cur_hid
         
         
         
@@ -522,6 +522,59 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int):
         'data': res
     }
     
+    
+
+@app.get("/pig_prod_pig_ops/entry/{entry_hid}", tags=["Production Details"])
+async def pig_prod_pig_ops_entry(entry_hid: str):
+    """
+    Will get pig_prod_pig_ops entry.
+    
+    Parameters
+    ----------
+    
+    entry_hid:str
+        pig_prod_pig_ops hashid
+
+    
+    """
+    
+    
+    res = hashids_common.decrypt(entry_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_PIG_OPS_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_PIG_OPS_INVALID_HASHID'
+            }
+        }
+    
+    
+    pig_prod_pig_ops_id = res[0]
+        
+    res = model['pig_prod_pig_ops'].get_entry(pig_prod_pig_ops_id, inc_user_audit = 1)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    # Replace plain id
+    clean_pig_prod_pig_ops(res)
+
+
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res[0]
+    }
     
 
     

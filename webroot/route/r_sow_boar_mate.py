@@ -252,6 +252,7 @@ def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0):
         
             cur_id     = cur_entry['boar_customer']['id']
             cur_hid    = hashids_common.encrypt(cur_id)
+               
             
             del cur_entry['boar_customer']['id']
             cur_entry['boar_customer']['hid'] = cur_hid
