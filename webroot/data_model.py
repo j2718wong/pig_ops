@@ -622,10 +622,21 @@ class DataPigProdPigOps(BaseModel):
     pig_prod_pig_ops_hid:   str = None
     staff_hid:              str = None
     
+    medvac_brand_hid:       str = None
+    medvac_type_hid:        str = None
+    acc_medvac_hid:         str = None
+    
+    
     user_id:                int = 0
     pig_prod_pig_ops_id:    int = 0
     staff_id:               int = 0
     done_by_user:           int = 0
+    
+    
+    medvac_brand_id:        int = 0
+    medvac_type_id:         int = 0
+    acc_medvac_id:          int = 0
+    
     
     date:                   str
     notes:                  str = None

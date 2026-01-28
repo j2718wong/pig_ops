@@ -36,11 +36,12 @@ from r_utils                import (remove_database_null_description,
 
 from r_sow_boar             import clean_sow_boar_entry
 
+from r_pig_prod_pig_ops     import clean_pig_prod_pig_ops
+
+
+
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
-
-COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS, 
-                                PIG_OPERATION_TYPE_LACTATING_SOW)
 
 
 
@@ -1476,6 +1477,7 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     
     
 def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
+    
     res = model['pig_prod'].get_list(
             pig_farm_id = pig_farm_id, 
             pig_prod_type = pig_prod_type,
@@ -1503,43 +1505,8 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         cur_entry['birth']['birth_staff_hid']   = cur_hid
             
         
-        
-        for cur_ops in gestating_ops:
-            cur_id  = cur_ops['pig_prod_pig_ops']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_ops['pig_prod_pig_ops']['id']
-            cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
-            
-            
-            cur_id  = cur_ops['account_pig_ops']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_ops['account_pig_ops']['id']
-            cur_ops['account_pig_ops']['hid']   = cur_hid
-            
-            
-            cur_id  = cur_ops['staff']['id']
-            if cur_id is not None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_ops['staff']['id']
-            cur_ops['staff']['hid']   = cur_hid
-            
-            
-            cur_id  = cur_ops['notes']['id']
-            if cur_id is not None:
-                cur_hid = hashids_common.encrypt(cur_id)
-            else:
-                cur_hid = None
-            
-            del cur_ops['notes']['id']
-            cur_ops['notes']['hid']   = cur_hid
-            
-            
-        
+        # Replace plain id
+        clean_pig_prod_pig_ops(gestating_ops)
         cur_entry['gestating_ops'] = gestating_ops
         
         
@@ -1552,20 +1519,8 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             lactating_piglets_ops = model['pig_prod_pig_ops'].get_list( 
                 operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
             
-            for cur_ops in lactating_piglets_ops:
-                cur_id  = cur_ops['pig_prod_pig_ops']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_ops['pig_prod_pig_ops']['id']
-                cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
-                
-                
-                cur_id  = cur_ops['account_pig_ops']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_ops['account_pig_ops']['id']
-                cur_ops['account_pig_ops']['hid']   = cur_hid
-            
+            # Replace plain id
+            clean_pig_prod_pig_ops(lactating_piglets_ops)
             cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
             
             
@@ -1573,43 +1528,18 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             lactating_sow_ops = model['pig_prod_pig_ops'].get_list( 
                 operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
             
-            for cur_ops in lactating_sow_ops:
-                cur_id  = cur_ops['pig_prod_pig_ops']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_ops['pig_prod_pig_ops']['id']
-                cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
-                
-                
-                cur_id  = cur_ops['account_pig_ops']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_ops['account_pig_ops']['id']
-                cur_ops['account_pig_ops']['hid']   = cur_hid
-            
+            # Replace plain id
+            clean_pig_prod_pig_ops(lactating_sow_ops)
             cur_entry['lactating_sow_ops'] = lactating_sow_ops
         
         else:
             # Combine lactating pig_ops
             
-            operation_type  = COMBINED_LACTATING_PIG_OPS
+            operation_type  = PIG_OPERATION_TYPE_LACTATING_COMBINED
             lactating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
                 pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = 1)
             
-            for cur_ops in lactating_ops:
-                cur_id  = cur_ops['pig_prod_pig_ops']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_ops['pig_prod_pig_ops']['id']
-                cur_ops['pig_prod_pig_ops']['hid']   = cur_hid
-                
-                
-                cur_id  = cur_ops['account_pig_ops']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_ops['account_pig_ops']['id']
-                cur_ops['account_pig_ops']['hid']   = cur_hid
-            
+            clean_pig_prod_pig_ops(lactating_ops)
             cur_entry['lactating_ops'] = lactating_ops
             
         

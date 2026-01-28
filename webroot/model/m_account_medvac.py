@@ -296,8 +296,8 @@ class AccountMedVac:
                 cur_entry = {
                     'acc_medvac': {
                         'id':               row[0],
-                        'brand_id'          row[1],
-                        'type_id'           row[2],
+                        'brand_id':         row[1],
+                        'type_id':          row[2],
                         'name':             row[3]
                     }
                 }

@@ -102,6 +102,102 @@ class PigProdPigOps:
         return None
     
     
+    def update_with_medvac(self, data = None):
+        """
+        PROCEDURE pig_prod_pig_ops_medvac_update(
+            in_user_id              INT,
+           
+            in_pig_prod_pig_ops_id  INT,
+            in_staff_id             INT,
+            in_done_by_user         INT,
+            
+            in_medvac_brand_id      INT,
+            in_medvac_type_id       INT,
+            in_acc_medvac_id        INT,
+            
+            in_date                 VARCHAR(10),
+            in_notes                VARCHAR(160)
+        )
+        """
+       
+        sql =  'CALL pig_prod_pig_ops_update('
+        sql += '%s,'    % data.user_id
+        sql += '%s,'    % data.pig_prod_pig_ops_id
+        sql += '%s,'    % data.staff_id
+        sql += '%s,'    % data.done_by_user
+        
+        sql += '%s,'    % data.medvac_brand_id
+        sql += '%s,'    % data.medvac_type_id
+        sql += '%s,'    % data.acc_medvac_id
+        
+        
+        sql += '"%s",'  % data.date
+        
+        if data.notes is not None:
+            data.notes = data.notes.strip()
+            
+            if len(data.notes) > 0:
+                sql += '"%s");'  % data.notes
+            else:
+                sql += 'NULL);'
+        else:
+            sql += 'NULL);'
+            
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            added_new_staff = row[4]
+            pig_farm_id     = row[5]
+            
+            cur_entry = {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod_pig_ops': {
+                    'id':               row[3]
+                }
+            }
+            
+            if added_new_staff > 0:
+                cur_entry['added_new_staff']= 1
+                cur_entry['pig_farm_id']    = pig_farm_id  
+        
+            return cur_entry
+        
+        return None
+    
+    
+    
+    
+    
     def get_list(self, operation_type, pig_prod_id = None,  sow_boar_id = None,
             inc_user_audit = 0, order_by = 0):
         
@@ -109,7 +205,7 @@ class PigProdPigOps:
         Paremeters
         ----------
             
-        operation_type : can be an integer or tuple
+        operation_type : PIG_OPERATION_TYPE constant
             
         pig_prod_id : int
             pig_production id
@@ -122,11 +218,8 @@ class PigProdPigOps:
             1 = ORDER BY num_days_since DESC
         """
         
-        if isinstance(operation_type, tuple):
-            s_operation_type = tuple(str(x) for x in operation_type)
-            op_types = ','.join(s_operation_type)
-            
-            filter_clause = 'a.operation_type IN (%s )' % op_types
+        if operation_type == PIG_OPERATION_TYPE_LACTATING_COMBINED:
+            filter_clause = 'a.operation_type IN (2,3)'
         else:
             filter_clause = 'a.operation_type = %s ' % operation_type
         
@@ -219,7 +312,7 @@ class PigProdPigOps:
                         
                         i.name_last,
                         i.name_first,
-                        i.dt_last_update
+                        a.dt_last_update
                         
                     FROM pig_prod_pig_ops a 
                     LEFT OUTER JOIN account_pig_ops b   ON a.account_pig_ops_id = b.id
@@ -237,6 +330,7 @@ class PigProdPigOps:
                     %s
                     ORDER BY b.num_days_since %s
                     """ % (where_clause, order_clause)
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
