@@ -92,69 +92,6 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     
     
     
-    medvac_brand_hid = pig_medvac_data.medvac_brand_hid
-    
-    res = hashids_common.decrypt(medvac_brand_hid)
-    if len(res) == 0:
-        result = {
-            'result':{
-                'num':  ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID'
-            }
-        }
-        
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
-        
-        return result
-        
-    medvac_brand_id = res[0]
-    
-
-    
-    medvac_type_hid = pig_medvac_data.medvac_type_hid
-    
-    res = hashids_common.decrypt(medvac_type_hid)
-    if len(res) == 0:
-        result = {
-            'result':{
-                'num':  ERROR_PIG_MEDVAC_INVALID_MEDVAC_TYPE_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_INVALID_MEDVAC_TYPE_HASHID'
-            }
-        }
-        
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
-        
-        return result
-    
-    medvac_type_id = res[0]
-    
-    
-    acc_medvac_hid = pig_medvac_data.acc_medvac_hid
-    
-    res = hashids_common.decrypt(acc_medvac_hid)
-    if len(res) == 0:
-        result = {
-            'result':{
-                'num':  ERROR_PIG_MEDVAC_INVALID_ACC_MEDVAC_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_INVALID_ACC_MEDVAC_HASHID'
-            }
-        }
-        
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
-        
-        return result
-    
-    acc_medvac_id = res[0]
-    
-    
-    
-    
-    
-    
-    
     pig_prod_pig_ops_data.user_id               = user_id
     pig_prod_pig_ops_data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
     pig_prod_pig_ops_data.staff_id              = staff_id
@@ -195,7 +132,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
             
             
     # Remove optional desc coming from database
-    remove_database_null_description(res_add)
+    remove_database_null_description(res_update)
 
         
     return res_update
@@ -260,7 +197,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
         
     
     
-    medvac_brand_hid = pig_medvac_data.medvac_brand_hid
+    medvac_brand_hid = pig_prod_pig_ops_data.medvac_brand_hid
     
     res = hashids_common.decrypt(medvac_brand_hid)
     if len(res) == 0:
@@ -280,7 +217,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     
 
     
-    medvac_type_hid = pig_medvac_data.medvac_type_hid
+    medvac_type_hid = pig_prod_pig_ops_data.medvac_type_hid
     
     res = hashids_common.decrypt(medvac_type_hid)
     if len(res) == 0:
@@ -299,7 +236,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     medvac_type_id = res[0]
     
     
-    acc_medvac_hid = pig_medvac_data.acc_medvac_hid
+    acc_medvac_hid = pig_prod_pig_ops_data.acc_medvac_hid
     
     res = hashids_common.decrypt(acc_medvac_hid)
     if len(res) == 0:
@@ -318,24 +255,6 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     acc_medvac_id = res[0]
     
     
-    # Check for valid keys
-    if sow_boar_id == 0 and pig_prod_id == 0 and pig_prod_pig_ops_id == 0 and health_issue_id == 0:
-        result = {
-            'result':{
-                'num':  ERROR_PIG_MEDVAC_NO_VALID_KEY,
-                'code': 'ERROR_PIG_MEDVAC_NO_VALID_KEY'
-            }
-        }
-        
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
-        
-        return result
-    
-    
-    
-        
-        
         
     
     pig_prod_pig_ops_data.user_id               = user_id
@@ -382,7 +301,10 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
             
             res_update['staff_list'] = list_staff
             
-        
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+    
     return res_update
     
 
@@ -395,11 +317,12 @@ def clean_pig_prod_pig_ops(prod_pig_ops):
         del cur_entry['pig_prod_pig_ops']['id']
         cur_entry['pig_prod_pig_ops']['hid']   = cur_hid
         
-        acc_gestating_ops_id  = cur_entry['account_pig_ops']['id']
-        acc_gestating_ops_hid = hashids_common.encrypt(acc_gestating_ops_id)
+        
+        cur_id  = cur_entry['account_pig_ops']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
         
         del cur_entry['account_pig_ops']['id']
-        cur_entry['account_pig_ops']['hid']   = acc_gestating_ops_hid
+        cur_entry['account_pig_ops']['hid']   = cur_hid
         
         
         cur_id  = cur_entry['staff']['id']
@@ -424,34 +347,35 @@ def clean_pig_prod_pig_ops(prod_pig_ops):
         
         
         if 'pig_medvac' in cur_entry:
+
             pig_medvac = cur_entry['pig_medvac']
-            
+
             cur_id  = pig_medvac['id']
             cur_hid = hashids_common.encrypt(cur_id)
             
             del cur_entry['pig_medvac']['id']
-            cur_entry['pig_medvac'] = cur_hid
+            cur_entry['pig_medvac']['hid'] = cur_hid
         
         
             cur_id  = pig_medvac['brand']['id']
             cur_hid = hashids_common.encrypt(cur_id)
             
             del cur_entry['pig_medvac']['brand']['id']
-            cur_entry['pig_medvac']['brand'] = cur_hid
+            cur_entry['pig_medvac']['brand']['hid'] = cur_hid
         
             
             cur_id  = pig_medvac['type']['id']
             cur_hid = hashids_common.encrypt(cur_id)
             
             del cur_entry['pig_medvac']['type']['id']
-            cur_entry['pig_medvac']['type'] = cur_hid
+            cur_entry['pig_medvac']['type']['hid'] = cur_hid
         
         
             cur_id  = pig_medvac['acc_medvac']['id']
             cur_hid = hashids_common.encrypt(cur_id)
             
             del cur_entry['pig_medvac']['acc_medvac']['id']
-            cur_entry['pig_medvac']['acc_medvac'] = cur_hid
+            cur_entry['pig_medvac']['acc_medvac']['hid'] = cur_hid
         
     
 

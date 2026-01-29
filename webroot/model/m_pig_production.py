@@ -320,7 +320,8 @@ class PigProduction:
             
         sql += '%s,'    % data.insem_staff_id
         sql += '"%s");' % data.insem_date
-       
+        
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -726,7 +727,7 @@ class PigProduction:
                 where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6) ' % pig_farm_id
     
         else:
-            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
+            where_clause = 'WHERE a.id = %s ' % pig_prod_id
             
     
         sql =   """
@@ -1652,8 +1653,8 @@ class PigProduction:
                 SELECT
                     sow_id,
                     COUNT(*) AS cnt,
-                    CAST(SUM(num_pigs_weaning_m) AS INTEGER) as num_pigs_weaning_m,
-                    CAST(SUM(num_pigs_weaning_f) AS INTEGER) as num_pigs_weaning_f
+                    SUM(num_pigs_weaning_m) as num_pigs_weaning_m,
+                    SUM(num_pigs_weaning_f) as num_pigs_weaning_f
 
                 FROM pig_production 
 
@@ -1709,8 +1710,8 @@ class PigProduction:
                     
                     
                     cur_date_weaning            = row[6]
-                    cur_pigs_weaning_m          = row[7]
-                    cur_pigs_weaning_f          = row[8]
+                    cur_pigs_weaning_m          = int(row[7])   if row[7] is not None else None
+                    cur_pigs_weaning_f          = int(row[8])   if row[8] is not None else None
                     cur_pigs_weaning_weight     = float(row[9]) if row[9] is not None else None
                    
                     

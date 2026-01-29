@@ -384,9 +384,7 @@ class PigProd(ViewBase):
             "/static_m/js/pages/sow_boar/page_sow_boar_add_edit.js",
             
             
-            
-            "/static_m/js/pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
-            
+                
             
             "/static_m/js/pages/production/gesta_lacta/insem_data_select.js",
             "/static_m/js/pages/production/gesta_lacta/page_prod_gestating_add.js",
