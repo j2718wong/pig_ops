@@ -1740,8 +1740,8 @@ class PigProduction:
                 else:
                     cur_sow_id                  = row[0]
                     cur_birth_count             = row[1]
-                    cur_pigs_weaning_m          = row[2]
-                    cur_pigs_weaning_f          = row[3]
+                    cur_pigs_weaning_m          = int(row[2]) if row[2] is not None else None
+                    cur_pigs_weaning_f          = int(row[3]) if row[3] is not None else None
                     
                     cur_entry ={
                         'sow_id':               cur_sow_id,

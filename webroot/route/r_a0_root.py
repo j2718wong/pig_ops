@@ -4,6 +4,7 @@
 import os
 import sys
 import time
+import pprint
 
 from pydantic               import BaseModel
 from fastapi.responses      import HTMLResponse
@@ -143,7 +144,6 @@ async def root(pfhid:str = None):
     s_time      = '%.2f' % delta_secs
     
     print('\n\nroot page_data time(secs): %s' %s_time)
-    
     page = controller.view['root'].render(page_data = json.dumps(page_data, indent=4))
     
     return page

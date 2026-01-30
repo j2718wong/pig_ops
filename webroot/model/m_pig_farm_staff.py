@@ -251,7 +251,8 @@ class PigFarmStaff:
                     %s
                     ORDER BY a.name
                     """ % where_clause
-            
+        
+        
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection

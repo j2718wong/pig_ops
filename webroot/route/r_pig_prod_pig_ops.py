@@ -345,7 +345,6 @@ def clean_pig_prod_pig_ops(prod_pig_ops):
         cur_entry['notes']['hid']   = cur_hid
         
         
-        
         if 'pig_medvac' in cur_entry:
 
             pig_medvac = cur_entry['pig_medvac']
