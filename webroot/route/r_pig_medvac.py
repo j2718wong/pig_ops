@@ -487,8 +487,8 @@ async def pig_medvac_delete(uhid:str, ehid: str):
     return res_delete
     
     
-def get_data_pig_medvac(sow_boar_id, inc_deleted, inc_user_audit):
-    res = model['pig_medvac'].get_list(sow_boar_id, 
+def get_data_pig_medvac(sow_boar_id, pig_prod_id, inc_deleted, inc_user_audit):
+    res = model['pig_medvac'].get_list(sow_boar_id, pig_prod_id,
             inc_deleted, inc_user_audit)
     
     if res is None: 
@@ -556,7 +556,8 @@ def get_data_pig_medvac(sow_boar_id, inc_deleted, inc_user_audit):
     
     
 @app.get("/pig_medvac/list", tags=["Pig Details"])
-async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_medvac_list(sow_boar_hid: str = None, pig_prod_hid: str = None,
+        inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get pig medvac list.
     
@@ -564,7 +565,11 @@ async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audi
     ----------
     
     sow_boar_hid:str
-        account hashid
+        sow_boar hashid
+
+    pig_prod_hid:str
+        pig_prod hashid
+
 
     inc_deleted: int
         if > 0, will include deleted entries
@@ -574,22 +579,51 @@ async def pig_medvac_list(sow_boar_hid: str, inc_deleted: int = 0, inc_user_audi
     
     """
     
+    sow_boar_id = 0
+    pig_prod_id = 0
     
-    res = hashids_common.decrypt(sow_boar_hid)
-    if len(res) == 0:
-        return {
+    if sow_boar_hid is not None:
+    
+        res = hashids_common.decrypt(sow_boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_MEDVAC_SOW_BOAR_HASHID,
+                    'code': 'ERROR_PIG_MEDVAC_SOW_BOAR_HASHID'
+                }
+            }
+        
+        
+        sow_boar_id = res[0]
+        
+        
+    if pig_prod_hid is not None:
+    
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_MEDVAC_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PIG_MEDVAC_INVALID_PIG_PROD_HASHID'
+                }
+            }
+        
+        
+        pig_prod_id = res[0]
+    
+    
+    if sow_boar_id == 0 and pig_prod_id == 0:
+        result = {
             'result':{
-                'num':  ERROR_PIG_MEDVAC_SOW_BOAR_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_SOW_BOAR_HASHID'
+                'num':  ERROR_PIG_MEDVAC_NO_VALID_KEY,
+                'code': 'ERROR_PIG_MEDVAC_NO_VALID_KEY'
             }
         }
-    
-    
-    sow_boar_id = res[0]
-    
-    
         
-    res = get_data_pig_medvac(sow_boar_id, inc_deleted, inc_user_audit)
+        return result
+        
+        
+    res = get_data_pig_medvac(sow_boar_id, pig_prod_id, inc_deleted, inc_user_audit)
     
     if res is None:
         return {

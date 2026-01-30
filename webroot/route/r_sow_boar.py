@@ -679,8 +679,8 @@ def clean_sow_boar_entry(cur_sow_boar_entry):
         cur_entry['last_mate_sow_boar_hid']   = cur_hid
             
 
-@app.get("/sow_boar/entry", tags=["Sow Boar"])
-async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
+@app.get("/sow_boar/data_details", tags=["Sow Boar"])
+async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     res = hashids_common.decrypt(sow_boar_hid)
     if len(res) == 0:
         return {
@@ -696,7 +696,7 @@ async def sow_boar_entry(sow_boar_hid, inc_user_audit:int = 0):
     cur_sow_boar_data   = model['sow_boar'].get_entry(sow_boar_id)
     
     
-    data_pig_medvac     = get_data_pig_medvac(sow_boar_id, 0, 0)
+    data_pig_medvac     = get_data_pig_medvac(sow_boar_id, 0, 0, 0)
     data_pig_prod_notes = get_data_pig_prod_notes(0, sow_boar_id, 0, 0, 0)
     
     

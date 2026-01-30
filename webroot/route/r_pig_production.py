@@ -38,6 +38,9 @@ from r_sow_boar             import clean_sow_boar_entry
 
 from r_pig_prod_pig_ops     import clean_pig_prod_pig_ops
 
+from r_pig_medvac           import get_data_pig_medvac
+
+from r_pig_prod_notes       import get_data_pig_prod_notes
 
 
 
@@ -1429,7 +1432,6 @@ async def pig_prod_entry(entry_hid:str):
 
 
 
-
 @app.get("/pig_prod/list", tags=["Pig Production"])
 async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     """
@@ -1474,6 +1476,7 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
         
         'data': res 
     }
+    
     
     
 def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
@@ -1616,5 +1619,57 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         
         
     return res
+
+
+@app.get("/pig_prod/data_details", tags=["Pig Production"])
+async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
+            }
+        }
+    
+    pig_prod_id = res[0]
+    
+    
+    data_pig_medvac = get_data_pig_medvac(0, pig_prod_id, 0, 0)
+    
+    data_pig_prod_notes = get_data_pig_prod_notes(pig_prod_id, 0, 0, 0, 0)
+    
+    data_health_issues  = []
+    data_notes          = []
+    
+    for cur_entry in data_pig_prod_notes:
+        if 'is_health_issue' in cur_entry['prod_notes']:
+            data_health_issues.append(cur_entry)
+        else:
+            data_notes.append(cur_entry)
+    
+    
+    
+    
+    
+    
+    data = {
+        
+        'list_medvac':      data_pig_medvac,
+        'list_health_issues': data_health_issues,
+        'list_notes':       data_notes
+    }
+    
+    
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': data
+    }
+
 
 

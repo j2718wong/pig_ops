@@ -259,12 +259,20 @@ class PigMedVac:
         return None
     
     
-    def get_list(self, sow_boar_id, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self, sow_boar_id = 0, pig_prod_id = 0, 
+            inc_deleted = 0, inc_user_audit = 0):
         
-        if inc_deleted > 0:
-            where_clause = 'WHERE a.sow_boar_id = %s' % sow_boar_id 
-        else:
-            where_clause = 'WHERE a.sow_boar_id = %s AND (a.flag & 1) = 0' % sow_boar_id 
+        if sow_boar_id > 0:
+            if inc_deleted > 0:
+                where_clause = 'WHERE a.sow_boar_id = %s' % sow_boar_id 
+            else:
+                where_clause = 'WHERE a.sow_boar_id = %s AND (a.flag & 1) = 0' % sow_boar_id 
+        
+        if pig_prod_id > 0:
+            if inc_deleted > 0:
+                where_clause = 'WHERE a.pig_prod_id = %s' % pig_prod_id 
+            else:
+                where_clause = 'WHERE a.pig_prod_id = %s AND (a.flag & 1) = 0' % pig_prod_id 
         
         
         if inc_user_audit == 0:
