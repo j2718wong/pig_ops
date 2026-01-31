@@ -446,7 +446,7 @@ class DataPigProdBirth(BaseModel):
     uhid:                   str
         
     pig_prod_hid:           str
-    birth_staff_hid:        str
+    birth_staff_hid:        str = None
         
     user_id:                int = 0
     pig_prod_id:            int = 0  
@@ -457,6 +457,7 @@ class DataPigProdBirth(BaseModel):
     num_pigs_female:        int = 0
         
     birth_staff_id:         int = 0
+    done_by_user:           int = 0
     
     
 class DataPigProdWeaning(BaseModel):

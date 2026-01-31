@@ -1058,19 +1058,21 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     pig_prod_id = res[0]
     
     
+    birth_staff_id  = None
     birth_staff_hid = pig_birth_data.birth_staff_hid
+    
+    if birth_staff_hid is not None:
+        res = hashids_common.decrypt(birth_staff_hid)
+        if len(res) == 0:
         
-    res = hashids_common.decrypt(birth_staff_hid)
-    if len(res) == 0:
-    
-        return {
-            'result':{
-                'num':  ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID'
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_BIRTH_STAFF_HASHID'
+                }
             }
-        }
-    
-    birth_staff_id = res[0]
+        
+        birth_staff_id = res[0]
 
     
     

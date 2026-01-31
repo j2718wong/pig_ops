@@ -445,7 +445,8 @@ class PigProduction:
             in_num_pigs_live_male       INT,
             in_num_pigs_live_female     INT,
             
-            in_birth_staff_id           INT
+            in_birth_staff_id           INT,
+            in_done_by_user             INT
         )  
         """
         
@@ -459,8 +460,13 @@ class PigProduction:
             
         sql += '%s,'    % data.num_pigs_male
         sql += '%s,'    % data.num_pigs_female
-        sql += '%s);'   % data.birth_staff_id
-       
+        if data.birth_staff_id is not None:
+            sql += '%s,'    % data.birth_staff_id
+        else:
+            sql += 'NULL,'
+        
+        sql += '%s);'   % data.done_by_user
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
