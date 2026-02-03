@@ -79,6 +79,51 @@ class DataPigFarm(BaseModel, HasAddressLevel):
         
         
     name:                   str
+
+
+class DataPigFarmFeedBuy(BaseModel):
+    uhid:                   str
+    pig_farm_hid:           str = None
+    supplier_hid:           str = None
+    pf_feed_buy_hid:        str = None
+    
+    
+    user_id:                int = 0
+    pf_feed_buy_id:         int = 0
+    pig_farm_id:            int = 0
+    supplier_id:            int = 0
+        
+    date_buy:               str 
+    
+    other_cost:             float = None
+
+    
+    
+
+class DataPigFarmFeedBuyItem(BaseModel):
+    uhid:                   str
+    
+    pf_feed_buy_item_hid:   str = None
+    
+    feed_type_hid:          str = None
+    feed_brand_hid :        str = None
+    
+    
+    user_id:                int = 0
+    
+    pf_feed_buy_item_id:    int = 0
+    
+    
+    feed_type_id:           int = 0
+    feed_brand_id:          int = 0
+    
+    quantity:               int = 0
+    unit_weight:            float
+    
+    unit_cost:              float
+    total_cost:             float
+
+
     
 
 
@@ -472,6 +517,8 @@ class DataPigProdWeaning(BaseModel):
         
     num_pigs_male:          int = 0
     num_pigs_female:        int = 0
+    
+    num_pigs:               int = 0
         
     total_weight:           int = None
     

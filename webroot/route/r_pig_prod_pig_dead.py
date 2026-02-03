@@ -214,12 +214,20 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     
   
 @app.get("/prod_pig_dead/list", tags=["Production Details"])
-async def prod_pig_dead_list(pig_prod_hid: str):
+async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1, 
+        pig_prod_hid: str =None):
     """
     Will get prod_pig_dead list.
     
     Parameters
     ----------
+    pig_farm_hid : str
+        if this is given the return is count by pig_prod_id;
+        
+    dead_at_stage : int
+        this is used only if pig_farm_hid is given;
+        if == 1, will return dead pigs at PRODUCTION_STATUS_ID_LACTATING
+        else: will return dead pigs at PRODUCTION_STATUS_ID_WEANING, PRODUCTION_STATUS_ID_GROWING
     
     pig_prod_hid:str
         pir_prod hashid
@@ -228,21 +236,44 @@ async def prod_pig_dead_list(pig_prod_hid: str):
     
     """
     
+    pig_farm_id = 0
+    pig_prod_id = 0
     
-    res = hashids_common.decrypt(pig_prod_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+    
+    if pig_farm_hid is not None:
+    
+        res = hashids_common.decrypt(pig_farm_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
             }
-        }
-    
-    
-    pig_prod_id = res[0]
         
-    res = model['prod_pig_dead'].get_list(pig_prod_id)
+        pig_farm_id = res[0]
+    
+    
+    
+    if pig_prod_hid is not None:
+    
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
+                    'desc': ''
+                }
+            }
+        
+        pig_prod_id = res[0]
+        
+        
+        
+        
+    res = model['prod_pig_dead'].get_list(pig_farm_id, dead_at_stage, pig_prod_id)
     
     if res is None:
         return {
@@ -254,21 +285,30 @@ async def prod_pig_dead_list(pig_prod_hid: str):
         }
     
     
-    # Replace plain id
-    for cur_entry in res:
-        cur_id  = cur_entry['pig_dead']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
+    if pig_farm_id > 0:
+        for cur_entry in res:
+            cur_id  = cur_entry['pig_prod_id']
+            cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['pig_dead']['id']
-        cur_entry['pig_dead']['hid']   = cur_hid
-        
-        
-        cur_id  = cur_entry['pig_dead']['dead_type_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_dead']['dead_type_id']
-        cur_entry['pig_dead']['dead_type_hid']   = cur_hid
-        
+            del cur_entry['pig_prod_id']
+            cur_entry['pig_prod_hid']   = cur_hid
+            
+    else:
+        # Replace plain id
+        for cur_entry in res:
+            cur_id  = cur_entry['pig_dead']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_dead']['id']
+            cur_entry['pig_dead']['hid']   = cur_hid
+            
+            
+            cur_id  = cur_entry['pig_dead']['dead_type_id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_dead']['dead_type_id']
+            cur_entry['pig_dead']['dead_type_hid']   = cur_hid
+            
         
         
     return {

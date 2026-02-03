@@ -269,10 +269,10 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
         }
     
     
+    # remove plain id
     cur_id    = res_add['pig_medvac']['id']
     cur_hid   = hashids_common.encrypt(cur_id)
     
-    # remove plain id
     del res_add['pig_medvac']['id']
     res_add['pig_medvac']['hid'] = cur_hid
 

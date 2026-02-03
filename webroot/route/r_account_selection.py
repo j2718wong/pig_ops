@@ -18,6 +18,16 @@ from common_fast_api        import *
 import data_model           as dm
 
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
 
 @app.post("/account/selection/add", tags=["Account"])
 async def account_selection_add(selection_data: dm.DataAccountSelection):
@@ -34,6 +44,15 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
     
     user_id = res[0]
 
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     feed_supplier_id    = 0
     semen_supplier_id   = 0
@@ -92,43 +111,17 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
     
     
     
-    if res_add['result']['num'] == 0:
-    
-        if feed_supplier_id > 0:
-            list_ids = [feed_supplier_id]
-            
-            res_suppliers = model['feed_supplier'].get_list(list_ids = list_ids, 
-                minimum_info = 0)
-            feed_supplier = res_suppliers[0]
-            
-            #Replace Plain Id
-            cur_id      = feed_supplier['feed_supplier']['id']
-            cur_hid     = hashids_common.encrypt(cur_id)
-            
-            del feed_supplier['feed_supplier']['id']
-            feed_supplier['feed_supplier']['hid']   = cur_hid
-            
-            
-            get_location_address_names_and_replace_ids(feed_supplier)
-        
-            result = {
-                'num':  0,
-                'code': 'SUCCESS'
-            }
-            
-            feed_supplier['result'] = result
-            
-            return feed_supplier
-            
-    
-    
     cur_id      = res_add['account']['id']
     cur_hashid  = hashids_account.encrypt(cur_id)
     
     # remove plain id
     del res_add['account']['id']
     res_add['account']['hid'] = cur_hashid
-
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
+    
         
     return res_add
     

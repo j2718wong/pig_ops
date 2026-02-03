@@ -1628,8 +1628,8 @@ class PigProduction:
                             
                         FROM pig_production 
                         
-                        WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
-                        ORDER BY sow_id ASC, date_weaning DESC
+                        WHERE pig_farm_id = %s AND date_actual_birth IS NOT NULL
+                        ORDER BY sow_id ASC, date_actual_birth DESC
                         """ % pig_farm_id
             
             
@@ -1651,10 +1651,12 @@ class PigProduction:
                             
                         FROM pig_production 
                         
-                        WHERE sow_id = %s AND date_weaning IS NOT NULL
-                        ORDER BY date_weaning DESC
+                        WHERE sow_id = %s AND date_actual_birth IS NOT NULL
+                        ORDER BY date_actual_birth DESC
                         """ % sow_id
         else:
+            
+            # This sql only returns piglets at weaning
             sql = """
                 SELECT
                     sow_id,
@@ -1668,7 +1670,44 @@ class PigProduction:
                 GROUP BY sow_id
                 ORDER BY sow_id ASC
             """ % pig_farm_id
+            
+            
+            # This sql return piglets at weaning + currently lactating
+            sql = """
+            SELECT 
+                a.sow_id,
+                SUM(cnt) AS num_birth,
+                SUM(num_pigs_m) AS num_pigs_m,
+                SUM(num_pigs_f) AS num_pigs_f
 
+            FROM (
+                SELECT
+                    'weaning' as record_type,
+                    sow_id,
+                    COUNT(*) AS cnt,
+                    SUM(num_pigs_weaning_m) as num_pigs_m,
+                    SUM(num_pigs_weaning_f) as num_pigs_f
+                FROM pig_production 
+                WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
+                GROUP BY sow_id
+
+                UNION ALL
+
+                SELECT
+                    'birth' as record_type,
+                    sow_id,
+                    COUNT(*) AS cnt,
+                    SUM(num_pigs_live_m) as num_pigs_m,
+                    SUM(num_pigs_live_f) as num_pigs_f
+                FROM pig_production 
+                WHERE pig_farm_id = %s AND date_actual_birth IS NOT NULL AND date_weaning IS NULL
+                GROUP BY sow_id
+
+                ORDER BY sow_id, record_type ASC
+                ) a
+                GROUP BY a.sow_id 
+            """ %(pig_farm_id, pig_farm_id)
+            
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -1745,15 +1784,15 @@ class PigProduction:
                     
                 else:
                     cur_sow_id                  = row[0]
-                    cur_birth_count             = row[1]
-                    cur_pigs_weaning_m          = int(row[2]) if row[2] is not None else None
-                    cur_pigs_weaning_f          = int(row[3]) if row[3] is not None else None
+                    cur_birth_count             = int(row[1]) if row[1] is not None else None
+                    cur_pigs_live_m             = int(row[2]) if row[2] is not None else None
+                    cur_pigs_live_f             = int(row[3]) if row[3] is not None else None
                     
                     cur_entry ={
                         'sow_id':               cur_sow_id,
                         'num_births':           cur_birth_count,
-                        'num_pig_wean_m':       cur_pigs_weaning_m,
-                        'num_pig_wean_f':       cur_pigs_weaning_f
+                        'num_pig_wean_m':       cur_pigs_live_m,
+                        'num_pig_wean_f':       cur_pigs_live_f
                     }
                     
             
