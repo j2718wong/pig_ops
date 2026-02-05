@@ -1620,6 +1620,7 @@ class PigProduction:
                             date_actual_birth,
                             num_pigs_live_m,
                             num_pigs_live_f,
+                            num_pigs_dead_at_birth,
                             
                             date_weaning,
                             num_pigs_weaning_m,
@@ -1643,6 +1644,7 @@ class PigProduction:
                             date_actual_birth,
                             num_pigs_live_m,
                             num_pigs_live_f,
+                            num_pigs_dead_at_birth,
                             
                             date_weaning,
                             num_pigs_weaning_m,
@@ -1752,12 +1754,13 @@ class PigProduction:
                     cur_date_actual_birth       = str(row[3])
                     cur_pigs_live_m             = row[4]
                     cur_pigs_live_f             = row[5]
+                    cur_dead_at_birth           = row[6]
                     
                     
-                    cur_date_weaning            = row[6]
-                    cur_pigs_weaning_m          = int(row[7])   if row[7] is not None else None
-                    cur_pigs_weaning_f          = int(row[8])   if row[8] is not None else None
-                    cur_pigs_weaning_weight     = float(row[9]) if row[9] is not None else None
+                    cur_date_weaning            = row[7]
+                    cur_pigs_weaning_m          = int(row[8])   if row[8] is not None else None
+                    cur_pigs_weaning_f          = int(row[9])   if row[9] is not None else None
+                    cur_pigs_weaning_weight     = float(row[10]) if row[10] is not None else None
                    
                     
                     cur_entry = {
@@ -1770,7 +1773,8 @@ class PigProduction:
                         'birth':{
                             'date_actual':      cur_date_actual_birth,
                             'pigs_m':           cur_pigs_live_m,
-                            'pigs_f':           cur_pigs_live_f
+                            'pigs_f':           cur_pigs_live_f,
+                            'dead':             cur_dead_at_birth,
                         },
                         
                         'wean':{

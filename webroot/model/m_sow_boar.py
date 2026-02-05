@@ -696,12 +696,12 @@ class SowBoar:
                         
                     
                     'parent_sow_id':        row[9],
-                    'parent_sow_name':      row[10],
-                    'parent_sow_number':    row[11],
+                    'parent_sow_number':    row[10],
+                    'parent_sow_name':      row[11],
                     
                     'parent_boar_id':       row[12],
-                    'parent_boar_name':     row[13],
-                    'parent_boar_number':   row[14],
+                    'parent_boar_number':   row[13],
+                    'parent_boar_name':     row[14],
                     
                     'date_of_birth':        str(row[15])  if row[15] else None,
                     'date_eartag':          str(row[16])  if row[16] else None,
