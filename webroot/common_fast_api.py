@@ -1,6 +1,8 @@
 # December 13, 2024
 # Jack Wong (zhaoshan99@gmail.com)
 
+import os
+
 from fastapi_offline            import FastAPIOffline
 from fastapi                    import FastAPI, Depends, HTTPException, status
 from fastapi.security           import HTTPBasicCredentials, HTTPBearer
@@ -50,12 +52,12 @@ app = FastAPIOffline(openapi_tags = tags_metadata)
 
 
 # Old desktop first static directory
-dir_static = 'C:\\Users\\JackWong\\Downloads\\p\\pig_ops_ui\\pig_ops_app\\src\\static'
+dir_static = '/home/dev01/projects/jsys/pig_ops_ui/pig_ops_app/src/static'
 app.mount('/static', StaticFiles(directory=dir_static), name='static')
 
 
 # New mobile first static directory
-dir_static_m = 'C:\\Users\\JackWong\\Downloads\\p\\pig_ops_mob\\src\\static'
+dir_static_m = '/home/dev01/projects/jsys/pig_ops_ui_mob/src/static'
 app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
 
 

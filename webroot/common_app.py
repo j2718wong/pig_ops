@@ -158,15 +158,20 @@ DEV_HOME                        = 1
 
 
 # Change thee settings for development
-USING_PRODUCTION_DB             = 0
+USING_PRODUCTION_DB             = 1
 USING_DEV_AT                    = DEV_HOME
 DB_INFO                         = ''
+
 
 
 
 if USING_PRODUCTION_DB > 0:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
     db_desc     = 'Jackson Farm Production'
+
+
+    # Need to improve this
+    
 
     credentials_po = {
         'db_host':      '127.0.0.1',
@@ -193,13 +198,16 @@ if USING_PRODUCTION_DB > 0:
         ssh_tunnel_prod['ssh_host'] = '192.168.0.166'
     
     
+    # 2026-02-04 Direct at server machine
+    ssh_tunnel_prod = None
+    
     print('\n\nWill use PRODUCTION database\n\n')
 else:
     DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
     db_desc     = 'Jackson Farm Production'
 
     credentials_po = {
-        'db_host':      '127.0.0.1',
+        'db_host':      '192.168.122.13',
         'db_user':      'pops_web',
         'db_password':  '1@PO#db$1234.',
         'database':     DATABASE_NAME_PIG_OPERATIONS
@@ -222,6 +230,9 @@ else:
     if USING_DEV_AT == DEV_HOME:
         ssh_tunnel_prod['ssh_host'] = '192.168.0.166'
     
+    
+    # 2026-02-04; something is wrong with paramiko when using SSH Tunnel
+    ssh_tunnel_prod = None
     
     print('\n\nWill use DEVELOPMENT database\n\n')
     
@@ -320,6 +331,8 @@ try:
         ssh_tunnel = None
 except:
     ssh_tunnel = ssh_tunnel_la
+
+ssh_tunnel_la = None
 
 
 model_la = Model(
