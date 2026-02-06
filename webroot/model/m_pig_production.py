@@ -790,6 +790,7 @@ class PigProduction:
                     a.date_weaning,
                     a.num_pigs_weaning_m,
                     a.num_pigs_weaning_f,
+                    a.num_pigs_weaning,
                     a.total_pigs_weight_weaning,
                     
                     a.num_pigs_current,
@@ -932,45 +933,46 @@ class PigProduction:
                 cur_weaning_date            = row[35]
                 cur_weaning_num_pigs_m      = row[36]
                 cur_weaning_num_pigs_f      = row[37]
-                cur_weaning_weight          = row[38]
+                cur_weaning_num_pigs        = row[38]
+                cur_weaning_weight          = row[39]
                 
                 
-                cur_pig_count               = row[39]
+                cur_pig_count               = row[40]
                 
                 
-                cur_prod_num_b_gestating    = row[40]
-                cur_prod_num_b_lactating    = row[41]
-                cur_prod_num_b_booster      = row[42]
-                cur_prod_num_b_prestarter   = row[43]
-                cur_prod_num_b_starter      = row[44]
-                cur_prod_num_b_grower       = row[45]
-                cur_prod_num_b_finisher     = row[46]
+                cur_prod_num_b_gestating    = row[41]
+                cur_prod_num_b_lactating    = row[42]
+                cur_prod_num_b_booster      = row[43]
+                cur_prod_num_b_prestarter   = row[44]
+                cur_prod_num_b_starter      = row[45]
+                cur_prod_num_b_grower       = row[46]
+                cur_prod_num_b_finisher     = row[47]
                 
-                cur_feed_bal_date_balance   = row[47]
+                cur_feed_bal_date_balance   = row[48]
                
-                cur_feed_bal_gestating      = row[48]
-                cur_feed_bal_lactating      = row[49]
-                cur_feed_bal_booster        = row[50]
-                cur_feed_bal_prestarter     = row[51]
-                cur_feed_bal_starter        = row[52]
-                cur_feed_bal_grower         = row[53]
-                cur_feed_bal_finisher       = row[54]
+                cur_feed_bal_gestating      = row[49]
+                cur_feed_bal_lactating      = row[50]
+                cur_feed_bal_booster        = row[51]
+                cur_feed_bal_prestarter     = row[52]
+                cur_feed_bal_starter        = row[53]
+                cur_feed_bal_grower         = row[54]
+                cur_feed_bal_finisher       = row[55]
                 
-                cur_prod_cost_gestating     = row[55]
-                cur_prod_cost_lactating     = row[56]
-                cur_prod_cost_booster       = row[57]
-                cur_prod_cost_prestarter    = row[58]
-                cur_prod_cost_starter       = row[59]
-                cur_prod_cost_grower        = row[60]
-                cur_prod_cost_finisher      = row[61]
+                cur_prod_cost_gestating     = row[56]
+                cur_prod_cost_lactating     = row[57]
+                cur_prod_cost_booster       = row[58]
+                cur_prod_cost_prestarter    = row[59]
+                cur_prod_cost_starter       = row[60]
+                cur_prod_cost_grower        = row[61]
+                cur_prod_cost_finisher      = row[62]
                 
-                cur_prod_date_gestating     = row[62]
-                cur_prod_date_lactating     = row[63]
-                cur_prod_date_booster       = row[64]
-                cur_prod_date_prestarter    = row[65]
-                cur_prod_date_starter       = row[66]
-                cur_prod_date_grower        = row[67]
-                cur_prod_date_finisher      = row[68]
+                cur_prod_date_gestating     = row[63]
+                cur_prod_date_lactating     = row[64]
+                cur_prod_date_booster       = row[65]
+                cur_prod_date_prestarter    = row[66]
+                cur_prod_date_starter       = row[67]
+                cur_prod_date_grower        = row[68]
+                cur_prod_date_finisher      = row[69]
             
                 
                 cur_entry = {
@@ -1043,6 +1045,7 @@ class PigProduction:
                         'date_weaning':     cur_weaning_date,
                         'num_pigs_m':       cur_weaning_num_pigs_m,
                         'num_pigs_f':       cur_weaning_num_pigs_f,
+                        'num_pigs':         cur_weaning_num_pigs,
                         'weight':           cur_weaning_weight    
                     },
                     
@@ -1607,6 +1610,18 @@ class PigProduction:
         
     
     def get_production_output(self, pig_farm_id = 0, sow_id = 0, group_per_sow = 0):
+        """
+        
+        Notes:
+        1.) The number of piglets output at weaning are entered in two ways
+            - separate counts: num_pigs_weaning_m, num_pigs_weaning_f  
+            - total count no separation: num_pigs_weaning
+        
+        2.) If entered via separate count, num_pigs_weaning is NULL; 
+        
+        """
+        
+        
         
         if group_per_sow == 0:
             if pig_farm_id > 0:
@@ -1625,6 +1640,7 @@ class PigProduction:
                             date_weaning,
                             num_pigs_weaning_m,
                             num_pigs_weaning_f,
+                            num_pigs_weaning,
                             total_pigs_weight_weaning
                             
                         FROM pig_production 
@@ -1649,6 +1665,7 @@ class PigProduction:
                             date_weaning,
                             num_pigs_weaning_m,
                             num_pigs_weaning_f,
+                            num_pigs_weaning,
                             total_pigs_weight_weaning
                             
                         FROM pig_production 
@@ -1658,37 +1675,44 @@ class PigProduction:
                         """ % sow_id
         else:
             
-            # This sql only returns piglets at weaning
-            sql = """
-                SELECT
-                    sow_id,
-                    COUNT(*) AS cnt,
-                    SUM(num_pigs_weaning_m) as num_pigs_weaning_m,
-                    SUM(num_pigs_weaning_f) as num_pigs_weaning_f
-
-                FROM pig_production 
-
-                WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
-                GROUP BY sow_id
-                ORDER BY sow_id ASC
-            """ % pig_farm_id
             
+            # This sql return number of piglets at weaning + currently lactating.
+            # This includes both active sows and disposed sows.
+            # The basic info of the sow is also returned.
+            # The num_dead column is the number of dead piglets at birth.
+            # The number of dead piglets after birth and before weaning should 
+            # computed.
             
-            # This sql return piglets at weaning + currently lactating
             sql = """
             SELECT 
                 a.sow_id,
-                SUM(cnt) AS num_birth,
-                SUM(num_pigs_m) AS num_pigs_m,
-                SUM(num_pigs_f) AS num_pigs_f
-
+                SUM(a.cnt) AS num_birth,
+                
+                SUM(a.num_pigs_live_m) AS num_live_m,
+                SUM(a.num_pigs_live_f) AS num_live_f,
+                SUM(a.num_dead_birth) AS num_dead_birth,
+                
+                SUM(a.num_pigs_wean_m) as num_wean_m,
+                SUM(a.num_pigs_wean_f) as num_wean_f,
+                SUM(a.num_pigs_wean) as num_wean,
+                
+                b.name,
+                b.number,
+                b.date_dispose
+                
             FROM (
                 SELECT
                     'weaning' as record_type,
                     sow_id,
                     COUNT(*) AS cnt,
-                    SUM(num_pigs_weaning_m) as num_pigs_m,
-                    SUM(num_pigs_weaning_f) as num_pigs_f
+                    
+                    SUM(num_pigs_live_m) AS num_pigs_live_m,
+                    SUM(num_pigs_live_f) AS num_pigs_live_f,
+                    SUM(num_pigs_dead_at_birth) AS num_dead_birth,
+                    
+                    SUM(num_pigs_weaning_m) as num_pigs_wean_m,
+                    SUM(num_pigs_weaning_f) as num_pigs_wean_f,
+                    SUM(num_pigs_weaning)   as num_pigs_wean
                 FROM pig_production 
                 WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
                 GROUP BY sow_id
@@ -1699,18 +1723,27 @@ class PigProduction:
                     'birth' as record_type,
                     sow_id,
                     COUNT(*) AS cnt,
-                    SUM(num_pigs_live_m) as num_pigs_m,
-                    SUM(num_pigs_live_f) as num_pigs_f
+                    
+                    SUM(num_pigs_live_m) as num_pigs_live_m,
+                    SUM(num_pigs_live_f) as num_pigs_live_f,
+                    SUM(num_pigs_dead_at_birth) AS num_dead_birth,
+                    
+                    SUM(num_pigs_live_m) as num_pigs_wean_m,
+                    SUM(num_pigs_live_f) as num_pigs_wean_f,
+                    0 as num_pigs_wean
                 FROM pig_production 
                 WHERE pig_farm_id = %s AND date_actual_birth IS NOT NULL AND date_weaning IS NULL
                 GROUP BY sow_id
 
                 ORDER BY sow_id, record_type ASC
-                ) a
-                GROUP BY a.sow_id 
+            ) a
+            LEFT OUTER JOIN sow_boar b ON a.sow_id = b.id
+            GROUP BY a.sow_id; 
             """ %(pig_farm_id, pig_farm_id)
             
-        
+            
+            
+            
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -1791,12 +1824,50 @@ class PigProduction:
                     cur_birth_count             = int(row[1]) if row[1] is not None else None
                     cur_pigs_live_m             = int(row[2]) if row[2] is not None else None
                     cur_pigs_live_f             = int(row[3]) if row[3] is not None else None
+                    cur_dead_at_birth           = int(row[4]) if row[4] is not None else None
+                    
+                    cur_pigs_wean_m             = int(row[5]) if row[6] is not None else None
+                    cur_pigs_wean_f             = int(row[6]) if row[6] is not None else None
+                    cur_pigs_wean               = int(row[7]) if row[7] is not None else None
+                    
+                    
+                    cur_sow_name                = row[8]
+                    cur_sow_number              = row[9]
+                    cur_date_disposed           = str(row[10]) if row[10] is not None else None
+                    
+                    
+                    # compute total live births
+                    cur_pigs_live_birth         =  cur_pigs_live_m + cur_pigs_live_f
+                    
+                    # compute total live pigs at wean
+                    cur_total_wean = 0
+                    if cur_pigs_wean_m is not None:
+                        cur_total_wean += cur_pigs_wean_m
+                        
+                    if cur_pigs_wean_f is not None:
+                        cur_total_wean += cur_pigs_wean_f
+                        
+                    if cur_pigs_wean is not None:
+                        cur_total_wean += cur_pigs_wean
+                        
+                        
+                    # compute dead before wean
+                    cur_dead_before_wean = cur_pigs_live_birth - cur_total_wean
                     
                     cur_entry ={
                         'sow_id':               cur_sow_id,
+                        'sow_name':             cur_sow_name,     
+                        'sow_number':           cur_sow_number,   
+                        'date_disposed':        cur_date_disposed,
+                        
                         'num_births':           cur_birth_count,
-                        'num_pig_wean_m':       cur_pigs_live_m,
-                        'num_pig_wean_f':       cur_pigs_live_f
+                        
+                        'num_pigs_live_m':      cur_pigs_live_m,
+                        'num_pigs_live_f':      cur_pigs_live_f,
+                        'dead_at_birth':        cur_dead_at_birth,
+                        
+                        'num_pigs_wean':        cur_total_wean,
+                        'dead_before_wean':     cur_dead_before_wean
                     }
                     
             

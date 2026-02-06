@@ -858,34 +858,37 @@ async def sow_boar_list(pfhid:str, sex:str = None,
     }
 
 
-@app.get("/sow/production_output", tags=["Sow Boar"])
-async def sow_production_output(sow_hid:str):
+@app.get("/sow/piglets_output", tags=["Sow Boar"])
+async def sow_production_output(sow_hid:str = None):
     """
-    Will get sow production list.
+    This will return number of piglets at weaning + currently lactating for a 
+    given sow_hid.
     
     Parameters
     ----------
-    sowhid: str
+    sow_hid: str
         sow hash id
     
    
 
     """
+    sow_id      = 0
     
-    
-    res = hashids_common.decrypt(sowhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
-                'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+    if sow_hid is not None:
+        res = hashids_common.decrypt(sow_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_SOW_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_SOW_HASHID'
+                }
             }
-        }
+        
+        sow_id = res[0]
     
-    sow_id = res[0]
     
+    res = model['pig_prod'].get_production_output(sow_id = sow_id)
     
-    res = model['pig_prod'].get_production_output(sow_id)
     
     if res is None:
         return {
@@ -898,14 +901,19 @@ async def sow_production_output(sow_hid:str):
         
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['pig_production']['id']
+        cur_id  = cur_entry['pig_prod']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['pig_production']['id']
-        cur_entry['hid']   = cur_hid
+        del cur_entry['pig_prod']['id']
+        cur_entry['pig_prod']['hid']   = cur_hid
         
-        if sow_id > 0:
-            del cur_entry['sow']
+        
+        cur_id  = cur_entry['pig_prod']['sow_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_prod']['sow_id']
+        cur_entry['pig_prod']['sow_hid']   = cur_hid
+        
         
         
     return {
@@ -917,6 +925,72 @@ async def sow_production_output(sow_hid:str):
         'data': res
     }
     
+
+@app.get("/pig_farm/piglets_output", tags=["Sow Boar"])
+async def sow_production_output(pfhid:str = None):
+    """
+    Will get pig farm piglets output list.
+    This will return number of piglets at weaning + currently lactating.
+    This includes both active sows and disposed sows.
+            
+    
+    Parameters
+    ----------
+    pfhid: str
+        pig_farm id
+    
+   
+
+    """
+    pig_farm_id = 0
+    
+    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_SOW_BOAR_INVALID_PIG_FARM_HASHID'
+                }
+            }
+        
+        pig_farm_id = res[0]
+    
+    
+    res = model['pig_prod'].get_production_output(pig_farm_id = pig_farm_id, 
+        group_per_sow = 1)
+
+    
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+        
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['sow_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['sow_id']
+        cur_entry['sow_hid']   = cur_hid
+        
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+
+
     
 @app.get("/sow_boar/get_parent_trace", tags=["Sow Boar"])
 async def sow_boar_get_parent_trace(sow_hid:str = None, boar_hid: str = None, pfhid:str = None):

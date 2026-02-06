@@ -178,8 +178,7 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
         for cur_sow_output in list_sow_output_list:
             if cur_sow_output['sow_id'] == cur_sow_id:
                 cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
-                cur_sow['sow_boar']['num_pig_wean_f']   = cur_sow_output['num_pig_wean_f']
-                cur_sow['sow_boar']['num_pig_wean_m']   = cur_sow_output['num_pig_wean_m']
+                cur_sow['sow_boar']['num_pigs_wean']    = cur_sow_output['num_pigs_wean']
                 
                 break
 
