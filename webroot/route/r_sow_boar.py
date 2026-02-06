@@ -679,6 +679,50 @@ def clean_sow_boar_entry(cur_sow_boar_entry):
         cur_entry['last_mate_sow_boar_hid']   = cur_hid
             
 
+            
+def clean_sow_production_list(production_list):
+    for cur_entry in production_list:
+        cur_id  = cur_entry['pig_production']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_production']['id']
+        cur_entry['pig_production']['hid']   = cur_hid
+
+        
+        if 'boar' in cur_entry['insemination']:
+            cur_id  = cur_entry['insemination']['boar']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['boar']['id']
+            cur_entry['insemination']['boar']['hid']   = cur_hid
+
+        
+        if 'ai' in cur_entry['insemination']:
+            if 'semen_supplier' in cur_entry['insemination']['ai']:
+                cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['semen_supplier']['id']
+                cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
+            
+                
+                cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+                cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
+            
+            
+            else:
+                cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['internal_boar']['id']
+                cur_entry['insemination']['ai']['internal_boar']['hid']   = cur_hid
+
+
+
+
 @app.get("/sow_boar/data_details", tags=["Sow Boar"])
 async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     res = hashids_common.decrypt(sow_boar_hid)
@@ -715,7 +759,16 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     data_gilt_ops       = None
     
     if cur_sow_boar_data['sex'] == 'F':
-        data_output = model['pig_prod'].get_production_output(sow_id = sow_boar_id)
+        # This will return a list
+        res_sow_production = model['pig_prod'].get_production_output(
+                sow_id = sow_boar_id)
+        
+        if res_sow_production and len(res_sow_production) == 1:
+            production_list = res_sow_production[0]['production']
+            clean_sow_production_list(production_list)
+            data_output = production_list
+            
+            
         
         # Check if Gilt
         # Gilt if sow_status = SOW_STATUS_GROWING
@@ -728,7 +781,9 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
             
             data_gilt_ops = res_gilt_ops
     
+    
     data_mates          = get_data_sow_boar_mate_list(sow_boar_id)
+    
     
     data_mates_ext  = None
     if cur_sow_boar_data['sex'] == 'M':
@@ -817,8 +872,8 @@ async def sow_boar_list(pfhid:str, sex:str = None,
                 sex = sex, inc_user_audit = inc_user_audit, order_by = order_by)
     
         if pig_farm_id > 0 and sex == 'F':
-            list_sow_output_list = model['pig_prod'].get_production_output(
-                pig_farm_id = pig_farm_id, group_per_sow = 1);
+            list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
+                pig_farm_id);
     
             
             for cur_sow in res:
@@ -827,8 +882,7 @@ async def sow_boar_list(pfhid:str, sex:str = None,
                 for cur_sow_output in list_sow_output_list:
                     if cur_sow_output['sow_id'] == cur_sow_id:
                         cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
-                        cur_sow['sow_boar']['num_pig_wean_f']   = cur_sow_output['num_pig_wean_f']
-                        cur_sow['sow_boar']['num_pig_wean_m']   = cur_sow_output['num_pig_wean_m']
+                        cur_sow['sow_boar']['num_pig_wean']     = cur_sow_output['num_pig_wean']
                         
                         break
                     
@@ -897,24 +951,14 @@ async def sow_production_output(sow_hid:str = None):
                 'code': 'ERROR_DATABASE_ERROR'
             }
         }
-        
-        
-    # Replace plain id
-    for cur_entry in res:
-        cur_id  = cur_entry['pig_prod']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_prod']['id']
-        cur_entry['pig_prod']['hid']   = cur_hid
-        
-        
-        cur_id  = cur_entry['pig_prod']['sow_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_prod']['sow_id']
-        cur_entry['pig_prod']['sow_hid']   = cur_hid
-        
-        
+    
+    
+    production_list = []
+    
+    if len(res_sow_production) == 1:
+        production_list = res[0]['production']
+        clean_sow_production_list(production_list)    
+    
         
     return {
         'result':{
@@ -922,7 +966,7 @@ async def sow_production_output(sow_hid:str = None):
             'code': 'SUCCESS'
         },
         
-        'data': res
+        'data': production_list
     }
     
 
@@ -958,8 +1002,7 @@ async def sow_production_output(pfhid:str = None):
         pig_farm_id = res[0]
     
     
-    res = model['pig_prod'].get_production_output(pig_farm_id = pig_farm_id, 
-        group_per_sow = 1)
+    res = model['pig_prod'].get_production_output_group_per_sow(pig_farm_id)
 
     
     

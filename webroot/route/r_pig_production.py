@@ -167,8 +167,8 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
     
 
     # Get sow production output list
-    list_sow_output_list = model['pig_prod'].get_production_output(
-        pig_farm_id = pig_farm_id, group_per_sow = 1);
+    list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
+        pig_farm_id);
     
     
     
