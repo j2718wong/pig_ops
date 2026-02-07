@@ -158,7 +158,7 @@ DEV_HOME                        = 1
 
 
 # Change thee settings for development
-USING_PRODUCTION_DB             = 1
+USING_PRODUCTION_DB             = 0
 USING_DEV_AT                    = DEV_HOME
 DB_INFO                         = ''
 
@@ -203,12 +203,12 @@ if USING_PRODUCTION_DB > 0:
     
     print('\n\nWill use PRODUCTION database\n\n')
 else:
-    DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
+    DATABASE_NAME_PIG_OPERATIONS = 'pig_ops_dev'
     db_desc     = 'Jackson Farm Production'
 
     credentials_po = {
-        'db_host':      '192.168.122.13',
-        'db_user':      'pops_web',
+        'db_host':      '127.0.0.1',
+        'db_user':      'pops_web3',
         'db_password':  '1@PO#db$1234.',
         'database':     DATABASE_NAME_PIG_OPERATIONS
     }

@@ -85,17 +85,13 @@ MODULES_ROOT = [
     "pages/farm_account/account_lists.js",
     
     
-    "pages/acc_pig_ops/add_modal_acc_pig_ops.js",
-    "pages/acc_pig_ops/edit_modal_acc_pig_ops.js",
-    "pages/acc_pig_ops/page_acc_pig_ops.js",
+    "pages/acc_pig_ops/page_acc_pig_ops_list.js",
     
     
     "pages/sow_boar/page_sow_boar_list.js",
     "pages/sow_boar/page_sow_boar_add_edit.js",
     
     
-    
-    "pages/production/gesta_lacta/edit_modal_prod_pig_ops.js",
     
     
     

@@ -755,8 +755,8 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     
     
     
-    data_output         = None
-    data_gilt_ops       = None
+    data_output         = []
+    data_gilt_ops       = []
     
     if cur_sow_boar_data['sex'] == 'F':
         # This will return a list

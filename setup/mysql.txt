@@ -71,6 +71,10 @@ GRANT ALL PRIVILEGES ON pig_operations.* TO 'pops_msgr'@'localhost';
 FLUSH PRIVILEGES;
 
 
+
+GRANT ALL PRIVILEGES ON pig_ops_dev.* TO 'pops_web3'@'%';
+FLUSH PRIVILEGES;
+
 /*
 // start mysql
 sudo /etc/init.d/mysql start 
