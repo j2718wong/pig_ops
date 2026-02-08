@@ -365,8 +365,8 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
     
 
 @app.get("/account_pig_ops/list", tags=["Account"])
-async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int = 0, 
-        inc_user_audit:int = 0):
+async def account_pig_ops_list(ahid: str, operation_type: int = None, 
+        inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get account_pig_ops list.
     
@@ -378,6 +378,7 @@ async def account_pig_ops_list(ahid: str, operation_type: int, inc_deleted: int 
         
     operation_type :int
         1 = GESTATING; 2 = LACTATING_PIGLETS; 3 = LACTATING_SOW; 4 = GILTS
+        if None, will get all.
     
     inc_deleted: int
         if > 0, will include deleted entries
