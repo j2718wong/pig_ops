@@ -234,7 +234,7 @@ class PigProdNotes:
         where_clause = ''
         
         if pig_prod_id > 0:
-            where_clause = 'WHERE a.pig_prod_id = %s  AND a.notes IS NOT NULL' % pig_prod_id
+            where_clause = 'WHERE a.pig_prod_id = %s AND a.sow_boar_id IS NULL AND a.notes IS NOT NULL' % pig_prod_id
         
         if sow_boar_id > 0:
             where_clause = 'WHERE a.sow_boar_id = %s AND a.notes IS NOT NULL' % sow_boar_id
