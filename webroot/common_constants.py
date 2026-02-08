@@ -84,6 +84,7 @@ PIG_OPERATION_TYPE_GESTATING                        = 1
 PIG_OPERATION_TYPE_LACTATING_PIGLETS                = 2
 PIG_OPERATION_TYPE_LACTATING_SOW                    = 3
 PIG_OPERATION_TYPE_GILT                             = 4
+PIG_OPERATION_TYPE_WEANING_SOW                      = 5
 
 # This is not saved in database
 PIG_OPERATION_TYPE_LACTATING_COMBINED               = 10

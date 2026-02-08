@@ -504,7 +504,9 @@ class PigProduction:
                 
                 'pig_prod': {
                     'id':               row[3]
-                }
+                },
+                
+                'added_new_staff':      row[4]
             }
 
         return None

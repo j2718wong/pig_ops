@@ -145,34 +145,6 @@
             </button>
             
             <div class="nav-menus">
-                <!-- Settings Menu -->
-                <div class="nav-menu" id="desktop-nav-settings">
-                    <button class="nav-menu-btn">
-                        <i class="fas fa-cogs" style="color: var(--icon-blue);"></i>
-                        <span>Settings</span>
-                    </button>
-                    <div class="nav-submenu">
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'op-settings');">          <i class="fas fa-sliders-h" style="color: var(--icon-purple);"></i>Ops Settings</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gesta-sow-ops');">        <i class="fas fa-syringe" style="color: var(--gestating-color);"></i>Gestating Ops</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'lacta-piglets-ops');">    <i class="fas fa-syringe" style="color: var(--lactating-piglets-color);"></i>Lactating Piglets Ops</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'lacta-sow-ops');">        <i class="fas fa-syringe" style="color: var(--lactating-sow-color);"></i>Lactating Sow Ops</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilt-ops');">             <i class="fas fa-syringe" style="color: var(--gilt-color);"></i>Gilt Ops</div>
-                    </div>
-                </div>
-                
-                <!-- Sow Boar Gilt Menu -->
-                <div class="nav-menu" id="desktop-nav-sow-boar-gilt">
-                    <button class="nav-menu-btn">
-                        <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>
-                        <span>Sow Boar Gilt</span>
-                    </button>
-                    <div class="nav-submenu">
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'sows');">                 <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Sows</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'boars');">                <i class="fas fa-mars" style="color: var(--icon-blue);"></i>Boars</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilts');">                <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Gilts</div>
-                    </div>
-                </div>
-                
                 <!-- Production Menu -->
                 <div class="nav-menu" id="desktop-nav-production">
                     <button class="nav-menu-btn">
@@ -187,6 +159,21 @@
                         <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-feeds');">           <i class="fas fa-weight" style="color: var(--icon-red);"></i>Feeds</div>
                     </div>
                 </div>
+                
+                
+                <!-- Sow Boar Gilt Menu -->
+                <div class="nav-menu" id="desktop-nav-sow-boar-gilt">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>
+                        <span>Sow Boar Gilt</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'sows');">                 <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Sows</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'boars');">                <i class="fas fa-mars" style="color: var(--icon-blue);"></i>Boars</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilts');">                <i class="fas fa-venus" style="color: var(--icon-pink);"></i>Gilts</div>
+                    </div>
+                </div>
+                
                 
                 <!-- Operations Menu -->
                 <div class="nav-menu" id="desktop-nav-operations">
@@ -228,6 +215,23 @@
                         <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilt-suppliers');">       <i class="fas fa-shipping-fast" style="color: var(--icon-red);"></i>Gilt Suppliers</div>
                     </div>
                 </div>
+                
+                <!-- Settings Menu -->
+                <div class="nav-menu" id="desktop-nav-settings">
+                    <button class="nav-menu-btn">
+                        <i class="fas fa-cogs" style="color: var(--icon-blue);"></i>
+                        <span>Settings</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'op-settings');">          <i class="fas fa-sliders-h" style="color: var(--icon-purple);"></i>Ops Settings</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gesta-sow-ops');">        <i class="fas fa-syringe" style="color: var(--gestating-color);"></i>Gestating Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'lacta-piglets-ops');">    <i class="fas fa-syringe" style="color: var(--lactating-piglets-color);"></i>Lactating Piglets Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'lacta-sow-ops');">        <i class="fas fa-syringe" style="color: var(--lactating-sow-color);"></i>Lactating Sow Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'wean-sow-ops');">         <i class="fas fa-syringe" style="color: var(--weaning-color);"></i>Weaning Sow Ops</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'gilt-ops');">             <i class="fas fa-syringe" style="color: var(--gilt-color);"></i>Gilt Ops</div>
+                    </div>
+                </div>
+                
                 
                 <!-- Admin Menu -->
                 <div class="nav-menu" id="desktop-nav-admin">
@@ -523,6 +527,7 @@
                 <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gesta-sow-ops');">     <i class="fas fa-syringe" style="color: var(--gestating-color);"></i>Gestating Ops</div>
                 <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'lacta-piglets-ops');"> <i class="fas fa-syringe" style="color: var(--lactating-piglets-color);"></i>Lactating Piglets Ops</div>
                 <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'lacta-sow-ops');">     <i class="fas fa-syringe" style="color: var(--lactating-sow-color);"></i>Lactating Sow Ops</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'wean-sow-ops');">      <i class="fas fa-syringe" style="color: var(--weaning-color);"></i>Weaning Sow Ops</div>
                 <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'gilt-ops');">          <i class="fas fa-syringe" style="color: var(--gilt-color);"></i>Gilt Ops</div>
             </div>
         </div>
