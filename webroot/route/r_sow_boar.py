@@ -875,6 +875,8 @@ async def sow_boar_list(pfhid:str, sex:str = None,
             list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
                 pig_farm_id);
     
+            print('list_sow_output_list')
+            pprint.pprint(list_sow_output_list)
             
             for cur_sow in res:
                 cur_sow_id = cur_sow['sow_boar']['id']
@@ -882,7 +884,7 @@ async def sow_boar_list(pfhid:str, sex:str = None,
                 for cur_sow_output in list_sow_output_list:
                     if cur_sow_output['sow_id'] == cur_sow_id:
                         cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
-                        cur_sow['sow_boar']['num_pig_wean']     = cur_sow_output['num_pig_wean']
+                        cur_sow['sow_boar']['num_pigs_wean']    = cur_sow_output['num_pigs_wean']
                         
                         break
                     

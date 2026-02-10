@@ -1481,6 +1481,20 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     
     
 def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
+    """
+    Parameters
+    ----------
+    
+    pig_prod_type : int
+        1 = pig_prod_status.gestating
+        2 = pig_prod_status.lactating
+        3 = pig_prod_status.gestating, pig_prod_status.lactating
+        4 = pig_prod_status.weaning, pig_prod_status.growing 
+        5 = pig_prod_status.gestating, pig_prod_status.lactating ,pig_prod_status.weaning, pig_prod_status.growing 
+    
+    """
+    
+    
     
     res = model['pig_prod'].get_list(
             pig_farm_id = pig_farm_id, 

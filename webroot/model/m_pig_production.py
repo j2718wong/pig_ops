@@ -138,8 +138,12 @@ class PigProduction:
             sql += '"%s",'    % data.insem_notes
         else:
             sql += 'NULL,'
+        
+        if data.insem_staff_id is not None and data.insem_staff_id > 0: 
+            sql += '%s,'    % data.insem_staff_id
+        else:
+            sql += 'NULL,'
             
-        sql += '%s,'    % data.insem_staff_id
         sql += '%s,'    % data.done_by_user
         
         
@@ -733,10 +737,12 @@ class PigProduction:
             
             if pig_prod_type == 4:
                 where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6) ' % pig_farm_id
-    
+                
+            if pig_prod_type == 5:
+                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4, 5, 6) ' % pig_farm_id
         else:
             where_clause = 'WHERE a.id = %s ' % pig_prod_id
-            
+                
     
         sql =   """
                 SELECT 

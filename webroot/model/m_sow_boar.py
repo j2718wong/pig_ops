@@ -114,7 +114,7 @@ class SowBoar:
             in_number               VARCHAR(10),
             in_name                 VARCHAR(20),
             in_date_of_birth        VARCHAR(10),
-            in_description          VARCHAR(160)
+            in_notes                VARCHAR(160)
         )    
         """
         
@@ -162,7 +162,7 @@ class SowBoar:
             sql += 'NULL,'            
             
         
-        if data.notes is not None:
+        if data.notes is not None and len(data.notes) > 0:
             sql += '"%s");'   % data.notes
         else:
             sql += 'NULL);'
