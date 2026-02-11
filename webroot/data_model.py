@@ -103,6 +103,8 @@ class DataPigFarmFeedBuy(BaseModel):
 class DataPigFarmFeedBuyItem(BaseModel):
     uhid:                   str
     
+    pig_farm_feed_buy_hid:  str = None
+    
     pf_feed_buy_item_hid:   str = None
     
     feed_type_hid:          str = None
@@ -111,6 +113,7 @@ class DataPigFarmFeedBuyItem(BaseModel):
     
     user_id:                int = 0
     
+    pig_farm_feed_buy_id:   int = 0
     pf_feed_buy_item_id:    int = 0
     
     

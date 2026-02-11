@@ -32,11 +32,11 @@ if module_directory not in sys.path:
 from r_account_selection    import get_account_lookup_selection
 from r_utils                import (remove_database_null_description,
                                     get_user_account_info,
-                                   get_location_address_names_and_replace_ids)
+                                    get_location_address_names_and_replace_ids)
 
-from r_sow_boar             import clean_sow_boar_entry
+from r_sow_boar             import replace_plain_ids_sow_boar_entry
 
-from r_pig_prod_pig_ops     import clean_pig_prod_pig_ops
+from r_pig_prod_pig_ops     import replace_plain_ids_pig_prod_pig_ops
 
 from r_pig_medvac           import get_data_pig_medvac
 
@@ -228,11 +228,11 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
     
     
     for cur_entry in list_sow_list:
-        clean_sow_boar_entry(cur_entry)
+        replace_plain_ids_sow_boar_entry(cur_entry)
         
 
     for cur_entry in list_boar_list:
-        clean_sow_boar_entry(cur_entry)
+        replace_plain_ids_sow_boar_entry(cur_entry)
         
 
     for cur_entry in list_staff:
@@ -1524,7 +1524,7 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             
         
         # Replace plain id
-        clean_pig_prod_pig_ops(gestating_ops)
+        replace_plain_ids_pig_prod_pig_ops(gestating_ops)
         cur_entry['gestating_ops'] = gestating_ops
         
         
@@ -1538,7 +1538,7 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
                 operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
             
             # Replace plain id
-            clean_pig_prod_pig_ops(lactating_piglets_ops)
+            replace_plain_ids_pig_prod_pig_ops(lactating_piglets_ops)
             cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
             
             
@@ -1547,7 +1547,7 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
                 operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
             
             # Replace plain id
-            clean_pig_prod_pig_ops(lactating_sow_ops)
+            replace_plain_ids_pig_prod_pig_ops(lactating_sow_ops)
             cur_entry['lactating_sow_ops'] = lactating_sow_ops
         
         else:
@@ -1557,7 +1557,7 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             lactating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
                 pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = 1)
             
-            clean_pig_prod_pig_ops(lactating_ops)
+            replace_plain_ids_pig_prod_pig_ops(lactating_ops)
             cur_entry['lactating_ops'] = lactating_ops
             
         

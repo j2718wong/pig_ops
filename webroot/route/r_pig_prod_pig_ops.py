@@ -309,7 +309,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     
 
 
-def clean_pig_prod_pig_ops(prod_pig_ops):
+def replace_plain_ids_pig_prod_pig_ops(prod_pig_ops):
     for cur_entry in prod_pig_ops:
         cur_id  = cur_entry['pig_prod_pig_ops']['id']
         cur_hid = hashids_common.encrypt(cur_id)
@@ -432,7 +432,7 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int):
     
     
     # Replace plain id
-    clean_pig_prod_pig_ops(res)
+    replace_plain_ids_pig_prod_pig_ops(res)
 
 
     return {
@@ -486,7 +486,7 @@ async def pig_prod_pig_ops_entry(entry_hid: str):
     
     
     # Replace plain id
-    clean_pig_prod_pig_ops(res)
+    replace_plain_ids_pig_prod_pig_ops(res)
 
 
     return {

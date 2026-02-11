@@ -29,7 +29,7 @@ if module_directory not in sys.path:
 from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
 
-
+from r_pig_farm_feed_buy    import replace_plain_ids_feed_item
 
   
 
@@ -60,9 +60,9 @@ async def pig_farm_feed_buy_item_add(feed_buy_data: dm.DataPigFarmFeedBuyItem):
     new_bill_hid = res_check['new_bill_hid']
     
     
-    pig_farm_hid        = feed_buy_data.pig_farm_hid
+    pig_farm_feed_buy_hid        = feed_buy_data.pig_farm_feed_buy_hid
     
-    res = hashids_common.decrypt(pig_farm_hid)
+    res = hashids_common.decrypt(pig_farm_feed_buy_hid)
     if len(res) == 0:
         result =  {
             'result':{
@@ -71,17 +71,15 @@ async def pig_farm_feed_buy_item_add(feed_buy_data: dm.DataPigFarmFeedBuyItem):
             }
         }
         
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
         
         return result
         
-    pig_farm_id = res[0]
+    pig_farm_feed_buy_id = res[0]
 
     
-    feed_supplier_hid        = feed_buy_data.feed_supplier_hid
+    feed_type_hid        = feed_buy_data.feed_type_hid
     
-    res = hashids_common.decrypt(feed_supplier_hid)
+    res = hashids_common.decrypt(feed_type_hid)
     if len(res) == 0:
         result =  {
             'result':{
@@ -90,40 +88,55 @@ async def pig_farm_feed_buy_item_add(feed_buy_data: dm.DataPigFarmFeedBuyItem):
             }
         }
         
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
         
         return result
         
-    feed_supplier_id = res[0]
+    feed_type_id = res[0]
     
+    
+    feed_brand_hid        = feed_buy_data.feed_brand_hid
+    
+    res = hashids_common.decrypt(feed_brand_hid)
+    if len(res) == 0:
+        result =  {
+            'result':{
+                'num':  ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID'
+            }
+        }
+        
+        
+        return result
+        
+    feed_brand_id = res[0]
     
     
     
     
     feed_buy_data.user_id           = user_id
-    feed_buy_data.pig_farm_id       = pig_farm_id
-    feed_buy_data.feed_supplier_id  = feed_supplier_id
     
-    res_add    =  model['pf_feed_buy'].add(feed_buy_data)
+    feed_buy_data.pig_farm_feed_buy_id  = pig_farm_feed_buy_id
+    feed_buy_data.feed_type_id          = feed_type_id
+    feed_buy_data.feed_brand_id         = feed_brand_id
+    
+    res_add    =  model['pf_feed_buy_item'].add(feed_buy_data)
     
     if res_add is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
     
     
     # remove plain id
-    cur_id      = res_add['pf_feed_buy']['id']
+    cur_id      = res_add['feed_buy_item']['id']
     cur_hid     = hashids_common.encrypt(cur_id)
     
-    del res_add['pf_feed_buy']['id']
-    res_add['pf_feed_buy']['hid'] = cur_hid
+    del res_add['feed_buy_item']['id']
+    res_add['feed_buy_item']['hid'] = cur_hid
 
     
     # Remove optional desc coming from database
@@ -133,8 +146,8 @@ async def pig_farm_feed_buy_item_add(feed_buy_data: dm.DataPigFarmFeedBuyItem):
     return res_add
     
     
-@app.post("/pf_feed_buy/update", tags=["Pig Farm"])
-async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
+@app.post("/pf_feed_buy_item/update", tags=["Pig Farm"])
+async def pig_farm_feed_buy_item_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     uhid    = feed_buy_data.uhid
     
     
@@ -201,4 +214,61 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
         
     return res_update
     
-  
+
+@app.get("/pf_feed_buy_item/list", tags=["Pig Farm"])
+async def pig_farm_feed_buy_item_list(pf_feed_buy_hid: str):
+    """
+    Will get pig farm feed_buy item list.
+    
+    Parameters
+    ----------
+    
+    pf_feed_buy_hid:str
+        pig_farm  feed_buy hashid
+
+        
+    """
+    
+    
+    res = hashids_common.decrypt(pf_feed_buy_hid)
+    if len(res) == 0:
+        result =  {
+            'result':{
+                'num':  ERROR_FEED_BUY_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_FEED_BUY_INVALID_PIG_FARM_HASHID'
+            }
+        }
+        
+        return result
+        
+    pf_feed_buy_id = res[0]
+
+
+    res = model['pf_feed_buy'].get_list_items(pf_feed_buy_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+
+    
+    # Replace plain id
+    for cur_entry in res:
+        replace_plain_ids_feed_item(cur_entry)
+        
+        
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+

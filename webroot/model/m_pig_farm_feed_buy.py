@@ -352,9 +352,9 @@ class PigFarmFeedBuy:
                 
                 
                 cur_entry = {
-                    'id':               cur_feed_buy_item_id,
                     
-                    'feed':{
+                    'feed_item':{
+                        'id':           cur_feed_buy_item_id,
                         'quantity':     cur_quantity,
                         'kg_per_unit':  cur_kg_per_unit,
                         'kg_total':     cur_kg_total,

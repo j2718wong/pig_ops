@@ -202,6 +202,29 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     return res_update
     
     
+def replace_plain_ids_feed_item(cur_entry):
+    cur_id  = cur_entry['feed_item']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['feed_item']['id']
+    cur_entry['feed_item']['hid']   = cur_hid
+    
+    
+    cur_id  = cur_entry['feed_type']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['feed_type']['id']
+    cur_entry['feed_type']['hid']   = cur_hid
+    
+    
+    cur_id  = cur_entry['feed_brand']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['feed_brand']['id']
+    cur_entry['feed_brand']['hid']   = cur_hid
+    
+    
+    
 @app.get("/pf_feed_buy/list", tags=["Pig Farm"])
 async def pf_feed_buy_list(pfhid: str, page_number = 1):
     """
@@ -260,6 +283,9 @@ async def pf_feed_buy_list(pfhid: str, page_number = 1):
         cur_entry['feed_supplier']['hid']   = cur_hid
         
         
+        for cur_item in cur_entry['feed_items']:
+            replace_plain_ids_feed_item(cur_item)
+            
             
     return {
         'result':{

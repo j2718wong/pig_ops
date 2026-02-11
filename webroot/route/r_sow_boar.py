@@ -452,7 +452,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         
     
     # remove plain id
-    clean_sow_boar_entry(res_update)
+    replace_plain_ids_sow_boar_entry(res_update)
     
     
     # Add new_bill_hid
@@ -636,7 +636,7 @@ async def sow_pt_list(pfhid, full_info: int = 0):
     
 
 
-def clean_sow_boar_entry(cur_sow_boar_entry):
+def replace_plain_ids_sow_boar_entry(cur_sow_boar_entry):
     cur_entry = cur_sow_boar_entry['sow_boar']
     
     cur_id  = cur_entry['id']
@@ -901,7 +901,7 @@ async def sow_boar_list(pfhid:str, sex:str = None,
         
     # Replace plain id
     for cur_entry in res:
-        clean_sow_boar_entry(cur_entry)
+        replace_plain_ids_sow_boar_entry(cur_entry)
 
         
     return {
