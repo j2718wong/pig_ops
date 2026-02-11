@@ -43,8 +43,7 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -111,8 +110,7 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -143,8 +141,7 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -169,8 +166,7 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_INVALID_HASHID,
-                'code': 'ERROR_PIG_FARM_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
             }
         }
     
@@ -189,8 +185,7 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -242,23 +237,34 @@ async def pf_feed_buy_list(pfhid: str, page_number = 1):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
     
-    # remove plain id
-    for cur_entry in res:
-        test = 1
 
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['pf_feed_buy']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pf_feed_buy']['id']
+        cur_entry['pf_feed_buy']['hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['feed_supplier']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['feed_supplier']['id']
+        cur_entry['feed_supplier']['hid']   = cur_hid
+        
         
             
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

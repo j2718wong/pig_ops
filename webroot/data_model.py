@@ -84,14 +84,14 @@ class DataPigFarm(BaseModel, HasAddressLevel):
 class DataPigFarmFeedBuy(BaseModel):
     uhid:                   str
     pig_farm_hid:           str = None
-    supplier_hid:           str = None
+    feed_supplier_hid:      str = None
     pf_feed_buy_hid:        str = None
     
     
     user_id:                int = 0
     pf_feed_buy_id:         int = 0
     pig_farm_id:            int = 0
-    supplier_id:            int = 0
+    feed_supplier_id:       int = 0
         
     date_buy:               str 
     

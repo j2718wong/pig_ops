@@ -134,13 +134,109 @@ class PigFarmFeedBuy:
 
         return None
     
-      
+    
     def get_list(self, pig_farm_id, page_number = 1, limit =  50):
         
         offset = (page_number - 1) * limit
         
         sql =   """
                 SELECT 
+                    a.id,
+                    
+                    a.date_buy,
+                    
+                    a.total_feed_cost,
+                    a.other_cost,
+                    
+                    a.feed_supplier_id,
+                    b.name AS feed_supplier_name
+                    
+                FROM pig_farm_feed_buy a 
+                LEFT OUTER JOIN common_supplier b     ON a.feed_supplier_id = b.id
+                WHERE a.pig_farm_id = %s
+                ORDER BY a.date_buy DESC
+                LIMIT %s OFFSET %s 
+                """ % (pig_farm_id, limit, offset)
+        
+            
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_id                  = row[0]
+                    
+                cur_date_buy            = str(row[1])
+
+                cur_total_feed_cost     = float(row[2]) if row[2] is not None else None
+                cur_other_cost          = float(row[3]) if row[3] is not None else None
+
+                cur_feed_supplier_id    = row[4]
+                cur_feed_supplier_name  = row[5]
+
+
+                    
+                cur_entry = {
+                    'pf_feed_buy': {
+                        'id':               cur_id,
+                        'date_buy':         cur_date_buy,
+                        'total_feed_cost':  cur_total_feed_cost,
+                        'other_cost':       cur_other_cost
+                        
+                    },
+                    
+                    
+                    'feed_supplier':{
+                        'id':               cur_feed_supplier_id,
+                        'name':             cur_feed_supplier_name
+                    }
+                }
+                result.append(cur_entry)
+                
+                feed_items = self.get_list_items(cur_id)
+                cur_entry['feed_items'] = feed_items
+                    
+
+        return result
+    
+    
+      
+    def get_list_items(self, feed_buy_id):
+        
+        
+        """
+        # This will not work, because the feed_buy row will black if there
+        # are no feed_items; The only option is query feed_items by feed_buy_id
+        
+        SELECT 
                     a.id,
                     
                     a.date_buy,
@@ -173,7 +269,36 @@ class PigFarmFeedBuy:
                 WHERE a.pig_farm_id = %s
                 ORDER BY a.date_buy DESC, c.id ASC
                 LIMIT %s OFFSET %s 
-                """ % (pig_farm_id, limit, offset)
+        
+        """ 
+
+        
+        
+        
+        sql =   """
+                SELECT 
+                    
+                    a.id,
+                    a.feed_type_id,
+                    a.feed_brand_id,
+                    
+                    a.quantity,
+                    a.kg_per_unit,
+                    a.kg_total,
+                    
+                    a.unit_cost,
+                    a.total_cost,
+
+                    b.name  AS feed_type_name,
+                    c.name  AS feed_brand_name
+                    
+                FROM pig_farm_feed_buy_item a 
+                LEFT OUTER JOIN feed_type b         ON a.feed_type_id = b.id
+                LEFT OUTER JOIN feed_type c         ON a.feed_brand_id = c.id
+                WHERE a.pig_farm_feed_buy_id = %s
+                ORDER BY a.id ASC
+        
+                """ % (feed_buy_id)
         
         
             
@@ -208,61 +333,25 @@ class PigFarmFeedBuy:
         result = []
         if rows is not None:
             
-            cur_pf_feed_buy_id = None
             
             for row in rows:
                 cur_id                  = row[0]
-                    
-                cur_date_buy            = str(row[1])
+                
+                cur_feed_type_id        = row[1]
+                cur_feed_brand_id       = row[2]
 
-                cur_total_feed_cost     = float(row[2]) if row[2] is not None else None
-                cur_other_cost          = float(row[3]) if row[3] is not None else None
-
-                cur_feed_supplier_id    = row[4]
-                cur_feed_supplier_name  = row[5]
-
-
-                if cur_pf_feed_buy_id is None or cur_pf_feed_buy_id != cur_id:
-                    cur_pf_feed_buy_id  = cur_id
-                    
-                    cur_entry = {
-                        'pf_feed_buy': {
-                            'id':               cur_id,
-                            'date_buy':         cur_date_buy,
-                            'total_feed_cost':  cur_total_feed_cost,
-                            'other_cost':       cur_other_cost
-                            
-                        },
-                        
-                        
-                        'feed_supplier':{
-                            'id':               cur_feed_supplier_id,
-                            'name':             cur_feed_supplier_name
-                        },
-                        
-                        'buy_items':[]
-                    }
-                    result.append(cur_entry)
-                    
-
-
-                cur_feed_buy_item_id    = row[6]
-
-                cur_feed_type_id        = row[7]
-                cur_feed_brand_id       = row[8]
-
-                cur_quantity            = row[9]
-                cur_kg_per_unit         = row[10]
-                cur_kg_total            = row[11]
+                cur_quantity            = row[3]
+                cur_kg_per_unit         = row[4]
+                cur_kg_total            = row[5]
             
-                cur_unit_cost           = float(row[12]) if row[12] is not None else None
-                cur_total_cost          = float(row[13]) if row[13] is not None else None
+                cur_unit_cost           = float(row[6]) if row[6] is not None else None
+                cur_total_cost          = float(row[7]) if row[7] is not None else None
                 
                 cur_feed_type_name      = row[14]
                 cur_feed_brand_name     = row[15]
                 
                 
-                cur_buy_item = {
+                cur_entry = {
                     'id':               cur_feed_buy_item_id,
                     
                     'feed':{
@@ -287,7 +376,7 @@ class PigFarmFeedBuy:
                     
                 }
                 
-                cur_entry['buy_items'].append(cur_buy_item)
+                retult.append(cur_entry)
                 
               
         return result

@@ -472,7 +472,8 @@ class CommonSupplier:
                         LEFT OUTER JOIN common_supplier b   ON a.feed_supplier_id = b.id
                         WHERE   a.account_id = %s AND 
                                 a.feed_supplier_id IS NOT NULL  AND 
-                                (a.flag & 1) = 0 
+                                (a.flag & 1) = 0 AND
+                                b.is_feed_supplier > 0
                         ORDER BY b.name; 
                 """% account_id
                     
@@ -504,7 +505,8 @@ class CommonSupplier:
                         LEFT OUTER JOIN common_supplier b   ON a.gilt_supplier_id = b.id
                         WHERE   a.account_id = %s AND 
                                 a.gilt_supplier_id IS NOT NULL AND 
-                                (a.flag & 1) = 0 
+                                (a.flag & 1) = 0 AND
+                                b.is_gilt_supplier > 0
                         ORDER BY b.name; 
                 """% account_id
                     
@@ -536,7 +538,8 @@ class CommonSupplier:
                         LEFT OUTER JOIN common_supplier b   ON a.semen_supplier_id = b.id
                         WHERE   a.account_id = %s AND 
                                 a.semen_supplier_id IS NOT NULL AND 
-                                (a.flag & 1) = 0 
+                                (a.flag & 1) = 0 AND
+                                b.is_semen_supplier > 0
                         ORDER BY b.name; 
                 """% account_id
             
