@@ -289,12 +289,12 @@ class PigFarmFeedBuy:
                     a.unit_cost,
                     a.total_cost,
 
-                    b.name  AS feed_type_name,
+                    b.name_short  AS feed_type_name,
                     c.name  AS feed_brand_name
                     
                 FROM pig_farm_feed_buy_item a 
                 LEFT OUTER JOIN feed_type b         ON a.feed_type_id = b.id
-                LEFT OUTER JOIN feed_type c         ON a.feed_brand_id = c.id
+                LEFT OUTER JOIN feed_brand c        ON a.feed_brand_id = c.id
                 WHERE a.pig_farm_feed_buy_id = %s
                 ORDER BY a.id ASC
         
@@ -347,14 +347,14 @@ class PigFarmFeedBuy:
                 cur_unit_cost           = float(row[6]) if row[6] is not None else None
                 cur_total_cost          = float(row[7]) if row[7] is not None else None
                 
-                cur_feed_type_name      = row[14]
-                cur_feed_brand_name     = row[15]
+                cur_feed_type_name      = row[8]
+                cur_feed_brand_name     = row[9]
                 
                 
                 cur_entry = {
                     
                     'feed_item':{
-                        'id':           cur_feed_buy_item_id,
+                        'id':           cur_id,
                         'quantity':     cur_quantity,
                         'kg_per_unit':  cur_kg_per_unit,
                         'kg_total':     cur_kg_total,
@@ -365,18 +365,18 @@ class PigFarmFeedBuy:
                     
                     
                     'feed_type':{
-                        'id':       cur_feed_type_id,
-                        'name':     cur_feed_type_name 
+                        'id':           cur_feed_type_id,
+                        'name':         cur_feed_type_name 
                     },
                     
                     'feed_brand':{
-                        'id':       cur_feed_brand_id,
-                        'name':     cur_feed_brand_id
+                        'id':           cur_feed_brand_id,
+                        'name':         cur_feed_brand_name
                     }
                     
                 }
                 
-                retult.append(cur_entry)
+                result.append(cur_entry)
                 
               
         return result

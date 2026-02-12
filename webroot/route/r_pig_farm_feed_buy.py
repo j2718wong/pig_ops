@@ -65,8 +65,8 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     if len(res) == 0:
         result =  {
             'result':{
-                'num':  ERROR_FEED_BUY_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_PIG_FARM_HASHID'
+                'num':  ERROR_PF_FEED_BUY_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PF_FEED_BUY_INVALID_PIG_FARM_HASHID'
             }
         }
         
@@ -84,8 +84,8 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     if len(res) == 0:
         result =  {
             'result':{
-                'num':  ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID'
+                'num':  ERROR_PF_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
+                'code': 'ERROR_PF_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID'
             }
         }
         
