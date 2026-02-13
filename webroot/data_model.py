@@ -518,10 +518,10 @@ class DataPigProdWeaning(BaseModel):
     pig_prod_id:            int = 0  
     date_weaning:           str
         
-    num_pigs_male:          int = 0
-    num_pigs_female:        int = 0
+    num_pigs_male:          int = None
+    num_pigs_female:        int = None
     
-    num_pigs:               int = 0
+    num_pigs:               int = None
         
     total_weight:           int = None
     

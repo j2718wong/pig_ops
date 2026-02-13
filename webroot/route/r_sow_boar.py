@@ -677,49 +677,61 @@ def replace_plain_ids_sow_boar_entry(cur_sow_boar_entry):
         
         del cur_entry['last_mate_sow_boar_id']
         cur_entry['last_mate_sow_boar_hid']   = cur_hid
-            
+    
+    
+    if 'cur_pig_production' in cur_entry:
+        replace_plain_ids_production_entry(cur_entry['cur_pig_production'])
+    
+    
+def replace_plain_ids_production_entry(cur_entry):
+   
+    
+    
+    cur_id  = cur_entry['pig_production']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['pig_production']['id']
+    cur_entry['pig_production']['hid']   = cur_hid
 
-            
-def clean_sow_production_list(production_list):
-    for cur_entry in production_list:
-        cur_id  = cur_entry['pig_production']['id']
+    
+    if 'boar' in cur_entry['insemination']:
+        cur_id  = cur_entry['insemination']['boar']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['pig_production']['id']
-        cur_entry['pig_production']['hid']   = cur_hid
+        del cur_entry['insemination']['boar']['id']
+        cur_entry['insemination']['boar']['hid']   = cur_hid
 
-        
-        if 'boar' in cur_entry['insemination']:
-            cur_id  = cur_entry['insemination']['boar']['id']
+    
+    if 'ai' in cur_entry['insemination']:
+        if 'semen_supplier' in cur_entry['insemination']['ai']:
+            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
             cur_hid = hashids_common.encrypt(cur_id)
             
-            del cur_entry['insemination']['boar']['id']
-            cur_entry['insemination']['boar']['hid']   = cur_hid
-
+            del cur_entry['insemination']['ai']['semen_supplier']['id']
+            cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
         
-        if 'ai' in cur_entry['insemination']:
-            if 'semen_supplier' in cur_entry['insemination']['ai']:
-                cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_entry['insemination']['ai']['semen_supplier']['id']
-                cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
             
-                
-                cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
-                cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
+            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
             
+            del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+            cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
+        
+        
+        else:
+            cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
             
-            else:
-                cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_entry['insemination']['ai']['internal_boar']['id']
-                cur_entry['insemination']['ai']['internal_boar']['hid']   = cur_hid
+            del cur_entry['insemination']['ai']['internal_boar']['id']
+            cur_entry['insemination']['ai']['internal_boar']['hid']   = cur_hid
 
+
+
+
+            
+def replace_plain_ids_production_list(production_list):
+    for cur_entry in production_list:
+        replace_plain_ids_production_entry(cur_entry)
 
 
 
@@ -765,7 +777,7 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
         
         if res_sow_production and len(res_sow_production) == 1:
             production_list = res_sow_production[0]['production']
-            clean_sow_production_list(production_list)
+            replace_plain_ids_production_list(production_list)
             data_output = production_list
             
             
@@ -875,8 +887,6 @@ async def sow_boar_list(pfhid:str, sex:str = None,
             list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
                 pig_farm_id);
     
-            print('list_sow_output_list')
-            pprint.pprint(list_sow_output_list)
             
             for cur_sow in res:
                 cur_sow_id = cur_sow['sow_boar']['id']
@@ -959,7 +969,7 @@ async def sow_production_output(sow_hid:str = None):
     
     if len(res_sow_production) == 1:
         production_list = res[0]['production']
-        clean_sow_production_list(production_list)    
+        replace_plain_ids_production_list(production_list)    
     
         
     return {

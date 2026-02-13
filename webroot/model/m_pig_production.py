@@ -527,6 +527,11 @@ class PigProduction:
             in_num_pigs_female      INT,
             in_num_pigs_male        INT,
             
+            /* There is an option to count the pigs 
+            regardless of sex. This is because it maybe time 
+            consuming to count per sex at wean. */
+            in_num_pigs             INT,    
+            
             in_total_weight         INT
         )  
         """
@@ -535,11 +540,16 @@ class PigProduction:
         sql += '%s,'    % data.user_id
         
         sql += '%s,'    % data.pig_prod_id
-        
         sql += '"%s",'  % data.date_weaning
-            
-        sql += '%s,'    % data.num_pigs_male
-        sql += '%s,'    % data.num_pigs_female
+        
+        if data.num_pigs is None:
+            sql += '%s,'    % data.num_pigs_male
+            sql += '%s,'    % data.num_pigs_female
+            sql += 'NULL,'
+        else:
+            sql += 'NULL,'
+            sql += 'NULL,'
+            sql += '%s,'    % data.num_pigs
         
         if data.total_weight is not None:
             sql += '%s);'    % data.total_weight

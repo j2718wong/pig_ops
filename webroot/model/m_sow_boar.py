@@ -562,15 +562,48 @@ class SowBoar:
                         
                         a.num_nipples,
                         
+                        a.last_pig_production_id,
                         d.farm_prod_id,
+                        d.prod_status_id,
+                        
+                        d.insemination_type,
+                        
                         d.date_insemination,
                         d.date_expected_birth,
+                        d.date_actual_birth,
+                        d.date_weaning,
+                        
+                        d.boar_id,
+                        d.semen_supplier_id,
+                        d.semen_sup_semen_id,
+                        d.semen_ai_boar_id,
+                        
+                        d.num_pigs_live_m,
+                        d.num_pigs_live_f,
+                        d.num_pigs_dead_at_birth,
+                        
+                        d.num_pigs_current,
+                        
+                        d.num_pigs_weaning_m,
+                        d.num_pigs_weaning_f,
+                        d.num_pigs_weaning,
+                        d.total_pigs_weight_weaning,
+                        
+                        
+                        e.name      AS boar_name,
+                        e.number    AS boar_number,
+                        e.is_external,
+                        
+                        f.name      AS semen_supplier_name,
+                        g.name      AS semen_name,
+                        
+                        h.name      AS ai_boar_name,
+                        h.number    AS ai_boar_number,
+                        
                         
                         a.last_mate_sow_boar_id,
                         a.mate_count,
-                        a.date_last_mate,
-                        
-                        e.notes AS add_notes
+                        a.date_last_mate
                         
                         
                         
@@ -578,7 +611,13 @@ class SowBoar:
                     LEFT OUTER JOIN sow_boar b          ON a.parent_sow_id          = b.id
                     LEFT OUTER JOIN sow_boar c          ON a.parent_boar_id         = c.id
                     LEFT OUTER JOIN pig_production d    ON a.last_pig_production_id  = d.id
-                    LEFT OUTER JOIN pig_prod_notes e    ON a.add_notes_id           = e.id
+                    
+                    LEFT OUTER JOIN sow_boar e          ON d.boar_id                = e.id
+                    LEFT OUTER JOIN common_supplier f   ON d.semen_supplier_id      = f.id
+                    LEFT OUTER JOIN semen_supplier_semen g  ON d.semen_sup_semen_id = g.id
+                    
+                    LEFT OUTER JOIN sow_boar h          ON d.semen_ai_boar_id       = h.id
+                    
                     %s
                     %s 
                     """ % (where_clause, order_clause)
@@ -615,32 +654,72 @@ class SowBoar:
                         
                         a.num_nipples,
                         
+                        a.last_pig_production_id,
                         d.farm_prod_id,
+                        d.prod_status_id,
+                        
+                        d.insemination_type,
+                        
                         d.date_insemination,
                         d.date_expected_birth,
+                        d.date_actual_birth,
+                        d.date_weaning,
+                        
+                        d.boar_id,
+                        d.semen_supplier_id,
+                        d.semen_sup_semen_id,
+                        d.semen_ai_boar_id,
+                        
+                        d.num_pigs_live_m,
+                        d.num_pigs_live_f,
+                        d.num_pigs_dead_at_birth,
+                        
+                        d.num_pigs_current,
+                        
+                        d.num_pigs_weaning_m,
+                        d.num_pigs_weaning_f,
+                        d.num_pigs_weaning,
+                        d.total_pigs_weight_weaning,
+                        
+                        
+                        e.name      AS boar_name,
+                        e.number    AS boar_number,
+                        e.is_external,
+                        
+                        f.name      AS semen_supplier_name,
+                        g.name      AS semen_name,
+                        
+                        h.name      AS ai_boar_name,
+                        h.number    AS ai_boar_number,
+                        
                         
                         a.last_mate_sow_boar_id,
                         a.mate_count,
                         a.date_last_mate,
                         
-                        e.notes AS add_notes,
                         
-                        
-                        f.name_last,
-                        f.name_first,
+                        j.name_last,
+                        j.name_first,
                         a.dt_entry,
                         
-                        g.name_last,
-                        g.name_first,
+                        k.name_last,
+                        k.name_first,
                         a.dt_last_update
                         
                     FROM sow_boar a
                     LEFT OUTER JOIN sow_boar b          ON a.parent_sow_id          = b.id
                     LEFT OUTER JOIN sow_boar c          ON a.parent_boar_id         = c.id
-                    LEFT OUTER JOIN pig_production d    ON a.last_pig_production_id = d.id
-                    LEFT OUTER JOIN pig_prod_notes e    ON a.add_notes_id       = e.id
-                    LEFT OUTER JOIN user f              ON a.added_by_user_id   = f.id
-                    LEFT OUTER JOIN user g              ON a.last_update_user_id = g.id
+                    LEFT OUTER JOIN pig_production d    ON a.last_pig_production_id  = d.id
+                    
+                    LEFT OUTER JOIN sow_boar e          ON d.boar_id                = e.id
+                    LEFT OUTER JOIN common_supplier f   ON d.semen_supplier_id      = f.id
+                    LEFT OUTER JOIN semen_supplier_semen g  ON d.semen_sup_semen_id = g.id
+                    
+                    LEFT OUTER JOIN sow_boar h          ON d.semen_ai_boar_id       = h.id
+
+                    
+                    LEFT OUTER JOIN user j              ON a.added_by_user_id       = j.id
+                    LEFT OUTER JOIN user k              ON a.last_update_user_id    = k.id
                     %s
                     %s 
                     """ % (where_clause, order_clause)
@@ -679,49 +758,179 @@ class SowBoar:
         if rows is not None:
             
             for row in rows:
+                cur_id                      = row[0]
+                cur_farm_sow_id             = row[1]
+                cur_farm_boar_id            = row[2]
+                cur_number                  = row[3]
+                cur_name                    = row[4]
+                    
+                cur_sow_status_id           = row[5]
+                cur_birth_pig_prod_id       = row[6]
+                    
+                cur_dispose_status_id       = row[7]
+                cur_date_dispose            = str(row[8]) if row[8] else None
+                    
+                cur_parent_sow_id           = row[9]
+                cur_parent_sow_number       = row[10]
+                cur_parent_sow_name         = row[11]
+                    
+                cur_parent_boar_id          = row[12]
+                cur_parent_boar_number      = row[13]
+                cur_parent_boar_name        = row[14]
+                    
+                cur_date_of_birth           = str(row[15]) if row[15] else None
+                cur_date_eartag             = str(row[16]) if row[16] else None
+                    
+                cur_is_external             = row[17]
+                cur_is_production_ready     = row[18]
+                    
+                cur_num_nipples             = row[19]
+                    
+                    
+                cur_pig_prod_id             = row[20]
+                cur_farm_prod_id            = row[21]
+                cur_prod_status_id          = row[22]    
+                
+                cur_prod_insemination_type  = row[23]
+                
+                cur_date_insemination       = str(row[24]) if row[24] else None 
+                cur_date_expected_birth     = str(row[25]) if row[25] else None
+                cur_date_actual_birth       = str(row[26]) if row[26] else None
+                cur_date_weaning            = str(row[27]) if row[27] else None
+                    
+                cur_boar_id                 = row[28]
+                cur_semen_supplier_id       = row[29]
+                cur_semen_sup_semen_id      = row[30]
+                cur_semen_ai_boar_id        = row[31]
+                    
+                cur_num_pigs_live_m         = row[32]
+                cur_num_pigs_live_f         = row[33]
+                cur_num_pigs_dead_birth     = row[34]
+                    
+                cur_num_pigs_current        = row[35]
+                    
+                cur_num_pigs_weaning_m      = row[36]
+                cur_num_pigs_weaning_f      = row[37]
+                cur_num_pigs_weaning        = row[38]
+                cur_weight_weaning          = row[39]
+                    
+                    
+                cur_boar_name               = row[40]
+                cur_boar_number             = row[41]
+                cur_boar_is_external        = row[42]
+                    
+                    
+                cur_semen_supplier_name     = row[43]
+                cur_semen_sup_semen_name    = row[44]
+                
+                cur_semen_ai_boar_name      = row[45]
+                cur_semen_ai_boar_number    = row[46]
+                
+                cur_last_mate_sow_boar_id   = row[47]
+                cur_mate_count              = row[48]
+                cur_date_last_mate          = str(row[49]) if  row[49] else None
+                
+                
                
                 sow_boar = {
-                    'id':                   row[0],
-                    'farm_sow_id':          row[1],
-                    'farm_boar_id':         row[2],
-                    'number':               row[3], 
-                    'name':                 row[4],
+                    'id':                   cur_id,
+                    'farm_sow_id':          cur_farm_sow_id,
+                    'farm_boar_id':         cur_farm_boar_id,
+                    'number':               cur_number, 
+                    'name':                 cur_name,
                     
-                    'status_id':            row[5],
-                    'birth_pig_prod_id':    row[6],
+                    'status_id':            cur_sow_status_id,
+                    'birth_pig_prod_id':    cur_birth_pig_prod_id,
                     
                     
-                    'dispose_status_id':    row[7],
-                    'date_dispose':         row[8],
+                    'dispose_status_id':    cur_dispose_status_id,
+                    'date_dispose':         cur_date_dispose,
                         
                     
-                    'parent_sow_id':        row[9],
-                    'parent_sow_number':    row[10],
-                    'parent_sow_name':      row[11],
+                    'parent_sow_id':        cur_parent_sow_id,
+                    'parent_sow_number':    cur_parent_sow_number,
+                    'parent_sow_name':      cur_parent_sow_name,
                     
-                    'parent_boar_id':       row[12],
-                    'parent_boar_number':   row[13],
-                    'parent_boar_name':     row[14],
+                    'parent_boar_id':       cur_parent_boar_id,
+                    'parent_boar_number':   cur_parent_boar_number,
+                    'parent_boar_name':     cur_parent_boar_name,
                     
-                    'date_of_birth':        str(row[15])  if row[15] else None,
-                    'date_eartag':          str(row[16])  if row[16] else None,
+                    'date_of_birth':        cur_date_of_birth,
+                    'date_eartag':          cur_date_eartag,
                     
-                    'is_external':          row[17],
-                    'is_production_ready':  row[18],
+                    'is_external':          cur_is_external,
+                    'is_production_ready':  cur_is_production_ready,
                     
-                    'num_nipples':          row[19],
+                    'num_nipples':          cur_num_nipples,
                     
-                    'last_farm_prod_id':    row[20],
-                    'date_insemination':    str(row[21]) if row[21] else None,
-                    'date_expected_birth':  str(row[22]) if row[22] else None,
                     
-                    'last_mate_sow_boar_id': row[23],
-                    'mate_count':           row[24],
-                    'date_last_mate':       str(row[25]) if row[25] else None,
+                    'cur_pig_production': {
+                        'pig_production': {
+                            'id':                   cur_pig_prod_id,
+                            'farm_prod_id':         cur_farm_prod_id,
+                            'prod_status_id':       cur_prod_status_id,
+                            'cur_pig_count':        cur_num_pigs_current
+                        },
+                        
+                        'insemination':{
+                            'insem_type':       cur_prod_insemination_type,
+                            'insem_date':       cur_date_insemination,
+                        
+                            'boar': {
+                                'id':           cur_boar_id,
+                                'number':       cur_boar_number,
+                                'name':         cur_boar_name,
+                                'is_external':  cur_boar_is_external
+                            },
+                            
+                            'ai': {
+                                'semen_supplier':{
+                                    'id':       cur_semen_supplier_id,
+                                    'name':     cur_semen_supplier_name,
+                                    
+                                    'semen': {
+                                        'id':   cur_semen_sup_semen_id,
+                                        'name': cur_semen_sup_semen_name
+                                    }
+                                },
+                                
+                                'internal_boar':{
+                                    'id':           cur_semen_ai_boar_id,
+                                    'number':       cur_semen_ai_boar_number,
+                                    'name':         cur_semen_ai_boar_name
+                                }
+                            }
+                        },
+                     
+                        'birth': {
+                            'date_expected':    cur_date_expected_birth,
+                            'date_actual':      cur_date_actual_birth,
+                            
+                            'num_dead_at_birth':cur_num_pigs_dead_birth,
+                            
+                            'pigs_live_m':      cur_num_pigs_live_m,
+                            'pigs_live_f':      cur_num_pigs_live_f
+                        },
+                        
+                        'weaning': {
+                            'date_weaning':     cur_date_weaning,
+                            'num_pigs_m':       cur_num_pigs_weaning_m,
+                            'num_pigs_f':       cur_num_pigs_weaning_f,
+                            'num_pigs':         cur_num_pigs_weaning,
+                            'weight':           cur_weight_weaning    
+                        }
+                        
+                    },
+                    
+                    
+                    'last_mate_sow_boar_id': cur_last_mate_sow_boar_id,
+                    'mate_count':           cur_mate_count,
+                    'date_last_mate':       cur_date_last_mate
                   
-                    'add_notes':            row[26]
                 }
-                 
+                
+                
+                # Remove null entries if possible
                 
                 if is_disposed == 0:
                     del sow_boar['dispose_status_id']
@@ -735,12 +944,38 @@ class SowBoar:
                         
                         if sow_boar['num_nipples'] is None:
                             del sow_boar['num_nipples']
+                        
+                        
+                        # sow_boar['cur_pig_production'] is for sow only
+                        
+                        if sow_boar['cur_pig_production']['pig_production']['id'] is None:
+                            del sow_boar['cur_pig_production']
+                        else:  
+                            if cur_prod_insemination_type == 'B':
+                                del sow_boar['cur_pig_production']['insemination']['ai']
+                                
+                                if cur_boar_is_external == 0:
+                                    del sow_boar['cur_pig_production']['insemination']['boar']['is_external']
+                                
+                            else:
+                                del sow_boar['cur_pig_production']['insemination']['boar']
+                                
+                                if cur_prod_insemination_type == 'AI_X':
+                                    del sow_boar['cur_pig_production']['insemination']['ai']['internal_boar']
+                                    
+                                else:
+                                    del sow_boar['cur_pig_production']['insemination']['ai']['semen_supplier']
                             
-                        if sow_boar['date_insemination'] is None:
-                            del sow_boar['date_insemination']
                             
-                        if sow_boar['date_expected_birth'] is None:
-                            del sow_boar['date_expected_birth']
+                            if cur_date_actual_birth is None:
+                                del sow_boar['cur_pig_production']['birth']['pigs_live_m']
+                                del sow_boar['cur_pig_production']['birth']['pigs_live_f']
+                                
+                                del sow_boar['cur_pig_production']['weaning']
+                                
+                            else:
+                                if cur_date_weaning is None:
+                                    del sow_boar['cur_pig_production']['weaning']
                             
                         
                     else:
@@ -748,11 +983,12 @@ class SowBoar:
                         del sow_boar['farm_sow_id'] 
                         del sow_boar['status_id']
                         del sow_boar['num_nipples'] 
-                        del sow_boar['date_insemination'] 
-                        del sow_boar['date_expected_birth']
-            
+                        
+                        del sow_boar['cur_pig_production'] 
+                        
+                        
                 
-                # Remove null entries if possible
+                
                 if sow_boar['parent_sow_id'] is None:
                     del sow_boar['parent_sow_id']
                     del sow_boar['parent_sow_name']
@@ -768,8 +1004,6 @@ class SowBoar:
                 if sow_boar['date_eartag'] is None:
                     del sow_boar['date_eartag']
                 
-                if sow_boar['last_farm_prod_id'] is None:
-                   del sow_boar['last_farm_prod_id']
                 
                 if sow_boar['last_mate_sow_boar_id'] is None:
                     del sow_boar['last_mate_sow_boar_id']
@@ -777,24 +1011,20 @@ class SowBoar:
                 if sow_boar['date_last_mate'] is None:
                     del sow_boar['date_last_mate']
                 
-                if sow_boar['add_notes'] is None:
-                    del sow_boar['add_notes']
-                
-                
+
                 
                 if inc_user_audit > 0:
                     
-                    
                     added_by = {
-                        'name_last':        row[27],
-                        'name_first':       row[28],
-                        'dt_entry':         str(row[29])
+                        'name_last':        row[38],
+                        'name_first':       row[39],
+                        'dt_entry':         str(row[40])
                     }
                     
                     last_update = {
-                        'name_last':        row[30],
-                        'name_first':       row[31],
-                        'dt_update':        str(row[32]) if row[32] else None
+                        'name_last':        row[41],
+                        'name_first':       row[42],
+                        'dt_update':        str(row[43]) if row[43] else None
                     }
                 
                     sow_boar['added_by']    = added_by
