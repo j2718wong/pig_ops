@@ -18,6 +18,19 @@ from common_fast_api        import *
 import data_model           as dm
 
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
+
+
+
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
 
@@ -149,8 +162,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -182,24 +194,22 @@ async def pig_farm_list(ahid: str):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID'
             }
         }
     
     
     account_id = res[0]
         
-    print('Test 1')
+
     res                 = model['pig_farm'].get_list(account_id)
-    print('Test 2')
+
     
     if res is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -249,8 +259,7 @@ async def pig_farm_list(ahid: str):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

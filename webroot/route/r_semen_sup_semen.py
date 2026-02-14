@@ -58,6 +58,7 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -138,6 +139,7 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
         }
     
     user_id = res[0]
+    
     
     
     # Checks if user is valid, if account is valid, if account has due bill

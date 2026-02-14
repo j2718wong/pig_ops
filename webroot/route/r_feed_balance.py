@@ -17,6 +17,19 @@ from common_fast_api        import *
 
 import data_model           as dm
 
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
+
+
    
 @app.post("/feed_balance/add", tags=["Production Details"])
 async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
@@ -27,12 +40,22 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
         return {
             'result':{
                 'num':  ERROR_FEED_BALANCE_INVALID_USER_HASHID,
-                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     pig_prod_hid        = feed_balance_data.pig_prod_hid
@@ -44,8 +67,7 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
             return {
                 'result':{
                     'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -61,8 +83,7 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
             return {
                 'result':{
                     'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -80,8 +101,7 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -93,6 +113,9 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
     del res_add['feed_balance']['id']
     res_add['feed_balance']['hid'] = feed_balance_hid
 
+
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
         
     return res_add
     
@@ -106,12 +129,22 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
         return {
             'result':{
                 'num':  ERROR_FEED_BALANCE_INVALID_USER_HASHID,
-                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     feed_balance_hid    = feed_balance_data.feed_balance_hid
@@ -121,8 +154,7 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
         return {
             'result':{
                 'num':  ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID,
-                'code': 'ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID'
             }
         }
     
@@ -139,8 +171,7 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -148,6 +179,10 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
     # remove plain id
     del res_update['feed_balance']['id']
     res_update['feed_balance']['hid'] = feed_balance_hid
+    
+        
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
         
     return res_update
  
@@ -175,8 +210,7 @@ async def feed_balance_list(pig_prod_hid: str, inc_user_audit:int = 0):
         return {
             'result':{
                 'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
-                'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID',
-                'desc': ''
+                'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID'
             }
         }
     
@@ -190,8 +224,7 @@ async def feed_balance_list(pig_prod_hid: str, inc_user_audit:int = 0):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -233,8 +266,7 @@ async def feed_balance_list(pig_prod_hid: str, inc_user_audit:int = 0):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

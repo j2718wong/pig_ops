@@ -26,6 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
 
 
@@ -57,6 +58,17 @@ async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
     
     user_id = res[0]
     
+
+
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+
+
     
     country_hid = medvac_brand_data.country_hid
     country_id = 0
@@ -67,8 +79,7 @@ async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
         return {
             'result':{
                 'num':  ERROR_ADDRESS_COUNTRY_HID,
-                'code': 'ERROR_ADDRESS_COUNTRY_HID',
-                'desc': ''
+                'code': 'ERROR_ADDRESS_COUNTRY_HID'
             }
         }
     
@@ -130,8 +141,7 @@ async def medvac_brand_list(country_hid: str):
         return {
             'result':{
                 'num':  ERROR_ADDRESS_COUNTRY_HID,
-                'code': 'ERROR_ADDRESS_COUNTRY_HID',
-                'desc': ''
+                'code': 'ERROR_ADDRESS_COUNTRY_HID'
             }
         }
     

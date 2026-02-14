@@ -47,6 +47,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -154,6 +155,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -161,6 +163,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
         return res_check['inv_result']
         
     new_bill_hid = res_check['new_bill_hid']
+    
     
     
     pig_prod_pig_ops_hid = pig_prod_pig_ops_data.pig_prod_pig_ops_hid

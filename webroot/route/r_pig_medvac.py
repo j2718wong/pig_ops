@@ -47,6 +47,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -306,6 +307,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -313,6 +315,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
         return res_check['inv_result']
         
     new_bill_hid = res_check['new_bill_hid']
+    
     
     
     pig_medvac_id       = 0

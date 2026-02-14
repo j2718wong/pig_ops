@@ -26,7 +26,10 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
+
+   
    
 @app.post("/pig_farm_staff/add", tags=["Pig Farm"])
 async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
@@ -69,7 +72,18 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
         }
        
     pig_farm_id = res[0]
-   
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
 
     pig_farm_staff_data.name            = name
     pig_farm_staff_data.user_id         = user_id
@@ -126,6 +140,17 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+
     
     
     pig_farm_hid = pig_farm_staff_data.pig_farm_hid

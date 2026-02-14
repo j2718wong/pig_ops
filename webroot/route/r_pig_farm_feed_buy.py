@@ -50,6 +50,7 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -57,6 +58,7 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
         return res_check['inv_result']
         
     new_bill_hid = res_check['new_bill_hid']
+    
     
     
     pig_farm_hid        = feed_buy_data.pig_farm_hid

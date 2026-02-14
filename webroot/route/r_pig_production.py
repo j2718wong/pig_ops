@@ -29,6 +29,8 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_a0_security_checks   import check_if_valid_user_account
+
 from r_account_selection    import get_account_lookup_selection
 from r_utils                import (remove_database_null_description,
                                     get_user_account_info,
@@ -567,6 +569,17 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
     user_id = res[0]
     
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
 
     sow_hid    = pig_prod_data.sow_hid
     
@@ -725,6 +738,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
         del res_add['pig_prod_ai']
   
     
+    # Remove optional desc coming from database
     remove_database_null_description(res_add)
     
     return res_add
@@ -744,6 +758,17 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
 
     pig_farm_hid = pig_fattening_data.pig_farm_hid
@@ -785,6 +810,8 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
     del res_add['pig_prod']['id']
     res_add['pig_prod']['hid'] = pig_prod_hashid
     
+    
+    # Remove optional desc coming from database
     remove_database_null_description(res_add)
     
     return res_add
@@ -804,6 +831,17 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
 
     pig_prod_hid    = pig_prod_data.pig_prod_hid
@@ -969,6 +1007,17 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     
     user_id = res[0]
     
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
 
     pig_prod_hid    = prod_status_data.pig_prod_hid
     
@@ -1022,6 +1071,8 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+    
+    # Remove optional desc coming from database
     remove_database_null_description(res_update)
 
     return res_update
@@ -1042,6 +1093,17 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     
     user_id = res[0]
     
+
+
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+
 
     pig_prod_hid    = pig_birth_data.pig_prod_hid
     
@@ -1097,6 +1159,8 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+
+    # Remove optional desc coming from database
     remove_database_null_description(res_update)
 
     return res_update
@@ -1117,6 +1181,17 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     
     user_id = res[0]
     
+
+
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+
 
     pig_prod_hid    = pig_weaning_data.pig_prod_hid
     
@@ -1155,6 +1230,8 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     del res_update['pig_prod']['id']
     res_update['pig_prod']['hid'] = pig_prod_hashid
 
+
+    # Remove optional desc coming from database
     remove_database_null_description(res_update)
 
     return res_update
@@ -1175,6 +1252,18 @@ async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStart
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
     
 
     pig_prod_hid    = feed_start_date_data.pig_prod_hid
@@ -1242,6 +1331,17 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
     
     user_id = res[0]
     
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
 
     pig_prod_hid    = pig_count_data.pig_prod_hid
     
@@ -1301,8 +1401,7 @@ async def pig_prod_feed_summary(pig_prod_hid:str):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -1315,16 +1414,14 @@ async def pig_prod_feed_summary(pig_prod_hid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res 
@@ -1354,8 +1451,7 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -1368,16 +1464,14 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res 

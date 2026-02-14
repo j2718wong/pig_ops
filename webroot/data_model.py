@@ -590,6 +590,42 @@ class DataPigProdNotes(BaseModel):
     notes:                  str
 
 
+class PigProdFeed:
+    uhid:                   str
+        
+    pig_prod_feed_hid:      str = None
+    pig_prod_hid:           str = None
+    pig_farm_feed_buy_hid:  str = None
+    
+    
+    user_id:                int = 0
+    pig_prod_feed_id:       int = 0
+    pig_prod_id:            int = 0
+    pig_farm_feed_buy_id:   int = 0
+    
+    
+    date_add:               str
+    
+    
+    num_gesta:              int = None
+    num_lacta:              int = None
+    num_booster:            int = None
+    num_prestarter:         int = None
+    num_starter:            int = None
+    num_grower:             int = None
+    num_finisher:           int = None
+    
+    
+    feed_item_gesta_id:     int = None         
+    feed_item_lacta_id:     int = None 
+    feed_item_booster_id:   int = None 
+    feed_item_prestarter_id:int = None 
+    feed_item_starter_id:   int = None 
+    feed_item_grower_id:    int = None 
+    feed_item_finisher_id:  int = None 
+    
+
+
 class DataMedVacBrand(BaseModel):
     uhid:                   str
     medvac_brand_hid:       str = None

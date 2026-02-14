@@ -18,6 +18,19 @@ from common_fast_api        import *
 import data_model           as dm
 
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
+
+
+
 @app.get("/pig_dead_type/list", tags=["Production Details"])
 async def pig_dead_type_list():
     """
@@ -71,12 +84,22 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
         return {
             'result':{
                 'num':  ERROR_PIG_DEAD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_DEAD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_DEAD_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     pig_prod_hid        = prod_pig_dead_data.pig_prod_hid
@@ -88,8 +111,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
             return {
                 'result':{
                     'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -105,8 +127,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
             return {
                 'result':{
                     'num':  ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID,
-                    'code': 'ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID'
                 }
             }
         
@@ -121,8 +142,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
         return {
             'result':{
                 'num':  ERROR_PIG_DEAD_INVALID_PIG_DEAD_TYPE_HASHID,
-                'code': 'ERROR_PIG_DEAD_INVALID_PIG_DEAD_TYPE_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_DEAD_INVALID_PIG_DEAD_TYPE_HASHID'
             }
         }
     
@@ -140,8 +160,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -152,7 +171,10 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
     # remove plain id
     del res_add['prod_pig_dead']['id']
     res_add['prod_pig_dead']['hid'] = prod_pig_dead_hid
-
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
         
     return res_add
     
@@ -166,12 +188,21 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
         return {
             'result':{
                 'num':  ERROR_PIG_DEAD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_DEAD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_DEAD_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
     
     
 
@@ -182,8 +213,7 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
         return {
             'result':{
                 'num':  ERROR_PIG_DEAD_INVALID_HASHID,
-                'code': 'ERROR_PIG_DEAD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_DEAD_INVALID_HASHID'
             }
         }
     
@@ -200,8 +230,7 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
         
@@ -209,7 +238,11 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     # remove plain id
     del res_update['prod_pig_dead']['id']
     res_update['prod_pig_dead']['hid'] = prod_pig_dead_hid
-        
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+    
     return res_update
     
   
@@ -247,8 +280,7 @@ async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1,
             return {
                 'result':{
                     'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -263,8 +295,7 @@ async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1,
             return {
                 'result':{
                     'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID',
-                    'desc': ''
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID'
                 }
             }
         
@@ -279,8 +310,7 @@ async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1,
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -314,8 +344,7 @@ async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1,
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

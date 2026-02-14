@@ -26,6 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import get_location_address_names_and_replace_ids
 from r_utils                import remove_database_null_description
     
@@ -66,6 +67,17 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     level_1_id  = 0
@@ -175,6 +187,17 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     supplier_hid = supplier_data.supplier_hid

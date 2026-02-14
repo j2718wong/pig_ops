@@ -26,6 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
 
 
@@ -57,6 +58,17 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     # Checks if user is valid, if account is valid, if account has due bill
@@ -178,6 +190,17 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
     user_id = res[0]
     
     
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
+    
     account_pig_buyer_hid = account_pig_buyer_data.account_pig_buyer_hid
     res = hashids_common.decrypt(account_pig_buyer_hid)
     if len(res) == 0:
@@ -225,6 +248,17 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
     
     
     res = hashids_common.decrypt(ehid)

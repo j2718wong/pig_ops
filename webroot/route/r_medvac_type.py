@@ -26,6 +26,7 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
 
     
@@ -55,6 +56,17 @@ async def medvac_type_add(medvac_type_data: dm.DataMedVacType):
         }
     
     user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+
     
     
     medvac_type_data.name      = name

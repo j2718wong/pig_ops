@@ -209,6 +209,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -216,6 +217,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         return res_check['inv_result']
         
     new_bill_hid = res_check['new_bill_hid']
+    
     
     
     pfhid       = sow_boar_data.pfhid
@@ -364,6 +366,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
     if res_check['inv_result'] != None:
@@ -483,12 +486,14 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     user_id = res[0]
     
     
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
     if res_check['inv_result'] != None:
         return res_check['inv_result']
         
     new_bill_hid = res_check['new_bill_hid']
+    
     
     
     sow_boar_hid    = sow_boar_data.sow_boar_hid
