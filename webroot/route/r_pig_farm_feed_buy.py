@@ -160,10 +160,10 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
     
-    pig_farm_hid = feed_buy_data.pig_farm_hid
+    pf_feed_buy_hid = feed_buy_data.pf_feed_buy_hid
     
     
-    res = hashids_common.decrypt(pig_farm_hid)
+    res = hashids_common.decrypt(pf_feed_buy_hid)
     if len(res) == 0:
         return {
             'result':{
@@ -172,16 +172,34 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
             }
         }
     
+    pf_feed_buy_id = res[0]
     
-    pig_farm_id = res[0]
+    
+    feed_supplier_hid        = feed_buy_data.feed_supplier_hid
+    
+    res = hashids_common.decrypt(feed_supplier_hid)
+    if len(res) == 0:
+        result =  {
+            'result':{
+                'num':  ERROR_PF_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID,
+                'code': 'ERROR_PF_FEED_BUY_INVALID_FEED_SUPPLIER_HASHID'
+            }
+        }
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        
+        return result
+        
+    feed_supplier_id = res[0]
     
     
-    feed_buy_data.name      = name
+    
     feed_buy_data.user_id   = user_id
-    feed_buy_data.pig_farm_id = pig_farm_id
+    feed_buy_data.pf_feed_buy_id = pf_feed_buy_id
+    feed_buy_data.feed_supplier_id  = feed_supplier_id
     
-    
-    res_update    =  model['pig_farm'].update(feed_buy_data)
+    res_update    =  model['pf_feed_buy'].update(feed_buy_data)
     
     if res_update is None:
         return {
@@ -193,6 +211,9 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
     # remove plain id
+    cur_id      = res_update['pf_feed_buy']['id']
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
     del res_update['pf_feed_buy']['id']
     res_update['pf_feed_buy']['hid'] = cur_hid
 
