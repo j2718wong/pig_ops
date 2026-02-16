@@ -684,9 +684,13 @@ def replace_plain_ids_sow_boar_entry(cur_sow_boar_entry):
         cur_entry['last_mate_sow_boar_hid']   = cur_hid
     
     
-    if 'cur_pig_production' in cur_entry:
-        replace_plain_ids_production_entry(cur_entry['cur_pig_production'])
     
+    if 'cur_pig_production' in cur_entry:
+        if cur_entry['cur_pig_production']['pig_production']['id'] is None:
+            del cur_sow_boar_entry['sow_boar']['cur_pig_production']
+        else:
+            replace_plain_ids_production_entry(cur_entry['cur_pig_production'])
+        
     
 def replace_plain_ids_production_entry(cur_entry):
    

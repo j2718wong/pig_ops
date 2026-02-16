@@ -281,7 +281,7 @@ class SowBoar:
         else:
             sql += 'NULL);'
         
-        print(sql)
+
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -931,6 +931,9 @@ class SowBoar:
                 
                 
                 # Remove null entries if possible
+                sow_only = 0
+                boar_only = 0
+                
                 
                 if is_disposed == 0:
                     del sow_boar['dispose_status_id']
@@ -939,53 +942,63 @@ class SowBoar:
                 
                 if sex is not None:
                     if sex == 'F':
-                        del sow_boar['farm_boar_id']
-                        del sow_boar['is_external']
-                        
-                        if sow_boar['num_nipples'] is None:
-                            del sow_boar['num_nipples']
-                        
-                        
-                        # sow_boar['cur_pig_production'] is for sow only
-                        
-                        if sow_boar['cur_pig_production']['pig_production']['id'] is None:
-                            del sow_boar['cur_pig_production']
-                        else:  
-                            if cur_prod_insemination_type == 'B':
-                                del sow_boar['cur_pig_production']['insemination']['ai']
-                                
-                                if cur_boar_is_external == 0:
-                                    del sow_boar['cur_pig_production']['insemination']['boar']['is_external']
-                                
-                            else:
-                                del sow_boar['cur_pig_production']['insemination']['boar']
-                                
-                                if cur_prod_insemination_type == 'AI_X':
-                                    del sow_boar['cur_pig_production']['insemination']['ai']['internal_boar']
-                                    
-                                else:
-                                    del sow_boar['cur_pig_production']['insemination']['ai']['semen_supplier']
-                            
-                            
-                            if cur_date_actual_birth is None:
-                                del sow_boar['cur_pig_production']['birth']['pigs_live_m']
-                                del sow_boar['cur_pig_production']['birth']['pigs_live_f']
-                                
-                                del sow_boar['cur_pig_production']['weaning']
-                                
-                            else:
-                                if cur_date_weaning is None:
-                                    del sow_boar['cur_pig_production']['weaning']
-                            
-                        
+                        sow_only = 1
                     else:
-                        # These are for sow only
-                        del sow_boar['farm_sow_id'] 
-                        del sow_boar['status_id']
-                        del sow_boar['num_nipples'] 
+                        boar_only = 1
+                else:
+                    if sow_boar['farm_sow_id'] is not None:
+                        sow_only = 1
+                    else:
+                        boar_only = 1
+                    
                         
-                        del sow_boar['cur_pig_production'] 
+                if sow_only > 0:
+                    del sow_boar['farm_boar_id']
+                    del sow_boar['is_external']
+                    
+                    if sow_boar['num_nipples'] is None:
+                        del sow_boar['num_nipples']
+                    
+                    
+                    # sow_boar['cur_pig_production'] is for sow only
+                    
+                    if sow_boar['cur_pig_production']['pig_production']['id'] is None:
+                        del sow_boar['cur_pig_production']
+                    else:  
+                        if cur_prod_insemination_type == 'B':
+                            del sow_boar['cur_pig_production']['insemination']['ai']
+                            
+                            if cur_boar_is_external == 0:
+                                del sow_boar['cur_pig_production']['insemination']['boar']['is_external']
+                            
+                        else:
+                            del sow_boar['cur_pig_production']['insemination']['boar']
+                            
+                            if cur_prod_insemination_type == 'AI_X':
+                                del sow_boar['cur_pig_production']['insemination']['ai']['internal_boar']
+                                
+                            else:
+                                del sow_boar['cur_pig_production']['insemination']['ai']['semen_supplier']
                         
+                        
+                        if cur_date_actual_birth is None:
+                            del sow_boar['cur_pig_production']['birth']['pigs_live_m']
+                            del sow_boar['cur_pig_production']['birth']['pigs_live_f']
+                            
+                            del sow_boar['cur_pig_production']['weaning']
+                            
+                        else:
+                            if cur_date_weaning is None:
+                                del sow_boar['cur_pig_production']['weaning']
+                        
+                        
+                if boar_only > 0:
+                    # These are for sow only
+                    del sow_boar['farm_sow_id'] 
+                    del sow_boar['status_id']
+                    del sow_boar['num_nipples'] 
+                    
+                    del sow_boar['cur_pig_production'] 
                         
                 
                 

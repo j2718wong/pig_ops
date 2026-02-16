@@ -118,16 +118,16 @@ class TopRenderNode:
 
         render_index.add(render_main)
 
-        print('render test 1')
+
         
         main_render = render_index.render()
-        print(main_render)
+
 
         # Return page
         template_index = Template(filename = 'templates/index.html',
                         input_encoding = 'utf-8', output_encoding = 'utf-8')
         
-        print('render test 2')
+
         
         return template_index.render(
                     main            = render_index.render(),
