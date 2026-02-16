@@ -614,15 +614,7 @@ class PigProdFeed:
     num_starter:            int = None
     num_grower:             int = None
     num_finisher:           int = None
-    
-    
-    feed_item_gesta_id:     int = None         
-    feed_item_lacta_id:     int = None 
-    feed_item_booster_id:   int = None 
-    feed_item_prestarter_id:int = None 
-    feed_item_starter_id:   int = None 
-    feed_item_grower_id:    int = None 
-    feed_item_finisher_id:  int = None 
+
     
 
 

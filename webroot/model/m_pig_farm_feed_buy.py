@@ -242,7 +242,7 @@ class PigFarmFeedBuy:
     
     
       
-    def get_list_items(self, feed_buy_id):
+    def get_list_items(self, pig_farm_feed_buy_id):
         
         sql =   """
                 SELECT 
@@ -267,7 +267,7 @@ class PigFarmFeedBuy:
                 WHERE a.pig_farm_feed_buy_id = %s
                 ORDER BY a.id ASC
         
-                """ % (feed_buy_id)
+                """ % (pig_farm_feed_buy_id)
         
         
             
