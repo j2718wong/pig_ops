@@ -277,7 +277,11 @@ class ReportGenPigProdOps:
         list_gestating_sows = model['sow_act'].get_production_sow_list(
                             pig_farm_id, 0, inc_historical)
         
+        
+        
+
         for cur_entry in list_gestating_sows:
+
             cur_pig_prod_id = cur_entry['pig_prod']['id']
             
             # This is the actual pig operations on the gestating sow.
@@ -286,6 +290,8 @@ class ReportGenPigProdOps:
             )
             
             cur_entry['gestating_ops'] = list_pig_ops
+            
+            index += 1
             
             
         dt_now      = datetime.now()
@@ -363,10 +369,9 @@ class ReportGenPigProdOps:
             s           += '  '
             
             
+            # Add Boar
             boar_id         = cur_entry['boar']['id']
-            semen_source    = cur_entry['semen_source']
-            semen_source_id = semen_source['id']
-            
+          
             if boar_id is None:
                 s_temp      = cur_entry['insemination']['type']
             else:
@@ -427,30 +432,26 @@ class ReportGenPigProdOps:
             s           += '  '
             
             
-            # Add comments of the semen source if artificial insemination
+            # Add comments 
+            # - if boar is external to farm
+            # - insemination type is AI; add semen name, semen supplier 
             s_temp = ''
-            if semen_source_id is not None:
-                semen_is_external = semen_source['is_external']
-                
-                if semen_is_external > 0:
-                    semen_source_name       = semen_source['name']
-                    semen_source_supplier   = semen_source['supplier']['name']
-                
-                    s_temp = semen_source_name + ' from ' + semen_source_supplier
-                else:
-                    boar_number = semen_source['boar']['number']
-                    boar_name = semen_source['boar']['name']
+            
+            if boar_id is not None:
+                if 'is_external' in cur_entry['boar']:
+                    boar_notes = cur_entry['boar']['notes']
+                    if boar_notes is not None:
+                        s_temp = boar_notes
                     
-                    s_temp = 'Internal semen from BOAR: '
-                    
-                    if boar_name is not None:
-                        s_temp += boar_name
-                    else:
-                        s_temp += boar_number
             else:
-                boar_notes = cur_entry['boar']['notes']
-                if boar_notes is not None:
-                    s_temp = boar_notes
+                semen_source    = cur_entry['semen_source']
+                
+                semen_name      = semen_source['semen']['name']
+                supplier_name   = semen_source['supplier']['name']
+            
+                s_temp = semen_name + ' from ' + supplier_name
+                
+            
                 
             s += s_temp
             

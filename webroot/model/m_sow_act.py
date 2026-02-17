@@ -319,27 +319,27 @@ class SowActivity:
                     
                     
                     a.boar_id,
-                    a.semen_source_id,
-                    
-                    d.number,
+                    d.number AS boar_number,
                     d.name AS boar_name,
-                    d.notes,
+                    d.is_external,
+                    e.notes AS boar_notes,
                     
-                    e.name AS semen_source_name,
-                    e.semen_supplier_id,
+                   
+                    a.semen_supplier_id,
                     f.name AS semen_supplier_name,
                     
-                    e.boar_id AS semen_source_boar_id,
-                    g.number AS semen_source_boar_num,
-                    g.name AS semen_source_boar_name 
+                    a.semen_sup_semen_id,
+                    g.name AS semen_name
                     
                 FROM pig_production a
                 LEFT OUTER JOIN sow_boar       b    ON a.sow_id = b.id
                 LEFT OUTER JOIN pig_prod_status c   ON a.prod_status_id = c.id
                 LEFT OUTER JOIN sow_boar       d    ON a.boar_id = d.id
-                LEFT OUTER JOIN semen_source   e    ON a.semen_source_id = e.id
-                LEFT OUTER JOIN semen_supplier f    ON e.semen_supplier_id = f.id
-                LEFT OUTER JOIN sow_boar       g    ON e.boar_id = g.id
+                LEFT OUTER JOIN pig_prod_notes e    ON d.add_notes_id = e.id
+                
+                LEFT OUTER JOIN common_supplier f   ON a.semen_supplier_id = f.id
+                LEFT OUTER JOIN semen_supplier_semen  g ON a.semen_sup_semen_id = g.id
+                
                 WHERE a.pig_farm_id = %s AND %s
                 ORDER BY a.date_insemination DESC
                 """ % (pig_farm_id, filter_clause)  
@@ -408,19 +408,16 @@ class SowActivity:
                 
                 
                 cur_boar_id             = row[18]
-                cur_semen_source_id     = row[19]
-                
-                cur_boar_number         = row[20]
-                cur_boar_name           = row[21]
+                cur_boar_number         = row[19]
+                cur_boar_name           = row[20]
+                cur_boar_is_external    = row[21]
                 cur_boar_notes          = row[22]
                 
-                cur_semen_source_name   = row[23]
-                cur_semen_supplier_id   = row[24]
-                cur_semen_supplier_name = row[25]
+                cur_semen_supplier_id   = row[23]
+                cur_semen_supplier_name = row[24]
                 
-                cur_semen_source_boar_id    = row[26]
-                cur_semen_source_boar_num   = row[27]
-                cur_semen_source_boar_name  = row[28]
+                cur_semen_id            = row[25]
+                cur_semen_name          = row[26]
                 
                 cur_entry = {
                     'pig_prod': {
@@ -447,25 +444,20 @@ class SowActivity:
                     'boar': {
                         'id':               cur_boar_id,
                         'number':           cur_boar_number,
+                        'is_external':      cur_boar_is_external,
                         'name':             cur_boar_name,
                         'notes':            cur_boar_notes
                     },
                     
                     'semen_source': {
-                        'id':               cur_semen_source_id,
-                        'name':             cur_semen_source_name,
-                        
-                        'is_external':      1,
-                        
                         'supplier':{
                             'id':           cur_semen_supplier_id,
                             'name':         cur_semen_supplier_name
                         },
                         
-                        'boar':{
-                            'id':           cur_semen_source_boar_id,
-                            'number':       cur_semen_source_boar_num,
-                            'name':         cur_semen_source_boar_name
+                        'semen':{
+                            'id':           cur_semen_id,
+                            'name':         cur_semen_name
                         }
                     },
                     
@@ -488,12 +480,12 @@ class SowActivity:
                         'num_pigs_m':       cur_num_pigs_weaning_m,
                         'num_pigs_f':       cur_num_pigs_weaning_f
                     }
-                    
-                    
                 }
                 
-                if cur_semen_source_boar_id  and cur_semen_source_boar_id > 0:
-                    cur_entry['semen_source']['is_external'] = 0
+                if cur_boar_is_external == 0:
+                    del cur_entry['boar']['is_external']
+                    del cur_entry['boar']['notes']
+                    
                 
                 result.append(cur_entry)
 

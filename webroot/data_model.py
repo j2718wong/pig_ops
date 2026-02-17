@@ -590,7 +590,7 @@ class DataPigProdNotes(BaseModel):
     notes:                  str
 
 
-class PigProdFeed:
+class DataPigProdFeed(BaseModel):
     uhid:                   str
         
     pig_prod_feed_hid:      str = None

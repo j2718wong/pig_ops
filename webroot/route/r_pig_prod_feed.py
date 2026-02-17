@@ -28,7 +28,7 @@ if module_directory not in sys.path:
 
 from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
-
+from r_pig_farm_feed_buy    import replace_plain_ids_feed_item
 
 
    
@@ -156,7 +156,30 @@ async def pig_prod_feed_update(pig_prod_feed_data: dm.DataPigProdFeed):
     pig_prod_feed_data.user_id   = user_id
     pig_prod_feed_data.pig_prod_feed_id = pig_prod_feed_id
     
-    res_update    =  model['prod_feed'].update(pig_prod_feed_data)
+    
+    if pig_prod_feed_data.num_gesta is None:
+        pig_prod_feed_data.num_gesta = 0
+    
+    if pig_prod_feed_data.num_lacta is None:
+        pig_prod_feed_data.num_lacta = 0
+    
+    if pig_prod_feed_data.num_booster is None:
+        pig_prod_feed_data.num_booster = 0
+    
+    if pig_prod_feed_data.num_prestarter is None:
+        pig_prod_feed_data.num_prestarter = 0
+    
+    if pig_prod_feed_data.num_starter is None:
+        pig_prod_feed_data.num_starter = 0
+    
+    if pig_prod_feed_data.num_grower is None:
+        pig_prod_feed_data.num_grower = 0
+    
+    if pig_prod_feed_data.num_finisher is None:
+        pig_prod_feed_data.num_finisher = 0
+    
+    
+    res_update    =  model['pig_prod_feed'].update(pig_prod_feed_data)
     
     if res_update is None:
         return {
@@ -235,11 +258,9 @@ async def pig_prod_feed_delete(uhid:str, ehid: str):
     return res_delete
     
     
-def get_data_pig_prod_feed(pig_prod_id, sow_boar_id, prod_group_id, 
-        inc_deleted, inc_user_audit):
+def get_data_pig_prod_feed(pig_prod_id):
             
-    res = model['prod_feed'].get_list(pig_prod_id, sow_boar_id, prod_group_id, 
-        inc_deleted, inc_user_audit)
+    res = model['pig_prod_feed'].get_list(pig_prod_id)
     
     if res is None:
         return None
@@ -247,19 +268,33 @@ def get_data_pig_prod_feed(pig_prod_id, sow_boar_id, prod_group_id,
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['prod_feed']['id']
+        cur_id  = cur_entry['pig_prod_feed']['id']
         cur_hid = hashids_common.encrypt(cur_id)
         
-        del cur_entry['prod_feed']['id']
-        cur_entry['prod_feed']['hid']   = cur_hid
-
+        del cur_entry['pig_prod_feed']['id']
+        cur_entry['pig_prod_feed']['hid']   = cur_hid
         
-        if 'pig_medvac' in cur_entry:
-            cur_id  = cur_entry['pig_medvac']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['pig_medvac']['id']
-            cur_entry['pig_medvac']['hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['pig_prod_feed']['pf_feed_buy_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_prod_feed']['pf_feed_buy_id']
+        cur_entry['pig_prod_feed']['pf_feed_buy_hid']   = cur_hid
+        
+        
+        
+        
+        cur_id  = cur_entry['feed_supplier']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['feed_supplier']['id']
+        cur_entry['feed_supplier']['hid']   = cur_hid
+        
+        
+        
+        for cur_item in cur_entry['feed_items']:
+            replace_plain_ids_feed_item(cur_item)
     
     
     return res
@@ -267,8 +302,7 @@ def get_data_pig_prod_feed(pig_prod_id, sow_boar_id, prod_group_id,
     
     
 @app.get("/pig_prod_feed/list", tags=["Production Details"])
-async def pig_prod_feed_list(pig_prod_hid: str = None, sow_boar_hid: str = None,
-    prod_group_hid = None, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_prod_feed_list(pig_prod_hid: str = None):
     """
     Will get pig_prod_feed list.
     
@@ -278,61 +312,26 @@ async def pig_prod_feed_list(pig_prod_hid: str = None, sow_boar_hid: str = None,
     pig_prod_hid:str
         pig_prod_hid hashid
 
-    inc_deleted: int
-        if > 0, will include deleted entries
-    
-    inc_user_audit:
-        if > 0, will include added_by and last_update info
-    
+   
     """
     
     pig_prod_id     = 0
-    sow_boar_id     = 0
-    prod_group_id   = 0
+
     
-    
-    if pig_prod_hid is not None:
-        res = hashids_common.decrypt(pig_prod_hid)
-        if len(res) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_FEED_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PIG_PROD_FEED_INVALID_PIG_PROD_HASHID'
-                }
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_FEED_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_PIG_PROD_FEED_INVALID_PIG_PROD_HASHID'
             }
-            
-        pig_prod_id = res[0]
+        }
+        
+    pig_prod_id = res[0]
         
         
-    if sow_boar_hid is not None:
-        res = hashids_common.decrypt(sow_boar_hid)
-        if len(res) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_FEED_INVALID_SOW_BOAR_HASHID,
-                    'code': 'ERROR_PIG_PROD_FEED_INVALID_SOW_BOAR_HASHID'
-                }
-            }
         
-        sow_boar_id = res[0]
-    
-    
-    if prod_group_hid is not None:
-        res = hashids_common.decrypt(prod_group_id)
-        if len(res) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_FEED_INVALID_PROD_GROUP_HASHID,
-                    'code': 'ERROR_PIG_PROD_FEED_INVALID_PROD_GROUP_HASHID'
-                }
-            }
-        
-        prod_group_id = res[0]
-    
-    
-        
-    res = get_data_pig_prod_feed(pig_prod_id, sow_boar_id, prod_group_id, 
-        inc_deleted, inc_user_audit)
+    res = get_data_pig_prod_feed(pig_prod_id)
     
     
     if res is None:

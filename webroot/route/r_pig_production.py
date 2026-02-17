@@ -44,6 +44,8 @@ from r_pig_medvac           import get_data_pig_medvac
 
 from r_pig_prod_notes       import get_data_pig_prod_notes
 
+from r_pig_prod_feed        import get_data_pig_prod_feed
+
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -1744,10 +1746,13 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
     pig_prod_id = res[0]
     
     
+    # Get MedVac list
     data_pig_medvac = get_data_pig_medvac(0, pig_prod_id, 0, 0)
     
     data_pig_prod_notes = get_data_pig_prod_notes(pig_prod_id, 0, 0, 0, 0)
     
+    
+    # Get Health/Notes list
     data_health_issues  = []
     data_notes          = []
     
@@ -1758,15 +1763,17 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
             data_notes.append(cur_entry)
     
     
-    
+    # Get pig_prod_feed list
+    data_pig_prod_feed = get_data_pig_prod_feed(pig_prod_id)
     
     
     
     data = {
         
-        'list_medvac':      data_pig_medvac,
-        'list_health_issues': data_health_issues,
-        'list_notes':       data_notes
+        'list_medvac':          data_pig_medvac,
+        'list_health_issues':   data_health_issues,
+        'list_notes':           data_notes,
+        'list_prod_feed':       data_pig_prod_feed
     }
     
     

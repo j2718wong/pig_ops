@@ -21,13 +21,13 @@ class PigProdFeed:
             in_date_add             VARCHAR(10),
             
             
-            in_num_gesta            INT,
-            in_num_lacta            INT,
-            in_num_booster          INT,
-            in_num_prestarter       INT,
-            in_num_starter          INT,
-            in_num_grower           INT,
-            in_num_finisher         INT
+            in_num_gesta            INT, /** must be > 0; can be NULL; */
+            in_num_lacta            INT, /** must be > 0; can be NULL; */   
+            in_num_booster          INT, /** must be > 0; can be NULL; */
+            in_num_prestarter       INT, /** must be > 0; can be NULL; */
+            in_num_starter          INT, /** must be > 0; can be NULL; */
+            in_num_grower           INT, /** must be > 0; can be NULL; */
+            in_num_finisher         INT  /** must be > 0; can be NULL; */
         )  
         """
         
@@ -136,22 +136,13 @@ class PigProdFeed:
             in_date_add             VARCHAR(10),
             
             
-            in_num_gesta            INT,
-            in_num_lacta            INT,
-            in_num_booster          INT,
-            in_num_prestarter       INT,
-            in_num_starter          INT,
-            in_num_grower           INT,
-            in_num_finisher         INT,
-            
-            
-            in_feed_item_gesta_id        INT,
-            in_feed_item_lacta_id        INT,
-            in_feed_item_booster_id      INT,
-            in_feed_item_prestarter_id   INT,
-            in_feed_item_starter_id      INT,
-            in_feed_item_grower_id       INT,
-            in_feed_item_finisher_id     INT
+            in_num_gesta            INT, /** can be >= 0; cannot be NULL*/
+            in_num_lacta            INT, /** can be >= 0; cannot be NULL*/   
+            in_num_booster          INT, /** can be >= 0; cannot be NULL*/
+            in_num_prestarter       INT, /** can be >= 0; cannot be NULL*/
+            in_num_starter          INT, /** can be >= 0; cannot be NULL*/
+            in_num_grower           INT, /** can be >= 0; cannot be NULL*/
+            in_num_finisher         INT  /** can be >= 0; cannot be NULL*/
         )  
         """
         
@@ -162,49 +153,13 @@ class PigProdFeed:
         sql += '"%s",'  % data.date_add
         
         
-        if data.num_gesta is not None and data.num_gesta > 0:
-            sql += '%s,'    % data.num_gesta
-        
-        if data.num_lacta is not None and data.num_lacta > 0:
-            sql += '%s,'    % data.num_lacta
-        
-        if data.num_booster is not None and data.num_booster > 0:
-            sql += '%s,'    % data.num_booster
-        
-        if data.num_prestarter is not None and data.num_prestarter > 0:
-            sql += '%s,'    % data.num_prestarter
-        
-        if data.num_starter is not None and data.num_starter > 0:
-            sql += '%s,'    % data.num_starter
-        
-        if data.num_grower is not None and data.num_grower > 0:
-            sql += '%s,'    % data.num_grower
-        
-        if data.num_finisher is not None and data.num_finisher > 0:
-            sql += '%s,'    % data.num_finisher
-        
-        
-        if data.feed_item_gesta_id is not None and data.feed_item_gesta_id > 0:
-            sql += '%s,'    % data.feed_item_gesta_id
-        
-        if data.feed_item_lacta_id is not None and data.feed_item_lacta_id > 0:
-            sql += '%s,'    % data.feed_item_lacta_id
-        
-        if data.feed_item_booster_id is not None and data.feed_item_booster_id > 0:
-            sql += '%s,'    % data.feed_item_booster_id
-        
-        if data.feed_item_prestarter_id is not None and data.feed_item_prestarter_id > 0:
-            sql += '%s,'    % data.feed_item_prestarter_id
-        
-        if data.feed_item_starter_id is not None and data.feed_item_starter_id > 0:
-            sql += '%s,'    % data.feed_item_starter_id
-        
-        if data.feed_item_grower_id is not None and data.feed_item_grower_id > 0:
-            sql += '%s,'    % data.feed_item_grower_id
-        
-        if data.feed_item_finisher_id is not None and data.feed_item_finisher_id > 0:
-            sql += '%s)'    % data.feed_item_finisher_id
-        
+        sql += '%s,'    % data.num_gesta
+        sql += '%s,'    % data.num_lacta
+        sql += '%s,'    % data.num_booster
+        sql += '%s,'    % data.num_prestarter
+        sql += '%s,'    % data.num_starter
+        sql += '%s,'    % data.num_grower
+        sql += '%s);'   % data.num_finisher
         
         
         # Check if still connected to database
@@ -254,13 +209,17 @@ class PigProdFeed:
         
         sql =   """
                 SELECT 
-                    id,
-                    pig_farm_feed_buy_id,
-                    date_add        
+                    a.id,
+                    a.pig_farm_feed_buy_id,
+                    b.feed_supplier_id,
+                    c.name AS supplier_name,
+                    a.date_add        
                     
-                FROM pig_prod_feed 
-                WHERE pig_prod_id = %s
-                ORDER BY date_add DESC
+                FROM pig_prod_feed a
+                LEFT OUTER JOIN pig_farm_feed_buy b ON a.pig_farm_feed_buy_id = b.id
+                LEFT OUTER JOIN common_supplier c   ON b.feed_supplier_id = c.id
+                WHERE a.pig_prod_id = %s
+                ORDER BY a.date_add DESC
                 """ % (pig_prod_id)
         
             
@@ -300,13 +259,22 @@ class PigProdFeed:
             for row in rows:
                 cur_id                      = row[0]
                 cur_pig_farm_feed_buy_id    = row[1]
-                cur_date_add                = str(row[2])
+                cur_feed_supplier_id        = row[2]
+                cur_feed_supplier_name      = row[3]
+                cur_date_add                = str(row[4])
                 
                
                 cur_entry = {
-                    'id':               cur_id,
-                    'pf_feed_buy_id':   cur_pig_farm_feed_buy_id,
-                    'date_add':         cur_date_add 
+                    'pig_prod_feed': {
+                        'id':               cur_id,
+                        'pf_feed_buy_id':   cur_pig_farm_feed_buy_id,
+                        'date_add':         cur_date_add
+                    },
+                    
+                    'feed_supplier': {
+                        'id':           cur_feed_supplier_id,
+                        'name':         cur_feed_supplier_name
+                    } 
                 }
                 
                 feed_items = self.get_list_items(cur_id)
