@@ -97,7 +97,7 @@ MODULES_ROOT = [
     
     "pages/production/gesta_lacta/page_prod_gestating_add.js",
     
-    "pages/production/gesta_lacta/prod_entry_notes.js",
+
     "pages/production/gesta_lacta/prod_entry_pig_ops.js",
     "pages/production/gesta_lacta/prod_entry_birth.js",
     "pages/production/gesta_lacta/page_prod_gestating_entry.js",

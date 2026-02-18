@@ -46,6 +46,7 @@ from r_pig_prod_notes       import get_data_pig_prod_notes
 
 from r_pig_prod_feed        import get_data_pig_prod_feed
 
+from r_feed_balance         import get_data_feed_balance
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -1767,13 +1768,16 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
     data_pig_prod_feed = get_data_pig_prod_feed(pig_prod_id)
     
     
+    # Get feed_balance list
+    data_feed_balance_list = get_data_feed_balance(pig_prod_id)
     
     data = {
         
         'list_medvac':          data_pig_medvac,
         'list_health_issues':   data_health_issues,
         'list_notes':           data_notes,
-        'list_prod_feed':       data_pig_prod_feed
+        'list_prod_feed':       data_pig_prod_feed,
+        'list_feed_balance':    data_feed_balance_list
     }
     
     

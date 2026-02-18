@@ -210,38 +210,60 @@ class FeedBalance:
     
     
     def get_list(self, pig_prod_id, inc_user_audit = 0):
-        
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.date_balance,
-                    
-                    a.num_pigs,
-                    
-                    a.num_lactating,
-                    a.num_booster,
-                    a.num_prestarter,
-                    a.num_starter,
-                    a.num_grower,
-                    a.num_finisher,
-                    
-                    b.name_last,
-                    b.name_first,
-                    a.dt_entry,
-                    
-                    
-                    c.name_last,
-                    c.name_first,
-                    a.dt_last_update
-                    
-                FROM feed_balance a
-                LEFT OUTER JOIN user b          ON a.added_by_user_id = b.id
-                LEFT OUTER JOIN user c          ON a.last_update_user_id = c.id
-                WHERE a.pig_prod_id = %s
-                ORDER BY a.date_balance DESC
-                """ % pig_prod_id
-                    
-            
+        if inc_user_audit == 0:
+                        sql =   """
+                    SELECT 
+                        id,
+                        date_balance,
+                        
+                        num_pigs,
+                        
+                        num_gestating,
+                        num_lactating,
+                        num_booster,
+                        num_prestarter,
+                        num_starter,
+                        num_grower,
+                        num_finisher
+                        
+                    FROM feed_balance a
+                    WHERE pig_prod_id = %s
+                    ORDER BY date_balance DESC
+                    """ % pig_prod_id
+                        
+
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.date_balance,
+                        
+                        a.num_pigs,
+                        
+                        a.num_lactating,
+                        a.num_booster,
+                        a.num_prestarter,
+                        a.num_starter,
+                        a.num_grower,
+                        a.num_finisher,
+                        
+                        b.name_last,
+                        b.name_first,
+                        a.dt_entry,
+                        
+                        
+                        c.name_last,
+                        c.name_first,
+                        a.dt_last_update
+                        
+                    FROM feed_balance a
+                    LEFT OUTER JOIN user b          ON a.added_by_user_id = b.id
+                    LEFT OUTER JOIN user c          ON a.last_update_user_id = c.id
+                    WHERE a.pig_prod_id = %s
+                    ORDER BY a.date_balance DESC
+                    """ % pig_prod_id
+                        
+                
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
@@ -259,7 +281,7 @@ class FeedBalance:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql
@@ -274,32 +296,63 @@ class FeedBalance:
         if rows is not None:
             
             for row in rows:
+                cur_num_gestating       = float(row[3]) if row[3] else None
+                cur_num_lactating       = float(row[4]) if row[4] else None
+                cur_num_booster         = float(row[5]) if row[5] else None
+                cur_num_prestarter      = float(row[6]) if row[6] else None
+                cur_num_starter         = float(row[7]) if row[7] else None
+                cur_num_grower          = float(row[8]) if row[8] else None
+                cur_num_finisher        = float(row[9]) if row[9] else None
+                
+                
+                
                 cur_entry = {
                     'feed_balance': {
                         'id':               row[0],
                         'date_balance':     str(row[1]),
-                        'num_pigs':         row[2],
-                        'num_lactating':    float(row[3]) if row[3] else None,
-                        'num_booster':      float(row[4]) if row[4] else None,
-                        'num_prestarter':   float(row[5]) if row[5] else None,
-                        'num_starter':      float(row[6]) if row[6] else None,
-                        'num_grower':       float(row[7]) if row[7] else None,
-                        'num_finisher':     float(row[8]) if row[8] else None,
-                    },
-                    
-                    'added_by': {
-                        'name_last':        row[9],
-                        'name_first':       row[10],
-                        'dt_entry':         row[11]
-                    },
-                    
-                    'last_update':{
-                        'name_last':        row[12],
-                        'name_first':       row[13],
-                        'dt_update':        str(row[14]) if row[14] else None
+                        'num_pigs':         row[2]
                     }
                 }
-
+                
+                
+                if cur_num_gestating is not None:
+                    cur_entry['feed_balance']['num_gestating'] = cur_num_gestating
+                
+                if cur_num_lactating is not None:
+                    cur_entry['feed_balance']['num_lactating'] = cur_num_lactating
+                
+                if cur_num_booster is not None:
+                    cur_entry['feed_balance']['num_booster'] = cur_num_booster
+                
+                if cur_num_prestarter is not None:
+                    cur_entry['feed_balance']['num_prestarter'] = cur_num_prestarter
+                
+                if cur_num_starter is not None:
+                    cur_entry['feed_balance']['num_starter'] = cur_num_starter
+                
+                if cur_num_grower is not None:
+                    cur_entry['feed_balance']['num_grower'] = cur_num_grower
+                
+                if cur_num_finisher is not None:
+                    cur_entry['feed_balance']['num_finisher'] = cur_num_finisher
+                
+                
+                if inc_user_audit > 0:
+                
+                    added_by = {
+                        'name_last':        row[10],
+                        'name_first':       row[11],
+                        'dt_entry':         row[12]
+                    }
+                    
+                    last_update = {
+                        'name_last':        row[13],
+                        'name_first':       row[14],
+                        'dt_update':        str(row[15]) if row[15] else None
+                    }
+                
+                    cur_entry['added_by']   = added_by
+                    cur_entry['last_update'] = last_update
                 
                     
                 result.append(cur_entry)
