@@ -32,7 +32,7 @@ from r_utils                import remove_database_null_description
 
    
 @app.post("/feed_balance/add", tags=["Production Details"])
-async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
+async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
     uhid    = feed_balance_data.uhid
     
     res = hashids_user.decrypt(uhid)
@@ -121,7 +121,7 @@ async def feed_balance_add(feed_balance_data: dm.DataProdFeedBal):
     
 
 @app.post("/feed_balance/update", tags=["Production Details"])
-async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
+async def feed_balance_update(feed_balance_data: dm.DataFeedBalance):
     uhid    = feed_balance_data.uhid
     
     res = hashids_user.decrypt(uhid)
@@ -147,22 +147,24 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
     
     
     
-    feed_balance_hid    = feed_balance_data.feed_balance_hid
+    pig_prod_hid        = feed_balance_data.pig_prod_hid
+    pig_prod_id         = 0
     
-    res = hashids_common.decrypt(feed_balance_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID,
-                'code': 'ERROR_FEED_BALANCE_INVALID_FEED_BRAND_HASHID'
+    if pig_prod_hid is not None:
+        res = hashids_common.decrypt(pig_prod_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
+                    'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID'
+                }
             }
-        }
-    
-    feed_balance_id = res[0]
+        
+        pig_prod_id = res[0]
     
     
     feed_balance_data.user_id           = user_id
-    feed_balance_data.feed_balance_id   = feed_balance_id
+    feed_balance_data.pig_prod_id       = pig_prod_id
    
     
     res_update    =  model['feed_balance'].update(feed_balance_data)
@@ -175,10 +177,13 @@ async def feed_balance_update(feed_balance_data: dm.DataProdFeedBal):
             }
         }
         
-        
+    cur_id  = res_update['feed_balance']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    
     # remove plain id
     del res_update['feed_balance']['id']
-    res_update['feed_balance']['hid'] = feed_balance_hid
+    res_update['feed_balance']['hid'] = cur_hid
     
         
     # Remove optional desc coming from database

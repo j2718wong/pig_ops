@@ -721,7 +721,7 @@ class DataPigProdPigOps(BaseModel):
     notes:                  str = None
     
  
-class DataProdFeedBal(BaseModel):
+class DataFeedBalance(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None
@@ -739,8 +739,8 @@ class DataProdFeedBal(BaseModel):
     
     num_pigs:               int = None
     
-    num_gestating:          float = None
-    num_lactating:          float = None
+    num_gesta:              float = None
+    num_lacta:              float = None
     num_booster:            float = None
     num_prestarter:         float = None
     num_starter:            float = None
