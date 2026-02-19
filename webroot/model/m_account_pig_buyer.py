@@ -550,7 +550,7 @@ class AccountPigBuyer:
                         'longitude':    cur_address_longitude
                     }
                     
-                cur_entry['location']['geoloc'] = geoloc
+                    cur_entry['location']['geoloc'] = geoloc
                     
                 
                 if inc_user_audit > 0:
