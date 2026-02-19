@@ -271,6 +271,9 @@ class ProductionHarvest:
                         
                         a.date_harvest,
                         a.num_pigs_harvest,
+                        a.num_days_since_birth,
+                        
+                        a.harvest_type_id,
                         
                         a.live_weight,
                         a.live_weight_ave,
@@ -281,9 +284,13 @@ class ProductionHarvest:
                         a.slaughter_net_weight,
                         a.slaughter_price_per_unit,
                         
-                        a.sales,
+                        a.net_sales,
+                        a.net_sales_per_pig,
                         a.harvest_cost,
                         a.comments,
+                        
+                        
+                        a.weight_pp_csv,
                         
                         a.acc_pig_buyer_id,
                         b.name AS acc_pig_buyer_name
@@ -301,6 +308,9 @@ class ProductionHarvest:
                         
                         a.date_harvest,
                         a.num_pigs_harvest,
+                        a.num_days_since_birth,
+                        
+                        a.harvest_type_id,
                         
                         a.live_weight,
                         a.live_weight_ave,
@@ -311,9 +321,13 @@ class ProductionHarvest:
                         a.slaughter_net_weight,
                         a.slaughter_price_per_unit,
                         
-                        a.sales,
+                        a.net_sales,
+                        a.net_sales_per_pig,
                         a.harvest_cost,
                         a.comments,
+                        
+                        
+                        a.weight_pp_csv,
                         
                         a.acc_pig_buyer_id,
                         b.name AS acc_pig_buyer_name,
@@ -367,25 +381,74 @@ class ProductionHarvest:
         if rows is not None:
             
             for row in rows:
+                cur_id                  = row[0]
+                
+                cur_date_harvest        = str(row[1])
+                cur_num_pigs_harvest    = row[2]
+                cur_num_days_since_birth= row[3]
+                
+                cur_harvest_type_id     = row[4]
+                
+                cur_live_weight         = float(row[5]) if row[5] else None
+                cur_live_weight_ave     = float(row[6]) if row[6] else None 
+                cur_live_price_per_unit = float(row[7]) if row[7] else None
+                
+                cur_slaugther_weight    = float(row[8]) if row[8] else None
+                cur_slaughter_weight_ave= float(row[9]) if row[9] else None
+                cur_slaughter_net_weight= float(row[10]) if row[10] else None
+                cur_slaughter_price_per_unit = float(row[11]) if row[11] else None
+                
+                cur_net_sales           = float(row[12]) if row[12] else None
+                cur_net_sales_per_pig   = float(row[13]) if row[13] else None
+                cur_harvest_cost        = float(row[14]) if row[14] else None
+                cur_comments            = row[15]
+                
+                cur_weight_pp_csv       = row[16]
+                
+                cur_acc_pig_buyer_id    = row[17]
+                cur_acc_pig_buyer_name  = row[18]
+                
+                
+                
                 cur_entry = {
                     'pig_harvest'{
-                        'id':               row[0],
-                        'date_harvest':     str(row[1]),
-                        'num_pigs':         row[2],
+                        'id':               cur_id,
+                        'date_harvest':     cur_date_harvest,
+                        'num_pigs':         cur_num_pigs_harvest,
+                        'num_days':         cur_num_days_since_birth,
                         
-                        'live_weight':      float(row[3])   if row[3] is not None else None,
-                        'live_weight_ave':  float(row[4])   if row[4] is not None else None, 
-                        'live_ppu':         float(row[5])   if row[5] is not None else None,
+                        'harvest_type_id':  cur_harvest_type_id,
                         
-                        'slaugther_weight': float(row[6])   if row[6] is not None else None,
-                        'slaughter_weight_ave':float(row[7])if row[7] is not None else None,
-                        'slaughter_net_weight':float(row[8])if row[8] is not None else None,
-                        'slaughter_ppu':    float(row[9])   if row[9] is not None else None,
+                        'live_weight': {
+                            'weight':       cur_live_weight,
+                            'weight_ave':   cur_live_weight_ave,
+                            'price':        cur_live_price_per_unit
+                        },
+                            
                         
-                        'sales':            float(row[10])   if row[10] is not None else None,
-                        'harvest_cost':     float(row[11])   if row[11] is not None else None,
-                        'comments':,
+                        'slaugther_weight': {
+                            'weight':       cur_slaugther_weight,
+                            'net_weight':   cur_slaughter_net_weight,
+                            'weight_ave':   cur_slaughter_weight_ave,
+                            'price':        cur_slaughter_price_per_unit,
+                            'per_pig_weight': cur_weight_pp_csv
+                        },
                         
+                        
+                        
+                        'sales':           { 
+                            'net_sales':    cur_net_sales,
+                            'sales_pp':     cur_net_sales_per_pig,
+                            'harvest_cost': cur_harvest_cost
+                        
+                        },
+                        
+                        'notes': cur_comments,
+                        
+                        'pig_buyer':{
+                            'id':           cur_acc_pig_buyer_id,
+                            'name':         cur_acc_pig_buyer_name,
+                        }
                         
                     }
                    

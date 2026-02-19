@@ -38,6 +38,9 @@ from model.m_account            import Account
 from model.m_account_request    import AccountRequest
 from model.m_mfa                import Mfa
 
+
+from model.m_a0_public_lookup   import PublicLookup
+
 from model.m_user               import User
 from model.m_user_group         import UserGroup
 from model.m_user_pig_farm      import UserPigFarm
@@ -61,7 +64,7 @@ from model.m_pig_race           import PigRace
 from model.m_pig_race_line      import PigRaceLine
 from model.m_semen_supplier_semen import SemenSupplierSemen
 
-from model.m_feed_type          import FeedType
+
 from model.m_feed_brand         import FeedBrand
 from model.m_feed_supplier      import FeedSupplier
 from model.m_feed_buy           import FeedBuy
@@ -103,6 +106,8 @@ model_names_pig_ops = [
     ('user_group',              UserGroup),
     ('user_farm',               UserPigFarm),
     
+    ('public_lookup',           PublicLookup),
+    
     
     ('pig_farm',                PigFarm),
     ('pig_farm_staff',          PigFarmStaff),
@@ -124,7 +129,7 @@ model_names_pig_ops = [
     
     ('semen_sup_semen',         SemenSupplierSemen),
     
-    ('feed_type',               FeedType),
+    
     ('feed_brand',              FeedBrand),
     ('feed_supplier',           FeedSupplier),
     ('feed_buy',                FeedBuy),
