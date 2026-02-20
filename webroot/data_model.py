@@ -8,10 +8,12 @@ COUNTRY_ID_PHILIPPINES      = 1
 
 
 class HasAddressLevel:
-    country_id:             int = 1     # default to PH
     level_1_hid:            str = None
     level_2_hid:            str = None
     level_3_hid:            str = None
+    
+    
+    country_id:             int = 0
     
     level_1_id:             int = 0
     level_2_id:             int = 0
@@ -748,34 +750,37 @@ class DataFeedBalance(BaseModel):
     num_finisher:           float = None
     
     
-class DataProductionHarvest:
+class DataProductionHarvest(BaseModel):
     uhid:                   str
     
     pig_prod_hid:           str = None
     production_group_hid:   str = None
+    harvest_type_hid:       str = None 
     acc_pig_buyer_hid:      str = None
-    production_harvest_hid: str = None
+    prod_harvest_hid:       str = None
     
     
     user_id:                int = 0
     pig_prod_id:            int = 0
     production_group_id:    int = 0
     acc_pig_buyer_id:       int = 0
-    production_harvest_id:  int = 0
+    prod_harvest_id:        int = 0
     
     date_harvest:           str
-    num_pigs_harvest:       int
-    harvest_type_id:        int
+    num_pigs:               int
+    harvest_type_id:        int = 0
     
     live_weight:            float = None
-    live_price_per_unit:    float = None
+    live_price:             float = None
     
     slaughter_weight:       float = None
-    slaughter_net_weight:   float = None
-    slaughter_price_per_unit: float = None
+    slaughter_minus_weight: float = None
+    slaughter_price:        float = None
     
     net_sales:              float = None
     harvest_cost:           float = None
     comments:               str = None
     
+    weight_pp_lw_csv:       str = None
+    weight_pp_sw_csv:       str = None
     

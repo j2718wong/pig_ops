@@ -53,19 +53,19 @@ class AccountPigBuyer:
             sql += 'NULL,'
         
         
-        if data.address_level_1_id:
-            sql += '%s,'    % data.address_level_1_id
+        if data.level_1_id > 0:
+            sql += '%s,'    % data.level_1_id
         else:
             sql += 'NULL,'
         
         
-        if data.address_level_2_id > 0:
-            sql += '%s,'    % data.address_level_2_id
+        if data.level_2_id > 0:
+            sql += '%s,'    % data.level_2_id
         else:
             sql += 'NULL,'
         
-        if data.address_level_3_id:
-            sql += '%s,'    % data.address_level_3_id
+        if data.level_3_id > 0:
+            sql += '%s,'    % data.level_3_id
         else:
             sql += 'NULL,'
             

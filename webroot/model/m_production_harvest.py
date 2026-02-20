@@ -10,10 +10,6 @@ class ProductionHarvest:
         self.TAG                = 'ProductionHarvest'
 
 
-    def get_harvest_type(self):
-        
-
-
     def add(self, data = None):
         """
         PROCEDURE production_harvest_add(
@@ -27,16 +23,19 @@ class ProductionHarvest:
             in_num_pigs_harvest     INT,
             in_harvest_type_id      INT,
             
-            in_live_weight          INT,
-            in_slaughter_weight     DECIMAL(6,1),
-            in_slaughter_net_weight DECIMAL(6,1),
-            
+            in_live_weight                  DECIMAL(6,1),
             in_live_price_per_unit          DECIMAL(6,1),
+            
+            in_slaughter_weight             DECIMAL(6,1),
+            in_slaughter_minus_weight       DECIMAL(6,1),
             in_slaughther_price_per_unit    DECIMAL(6,1),
             
             in_net_sales            DECIMAL(8,1),
             in_harvest_cost         DECIMAL(5,1),
-            in_comments             VARCHAR(160)
+            in_comments             VARCHAR(160),
+            
+            in_weight_pp_live       VARCHAR(400),
+            in_weight_pp_slaughter  VARCHAR(400)
         )  
         """
         
@@ -49,15 +48,19 @@ class ProductionHarvest:
         else:
             sql += 'NULL,'
         
-        if data.pig_prod_group_id is not None and data.pig_prod_group_id > 0:
+        if data.production_group_id is not None and data.production_group_id > 0:
             sql += '%s,'    % data.pig_prod_group_id
         else:
             sql += 'NULL,'
             
-        sql += '%s,'    % data.acc_pig_buyer_id
+        if data.acc_pig_buyer_id is not None and data.acc_pig_buyer_id > 0: 
+            sql += '%s,'    % data.acc_pig_buyer_id
+        else:
+            sql += 'NULL,'
+        
         
         sql += '"%s",'  % data.date_harvest
-        sql += '%s,'    % data.num_pigs_harvest
+        sql += '%s,'    % data.num_pigs
         sql += '%s,'    % data.harvest_type_id
         
         if data.live_weight is not None:
@@ -65,25 +68,29 @@ class ProductionHarvest:
         else:
             sql += 'NULL,'
         
+        if data.live_price is not None:
+            sql += '%s,'    % data.live_price
+        else:
+            sql += 'NULL,'
+        
+        
+        
         if data.slaughter_weight is not None:
             sql += '%s,'    % data.slaughter_weight
         else:
             sql += 'NULL,'
             
-        if data.slaughter_net_weight is not None:
-            sql += '%s,'    % data.slaughter_net_weight
+        if data.slaughter_minus_weight is not None:
+            sql += '%s,'    % data.slaughter_minus_weight
+        else:
+            sql += 'NULL,'
+          
+        if data.slaughter_price is not None:
+            sql += '%s,'    % data.slaughter_price
         else:
             sql += 'NULL,'
         
-        if data.live_price_per_unit is not None:
-            sql += '%s,'    % data.live_price_per_unit
-        else:
-            sql += 'NULL,'
         
-        if data.slaughter_price_per_unit is not None:
-            sql += '%s,'    % data.slaughter_price_per_unit
-        else:
-            sql += 'NULL,'
         
         if data.net_sales is not None:
             sql += '%s,'    % data.net_sales
@@ -97,7 +104,19 @@ class ProductionHarvest:
         
         
         if data.comments is not None:
-            sql += '"%s");'  % data.comments
+            sql += '"%s",'  % data.comments
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.weight_pp_lw_csv is not None:
+            sql += '"%s",'  % data.weight_pp_lw_csv
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.weight_pp_sw_csv is not None:
+            sql += '"%s");'  % data.weight_pp_sw_csv
         else:
             sql += 'NULL);'
         
@@ -136,7 +155,7 @@ class ProductionHarvest:
                     'desc':             row[2],
                 },
                 
-                'production_harvest': {
+                'prod_harvest': {
                     'id':               row[3]
                 }
             }
@@ -149,6 +168,8 @@ class ProductionHarvest:
         PROCEDURE production_harvest_update(
             in_user_id              INT,
             
+            in_acc_pig_buyer_id     INT,
+            
             in_production_harvest_id INT,
             
             in_date_harvest         VARCHAR(10),
@@ -156,61 +177,95 @@ class ProductionHarvest:
             in_num_pigs_harvest     INT,
             in_harvest_type_id      INT,
             
-            in_live_weight          DECIMAL(6,1),
-            in_slaughter_weight     DECIMAL(6,1),
-            in_slaughter_net_weight DECIMAL(6,1),
-            
+            in_live_weight                  DECIMAL(6,1),
             in_live_price_per_unit          DECIMAL(6,1),
+            
+            in_slaughter_weight             DECIMAL(6,1),
+            in_slaughter_minus_weight       DECIMAL(6,1),
             in_slaughther_price_per_unit    DECIMAL(6,1),
             
             in_net_sales            DECIMAL(8,1),
             in_harvest_cost         DECIMAL(5,1),
-            in_comments             VARCHAR(160)
+            in_comments             VARCHAR(160),
+            
+            in_weight_pp_live       VARCHAR(400),
+            in_weight_pp_slaughter  VARCHAR(400)
         )
         """
        
         sql =  'CALL production_harvest_update('
         sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.production_harvest_id
+        sql += '%s,'    % data.prod_harvest_id
+        
+        if data.acc_pig_buyer_id is not None and data.acc_pig_buyer_id > 0: 
+            sql += '%s,'    % data.acc_pig_buyer_id
+        else:
+            sql += 'NULL,'
+        
         
         sql += '"%s",'  % data.date_harvest
-        sql += '%s,'    % data.num_pigs_harvest
+        sql += '%s,'    % data.num_pigs
         sql += '%s,'    % data.harvest_type_id
+        
         
         if data.live_weight is not None:
             sql += '%s,'    % data.live_weight
         else:
             sql += 'NULL,'
         
+        if data.live_price is not None:
+            sql += '%s,'    % data.live_price
+        else:
+            sql += 'NULL,'
+        
+        
+        
         if data.slaughter_weight is not None:
             sql += '%s,'    % data.slaughter_weight
         else:
             sql += 'NULL,'
             
-        if data.slaughter_net_weight is not None:
-            sql += '%s,'    % data.slaughter_net_weight
+        if data.slaughter_minus_weight is not None:
+            sql += '%s,'    % data.slaughter_minus_weight
+        else:
+            sql += 'NULL,'
+          
+        if data.slaughter_price is not None:
+            sql += '%s,'    % data.slaughter_price
         else:
             sql += 'NULL,'
         
-        if data.live_price_per_unit is not None:
-            sql += '%s,'    % data.live_price_per_unit
+        
+        
+        if data.net_sales is not None:
+            sql += '%s,'    % data.net_sales
+        else:
+            sql += 'NULL,'
+            
+        if data.harvest_cost is not None:
+            sql += '%s,'    % data.harvest_cost
         else:
             sql += 'NULL,'
         
-        if data.slaughter_price_per_unit is not None:
-            sql += '%s,'    % data.slaughter_price_per_unit
-        else:
-            sql += 'NULL,'
-        
-
-        sql += '%s,'    % data.net_sales
-        sql += '%s,'    % data.harvest_cost
         
         if data.comments is not None:
-            sql += '"%s");'  % data.comments
+            sql += '"%s"'  % data.comments
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.weight_pp_lw_csv is not None:
+            sql += '"%s",'  % data.weight_pp_lw_csv
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.weight_pp_sw_csv is not None:
+            sql += '"%s");'  % data.weight_pp_sw_csv
         else:
             sql += 'NULL);'
+        
         
         
         # Check if still connected to database
@@ -247,7 +302,7 @@ class ProductionHarvest:
                     'desc':             row[2],
                 },
                 
-                'pig_prod_notes': {
+                'prod_harvest': {
                     'id':               row[3]
                 }
             }
@@ -281,6 +336,7 @@ class ProductionHarvest:
                         
                         a.slaugther_weight,
                         a.slaughter_weight_ave,
+                        a.slaugther_minus_weight,
                         a.slaughter_net_weight,
                         a.slaughter_price_per_unit,
                         
@@ -290,7 +346,8 @@ class ProductionHarvest:
                         a.comments,
                         
                         
-                        a.weight_pp_csv,
+                        a.weight_pp_lw_csv,
+                        a.weight_pp_sw_csv,
                         
                         a.acc_pig_buyer_id,
                         b.name AS acc_pig_buyer_name
@@ -318,6 +375,7 @@ class ProductionHarvest:
                         
                         a.slaugther_weight,
                         a.slaughter_weight_ave,
+                        a.slaugther_minus_weight,
                         a.slaughter_net_weight,
                         a.slaughter_price_per_unit,
                         
@@ -327,7 +385,8 @@ class ProductionHarvest:
                         a.comments,
                         
                         
-                        a.weight_pp_csv,
+                        a.weight_pp_lw_csv,
+                        a.weight_pp_sw_csv,
                         
                         a.acc_pig_buyer_id,
                         b.name AS acc_pig_buyer_name,
@@ -393,25 +452,27 @@ class ProductionHarvest:
                 cur_live_weight_ave     = float(row[6]) if row[6] else None 
                 cur_live_price_per_unit = float(row[7]) if row[7] else None
                 
-                cur_slaugther_weight    = float(row[8]) if row[8] else None
-                cur_slaughter_weight_ave= float(row[9]) if row[9] else None
-                cur_slaughter_net_weight= float(row[10]) if row[10] else None
-                cur_slaughter_price_per_unit = float(row[11]) if row[11] else None
+                cur_slaugther_weight        = float(row[8]) if row[8] else None
+                cur_slaughter_weight_ave    = float(row[9]) if row[9] else None
+                cur_slaughter_minus_weight  = float(row[10]) if row[10] else None
+                cur_slaughter_net_weight    = float(row[11]) if row[11] else None
+                cur_slaughter_price_per_unit= float(row[12]) if row[12] else None
                 
-                cur_net_sales           = float(row[12]) if row[12] else None
-                cur_net_sales_per_pig   = float(row[13]) if row[13] else None
-                cur_harvest_cost        = float(row[14]) if row[14] else None
-                cur_comments            = row[15]
+                cur_net_sales           = float(row[13]) if row[13] else None
+                cur_net_sales_per_pig   = float(row[14]) if row[14] else None
+                cur_harvest_cost        = float(row[15]) if row[15] else None
+                cur_comments            = row[16]
                 
-                cur_weight_pp_csv       = row[16]
+                cur_weight_pp_lw_csv    = row[17]
+                cur_weight_pp_sw_csv    = row[18]
                 
-                cur_acc_pig_buyer_id    = row[17]
-                cur_acc_pig_buyer_name  = row[18]
+                cur_acc_pig_buyer_id    = row[19]
+                cur_acc_pig_buyer_name  = row[20]
                 
                 
                 
                 cur_entry = {
-                    'pig_harvest'{
+                    'prod_harvest': {
                         'id':               cur_id,
                         'date_harvest':     cur_date_harvest,
                         'num_pigs':         cur_num_pigs_harvest,
@@ -422,7 +483,8 @@ class ProductionHarvest:
                         'live_weight': {
                             'weight':       cur_live_weight,
                             'weight_ave':   cur_live_weight_ave,
-                            'price':        cur_live_price_per_unit
+                            'price':        cur_live_price_per_unit,
+                            'pp_csv':       cur_weight_pp_lw_csv
                         },
                             
                         
@@ -431,7 +493,7 @@ class ProductionHarvest:
                             'net_weight':   cur_slaughter_net_weight,
                             'weight_ave':   cur_slaughter_weight_ave,
                             'price':        cur_slaughter_price_per_unit,
-                            'per_pig_weight': cur_weight_pp_csv
+                            'pp_csv':       cur_weight_pp_sw_csv
                         },
                         
                         

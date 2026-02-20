@@ -86,6 +86,7 @@ from model.m_pig_prod_pig_dead  import PigProdPigDead
 from model.m_pig_prod_pig_ops   import PigProdPigOps
 from model.m_pig_prod_feed      import PigProdFeed
 
+from model.m_production_harvest import ProductionHarvest
 
 from model.m_pig_medvac         import PigMedVac
 
@@ -151,7 +152,7 @@ model_names_pig_ops = [
     ('pig_prod_pig_ops',        PigProdPigOps),
     ('pig_prod_feed',           PigProdFeed),
     
-    
+    ('prod_harvest',            ProductionHarvest),
     
     ('pig_medvac',              PigMedVac),
     
