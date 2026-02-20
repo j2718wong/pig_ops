@@ -307,29 +307,7 @@ def get_data_prod_harvest(pig_prod_id):
         del cur_entry['prod_harvest']['id']
         cur_entry['prod_harvest']['hid']   = cur_hid
         
-        
-        
-        cur_id  = cur_entry['prod_harvest']['pf_feed_buy_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['prod_harvest']['pf_feed_buy_id']
-        cur_entry['prod_harvest']['pf_feed_buy_hid']   = cur_hid
-        
-        
-        
-        
-        cur_id  = cur_entry['feed_supplier']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['feed_supplier']['id']
-        cur_entry['feed_supplier']['hid']   = cur_hid
-        
-        
-        
-        for cur_item in cur_entry['feed_items']:
-            replace_plain_ids_feed_item(cur_item)
-    
-    
+      
     return res
     
     

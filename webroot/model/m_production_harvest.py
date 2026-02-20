@@ -334,14 +334,14 @@ class ProductionHarvest:
                         a.live_weight_ave,
                         a.live_price_per_unit,
                         
-                        a.slaugther_weight,
+                        a.slaughter_weight,
                         a.slaughter_weight_ave,
-                        a.slaugther_minus_weight,
+                        a.slaughter_minus_weight,
                         a.slaughter_net_weight,
                         a.slaughter_price_per_unit,
                         
                         a.net_sales,
-                        a.net_sales_per_pig,
+                        a.net_sales_pp,
                         a.harvest_cost,
                         a.comments,
                         
@@ -353,7 +353,7 @@ class ProductionHarvest:
                         b.name AS acc_pig_buyer_name
                     
                     FROM production_harvest a 
-                    LEFT OUTER JOIN acc_pig_buyer b ON a.acc_pig_buyer_id = b.id
+                    LEFT OUTER JOIN account_pig_buyer b ON a.acc_pig_buyer_id = b.id
                     %s
                     ORDER BY a.id DESC
                     """ % where_clause
@@ -373,14 +373,14 @@ class ProductionHarvest:
                         a.live_weight_ave,
                         a.live_price_per_unit,
                         
-                        a.slaugther_weight,
+                        a.slaughter_weight,
                         a.slaughter_weight_ave,
-                        a.slaugther_minus_weight,
+                        a.slaughter_minus_weight,
                         a.slaughter_net_weight,
                         a.slaughter_price_per_unit,
                         
                         a.net_sales,
-                        a.net_sales_per_pig,
+                        a.net_sales_pp,
                         a.harvest_cost,
                         a.comments,
                         
@@ -400,7 +400,7 @@ class ProductionHarvest:
                         a.dt_last_update
                     
                     FROM production_harvest a 
-                    LEFT OUTER JOIN acc_pig_buyer b ON a.acc_pig_buyer_id = b.id
+                    LEFT OUTER JOIN account_pig_buyer b ON a.acc_pig_buyer_id = b.id
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                     %s
@@ -452,7 +452,7 @@ class ProductionHarvest:
                 cur_live_weight_ave     = float(row[6]) if row[6] else None 
                 cur_live_price_per_unit = float(row[7]) if row[7] else None
                 
-                cur_slaugther_weight        = float(row[8]) if row[8] else None
+                cur_slaughter_weight        = float(row[8]) if row[8] else None
                 cur_slaughter_weight_ave    = float(row[9]) if row[9] else None
                 cur_slaughter_minus_weight  = float(row[10]) if row[10] else None
                 cur_slaughter_net_weight    = float(row[11]) if row[11] else None
@@ -482,16 +482,16 @@ class ProductionHarvest:
                         
                         'live_weight': {
                             'weight':       cur_live_weight,
-                            'weight_ave':   cur_live_weight_ave,
+                            'average':      cur_live_weight_ave,
                             'price':        cur_live_price_per_unit,
                             'pp_csv':       cur_weight_pp_lw_csv
                         },
                             
                         
-                        'slaugther_weight': {
-                            'weight':       cur_slaugther_weight,
+                        'slaughter_weight': {
+                            'weight':       cur_slaughter_weight,
                             'net_weight':   cur_slaughter_net_weight,
-                            'weight_ave':   cur_slaughter_weight_ave,
+                            'average':      cur_slaughter_weight_ave,
                             'price':        cur_slaughter_price_per_unit,
                             'pp_csv':       cur_weight_pp_sw_csv
                         },
