@@ -31,7 +31,7 @@ from r_utils                import remove_database_null_description
 
 
    
-@app.post("/production_harvest/add", tags=["Production Details"])
+@app.post("/prod_harvest/add", tags=["Production Details"])
 async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
     uhid    = prod_harvest_data.uhid
     
@@ -306,6 +306,23 @@ def get_data_prod_harvest(pig_prod_id):
         
         del cur_entry['prod_harvest']['id']
         cur_entry['prod_harvest']['hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['prod_harvest']['harvest_type_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['prod_harvest']['harvest_type_id']
+        cur_entry['prod_harvest']['harvest_type_hid']   = cur_hid
+        
+        
+        if 'pig_buyer' in cur_entry['prod_harvest']:
+        
+            cur_id  = cur_entry['prod_harvest']['pig_buyer']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['prod_harvest']['pig_buyer']['id']
+            cur_entry['prod_harvest']['pig_buyer']['hid']   = cur_hid
+        
         
       
     return res

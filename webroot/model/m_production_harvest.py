@@ -156,7 +156,8 @@ class ProductionHarvest:
                 },
                 
                 'prod_harvest': {
-                    'id':               row[3]
+                    'id':               row[3],
+                    'prod_status_id':   row[4]
                 }
             }
 
@@ -250,7 +251,7 @@ class ProductionHarvest:
         
         
         if data.comments is not None:
-            sql += '"%s"'  % data.comments
+            sql += '"%s",'  % data.comments
         else:
             sql += 'NULL,'
         
@@ -303,7 +304,8 @@ class ProductionHarvest:
                 },
                 
                 'prod_harvest': {
-                    'id':               row[3]
+                    'id':               row[3],
+                    'prod_status_id':   row[4]
                 }
             }
 
@@ -490,6 +492,7 @@ class ProductionHarvest:
                         
                         'slaughter_weight': {
                             'weight':       cur_slaughter_weight,
+                            'minus':        cur_slaughter_minus_weight,
                             'net_weight':   cur_slaughter_net_weight,
                             'average':      cur_slaughter_weight_ave,
                             'price':        cur_slaughter_price_per_unit,
@@ -515,6 +518,19 @@ class ProductionHarvest:
                     }
                    
                 }
+                
+                # remove null data
+                if cur_acc_pig_buyer_id is None:
+                    del cur_entry['prod_harvest']['pig_buyer']  
+                    
+                    
+                if cur_live_weight is None:
+                    del cur_entry['prod_harvest']['live_weight']
+                    
+                    
+                if cur_net_sales is None:
+                    del cur_entry['prod_harvest']['sales']
+                
                 
                 result.append(cur_entry)
         
