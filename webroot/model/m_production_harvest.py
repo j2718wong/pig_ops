@@ -312,7 +312,25 @@ class ProductionHarvest:
         return None
     
     
-    def get_list(self, pig_prod_id = 0, production_group_id = 0,  inc_user_audit = 0):
+    def get_list(self, pig_farm_id = 0, pig_prod_id = 0, 
+            production_group_id = 0,  inc_user_audit = 0):
+        
+        """
+        if pig_farm_id is given, the result structure will be different
+        result = [
+            {   'pig_prod_id': 1,
+                'list_harvest':[]
+            }
+            
+        ]
+        
+        if pig_farm_id is not given, the result is just plain array
+        
+        """
+        
+        
+        if pig_farm_id > 0:
+            where_clause = 'WHERE a.pig_farm_id = %s ' % pig_farm_id
         
         if pig_prod_id > 0:
             where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
@@ -320,11 +338,17 @@ class ProductionHarvest:
         if production_group_id > 0:
             where_clause = 'WHERE a.production_group_id = %s ' % production_group_id
         
+        order_clause = 'ORDER BY a.date_harvest DESC'
+        
+        if pig_farm_id > 0:
+            order_clause = 'ORDER BY a.pig_prod_id DESC, a.date_harvest DESC'
+        
         
         if inc_user_audit == 0:
             sql =   """
                     SELECT 
                         a.id,
+                        a.pig_prod_id,
                         
                         a.date_harvest,
                         a.num_pigs_harvest,
@@ -357,13 +381,14 @@ class ProductionHarvest:
                     FROM production_harvest a 
                     LEFT OUTER JOIN account_pig_buyer b ON a.acc_pig_buyer_id = b.id
                     %s
-                    ORDER BY a.id DESC
-                    """ % where_clause
+                    %s
+                    """ % (where_clause, order_clause)
                     
         else:
             sql =   """
                     SELECT 
                         a.id,
+                        a.pig_prod_id,
                         
                         a.date_harvest,
                         a.num_pigs_harvest,
@@ -406,8 +431,8 @@ class ProductionHarvest:
                     LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
                     LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
                     %s
-                    ORDER BY a.id DESC
-                    """ % where_clause
+                    %s
+                    """ % (where_clause, order_clause)
             
            
         # Check if still connected to database
@@ -438,44 +463,50 @@ class ProductionHarvest:
                 log_level = LOG_FATAL, tag = self.TAG, msg = msg)
             rows = None
         
+        
         result = []
         if rows is not None:
             
+            last_pig_prod_id = None
+            
             for row in rows:
                 cur_id                  = row[0]
+                cur_pig_prod_id         = row[1]
                 
-                cur_date_harvest        = str(row[1])
-                cur_num_pigs_harvest    = row[2]
-                cur_num_days_since_birth= row[3]
+                cur_date_harvest        = str(row[2])
+                cur_num_pigs_harvest    = row[3]
+                cur_num_days_since_birth= row[4]
                 
-                cur_harvest_type_id     = row[4]
+                cur_harvest_type_id     = row[5]
                 
-                cur_live_weight         = float(row[5]) if row[5] else None
-                cur_live_weight_ave     = float(row[6]) if row[6] else None 
-                cur_live_price_per_unit = float(row[7]) if row[7] else None
+                cur_live_weight         = float(row[6]) if row[6] else None
+                cur_live_weight_ave     = float(row[7]) if row[7] else None 
+                cur_live_price_per_unit = float(row[8]) if row[8] else None
                 
-                cur_slaughter_weight        = float(row[8]) if row[8] else None
-                cur_slaughter_weight_ave    = float(row[9]) if row[9] else None
-                cur_slaughter_minus_weight  = float(row[10]) if row[10] else None
-                cur_slaughter_net_weight    = float(row[11]) if row[11] else None
-                cur_slaughter_price_per_unit= float(row[12]) if row[12] else None
+                cur_slaughter_weight        = float(row[9]) if row[9] else None
+                cur_slaughter_weight_ave    = float(row[10]) if row[10] else None
+                cur_slaughter_minus_weight  = float(row[11]) if row[11] else None
+                cur_slaughter_net_weight    = float(row[12]) if row[12] else None
+                cur_slaughter_price_per_unit= float(row[13]) if row[13] else None
                 
-                cur_net_sales           = float(row[13]) if row[13] else None
-                cur_net_sales_per_pig   = float(row[14]) if row[14] else None
-                cur_harvest_cost        = float(row[15]) if row[15] else None
-                cur_comments            = row[16]
+                cur_net_sales           = float(row[14]) if row[14] else None
+                cur_net_sales_per_pig   = float(row[15]) if row[15] else None
+                cur_harvest_cost        = float(row[16]) if row[16] else None
+                cur_comments            = row[17]
                 
-                cur_weight_pp_lw_csv    = row[17]
-                cur_weight_pp_sw_csv    = row[18]
+                cur_weight_pp_lw_csv    = row[18]
+                cur_weight_pp_sw_csv    = row[19]
                 
-                cur_acc_pig_buyer_id    = row[19]
-                cur_acc_pig_buyer_name  = row[20]
+                cur_acc_pig_buyer_id    = row[20]
+                cur_acc_pig_buyer_name  = row[21]
                 
                 
                 
                 cur_entry = {
                     'prod_harvest': {
                         'id':               cur_id,
+                        'pig_prod_id':      cur_pig_prod_id,
+                        
                         'date_harvest':     cur_date_harvest,
                         'num_pigs':         cur_num_pigs_harvest,
                         'num_days':         cur_num_days_since_birth,
@@ -519,6 +550,10 @@ class ProductionHarvest:
                    
                 }
                 
+                
+                
+                
+                
                 # remove null data
                 if cur_acc_pig_buyer_id is None:
                     del cur_entry['prod_harvest']['pig_buyer']  
@@ -531,8 +566,29 @@ class ProductionHarvest:
                 if cur_net_sales is None:
                     del cur_entry['prod_harvest']['sales']
                 
+
                 
-                result.append(cur_entry)
+                
+                if pig_farm_id == 0:
+                    # No need for this if not given
+                    del cur_entry['prod_harvest']['pig_prod_id']  
+                
+                    result.append(cur_entry)
+                    
+                else:
+                    
+                    if last_pig_prod_id is None or last_pig_prod_id != cur_pig_prod_id:
+                        last_pig_prod_id = cur_pig_prod_id
+                        
+                        cur_harvest = {
+                            'pig_prod_id': cur_pig_prod_id,
+                            'list_harvest': []
+                        }
+                        
+                        result.append(cur_harvest)
+                        
+                    
+                    cur_harvest['list_harvest'].append(cur_entry)
         
         return result
     

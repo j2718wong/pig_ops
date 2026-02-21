@@ -152,11 +152,13 @@
                         <span>Production</span>
                     </button>
                     <div class="nav-submenu">
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-gesta');">           <i class="fas fa-chart-bar" style="color: var(--icon-indigo);"></i>Prod Gestating</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-lacta-piglets');">   <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating Piglets</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-lacta-sows');">      <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating Sows</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-fattening');">       <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>Fattening</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-feeds');">           <i class="fas fa-weight" style="color: var(--icon-red);"></i>Feeds</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-gesta');">           <i class="fas fa-chart-bar"         style="color: var(--icon-indigo);"></i>Prod Gesta</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-lacta-piglets');">   <i class="fas fa-wine-bottle"       style="color: var(--icon-teal);"></i>Prod Lacta Piglets</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-lacta-sows');">      <i class="fas fa-wine-bottle"       style="color: var(--icon-teal);"></i>Prod Lacta Sows</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-fattening');">       <i class="fas fa-piggy-bank"        style="color: var(--icon-orange);"></i>Fattening</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-history');">         <i class="fas fa-file-spreadsheet"  style="color: var(--icon-green);"></i>Prod History</div>
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-feeds');">           <i class="fas fa-file-spreadsheet"  style="color: var(--icon-green);"></i>Feeds</div>
+                        
                     </div>
                 </div>
                 
@@ -451,11 +453,14 @@
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="mobile-submenu" id="mobile-subnav-production">
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-gesta');">            <i class="fas fa-chart-bar" style="color: var(--icon-indigo);"></i>Prod Gestating</div>
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-lacta-piglets');">    <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating</div>
-                <!--<div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-lacta-sows');">       <i class="fas fa-wine-bottle" style="color: var(--icon-teal);"></i>Prod Lactating Sows</div>-->
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-fattening');">        <i class="fas fa-piggy-bank" style="color: var(--icon-orange);"></i>Fattening</div>
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-feeds');">            <i class="fas fa-weight" style="color: var(--icon-red);"></i>Feeds</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-gesta');">            <i class="fas fa-chart-bar"         style="color: var(--icon-indigo);"></i>Prod Gestating</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-lacta-piglets');">    <i class="fas fa-wine-bottle"       style="color: var(--icon-teal);"></i>Prod Lactating</div>
+                <!--<div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-lacta-sows');">       <i class="fas fa-wine-bottle"   style="color: var(--icon-teal);"></i>Prod Lactating Sows</div>-->
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-fattening');">        <i class="fas fa-piggy-bank"        style="color: var(--icon-orange);"></i>Fattening</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-history');">          <i class="fas fa-table-columns"     style="color: var(--icon-green);"></i>Prod History</div>
+                
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-feeds');">            <i class="fas fa-weight"            style="color: var(--icon-red);"></i>Feeds</div>
+            
             </div>
         </div>
         
@@ -566,9 +571,12 @@
         <div id="container-fattening-entry"     class="hidden-container" style="display:none;"></div>
         
         
-        
         <div id="container-prod-pig-ops-edit"   class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-feed-add-edit"  class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-harvest-add-edit" class="hidden-container" style="display:none;"></div>
         
+        <div id="container-prod-history-list"   class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-history-entry"  class="hidden-container" style="display:none;"></div>
         
         
         
@@ -594,10 +602,8 @@
         <div id="container-farm-feed-buy-item-add-edit" class="hidden-container" style="display:none;"></div>
         
         
-        <div id="container-prod-feed-add-edit"          class="hidden-container" style="display:none;"></div>
         <div id="container-feed-balance-add-edit"       class="hidden-container" style="display:none;"></div>
         
-        <div id="container-prod-harvest-add-edit"       class="hidden-container" style="display:none;"></div>
         
         
         <div id="container-acc-pig-ops-list"    class="hidden-container" style="display:none;"></div>

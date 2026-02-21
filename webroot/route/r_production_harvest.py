@@ -289,11 +289,38 @@ async def prod_harvest_delete(uhid:str, ehid: str):
     
     
     return res_delete
+
+
+
+def replace_plain_ids_prod_harvest(cur_entry):
+    cur_id  = cur_entry['prod_harvest']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['prod_harvest']['id']
+    cur_entry['prod_harvest']['hid']   = cur_hid
     
     
-def get_data_prod_harvest(pig_prod_id):
+    cur_id  = cur_entry['prod_harvest']['harvest_type_id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['prod_harvest']['harvest_type_id']
+    cur_entry['prod_harvest']['harvest_type_hid']   = cur_hid
+    
+    
+    if 'pig_buyer' in cur_entry['prod_harvest']:
+    
+        cur_id  = cur_entry['prod_harvest']['pig_buyer']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['prod_harvest']['pig_buyer']['id']
+        cur_entry['prod_harvest']['pig_buyer']['hid']   = cur_hid
+    
+
+    
+def get_data_prod_harvest(pig_farm_id = 0, pig_prod_id = 0):
             
-    res = model['prod_harvest'].get_list(pig_prod_id)
+    res = model['prod_harvest'].get_list(pig_farm_id = pig_farm_id,
+        pig_prod_id = pig_prod_id)
     
     if res is None:
         return None
@@ -301,29 +328,7 @@ def get_data_prod_harvest(pig_prod_id):
     
     # Replace plain id
     for cur_entry in res:
-        cur_id  = cur_entry['prod_harvest']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['prod_harvest']['id']
-        cur_entry['prod_harvest']['hid']   = cur_hid
-        
-        
-        cur_id  = cur_entry['prod_harvest']['harvest_type_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['prod_harvest']['harvest_type_id']
-        cur_entry['prod_harvest']['harvest_type_hid']   = cur_hid
-        
-        
-        if 'pig_buyer' in cur_entry['prod_harvest']:
-        
-            cur_id  = cur_entry['prod_harvest']['pig_buyer']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['prod_harvest']['pig_buyer']['id']
-            cur_entry['prod_harvest']['pig_buyer']['hid']   = cur_hid
-        
-        
+        replace_plain_ids_prod_harvest(cur_entry)
       
     return res
     
@@ -359,7 +364,7 @@ async def prod_harvest_list(pig_prod_hid: str = None):
         
         
         
-    res = get_data_prod_harvest(pig_prod_id)
+    res = get_data_prod_harvest(pig_prod_id = pig_prod_id)
     
     
     if res is None:

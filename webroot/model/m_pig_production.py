@@ -735,7 +735,8 @@ class PigProduction:
         """
         
         if pig_farm_id > 0:
-
+            order_clause = 'ORDER BY a.date_insemination'
+            
             if pig_prod_type == 1:
                 where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 1 ' % pig_farm_id
             
@@ -750,6 +751,12 @@ class PigProduction:
                 
             if pig_prod_type == 5:
                 where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4, 5, 6) ' % pig_farm_id
+                
+            if pig_prod_type == 6:
+                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (8, 9) ' % pig_farm_id
+                
+                order_clause = 'ORDER BY a.date_weaning DESC'
+            
         else:
             where_clause = 'WHERE a.id = %s ' % pig_prod_id
                 
@@ -861,8 +868,8 @@ class PigProduction:
                 LEFT OUTER JOIN pig_farm_staff j    ON a.birth_staff_id = j.id
                 LEFT OUTER JOIN feed_balance k      ON a.last_feed_balance_id = k.id
                 %s
-                ORDER BY a.date_insemination
-                """ % where_clause
+                %s
+                """ % (where_clause, order_clause)
 
 
         # Check if still connected to database

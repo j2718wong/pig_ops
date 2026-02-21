@@ -48,7 +48,7 @@ from r_pig_prod_feed        import get_data_pig_prod_feed
 
 from r_feed_balance         import get_data_feed_balance
 
-from r_production_harvest   import get_data_prod_harvest  
+from r_production_harvest   import get_data_prod_harvest, replace_plain_ids_prod_harvest  
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -1590,6 +1590,11 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         3 = pig_prod_status.gestating, pig_prod_status.lactating
         4 = pig_prod_status.weaning, pig_prod_status.growing 
         5 = pig_prod_status.gestating, pig_prod_status.lactating ,pig_prod_status.weaning, pig_prod_status.growing 
+        6 = pig_prod_status.harvested, pig_prod_status.closed 
+    
+    
+        pig_prod_type = 6, is a special case; will also return harvest data for 
+        each production_entry
     
     """
     
@@ -1600,6 +1605,11 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             pig_prod_type = pig_prod_type,
             pig_prod_id = pig_prod_id)
     
+    
+    res_harvest = []
+    if pig_prod_type == 6 and pig_farm_id > 0:
+        res_harvest = model['prod_harvest'].get_list(pig_farm_id = pig_farm_id)
+    
      
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
@@ -1609,6 +1619,8 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         operation_type  = PIG_OPERATION_TYPE_GESTATING
         gestating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
             pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = order_by)
+        
+        
         
         # Replace plain_id
         
@@ -1729,7 +1741,29 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         
         del cur_entry['insemination']['insem_staff_id']
         cur_entry['insemination']['insem_staff_hid']   = cur_hid
-        
+    
+    
+        if pig_prod_type == 6:
+          
+            for cur_harvest in res_harvest:
+                if cur_harvest['pig_prod_id'] == pig_prod_id:
+                    
+                    list_harvest = cur_harvest['list_harvest']
+
+                    if len(list_harvest) > 0:
+                        # Replace plain_ids in each list_harvest
+                        for cur_item in list_harvest:
+                            replace_plain_ids_prod_harvest(cur_item)
+                    
+                    
+                    # Only this detail to be added to pig_prod
+                    cur_entry['data_details'] = {}
+                    cur_entry['data_details']['list_harvest'] = list_harvest
+                    
+                    
+                    
+                    break
+    
         
         
     return res
@@ -1775,7 +1809,7 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
     
     
     # Get prod_harvest list
-    data_prod_harvest_list  = get_data_prod_harvest(pig_prod_id)
+    data_prod_harvest_list  = get_data_prod_harvest(pig_prod_id = pig_prod_id)
     
     
     
