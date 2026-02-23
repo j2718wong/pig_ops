@@ -851,7 +851,15 @@ class PigProduction:
                     a.date_prestarter,
                     a.date_starter,
                     a.date_grower,
-                    a.date_finisher
+                    a.date_finisher,
+                    
+                    
+                    a.data_ver_num_pig_prod,
+                    a.data_ver_num_medvac, 
+                    a.data_ver_num_health_notes,
+                    a.data_ver_num_prod_feed,
+                    a.data_ver_num_feed_balance,
+                    a.data_ver_num_harvest     
                     
                    
                 FROM pig_production a
@@ -1000,6 +1008,14 @@ class PigProduction:
                 cur_prod_date_finisher      = row[69]
             
                 
+                cur_data_ver_num_pig_prod       = row[70]
+                cur_data_ver_num_medvac         = row[71] 
+                cur_data_ver_num_health_notes   = row[72]
+                cur_data_ver_num_prod_feed      = row[73]
+                cur_data_ver_num_feed_balance   = row[74]
+                cur_data_ver_num_harvest        = row[75] 
+                
+                
                 cur_entry = {
                     'pig_production' :{
                         'id':               cur_prod_id, 
@@ -1117,6 +1133,17 @@ class PigProduction:
                             'grower':       str(cur_prod_date_grower)           if cur_prod_date_grower         is not None else None,
                             'finisher':     str(cur_prod_date_finisher)         if cur_prod_date_finisher       is not None else None
                         }
+                    
+                    },
+                    
+                    
+                    'data_ver_num': {
+                        'pig_prod':         cur_data_ver_num_pig_prod,
+                        'medvac':           cur_data_ver_num_medvac,
+                        'health_notes':     cur_data_ver_num_health_notes,
+                        'prod_feed':        cur_data_ver_num_prod_feed,
+                        'feed_balance':     cur_data_ver_num_feed_balance,
+                        'harvest':          cur_data_ver_num_harvest
                     
                     }
                     
@@ -1358,6 +1385,80 @@ class PigProduction:
                 return cur_entry
 
         return None
+    
+    
+    def get_data_ver_num(self, pig_prod_id):
+        sql =   """
+                SELECT 
+                    
+                    data_ver_num_pig_prod,
+                    data_ver_num_medvac, 
+                    data_ver_num_health_notes,
+                    data_ver_num_prod_feed,
+                    data_ver_num_feed_balance,
+                    data_ver_num_harvest     
+                    
+                FROM pig_production 
+                WHERE id = %s
+                """ % pig_prod_id
+
+
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_data_ver_num(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+
+        if rows is not None:
+
+            for row in rows:
+                
+                cur_data_ver_num_pig_prod       = row[0]
+                cur_data_ver_num_medvac         = row[1] 
+                cur_data_ver_num_health_notes   = row[2]
+                cur_data_ver_num_prod_feed      = row[3]
+                cur_data_ver_num_feed_balance   = row[4]
+                cur_data_ver_num_harvest        = row[5] 
+                
+
+                cur_entry = {
+                    'pig_prod':     cur_data_ver_num_pig_prod,    
+                    'medvac':       cur_data_ver_num_medvac,      
+                    'health_notes': cur_data_ver_num_health_notes,
+                    'prod_feed':    cur_data_ver_num_prod_feed,   
+                    'feed_balance': cur_data_ver_num_feed_balance,
+                    'harvest':      cur_data_ver_num_harvest
+                }
+                
+                return cur_entry
+
+        return None
+    
+    
     
     
     def get_pig_prod_ops_list(self, pig_farm_id,  inc_historical = 0):

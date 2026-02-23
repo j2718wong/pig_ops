@@ -184,7 +184,6 @@
                         <span>Operations</span>
                     </button>
                     <div class="nav-submenu">
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'pig-harvest');">      <i class="fas fa-paw" style="color: var(--icon-orange);"></i><i class="fas fa-paw" style="color: var(--icon-orange); margin-left: -8px;"></i> Pig Harvests</div>
                         <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'reports');">          <i class="fas fa-clipboard-list" style="color: var(--icon-blue);"></i>Reports</div>
                         <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'feed-caculator');">   <i class="fas fa-calculator" style="color: var(--icon-green);"></i>Feed Calculator</div>
                     </div>
@@ -197,9 +196,9 @@
                         <span>Financials</span>
                     </button>
                     <div class="nav-submenu">
+                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'prod-sales');">           <i class="fas fa-cash-register" style="color: var(--icon-indigo);"></i>Sales</div>
                         <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'feeds-expenses');">       <i class="fas fa-seedling" style="color: var(--icon-teal);"></i>Feeds Expenses</div>
                         <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'nonfeeds-expenses');">    <i class="fas fa-receipt" style="color: var(--icon-purple);"></i>Non Feeds Expenses</div>
-                        <div class="submenu-item" onclick="gNavigation.onClickNav(0, 'sales');">                <i class="fas fa-cash-register" style="color: var(--icon-indigo);"></i>Sales</div>
                     </div>
                 </div>
                 
@@ -502,9 +501,9 @@
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="mobile-submenu" id="mobile-subnav-financials">
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'feeds-expenses');">        <i class="fas fa-seedling" style="color: var(--icon-teal);"></i>Feeds Expenses</div>
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'nonfeeds-expenses');"> <i class="fas fa-receipt" style="color: var(--icon-purple);"></i>Non Feeds Expenses</div>
-                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'sales');">             <i class="fas fa-cash-register" style="color: var(--icon-indigo);"></i>Sales</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'prod-sales');">            <i class="fas fa-cash-register"     style="color: var(--icon-indigo);"></i>Prod Sales</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'feeds-expenses');">        <i class="fas fa-seedling"          style="color: var(--icon-teal);"></i>Feeds Expenses</div>
+                <div class="mobile-submenu-item" onclick="gNavigation.onClickNav(1, 'nonfeeds-expenses');">     <i class="fas fa-receipt"           style="color: var(--icon-purple);"></i>Non Feeds Expenses</div>
             </div>
         </div>
         
@@ -603,6 +602,11 @@
         
         
         <div id="container-feed-balance-add-edit"       class="hidden-container" style="display:none;"></div>
+        
+        
+        
+        <div id="container-prod-sales-list"     class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-sales-entry"    class="hidden-container" style="display:none;"></div>
         
         
         

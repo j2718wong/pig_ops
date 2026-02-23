@@ -1835,4 +1835,59 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
     }
 
 
+@app.get("/pig_prod/data_ver_num", tags=["Pig Production"])
+async def pig_prod_data_ver_num(pig_prod_hid: str):
+    """
+    Will get pig_prod data_ver_num.
+    
+    Parameters
+    ----------
+    
+    pig_prod_hid:str
+        pig_prod hashid
+
+        
+    """
+    
+    
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_HASHID'
+            }
+        }
+    
+    
+    pig_prod_id = res[0]
+        
+
+    res = model['pig_prod'].get_data_ver_num(pig_prod_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+
+
+
+
+
+
 

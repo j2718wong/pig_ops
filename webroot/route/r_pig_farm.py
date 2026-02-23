@@ -265,3 +265,56 @@ async def pig_farm_list(ahid: str):
         'data': res
     }
     
+
+
+@app.get("/pig_farm/data_ver_num", tags=["Pig Farm"])
+async def pig_farm_data_ver_num(pfid: str):
+    """
+    Will get pig farm data_ver_num.
+    
+    Parameters
+    ----------
+    
+    pfid:str
+        pig farm hashid
+
+        
+    """
+    
+    
+    res = hashids_common.decrypt(pfid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID'
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+        
+
+    res                 = model['pig_farm'].get_data_ver_num(pig_farm_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+
+

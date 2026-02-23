@@ -1236,3 +1236,58 @@ async def sow_boar_get_parent_trace(sow_hid:str = None, boar_hid: str = None, pf
         'data': res
     }
     
+
+@app.get("/sow_boar/data_ver_num", tags=["Sow Boar"])
+async def sow_boar_data_ver_num(sow_boar_hid: str):
+    """
+    Will get sow_boar data_ver_num.
+    
+    Parameters
+    ----------
+    
+    sow_boar_hid:str
+        sow_boar hashid
+
+        
+    """
+    
+    
+    res = hashids_common.decrypt(sow_boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_HASHID'
+            }
+        }
+    
+    
+    sow_boar_id = res[0]
+        
+
+    res                 = model['sow_boar'].get_data_ver_num(sow_boar_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+
+
+
+
+

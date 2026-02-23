@@ -465,7 +465,77 @@ class SowBoar:
 
         
         return None
+    
+    
+    def get_data_ver_num(self, sow_boar_id):
+        sql =   """
+                SELECT 
+                    data_ver_num_sow_boar,
+                    data_ver_num_medvac,
+                    data_ver_num_health_notes,
+                    data_ver_num_output,
+                    data_ver_num_mates
+                    
+                FROM sow_boar 
+                WHERE id = %s
+                """ % sow_boar_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
 
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+        
+        
+        except Exception as e:
+            msg = 'get_data_ver_num(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+
+
+            for row in rows:
+                cur_data_ver_num_sow_boar   = row[0]
+                cur_data_ver_num_medvac     = row[1]
+                cur_data_ver_num_health_notes= row[2]
+                cur_data_ver_num_output     = row[3]
+                cur_data_ver_num_mates      = row[4]
+
+                                
+                cur_entry = {
+                    'sow_boar':         cur_data_ver_num_sow_boar,   
+                    'medvac':           cur_data_ver_num_medvac,     
+                    'health_notes':     cur_data_ver_num_health_notes,
+                    'output':           cur_data_ver_num_output,     
+                    'mates':            cur_data_ver_num_mates      
+                }
+                
+                return cur_entry
+
+        
+        return None
+
+    
     
     def get_list(self, pig_farm_id = None, sex = None, sow_boar_id = None, 
             is_disposed = 0, inc_user_audit = 0, order_by = 0):
@@ -562,6 +632,7 @@ class SowBoar:
                         
                         a.num_nipples,
                         
+                        
                         a.last_pig_production_id,
                         d.farm_prod_id,
                         d.prod_status_id,
@@ -603,8 +674,14 @@ class SowBoar:
                         
                         a.last_mate_sow_boar_id,
                         a.mate_count,
-                        a.date_last_mate
+                        a.date_last_mate,
                         
+                        
+                        a.data_ver_num_sow_boar,
+                        a.data_ver_num_medvac,
+                        a.data_ver_num_health_notes,
+                        a.data_ver_num_output,
+                        a.data_ver_num_mates
                         
                         
                     FROM sow_boar a
@@ -654,6 +731,7 @@ class SowBoar:
                         
                         a.num_nipples,
                         
+                        
                         a.last_pig_production_id,
                         d.farm_prod_id,
                         d.prod_status_id,
@@ -698,6 +776,13 @@ class SowBoar:
                         a.date_last_mate,
                         
                         
+                        a.data_ver_num_sow_boar,
+                        a.data_ver_num_medvac,
+                        a.data_ver_num_health_notes,
+                        a.data_ver_num_output,
+                        a.data_ver_num_mates
+                        
+                        
                         j.name_last,
                         j.name_first,
                         a.dt_entry,
@@ -705,6 +790,8 @@ class SowBoar:
                         k.name_last,
                         k.name_first,
                         a.dt_last_update
+                        
+                        
                         
                     FROM sow_boar a
                     LEFT OUTER JOIN sow_boar b          ON a.parent_sow_id          = b.id
@@ -786,7 +873,6 @@ class SowBoar:
                     
                 cur_num_nipples             = row[19]
                     
-                    
                 cur_pig_prod_id             = row[20]
                 cur_farm_prod_id            = row[21]
                 cur_prod_status_id          = row[22]    
@@ -831,6 +917,12 @@ class SowBoar:
                 cur_date_last_mate          = str(row[49]) if  row[49] else None
                 
                 
+                cur_data_ver_num_sow_boar   = row[50]
+                cur_data_ver_num_medvac     = row[51]
+                cur_data_ver_num_health_notes= row[52]
+                cur_data_ver_num_output     = row[53]
+                cur_data_ver_num_mates      = row[54]
+
                
                 sow_boar = {
                     'id':                   cur_id,
@@ -862,6 +954,7 @@ class SowBoar:
                     'is_production_ready':  cur_is_production_ready,
                     
                     'num_nipples':          cur_num_nipples,
+                    
                     
                     
                     'cur_pig_production': {
@@ -925,8 +1018,17 @@ class SowBoar:
                     
                     'last_mate_sow_boar_id': cur_last_mate_sow_boar_id,
                     'mate_count':           cur_mate_count,
-                    'date_last_mate':       cur_date_last_mate
-                  
+                    'date_last_mate':       cur_date_last_mate,
+                    
+                    
+                    'data_ver_num':{
+                        'sow_boar':         cur_data_ver_num_sow_boar,   
+                        'medvac':           cur_data_ver_num_medvac,     
+                        'health_notes':     cur_data_ver_num_health_note,
+                        'output':           cur_data_ver_num_output,     
+                        'mates':            cur_data_ver_num_mates      
+                    }
+                    
                 }
                 
                 

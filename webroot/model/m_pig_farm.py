@@ -385,7 +385,15 @@ class PigFarm:
                     a.address_level_2_id,
                     a.address_level_3_id,
                     a.latitude,
-                    a.longitude
+                    a.longitude,
+                    
+                    a.data_ver_num_sow,
+                    a.data_ver_num_boar,     
+                    a.data_ver_num_pig_prod, 
+                    a.data_ver_num_staff,    
+                    a.data_ver_num_feed_buy 
+                    
+                    
                 FROM pig_farm a
                 LEFT OUTER JOIN app_country b ON a.country_id = b.id
                 WHERE %s
@@ -433,13 +441,20 @@ class PigFarm:
                 cur_country_id          = row[3]
                 cur_country_name        = row[4]
                 
-                cur_farm_address_level_1_id= row[5]
-                cur_farm_address_level_2_id= row[6]
-                cur_farm_address_level_3_id= row[7]
-                cur_farm_latitude       = float(row[8]) if row[8] else None
-                cur_farm_longitude      = float(row[9]) if row[9] else None
+                cur_farm_address_level_1_id = row[5]
+                cur_farm_address_level_2_id = row[6]
+                cur_farm_address_level_3_id = row[7]
+                cur_farm_latitude           = float(row[8]) if row[8] else None
+                cur_farm_longitude          = float(row[9]) if row[9] else None
                 
-               
+                
+                cur_data_ver_num_sow        = row[10]
+                cur_data_ver_num_boar       = row[11]   
+                cur_data_ver_num_pig_prod   = row[12]
+                cur_data_ver_num_staff      = row[13]  
+                cur_data_ver_num_feed_buy   = row[14]
+                
+                
                 cur_entry = {
                     'pig_farm': {
                         'id':           cur_farm_id, 
@@ -471,6 +486,14 @@ class PigFarm:
                             'latitude':  cur_farm_latitude,
                             'longitude': cur_farm_longitude,
                         }
+                    },
+                    
+                    'data_ver_num':{
+                        'sow':          cur_data_ver_num_sow,       
+                        'boar':         cur_data_ver_num_boar,    
+                        'pig_prod':     cur_data_ver_num_pig_prod,
+                        'staff':        cur_data_ver_num_staff,   
+                        'feed_buy':     cur_data_ver_num_feed_buy
                     }
                     
                 }
@@ -517,8 +540,8 @@ class PigFarm:
             cursor.close()
             #conn.close()
             
-        except get_sow_boar_balance as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
+        except Exception as e:
+            msg = 'get_sow_boar_balance(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -553,3 +576,71 @@ class PigFarm:
                 }
                 
                 return cur_entry
+    
+    
+    def get_data_ver_num(self, pig_farm_id):
+        sql =   """
+                SELECT 
+                    data_ver_num_sow,
+                    data_ver_num_boar,     
+                    data_ver_num_pig_prod, 
+                    data_ver_num_staff,    
+                    data_ver_num_feed_buy 
+                    
+                FROM pig_farm 
+                WHERE id = %s
+                """ % pig_farm_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_data_ver_num(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_data_ver_num_sow        = row[0]
+                cur_data_ver_num_boar       = row[1]   
+                cur_data_ver_num_pig_prod   = row[2]
+                cur_data_ver_num_staff      = row[3]  
+                cur_data_ver_num_feed_buy   = row[4]
+                
+                
+                cur_entry = {
+                    'sow':          cur_data_ver_num_sow,       
+                    'boar':         cur_data_ver_num_boar,    
+                    'pig_prod':     cur_data_ver_num_pig_prod,
+                    'staff':        cur_data_ver_num_staff,   
+                    'feed_buy':     cur_data_ver_num_feed_buy
+                }
+                
+                return cur_entry
+
+    
