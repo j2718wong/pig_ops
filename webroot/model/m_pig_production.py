@@ -1462,7 +1462,6 @@ class PigProduction:
     
     
     
-    
     def get_pig_prod_ops_list(self, pig_farm_id,  inc_historical = 0):
         
         # Check if still connected to database
@@ -1737,6 +1736,7 @@ class PigProduction:
         return result
         
     
+    
     def get_production_output(self, pig_farm_id = 0, sow_id = 0):
         """
         
@@ -1968,6 +1968,7 @@ class PigProduction:
                 }
                 
                 
+                
                 if cur_boar_id and cur_boar_id > 0:
                      del cur_prod['insemination']['ai']
                 
@@ -1979,10 +1980,190 @@ class PigProduction:
                         
                     else:
                         del cur_prod['insemination']['ai']['semen_supplier']
-                    
-            
+                
+                
                 cur_entry['production'].append(cur_prod)
         
+        
+        return result
+    
+    
+    
+    def get_production_not_pregnant(self, pig_farm_id):
+
+
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.farm_prod_id,
+                    
+                    a.sow_id,
+                    b.name AS sow_name,
+                    b.number AS sow_number,
+                    b.date_dispose AS sow_date_dispose, 
+                    
+                    a.insemination_type,
+                    a.date_insemination,
+                    
+                    a.boar_id,
+                    c.name AS boar_name,
+                    c.number AS boar_number,
+                    c.date_dispose AS boar_date_dispose,
+                    
+                    
+                    a.semen_supplier_id,
+                    d.name AS semen_supplier_name,
+                    
+                    a.semen_sup_semen_id,
+                    e.name AS semen_name,
+                    
+                    a.semen_ai_boar_id,
+                    f.name AS boar_name,
+                    f.number AS boar_number,
+                    f.date_dispose AS boar_date_dispose
+                    
+                    
+                FROM pig_production a 
+                LEFT OUTER JOIN sow_boar b              ON a.sow_id = b.id
+                LEFT OUTER JOIN sow_boar c              ON a.boar_id = c.id
+                LEFT OUTER JOIN common_supplier d       ON a.semen_supplier_id = d.id
+                LEFT OUTER JOIN semen_supplier_semen e  ON a.semen_sup_semen_id = e.id
+                LEFT OUTER JOIN sow_boar f              ON a.semen_ai_boar_id = f.id
+                
+                WHERE a.pig_farm_id = %s AND a.prod_status_id = 3
+                ORDER BY a.date_insemination DESC; 
+                """ % pig_farm_id
+    
+            
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_production_output(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+        result = []
+        if rows is not None:
+            
+          
+            for row in rows:
+                
+
+                cur_pig_prod_id             = row[0]
+                cur_farm_prod_id            = row[1]
+                
+                cur_sow_id                  = row[2]
+                cur_sow_name                = row[3]
+                cur_sow_number              = row[4]
+                cur_sow_date_dispose        = str(row[5]) if row[5] else None
+                
+                cur_insemination_type       = row[6]
+                cur_date_insemination       = str(row[7]) if row[7] else None
+                
+                cur_boar_id                 = row[8]
+                cur_boar_name               = row[9]
+                cur_boar_number             = row[10]
+                cur_boar_date_dispose       = str(row[11]) if row[11] else None
+                
+                
+                cur_semen_supplier_id       = row[12]
+                cur_semen_supplier_name     = row[13]
+                
+                cur_semen_sup_semen_id      = row[14]
+                cur_semen_sup_semen_name    = row[15]
+                
+                cur_semen_ai_boar_id        = row[16]
+                cur_semen_ai_boar_name      = row[17]
+                cur_semen_ai_boar_number    = row[18]
+                cur_semen_ai_boar_date_dispose = str(row[19]) if row[19] else None
+                
+                
+                cur_entry = {
+                    'pig_production':{
+                        'id':               cur_pig_prod_id,
+                        'farm_prod_id':     cur_farm_prod_id
+                    },
+                    
+                    'sow':{
+                        'id':               cur_sow_id,
+                        'name':             cur_sow_name,
+                        'number':           cur_sow_number,
+                        'date_dispose':     cur_sow_date_dispose
+                    },
+                        
+                        
+                    'insemination': {
+                        'insem_type':       cur_insemination_type,
+                        'insem_date':       cur_date_insemination,
+                        
+                        'boar': {
+                            'id':           cur_boar_id,
+                            'number':       cur_boar_number,
+                            'name':         cur_boar_name,
+                            'date_dispose': cur_boar_date_dispose
+                        },
+                        
+                        'ai': {
+                            'semen_supplier':{
+                                'id':       cur_semen_supplier_id,
+                                'name':     cur_semen_supplier_name,
+                                
+                                'semen': {
+                                    'id':   cur_semen_sup_semen_id,
+                                    'name': cur_semen_sup_semen_name
+                                }
+                            },
+                            
+                            'internal_boar':{
+                                'id':           cur_semen_ai_boar_id,
+                                'number':       cur_semen_ai_boar_number,
+                                'name':         cur_semen_ai_boar_name,
+                                'date_dispose': cur_semen_ai_boar_date_dispose
+                            }
+                        }
+                    }
+                
+                }
+
+                
+                """
+                if cur_boar_id and cur_boar_id > 0:
+                     del cur_entry['insemination']['ai']
+                
+                else:
+                    del cur_entry['insemination']['boar']
+                    
+                    if cur_semen_supplier_id and cur_semen_supplier_id > 0:
+                        del cur_entry['insemination']['ai']['internal_boar']
+                        
+                    else:
+                        del cur_entry['insemination']['ai']['semen_supplier']
+                """
+        
+                result.append(cur_entry)
+    
         
         return result
     

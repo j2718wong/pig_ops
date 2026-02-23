@@ -1559,7 +1559,81 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
         'data': res 
     }
     
+
+
+def replace_plain_ids_pig_production(cur_entry):
+    # Replace plain_id
+        
+    cur_id  = cur_entry['pig_production']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
     
+    del cur_entry['pig_production']['id']
+    cur_entry['pig_production']['hid']   = cur_hid
+    
+    
+    cur_id  = cur_entry['sow']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['sow']['id']
+    cur_entry['sow']['hid']   = cur_hid
+    
+    
+    # If boar_id is None, delete whole boar block
+    cur_id  = cur_entry['insemination']['boar']['id']
+    if cur_id is None:
+        del cur_entry['insemination']['boar']
+        
+        
+        # If semen_supplier_id is None, delete whole semen_supplier block
+        cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
+        if cur_id is None:
+            del cur_entry['insemination']['ai']['semen_supplier']
+        
+            cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
+            if cur_id is None:
+                del cur_entry['insemination']['ai']['internal_boar']
+            else:
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['internal_boar']['id']
+                cur_entry['insemination']['ai']['internal_boar']['hid'] = cur_hid
+        else:
+            # encrypt semen_supplier.id
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['ai']['semen_supplier']['id']
+            cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
+            
+            # encrypt semen_supplier.semen.id
+            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+            cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
+            
+            
+        
+    else:
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['insemination']['boar']['id']
+        cur_entry['insemination']['boar']['hid']   = cur_hid
+        
+        
+        # delete whole ai block
+        del cur_entry['insemination']['ai']
+
+    
+    if 'insem_staff_id' in cur_entry['insemination']:
+    
+        cur_id  = cur_entry['insemination']['insem_staff_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['insemination']['insem_staff_id']
+        cur_entry['insemination']['insem_staff_hid']   = cur_hid
+
+
+
     
 def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
     """
@@ -1655,76 +1729,11 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             
         
         
-        # Replace plain_id
+        # Replace plain_ids
+        replace_plain_ids_pig_production(cur_entry)
         
-        cur_id  = pig_prod_id
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_production']['id']
-        cur_entry['pig_production']['hid']   = cur_hid
-        
-        
-        cur_id  = cur_entry['sow']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['sow']['id']
-        cur_entry['sow']['hid']   = cur_hid
-        
-        
-        # If boar_id is None, delete whole boar block
-        cur_id  = cur_entry['insemination']['boar']['id']
-        if cur_id is None:
-            del cur_entry['insemination']['boar']
-            
-            
-            # If semen_supplier_id is None, delete whole semen_supplier block
-            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
-            if cur_id is None:
-                del cur_entry['insemination']['ai']['semen_supplier']
-            
-                cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
-                if cur_id is None:
-                    del cur_entry['insemination']['ai']['internal_boar']
-                else:
-                    cur_hid = hashids_common.encrypt(cur_id)
-                    
-                    del cur_entry['insemination']['ai']['internal_boar']['id']
-                    cur_entry['insemination']['ai']['internal_boar']['hid'] = cur_hid
-            else:
-                # encrypt semen_supplier.id
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_entry['insemination']['ai']['semen_supplier']['id']
-                cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
-                
-                # encrypt semen_supplier.semen.id
-                cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
-                cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
-                
-                
-            
-        else:
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['insemination']['boar']['id']
-            cur_entry['insemination']['boar']['hid']   = cur_hid
-            
-            
-            # delete whole ai block
-            del cur_entry['insemination']['ai']
     
-    
-        
-        cur_id  = cur_entry['insemination']['insem_staff_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['insemination']['insem_staff_id']
-        cur_entry['insemination']['insem_staff_hid']   = cur_hid
-    
-    
+        # Get production harvest data
         if pig_prod_type == 6:
           
             for cur_harvest in res_harvest:
@@ -1749,6 +1758,7 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         
         
     return res
+
 
 
 @app.get("/pig_prod/data_details", tags=["Pig Production"])
@@ -1815,6 +1825,63 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
         
         'data': data
     }
+
+
+
+@app.get("/pig_prod/not_pregnant", tags=["Pig Production"])
+async def pig_prod_not_pregnant(pfhid:str):
+    """
+    Will get pig_production not pregnant list.
+    
+    Parameters
+    ----------
+    
+    pfhid:str
+        pig_farm hashid
+
+
+    """
+    
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID'
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+    res = model['pig_prod'].get_production_not_pregnant(pig_farm_id)
+    
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    
+    for cur_entry in res:
+        replace_plain_ids_pig_production(cur_entry)
+    
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res 
+    }
+    
+    
+
+
 
 
 @app.get("/pig_prod/data_ver_num", tags=["Pig Production"])
