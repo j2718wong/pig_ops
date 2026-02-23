@@ -634,11 +634,13 @@ class PigFarm:
                 
                 
                 cur_entry = {
-                    'sow':          cur_data_ver_num_sow,       
-                    'boar':         cur_data_ver_num_boar,    
-                    'pig_prod':     cur_data_ver_num_pig_prod,
-                    'staff':        cur_data_ver_num_staff,   
-                    'feed_buy':     cur_data_ver_num_feed_buy
+                    'data_ver_num': {
+                        'sow':          cur_data_ver_num_sow,       
+                        'boar':         cur_data_ver_num_boar,    
+                        'pig_prod':     cur_data_ver_num_pig_prod,
+                        'staff':        cur_data_ver_num_staff,   
+                        'feed_buy':     cur_data_ver_num_feed_buy
+                    }
                 }
                 
                 return cur_entry

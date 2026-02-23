@@ -172,24 +172,6 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
         return None
     
     
-
-    # Get sow production output list
-    list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
-        pig_farm_id);
-    
-    
-    
-    for cur_sow in list_sow_list:
-        cur_sow_id = cur_sow['sow_boar']['id']
-        
-        for cur_sow_output in list_sow_output_list:
-            if cur_sow_output['sow_id'] == cur_sow_id:
-                cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
-                cur_sow['sow_boar']['num_pigs_wean']    = cur_sow_output['num_pigs_wean']
-                
-                break
-
-    
     # Get pig_farm boar list
     list_boar_list = model['sow_boar'].get_list(
         pig_farm_id = pig_farm_id, sex = 'M', 

@@ -1446,12 +1446,14 @@ class PigProduction:
                 
 
                 cur_entry = {
-                    'pig_prod':     cur_data_ver_num_pig_prod,    
-                    'medvac':       cur_data_ver_num_medvac,      
-                    'health_notes': cur_data_ver_num_health_notes,
-                    'prod_feed':    cur_data_ver_num_prod_feed,   
-                    'feed_balance': cur_data_ver_num_feed_balance,
-                    'harvest':      cur_data_ver_num_harvest
+                    'data_ver_num': {
+                        'pig_prod':     cur_data_ver_num_pig_prod,    
+                        'medvac':       cur_data_ver_num_medvac,      
+                        'health_notes': cur_data_ver_num_health_notes,
+                        'prod_feed':    cur_data_ver_num_prod_feed,   
+                        'feed_balance': cur_data_ver_num_feed_balance,
+                        'harvest':      cur_data_ver_num_harvest
+                    }
                 }
                 
                 return cur_entry
@@ -1737,7 +1739,7 @@ class PigProduction:
     
     def get_production_output(self, pig_farm_id = 0, sow_id = 0):
         """
-        This will get disposed sow and boar
+        
         
         Notes:
         1.) The number of piglets output at weaning are entered in two ways

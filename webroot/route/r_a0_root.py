@@ -43,7 +43,9 @@ def get_application_data():
     return {
         "product_name":     "SuperPig",
         "contact_whatsapp": "+85260615575",
-        "contact_email":    "support@superpig.jsysdev.com"
+        "contact_email":    "support@superpig.jsysdev.com",
+        
+        "rt_updates_enabled": 0
     }
 
 

@@ -812,12 +812,12 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     
     
     data = {
-        'sow_boar':         cur_sow_boar_data,
-        'list_medvac':      data_pig_medvac,
-        'list_health_issues': data_health_issues,
-        'list_notes':       data_notes,
-        'list_output':      data_output,
-        'list_mates':       data_mates
+        'sow_boar':             cur_sow_boar_data,
+        'list_medvac':          data_pig_medvac,
+        'list_health_issues':   data_health_issues,
+        'list_notes':           data_notes,
+        'list_output':          data_output,
+        'list_mates':           data_mates
     }
     
     if cur_sow_boar_data['sex'] == 'M':
@@ -840,6 +840,98 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     }
 
     
+
+@app.get("/sow_boar/entry", tags=["Sow Boar"])
+async def sow_boar_entry(sow_boar_hid:str):
+    """
+    Will get sow boar entry.
+    
+    Parameters
+    ----------
+    sow_boar_hid:str
+        sow_boar hid; 
+    """
+    
+    
+    res = hashids_common.decrypt(sow_boar_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_SOW_BOAR_INVALID_HASHID,
+                'code': 'ERROR_SOW_BOAR_INVALID_HASHID'
+            }
+        }
+    
+    sow_boar_id = res[0]
+    
+    
+
+    res = model['sow_boar'].get_list(sow_boar_id = sow_boar_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+    
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+    cur_sow_boar = res[0]
+    
+    
+    
+    # Check if sow_boar is female
+    if 'farm_sow_id' in cur_sow_boar:
+        
+        list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
+            pig_farm_id);
+
+        
+        for cur_sow in res:
+            cur_sow_id = cur_sow['sow_boar']['id']
+            
+            for cur_sow_output in list_sow_output_list:
+                if cur_sow_output['sow_id'] == cur_sow_id:
+                    cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
+                    cur_sow['sow_boar']['num_pigs_wean']    = cur_sow_output['num_pigs_wean']
+                    
+                    break
+                
+            
+            
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+        
+    # Replace plain id
+    for cur_entry in res:
+        replace_plain_ids_sow_boar_entry(cur_entry)
+
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+
+
 
 
 @app.get("/sow_boar/list", tags=["Sow Boar"])
@@ -891,21 +983,6 @@ async def sow_boar_list(pfhid:str, sex:str = None,
     else:
         res = model['sow_boar'].get_list(pig_farm_id = pig_farm_id,
                 sex = sex, inc_user_audit = inc_user_audit, order_by = order_by)
-    
-        if pig_farm_id > 0 and sex == 'F':
-            list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
-                pig_farm_id);
-    
-            
-            for cur_sow in res:
-                cur_sow_id = cur_sow['sow_boar']['id']
-                
-                for cur_sow_output in list_sow_output_list:
-                    if cur_sow_output['sow_id'] == cur_sow_id:
-                        cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
-                        cur_sow['sow_boar']['num_pigs_wean']    = cur_sow_output['num_pigs_wean']
-                        
-                        break
                     
             
             
