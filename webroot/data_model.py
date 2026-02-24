@@ -525,7 +525,8 @@ class DataPigProdWeaning(BaseModel):
     
     num_pigs:               int = None
         
-    total_weight:           int = None
+    total_weight:           float = None
+    weight_pp:              str = None
     
     
 class DataPigProdStatus(BaseModel):

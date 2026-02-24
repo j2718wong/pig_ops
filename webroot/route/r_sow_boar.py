@@ -841,8 +841,8 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
 
     
 
-@app.get("/sow_boar/entry", tags=["Sow Boar"])
-async def sow_boar_entry(sow_boar_hid:str):
+@app.get("/sow_boar/entry/{entry_hid}", tags=["Sow Boar"])
+async def sow_boar_entry(entry_hid:str):
     """
     Will get sow boar entry.
     
@@ -853,7 +853,7 @@ async def sow_boar_entry(sow_boar_hid:str):
     """
     
     
-    res = hashids_common.decrypt(sow_boar_hid)
+    res = hashids_common.decrypt(entry_hid)
     if len(res) == 0:
         return {
             'result':{
@@ -887,26 +887,7 @@ async def sow_boar_entry(sow_boar_hid:str):
         
     cur_sow_boar = res[0]
     
-    
-    
-    # Check if sow_boar is female
-    if 'farm_sow_id' in cur_sow_boar:
-        
-        list_sow_output_list = model['pig_prod'].get_production_output_group_per_sow(
-            pig_farm_id);
-
-        
-        for cur_sow in res:
-            cur_sow_id = cur_sow['sow_boar']['id']
-            
-            for cur_sow_output in list_sow_output_list:
-                if cur_sow_output['sow_id'] == cur_sow_id:
-                    cur_sow['sow_boar']['num_births']       = cur_sow_output['num_births']
-                    cur_sow['sow_boar']['num_pigs_wean']    = cur_sow_output['num_pigs_wean']
-                    
-                    break
-                
-            
+ 
             
     if res is None:
         return {

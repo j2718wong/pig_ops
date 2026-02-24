@@ -73,12 +73,12 @@ class Account:
                     a.current_bill_id,
                     c.status_id,
                     
-                    
+                    a.weight_unit,
+                    a.currency,
                     a.flag_settings,
                     a.num_days_wean,
                     a.num_days_harvest_from_birth,
                     a.num_days_harvest_from_wean,
-                    
                     
                     
                     d.name_last,
@@ -125,26 +125,28 @@ class Account:
         if rows is not None:
             
             for row in rows:
-                cur_acc_id              = row[0]
-                cur_acc_flag            = row[1]
-                cur_acc_status_id       = row[2]
-                cur_acc_status_name     = row[3]
-                cur_acc_account_name    = row[4]
-                cur_acc_date_trial_start = row[5]
-                cur_acc_date_trial_end  = row[6]
+                cur_acc_id                  = row[0]
+                cur_acc_flag                = row[1]
+                cur_acc_status_id           = row[2]
+                cur_acc_status_name         = row[3]
+                cur_acc_account_name        = row[4]
+                cur_acc_date_trial_start    = row[5]
+                cur_acc_date_trial_end      = row[6]
                 
-                cur_acc_current_bill_id = row[7]
+                cur_acc_current_bill_id     = row[7]
                 cur_acc_current_bill_status = row[8]
                 
-                cur_acc_settings_flag   = row[9]
-                cur_acc_num_days_wean   = row[10]
-                cur_acc_num_days_harvest_from_birth = row[11]
-                cur_acc_num_days_harvest_from_wean  = row[12]
+                cur_acc_weight_unit         = row[9]
+                cur_acc_currency            = row[10]
+                cur_acc_settings_flag       = row[11]
+                cur_acc_num_days_wean       = row[12]
+                cur_acc_num_days_harvest_from_birth = row[13]
+                cur_acc_num_days_harvest_from_wean  = row[14]
                 
                                
-                cur_user_name_last      = row[13]
-                cur_user_name_first     = row[14]
-                cur_settings_last_update= str(row[15]) if row[15] else None
+                cur_user_name_last          = row[15]
+                cur_user_name_first         = row[16]
+                cur_settings_last_update    = str(row[17]) if row[17] else None
                 
                 
                 temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
@@ -185,11 +187,13 @@ class Account:
                     },
                     
                     'settings_operations': {
-                        'day_1_on_date_of_birth': cur_flag_day_1_on_dob,
-                        'day_1_on_date_of_insem': cur_flag_day_1_on_doi,
-                        'num_days_wean':    cur_acc_num_days_wean,
-                        'num_days_harvest_from_birth': cur_acc_num_days_harvest_from_birth,
-                        'num_days_harvest_from_wean':  cur_acc_num_days_harvest_from_wean,
+                        'weight_unit':                  cur_acc_weight_unit,
+                        'currency':                     cur_acc_currency,
+                        'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
+                        'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
+                        'num_days_wean':                cur_acc_num_days_wean,
+                        'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
+                        'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
                     
                         'last_update':{
                             'name_last':    cur_user_name_last,

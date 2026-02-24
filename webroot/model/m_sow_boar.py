@@ -663,7 +663,8 @@ class SowBoar:
                         d.num_pigs_weaning_m,
                         d.num_pigs_weaning_f,
                         d.num_pigs_weaning,
-                        d.total_pigs_weight_weaning,
+                        d.wean_pigs_weight_total,
+                        d.wean_pigs_weight_pp,
                         
                         
                         e.name      AS boar_name,
@@ -765,7 +766,8 @@ class SowBoar:
                         d.num_pigs_weaning_m,
                         d.num_pigs_weaning_f,
                         d.num_pigs_weaning,
-                        d.total_pigs_weight_weaning,
+                        d.wean_pigs_weight_total,
+                        d.wean_pigs_weight_pp,
                         
                         
                         e.name      AS boar_name,
@@ -911,29 +913,30 @@ class SowBoar:
                 cur_num_pigs_weaning_f      = row[39]
                 cur_num_pigs_weaning        = row[40]
                 cur_weight_weaning          = row[41]
+                cur_weight_weaning_pp       = row[42]
                     
                     
-                cur_boar_name               = row[42]
-                cur_boar_number             = row[43]
-                cur_boar_is_external        = row[44]
+                cur_boar_name               = row[43]
+                cur_boar_number             = row[44]
+                cur_boar_is_external        = row[45]
                     
                     
-                cur_semen_supplier_name     = row[45]
-                cur_semen_sup_semen_name    = row[46]
+                cur_semen_supplier_name     = row[46]
+                cur_semen_sup_semen_name    = row[47]
                 
-                cur_semen_ai_boar_name      = row[47]
-                cur_semen_ai_boar_number    = row[48]
+                cur_semen_ai_boar_name      = row[48]
+                cur_semen_ai_boar_number    = row[49]
                 
-                cur_last_mate_sow_boar_id   = row[49]
-                cur_mate_count              = row[50]
-                cur_date_last_mate          = str(row[51]) if  row[51] else None
+                cur_last_mate_sow_boar_id   = row[50]
+                cur_mate_count              = row[51]
+                cur_date_last_mate          = str(row[52]) if  row[52] else None
                 
                 
-                cur_data_ver_num_sow_boar   = row[52]
-                cur_data_ver_num_medvac     = row[53]
-                cur_data_ver_num_health_notes= row[54]
-                cur_data_ver_num_output     = row[55]
-                cur_data_ver_num_mates      = row[56]
+                cur_data_ver_num_sow_boar   = row[53]
+                cur_data_ver_num_medvac     = row[54]
+                cur_data_ver_num_health_notes= row[55]
+                cur_data_ver_num_output     = row[56]
+                cur_data_ver_num_mates      = row[57]
 
                
                 sow_boar = {
@@ -1024,7 +1027,8 @@ class SowBoar:
                             'num_pigs_m':       cur_num_pigs_weaning_m,
                             'num_pigs_f':       cur_num_pigs_weaning_f,
                             'num_pigs':         cur_num_pigs_weaning,
-                            'weight':           cur_weight_weaning    
+                            'weight':           cur_weight_weaning,
+                            'weight_pp':        cur_weight_weaning_pp
                         }
                         
                     },
@@ -1147,15 +1151,15 @@ class SowBoar:
                 if inc_user_audit > 0:
                     
                     added_by = {
-                        'name_last':        row[57],
-                        'name_first':       row[58],
-                        'dt_entry':         str(row[59])
+                        'name_last':        row[58],
+                        'name_first':       row[59],
+                        'dt_entry':         str(row[60])
                     }
                     
                     last_update = {
-                        'name_last':        row[60],
-                        'name_first':       row[61],
-                        'dt_update':        str(row[62]) if row[62] else None
+                        'name_last':        row[61],
+                        'name_first':       row[62],
+                        'dt_update':        str(row[63]) if row[63] else None
                     }
                 
                     sow_boar['added_by']    = added_by
