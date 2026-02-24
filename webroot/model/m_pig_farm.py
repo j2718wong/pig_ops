@@ -396,7 +396,8 @@ class PigFarm:
                     a.data_ver_num_boar,     
                     a.data_ver_num_pig_prod, 
                     a.data_ver_num_staff,    
-                    a.data_ver_num_feed_buy 
+                    a.data_ver_num_feed_buy,
+                    a.data_ver_num_not_pregnant 
                     
                     
                 FROM pig_farm a
@@ -458,7 +459,7 @@ class PigFarm:
                 cur_data_ver_num_pig_prod   = row[12]
                 cur_data_ver_num_staff      = row[13]  
                 cur_data_ver_num_feed_buy   = row[14]
-                
+                cur_data_ver_num_not_pregnant = row[15]
                 
                 cur_entry = {
                     'pig_farm': {
@@ -498,7 +499,8 @@ class PigFarm:
                         'boar':         cur_data_ver_num_boar,    
                         'pig_prod':     cur_data_ver_num_pig_prod,
                         'staff':        cur_data_ver_num_staff,   
-                        'feed_buy':     cur_data_ver_num_feed_buy
+                        'feed_buy':     cur_data_ver_num_feed_buy,
+                        'not_pregnant': cur_data_ver_num_not_pregnant
                     }
                     
                 }
@@ -590,7 +592,8 @@ class PigFarm:
                     data_ver_num_boar,     
                     data_ver_num_pig_prod, 
                     data_ver_num_staff,    
-                    data_ver_num_feed_buy 
+                    data_ver_num_feed_buy,
+                    data_ver_num_not_pregnant
                     
                 FROM pig_farm 
                 WHERE id = %s
@@ -636,6 +639,8 @@ class PigFarm:
                 cur_data_ver_num_pig_prod   = row[2]
                 cur_data_ver_num_staff      = row[3]  
                 cur_data_ver_num_feed_buy   = row[4]
+                cur_data_ver_num_not_pregnant = row[5]
+                
                 
                 
                 cur_entry = {
@@ -644,7 +649,8 @@ class PigFarm:
                         'boar':         cur_data_ver_num_boar,    
                         'pig_prod':     cur_data_ver_num_pig_prod,
                         'staff':        cur_data_ver_num_staff,   
-                        'feed_buy':     cur_data_ver_num_feed_buy
+                        'feed_buy':     cur_data_ver_num_feed_buy,
+                        'not_pregnant': cur_data_ver_num_not_pregnant
                     }
                 }
                 
