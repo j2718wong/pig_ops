@@ -356,4 +356,74 @@ async def user_info(uhid:str):
     }
     
 
+@app.get("/user/list", tags=["User"])
+async def pig_farm_staff_list(ahid: str, inc_deleted : int = 0):
+    """
+    Will get user list.
+    
+    Parameters
+    ----------
+    
+    ahid:str
+        account hashid
+
+    inc_deleted: int
+        if > 0, will include deleted entries
+    
+    
+    """
+    
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID'
+            }
+        }
+    
+    
+    account_id = res[0]
+        
+        
+    res = model['user'].get_list(account_id, inc_deleted)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'    
+            }
+        }
+    
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['user']['id']
+        cur_hid = hashids_user.encrypt(cur_id)
+        
+        del cur_entry['user']['id']
+        cur_entry['user']['hid']   = cur_hid
+        
+        
+        cur_id  = cur_entry['user_group']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['user_group']['id']
+        cur_entry['user_group']['hid']   = cur_hid
+        
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+    
+
+    
 

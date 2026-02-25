@@ -331,6 +331,96 @@ class User:
         return self.model.execute_sql(sql)
     
         
+    def get_list(self, account_id, inc_deleted = 0 ):
+        
+        if inc_deleted > 0:
+            where_clause = 'WHERE a.account_id = %s' % account_id 
+        else:
+            where_clause = 'WHERE a.account_id = %s AND (a.flag & 8) = 0' % account_id 
+        
+    
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.flag,
+                    a.user_group_id,
+                    b.group_num,
+                    b.name,
+                    
+                    a.name_last,
+                    a.name_first
+                    
+                FROM user a 
+                LEFT OUTER JOIN user_group b        ON a.user_group_id   = b.id
+                
+                %s
+                ORDER BY a.name_first
+                """ % where_clause
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_id                  = row[0]
+                cur_flag                = row[1]
+                cur_user_group_id       = row[2]
+                cur_group_num           = row[3]
+                cur_name                = row[4]
+                
+                cur_name_last           = row[5]
+                cur_name_first          = row[6]
+                
+                
+                cur_entry = {
+                    'user': {
+                        'id':           cur_id,
+                        'name_last':    cur_name_last,
+                        'name_first':   cur_name_first,
+                        'flag':         cur_flag
+                    },
+                    
+                    'user_group': {
+                        'id':           cur_user_group_id,
+                        'group_num':    cur_group_num,
+                        'name':         cur_name
+                    }
+                    
+                }
+                
+                    
+                result.append(cur_entry)
+        
+        return result
+    
     
     
     

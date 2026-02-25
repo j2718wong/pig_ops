@@ -885,7 +885,7 @@ async def sow_boar_entry(entry_hid:str):
             }
         }
         
-    cur_sow_boar = res[0]
+    
     
  
             
@@ -901,7 +901,10 @@ async def sow_boar_entry(entry_hid:str):
     # Replace plain id
     for cur_entry in res:
         replace_plain_ids_sow_boar_entry(cur_entry)
-
+    
+    
+    cur_sow_boar = res[0]
+        
         
     return {
         'result':{
@@ -909,7 +912,7 @@ async def sow_boar_entry(entry_hid:str):
             'code': 'SUCCESS'
         },
         
-        'data': res
+        'data': cur_sow_boar
     }
 
 

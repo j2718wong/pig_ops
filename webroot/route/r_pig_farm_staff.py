@@ -306,8 +306,7 @@ async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:i
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_STAFF_INVALID_PIG_FARM_HASHID'
             }
         }
     
@@ -321,8 +320,7 @@ async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:i
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -346,8 +344,7 @@ async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:i
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res
