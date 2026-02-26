@@ -27,11 +27,10 @@ if module_directory not in sys.path:
 
 
 from r_a0_security_checks   import check_if_valid_user_account
-from r_utils                import remove_database_null_description
+from r_utils                import (remove_database_null_description,
+                                    get_location_address_names_and_replace_ids)
 
 
-
-PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
 
 
   
@@ -47,8 +46,7 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_INVALID_NAME,
-                'code': 'ERROR_PIG_FARM_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_INVALID_NAME'
             }
         }
         
@@ -58,8 +56,7 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -74,37 +71,42 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
-    pig_farm_id     = res_add['pig_farm']['id']
-    pig_farm_flag   = res_add['pig_farm']['flag']
-        
-    pig_farm_hid    = hashids_common.encrypt(pig_farm_id)
     
-    if pig_farm_id == 0:
-        pig_farm_hid = ''
+    # Replace plain ids
+    cur_id     = res_add['pig_farm']['id']
+    cur_hid    = hashids_common.encrypt(cur_id)
     
-    # remove plain id
+    pig_farm_id     = cur_id
+    pig_farm_hid    = cur_hid    
+    
     del res_add['pig_farm']['id']
-    res_add['pig_farm']['hid'] = pig_farm_hid
+    res_add['pig_farm']['hid'] = cur_hid
 
     result_num      = res_add['result']['num']
     
-    if result_num == PIG_FARM_ADD_RES_NUM_SUCCESS:
+    if result_num == 0:
         data = {
            'pig_farm_id':   pig_farm_id,
            'hashid':        pig_farm_hid
         }
         res_update = model['pig_farm'].update_hashid(data)
-        
+    
+    
     return res_add
     
     
 @app.post("/pig_farm/update", tags=["Pig Farm"])
 async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
+    """
+    The pig farm update vary a little bit from normal add/update returns;
+    It will return the pig_farm object so no need to request again for 
+    the pig_farm entry.
+    """    
+    
     name    = pig_farm_data.name
     uhid    = pig_farm_data.uhid
     
@@ -114,8 +116,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_ACCOUNT_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_INVALID_NAME',
-                'desc': ''
+                'code': 'ERROR_ACCOUNT_INVALID_NAME'
             }
         }
         
@@ -125,8 +126,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -142,8 +142,7 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
         return {
             'result':{
                 'num':  ERROR_PIG_FARM_INVALID_HASHID,
-                'code': 'ERROR_PIG_FARM_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
             }
         }
     
@@ -151,9 +150,61 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
     pig_farm_id = res[0]
     
     
-    pig_farm_data.name      = name
-    pig_farm_data.user_id   = user_id
-    pig_farm_data.pig_farm_id = pig_farm_id
+    level_1_id  = 0
+    level_2_id  = 0
+    level_3_id  = 0
+    
+    
+    level_1_hid = pig_farm_data.level_1_hid
+    res = hashids_common.decrypt(level_1_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_INVALID_ADDRESS_LEVEL_1,
+                'code': 'ERROR_INVALID_ADDRESS_LEVEL_1'
+            }
+        }
+        
+    level_1_id = res[0]
+    
+    
+    level_2_hid = pig_farm_data.level_2_hid
+    res = hashids_common.decrypt(level_2_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_INVALID_ADDRESS_LEVEL_2,
+                'code': 'ERROR_INVALID_ADDRESS_LEVEL_2'
+            }
+        }
+    
+    level_2_id = res[0]
+    
+    
+    level_3_hid = pig_farm_data.level_3_hid
+    
+    if level_3_hid is not None:
+        res = hashids_common.decrypt(level_3_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_INVALID_ADDRESS_LEVEL_3,
+                    'code': 'ERROR_INVALID_ADDRESS_LEVEL_3'
+                }
+            }
+        
+        level_3_id = res[0]
+    
+    
+    
+    
+    pig_farm_data.name          = name
+    pig_farm_data.user_id       = user_id
+    pig_farm_data.pig_farm_id   = pig_farm_id
+    pig_farm_data.level_1_id    = level_1_id
+    pig_farm_data.level_2_id    = level_2_id
+    pig_farm_data.level_3_id    = level_3_id
+    
     
     
     res_update    =  model['pig_farm'].update(pig_farm_data)
@@ -166,13 +217,56 @@ async def pig_farm_update(pig_farm_data: dm.DataPigFarm):
             }
         }
     
-    
-    # remove plain id
-    del res_update['pig_farm']['id']
-    res_update['pig_farm']['hid'] = pig_farm_hid
+    if res_update['result']['num'] != 0:
         
-    return res_update
+        # remove plain id
+        del res_update['pig_farm']['id']
+        res_update['pig_farm']['hid'] = pig_farm_hid
+            
+        return res_update
+
+
+    # Request pig_farm entry
+    id_list = [pig_farm_id]
+    res_list = model['pig_farm'].get_list(id_list = id_list)
     
+    if res_list is None or len(res_list) != 1:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+
+    
+    res = res_list[0]
+    
+    # Replace plain ids
+    cur_id     = res['pig_farm']['id']
+    cur_hid    = hashids_common.encrypt(cur_id)
+    
+    del res['pig_farm']['id']
+    res['pig_farm']['hid'] = cur_hid
+
+    
+    get_location_address_names_and_replace_ids(res)
+    
+    
+    
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+    
+    
+    
+
+        
     
 @app.get("/pig_farm/list", tags=["Pig Farm"])
 async def pig_farm_list(ahid: str):

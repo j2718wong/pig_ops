@@ -28,8 +28,11 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import (get_user_account_info,
-                                    clean_data_user_account)
+
+from r_a0_security_checks   import get_user_account_info
+
+from r_utils                import clean_data_user_account
+
 from r_pig_production       import get_page_data_farm_account_pig_prod
 
 

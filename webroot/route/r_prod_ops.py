@@ -291,7 +291,7 @@ class ReportGenPigProdOps:
             
             cur_entry['gestating_ops'] = list_pig_ops
             
-            index += 1
+
             
             
         dt_now      = datetime.now()

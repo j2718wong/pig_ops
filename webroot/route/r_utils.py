@@ -108,40 +108,6 @@ def check_if_valid_user_account(user_id):
     
     
 
-def get_user_account_info(user_id):
-    data_user = model['user'].get_user_info(user_id)
-    if data_user == None:
-        # TODO what to do in case no result
-        print('Error 1')
-        return None
-        
-        
-    # Get user.account_id 
-    account_id = data_user['user']['account_id']
-    
-    
-    
-    
-    # Get account info
-    data_account = model['account'].get_info(account_id)
-    if data_account == None:
-        # TODO what to do in case no result
-        print('Error 2')
-        return None
-        
-        
-    # TODO Check account free trial period
-        
-    # TODO check account for not paid bill
-    
-    result = {
-        'user':     data_user,
-        'account':  data_account
-    }
-    
-    return result
-
-
 def clean_data_user_account(user_account):
     # Clean user
     cur_id      = user_account['user']['user']['id']
@@ -200,11 +166,19 @@ def get_location_address_names_and_replace_ids(data):
     data['location']['country']['hid']   = cur_hid
     
     
+    
+    # Nothing to request; nothing to change
+    if level_1_id == 0 and level_2_id == 0 and level_3_id == 0:
+        return
+    
+    
+    
     address_names = model_la['address_level'].get_address_level_names(
         address_level_1_id = level_1_id, 
         address_level_2_id = level_2_id,
         address_level_3_id = level_3_id
     )
+    
     
     if address_names is not None:
         location_address['level_1']['name'] = address_names['level_1_name']

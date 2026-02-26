@@ -29,11 +29,11 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_a0_security_checks   import check_if_valid_user_account
+from r_a0_security_checks   import (check_if_valid_user_account,
+                                    get_user_account_info)
 
 from r_account_selection    import get_account_lookup_selection
 from r_utils                import (remove_database_null_description,
-                                    get_user_account_info,
                                     get_location_address_names_and_replace_ids)
 
 from r_sow_boar             import replace_plain_ids_sow_boar_entry
@@ -118,6 +118,8 @@ def get_page_data_farm_account_pig_prod(pig_farm_id,
         inc_pig_prod = 0, inc_user_audit = 0):
     
     pig_farm_account= model['pig_farm'].get_pig_farm_account_info(pig_farm_id)
+    
+    
     
     if pig_farm_account == None: return None
     
@@ -370,6 +372,9 @@ async def pig_fattening(pfhid:str = None):
     if len_items == 0:
         # TODO what to do in case no farm set
         return None
+        
+        
+        
         
     if pig_farm_id is not None:
         # This is given by user 
