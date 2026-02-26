@@ -368,7 +368,9 @@ class Account:
             in_days_wean                INT,
             
             in_days_harvest_from_birth  INT,
-            in_days_harvest_from_wean   INT
+            in_days_harvest_from_wean   INT,
+            
+            in_weight_unit              VARCHAR(4)
         )  
         """
         
@@ -378,7 +380,10 @@ class Account:
         sql += '%s,'    % data.day_1_on_date_insem
         sql += '%s,'    % data.days_wean
         sql += '%s,'    % data.days_harvest_from_birth
-        sql += '%s);'   % data.days_harvest_from_wean
+        sql += '%s,'    % data.days_harvest_from_wean
+        sql += '"%s");' % data.weight_unit
+        
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -424,13 +429,11 @@ class Account:
             cur_acc_num_days_harvest_from_birth = row[5]
             cur_acc_num_days_harvest_from_wean  = row[6]
             
-            
-            cur_user_name_last          = row[7]
-            cur_user_name_first         = row[8]
-            cur_settings_last_update    = str(row[9]) if row[9] is not None else None
+            cur_acc_weight_unit         = row[7]
+            cur_acc_currency            = row[8]
             
             
-            return {
+            result =  {
                 'result':{
                     'num':              cur_res_num,
                     'code':             cur_res_code,
@@ -443,14 +446,13 @@ class Account:
                     'num_days_wean':                cur_acc_num_days_wean,
                     'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
                     'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
-                
-                    'last_update':{
-                        'name_last':    cur_user_name_last,
-                        'name_first':   cur_user_name_first,
-                        'dt_update':    cur_settings_last_update
-                    }
+                    
+                    'acc_weight_unit':  cur_acc_weight_unit,
+                    'currency':         cur_acc_currency
                 }
             }
+
+            return result 
 
         return None
     
