@@ -34,7 +34,8 @@ from r_a0_security_checks   import (check_if_valid_user_account,
 
 from r_account_selection    import get_account_lookup_selection
 from r_utils                import (remove_database_null_description,
-                                    get_location_address_names_and_replace_ids)
+                                    get_location_address_names_and_replace_ids,
+                                    replace_plain_ids_pig_production)
 
 from r_sow_boar             import replace_plain_ids_sow_boar_entry
 
@@ -1565,80 +1566,6 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     }
     
 
-
-def replace_plain_ids_pig_production(cur_entry):
-    # Replace plain_id
-        
-    cur_id  = cur_entry['pig_production']['id']
-    cur_hid = hashids_common.encrypt(cur_id)
-    
-    del cur_entry['pig_production']['id']
-    cur_entry['pig_production']['hid']   = cur_hid
-    
-    
-    cur_id  = cur_entry['sow']['id']
-    cur_hid = hashids_common.encrypt(cur_id)
-    
-    del cur_entry['sow']['id']
-    cur_entry['sow']['hid']   = cur_hid
-    
-    
-    # If boar_id is None, delete whole boar block
-    cur_id  = cur_entry['insemination']['boar']['id']
-    if cur_id is None:
-        del cur_entry['insemination']['boar']
-        
-        
-        # If semen_supplier_id is None, delete whole semen_supplier block
-        cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
-        if cur_id is None:
-            del cur_entry['insemination']['ai']['semen_supplier']
-        
-            cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
-            if cur_id is None:
-                del cur_entry['insemination']['ai']['internal_boar']
-            else:
-                cur_hid = hashids_common.encrypt(cur_id)
-                
-                del cur_entry['insemination']['ai']['internal_boar']['id']
-                cur_entry['insemination']['ai']['internal_boar']['hid'] = cur_hid
-        else:
-            # encrypt semen_supplier.id
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['insemination']['ai']['semen_supplier']['id']
-            cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
-            
-            # encrypt semen_supplier.semen.id
-            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
-            cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
-            
-            
-        
-    else:
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['insemination']['boar']['id']
-        cur_entry['insemination']['boar']['hid']   = cur_hid
-        
-        
-        # delete whole ai block
-        del cur_entry['insemination']['ai']
-
-    
-    if 'insem_staff_id' in cur_entry['insemination']:
-    
-        cur_id  = cur_entry['insemination']['insem_staff_id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['insemination']['insem_staff_id']
-        cur_entry['insemination']['insem_staff_hid']   = cur_hid
-
-
-
     
 def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
     """
@@ -1802,7 +1729,7 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
     
     
     # Get feed_balance list
-    data_feed_balance_list = get_data_feed_balance(pig_prod_id)
+    data_feed_balance_list = get_data_feed_balance(pig_prod_id = pig_prod_id)
     
     
     # Get prod_harvest list

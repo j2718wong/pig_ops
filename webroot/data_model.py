@@ -730,12 +730,14 @@ class DataPigProdPigOps(BaseModel):
 class DataFeedBalance(BaseModel):
     uhid:                   str
     
+    pig_farm_hid:           str = None
     pig_prod_hid:           str = None
     pig_prod_group_hid:     str = None
     feed_balance_hid:       str = None
     
     
     user_id:                int = 0
+    pig_farm_id:            int = 0
     pig_prod_id:            int = 0
     pig_prod_group_id:      int = 0
     feed_balance_id:        int = 0

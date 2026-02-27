@@ -210,3 +210,76 @@ def get_location_address_names_and_replace_ids(data):
         data['location']['address']['level_3']['hid']   = cur_hid
 
 
+
+def replace_plain_ids_pig_production(cur_entry):
+    # Replace plain_id
+        
+    cur_id  = cur_entry['pig_production']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['pig_production']['id']
+    cur_entry['pig_production']['hid']   = cur_hid
+    
+    
+    cur_id  = cur_entry['sow']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['sow']['id']
+    cur_entry['sow']['hid']   = cur_hid
+    
+    
+    # If boar_id is None, delete whole boar block
+    cur_id  = cur_entry['insemination']['boar']['id']
+    if cur_id is None:
+        del cur_entry['insemination']['boar']
+        
+        
+        # If semen_supplier_id is None, delete whole semen_supplier block
+        cur_id  = cur_entry['insemination']['ai']['semen_supplier']['id']
+        if cur_id is None:
+            del cur_entry['insemination']['ai']['semen_supplier']
+        
+            cur_id  = cur_entry['insemination']['ai']['internal_boar']['id']
+            if cur_id is None:
+                del cur_entry['insemination']['ai']['internal_boar']
+            else:
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['insemination']['ai']['internal_boar']['id']
+                cur_entry['insemination']['ai']['internal_boar']['hid'] = cur_hid
+        else:
+            # encrypt semen_supplier.id
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['ai']['semen_supplier']['id']
+            cur_entry['insemination']['ai']['semen_supplier']['hid']   = cur_hid
+            
+            # encrypt semen_supplier.semen.id
+            cur_id  = cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['insemination']['ai']['semen_supplier']['semen']['id']
+            cur_entry['insemination']['ai']['semen_supplier']['semen']['hid']   = cur_hid
+            
+            
+        
+    else:
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['insemination']['boar']['id']
+        cur_entry['insemination']['boar']['hid']   = cur_hid
+        
+        
+        # delete whole ai block
+        del cur_entry['insemination']['ai']
+
+    
+    if 'insem_staff_id' in cur_entry['insemination']:
+    
+        cur_id  = cur_entry['insemination']['insem_staff_id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['insemination']['insem_staff_id']
+        cur_entry['insemination']['insem_staff_hid']   = cur_hid
+
+
