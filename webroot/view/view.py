@@ -45,7 +45,9 @@ from common_fast_api    import dir_static, dir_static_m
 env = Environment(loader=FileSystemLoader('templates'))
 
 
-view_names = [              
+view_names = [
+            ('signup',              'SignUp'),
+            
             ('root',                'Root'),
             
             ('acc_pig_ops',         'AccPigOps'),
@@ -55,6 +57,11 @@ view_names = [
            
             
         ]
+
+
+MODULES_SIGNUP =[
+    "pages/account_management/page_user_signup_or_login.js"
+]
 
 
 MODULES_ROOT = [
@@ -149,6 +156,24 @@ class ViewBase:
         self.view = view
         self.controller = view.controller
 
+
+class SignUp(ViewBase):
+    def render(self, page_data = None):
+        # Mobile version
+        template = env.get_template('signup.html')
+    
+        data    = {}
+        
+        # These should have type= module
+        js_app_modules = MODULES_SIGNUP
+            
+        data    = { 'page_data':        page_data,
+                    'js_lib':           [],
+                    'js_app_text':      [],
+                    'js_app_modules':   js_app_modules}
+        
+                
+        return template.render(data)
     
 #
 # Views

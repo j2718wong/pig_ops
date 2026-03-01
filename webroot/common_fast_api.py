@@ -10,6 +10,8 @@ from fastapi.security           import HTTPBasicCredentials, HTTPBearer
 from fastapi.staticfiles        import StaticFiles
 
 import mimetypes
+import jwt
+import secrets
 
 
 # Add JavaScript MIME type if not already registered
@@ -49,7 +51,7 @@ tags_metadata = [
 ]
 
 app = FastAPIOffline(openapi_tags = tags_metadata)
-
+ALGORITHM = "HS256"
 
 # Old desktop first static directory
 dir_static = '/home/dev01/projects/jsys/pig_ops_ui/pig_ops_app/src/static'
@@ -61,6 +63,38 @@ dir_static_m = '/home/dev01/projects/jsys/pig_ops_ui_mob/src/static'
 app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
 
 
+
+def generate_csrf_token(data) -> str:
+    """Generate a CSRF token"""
+    # Create a unique token
+    random_string = secrets.token_urlsafe(32)
+    
+    
+    hours_expiry = 1
+    
+    if data:
+        if 'hours_expiry' in data:
+            hours_expiry = data['hours_expiry']
+    
+    
+    # Create JWT token
+    payload = {
+        "csrf_token": random_string,
+        "exp": datetime.utcnow() + timedelta(hours=hours_expiry)
+    }
+    
+    return jwt.encode(payload, APP_SECRET_KEY, algorithm=ALGORITHM)
+
+
+
+def validate_csrf_token(token: str) -> bool:
+    """Validate CSRF token"""
+    try:
+        # Decode and verify JWT
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return bool(payload.get("csrf_token"))
+    except jwt.InvalidTokenError:
+        return False
 
 
 

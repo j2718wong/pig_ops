@@ -5,7 +5,10 @@ import os
 import sys
 import random
 import pprint
+import json
 
+
+from fastapi                import HTTPException, status
 from pydantic               import BaseModel
 
 from datetime               import datetime, timedelta
@@ -29,6 +32,21 @@ FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
 
 
 USER_REGISTER_RES_NUM_SUCCESS           = 0
+
+
+SOCIAL_MEDIA_GOOGLE             = 1
+SOCIAL_MEDIA_FACEBOOK           = 2
+SOCIAL_MEDIA_TIKTOK             = 3
+
+ALLOWED_SOCIAL_MEDIA_LOGIN = [
+    SOCIAL_MEDIA_GOOGLE,  
+    SOCIAL_MEDIA_FACEBOOK,
+    SOCIAL_MEDIA_TIKTOK  
+
+]
+
+
+
 
 
 def write_user_flag_bits(user, user_flag):
@@ -67,6 +85,10 @@ def write_user_flag_bits(user, user_flag):
 
 @app.post("/user/register", tags=["User"])
 async def user_register(user_data: dm.DataUser):
+    # TODO preprocess 
+    # checking token
+    
+    
 
     res_register    =  model['user'].register(user_data)
     
@@ -74,13 +96,12 @@ async def user_register(user_data: dm.DataUser):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
-    # Check for email verification flag
     
+    # Check for email verification flag
     user_id         = res_register['user']['id']
     user_flag       = res_register['user']['flag']
         
@@ -92,10 +113,7 @@ async def user_register(user_data: dm.DataUser):
 
     result_num      = res_register['result']['num']
 
-    if result_num == USER_REGISTER_RES_NUM_SUCCESS:
-        # Update user.hashid
-        
-        
+    if result_num == 0:
         verify_code = random.randint(MFA_VERIFICATION_CODE_MIN,
                         MFA_VERIFICATION_CODE_MAX)
         
@@ -145,7 +163,9 @@ async def user_register(user_data: dm.DataUser):
             res_register['mfa']['hid'] = mfa_hashid
 
         
-        write_user_flag_bits(res_register['user'], user_flag)
+        # No more more flag decomposition on transit; for security reasons;
+        # Should be decomposed at JS side
+        # write_user_flag_bits(res_register['user'], user_flag)
 
     return res_register
     
@@ -177,8 +197,7 @@ async def user_email_verify_code(uhid:str, code: int):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -197,8 +216,7 @@ async def user_email_verify_code(uhid:str, code: int):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -209,7 +227,6 @@ async def user_email_verify_code(uhid:str, code: int):
     
     user_flag = res_verify['user']['flag']
     
-    write_user_flag_bits(res_verify['user'], user_flag)
     
     return res_verify
     
@@ -222,8 +239,7 @@ async def user_email_verify_resend(uhid:str):
         return {
             'result':{
                 'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
@@ -279,18 +295,84 @@ async def user_email_verify_resend(uhid:str):
         return {
             'result':{
                 'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'code': 'SUCCESS'
             }
         }
         
     return {
         'result':{
             'num':  ERROR_DATABASE_ERROR,
-            'code': 'ERROR_DATABASE_ERROR',
-            'desc': ''
+            'code': 'ERROR_DATABASE_ERROR'
         }
     }
+    
+    
+@app.get("/user/login_social", tags=["User"])
+async def user_info(request: Request):
+     # Get raw JSON body
+    body = await request.body()
+    
+    # Parse JSON manually
+    data = json.loads(body)
+    
+    
+    if 'social_media_id' not in data:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail = REQUEST_ACCESS_DENIED
+        )
+    
+    
+    social_media_id = data.get('social_media_id')
+    if social_media_id not in ALLOWED_SOCIAL_MEDIA_LOGIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail = REQUEST_ACCESS_DENIED
+        )
+
+    
+    
+    if 'email' not in data:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail = REQUEST_ACCESS_DENIED
+        )
+    
+    
+    email = data['email']
+    len_email = len(email)
+    if  len_email == 0 or len_email > 50:
+        return {
+            'result':{
+                'num':  ERROR_USER_EMAIL,
+                'code': 'ERROR_USER_EMAIL'
+                'desc': 'Invalid email lenght.'
+            }
+        }
+    
+    
+    # there should be at least a user.name_first;
+    
+    if 'name_first' not in data:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail = REQUEST_ACCESS_DENIED
+        )
+    
+    
+    name_first = data['name_first']
+    len_name_first = len(name_first)
+    if  len_name_first == 0 or len_name_first > 50:
+        return {
+            'result':{
+                'num':  ERROR_USER_EMAIL,
+                'code': 'ERROR_USER_EMAIL'
+                'desc': 'Invalid email lenght.'
+            }
+        }
+    
+    model['user']
+    
     
     
 @app.get("/user/info", tags=["User"])

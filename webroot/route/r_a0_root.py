@@ -52,6 +52,31 @@ def get_application_data():
     }
 
 
+@app.get("/signup", response_class = HTMLResponse)
+async def signup():
+    page_data = {}
+    
+    
+    #generate_csrf_token() 
+    
+    page = controller.view['signup'].render(page_data = json.dumps(page_data, indent=4))
+    
+    return page
+    
+
+
+@app.get("/login", response_class = HTMLResponse)
+async def signup():
+    page_data = {}
+    
+    
+    #generate_csrf_token() 
+    
+    page = controller.view['signup'].render(page_data = json.dumps(page_data, indent=4))
+    
+    return page
+    
+
 
 
 @app.get("/", response_class = HTMLResponse)

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>SuperPig</title>
+  <!-- Font Awesome 6 (free) for icons -->
+  <link type="text/css"       rel="stylesheet"    href="/static_m/css/all.min.css"/>
+  <style>
+    /* RESET & GLOBAL */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background:  white; /*#f2f5f9;*/
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    /* mobile card container */
+    .signup-card {
+      max-width: 400px;
+      width: 100%;
+      background: white;
+      padding: 32px 24px;
+    }
+
+    /* VARIABLE for corporate blue */
+    :root {
+        --corporate-blue:  #1e3a8a; /*#1e5aa7; */
+        --corporate-blue-company: #1877F0;
+        --corporate-blue-dark: #15467d;
+        --corporate-blue-light: #4a8adb;
+        --corporate-blue-border: #dbeafe;
+        --corporate-bg: #e0f2fe;
+    }
+
+    /* ---------- PRODUCT & LOGO section (centered) ---------- */
+    .product-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;   /* centers the logo + name group */
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .company-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--corporate-blue-company);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      font-weight: bold;
+      color: white;
+      flex-shrink: 0;
+      line-height: 1;
+      padding-bottom: 4px; /* optical balance */
+    }
+
+    .product-name {
+      font-size: 22px;
+      font-weight: 700;
+      white-space: nowrap;
+      color: var(--corporate-blue);
+      letter-spacing: -0.3px;
+    }
+
+    /* ---------- "Sign up to continue" (centered) ---------- */
+    .intro-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c3a5e;
+      text-align: center;
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+    }
+
+    /* email field */
+    .login-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2a41;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .email-input {
+      width: 100%;
+      padding: 8px 18px;
+      font-size: 16px;
+      background-color: #f8fafd;
+      border: 1.5px solid #e1e8f0;
+      border-radius: 24px;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s;
+      margin-bottom: 2px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .email-input:focus {
+      border-color: var(--corporate-blue-company);
+      box-shadow: 0 0 0 4px rgba(26, 76, 255, 0.15);
+      background-color: white;
+    }
+
+    .invalid-feedback {
+        color: red;
+    }
+
+    /* terms text */
+    .terms-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #6f7b90;
+      margin-top: 18px;
+      padding-right: 4px;
+    }
+
+    .terms-text a {
+      color: var(--corporate-blue-company);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .terms-text a:hover {
+      text-decoration: underline;
+    }
+
+    /* signup button */
+    .signup-btn {
+      width: 100%;
+      background: var(--corporate-blue-company);
+      border: none;
+      color: white;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 10px 18px -8px rgba(26, 76, 255, 0.4);
+      margin-top: 18px;
+      margin-bottom: 28px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .signup-btn:active {
+      background: #0e3ad0;
+      transform: scale(0.98);
+      box-shadow: 0 6px 12px -6px rgba(26, 76, 255, 0.5);
+    }
+
+    /* ---------- "Or continue with" section ---------- */
+    .or-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .or-line {
+      flex: 1;
+      height: 1px;
+      background: #e4e9f2;
+    }
+
+    .or-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: #8d99ae;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* social list – ONE LINE PER ITEM (vertical) with actual icons */
+    .social-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #f5f8ff;
+      border: 1px solid #e9eef4;
+      border-radius: 60px;
+      padding: 14px 10px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1f2a41;
+      text-decoration: none;
+      transition: background 0.15s, border 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .social-btn:active {
+      background: #e9f0fe;
+      border-color: #ccd9f0;
+    }
+
+    /* icon styling — Font Awesome 6 icons */
+    .social-btn i {
+      font-size: 22px;
+      width: 28px;          /* steady width for alignment */
+      text-align: right;
+    }
+
+    /* brand colors for icons */
+    .social-btn.google i { color: #4285F4; }
+    .social-btn.facebook i { color: #1877F2; }
+    .social-btn.tiktok i { 
+      color: #000; 
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* ensure text is neatly left-aligned after icon */
+    .social-btn span {
+      flex: 0 0 auto;
+      min-width: 70px;
+      text-align: left;
+    }
+
+    /* ---------- "Already Have an Account?" – now FULL LINE clickable (easy tap) ---------- */
+    .login-redirect {
+      margin: 24px 0 20px 0;    /* spacing before footer */
+      text-align: center;
+    }
+
+    .login-full-link {
+      display: inline-block;      /* makes the whole block tap-friendly */
+      font-size: 15px;
+      font-weight: 500;
+      color: #2c3a5e;
+      text-decoration: none;
+      padding: 8px 16px;         /* bigger tap area */
+      border-radius: 40px;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .login-full-link:hover {
+      background: #f0f4fe;        /* subtle feedback */
+    }
+
+    .login-full-link i {
+      color: var(--corporate-blue-company);
+      margin-right: 6px;
+      font-size: 14px;
+    }
+
+    .login-full-link span {
+      color: var(--corporate-blue-company);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    /* ---------- FOOTER (Option 1: Simple Legal) ---------- */
+    .legal-footer {
+      margin-top: 16px;
+      padding-top: 20px;
+      border-top: 1px solid #e9eef4;
+      text-align: center;
+      font-size: 13px;
+      color: #8d99ae;
+    }
+
+    .footer-links {
+      margin-bottom: 8px;
+    }
+
+    .footer-links a {
+      color: #5e6879;
+      text-decoration: none;
+      margin: 0 6px;
+      transition: color 0.2s;
+      font-weight: 450;
+    }
+
+    .footer-links a:hover {
+      color: var(--corporate-blue-company);
+    }
+
+    .dot {
+      color: #ccd4e0;
+      font-size: 12px;
+      user-select: none;
+    }
+
+    .copyright {
+      color: #a6b1c2;
+      font-size: 12px;
+    }
+
+    /* mobile fine-tune */
+    @media (max-width: 380px) {
+      .signup-card { padding: 24px 18px; }
+      .social-btn { font-size: 15px; }
+      .login-full-link { font-size: 14px; padding: 8px 12px; }
+    }
+
+    .signup-btn, .social-btn, .login-full-link {
+      touch-action: manipulation;
+    }
+  </style>
+  
+<script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
+  
+{% for script in js_app_modules %}
+    <script type = "module" src="/static_m/js/{{script}}"></script>
+{% endfor %}
+</head>
+
+<body>
+
+
+<div id="container-signup"       class="hidden-container" style="display:none;"></div>
+ 
+ 
+ 
+<!-- FOOTER (Option 1: Simple Legal) added exactly as recommended -->
+<div class="legal-footer">
+    <div class="footer-links">
+        <a href="#">Terms</a>
+        <span class="dot">•</span>
+        <a href="#">Privacy</a>
+        <span class="dot">•</span>
+        <a href="#">Contact</a>
+    </div>
+  
+    <div class="copyright">
+        © 2026 J SysDev. All rights reserved.
+    </div>
+</div>
+  
+
+  
+<script type="module">
+    import {ManagerLogin} from './static_m/js/pages/account_management/manager_login.js';
+    
+     
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log('Full page loaded');
+        // Your code here
+        
+        
+        
+        const managerLogin = new ManagerLogin();
+        managerLogin.init();
+        managerLogin.onPageLoad();
+        
+        globalThis.managerLogin = managerLogin;
+
+        
+    });
+      
+</script>
+
+  
+  
+</body>
+</html>

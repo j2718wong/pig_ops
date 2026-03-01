@@ -112,14 +112,25 @@ DEFAULT_KG_PER_FEED_UNIT = {
 
 
 
+REQUEST_ACCESS_DENIED    = "Access denied"
+
+
 
 
 ERROR_DATABASE_ERROR                                = 0x01
 ERROR_SERVER_ERROR                                  = 0x02
 
-ERROR_USER_INACTIVE                                 = 0x03
-ERROR_ACCOUNT_DISABLED                              = 0x04
-ERROR_ACCOUNT_BILL_OVERDUE                          = 0x05
+ERROR_USER_EMAIL                                    = 0x03
+ERROR_USER_INACTIVE                                 = 0x04
+
+
+
+
+ERROR_ACCOUNT_DISABLED                              = 0x08
+ERROR_ACCOUNT_BILL_OVERDUE                          = 0x09
+
+
+
 
 
 ERROR_ADDRESS_COUNTRY_HID                           = 0x0A

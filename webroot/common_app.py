@@ -169,7 +169,7 @@ DEV_HOME                        = 1
 
 
 # Change thee settings for development
-USING_PRODUCTION_DB             = 1
+USING_PRODUCTION_DB             = 0
 USING_DEV_AT                    = DEV_HOME
 DB_INFO                         = ''
 

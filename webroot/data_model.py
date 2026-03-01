@@ -33,11 +33,11 @@ class HasContactDetails:
 
 
 class DataUser(BaseModel):
-    name_last:              str
-    name_first:             str
+    name_last:              str = None
+    name_first:             str = None
     email:                  str
-    country_code:           int = 63    # default to PH
-    mobile_num:             str
+    
+    social_channel_id:      int = 0
 
 
 class DataAccount(BaseModel):

@@ -235,6 +235,8 @@ class User:
     def register(self, data = None):
         """
         PROCEDURE user_register(
+            in_social_channel_id    INT,
+            
             in_name_last            VARCHAR(50),
             in_name_first           VARCHAR(50),
     
@@ -243,15 +245,26 @@ class User:
         """
         
 
-        name_last       = data.name_last.upper()
-        name_first      = data.name_first.upper()
-        
         email           = data.email.lower()
         
         
         sql =  'CALL user_register('
-        sql += '"%s",'  % name_last
-        sql += '"%s",'  % name_first
+        
+        
+        if data.social_channel_id is not None and data.social_channel_id > 0:
+             sql += '%s,'  % data.social_channel_id
+        else:
+            sql += 'NULL,'
+        
+        if data.name_last is not None:
+            sql += '"%s",'  % data.name_last
+        else:
+            sql += 'NULL,'
+            
+        if data.name_first is not None:
+            sql += '"%s",'  % name_first
+        else:
+            sql += 'NULL,'
         
         
         sql += '"%s");'  % email
@@ -422,11 +435,9 @@ class User:
         return result
     
     
+
     
-    
-    
-    
-    def login(self, data = None):
+    def login_social(self, data = None):
         """
         PROCEDURE `booking`.`user_login`(
             in_email                    VARCHAR(30),
