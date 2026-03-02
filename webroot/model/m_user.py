@@ -439,20 +439,64 @@ class User:
     
     def login_social(self, data = None):
         """
-        PROCEDURE `booking`.`user_login`(
-            in_email                    VARCHAR(30),
-            in_password                 VARCHAR(255)
-        )  
+        PROCEDURE user_register_or_login(
+            in_social_media_id      INT,
+            
+            in_name_last            VARCHAR(50),
+            in_name_first           VARCHAR(50),
+            
+            in_email                VARCHAR(50),
+            
+            in_viewport_width       INT,
+            in_viewport_height      INT,
+            in_ip_address           VARCHAR(24)            
+        )    
         """
         
         
-        email           = data['email'].lower()
-        password        = data['password']
-       
         
-        sql =  'CALL user_login('
-        sql += '"%s",'  % email
-        sql += '"%s");' % password
+        sql =  'CALL user_register_or_login('
+        
+        if data.social_media_id and data.social_media_id > 0:
+            sql += '%s,'  % data.social_media_id
+        else:
+            sql += 'NULL,'
+            
+        
+        if data.name_last and len(data.name_last) > 0:
+            sql += '"%s",'  % data.name_last
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.name_first and len(data.name_first) > 0:
+            sql += '"%s",'  % data.name_first
+        else:
+            sql += 'NULL,'
+        
+        
+        sql += '"%s",'  % data.email
+        
+        
+        
+        if data.viewport_width and data.viewport_width > 0:
+            sql += '%s,'  % data.viewport_width
+        else:
+            sql += 'NULL,'
+        
+        if data.viewport_height and data.viewport_height > 0:
+            sql += '%s,'  % data.viewport_height
+        else:
+            sql += 'NULL,'
+        
+        
+            
+        if data.ip_address and len(data.ip_address) > 0:
+            sql += '"%s");'  % data.ip_address
+        else:
+            sql += 'NULL);'
+        
+            
         
         
         # Check if still connected to database
@@ -491,7 +535,8 @@ class User:
                 
                 'user': {
                     'id':               row[3],
-                    'flag':             row[4]
+                    'account_id':       row[4],
+                    'flag':             row[5]
                 }
             }
 

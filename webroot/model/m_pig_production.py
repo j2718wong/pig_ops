@@ -820,6 +820,8 @@ class PigProduction:
                     a.birth_staff_id,
                     j.name AS birth_staff_name,
                     
+                    a.num_dead_after_birth,
+                    
                     a.date_weaning,
                     a.num_pigs_weaning_m,
                     a.num_pigs_weaning_f,
@@ -968,63 +970,65 @@ class PigProduction:
                 cur_prod_date_actual_birth      = str(row[28]) if row[28] else None
                 cur_prod_num_days_actual        = row[29] 
                 cur_prod_num_pigs_dead_at_birth = row[30]
-                cur_prod_num_pigs_live_m    = row[31]
-                cur_prod_num_pigs_live_f    = row[32]
-                cur_prod_birth_staff_id     = row[33]
-                cur_prod_birth_staff_name   = row[34]
+                cur_prod_num_pigs_live_m        = row[31]
+                cur_prod_num_pigs_live_f        = row[32]
+                cur_prod_birth_staff_id         = row[33]
+                cur_prod_birth_staff_name       = row[34]
                 
-                cur_weaning_date            = row[35]
-                cur_weaning_num_pigs_m      = row[36]
-                cur_weaning_num_pigs_f      = row[37]
-                cur_weaning_num_pigs        = row[38]
-                cur_weaning_weight          = row[39]
-                cur_weaning_weight_pp       = row[40]
+                cur_prod_num_dead_after_birth   = row[35]
+                
+                cur_weaning_date            = row[36]
+                cur_weaning_num_pigs_m      = row[37]
+                cur_weaning_num_pigs_f      = row[38]
+                cur_weaning_num_pigs        = row[39]
+                cur_weaning_weight          = row[40]
+                cur_weaning_weight_pp       = row[41]
                 
                 
-                cur_pig_count               = row[41]
+                cur_pig_count               = row[42]
                 
                 
-                cur_prod_num_b_gestating    = row[42]
-                cur_prod_num_b_lactating    = row[43]
-                cur_prod_num_b_booster      = row[44]
-                cur_prod_num_b_prestarter   = row[45]
-                cur_prod_num_b_starter      = row[46]
-                cur_prod_num_b_grower       = row[47]
-                cur_prod_num_b_finisher     = row[48]
+                cur_prod_num_b_gestating    = row[43]
+                cur_prod_num_b_lactating    = row[44]
+                cur_prod_num_b_booster      = row[45]
+                cur_prod_num_b_prestarter   = row[46]
+                cur_prod_num_b_starter      = row[47]
+                cur_prod_num_b_grower       = row[48]
+                cur_prod_num_b_finisher     = row[49]
                 
-                cur_feed_bal_date_balance   = row[49]
+                cur_feed_bal_date_balance   = row[50]
                
-                cur_feed_bal_gestating      = row[50]
-                cur_feed_bal_lactating      = row[51]
-                cur_feed_bal_booster        = row[52]
-                cur_feed_bal_prestarter     = row[53]
-                cur_feed_bal_starter        = row[54]
-                cur_feed_bal_grower         = row[55]
-                cur_feed_bal_finisher       = row[56]
+                cur_feed_bal_gestating      = row[51]
+                cur_feed_bal_lactating      = row[52]
+                cur_feed_bal_booster        = row[53]
+                cur_feed_bal_prestarter     = row[54]
+                cur_feed_bal_starter        = row[55]
+                cur_feed_bal_grower         = row[56]
+                cur_feed_bal_finisher       = row[57]
                 
-                cur_prod_cost_gestating     = row[57]
-                cur_prod_cost_lactating     = row[58]
-                cur_prod_cost_booster       = row[59]
-                cur_prod_cost_prestarter    = row[60]
-                cur_prod_cost_starter       = row[61]
-                cur_prod_cost_grower        = row[62]
-                cur_prod_cost_finisher      = row[63]
+                cur_prod_cost_gestating     = row[58]
+                cur_prod_cost_lactating     = row[59]
+                cur_prod_cost_booster       = row[60]
+                cur_prod_cost_prestarter    = row[61]
+                cur_prod_cost_starter       = row[62]
+                cur_prod_cost_grower        = row[63]
+                cur_prod_cost_finisher      = row[64]
                 
-                cur_prod_date_gestating     = row[64]
-                cur_prod_date_lactating     = row[65]
-                cur_prod_date_booster       = row[66]
-                cur_prod_date_prestarter    = row[67]
-                cur_prod_date_starter       = row[68]
-                cur_prod_date_grower        = row[69]
-                cur_prod_date_finisher      = row[70]
+                cur_prod_date_gestating     = row[65]
+                cur_prod_date_lactating     = row[66]
+                cur_prod_date_booster       = row[67]
+                cur_prod_date_prestarter    = row[68]
+                cur_prod_date_starter       = row[69]
+                cur_prod_date_grower        = row[70]
+                cur_prod_date_finisher      = row[71]
             
                 
-                cur_data_ver_num_pig_prod       = row[71]
-                cur_data_ver_num_medvac         = row[72] 
-                cur_data_ver_num_health_notes   = row[73]
-                cur_data_ver_num_prod_feed      = row[74]
-                cur_data_ver_num_feed_balance   = row[75]
-                cur_data_ver_num_harvest        = row[76] 
+                cur_data_ver_num_pig_prod       = row[72]
+                cur_data_ver_num_medvac         = row[73] 
+                cur_data_ver_num_health_notes   = row[74]
+                cur_data_ver_num_prod_feed      = row[75]
+                cur_data_ver_num_feed_balance   = row[76]
+                cur_data_ver_num_harvest        = row[77] 
                 
                 
                 cur_entry = {
@@ -1033,7 +1037,8 @@ class PigProduction:
                         'farm_prod_id':     cur_prod_farm_prod_id,
                         'prod_status_id':   cur_prod_status_id,
                         'prod_status_name': cur_prod_status_name,
-                        'cur_pig_count':    cur_pig_count
+                        'cur_pig_count':    cur_pig_count,
+                        'dead_after_birth': cur_prod_num_dead_after_birth
                     },
                     
                     'sow': {
@@ -1808,6 +1813,7 @@ class PigProduction:
                     a.num_pigs_live_m,
                     a.num_pigs_live_f,
                     a.num_pigs_dead_at_birth,
+                    a.num_dead_after_birth,
                     
                     a.date_weaning,
                     a.num_pigs_weaning_m,
@@ -1899,13 +1905,14 @@ class PigProduction:
                 cur_pigs_live_m             = row[20]
                 cur_pigs_live_f             = row[21]
                 cur_dead_at_birth           = row[22]
+                cur_dead_after_birth        = row[23]
                 
                 
-                cur_weaning_date            = row[23]
-                cur_weaning_pigs_m          = int(row[24])   if row[24] is not None else None
-                cur_weaning_pigs_f          = int(row[25])   if row[25] is not None else None
-                cur_weaning_pigs            = int(row[26])   if row[26] is not None else None
-                cur_weaning_pigs_weight     = float(row[27]) if row[27] is not None else None
+                cur_weaning_date            = row[24]
+                cur_weaning_pigs_m          = int(row[25])   if row[25] is not None else None
+                cur_weaning_pigs_f          = int(row[26])   if row[26] is not None else None
+                cur_weaning_pigs            = int(row[27])   if row[27] is not None else None
+                cur_weaning_pigs_weight     = float(row[28]) if row[28] is not None else None
                
                
                
@@ -1929,7 +1936,8 @@ class PigProduction:
                 cur_prod = {
                     'pig_production':{
                         'id':               cur_pig_prod_id,
-                        'farm_prod_id':     cur_farm_prod_id
+                        'farm_prod_id':     cur_farm_prod_id,
+                        'dead_after_birth': cur_dead_after_birth
                     },
                     
                     'insemination': {

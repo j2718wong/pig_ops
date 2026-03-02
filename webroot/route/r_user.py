@@ -8,7 +8,7 @@ import pprint
 import json
 
 
-from fastapi                import HTTPException, status
+from fastapi                import Request, HTTPException, status
 from pydantic               import BaseModel
 
 from datetime               import datetime, timedelta
@@ -307,71 +307,94 @@ async def user_email_verify_resend(uhid:str):
     }
     
     
-@app.get("/user/login_social", tags=["User"])
-async def user_info(request: Request):
-     # Get raw JSON body
-    body = await request.body()
+@app.post("/user/login_social", tags=["User"])
+async def user_info(request: Request, user_data: dm.DataUser):
     
-    # Parse JSON manually
-    data = json.loads(body)
-    
-    
-    if 'social_media_id' not in data:
+    social_media_id = user_data.social_media_id
+    if social_media_id == 0 or social_media_id not in ALLOWED_SOCIAL_MEDIA_LOGIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail = REQUEST_ACCESS_DENIED
         )
     
     
-    social_media_id = data.get('social_media_id')
-    if social_media_id not in ALLOWED_SOCIAL_MEDIA_LOGIN:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail = REQUEST_ACCESS_DENIED
-        )
-
     
-    
-    if 'email' not in data:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail = REQUEST_ACCESS_DENIED
-        )
-    
-    
-    email = data['email']
+    email = user_data.email
     len_email = len(email)
     if  len_email == 0 or len_email > 50:
         return {
             'result':{
                 'num':  ERROR_USER_EMAIL,
-                'code': 'ERROR_USER_EMAIL'
+                'code': 'ERROR_USER_EMAIL',
                 'desc': 'Invalid email lenght.'
             }
         }
     
     
     # there should be at least a user.name_first;
-    
-    if 'name_first' not in data:
+    name_first = user_data.name_first
+    len_name_first = len(name_first)
+    if len_name_first == 0 or len_name_first > 50:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail = REQUEST_ACCESS_DENIED
         )
     
     
-    name_first = data['name_first']
-    len_name_first = len(name_first)
-    if  len_name_first == 0 or len_name_first > 50:
+    if user_data.viewport_width is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail = REQUEST_ACCESS_DENIED
+        )
+    
+    
+    if user_data.viewport_height is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail = REQUEST_ACCESS_DENIED
+        )
+    
+    
+    # record client ip
+    client_host = request.client.host
+    
+    # should port also be recorded?
+    
+    user_data.ip_address = client_host 
+    
+    res = model['user'].login_social(user_data)
+    if res == None:
         return {
             'result':{
-                'num':  ERROR_USER_EMAIL,
-                'code': 'ERROR_USER_EMAIL'
-                'desc': 'Invalid email lenght.'
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
-    model['user']
+    
+    # Temporary encode user.id and user.account_id
+    # Will put later in tokens
+    
+    cur_id = res['user']['id']
+    cur_hid = hashids_user.encrypt(cur_id)
+    
+    # remove plain id
+    del res['user']['id']
+    res['user']['hid'] = cur_hid
+    
+    
+    cur_id = res['user']['account_id']
+    if cur_id is not None and cur_id > 0:
+        cur_hid = hashids_account.encrypt(cur_id)
+    else:
+        cur_hid = None
+        
+    # remove plain id
+    del res['user']['account_id']
+    res['user']['account_hid'] = cur_hid
+    
+    
+    return res
     
     
     
@@ -406,8 +429,7 @@ async def user_info(uhid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -430,8 +452,7 @@ async def user_info(uhid:str):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res_get

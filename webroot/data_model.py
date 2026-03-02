@@ -37,7 +37,10 @@ class DataUser(BaseModel):
     name_first:             str = None
     email:                  str
     
-    social_channel_id:      int = 0
+    social_media_id:        int = 0
+    viewport_width:         int = None
+    viewport_height:        int = None
+    ip_address:             str = None
 
 
 class DataAccount(BaseModel):

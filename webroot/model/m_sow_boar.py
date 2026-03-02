@@ -657,6 +657,7 @@ class SowBoar:
                         d.num_pigs_live_m,
                         d.num_pigs_live_f,
                         d.num_pigs_dead_at_birth,
+                        d.num_dead_after_birth,
                         
                         d.num_pigs_current,
                         
@@ -760,6 +761,7 @@ class SowBoar:
                         d.num_pigs_live_m,
                         d.num_pigs_live_f,
                         d.num_pigs_dead_at_birth,
+                        d.num_dead_after_birth,
                         
                         d.num_pigs_current,
                         
@@ -906,37 +908,38 @@ class SowBoar:
                 cur_num_pigs_live_m         = row[34]
                 cur_num_pigs_live_f         = row[35]
                 cur_num_pigs_dead_birth     = row[36]
+                cur_num_dead_after_birth    = row[37]
                     
-                cur_num_pigs_current        = row[37]
+                cur_num_pigs_current        = row[38]
                     
-                cur_num_pigs_weaning_m      = row[38]
-                cur_num_pigs_weaning_f      = row[39]
-                cur_num_pigs_weaning        = row[40]
-                cur_weight_weaning          = row[41]
-                cur_weight_weaning_pp       = row[42]
-                    
-                    
-                cur_boar_name               = row[43]
-                cur_boar_number             = row[44]
-                cur_boar_is_external        = row[45]
+                cur_num_pigs_weaning_m      = row[39]
+                cur_num_pigs_weaning_f      = row[40]
+                cur_num_pigs_weaning        = row[41]
+                cur_weight_weaning          = row[42]
+                cur_weight_weaning_pp       = row[43]
                     
                     
-                cur_semen_supplier_name     = row[46]
-                cur_semen_sup_semen_name    = row[47]
+                cur_boar_name               = row[44]
+                cur_boar_number             = row[45]
+                cur_boar_is_external        = row[46]
+                    
+                    
+                cur_semen_supplier_name     = row[47]
+                cur_semen_sup_semen_name    = row[48]
                 
-                cur_semen_ai_boar_name      = row[48]
-                cur_semen_ai_boar_number    = row[49]
+                cur_semen_ai_boar_name      = row[49]
+                cur_semen_ai_boar_number    = row[50]
                 
-                cur_last_mate_sow_boar_id   = row[50]
-                cur_mate_count              = row[51]
-                cur_date_last_mate          = str(row[52]) if  row[52] else None
+                cur_last_mate_sow_boar_id   = row[51]
+                cur_mate_count              = row[52]
+                cur_date_last_mate          = str(row[53]) if  row[53] else None
                 
                 
-                cur_data_ver_num_sow_boar   = row[53]
-                cur_data_ver_num_medvac     = row[54]
-                cur_data_ver_num_health_notes= row[55]
-                cur_data_ver_num_output     = row[56]
-                cur_data_ver_num_mates      = row[57]
+                cur_data_ver_num_sow_boar   = row[54]
+                cur_data_ver_num_medvac     = row[55]
+                cur_data_ver_num_health_notes= row[56]
+                cur_data_ver_num_output     = row[57]
+                cur_data_ver_num_mates      = row[58]
 
                
                 sow_boar = {
@@ -979,7 +982,8 @@ class SowBoar:
                             'id':                   cur_pig_prod_id,
                             'farm_prod_id':         cur_farm_prod_id,
                             'prod_status_id':       cur_prod_status_id,
-                            'cur_pig_count':        cur_num_pigs_current
+                            'cur_pig_count':        cur_num_pigs_current,
+                            'dead_after_birth':     cur_num_dead_after_birth
                         },
                         
                         'insemination':{
