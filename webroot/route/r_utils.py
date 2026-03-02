@@ -108,45 +108,6 @@ def check_if_valid_user_account(user_id):
     
     
 
-def clean_data_user_account(user_account):
-    # Clean user
-    cur_id      = user_account['user']['user']['id']
-    cur_hid     = hashids_user.encrypt(cur_id)
-    
-    del user_account['user']['user']['id']
-    user_account['user']['user']['hid']   = cur_hid
-
-    del user_account['user']['user']['account_id']
-    
-    user_pig_farms = user_account['user']['pig_farms']
-    
-    farm_hash_ids = [hashids_common.encrypt(cur_id) for cur_id in user_pig_farms]
-    user_account['user']['pig_farms'] = farm_hash_ids
-    
-    
-    # Clean account
-    cur_id      = user_account['account']['account']['id']
-    cur_hid     = hashids_account.encrypt(cur_id)
-    
-    del user_account['account']['account']['id']
-    user_account['account']['account']['hid']   = cur_hid
-    
-    
-    account_pig_farms = user_account['account']['pig_farms']
-    
-    
-    for cur_entry in account_pig_farms:
-        cur_id      = cur_entry['pig_farm']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_farm']['id']
-        cur_entry['pig_farm']['hid']   = cur_hid
-    
-        get_location_address_names_and_replace_ids(cur_entry)
-        
-    return user_account
-
-
 def get_location_address_names_and_replace_ids(data):
     # Get location address names from a different database
     location_address = data['location']['address']
@@ -208,6 +169,57 @@ def get_location_address_names_and_replace_ids(data):
         
         del data['location']['address']['level_3']['id']
         data['location']['address']['level_3']['hid']   = cur_hid
+
+
+
+def replace_plain_ids_account(data):
+    cur_id  = data['account']['id']
+    cur_hid = hashids_account.encrypt(cur_id)
+    
+    del data['account']['id']
+    data['account']['hid']   = cur_hid
+    
+    
+    if 'pig_farms' in data:
+        pig_farms = data['pig_farms']
+        
+        for cur_entry in pig_farms:
+            cur_id  = cur_entry['pig_farm']['id']
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['pig_farm']['id']
+            cur_entry['pig_farm']['hid']   = cur_hid
+            
+            
+            get_location_address_names_and_replace_ids(cur_entry)
+        
+
+def replace_plain_ids_user_account(user_account):
+    # Clean user
+    cur_id      = user_account['user']['user']['id']
+    cur_hid     = hashids_user.encrypt(cur_id)
+    
+    del user_account['user']['user']['id']
+    user_account['user']['user']['hid']   = cur_hid
+
+    del user_account['user']['user']['account_id']
+    
+    
+    
+    if 'pig_farms' in user_account['user']:
+        user_pig_farms = user_account['user']['pig_farms']
+        
+        farm_hash_ids = [hashids_common.encrypt(cur_id) for cur_id in user_pig_farms]
+        user_account['user']['pig_farms'] = farm_hash_ids
+        
+    
+    # Clean account
+    replace_plain_ids_account(user_account['account'])
+        
+    return user_account
+
+
+
 
 
 

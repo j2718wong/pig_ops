@@ -172,6 +172,7 @@ class Account:
                 cur_entry = {
                     'account': {
                         'id':               cur_acc_id,
+                        'account_name':     cur_acc_account_name,
                         'flag':             cur_acc_flag,
                         'status_id':        cur_acc_status_id,
                         'status_name':      cur_acc_status_name,

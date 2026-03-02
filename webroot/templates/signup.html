@@ -26,10 +26,10 @@
 
     /* mobile card container */
     .signup-card {
-      max-width: 400px;
-      width: 100%;
-      background: white;
-      padding: 32px 24px;
+        width: 360px; /* Fixed width instead of 100% */
+        background: white;
+        padding: 32px 24px;
+        margin: 0 auto; /* Center it */
     }
 
     /* VARIABLE for corporate blue */
@@ -658,7 +658,7 @@
       background-color: var(--white);
       outline: none;
       transition: border 0.15s, box-shadow 0.15s;
-      margin-bottom: 1.3rem;
+      margin-bottom: 0.3rem;
       color: var(--text-dark);
       -webkit-appearance: none;
     }
@@ -666,6 +666,15 @@
     .input-field:focus {
       border-color: var(--corporate-blue-company, #1877F0);
       box-shadow: 0 0 0 4px var(--blue-soft, #e6f0ff);
+    }
+
+    .field-help {
+      font-size: 0.85rem;
+      color: var(--dark-gray, #64748b);
+      margin: 0 0 1.2rem 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
     .btn {
@@ -764,7 +773,7 @@
     .divider {
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--blue-border), transparent);
-      margin: 2rem 0 1.8rem;
+      margin: 1rem 0 1.8rem;
     }
 
     /* farm feedback cards (unchanged) */

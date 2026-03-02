@@ -26,35 +26,18 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import get_location_address_names_and_replace_ids
+from r_a0_security_checks   import (check_if_valid_user_account,
+                                    get_user_account_info)
+
+from r_utils                import (get_location_address_names_and_replace_ids,
+                                    replace_plain_ids_account,
+                                    replace_plain_ids_user_account)
 
 
 
 ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
 
 
-def replace_account_plain_ids(data):
-    cur_id  = data['account']['id']
-    cur_hid = hashids_account.encrypt(cur_id)
-    
-    del data['account']['id']
-    data['account']['hid']   = cur_hid
-    
-    
-    pig_farms = data['pig_farms']
-    
-    for cur_entry in pig_farms:
-        cur_id  = cur_entry['pig_farm']['id']
-        cur_hid = hashids_account.encrypt(cur_id)
-        
-        del cur_entry['pig_farm']['id']
-        cur_entry['pig_farm']['hid']   = cur_hid
-        
-        
-        get_location_address_names_and_replace_ids(cur_entry)
-        
-        
-    
     
 
 @app.get("/account/info", tags=["Account"])
@@ -94,7 +77,7 @@ async def user_account_info(ahid: str):
         }
     
     
-    replace_account_plain_ids(res)
+    replace_plain_ids_account(res)
     
         
     result = {
@@ -139,11 +122,16 @@ async def account_register(account_data: dm.DataAccount):
     
     
     user_id = res[0]
+    print('user_id = %s' % user_id)
     
     account_data.name       = name 
     account_data.user_id    = user_id
     
     res_register    =  model['account'].register(account_data)
+    
+    print('res_register')
+    pprint.pprint(res_register)
+    
     
     if res_register is None:
         return {
@@ -170,6 +158,32 @@ async def account_register(account_data: dm.DataAccount):
            'hashid':        account_hashid
         }
         res_update = model['account'].update_hashid(data)
+        
+        
+    # This will return user and account info
+    data_user_account = get_user_account_info(user_id)
+    
+    
+    print('data_user_account')
+    pprint.pprint(data_user_account)
+    
+    
+    # Remove not useful data
+    del data_user_account['account']['settings_operations']
+    del data_user_account['account']['account']['current_bill']
+    
+
+    
+    # replace the account block
+    del res_register['account']
+    
+    
+    # with this block
+    res_register['user_account'] = data_user_account
+
+
+    replace_plain_ids_user_account(data_user_account)
+
         
     return res_register
     
@@ -216,15 +230,31 @@ async def account_update(account_data: dm.DataAccount):
         }
     
     account_id      = res_update['account']['id']
-    account_flag    = res_update['account']['flag']
-        
-    account_hashid  = hashids_account.encrypt(account_id)
     
-    # remove plain id
-    del res_update['account']['id']
-    res_update['account']['hid'] = account_hashid
-
-        
+    
+    # Get account info
+    data_account = model['account'].get_info(account_id)
+    
+    if data_account is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': 'Cannot read account'
+            }
+        }
+    
+    replace_plain_ids_account(data_account)
+    
+    print('data_Account')
+    pprint.pprint(data_account)
+    
+    # Remove account block in res_update
+    del res_update['account']
+    
+    # Replace with data_account
+    res_update['account'] = data_account['account']
+    
     return res_update
     
     

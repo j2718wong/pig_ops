@@ -23,6 +23,22 @@ from server_messages        import *
 import data_model           as dm
 
 
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_utils                import replace_plain_ids_user_account
+
+from r_a0_security_checks   import (check_if_valid_user_account,
+                                    get_user_account_info)
+                                    
+
+
 FLAG_BIT_USER_IS_ACTIVE                 = 1
 FLAG_BIT_USER_EMAIL_VERIFIED            = 2
 FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
@@ -362,8 +378,8 @@ async def user_info(request: Request, user_data: dm.DataUser):
     
     user_data.ip_address = client_host 
     
-    res = model['user'].login_social(user_data)
-    if res == None:
+    res_login = model['user'].login_social(user_data)
+    if res_login == None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
@@ -375,26 +391,25 @@ async def user_info(request: Request, user_data: dm.DataUser):
     # Temporary encode user.id and user.account_id
     # Will put later in tokens
     
-    cur_id = res['user']['id']
-    cur_hid = hashids_user.encrypt(cur_id)
-    
-    # remove plain id
-    del res['user']['id']
-    res['user']['hid'] = cur_hid
+    user_id = res_login['user']['id']
     
     
-    cur_id = res['user']['account_id']
-    if cur_id is not None and cur_id > 0:
-        cur_hid = hashids_account.encrypt(cur_id)
-    else:
-        cur_hid = None
-        
-    # remove plain id
-    del res['user']['account_id']
-    res['user']['account_hid'] = cur_hid
+    # Get user_account info
+    data_user_account = get_user_account_info(user_id)
     
     
-    return res
+    
+    # replace the user block
+    del res_login['user']
+    
+    
+    # with this block
+    res_login['user_account'] = data_user_account
+
+    replace_plain_ids_user_account(data_user_account)
+
+    
+    return res_login
     
     
     

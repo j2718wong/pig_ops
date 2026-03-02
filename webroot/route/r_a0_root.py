@@ -28,10 +28,10 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
+from r_utils                import replace_plain_ids_user_account
+
 
 from r_a0_security_checks   import get_user_account_info
-
-from r_utils                import clean_data_user_account
 
 from r_pig_production       import get_page_data_farm_account_pig_prod
 
@@ -164,7 +164,7 @@ async def root(pfhid:str = None):
     
     page_data = {}
     page_data['application'] = data_app
-    page_data['user_account'] = clean_data_user_account(user_account)
+    page_data['user_account'] = replace_plain_ids_user_account(user_account)
     page_data['pig_farm_account'] = farm_account  
 
 
