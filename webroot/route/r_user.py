@@ -398,6 +398,8 @@ async def user_info(request: Request, user_data: dm.DataUser):
     data_user_account = get_user_account_info(user_id)
     
     
+    pprint.pprint('login social data_user_account')
+    pprint.pprint(data_user_account)
     
     # replace the user block
     del res_login['user']

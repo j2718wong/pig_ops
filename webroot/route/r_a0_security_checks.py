@@ -111,6 +111,14 @@ def get_user_account_info(user_id):
     account_id = data_user['user']['account_id']
     
     
+    if account_id is None or account_id == 0:
+        result = {
+            'user':     data_user,
+            'account':  None
+        }
+        
+        return result
+    
     
     
     # Get account info

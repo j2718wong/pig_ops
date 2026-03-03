@@ -160,9 +160,18 @@ class User:
                     b.group_num,
                     b.flag_business_obj_1,
                     b.flag_business_obj_2,
-                    b.name AS group_name
+                    b.name AS group_name,
+                    
+                    a.user_req_join_acc_id,
+                    c.account_id,
+                    c.status_id,
+                    c.dt_entry,
+                    d.name AS account_name
+                    
                 FROM user a
-                LEFT OUTER JOIN user_group b ON a.user_group_id = b.id
+                LEFT OUTER JOIN user_group b    ON a.user_group_id = b.id
+                LEFT OUTER JOIN user_request c  ON a.user_req_join_acc_id = c.id
+                LEFT OUTER JOIN account d       ON c.account_id = d.id 
                 WHERE a.id = %s
                 """ % user_id
         
@@ -199,26 +208,61 @@ class User:
         if rows is not None:
             
             for row in rows:
+                cur_user_id                         = row[0]
+                cur_user_account_id                 = row[1]
+                cur_user_flag                       = row[2]
+                cur_user_email                      = row[3]
+                cur_user_mobile_num                 = row[4]
+                cur_user_name_last                  = row[5]
+                cur_user_name_first                 = row[6]
+                
+                cur_user_group_id                   = row[7]
+                cur_user_group_num                  = row[8]
+                cur_user_group_flag_business_obj_1  = row[9]
+                cur_user_group_flag_business_obj_2  = row[10]
+                cur_user_group_name                 = row[11]
+                
+                cur_user_req_join_acc_id            = row[12]
+                cur_user_req_account_id             = row[13]
+                cur_user_req_status_id              = row[14]
+                cur_user_req_dt_entry               = str(row[15])[0:10] # extract date only
+                cur_user_req_account_name           = row[16]
+                
+                
+                
                                 
                 cur_entry = {
                     'user': {
-                        'id':               row[0],
-                        'account_id':       row[1],
-                        'flag':             row[2],
-                        'email':            row[3],
-                        'mobile_num':       row[4],
-                        'name_last':        row[5],
-                        'name_first':       row[6]
+                        'id':               cur_user_id,
+                        'account_id':       cur_user_account_id,
+                        'flag':             cur_user_flag,
+                        'email':            cur_user_email,
+                        'mobile_num':       cur_user_mobile_num,
+                        'name_last':        cur_user_name_last,
+                        'name_first':       cur_user_name_first
                     },
                     
                     'user_group': {
-                        'id':               row[7],
-                        'group_num':        row[8],
-                        'flag_business_obj_1': row[9],
-                        'flag_business_obj_2': row[10],
-                        'name':             row[11]
+                        'id':               cur_user_group_id,
+                        'group_num':        cur_user_group_num,
+                        'flag_business_obj_1': cur_user_group_flag_business_obj_1,
+                        'flag_business_obj_2': cur_user_group_flag_business_obj_2,
+                        'name':             cur_user_group_name
                     }
                 }
+                
+                
+                if cur_user_req_join_acc_id is not None:
+                    user_request = {
+                        'id':               cur_user_req_join_acc_id,
+                        'account_id':       cur_user_req_account_id,
+                        'account_name':     cur_user_req_account_name,
+                        'status_id':        cur_user_req_status_id,
+                        'date_req_sent':    cur_user_req_dt_entry
+                    }
+                    
+                    cur_entry['user_request'] = user_request
+                
                 
                 user_pig_farm_ids = self.model['user_farm'].get_list(user_id = user_id)
                 

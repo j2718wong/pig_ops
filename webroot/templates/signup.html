@@ -803,6 +803,97 @@
     }
     
     
+    /*****************************************************************/
+    .status-chip {
+        display: flex;
+        align-items: center;
+        background-color: var(--warning-bg, #fef3c7);
+        color: var(--warning-border, #b45309);
+        font-weight: 500;
+        font-size: 1.2rem;
+        padding: 0.4rem 1.2rem;
+        border-radius: 40px;
+        margin-top: 0.3rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--warning-border, #f59e0b);
+        background-color: #fef3c7;
+        letter-spacing: 0.01em;
+    }
+    
+    
+    /* detail grid – now with plain values (no background, no radius) */
+    .detail-grid {
+        /*background-color: var(--light-gray, #f8fafc);*/
+        /*border-radius: 24px;*/
+        padding: 0.5rem 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 0.7rem 0;
+        border-bottom: 1px dashed var(--blue-border, #dbeafe);
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 500;
+        color: var(--neutral-gray, #4b5563);
+        font-size: 0.95rem;
+        min-width: 110px;
+    }
+
+    /* --- plain text values: no background, no border, no radius, no padding --- */
+    .detail-value {
+        font-weight: 600;
+        color: var(--text-dark-alt);
+        text-align: right;
+        word-break: break-word;
+        flex: 1;
+        /* explicit removal of any decoration */
+        background: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        display: inline;        /* revert block styling */
+    }
+
+    /* ensure even the code stays plain */
+    .detail-value.code-plain {
+        font-family: 'SF Mono', ui-monospace, monospace;
+        letter-spacing: 0.02em;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    /* sent date with subtle icon, but still plain background */
+    .sent-date {
+        color: var(--icon-blue, #1e5aa7);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .sent-date::before {
+        content: "📅";
+        font-size: 1.2rem;
+        margin-right: 4px;
+        opacity: 0.8;
+    }
+
+    
 </style>
   
 <script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
@@ -818,7 +909,7 @@
 <div id="container-signup"              class="hidden-container" style="display:none;"></div>
 <div id="container-create-or-join-acc"  class="hidden-container" style="display:none;"></div>
 <div id="container-add-farm"            class="hidden-container" style="display:none;"></div>
-
+<div id="container-req-join-acc-sent"   class="hidden-container" style="display:none;"></div>
  
  
 

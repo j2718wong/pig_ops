@@ -39,18 +39,9 @@
         
     $(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
         console.log('\n\ngIsServerAvailable =' + gIsServerAvailable);       
-        //var GLOBAL_DATA = ${global_data};
-        //gGlobal.setGlobalData(GLOBAL_DATA);
     });
     </script>
-    
-    <!--Login function is available to all pages particularly for session expiry during any saving action.-->
-    <!--
-    <script type = "application/javascript" src="/static_m/js/others/webtoolkit.sha256.js"></script>
-    <script type = "application/javascript" src="/static_m/js/user_login.js"></script>
-        
-    <script type = "application/javascript" src="/static_m/js/navigation.js"></script>
-    -->
+
 
 {% for script in js_app_text %}
     <script type = "application/javascript" src="/static_m/js/{{script}}"></script>
@@ -441,8 +432,7 @@
         </div>
         
         <button class="mobile-special-button" id="mobile-nav-special-btn-summary">
-            <i class="fas fa-file-pdf"></i>
-            <span>Generate Summary PDF</span>
+            <span>Farm Summary</span>
         </button>
         
         

@@ -71,14 +71,17 @@ async def user_request_join_account(uhid: str, ahid:str):
             }
         }
     
-    acc_req_id          = res_add['user_request']['id']
-    acc_req_status_id   = res_add['user_request']['status_id']
-        
-    acc_req_hashid      = hashids_common.encrypt(acc_req_id)
+    user_req_id         = res_add['user_request']['id']
+    user_req_status_id  = res_add['user_request']['status_id']
+      
+    # Replace Plain Id
+    cur_id              = user_req_id
+    cur_hid             = hashids_common.encrypt(cur_id)
     
     # remove plain id
     del res_add['user_request']['id']
-    res_add['user_request']['hid'] = acc_req_hashid
+    res_add['user_request']['hid'] = cur_hid
+
 
     result_num      = res_add['result']['num']
     

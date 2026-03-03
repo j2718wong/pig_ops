@@ -4,13 +4,6 @@
 from common_constants       import *
 
 
-FLAG_BIT_ACCOUNT_ENABLE                 = 1
-FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 1<<4
-
-
-FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED       = 1<<16
-
-
 """
 account.flag bits
 
@@ -27,6 +20,24 @@ bit 4:  FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
 
 bit 16: COMPANY_OWNED ACCOUNT
 """
+
+FLAG_BIT_ACCOUNT_ENABLE                 = 1
+FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 1<<4
+
+
+FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED       = 1<<16
+
+
+
+
+
+FLAG_BIT_USER_IS_ACTIVE                 = 1
+FLAG_BIT_USER_EMAIL_VERIFIED            = 2
+FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
+FLAG_BIT_USER_IS_DELETED                = 8
+                                        
+FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
+
 
 
 # The account.flag_settings will be broken down so that

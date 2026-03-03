@@ -205,6 +205,22 @@ def replace_plain_ids_user_account(user_account):
     del user_account['user']['user']['account_id']
     
     
+    if 'user_request' in user_account['user']:
+        cur_id      = user_account['user']['user_request']['id']
+        cur_hid     = hashids_user.encrypt(cur_id)
+    
+        del user_account['user']['user_request']['id']
+        user_account['user']['user_request']['hid'] = cur_hid
+        
+        
+        cur_id      = user_account['user']['user_request']['account_id']
+        cur_hid     = hashids_account.encrypt(cur_id)
+    
+        del user_account['user']['user_request']['account_id']
+        user_account['user']['user_request']['account_hid'] = cur_hid
+        
+        
+        
     
     if 'pig_farms' in user_account['user']:
         user_pig_farms = user_account['user']['pig_farms']
@@ -214,7 +230,8 @@ def replace_plain_ids_user_account(user_account):
         
     
     # Clean account
-    replace_plain_ids_account(user_account['account'])
+    if 'account' in user_account and user_account['account'] is not None:
+        replace_plain_ids_account(user_account['account'])
         
     return user_account
 

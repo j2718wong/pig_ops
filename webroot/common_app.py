@@ -363,16 +363,16 @@ model_la.append_models(model_names_la)
 # Letter O is purposely removed so that users will not confused with 0.
 COMMON_HASH_ALPHABET                    = 'ABCDEFGHIJKLMNPQRSTUVWXYZ1234567890'
 
-HASHID_SALT_COMMON                      = '68FD4C'
-HASHID_MIN_LENGTH_COMMON                = 6
+HASHID_SALT_COMMON                      = '68FD4C30'
+HASHID_MIN_LENGTH_COMMON                = 8
 
 hashids_common  = hashids.Hashids(  salt        = HASHID_SALT_COMMON, 
                                     min_length  = HASHID_MIN_LENGTH_COMMON,
                                     alphabet    = COMMON_HASH_ALPHABET)
 
 
-HASHID_SALT_USER                        = '28A05B'
-HASHID_MIN_LENGTH_USER                  = 6
+HASHID_SALT_USER                        = '28A05B4A'
+HASHID_MIN_LENGTH_USER                  = 8
 
 hashids_user    = hashids.Hashids(  salt        = HASHID_SALT_USER, 
                                     min_length  = HASHID_MIN_LENGTH_USER,
@@ -380,8 +380,8 @@ hashids_user    = hashids.Hashids(  salt        = HASHID_SALT_USER,
 
 
 
-HASHID_SALT_ACCOUNT                     = '9C069A'
-HASHID_MIN_LENGTH_ACCOUNT               = 6
+HASHID_SALT_ACCOUNT                     = '9C069AF4'
+HASHID_MIN_LENGTH_ACCOUNT               = 8
 
 hashids_account = hashids.Hashids(  salt        = HASHID_SALT_ACCOUNT, 
                                     min_length  = HASHID_MIN_LENGTH_ACCOUNT,

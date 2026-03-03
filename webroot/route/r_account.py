@@ -122,15 +122,13 @@ async def account_register(account_data: dm.DataAccount):
     
     
     user_id = res[0]
-    print('user_id = %s' % user_id)
+
     
     account_data.name       = name 
     account_data.user_id    = user_id
     
     res_register    =  model['account'].register(account_data)
     
-    print('res_register')
-    pprint.pprint(res_register)
     
     
     if res_register is None:
@@ -163,9 +161,6 @@ async def account_register(account_data: dm.DataAccount):
     # This will return user and account info
     data_user_account = get_user_account_info(user_id)
     
-    
-    print('data_user_account')
-    pprint.pprint(data_user_account)
     
     
     # Remove not useful data
@@ -246,8 +241,6 @@ async def account_update(account_data: dm.DataAccount):
     
     replace_plain_ids_account(data_account)
     
-    print('data_Account')
-    pprint.pprint(data_account)
     
     # Remove account block in res_update
     del res_update['account']
