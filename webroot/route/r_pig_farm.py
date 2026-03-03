@@ -65,6 +65,10 @@ async def pig_farm_add(pig_farm_data: dm.DataPigFarm):
     pig_farm_data.name      = name
     pig_farm_data.user_id   = user_id
     
+    
+    if pig_farm_data.country_id == 0:
+        pig_farm_data.country_id = 1 # Default
+    
     res_add    =  model['pig_farm'].add(pig_farm_data)
     
     if res_add is None:

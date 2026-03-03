@@ -54,9 +54,9 @@ class PigFarm:
         sql += '"%s",'  % data.name
         
         sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.address_level_1_id
-        sql += '%s,'    % data.address_level_2_id
-        sql += '%s,'    % data.address_level_3_id
+        sql += '%s,'    % data.level_1_id
+        sql += '%s,'    % data.level_2_id
+        sql += '%s,'    % data.level_3_id
         
         if data.latitude is not None:   
             sql += '%s,'    % data.latitude

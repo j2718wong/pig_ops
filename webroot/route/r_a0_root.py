@@ -80,7 +80,7 @@ async def signup():
 
 
 @app.get("/", response_class = HTMLResponse)
-async def root(pfhid:str = None):
+async def root(p:str = None, u:str = None):
     """
     2026-01-09 Notes:
     
@@ -100,10 +100,18 @@ async def root(pfhid:str = None):
     
     
     
+    In Normal case the user is read from token
+    
+    
     Parameters
     ----------
-    pfhid : str
-        pig farm hid;  if this is given, wll decode pig_farm_id
+    p : str
+        pig farm hid;  if this is given, will decode pig_farm_id
+        
+        
+    u : str
+        user hid, if this is given, will decode pig_farm_id
+        Later on this option will be removed.
     """
     
     time_init = time.time()
@@ -116,26 +124,39 @@ async def root(pfhid:str = None):
     
     
     # Get the current logged in user;
+    # This should be read from a token
     # If not logged in, redirect to HOME_PAGE_USER_NOT_LOGGED_IN
     
-    if pfhid is not None:
-        test = 1
+    user_id = 0
     
-    # At this point user must be logged in
-    # temporary
-    user_id = 1
+    
+    # This u parameter is temporary until the tokens are implemented
+    if u is not None:
+        res = hashids_user.decrypt(u)
+        if len(res) == 0:
+            # redirect to PAGE_NOT_FOUND
+            
+            return 
+            
+        user_id = res[0]
+    
+    
+    
+    
+    
     
     user_account = get_user_account_info(user_id)
     
     account = user_account['account']
-  
+    user    = user_account['user']
     
+    pprint.pprint(user_account)
     
     
     pig_farm_id = None
     
-    if pfhid is not None:
-        res = hashids_common.decrypt(pfhid)
+    if p is not None:
+        res = hashids_common.decrypt(p)
         if len(res) == 0:
             # Just proceed if it is invalid; will get default 
             # account farm_id if not given
@@ -155,7 +176,11 @@ async def root(pfhid:str = None):
     
     else:
         # Get use user assigned farm id
-        pig_farm_id = 1
+        # This is the first pig_farm id in user.pig_farms
+        user_pig_farms =  user['pig_farms']
+        
+        if len(user_pig_farms) > 0:
+            pig_farm_id = user_pig_farms[0]
     
 
     
