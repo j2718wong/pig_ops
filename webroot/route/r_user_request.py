@@ -23,19 +23,17 @@ FLAG_BIT_USER_EMAIL_VERIFIED            = 2
 FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
 
 
-ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS            = 0
-ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS    = 0
 
     
-@app.get("/account_request/add_user", tags=["Account Details"])
-async def account_request_add_user(uhid: str, ahid:str):
+@app.get("/user_request/join_account", tags=["User"])
+async def user_request_join_account(uhid: str, ahid:str):
         
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_REQUEST_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_REQUEST_INVALID_USER_HASHID',
+                'num':  ERROR_USER_REQUEST_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_REQUEST_INVALID_USER_HASHID',
                 'desc': ''
             }
         }
@@ -47,8 +45,8 @@ async def account_request_add_user(uhid: str, ahid:str):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_REQUEST_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_ACCOUNT_REQUEST_INVALID_ACCOUNT_HASHID',
+                'num':  ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID',
                 'desc': ''
             }
         }
@@ -63,29 +61,28 @@ async def account_request_add_user(uhid: str, ahid:str):
     }
     
     
-    res_add    =  model['acc_req'].add_user(data)
+    res_add    =  model['user_req'].join_account(data)
     
     if res_add is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
-    acc_req_id          = res_add['account_request']['id']
-    acc_req_status_id   = res_add['account_request']['status_id']
+    acc_req_id          = res_add['user_request']['id']
+    acc_req_status_id   = res_add['user_request']['status_id']
         
     acc_req_hashid      = hashids_common.encrypt(acc_req_id)
     
     # remove plain id
-    del res_add['account_request']['id']
-    res_add['account_request']['hid'] = acc_req_hashid
+    del res_add['user_request']['id']
+    res_add['user_request']['hid'] = acc_req_hashid
 
     result_num      = res_add['result']['num']
     
-    if result_num == ACCOUNT_REQUEST_ADD_USER_RES_NUM_SUCCESS:
+    if result_num == 0:
         # Get account admin emails
         account_admins = model['account'].get_list_account_admin(account_id)
         
@@ -100,16 +97,15 @@ async def account_request_add_user(uhid: str, ahid:str):
     return res_add
     
 
-@app.get("/account_request/approve_add_user", tags=["Account Details"])
-async def account_request_approve_add_user(arhid: str, uhid:str):
+@app.get("/user_request/approve_add_user", tags=["Account Details"])
+async def user_request_approve_add_user(arhid: str, uhid:str):
         
     res = hashids_common.decrypt(arhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_REQUEST_INVALID_HASHID,
-                'code': 'ERROR_ACCOUNT_REQUEST_INVALID_HASHID',
-                'desc': ''
+                'num':  ERROR_USER_REQUEST_INVALID_HASHID,
+                'code': 'ERROR_USER_REQUEST_INVALID_HASHID'
             }
         }
     
@@ -120,9 +116,8 @@ async def account_request_approve_add_user(arhid: str, uhid:str):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_REQUEST_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_REQUEST_INVALID_USER_HASHID',
-                'desc': ''
+                'num':  ERROR_USER_REQUEST_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_REQUEST_INVALID_USER_HASHID'
             }
         }
     
@@ -148,12 +143,12 @@ async def account_request_approve_add_user(arhid: str, uhid:str):
         }
     
     
-    account_request_id  = res_approve['account_request']['id']
-    account_request_hashid  = hashids_account.encrypt(account_request_id)
+    user_request_id  = res_approve['user_request']['id']
+    user_request_hashid  = hashids_account.encrypt(user_request_id)
     
     # remove plain id
-    del res_approve['account_request']['id']
-    res_approve['account_request']['hid'] = account_request_hashid
+    del res_approve['user_request']['id']
+    res_approve['user_request']['hid'] = user_request_hashid
 
 
     requesting_user_id      = res_approve['requesting_user']['id']
@@ -163,7 +158,7 @@ async def account_request_approve_add_user(arhid: str, uhid:str):
     del res_approve['requesting_user']
     
     
-    if result_num == ACCOUNT_REQUEST_APPROVE_ADD_USER_RES_NUM_SUCCESS:
+    if result_num == 0:
 
         test = 1
         # TODO send email to user

@@ -4,15 +4,15 @@
 from common_constants       import *
 
 
-class AccountRequest:
+class UserRequest:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'AccountRequest'
+        self.TAG                = 'UserRequest'
 
 
-    def add_user(self, data = None):
+    def join_account(self, data = None):
         """
-        PROCEDURE account_request_user_add(
+        PROCEDURE user_request_join_account(
             in_account_id               INT,
             in_user_id                  INT
             
@@ -24,7 +24,7 @@ class AccountRequest:
                 
         values = (user_id, account_id)
         
-        sql =  'CALL account_request_user_add('
+        sql =  'CALL user_request_join_account('
         sql += '%s,'    % account_id
         sql += '%s);'   % user_id
         
@@ -46,7 +46,7 @@ class AccountRequest:
             cursor.close()
 
         except Exception as e:
-            msg = 'add_user(); error in executing query[] = ' + sql
+            msg = 'join_account(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -62,34 +62,34 @@ class AccountRequest:
                     'desc':             row[2],
                 },
                 
-                'account_request': {
+                'user_request': {
                     'id':               row[3],
-                    'status_id':        row[4],
-                    'status_name':      row[5]
+                    'status_id':        row[4]
                 }
             }
 
         return None
         
         
-    def approve_add_user(self, data = None):
+    def approve_join_account(self, data = None):
         """
-        PROCEDURE account_request_user_add_approve(
-            in_account_request_id       INT,
-            in_approving_user_id        INT
+        PROCEDURE user_request_join_account_approve(
+            in_user_request_id          INT,
+            in_approving_user_id        INT,
+            in_assigned_user_group_id   INT
         )
         """
         
-        acc_request_id      = data['acc_request_id']
+        user_request_id     = data['user_request_id']
         approving_user_id   = data['approving_user_id']
+        user_group_id       = data['user_group_id']
         
         
-        values = (acc_request_id, approving_user_id)
         
-        
-        sql =  'CALL account_request_user_add_approve('
-        sql += '%s,'    % acc_request_id
-        sql += '%s);'   % approving_user_id
+        sql =  'CALL user_request_join_account_approve('
+        sql += '%s,'    % user_request_id
+        sql += '%s,'    % approving_user_id
+        sql += '%s);'   % user_group_id
         
         
         # Check if still connected to database
@@ -110,7 +110,7 @@ class AccountRequest:
             cursor.close()
 
         except Exception as e:
-            msg = 'approve_add_user(); error in executing query[] = ' + sql
+            msg = 'approve_join_account(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -127,22 +127,22 @@ class AccountRequest:
                     'desc':             row[2],
                 },
                 
-                'account_request': {
+                'user_request': {
                     'id':               row[3],
                     'status_id':        row[4],
-                    'status_name':      row[5],
                     
                     'approving_user':{
-                        'name_last':    row[6],
-                        'name_first':   row[7]
+                        'email':        row[6],
+                        'name_last':    row[7],
+                        'name_first':   row[8]
                     },
                     
-                    'dt_approved':      str(row[8]) if row[8] else None,
+                    'dt_approved':      str(row[9]) if row[9] else None,
                 },
                 
                 'requesting_user': {
-                    'id':               row[9],
-                    'email':            row[10]
+                    'id':               row[10],
+                    'email':            row[11]
                 }
             }
 

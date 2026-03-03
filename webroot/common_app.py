@@ -35,13 +35,13 @@ logger.append(tag = 'Main', msg = s)
 from model.m_app_analytics      import AppAnalytics
 
 from model.m_account            import Account
-from model.m_account_request    import AccountRequest
 from model.m_mfa                import Mfa
 
 
 from model.m_a0_public_lookup   import PublicLookup
 
 from model.m_user               import User
+from model.m_user_request       import UserRequest
 from model.m_user_group         import UserGroup
 from model.m_user_pig_farm      import UserPigFarm
 
@@ -100,10 +100,10 @@ model_names_pig_ops = [
     ('app_analytics',           AppAnalytics),
 
     ('account',                 Account),
-    ('acc_req',                 AccountRequest),
     ('mfa',                     Mfa),
     
     ('user',                    User),
+    ('user_req',                UserRequest),
     ('user_group',              UserGroup),
     ('user_farm',               UserPigFarm),
     
