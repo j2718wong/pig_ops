@@ -169,3 +169,68 @@ async def user_request_approve_add_user(arhid: str, uhid:str):
     return res_approve
     
 
+
+
+@app.get("/user_request/list", tags=["User"])
+async def user_request_list(ahid: str):
+    """
+    Will get user request list.
+    
+    Parameters
+    ----------
+    
+    ahid:str
+        account hashid
+
+
+    
+    """
+    
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID'
+            }
+        }
+    
+    
+    account_id = res[0]
+        
+        
+    res = model['user_req'].get_list(account_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'    
+            }
+        }
+    
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['user_req']['id']
+        cur_hid = hashids_user.encrypt(cur_id)
+        
+        del cur_entry['user_req']['id']
+        cur_entry['user_req']['hid']   = cur_hid
+   
+        
+        
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+    
+
+    
+

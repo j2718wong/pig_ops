@@ -9,6 +9,9 @@ from fastapi.security           import HTTPBasicCredentials, HTTPBearer
 
 from fastapi.staticfiles        import StaticFiles
 
+from fastapi.middleware.cors    import CORSMiddleware
+
+
 import mimetypes
 import jwt
 import secrets
@@ -21,7 +24,7 @@ mimetypes.add_type('text/javascript', '.js')
 
 
 # Application secret key 
-APP_SECRET_KEY = b'\xf2Pu\xcf\xbe\x88\x80\xac\x8e\xf1\xc6\xa7\xa4`Ae\x84\x10f\x9a|\xff\xe1r'
+JWT_SECRET = b'\xf2Pu\xcf\xbe\x88\x80\xac\x8e\xf1\xc6\xa7\xa4`Ae\x84\x10f\x9a|\xff\xe1r'
 
 RELEASE_MODE_DEVELOPMENT    = 0
 RELEASE_MODE_PRODUCTION     = 1
@@ -51,7 +54,27 @@ tags_metadata = [
 ]
 
 app = FastAPIOffline(openapi_tags = tags_metadata)
-ALGORITHM = "HS256"
+
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8000", "http://127.0.0.1:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Configuration
+GOOGLE_CLIENT_ID = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com"
+
+
+
+JWT_ALGORITHM = "HS256"
+
+
+
 
 # Old desktop first static directory
 dir_static = '/home/dev01/projects/jsys/pig_ops_ui/pig_ops_app/src/static'
@@ -64,26 +87,29 @@ app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
 
 
 
+ACCESS_TOKEN_EXPIRE_DAYS        = 300
+
+
 def generate_csrf_token(data) -> str:
     """Generate a CSRF token"""
     # Create a unique token
     random_string = secrets.token_urlsafe(32)
     
     
-    hours_expiry = 1
+    days_expiry = ACCESS_TOKEN_EXPIRE_DAYS
     
     if data:
-        if 'hours_expiry' in data:
-            hours_expiry = data['hours_expiry']
+        if 'days_expiry' in data:
+            days_expiry = data['days_expiry']
     
     
     # Create JWT token
     payload = {
         "csrf_token": random_string,
-        "exp": datetime.utcnow() + timedelta(hours=hours_expiry)
+        "exp": datetime.utcnow() + timedelta(days=days_expiry)
     }
     
-    return jwt.encode(payload, APP_SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, APP_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
 
@@ -91,7 +117,7 @@ def validate_csrf_token(token: str) -> bool:
     """Validate CSRF token"""
     try:
         # Decode and verify JWT
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, APP_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         return bool(payload.get("csrf_token"))
     except jwt.InvalidTokenError:
         return False

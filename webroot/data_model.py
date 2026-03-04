@@ -33,9 +33,11 @@ class HasContactDetails:
 
 
 class DataUser(BaseModel):
+    email:                  str
+    
+    name:                   str = None
     name_last:              str = None
     name_first:             str = None
-    email:                  str
     
     social_media_id:        int = 0
     viewport_width:         int = None

@@ -65,55 +65,6 @@ MODULES_SIGNUP =[
 
 
 MODULES_ROOT = [
-    "constants.js",
-    "utils.js",
-    
-    
-    "models/model_basic.js",
-    "models/model_acc_pig_ops.js",
-    "models/model_pig_production.js",
-    
-    
-    "pages/common/page_view_basic.js",
-    "pages/common/manager_address.js",
-    "pages/common/common_app.js",
-    "pages/common/common_select_options.js",
-    
-    "pages/a_user_control/page_account_disabled.js",
-    "pages/a_user_control/page_user_disabled.js",
-    "pages/a_user_control/page_account_unpaid_bill.js",
-    
-    
-    
-    "pages/navigation/text_substitute_control.js",
-    
-    
-    "pages/farm_account/pig_farm.js",
-    "pages/farm_account/account_lists.js",
-    
-    
-    "pages/acc_pig_ops/page_acc_pig_ops_list.js",
-    
-    
-    "pages/sow_boar/page_sow_boar_list.js",
-    "pages/sow_boar/page_sow_boar_add_edit.js",
-    
-    
-    
-    
-    
-    "pages/production/gesta_lacta/page_prod_gestating_add.js",
-    
-
-    "pages/production/gesta_lacta/prod_entry_pig_ops.js",
-    "pages/production/gesta_lacta/prod_entry_birth.js",
-    "pages/production/gesta_lacta/page_prod_gestating_entry.js",
-    
-    
-    
-    "pages/production/gesta_lacta/page_mob_gesta_lacta.js",
-    
-    
     "pages/navigation/navigation.js"
 ]
 

@@ -153,6 +153,7 @@ class User:
                     a.flag,
                     a.email,
                     a.mobile_num,
+                    a.name,
                     a.name_last,
                     a.name_first,
                     
@@ -213,20 +214,21 @@ class User:
                 cur_user_flag                       = row[2]
                 cur_user_email                      = row[3]
                 cur_user_mobile_num                 = row[4]
-                cur_user_name_last                  = row[5]
-                cur_user_name_first                 = row[6]
+                cur_user_name                       = row[5]
+                cur_user_name_last                  = row[6]
+                cur_user_name_first                 = row[7]
                 
-                cur_user_group_id                   = row[7]
-                cur_user_group_num                  = row[8]
-                cur_user_group_flag_business_obj_1  = row[9]
-                cur_user_group_flag_business_obj_2  = row[10]
-                cur_user_group_name                 = row[11]
+                cur_user_group_id                   = row[8]
+                cur_user_group_num                  = row[9]
+                cur_user_group_flag_business_obj_1  = row[10]
+                cur_user_group_flag_business_obj_2  = row[11]
+                cur_user_group_name                 = row[12]
                 
-                cur_user_req_join_acc_id            = row[12]
-                cur_user_req_account_id             = row[13]
-                cur_user_req_status_id              = row[14]
-                cur_user_req_dt_entry               = str(row[15])[0:10] # extract date only
-                cur_user_req_account_name           = row[16]
+                cur_user_req_join_acc_id            = row[13]
+                cur_user_req_account_id             = row[14]
+                cur_user_req_status_id              = row[15]
+                cur_user_req_dt_entry               = str(row[16])[0:10] # extract date only
+                cur_user_req_account_name           = row[17]
                 
                 
                 
@@ -238,6 +240,7 @@ class User:
                         'flag':             cur_user_flag,
                         'email':            cur_user_email,
                         'mobile_num':       cur_user_mobile_num,
+                        'name':             cur_user_name,
                         'name_last':        cur_user_name_last,
                         'name_first':       cur_user_name_first
                     },
@@ -486,6 +489,7 @@ class User:
         PROCEDURE user_register_or_login(
             in_social_media_id      INT,
             
+            in_name                 VARCHAR(80),
             in_name_last            VARCHAR(50),
             in_name_first           VARCHAR(50),
             
@@ -505,7 +509,13 @@ class User:
             sql += '%s,'  % data.social_media_id
         else:
             sql += 'NULL,'
-            
+        
+        
+        if data.name and len(data.name) > 0:
+            sql += '"%s",'  % data.name
+        else:
+            sql += 'NULL,'
+        
         
         if data.name_last and len(data.name_last) > 0:
             sql += '"%s",'  % data.name_last

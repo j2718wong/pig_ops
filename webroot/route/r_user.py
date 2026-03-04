@@ -6,10 +6,13 @@ import sys
 import random
 import pprint
 import json
+import httpx
 
 
 from fastapi                import Request, HTTPException, status
 from pydantic               import BaseModel
+from google.oauth2          import id_token
+from google.auth.transport  import requests
 
 from datetime               import datetime, timedelta
 
@@ -324,7 +327,7 @@ async def user_email_verify_resend(uhid:str):
     
     
 @app.post("/user/login_social", tags=["User"])
-async def user_info(request: Request, user_data: dm.DataUser):
+async def user_login_social(request: Request, user_data: dm.DataUser):
     
     social_media_id = user_data.social_media_id
     if social_media_id == 0 or social_media_id not in ALLOWED_SOCIAL_MEDIA_LOGIN:
@@ -377,6 +380,8 @@ async def user_info(request: Request, user_data: dm.DataUser):
     # should port also be recorded?
     
     user_data.ip_address = client_host 
+    
+    
     
     res_login = model['user'].login_social(user_data)
     if res_login == None:
@@ -477,7 +482,7 @@ async def user_info(uhid:str):
     
 
 @app.get("/user/list", tags=["User"])
-async def pig_farm_staff_list(ahid: str, inc_deleted : int = 0):
+async def user_list(ahid: str, inc_deleted : int = 0):
     """
     Will get user list.
     
@@ -545,5 +550,170 @@ async def pig_farm_staff_list(ahid: str, inc_deleted : int = 0):
     
     
 
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: dict
+
+
+class Token(BaseModel):
+    token:                  str
+    viewport_width:         int = None
+    viewport_height:        int = None
     
+
+
+def create_access_token(data: dict):
+    to_encode   = data.copy()
+    expire      = datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+
+
+@app.post("/api/auth/google")
+async def google_auth(request: Request, token_data: Token):
+    
+    user_info = None
+    
+    try:
+        # Specify the CLIENT_ID of the app that accesses the backend
+        # The id_token.verify_oauth2_token method verifies the token's signature, 
+        # issuer, and audience (client_id)
+        user_info = id_token.verify_oauth2_token(
+            token_data.token, 
+            requests.Request(), 
+            GOOGLE_CLIENT_ID
+        )
+        
+        
+        # Get user info from token
+        
+        """
+        print(str(user_info))
+        
+
+        {'iss': 'https://accounts.google.com', 
+        'azp': '466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com', 
+        'aud': '466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com',
+        'sub': '117290373613803383814', 
+        'email': 'j2718wong@gmail.com', 
+        'email_verified': True, 
+        'nbf': 1772621501, 
+        
+        'name': 'Jack Wong', 
+        'picture': 'https://lh3.googleusercontent.com/a/ACg8ocJZJVZm7hWU9R7IaVXPDedhyyx2C8wJz6AMZNDWXpT0CEU9cw=s96-c', 
+        
+        'given_name': 'Jack', 
+        'family_name': 'Wong', 
+        'iat': 1772621801, 
+        'exp': 1772625401, 
+        
+        'jti': 'd3d598e78c4bad85419b46839b4d728da66facc4'}
+        """
+        
+    except ValueError as e:
+        # Invalid token
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+    except Exception as e:
+        print('google error = ' + str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    
+    # Get User data
+    user_email      = user_info['email']
+    email_verified  = user_info['email_verified']  
+    user_name       = user_info['name']         if 'name' in user_info else None 
+    user_name_last  = user_info['family_name']  if 'family_name' in user_info else None
+    user_name_first = user_info['given_name']   if 'given_name' in user_info else None
+    
+    
+    # record client ip
+    client_host = request.client.host
+    
+    # should port also be recorded?
+    
+    
+    # This will create account or login
+    user_data = dm.DataUser(
+        email             = user_email,
+        
+        name              = user_name,         
+        name_last         = user_name_last,      
+        name_first        = user_name_first,    
+        
+        social_media_id   = SOCIAL_MEDIA_GOOGLE,
+        viewport_width    = token_data.viewport_width, 
+        viewport_height   = token_data.viewport_height,
+        ip_address        = client_host     
+    )
+    
+    
+    
+    res_login = model['user'].login_social(user_data)
+    if res_login == None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    
+    # Get user_id
+    user_id = res_login['user']['id']
+    
+    
+    # Get user_account info
+    data_user_account = get_user_account_info(user_id)
+    
+
+    
+    # replace the user block
+    del res_login['user']
+    
+    
+    # with this block
+    res_login['user_account'] = data_user_account
+
+    replace_plain_ids_user_account(data_user_account)
+
+    
+    # Get user_hid
+    user_hid =  data_user_account['user']['user']['hid']
+        
+    
+    
+    
+    # Create JWT token for the app
+    access_token = create_access_token(
+        data = {"user_hid": user_hid}
+    )
+    
+    
+    res_login['bearer_token'] = access_token
+    
+    return res_login
+    
+
+
+
+@app.get("/api/protected")
+async def protected_route(request: Request):
+    token = request.headers.get("authorization", "").replace("Bearer ", "")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        return {"message": f"Hello user {user_id}", "data": payload}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 

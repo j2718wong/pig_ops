@@ -149,3 +149,86 @@ class UserRequest:
         return None
 
 
+    def get_list(self, account_id):
+        
+        
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.status_id,
+                    
+                    b.name_last,
+                    b.name_first,
+                    b.email,
+                    
+                    a.dt_entry
+                    
+                FROM user_request a 
+                LEFT OUTER JOIN user b        ON a.requesting_user_id   = b.id
+                WHERE a.account_id = %s AND a.status_id = 1 
+                ORDER BY a.dt_entry DESC
+                """ % account_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_list(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+        result = []
+        if rows is not None:
+            
+            for row in rows:
+                cur_id                  = row[0]
+                cur_status_id           = row[1]
+
+                
+                cur_name_last           = row[2]
+                cur_name_first          = row[3]
+                cur_email               = row[4]
+                
+                cur_dt_entry            = str(row[5])[0:10]
+                
+                cur_entry = {
+                    'user_req': {
+                        'id':           cur_id,
+                        'status_id':    cur_status_id,
+                        'dt_entry':     cur_dt_entry
+                    },
+                    
+                    'requesting_user': {
+                        'name_last':    cur_name_last,
+                        'name_first':   cur_name_first,
+                        'email':        cur_email
+                    }
+                    
+                }
+                
+                    
+                result.append(cur_entry)
+        
+        return result
+    
