@@ -11,6 +11,8 @@ from fastapi.staticfiles        import StaticFiles
 
 from fastapi.middleware.cors    import CORSMiddleware
 
+from fastapi_throttle           import RateLimiter
+
 
 import mimetypes
 import jwt
@@ -84,6 +86,30 @@ app.mount('/static', StaticFiles(directory=dir_static), name='static')
 # New mobile first static directory
 dir_static_m = '/home/dev01/projects/jsys/pig_ops_ui_mob/src/static'
 app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
+
+
+
+
+# Public endpoint: 10 requests per minute per IP
+public_limit = RateLimiter(
+    times=6,        # 6 requests
+    seconds=60,      # per minute
+    trust_proxy=True, # Use X-Forwarded-For if behind proxy
+    add_headers=True  # Show rate limit info in response headers
+)
+
+
+# More restrictive endpoint for sensitive operations
+strict_limit = RateLimiter(
+    times=3,
+    seconds=60,
+    add_headers=True
+)
+
+
+
+
+
 
 
 

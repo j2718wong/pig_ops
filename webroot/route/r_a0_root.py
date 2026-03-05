@@ -9,9 +9,9 @@ import pprint
 
 import jwt
 
-from fastapi                import Request, HTTPException, status
+from fastapi                import Request, HTTPException, status, Depends
 from pydantic               import BaseModel
-from fastapi.responses      import HTMLResponse
+from fastapi.responses      import HTMLResponse, RedirectResponse
 
 from datetime               import datetime, timedelta
 
@@ -56,34 +56,28 @@ def get_application_data():
     }
 
 
-@app.get("/signup", response_class = HTMLResponse)
+@app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
 async def signup():
-    page_data = {}
-    
-    
     #generate_csrf_token() 
     
-    page = controller.view['signup'].render(page_data = json.dumps(page_data, indent=4))
+    page = controller.view['signup'].render()
     
     return page
     
 
 
-@app.get("/login", response_class = HTMLResponse)
+@app.get("/login", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
 async def signup():
-    page_data = {}
-    
-    
     #generate_csrf_token() 
     
-    page = controller.view['signup'].render(page_data = json.dumps(page_data, indent=4))
+    page = controller.view['signup'].render()
     
     return page
     
 
 
 
-@app.get("/", response_class = HTMLResponse)
+@app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
 async def root(request: Request, p:str = None):
     """
     2026-01-09 Notes:
@@ -115,9 +109,23 @@ async def root(request: Request, p:str = None):
 
     """
     
+    page = controller.view['root'].render()
+    
+    return page
+    
+    
+
+@app.get("/pig_farm/data")
+async def pig_farm_data(request: Request):
+    """
+    2026-03-05 Notes:
+    
+    
+    """
+    
     token = request.headers.get("authorization", "").replace("Bearer ", "")
     if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Unauthorized")
     
     
     uhid = None
@@ -127,22 +135,17 @@ async def root(request: Request, p:str = None):
         uhid = payload.get("uhid")
         
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
+        return RedirectResponse(url="/login", status_code=302)
+        
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
     if uhid is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        return RedirectResponse(url="/login", status_code=302)
     
     
     
     time_init = time.time()
-    
-    
-    
-    
-    
-    data_app = get_application_data()
     
     
     # Get the current logged in user;
@@ -166,60 +169,52 @@ async def root(request: Request, p:str = None):
     account = user_account['account']
     user    = user_account['user']
     
-    print('\n\nroot user account')
-    pprint.pprint(user_account)
+
     
+    pig_farm_id = 0
     
-    pig_farm_id = None
+    # Get use user assigned farm id
+    # This is the first pig_farm id in user.pig_farms
+    user_pig_farms =  user['pig_farms']
     
-    if p is not None:
-        res = hashids_common.decrypt(p)
-        if len(res) == 0:
-            # Just proceed if it is invalid; will get default 
-            # account farm_id if not given
-            test = 1
-            
-            """
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
-                    'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID',
-                    'desc': ''
-                }
-            }
-            """
-        else:
-            pig_farm_id = res[0]
-    
-    else:
-        # Get use user assigned farm id
-        # This is the first pig_farm id in user.pig_farms
-        user_pig_farms =  user['pig_farms']
-        
-        if len(user_pig_farms) > 0:
-            pig_farm_id = user_pig_farms[0]
+    if len(user_pig_farms) > 0:
+        pig_farm_id = user_pig_farms[0]
     
 
+    data_app = get_application_data()
+    
     
     farm_account = get_page_data_farm_account_pig_prod(
         pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
     
-    page_data = {}
-    page_data['application'] = data_app
-    page_data['user_account'] = replace_plain_ids_user_account(user_account)
-    page_data['pig_farm_account'] = farm_account  
-
-
-
+    
+    data = {
+        'application':      data_app,
+        'user_account':     replace_plain_ids_user_account(user_account),
+        'pig_farm_account': farm_account
+    }
+    
+    
     time_final  = time.time()
     delta_secs  = time_final - time_init
     s_time      = '%.2f' % delta_secs
     
-    print('\n\nroot page_data time(secs): %s' %s_time)
-    page = controller.view['root'].render(page_data = json.dumps(page_data, indent=4))
     
-    return page
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': data
+    }
     
     
+    
+    
+
+
+    
+
     
     

@@ -119,7 +119,7 @@
                             <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
                             <span>Billing</span>
                         </div>
-                        <div class="user-dropdown-item">
+                        <div class="user-dropdown-item" id="desktop-user-logout">
                             <i class="fas fa-sign-out-alt" style="color: var(--icon-red);"></i>
                             <span>Logout</span>
                         </div>
@@ -414,7 +414,7 @@
                             <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
                             <span>Billing</span>
                         </div>
-                        <div class="user-dropdown-item">
+                        <div class="user-dropdown-item" id="mobile-user-logout">
                             <i class="fas fa-sign-out-alt" style="color: var(--icon-red);"></i>
                             <span>Logout</span>
                         </div>
@@ -680,19 +680,13 @@
         
         var gNavigation = null;
         
-        var PAGE_DATA = {{page_data}};
-        
-        
+
         document.addEventListener("DOMContentLoaded", function() {
             
             const gNavigation = new Navigation();
-            gNavigation.init();         
-            
             globalThis.gNavigation = gNavigation;
             
-            gNavigation.setPageData(PAGE_DATA);
-            
-            
+            gNavigation.init();         
         });
     </script>
 
