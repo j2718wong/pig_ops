@@ -8,8 +8,9 @@ import pprint
 
 import jwt
 
-from fastapi                import Request, HTTPException, status
-from pydantic               import BaseModel
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,28 +33,18 @@ FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
 @app.get("/user_request/join_account", tags=["User"])
 async def user_request_join_account(request: Request, ahid:str = None):
     
-    token = request.headers.get("authorization", "").replace("Bearer ", "")
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
     
     
-    token_uhid = None
+    uhid = result
     
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        token_uhid = payload.get("uhid")
-        
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
 
-    if token_uhid is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
     
-    
-    
-    res = hashids_user.decrypt(token_uhid)
+    res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
@@ -124,8 +115,18 @@ async def user_request_join_account(request: Request, ahid:str = None):
     
 
 @app.get("/user_request/approve_add_user", tags=["Account Details"])
-async def user_request_approve_add_user(arhid: str, uhid:str):
-        
+async def user_request_approve_add_user(urhid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    
     res = hashids_common.decrypt(arhid)
     if len(res) == 0:
         return {
@@ -135,7 +136,7 @@ async def user_request_approve_add_user(arhid: str, uhid:str):
             }
         }
     
-    acc_request_id = res[0]
+    user_request_id = res[0]
     
     
     res = hashids_user.decrypt(uhid)
@@ -152,7 +153,7 @@ async def user_request_approve_add_user(arhid: str, uhid:str):
     
     
     data = {
-        'acc_request_id':       acc_request_id,
+        'user_request_id':      user_request_id,
         'approving_user_id':    user_id
     }
     
@@ -208,6 +209,14 @@ async def user_request_list(ahid: str):
 
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_account.decrypt(ahid)

@@ -5,9 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
-from fastapi.responses      import HTMLResponse
-from fastapi                import Request
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -35,9 +36,19 @@ from r_utils                import remove_database_null_description
 
     
 @app.post("/account_medvac/add", tags=["Account"])
-async def account_medvac_add(account_medvac_data: dm.DataAccountMedVac):
-    name    = account_medvac_data.name
-    uhid    = account_medvac_data.uhid
+async def account_medvac_add(request: Request, data: dm.DataAccountMedVac):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -75,7 +86,7 @@ async def account_medvac_add(account_medvac_data: dm.DataAccountMedVac):
     
     
     medvac_brand_id     = 0
-    medvac_brand_hid    = account_medvac_data.medvac_brand_hid
+    medvac_brand_hid    = data.medvac_brand_hid
     
     if medvac_brand_hid is not None:
         res = hashids_common.decrypt(medvac_brand_hid)
@@ -91,7 +102,7 @@ async def account_medvac_add(account_medvac_data: dm.DataAccountMedVac):
     
     
     medvac_type_id     = 0
-    medvac_type_hid    = account_medvac_data.medvac_type_hid
+    medvac_type_hid    = data.medvac_type_hid
     
     if medvac_type_hid is not None:
         res = hashids_common.decrypt(medvac_type_hid)
@@ -108,12 +119,12 @@ async def account_medvac_add(account_medvac_data: dm.DataAccountMedVac):
     
     
     
-    account_medvac_data.name            = name
-    account_medvac_data.user_id         = user_id
-    account_medvac_data.medvac_brand_id = medvac_brand_id
-    account_medvac_data.medvac_type_id  = medvac_type_id
+    data.name            = name
+    data.user_id         = user_id
+    data.medvac_brand_id = medvac_brand_id
+    data.medvac_type_id  = medvac_type_id
     
-    res_add    =  model['account_medvac'].add(account_medvac_data)
+    res_add    =  model['account_medvac'].add(data)
     
     if res_add is None:
         return {
@@ -140,9 +151,19 @@ async def account_medvac_add(account_medvac_data: dm.DataAccountMedVac):
     
 
 @app.post("/account_medvac/update", tags=["Account"])
-async def account_medvac_update(account_medvac_data: dm.DataAccountMedVac):
-    name    = account_medvac_data.name
-    uhid    = account_medvac_data.uhid
+async def account_medvac_update(request: Request, data: dm.DataAccountMedVac):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -155,7 +176,7 @@ async def account_medvac_update(account_medvac_data: dm.DataAccountMedVac):
         }
         
     
-    operation_type  = account_medvac_data.operation_type
+    operation_type  = data.operation_type
     
     if operation_type not in PIG_OPERATION_TYPES:
         return {
@@ -166,7 +187,7 @@ async def account_medvac_update(account_medvac_data: dm.DataAccountMedVac):
         }
         
 
-    num_days_since = account_medvac_data.num_days_since
+    num_days_since = data.num_days_since
     
     if operation_type == PIG_OPERATION_TYPE_GESTATING:
         if num_days_since < 0 and num_days_since > 115:
@@ -224,7 +245,7 @@ async def account_medvac_update(account_medvac_data: dm.DataAccountMedVac):
     
 
 
-    account_medvac_hid = account_medvac_data.account_medvac_hid
+    account_medvac_hid = data.account_medvac_hid
     res = hashids_common.decrypt(account_medvac_hid)
     if len(res) == 0:
         return {
@@ -237,11 +258,11 @@ async def account_medvac_update(account_medvac_data: dm.DataAccountMedVac):
     account_medvac_id = res[0]
     
     
-    account_medvac_data.name      = name
-    account_medvac_data.user_id   = user_id
-    account_medvac_data.account_medvac_id = account_medvac_id
+    data.name      = name
+    data.user_id   = user_id
+    data.account_medvac_id = account_medvac_id
     
-    res_update    =  model['account_medvac'].update(account_medvac_data)
+    res_update    =  model['account_medvac'].update(data)
     
     if res_update is None:
         return {
@@ -265,7 +286,17 @@ async def account_medvac_update(account_medvac_data: dm.DataAccountMedVac):
     
 
 @app.get("/account_medvac/delete", tags=["Account"])
-async def account_medvac_delete(uhid:str, ehid: str):
+async def account_medvac_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -332,7 +363,7 @@ async def account_medvac_delete(uhid:str, ehid: str):
     
 
 @app.get("/account_medvac/list", tags=["Account"])
-async def account_medvac_list(ahid: str,  inc_deleted: int = 0, 
+async def account_medvac_list(request: Request, ahid: str,  inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
     Will get account_medvac list.
@@ -350,6 +381,16 @@ async def account_medvac_list(ahid: str,  inc_deleted: int = 0,
         if > 0, will include added_by and last_update info
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:

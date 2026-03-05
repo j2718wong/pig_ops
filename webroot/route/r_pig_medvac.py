@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -31,8 +34,18 @@ from r_utils                import remove_database_null_description
 
    
 @app.post("/pig_medvac/add", tags=["Pig Details"])
-async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
-    uhid    = pig_medvac_data.uhid
+async def pig_medvac_add(request: Request, data: dm.DataPigMedvac):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     
     res = hashids_user.decrypt(uhid)
@@ -70,7 +83,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     staff_id            = 0
     
     
-    sow_boar_hid        = pig_medvac_data.sow_boar_hid
+    sow_boar_hid        = data.sow_boar_hid
     
     if sow_boar_hid is not None:
         res = hashids_common.decrypt(sow_boar_hid)
@@ -89,7 +102,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
     
     
-    pig_prod_hid        = pig_medvac_data.pig_prod_hid
+    pig_prod_hid        = data.pig_prod_hid
     
     if pig_prod_hid is not None:
         res = hashids_common.decrypt(pig_prod_hid)
@@ -110,7 +123,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
     
     
-    pig_prod_pig_ops_hid = pig_medvac_data.pig_prod_pig_ops_hid
+    pig_prod_pig_ops_hid = data.pig_prod_pig_ops_hid
     
     if pig_prod_pig_ops_hid is not None:
         res = hashids_common.decrypt(pig_prod_pig_ops_hid)
@@ -131,7 +144,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
     
     
-    health_issue_hid        = pig_medvac_data.health_issue_hid
+    health_issue_hid        = data.health_issue_hid
     
     if health_issue_hid is not None:
         res = hashids_common.decrypt(health_issue_hid)
@@ -153,7 +166,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
     
 
-    staff_hid = pig_medvac_data.staff_hid
+    staff_hid = data.staff_hid
     
     if staff_hid is not None:
         res = hashids_common.decrypt(staff_hid)
@@ -173,7 +186,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
         staff_id = res[0]
     
     
-    medvac_brand_hid = pig_medvac_data.medvac_brand_hid
+    medvac_brand_hid = data.medvac_brand_hid
     
     res = hashids_common.decrypt(medvac_brand_hid)
     if len(res) == 0:
@@ -193,7 +206,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
 
     
-    medvac_type_hid = pig_medvac_data.medvac_type_hid
+    medvac_type_hid = data.medvac_type_hid
     
     res = hashids_common.decrypt(medvac_type_hid)
     if len(res) == 0:
@@ -212,7 +225,7 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     medvac_type_id = res[0]
     
     
-    acc_medvac_hid = pig_medvac_data.acc_medvac_hid
+    acc_medvac_hid = data.acc_medvac_hid
     
     res = hashids_common.decrypt(acc_medvac_hid)
     if len(res) == 0:
@@ -247,19 +260,19 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
         
         
    
-    pig_medvac_data.user_id         = user_id
-    pig_medvac_data.sow_boar_id     = sow_boar_id
-    pig_medvac_data.pig_prod_id     = pig_prod_id
-    pig_medvac_data.pig_prod_pig_ops_id = pig_prod_pig_ops_id
-    pig_medvac_data.health_issue_id = health_issue_id
+    data.user_id         = user_id
+    data.sow_boar_id     = sow_boar_id
+    data.pig_prod_id     = pig_prod_id
+    data.pig_prod_pig_ops_id = pig_prod_pig_ops_id
+    data.health_issue_id = health_issue_id
     
-    pig_medvac_data.medvac_brand_id = medvac_brand_id
-    pig_medvac_data.medvac_type_id  = medvac_type_id
-    pig_medvac_data.acc_medvac_id   = acc_medvac_id  
-    pig_medvac_data.staff_id        = staff_id
+    data.medvac_brand_id = medvac_brand_id
+    data.medvac_type_id  = medvac_type_id
+    data.acc_medvac_id   = acc_medvac_id  
+    data.staff_id        = staff_id
     
     
-    res_add    =  model['pig_medvac'].add(pig_medvac_data)
+    res_add    =  model['pig_medvac'].add(data)
     
     if res_add is None:
         return {
@@ -291,8 +304,18 @@ async def pig_medvac_add(pig_medvac_data: dm.DataPigMedvac):
     
 
 @app.post("/pig_medvac/update", tags=["Pig Details"])
-async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
-    uhid    = pig_medvac_data.uhid
+async def pig_medvac_update(request: Request, data: dm.DataPigMedvac):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     
     res = hashids_user.decrypt(uhid)
@@ -319,7 +342,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     
     
     pig_medvac_id       = 0
-    pig_medvac_hid      = pig_medvac_data.pig_medvac_hid
+    pig_medvac_hid      = data.pig_medvac_hid
     
     if pig_medvac_hid is not None:
         res = hashids_common.decrypt(pig_medvac_hid)
@@ -349,7 +372,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     
     
 
-    staff_hid = pig_medvac_data.staff_hid
+    staff_hid = data.staff_hid
     
     if staff_hid is not None:
         res = hashids_common.decrypt(staff_hid)
@@ -364,7 +387,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
         staff_id = res[0]
     
     
-    medvac_brand_hid = pig_medvac_data.medvac_brand_hid
+    medvac_brand_hid = data.medvac_brand_hid
     
     res = hashids_common.decrypt(medvac_brand_hid)
     if len(res) == 0:
@@ -378,7 +401,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     medvac_brand_id = res[0]
     
     
-    medvac_type_hid = pig_medvac_data.medvac_type_hid
+    medvac_type_hid = data.medvac_type_hid
     
     res = hashids_common.decrypt(medvac_type_hid)
     if len(res) == 0:
@@ -392,7 +415,7 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     medvac_type_id = res[0]
     
     
-    acc_medvac_hid = pig_medvac_data.acc_medvac_hid
+    acc_medvac_hid = data.acc_medvac_hid
     
     res = hashids_common.decrypt(acc_medvac_hid)
     if len(res) == 0:
@@ -407,16 +430,16 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     
     
    
-    pig_medvac_data.user_id         = user_id
-    pig_medvac_data.pig_medvac_id   = pig_medvac_id
+    data.user_id         = user_id
+    data.pig_medvac_id   = pig_medvac_id
     
-    pig_medvac_data.medvac_brand_id = medvac_brand_id
-    pig_medvac_data.medvac_type_id  = medvac_type_id
-    pig_medvac_data.acc_medvac_id   = acc_medvac_id  
-    pig_medvac_data.staff_id        = staff_id
+    data.medvac_brand_id = medvac_brand_id
+    data.medvac_type_id  = medvac_type_id
+    data.acc_medvac_id   = acc_medvac_id  
+    data.staff_id        = staff_id
     
     
-    res_update    =  model['pig_medvac'].update(pig_medvac_data)
+    res_update    =  model['pig_medvac'].update(data)
     
     if res_update is None:
         return {
@@ -435,7 +458,17 @@ async def pig_medvac_update(pig_medvac_data: dm.DataPigMedvac):
     
 
 @app.get("/pig_medvac/delete", tags=["Pig Details"])
-async def pig_medvac_delete(uhid:str, ehid: str):
+async def pig_medvac_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -559,8 +592,8 @@ def get_data_pig_medvac(sow_boar_id, pig_prod_id, inc_deleted, inc_user_audit):
     
     
 @app.get("/pig_medvac/list", tags=["Pig Details"])
-async def pig_medvac_list(sow_boar_hid: str = None, pig_prod_hid: str = None,
-        inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_medvac_list(request: Request, sow_boar_hid: str = None, 
+        pig_prod_hid: str = None, inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get pig medvac list.
     
@@ -581,6 +614,15 @@ async def pig_medvac_list(sow_boar_hid: str = None, pig_prod_hid: str = None,
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     sow_boar_id = 0
     pig_prod_id = 0
@@ -648,7 +690,7 @@ async def pig_medvac_list(sow_boar_hid: str = None, pig_prod_hid: str = None,
     
     
 @app.get("/pig_medvac/search_keys", tags=["Pig Details"])
-async def pig_medvac_search_keys(ahid: str, search_keyword: None):
+async def pig_medvac_search_keys(request: Request, ahid: str, search_keyword: None):
     """
     Will return pig_medvac search keys from given pig_farm account hid and a keyword;.
     This is used in searching pig_medvac. Note this will search 
@@ -670,6 +712,16 @@ async def pig_medvac_search_keys(ahid: str, search_keyword: None):
     
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:

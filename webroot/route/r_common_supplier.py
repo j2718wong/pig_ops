@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,9 +35,19 @@ from r_utils                import remove_database_null_description
     
     
 @app.post("/supplier/add", tags=["Common Lookup"])
-async def supplier_add(supplier_data: dm.DataCommonSupplier):
-    name    = supplier_data.name
-    uhid    = supplier_data.uhid
+async def supplier_add(request: Request, data: dm.DataCommonSupplier):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -46,9 +59,9 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
             }
         }
     
-    if  supplier_data.is_feed_supplier == 0 and \
-        supplier_data.is_gilt_supplier == 0 and \
-        supplier_data.is_semen_supplier == 0:
+    if  data.is_feed_supplier == 0 and \
+        data.is_gilt_supplier == 0 and \
+        data.is_semen_supplier == 0:
             
         return {
             'result':{
@@ -85,7 +98,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
     level_3_id  = 0
     
     
-    level_1_hid = supplier_data.level_1_hid
+    level_1_hid = data.level_1_hid
     res = hashids_common.decrypt(level_1_hid)
     if len(res) == 0:
         return {
@@ -98,7 +111,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
     level_1_id = res[0]
     
     
-    level_2_hid = supplier_data.level_2_hid
+    level_2_hid = data.level_2_hid
     res = hashids_common.decrypt(level_2_hid)
     if len(res) == 0:
         return {
@@ -111,7 +124,7 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
     level_2_id = res[0]
     
     
-    level_3_hid = supplier_data.level_3_hid
+    level_3_hid = data.level_3_hid
     
     if level_3_hid is not None:
         res = hashids_common.decrypt(level_3_hid)
@@ -128,14 +141,14 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
     
     
     
-    supplier_data.name         = name
-    supplier_data.user_id      = user_id
-    supplier_data.level_1_id   = level_1_id
-    supplier_data.level_2_id   = level_2_id
-    supplier_data.level_3_id   = level_3_id
+    data.name         = name
+    data.user_id      = user_id
+    data.level_1_id   = level_1_id
+    data.level_2_id   = level_2_id
+    data.level_3_id   = level_3_id
     
     
-    res_add    =  model['supplier'].add(supplier_data)
+    res_add    =  model['supplier'].add(data)
     
     if res_add is None:
         return {
@@ -162,9 +175,19 @@ async def supplier_add(supplier_data: dm.DataCommonSupplier):
     
 
 @app.post("/supplier/update", tags=["Common Lookup"])
-async def supplier_update(supplier_data: dm.DataCommonSupplier):
-    name    = supplier_data.name
-    uhid    = supplier_data.uhid
+async def supplier_update(request: Request, data: dm.DataCommonSupplier):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -200,7 +223,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
     
     
     
-    supplier_hid = supplier_data.supplier_hid
+    supplier_hid = data.supplier_hid
     
     res = hashids_common.decrypt(supplier_hid)
     if len(res) == 0:
@@ -215,7 +238,7 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
     
     
     level_3_id  = 0
-    level_3_hid = supplier_data.level_3_hid
+    level_3_hid = data.level_3_hid
     
     if level_3_hid is not None:
         res = hashids_common.decrypt(level_3_hid)
@@ -230,9 +253,9 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
         level_3_id = res[0]
     
     
-    if  supplier_data.is_feed_supplier == 0 and \
-        supplier_data.is_gilt_supplier == 0 and \
-        supplier_data.is_semen_supplier == 0:
+    if  data.is_feed_supplier == 0 and \
+        data.is_gilt_supplier == 0 and \
+        data.is_semen_supplier == 0:
             
         return {
             'result':{
@@ -244,12 +267,12 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
     
     
     
-    supplier_data.name          = name
-    supplier_data.user_id       = user_id
-    supplier_data.supplier_id   = supplier_id
-    supplier_data.level_3_id    = level_3_id
+    data.name          = name
+    data.user_id       = user_id
+    data.supplier_id   = supplier_id
+    data.level_3_id    = level_3_id
     
-    res_update      =  model['supplier'].update(supplier_data)
+    res_update      =  model['supplier'].update(data)
     
     if res_update is None:
         return {
@@ -275,9 +298,9 @@ async def supplier_update(supplier_data: dm.DataCommonSupplier):
 
    
 @app.get("/supplier/list", tags=["Common Lookup"])
-async def supplier_list(ahid:str = None, level_1_hid: str = None, 
-    level_2_hid: str = None,
-    is_fs:int = 0, is_gs:int = 0, is_ss:int = 0):
+async def supplier_list(request: Request, ahid:str = None, 
+        level_1_hid: str = None, level_2_hid: str = None,
+        is_fs:int = 0, is_gs:int = 0, is_ss:int = 0):
     """
     Will get common_supplier list.
     
@@ -304,6 +327,14 @@ async def supplier_list(ahid:str = None, level_1_hid: str = None,
         
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
 
     account_id      = 0
@@ -434,8 +465,8 @@ async def supplier_list(ahid:str = None, level_1_hid: str = None,
     
             
 @app.get("/supplier/count", tags=["Common Lookup"])
-async def supplier_count(country_id: int = 1, level_1_hid: str = None,
-    is_fs:int = 0, is_gs:int = 0, is_ss:int = 0):
+async def supplier_count(request: Request, country_id: int = 1, 
+        level_1_hid: str = None, is_fs:int = 0, is_gs:int = 0, is_ss:int = 0):
     """
     Will get supplier count.
     
@@ -446,6 +477,16 @@ async def supplier_count(country_id: int = 1, level_1_hid: str = None,
         address level 1 hashhid
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     
     level_1_id = None
     

@@ -5,9 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
-from fastapi.responses      import HTMLResponse
-from fastapi                import Request
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -42,7 +43,7 @@ PIG_OPERATION_TYPES = [
 
 
 @app.get("/acc_pig_ops", response_class = HTMLResponse, tags=["Account"])
-async def account_pig_ops(ahid:str = None, request: Request = None):
+async def account_pig_ops(request: Request, ahid:str = None):
     # Get the current logged in user;
     
     
@@ -116,13 +117,21 @@ async def account_pig_ops(ahid:str = None, request: Request = None):
     return page
 
 
-
-
     
 @app.post("/account_pig_ops/add", tags=["Account"])
-async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
-    name    = account_pig_ops_data.name
-    uhid    = account_pig_ops_data.uhid
+async def account_pig_ops_add(request: Request, data: dm.DataAccountPigOps):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -136,7 +145,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
         }
         
     
-    operation_type  = account_pig_ops_data.operation_type
+    operation_type  = data.operation_type
     
     if operation_type not in PIG_OPERATION_TYPES:
         return {
@@ -147,7 +156,7 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
         }
         
 
-    num_days_since = account_pig_ops_data.num_days_since
+    num_days_since = data.num_days_since
     
     if operation_type == PIG_OPERATION_TYPE_GESTATING:
         if num_days_since < 0 and num_days_since > 115:
@@ -202,10 +211,10 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
     
     
     
-    account_pig_ops_data.name      = name
-    account_pig_ops_data.user_id   = user_id
+    data.name      = name
+    data.user_id   = user_id
     
-    res_add    =  model['account_pig_ops'].add(account_pig_ops_data)
+    res_add    =  model['account_pig_ops'].add(data)
     
     if res_add is None:
         return {
@@ -231,9 +240,18 @@ async def account_pig_ops_add(account_pig_ops_data: dm.DataAccountPigOps):
     
 
 @app.post("/account_pig_ops/update", tags=["Account"])
-async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
-    name    = account_pig_ops_data.name
-    uhid    = account_pig_ops_data.uhid
+async def account_pig_ops_update(request: Request, data: dm.DataAccountPigOps):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -246,7 +264,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         }
         
     
-    operation_type  = account_pig_ops_data.operation_type
+    operation_type  = data.operation_type
     
     if operation_type not in PIG_OPERATION_TYPES:
         return {
@@ -257,7 +275,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
         }
         
 
-    num_days_since = account_pig_ops_data.num_days_since
+    num_days_since = data.num_days_since
     
     if operation_type == PIG_OPERATION_TYPE_GESTATING:
         if num_days_since < 0 and num_days_since > 115:
@@ -315,7 +333,7 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     
     
     
-    account_pig_ops_hid = account_pig_ops_data.account_pig_ops_hid
+    account_pig_ops_hid = data.account_pig_ops_hid
     res = hashids_common.decrypt(account_pig_ops_hid)
     if len(res) == 0:
         return {
@@ -328,11 +346,11 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     account_pig_ops_id = res[0]
     
     
-    account_pig_ops_data.name      = name
-    account_pig_ops_data.user_id   = user_id
-    account_pig_ops_data.account_pig_ops_id = account_pig_ops_id
+    data.name      = name
+    data.user_id   = user_id
+    data.account_pig_ops_id = account_pig_ops_id
     
-    res_update    =  model['account_pig_ops'].update(account_pig_ops_data)
+    res_update    =  model['account_pig_ops'].update(data)
     
     if res_update is None:
         return {
@@ -355,7 +373,17 @@ async def account_pig_ops_update(account_pig_ops_data: dm.DataAccountPigOps):
     
 
 @app.get("/account_pig_ops/delete", tags=["Account"])
-async def account_pig_ops_delete(uhid:str, ehid: str):
+async def account_pig_ops_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -417,7 +445,7 @@ async def account_pig_ops_delete(uhid:str, ehid: str):
     
 
 @app.get("/account_pig_ops/list", tags=["Account"])
-async def account_pig_ops_list(ahid: str, operation_type: int = None, 
+async def account_pig_ops_list(request: Request, ahid: str, operation_type: int = None, 
         inc_deleted: int = 0, inc_user_audit:int = 0):
     """
     Will get account_pig_ops list.
@@ -439,6 +467,15 @@ async def account_pig_ops_list(ahid: str, operation_type: int = None,
         if > 0, will include added_by and last_update info
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:

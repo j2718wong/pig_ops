@@ -5,8 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
-from fastapi.responses      import HTMLResponse
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -39,8 +41,16 @@ from r_sow_boar_mate        import get_data_sow_boar_mate_list
 
 
 @app.get("/sow_boar", response_class = HTMLResponse, tags=["Sow Boar"])
-async def sow_boar(pfhid:str = None):
-    # Get the current logged in user;
+async def sow_boar(request: Request, pfhid:str = None):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     pig_farm_id = None
     
@@ -160,7 +170,7 @@ async def sow_boar(pfhid:str = None):
     
     
 @app.get("/sow_status/list", tags=["Sow Boar"])
-async def sow_status_list(is_dispose: int = 0):
+async def sow_status_list(request: Request, is_dispose: int = 0):
     """
     Will get sow status list.
     
@@ -168,6 +178,15 @@ async def sow_status_list(is_dispose: int = 0):
     ----------
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = model['sow_boar'].get_sow_status_list()
     
@@ -194,8 +213,18 @@ async def sow_status_list(is_dispose: int = 0):
     
     
 @app.post("/sow_boar/add", tags=["Sow Boar"])
-async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
-    uhid        = sow_boar_data.uhid
+async def sow_boar_add(request: Request, data: dm.DataSowBoar):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid        = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -220,7 +249,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     
     
     
-    pfhid       = sow_boar_data.pfhid
+    pfhid       = data.pfhid
     
     res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
@@ -242,13 +271,13 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     number  = None
     name    = None
     
-    sow_boar_number     = sow_boar_data.number
+    sow_boar_number     = data.number
     if sow_boar_number is not None:
         number      = sow_boar_number.strip()
        
             
             
-    sow_boar_name       = sow_boar_data.name
+    sow_boar_name       = data.name
     if sow_boar_name is not None:
         name        = sow_boar_name.strip()
         
@@ -268,7 +297,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     
     
     parent_sow_id       = 0
-    parent_sow_hid      = sow_boar_data.parent_sow_hid
+    parent_sow_hid      = data.parent_sow_hid
     
     if parent_sow_hid is not None:
         res = hashids_common.decrypt(parent_sow_hid)
@@ -290,7 +319,7 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         
     
     parent_boar_id      = 0
-    parent_boar_hid     = sow_boar_data.parent_boar_hid
+    parent_boar_hid     = data.parent_boar_hid
     
     if parent_boar_hid is not None:
         res = hashids_common.decrypt(parent_boar_hid)
@@ -312,15 +341,15 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
         
     
     
-    sow_boar_data.user_id       = user_id
-    sow_boar_data.pig_farm_id   = pig_farm_id
-    sow_boar_data.parent_sow_id = parent_sow_id
-    sow_boar_data.parent_boar_id= parent_boar_id
-    sow_boar_data.number        = number
-    sow_boar_data.name          = name
+    data.user_id       = user_id
+    data.pig_farm_id   = pig_farm_id
+    data.parent_sow_id = parent_sow_id
+    data.parent_boar_id= parent_boar_id
+    data.number        = number
+    data.name          = name
     
     
-    res_add    =  model['sow_boar'].add(sow_boar_data)
+    res_add    =  model['sow_boar'].add(data)
     
     if res_add is None:
         return {
@@ -351,8 +380,18 @@ async def sow_boar_add(sow_boar_data: dm.DataSowBoar):
     
 
 @app.post("/sow_boar/update", tags=["Sow Boar"])
-async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
-    uhid        = sow_boar_data.uhid
+async def sow_boar_update(request: Request, data: dm.DataSowBoar):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid        = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -376,7 +415,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
     
     
-    sow_boar_hid    = sow_boar_data.sow_boar_hid
+    sow_boar_hid    = data.sow_boar_hid
     res = hashids_common.decrypt(sow_boar_hid)
     if len(res) == 0:
         return {
@@ -391,7 +430,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
     
     parent_sow_id       = 0
-    parent_sow_hid      = sow_boar_data.parent_sow_hid
+    parent_sow_hid      = data.parent_sow_hid
     
     if parent_sow_hid is not None:
         res = hashids_common.decrypt(parent_sow_hid)
@@ -413,7 +452,7 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
         
     
     parent_boar_id      = 0
-    parent_boar_hid     = sow_boar_data.parent_boar_hid
+    parent_boar_hid     = data.parent_boar_hid
     
     if parent_boar_hid is not None:
         res = hashids_common.decrypt(parent_boar_hid)
@@ -436,14 +475,14 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
     
     
-    sow_boar_data.user_id       = user_id
-    sow_boar_data.sow_boar_id   = sow_boar_id
-    sow_boar_data.parent_sow_id = parent_sow_id
-    sow_boar_data.parent_boar_id= parent_boar_id
+    data.user_id       = user_id
+    data.sow_boar_id   = sow_boar_id
+    data.parent_sow_id = parent_sow_id
+    data.parent_boar_id= parent_boar_id
     
     
     
-    res_update  =  model['sow_boar'].update(sow_boar_data)
+    res_update  =  model['sow_boar'].update(data)
     
     if res_update is None:
         return {
@@ -471,8 +510,18 @@ async def sow_boar_update(sow_boar_data: dm.DataSowBoar):
     
 
 @app.post("/sow_boar/dispose", tags=["Sow Boar"])
-async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
-    uhid        = sow_boar_data.uhid
+async def sow_boar_dispose(request: Request, data: dm.DataSowBoarDispose):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid        = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -496,7 +545,7 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     
     
     
-    sow_boar_hid    = sow_boar_data.sow_boar_hid
+    sow_boar_hid    = data.sow_boar_hid
     res = hashids_common.decrypt(sow_boar_hid)
     if len(res) == 0:
         return {
@@ -509,10 +558,10 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
     sow_boar_id = res[0]
     
     
-    sow_boar_data.user_id       = user_id
-    sow_boar_data.sow_boar_id   = sow_boar_id
+    data.user_id       = user_id
+    data.sow_boar_id   = sow_boar_id
     
-    res_dispose     =  model['sow_boar'].dispose(sow_boar_data)
+    res_dispose     =  model['sow_boar'].dispose(data)
     
     if res_dispose is None:
         return {
@@ -545,7 +594,7 @@ async def sow_boar_dispose(sow_boar_data: dm.DataSowBoarDispose):
 
 
 @app.get("/sow/pt_list", response_class=PlainTextResponse, tags=["Sow Boar"])
-async def sow_pt_list(pfhid, full_info: int = 0):
+async def sow_pt_list(request: Request, pfhid, full_info: int = 0):
     """
     Will get sow list.
     
@@ -745,7 +794,17 @@ def replace_plain_ids_production_list(production_list):
 
 
 @app.get("/sow_boar/data_details", tags=["Sow Boar"])
-async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
+async def data_details(request: Request, sow_boar_hid, inc_user_audit:int = 0):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_common.decrypt(sow_boar_hid)
     if len(res) == 0:
         return {
@@ -758,7 +817,7 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     sow_boar_id = res[0]
     
     # Get quick sow_boar data
-    cur_sow_boar_data   = model['sow_boar'].get_entry(sow_boar_id)
+    cur_data   = model['sow_boar'].get_entry(sow_boar_id)
     
     
     data_pig_medvac     = get_data_pig_medvac(sow_boar_id, 0, 0, 0)
@@ -779,7 +838,7 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     data_output         = []
     data_gilt_ops       = []
     
-    if cur_sow_boar_data['sex'] == 'F':
+    if cur_data['sex'] == 'F':
         # This will return a list
         res_sow_production = model['pig_prod'].get_production_output(
                 sow_id = sow_boar_id)
@@ -795,7 +854,7 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
         # Gilt if sow_status = SOW_STATUS_GROWING
         # get Gilt pig_prod_pig_ops
         operation_type = PIG_OPERATION_TYPE_GILT
-        if cur_sow_boar_data['sow_status_id'] == SOW_STATUS_GROWING:
+        if cur_data['sow_status_id'] == SOW_STATUS_GROWING:
             res_gilt_ops = model['pig_prod_pig_ops'].get_list(operation_type, 
                 sow_boar_id = sow_boar_id,
                 inc_user_audit = 1, order_by = 0)
@@ -807,12 +866,12 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     
     
     data_mates_ext  = None
-    if cur_sow_boar_data['sex'] == 'M':
+    if cur_data['sex'] == 'M':
         data_mates_ext  = get_data_sow_boar_mate_list(sow_boar_id, is_external = 1)
     
     
     data = {
-        'sow_boar':             cur_sow_boar_data,
+        'sow_boar':             cur_data,
         'list_medvac':          data_pig_medvac,
         'list_health_issues':   data_health_issues,
         'list_notes':           data_notes,
@@ -820,12 +879,12 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
         'list_mates':           data_mates
     }
     
-    if cur_sow_boar_data['sex'] == 'M':
+    if cur_data['sex'] == 'M':
         data['list_mates_ext'] = data_mates_ext
     
     
-    if cur_sow_boar_data['sex'] == 'F':
-        if cur_sow_boar_data['sow_status_id'] == SOW_STATUS_GROWING:
+    if cur_data['sex'] == 'F':
+        if cur_data['sow_status_id'] == SOW_STATUS_GROWING:
             data['list_gilt_ops'] = data_gilt_ops
     
     
@@ -842,7 +901,7 @@ async def sow_boar_data_details(sow_boar_hid, inc_user_audit:int = 0):
     
 
 @app.get("/sow_boar/entry/{entry_hid}", tags=["Sow Boar"])
-async def sow_boar_entry(entry_hid:str):
+async def sow_boar_entry(request: Request, entry_hid:str):
     """
     Will get sow boar entry.
     
@@ -851,6 +910,14 @@ async def sow_boar_entry(entry_hid:str):
     sow_boar_hid:str
         sow_boar hid; 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_common.decrypt(entry_hid)
@@ -919,7 +986,7 @@ async def sow_boar_entry(entry_hid:str):
 
 
 @app.get("/sow_boar/list", tags=["Sow Boar"])
-async def sow_boar_list(pfhid:str, sex:str = None,
+async def sow_boar_list(request: Request, pfhid:str, sex:str = None,
         is_disposed: int = 0, inc_user_audit:int = 0, order_by:int = 0):
     """
     Will get sow boar list.
@@ -947,6 +1014,15 @@ async def sow_boar_list(pfhid:str, sex:str = None,
             1 = ORDER BY name ASC
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     
     res = hashids_common.decrypt(pfhid)
@@ -995,7 +1071,7 @@ async def sow_boar_list(pfhid:str, sex:str = None,
 
 
 @app.get("/sow/piglets_output", tags=["Sow Boar"])
-async def sow_production_output(sow_hid:str = None):
+async def sow_production_output(request: Request, sow_hid:str = None):
     """
     This will return number of piglets at weaning + currently lactating for a 
     given sow_hid.
@@ -1008,6 +1084,17 @@ async def sow_production_output(sow_hid:str = None):
    
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    
     sow_id      = 0
     
     if sow_hid is not None:
@@ -1053,7 +1140,7 @@ async def sow_production_output(sow_hid:str = None):
     
 
 @app.get("/pig_farm/piglets_output", tags=["Sow Boar"])
-async def sow_production_output(pfhid:str = None):
+async def sow_production_output(request: Request, pfhid:str = None):
     """
     Will get pig farm piglets output list.
     This will return number of piglets at weaning + currently lactating.
@@ -1118,7 +1205,8 @@ async def sow_production_output(pfhid:str = None):
 
     
 @app.get("/sow_boar/get_parent_trace", tags=["Sow Boar"])
-async def sow_boar_get_parent_trace(sow_hid:str = None, boar_hid: str = None, pfhid:str = None):
+async def sow_boar_get_parent_trace(request: Request, sow_hid:str = None, 
+        boar_hid: str = None, pfhid:str = None):
     """
     Will get sow and boar parent trace from their birth_pig_prod_id.
     
@@ -1145,6 +1233,15 @@ async def sow_boar_get_parent_trace(sow_hid:str = None, boar_hid: str = None, pf
     pfhid:str
         it is possible to parent trace all not disposed pigs in the farm 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     sow_id = 0
     
@@ -1299,7 +1396,7 @@ async def sow_boar_get_parent_trace(sow_hid:str = None, boar_hid: str = None, pf
     
 
 @app.get("/sow_boar/data_ver_num", tags=["Sow Boar"])
-async def sow_boar_data_ver_num(sow_boar_hid: str):
+async def data_ver_num(request: Request, sow_boar_hid: str):
     """
     Will get sow_boar data_ver_num.
     
@@ -1311,6 +1408,14 @@ async def sow_boar_data_ver_num(sow_boar_hid: str):
 
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_common.decrypt(sow_boar_hid)

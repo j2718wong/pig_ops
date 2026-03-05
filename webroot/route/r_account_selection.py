@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -30,8 +33,19 @@ from r_a0_security_checks   import check_if_valid_user_account
 from r_utils                import remove_database_null_description
 
 @app.post("/account/selection/add", tags=["Account"])
-async def account_selection_add(selection_data: dm.DataAccountSelection):
-    uhid    = selection_data.uhid
+async def account_selection_add(request: Request, data: dm.DataAccountSelection):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
+    
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -57,7 +71,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
     feed_supplier_id    = 0
     semen_supplier_id   = 0
     
-    feed_supplier_hid =  selection_data.feed_supplier_hid
+    feed_supplier_hid =  data.feed_supplier_hid
     if feed_supplier_hid is not None:
         res = hashids_common.decrypt(feed_supplier_hid)
         if len(res) == 0:
@@ -71,7 +85,7 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         feed_supplier_id = res[0]
     
 
-    semen_supplier_hid = selection_data.semen_supplier_hid
+    semen_supplier_hid = data.semen_supplier_hid
     if semen_supplier_hid is not None:
         res = hashids_common.decrypt(semen_supplier_hid)
         if len(res) == 0:
@@ -94,12 +108,12 @@ async def account_selection_add(selection_data: dm.DataAccountSelection):
         }
     
     
-    selection_data.user_id              = user_id
-    selection_data.feed_supplier_id     = feed_supplier_id
-    selection_data.semen_supplier_id    = semen_supplier_id
+    data.user_id              = user_id
+    data.feed_supplier_id     = feed_supplier_id
+    data.semen_supplier_id    = semen_supplier_id
     
         
-    res_add =  model['account_selection'].add(selection_data)
+    res_add =  model['account_selection'].add(data)
     
     if res_add is None:
         return {
@@ -160,8 +174,8 @@ def get_account_lookup_selection(account_id, sel_f_brand = 0,
     
  
 @app.get("/account/selection", tags=["Account"])
-async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int = 0,
-        sel_s_supplier: int = 0):
+async def account_selection(request: Request, ahid: str, sel_f_brand: int = 0, 
+        sel_f_supplier: int = 0, sel_s_supplier: int = 0):
     """
     Will get account_selection
 
@@ -172,6 +186,15 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
     
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:
@@ -202,8 +225,18 @@ async def account_selection(ahid: str, sel_f_brand: int = 0, sel_f_supplier: int
 
 
 @app.post("/account/selection/delete", tags=["Account"])
-async def account_selection_delete(selection_data: dm.DataAccountSelection):
-    uhid    = selection_data.uhid
+async def account_selection_delete(request: Request, data: dm.DataAccountSelection):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -221,7 +254,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
     feed_supplier_id    = None 
     semen_supplier_id   = None
     
-    feed_brand_hid = selection_data.feed_brand_hid
+    feed_brand_hid = data.feed_brand_hid
     if feed_brand_hid is not None:
         res = hashids_common.decrypt(feed_brand_hid)
         if len(res) == 0:
@@ -235,7 +268,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
         feed_brand_id = res[0]
     
     
-    feed_supplier_hid = selection_data.feed_supplier_hid
+    feed_supplier_hid = data.feed_supplier_hid
     if feed_supplier_hid is not None:
         res = hashids_common.decrypt(feed_supplier_hid)
         if len(res) == 0:
@@ -249,7 +282,7 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
         feed_supplier_id = res[0]
     
     
-    semen_supplier_hid = selection_data.semen_supplier_hid
+    semen_supplier_hid = data.semen_supplier_hid
     if semen_supplier_hid is not None:
         res = hashids_common.decrypt(semen_supplier_hid)
         if len(res) == 0:
@@ -264,12 +297,12 @@ async def account_selection_delete(selection_data: dm.DataAccountSelection):
     
     
      
-    selection_data.user_id              = user_id
-    selection_data.feed_brand_id        = feed_brand_id    
-    selection_data.feed_supplier_id     = feed_supplier_id  
-    selection_data.semen_supplier_id    = semen_supplier_id
+    data.user_id              = user_id
+    data.feed_brand_id        = feed_brand_id    
+    data.feed_supplier_id     = feed_supplier_id  
+    data.semen_supplier_id    = semen_supplier_id
     
-    res_delete = model['account_selection'].delete(selection_data)
+    res_delete = model['account_selection'].delete(data)
     
     
     if res_delete is None:

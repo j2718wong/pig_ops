@@ -10,8 +10,9 @@ import pprint
 import jwt
 
 from fastapi                import Request, HTTPException, status, Depends
-from pydantic               import BaseModel
 from fastapi.responses      import HTMLResponse, RedirectResponse
+from pydantic               import BaseModel
+
 
 from datetime               import datetime, timedelta
 
@@ -120,29 +121,16 @@ async def pig_farm_data(request: Request):
     """
     2026-03-05 Notes:
     
-    
     """
     
-    token = request.headers.get("authorization", "").replace("Bearer ", "")
-    if not token:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
     
     
-    uhid = None
-    
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        uhid = payload.get("uhid")
-        
-    except jwt.ExpiredSignatureError:
-        return RedirectResponse(url="/login", status_code=302)
-        
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    if uhid is None:
-        return RedirectResponse(url="/login", status_code=302)
-    
+    uhid = result
     
     
     time_init = time.time()

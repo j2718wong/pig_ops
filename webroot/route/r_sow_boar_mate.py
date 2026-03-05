@@ -5,8 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
-from fastapi.responses      import HTMLResponse
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -36,8 +38,18 @@ from r_utils                import remove_database_null_description
    
    
 @app.post("/boar_external_mate/add", tags=["Sow Boar"])
-async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
-    uhid        = sow_boar_mate_data.uhid
+async def boar_external_mate_add(request: Request, data: dm.DataBoarExternalMate):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid        = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -62,7 +74,7 @@ async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
     
     
     
-    sow_boar_hid       = sow_boar_mate_data.sow_boar_hid
+    sow_boar_hid       = data.sow_boar_hid
     
     res = hashids_common.decrypt(sow_boar_hid)
     if len(res) == 0:
@@ -81,7 +93,7 @@ async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
     sow_boar_id = res[0]
     
     
-    boar_customer_hid       = sow_boar_mate_data.boar_customer_hid
+    boar_customer_hid       = data.boar_customer_hid
     
     res = hashids_common.decrypt(boar_customer_hid)
     if len(res) == 0:
@@ -102,12 +114,12 @@ async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
     
     
     
-    sow_boar_mate_data.user_id          = user_id
-    sow_boar_mate_data.sow_boar_id      = sow_boar_id
-    sow_boar_mate_data.boar_customer_id = boar_customer_id
+    data.user_id          = user_id
+    data.sow_boar_id      = sow_boar_id
+    data.boar_customer_id = boar_customer_id
     
     
-    res_add    =  model['sow_boar_mate'].add_boar_external_mate(sow_boar_mate_data)
+    res_add    =  model['sow_boar_mate'].add_boar_external_mate(data)
     
     if res_add is None:
         return {
@@ -138,8 +150,18 @@ async def boar_external_mate_add(sow_boar_mate_data: dm.DataBoarExternalMate):
     
 
 @app.post("/boar_external_mate/update", tags=["Sow Boar"])
-async def boar_external_mate_update(sow_boar_mate_data: dm.DataBoarExternalMate):
-    uhid        = sow_boar_mate_data.uhid
+async def boar_external_mate_update(request: Request, data: dm.DataBoarExternalMate):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid        = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -163,7 +185,7 @@ async def boar_external_mate_update(sow_boar_mate_data: dm.DataBoarExternalMate)
     
     
     
-    sow_boar_mate_hid    = sow_boar_mate_data.sow_boar_mate_hid
+    sow_boar_mate_hid    = data.sow_boar_mate_hid
     res = hashids_common.decrypt(sow_boar_mate_hid)
     if len(res) == 0:
         return {
@@ -178,12 +200,12 @@ async def boar_external_mate_update(sow_boar_mate_data: dm.DataBoarExternalMate)
     
     
     
-    sow_boar_mate_data.user_id          = user_id
-    sow_boar_mate_data.sow_boar_mate_id = sow_boar_mate_id
+    data.user_id          = user_id
+    data.sow_boar_mate_id = sow_boar_mate_id
     
     
     
-    res_update  =  model['sow_boar_mate'].update_boar_external_mate(sow_boar_mate_data)
+    res_update  =  model['sow_boar_mate'].update_boar_external_mate(data)
     
     if res_update is None:
         return {
@@ -264,7 +286,7 @@ def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0):
 
 
 @app.get("/sow_boar_mate/list", tags=["Sow Boar"])
-async def sow_boar_mate_list(sow_boar_hid:str, is_external:int = 0):
+async def sow_boar_mate_list(request: Request, sow_boar_hid:str, is_external:int = 0):
     """
     Will get sow boar list.
     
@@ -281,6 +303,15 @@ async def sow_boar_mate_list(sow_boar_hid:str, is_external:int = 0):
         if == 0, will get farm owned sows mated by the boar
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     sow_boar_id = 0
     

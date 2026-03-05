@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -33,8 +36,18 @@ from r_utils                import (remove_database_null_description,
 
    
 @app.post("/feed_balance/add", tags=["Production Details"])
-async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
-    uhid    = feed_balance_data.uhid
+async def feed_balance_add(request: Request, data: dm.DataFeedBalance):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -59,7 +72,7 @@ async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
     
     
     
-    pig_farm_hid        = feed_balance_data.pig_farm_hid
+    pig_farm_hid        = data.pig_farm_hid
     pig_farm_id         = 0
     
     if pig_farm_hid is not None:
@@ -76,7 +89,7 @@ async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
     
     
     
-    pig_prod_hid        = feed_balance_data.pig_prod_hid
+    pig_prod_hid        = data.pig_prod_hid
     pig_prod_id         = 0
     
     if pig_prod_hid is not None:
@@ -92,7 +105,7 @@ async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
         pig_prod_id = res[0]
         
     
-    pig_prod_group_hid  = feed_balance_data.pig_prod_group_hid
+    pig_prod_group_hid  = data.pig_prod_group_hid
     pig_prod_group_id   = 0
     
     if pig_prod_group_hid is not None:
@@ -109,11 +122,11 @@ async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
     
 
     
-    feed_balance_data.user_id          = user_id
-    feed_balance_data.pig_prod_id      = pig_prod_id
-    feed_balance_data.pig_prod_group_id= pig_prod_group_id
+    data.user_id          = user_id
+    data.pig_prod_id      = pig_prod_id
+    data.pig_prod_group_id= pig_prod_group_id
     
-    res_add    =  model['feed_balance'].add(feed_balance_data)
+    res_add    =  model['feed_balance'].add(data)
     
     if res_add is None:
         return {
@@ -139,8 +152,18 @@ async def feed_balance_add(feed_balance_data: dm.DataFeedBalance):
     
 
 @app.post("/feed_balance/update", tags=["Production Details"])
-async def feed_balance_update(feed_balance_data: dm.DataFeedBalance):
-    uhid    = feed_balance_data.uhid
+async def feed_balance_update(request: Request, data: dm.DataFeedBalance):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -165,7 +188,7 @@ async def feed_balance_update(feed_balance_data: dm.DataFeedBalance):
     
     
     
-    pig_prod_hid        = feed_balance_data.pig_prod_hid
+    pig_prod_hid        = data.pig_prod_hid
     pig_prod_id         = 0
     
     if pig_prod_hid is not None:
@@ -181,11 +204,11 @@ async def feed_balance_update(feed_balance_data: dm.DataFeedBalance):
         pig_prod_id = res[0]
     
     
-    feed_balance_data.user_id           = user_id
-    feed_balance_data.pig_prod_id       = pig_prod_id
+    data.user_id           = user_id
+    data.pig_prod_id       = pig_prod_id
    
     
-    res_update    =  model['feed_balance'].update(feed_balance_data)
+    res_update    =  model['feed_balance'].update(data)
     
     if res_update is None:
         return {
@@ -264,7 +287,7 @@ def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0,
     
     
 @app.get("/feed_balance/list", tags=["Production Details"])
-async def feed_balance_list(pig_prod_hid: str = None, pig_farm_hid = None, 
+async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_farm_hid = None, 
     date_since = None, inc_user_audit:int = 0):
     """
     Will get feed_balance list.
@@ -286,6 +309,14 @@ async def feed_balance_list(pig_prod_hid: str = None, pig_farm_hid = None,
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     pig_prod_id = 0

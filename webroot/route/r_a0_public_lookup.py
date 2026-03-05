@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -19,17 +22,24 @@ import data_model           as dm
 
    
 @app.get("/lookup/feed_type/list", tags=["Common Lookup"])
-async def lookup_feed_type_list():
+async def lookup_feed_type_list(request: Request):
     """
     Will get feed_type list.
     
     Parameters
     ----------
-    
-   
     """
     
-        
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = model['public_lookup'].get_list_feed_type()
     
     if res is None:
@@ -62,7 +72,7 @@ async def lookup_feed_type_list():
     
    
 @app.get("/lookup/harvest_type/list", tags=["Common Lookup"])
-async def lookup_harvest_type_list():
+async def lookup_harvest_type_list(request: Request):
     """
     Will get harvest_type list.
     
@@ -72,7 +82,17 @@ async def lookup_harvest_type_list():
    
     """
     
-        
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    
     res = model['public_lookup'].get_list_harvest_type()
     
     if res is None:

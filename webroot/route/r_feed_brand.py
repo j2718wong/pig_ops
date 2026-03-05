@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,9 +35,19 @@ from r_utils                import remove_database_null_description
 
     
 @app.post("/feed_brand/add", tags=["Common Lookup"])
-async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
-    name    = feed_brand_data.name
-    uhid    = feed_brand_data.uhid
+async def feed_brand_add(request: Request, data: dm.DataFeedBrand):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -71,10 +84,10 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
     
     
     
-    feed_brand_data.name      = name
-    feed_brand_data.user_id   = user_id
+    data.name      = name
+    data.user_id   = user_id
     
-    res_add    =  model['feed_brand'].add(feed_brand_data)
+    res_add    =  model['feed_brand'].add(data)
     
     if res_add is None:
         return {
@@ -101,7 +114,7 @@ async def feed_brand_add(feed_brand_data: dm.DataFeedBrand):
 
    
 @app.get("/feed_brand/list", tags=["Common Lookup"])
-async def feed_brand_list(country_id: int = 1, inc_deleted: int = 0, 
+async def feed_brand_list(request: Request, country_id: int = 1, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
     Will get feed_brand list.

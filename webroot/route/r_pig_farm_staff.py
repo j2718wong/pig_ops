@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,13 +35,23 @@ from r_utils                import remove_database_null_description
    
    
 @app.post("/pig_farm_staff/add", tags=["Pig Farm"])
-async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
-    name    = pig_farm_staff_data.name
-    uhid    = pig_farm_staff_data.uhid
+async def pig_farm_staff(request: Request, data: dm.DataPigFarmStaff):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
-    if pig_farm_staff_data.set_user_as_staff == 0:
+    if data.set_user_as_staff == 0:
         if name is None or len(name) == 0:
             return {
                 'result':{
@@ -60,7 +73,7 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     user_id = res[0]
     
     
-    pig_farm_hid = pig_farm_staff_data.pig_farm_hid
+    pig_farm_hid = data.pig_farm_hid
     
     res = hashids_common.decrypt(pig_farm_hid)
     if len(res) == 0:
@@ -85,11 +98,11 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     
     
 
-    pig_farm_staff_data.name            = name
-    pig_farm_staff_data.user_id         = user_id
-    pig_farm_staff_data.pig_farm_id     = pig_farm_id
+    data.name            = name
+    data.user_id         = user_id
+    data.pig_farm_id     = pig_farm_id
   
-    res_add    =  model['pig_farm_staff'].add(pig_farm_staff_data)
+    res_add    =  model['pig_farm_staff'].add(data)
     
     if res_add is None:
         return {
@@ -115,9 +128,19 @@ async def pig_farm_staff(pig_farm_staff_data: dm.DataPigFarmStaff):
     
 
 @app.post("/pig_farm_staff/update", tags=["Pig Farm"])
-async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
-    name    = pig_farm_staff_data.name
-    uhid    = pig_farm_staff_data.uhid
+async def pig_farm_staff_update(request: Request, data: dm.DataPigFarmStaff):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -153,7 +176,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
 
     
     
-    pig_farm_hid = pig_farm_staff_data.pig_farm_hid
+    pig_farm_hid = data.pig_farm_hid
     
     res = hashids_common.decrypt(pig_farm_hid)
     if len(res) == 0:
@@ -167,7 +190,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     pig_farm_id = res[0]
     
     
-    pig_farm_staff_hid = pig_farm_staff_data.pig_farm_staff_hid
+    pig_farm_staff_hid = data.pig_farm_staff_hid
     
     res = hashids_common.decrypt(pig_farm_staff_hid)
     if len(res) == 0:
@@ -181,7 +204,7 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     pig_farm_staff_id = res[0]
     
     
-    staff_user_hid  = pig_farm_staff_data.staff_user_hid
+    staff_user_hid  = data.staff_user_hid
     staff_user_id   = 0
     
     if staff_user_hid is not None:
@@ -198,13 +221,13 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     
     
 
-    pig_farm_staff_data.name                = name
-    pig_farm_staff_data.user_id             = user_id
-    pig_farm_staff_data.pig_farm_id         = pig_farm_id
-    pig_farm_staff_data.pig_farm_staff_id   = pig_farm_staff_id
-    pig_farm_staff_data.staff_user_id       = staff_user_id
+    data.name                = name
+    data.user_id             = user_id
+    data.pig_farm_id         = pig_farm_id
+    data.pig_farm_staff_id   = pig_farm_staff_id
+    data.staff_user_id       = staff_user_id
     
-    res_update    =  model['pig_farm_staff'].update(pig_farm_staff_data)
+    res_update    =  model['pig_farm_staff'].update(data)
     
     if res_update is None:
         return {
@@ -227,7 +250,17 @@ async def pig_farm_staff_update(pig_farm_staff_data: dm.DataPigFarmStaff):
     
 
 @app.get("/pig_farm_staff/delete", tags=["Pig Farm"])
-async def pig_farm_staff_delete(uhid:str, ehid: str):
+async def pig_farm_staff_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -282,7 +315,9 @@ async def pig_farm_staff_delete(uhid:str, ehid: str):
     
     
 @app.get("/pig_farm_staff/list", tags=["Pig Farm"])
-async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_farm_staff_list(request: Request, pfhid: str, 
+    inc_deleted: int = 0, inc_user_audit:int = 0):
+    
     """
     Will get pig_farm_staff list.
     
@@ -299,6 +334,15 @@ async def pig_farm_staff_list(pfhid: str, inc_deleted: int = 0, inc_user_audit:i
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     
     res = hashids_common.decrypt(pfhid)

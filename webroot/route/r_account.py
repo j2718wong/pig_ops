@@ -5,6 +5,11 @@ import os
 import sys
 import pprint
 
+
+import jwt
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
 from pydantic               import BaseModel
 
 from datetime               import datetime, timedelta
@@ -41,7 +46,7 @@ ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
     
 
 @app.get("/account/info", tags=["Account"])
-async def user_account_info(ahid: str):
+async def user_account_info(request: Request, ahid: str):
     """
     Will get account info
 
@@ -52,6 +57,17 @@ async def user_account_info(ahid: str):
     
     
     """
+    
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:
@@ -96,10 +112,21 @@ async def user_account_info(ahid: str):
 
 
 @app.post("/account/register", tags=["Account"])
-async def account_register(account_data: dm.DataAccount):
-    name    = account_data.name
-    uhid    = account_data.uhid
+async def account_register(request: Request, account_data: dm.DataAccount):
     
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    
+    
+    name    = account_data.name
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
@@ -184,10 +211,20 @@ async def account_register(account_data: dm.DataAccount):
     
     
 @app.post("/account/update", tags=["Account"])
-async def account_update(account_data: dm.DataAccount):
-    name    = account_data.name
-    uhid    = account_data.uhid
+async def account_update(request: Request, account_data: dm.DataAccount):
     
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    
+    name    = account_data.name
     name    = name.strip() if name else None 
     
     if name is None or len(name) == 0:
@@ -252,8 +289,16 @@ async def account_update(account_data: dm.DataAccount):
     
     
 @app.post("/account/update_settings", tags=["Account"])
-async def account_update_settings(account_settings_data: dm.DataAccountSettings):
-    uhid    = account_settings_data.uhid
+async def account_update_settings(request: Request, data: dm.DataAccountSettings):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -267,9 +312,9 @@ async def account_update_settings(account_settings_data: dm.DataAccountSettings)
     
     user_id = res[0]
     
-    account_settings_data.user_id    = user_id
+    data.user_id    = user_id
         
-    res_update      =  model['account'].update_settings(account_settings_data)
+    res_update      =  model['account'].update_settings(data)
     
     if res_update is None:
         return {

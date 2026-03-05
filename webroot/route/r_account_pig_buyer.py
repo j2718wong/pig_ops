@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -33,9 +36,19 @@ from r_utils                import remove_database_null_description
 
     
 @app.post("/account_pig_buyer/add", tags=["Account"])
-async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
-    name    = account_pig_buyer_data.name
-    uhid    = account_pig_buyer_data.uhid
+async def account_pig_buyer_add(request: Request, data: dm.DataAccountPigBuyer):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    # uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -87,7 +100,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     level_3_id  = 0
     
     
-    level_1_hid = account_pig_buyer_data.level_1_hid
+    level_1_hid = data.level_1_hid
     
     if level_1_hid is not None:
         res = hashids_common.decrypt(level_1_hid)
@@ -102,7 +115,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         level_1_id = res[0]
     
     
-    level_2_hid = account_pig_buyer_data.level_2_hid
+    level_2_hid = data.level_2_hid
     
     if level_2_hid is not None:
         res = hashids_common.decrypt(level_2_hid)
@@ -117,7 +130,7 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
         level_2_id = res[0]
     
     
-    level_3_hid = account_pig_buyer_data.level_3_hid
+    level_3_hid = data.level_3_hid
     
     if level_3_hid is not None:
         res = hashids_common.decrypt(level_3_hid)
@@ -133,14 +146,14 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     
 
     
-    account_pig_buyer_data.name         = name
-    account_pig_buyer_data.user_id      = user_id
-    account_pig_buyer_data.level_1_id   = level_1_id
-    account_pig_buyer_data.level_2_id   = level_2_id
-    account_pig_buyer_data.level_3_id   = level_3_id
+    data.name         = name
+    data.user_id      = user_id
+    data.level_1_id   = level_1_id
+    data.level_2_id   = level_2_id
+    data.level_3_id   = level_3_id
     
     
-    res_add    =  model['account_pig_buyer'].add(account_pig_buyer_data)
+    res_add    =  model['account_pig_buyer'].add(data)
     
     if res_add is None:
         return {
@@ -167,9 +180,19 @@ async def account_pig_buyer_add(account_pig_buyer_data: dm.DataAccountPigBuyer):
     
 
 @app.post("/account_pig_buyer/update", tags=["Account"])
-async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuyer):
-    name    = account_pig_buyer_data.name
-    uhid    = account_pig_buyer_data.uhid
+async def account_pig_buyer_update(request: Request, data: dm.DataAccountPigBuyer):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -205,7 +228,7 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
     
     
     
-    account_pig_buyer_hid = account_pig_buyer_data.account_pig_buyer_hid
+    account_pig_buyer_hid = data.account_pig_buyer_hid
     res = hashids_common.decrypt(account_pig_buyer_hid)
     if len(res) == 0:
         return {
@@ -218,11 +241,11 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
     account_pig_buyer_id = res[0]
     
     
-    account_pig_buyer_data.name      = name
-    account_pig_buyer_data.user_id   = user_id
-    account_pig_buyer_data.account_pig_buyer_id = account_pig_buyer_id
+    data.name      = name
+    data.user_id   = user_id
+    data.account_pig_buyer_id = account_pig_buyer_id
     
-    res_update    =  model['account_pig_buyer'].update(account_pig_buyer_data)
+    res_update    =  model['account_pig_buyer'].update(data)
     
     if res_update is None:
         return {
@@ -241,7 +264,17 @@ async def account_pig_buyer_update(account_pig_buyer_data: dm.DataAccountPigBuye
     
 
 @app.get("/account_pig_buyer/delete", tags=["Account"])
-async def account_pig_buyer_delete(uhid:str, ehid: str):
+async def account_pig_buyer_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -302,7 +335,7 @@ async def account_pig_buyer_delete(uhid:str, ehid: str):
     
 
 @app.get("/account_pig_buyer/list", tags=["Account"])
-async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0, 
+async def account_pig_buyer_list(request: Request, ahid: str, inc_deleted: int = 0, 
         inc_user_audit:int = 0):
     """
     Will get account_pig_buyer list.
@@ -320,6 +353,15 @@ async def account_pig_buyer_list(ahid: str, inc_deleted: int = 0,
         if > 0, will include added_by and last_update info
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_account.decrypt(ahid)
     if len(res) == 0:

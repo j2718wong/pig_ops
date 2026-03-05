@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -33,9 +36,18 @@ from r_pig_farm_feed_buy    import replace_plain_ids_feed_item
 
    
 @app.post("/pig_prod_feed/add", tags=["Production Details"])
-async def pig_prod_feed_add(pig_prod_feed_data: dm.DataPigProdFeed):
-    uhid    = pig_prod_feed_data.uhid
+async def pig_prod_feed_add(request: Request, data: dm.DataPigProdFeed):
+    result = get_uhid_or_redirect(request)
     
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     
     res = hashids_user.decrypt(uhid)
@@ -62,7 +74,7 @@ async def pig_prod_feed_add(pig_prod_feed_data: dm.DataPigProdFeed):
     
     
     
-    pig_prod_hid    = pig_prod_feed_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
 
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -76,7 +88,7 @@ async def pig_prod_feed_add(pig_prod_feed_data: dm.DataPigProdFeed):
     pig_prod_id = res[0]
     
     
-    pig_farm_feed_buy_hid    = pig_prod_feed_data.pig_farm_feed_buy_hid
+    pig_farm_feed_buy_hid    = data.pig_farm_feed_buy_hid
     
     res = hashids_common.decrypt(pig_farm_feed_buy_hid)
     if len(res) == 0:
@@ -92,11 +104,11 @@ async def pig_prod_feed_add(pig_prod_feed_data: dm.DataPigProdFeed):
    
 
    
-    pig_prod_feed_data.user_id              = user_id
-    pig_prod_feed_data.pig_prod_id          = pig_prod_id
-    pig_prod_feed_data.pig_farm_feed_buy_id = pig_farm_feed_buy_id
+    data.user_id              = user_id
+    data.pig_prod_id          = pig_prod_id
+    data.pig_farm_feed_buy_id = pig_farm_feed_buy_id
     
-    res_add    =  model['pig_prod_feed'].add(pig_prod_feed_data)
+    res_add    =  model['pig_prod_feed'].add(data)
     
     if res_add is None:
         return {
@@ -123,8 +135,18 @@ async def pig_prod_feed_add(pig_prod_feed_data: dm.DataPigProdFeed):
     
 
 @app.post("/pig_prod_feed/update", tags=["Production Details"])
-async def pig_prod_feed_update(pig_prod_feed_data: dm.DataPigProdFeed):
-    uhid    = pig_prod_feed_data.uhid
+async def pig_prod_feed_update(request: Request, data: dm.DataPigProdFeed):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
 
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -138,7 +160,7 @@ async def pig_prod_feed_update(pig_prod_feed_data: dm.DataPigProdFeed):
     user_id = res[0]
     
     
-    pig_prod_feed_hid = pig_prod_feed_data.pig_prod_feed_hid
+    pig_prod_feed_hid = data.pig_prod_feed_hid
     
     res = hashids_common.decrypt(pig_prod_feed_hid)
     if len(res) == 0:
@@ -153,33 +175,33 @@ async def pig_prod_feed_update(pig_prod_feed_data: dm.DataPigProdFeed):
     pig_prod_feed_id = res[0]
     
     
-    pig_prod_feed_data.user_id   = user_id
-    pig_prod_feed_data.pig_prod_feed_id = pig_prod_feed_id
+    data.user_id   = user_id
+    data.pig_prod_feed_id = pig_prod_feed_id
     
     
-    if pig_prod_feed_data.num_gesta is None:
-        pig_prod_feed_data.num_gesta = 0
+    if data.num_gesta is None:
+        data.num_gesta = 0
     
-    if pig_prod_feed_data.num_lacta is None:
-        pig_prod_feed_data.num_lacta = 0
+    if data.num_lacta is None:
+        data.num_lacta = 0
     
-    if pig_prod_feed_data.num_booster is None:
-        pig_prod_feed_data.num_booster = 0
+    if data.num_booster is None:
+        data.num_booster = 0
     
-    if pig_prod_feed_data.num_prestarter is None:
-        pig_prod_feed_data.num_prestarter = 0
+    if data.num_prestarter is None:
+        data.num_prestarter = 0
     
-    if pig_prod_feed_data.num_starter is None:
-        pig_prod_feed_data.num_starter = 0
+    if data.num_starter is None:
+        data.num_starter = 0
     
-    if pig_prod_feed_data.num_grower is None:
-        pig_prod_feed_data.num_grower = 0
+    if data.num_grower is None:
+        data.num_grower = 0
     
-    if pig_prod_feed_data.num_finisher is None:
-        pig_prod_feed_data.num_finisher = 0
+    if data.num_finisher is None:
+        data.num_finisher = 0
     
     
-    res_update    =  model['pig_prod_feed'].update(pig_prod_feed_data)
+    res_update    =  model['pig_prod_feed'].update(data)
     
     if res_update is None:
         return {
@@ -203,7 +225,17 @@ async def pig_prod_feed_update(pig_prod_feed_data: dm.DataPigProdFeed):
     
 
 @app.get("/pig_prod_feed/delete", tags=["Production Details"])
-async def pig_prod_feed_delete(uhid:str, ehid: str):
+async def pig_prod_feed_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -302,7 +334,7 @@ def get_data_pig_prod_feed(pig_prod_id):
     
     
 @app.get("/pig_prod_feed/list", tags=["Production Details"])
-async def pig_prod_feed_list(pig_prod_hid: str = None):
+async def pig_prod_feed_list(request: Request, pig_prod_hid: str = None):
     """
     Will get pig_prod_feed list.
     
@@ -314,6 +346,15 @@ async def pig_prod_feed_list(pig_prod_hid: str = None):
 
    
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     pig_prod_id     = 0
 

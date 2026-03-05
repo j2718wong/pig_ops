@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -33,10 +36,20 @@ from r_utils                import remove_database_null_description
 
    
 @app.post("/pig_prod_notes/add", tags=["Production Details"])
-async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
-    uhid    = pig_prod_notes_data.uhid
+async def pig_prod_notes_add(request: Request, data: dm.DataPigProdNotes):
+    result = get_uhid_or_redirect(request)
     
-    if pig_prod_notes_data.date_notes is None:
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
+    
+    if data.date_notes is None:
         dt_now          = datetime.now()
         dt_now_s        = dt_now.strftime('%Y-%m-%d')
     
@@ -66,7 +79,7 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     pig_prod_id     = 0
     sow_boar_id     = 0
     
-    pig_prod_hid    = pig_prod_notes_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     if pig_prod_hid is not None:
         res = hashids_common.decrypt(pig_prod_hid)
@@ -82,7 +95,7 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
         pig_prod_id = res[0]
     
     
-    sow_boar_hid    = pig_prod_notes_data.sow_boar_hid
+    sow_boar_hid    = data.sow_boar_hid
     
     if sow_boar_hid is not None:
         res = hashids_common.decrypt(sow_boar_hid)
@@ -106,11 +119,11 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
             }
         }
     
-    pig_prod_notes_data.user_id     = user_id
-    pig_prod_notes_data.pig_prod_id = pig_prod_id
-    pig_prod_notes_data.sow_boar_id = sow_boar_id
+    data.user_id     = user_id
+    data.pig_prod_id = pig_prod_id
+    data.sow_boar_id = sow_boar_id
     
-    res_add    =  model['prod_notes'].add(pig_prod_notes_data)
+    res_add    =  model['prod_notes'].add(data)
     
     if res_add is None:
         return {
@@ -137,8 +150,18 @@ async def pig_prod_notes_add(pig_prod_notes_data: dm.DataPigProdNotes):
     
 
 @app.post("/pig_prod_notes/update", tags=["Production Details"])
-async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
-    uhid    = pig_prod_notes_data.uhid
+async def pig_prod_notes_update(request: Request, data: dm.DataPigProdNotes):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
 
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -163,7 +186,7 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     
     
     
-    pig_prod_notes_hid = pig_prod_notes_data.pig_prod_notes_hid
+    pig_prod_notes_hid = data.pig_prod_notes_hid
     
     res = hashids_common.decrypt(pig_prod_notes_hid)
     if len(res) == 0:
@@ -178,10 +201,10 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     pig_prod_notes_id = res[0]
     
     
-    pig_prod_notes_data.user_id   = user_id
-    pig_prod_notes_data.pig_prod_notes_id = pig_prod_notes_id
+    data.user_id   = user_id
+    data.pig_prod_notes_id = pig_prod_notes_id
     
-    res_update    =  model['prod_notes'].update(pig_prod_notes_data)
+    res_update    =  model['prod_notes'].update(data)
     
     if res_update is None:
         return {
@@ -205,7 +228,17 @@ async def pig_prod_notes_update(pig_prod_notes_data: dm.DataPigProdNotes):
     
 
 @app.get("/pig_prod_notes/delete", tags=["Production Details"])
-async def pig_prod_notes_delete(uhid:str, ehid: str):
+async def pig_prod_notes_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -303,8 +336,10 @@ def get_data_pig_prod_notes(pig_prod_id, sow_boar_id, prod_group_id,
     
     
 @app.get("/pig_prod_notes/list", tags=["Production Details"])
-async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None,
-    prod_group_hid = None, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_prod_notes_list(request: Request, pig_prod_hid: str = None, 
+        sow_boar_hid: str = None, prod_group_hid = None, 
+        inc_deleted: int = 0, inc_user_audit:int = 0):
+    
     """
     Will get pig_prod_notes list.
     
@@ -321,6 +356,15 @@ async def pig_prod_notes_list(pig_prod_hid: str = None, sow_boar_hid: str = None
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     pig_prod_id     = 0
     sow_boar_id     = 0

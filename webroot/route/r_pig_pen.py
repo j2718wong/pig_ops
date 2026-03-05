@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -19,9 +22,19 @@ import data_model           as dm
 
    
 @app.post("/pig_pen/add")
-async def pig_pen_add(pig_pen_data: dm.DataPigPen):
-    name    = pig_pen_data.name
-    uhid    = pig_pen_data.uhid
+async def pig_pen_add(request: Request, data: dm.DataPigPen):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -48,10 +61,10 @@ async def pig_pen_add(pig_pen_data: dm.DataPigPen):
     user_id = res[0]
     
     
-    pig_pen_data.name      = name
-    pig_pen_data.user_id   = user_id
+    data.name      = name
+    data.user_id   = user_id
     
-    res_add    =  model['pig_pen'].add(pig_pen_data)
+    res_add    =  model['pig_pen'].add(data)
     
     if res_add is None:
         return {
@@ -75,9 +88,19 @@ async def pig_pen_add(pig_pen_data: dm.DataPigPen):
     
 
 @app.post("/pig_pen/update")
-async def pig_pen_update(pig_pen_data: dm.DataPigPen):
-    name    = pig_pen_data.name
-    uhid    = pig_pen_data.uhid
+async def pig_pen_update(request: Request, data: dm.DataPigPen):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -104,7 +127,7 @@ async def pig_pen_update(pig_pen_data: dm.DataPigPen):
     user_id = res[0]
     
     
-    pig_pen_hid = pig_pen_data.pig_pen_hid
+    pig_pen_hid = data.pig_pen_hid
     
     
     res = hashids_common.decrypt(pig_pen_hid)
@@ -121,11 +144,11 @@ async def pig_pen_update(pig_pen_data: dm.DataPigPen):
     pig_pen_id = res[0]
     
     
-    pig_pen_data.name      = name
-    pig_pen_data.user_id   = user_id
-    pig_pen_data.pig_pen_id = pig_pen_id
+    data.name      = name
+    data.user_id   = user_id
+    data.pig_pen_id = pig_pen_id
     
-    res_update    =  model['pig_pen'].update(pig_pen_data)
+    res_update    =  model['pig_pen'].update(data)
     
     if res_update is None:
         return {
@@ -145,7 +168,17 @@ async def pig_pen_update(pig_pen_data: dm.DataPigPen):
     
 
 @app.get("/pig_pen/delete")
-async def pig_pen_delete(uhid:str, ehid: str):
+async def pig_pen_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -199,7 +232,8 @@ async def pig_pen_delete(uhid:str, ehid: str):
     
     
 @app.get("/pig_pen/list")
-async def pig_pen_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_pen_list(request: Request, ahid: str, inc_deleted: int = 0, 
+        inc_user_audit:int = 0):
     """
     Will get pig_pen list.
     
@@ -216,6 +250,15 @@ async def pig_pen_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     
     res = hashids_account.decrypt(ahid)

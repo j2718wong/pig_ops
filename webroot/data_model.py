@@ -6,6 +6,12 @@ from pydantic               import BaseModel
 
 COUNTRY_ID_PHILIPPINES      = 1
 
+class GoogleToken(BaseModel):
+    token:                  str
+    viewport_width:         int = None
+    viewport_height:        int = None
+    
+
 
 class HasAddressLevel:
     level_1_hid:            str = None
@@ -46,14 +52,14 @@ class DataUser(BaseModel):
 
 
 class DataAccount(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     user_id:                int = 0
     name:                   str
     country_id:             int = COUNTRY_ID_PHILIPPINES
     
 
 class DataAccountSettings(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     user_id:                int = 0
     
     day_1_on_date_insem:    int = 0
@@ -67,7 +73,7 @@ class DataAccountSettings(BaseModel):
 
 
 class DataAccountSelection(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     feed_brand_hid:         str = None
     feed_supplier_hid:      str = None
@@ -80,7 +86,7 @@ class DataAccountSelection(BaseModel):
     
 
 class DataPigFarm(BaseModel, HasAddressLevel):
-    uhid:                   str
+    uhid:                   str = None
     pig_farm_hid:           str = None
         
         
@@ -92,7 +98,7 @@ class DataPigFarm(BaseModel, HasAddressLevel):
 
 
 class DataPigFarmFeedBuy(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     pig_farm_hid:           str = None
     feed_supplier_hid:      str = None
     pf_feed_buy_hid:        str = None
@@ -111,7 +117,7 @@ class DataPigFarmFeedBuy(BaseModel):
     
 
 class DataPigFarmFeedBuyItem(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_farm_feed_buy_hid:  str = None
     
@@ -142,7 +148,7 @@ class DataPigFarmFeedBuyItem(BaseModel):
 
 
 class DataAccountPigOps(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     account_pig_ops_hid:    str = None
     
     
@@ -160,7 +166,7 @@ class DataAccountPigOps(BaseModel):
     
     
 class DataAccountMedVac(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     account_medvac_hid:     str = None
     medvac_brand_hid:       str = None
     medvac_type_hid:        str = None
@@ -176,7 +182,7 @@ class DataAccountMedVac(BaseModel):
     
     
 class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
-    uhid:                   str
+    uhid:                   str = None
     account_pig_buyer_hid:  str = None
         
         
@@ -192,7 +198,7 @@ class DataAccountPigBuyer(BaseModel, HasAddressLevel, HasContactDetails):
     
     
 class DataPigFarmStaff(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_farm_hid:           str
     pig_farm_staff_hid:     str = None
@@ -210,7 +216,7 @@ class DataPigFarmStaff(BaseModel):
 
     
 class DataSowBoar(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     pfhid:                  str = None
     sow_boar_hid:           str = None
     parent_sow_hid:         str = None
@@ -241,7 +247,7 @@ class DataSowBoar(BaseModel):
 
 
 class DataBoarExternalMate(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     sow_boar_hid:           str = None
     sow_boar_mate_hid:      str = None
     boar_customer_hid:      str = None
@@ -260,7 +266,7 @@ class DataBoarExternalMate(BaseModel):
     
     
 class DataSowBoarDispose(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     sow_boar_hid:           str
         
         
@@ -274,7 +280,7 @@ class DataSowBoarDispose(BaseModel):
     
     
 class DataPigRaceLine(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     pig_race_line_hid:      str = None
         
         
@@ -288,7 +294,7 @@ class DataPigRaceLine(BaseModel):
     
 
 class DataPigPen(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     pig_pen_hid:            str = None
         
         
@@ -301,7 +307,7 @@ class DataPigPen(BaseModel):
 
 
 class DataPublicReport(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     supplier_hid:           str = None
         
         
@@ -313,7 +319,7 @@ class DataPublicReport(BaseModel):
 
 
 class DataCommonSupplier(BaseModel, HasAddressLevel, HasContactDetails):
-    uhid:                   str
+    uhid:                   str = None
     supplier_hid:           str = None
         
         
@@ -329,7 +335,7 @@ class DataCommonSupplier(BaseModel, HasAddressLevel, HasContactDetails):
 
 
 class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):
-    uhid:                   str
+    uhid:                   str = None
     semen_supplier_hid:     str = None
         
         
@@ -341,7 +347,7 @@ class DataSemenSupplier(BaseModel, HasAddressLevel, HasContactDetails):
 
 
 class DataSemenSupplierSemen(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     semen_supplier_hid:     str = None
     semen_sup_semen_hid:    str = None
     
@@ -355,7 +361,7 @@ class DataSemenSupplierSemen(BaseModel):
 
 
 class DataFeedBrand(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     feed_brand_hid:         str = None
         
         
@@ -368,7 +374,7 @@ class DataFeedBrand(BaseModel):
 
 
 class DataFeedSupplier(BaseModel, HasAddressLevel, HasContactDetails):
-    uhid:                   str
+    uhid:                   str = None
     feed_supplier_hid:      str = None
         
         
@@ -380,7 +386,7 @@ class DataFeedSupplier(BaseModel, HasAddressLevel, HasContactDetails):
 
 
 class DataFeedStartDate(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_prod_hid:           str = None
     pig_prod_group_hid:     str = None
@@ -396,7 +402,7 @@ class DataFeedStartDate(BaseModel):
     
 
 class DataFeedBuy(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_farm_hid:           str = None
     pig_prod_hid:           str = None
@@ -427,7 +433,7 @@ class DataFeedBuy(BaseModel):
     
 
 class DataSemenSource(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     semen_source_hid:       str = None
     pfhid:                  str = None
@@ -451,7 +457,7 @@ class DataSemenSource(BaseModel):
     
     
 class DataPigProd(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_hid:           str = None
     sow_hid:                str = None
@@ -485,7 +491,7 @@ class DataPigProd(BaseModel):
     
     
 class DataPigProdAI(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_ai_hid:        str = None
     pig_prod_hid:           str = None
@@ -501,7 +507,7 @@ class DataPigProdAI(BaseModel):
     
 
 class DataPigProdBirth(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_hid:           str
     birth_staff_hid:        str = None
@@ -519,7 +525,7 @@ class DataPigProdBirth(BaseModel):
     
     
 class DataPigProdWeaning(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_hid:           str
         
@@ -538,7 +544,7 @@ class DataPigProdWeaning(BaseModel):
     
     
 class DataPigProdStatus(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_hid:           str
     prod_status_hid:        str
@@ -551,7 +557,7 @@ class DataPigProdStatus(BaseModel):
     
     
 class DataPigProdFattening(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_farm_hid:           str = None
     
@@ -565,7 +571,7 @@ class DataPigProdFattening(BaseModel):
     
     
 class DataPigProdDeadPig(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_prod_hid:           str = None
     pig_prod_group_hid:     str = None
@@ -584,7 +590,7 @@ class DataPigProdDeadPig(BaseModel):
     
     
 class DataPigProdNotes(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_hid:           str = None
     sow_boar_hid:           str = None
@@ -602,7 +608,7 @@ class DataPigProdNotes(BaseModel):
 
 
 class DataPigProdFeed(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_feed_hid:      str = None
     pig_prod_hid:           str = None
@@ -630,7 +636,7 @@ class DataPigProdFeed(BaseModel):
 
 
 class DataMedVacBrand(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     medvac_brand_hid:       str = None
     country_hid:            str = None
         
@@ -643,7 +649,7 @@ class DataMedVacBrand(BaseModel):
 
 
 class DataMedVacType(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     medvac_type_hid:        str = None
         
     user_id:                int = 0
@@ -657,7 +663,7 @@ class DataMedVacType(BaseModel):
 
 
 class DataPigMedvac(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     pig_medvac_hid:         str = None
         
     sow_boar_hid:           str = None
@@ -694,7 +700,7 @@ class DataPigMedvac(BaseModel):
 
 
 class DataPigProdPigCount(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
         
     pig_prod_hid:           str = None
         
@@ -707,7 +713,7 @@ class DataPigProdPigCount(BaseModel):
 
     
 class DataPigProdPigOps(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_prod_pig_ops_hid:   str = None
     staff_hid:              str = None
@@ -733,7 +739,7 @@ class DataPigProdPigOps(BaseModel):
     
  
 class DataFeedBalance(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_farm_hid:           str = None
     pig_prod_hid:           str = None
@@ -762,7 +768,7 @@ class DataFeedBalance(BaseModel):
     
     
 class DataProductionHarvest(BaseModel):
-    uhid:                   str
+    uhid:                   str = None
     
     pig_prod_hid:           str = None
     production_group_hid:   str = None

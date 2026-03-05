@@ -9,9 +9,10 @@ import json
 import httpx
 
 
-from fastapi                import Request, HTTPException, status
-from fastapi.responses      import RedirectResponse
-from pydantic               import BaseModel
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
+
 from google.oauth2          import id_token
 from google.auth.transport  import requests
 
@@ -431,6 +432,15 @@ async def user_info(uhid:str):
         user hashid
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
 
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -498,6 +508,14 @@ async def user_list(ahid: str, inc_deleted : int = 0):
     
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_account.decrypt(ahid)
@@ -552,20 +570,6 @@ async def user_list(ahid: str, inc_deleted : int = 0):
     
 
 
-
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str
-    user: dict
-
-
-class Token(BaseModel):
-    token:                  str
-    viewport_width:         int = None
-    viewport_height:        int = None
-    
-
-
 def create_access_token(data: dict):
     to_encode   = data.copy()
     expire      = datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
@@ -576,7 +580,7 @@ def create_access_token(data: dict):
 
 
 @app.post("/api/auth/google")
-async def google_auth(request: Request, token_data: Token):
+async def google_auth(request: Request, token_data: dm.GoogleToken):
     
     user_info = None
     
@@ -706,20 +710,4 @@ async def google_auth(request: Request, token_data: Token):
     return res_login
     
 
-
-
-@app.get("/api/protected")
-async def protected_route(request: Request):
-    token = request.headers.get("authorization", "").replace("Bearer ", "")
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user_id = payload.get("sub")
-        return {"message": f"Hello user {user_id}", "data": payload}
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
 

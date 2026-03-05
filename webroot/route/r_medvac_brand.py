@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,9 +35,19 @@ from r_utils                import remove_database_null_description
 
     
 @app.post("/medvac_brand/add", tags=["Common Lookup"])
-async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
-    name    = medvac_brand_data.name
-    uhid    = medvac_brand_data.uhid
+async def medvac_brand_add(request: Request, data: dm.DataMedVacBrand):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -70,7 +83,7 @@ async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
 
 
     
-    country_hid = medvac_brand_data.country_hid
+    country_hid = data.country_hid
     country_id = 0
     
     res = hashids_common.decrypt(country_hid)
@@ -86,11 +99,11 @@ async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
     country_id = res[0]
 
     
-    medvac_brand_data.country_id    = country_id
-    medvac_brand_data.name          = name
-    medvac_brand_data.user_id       = user_id
+    data.country_id    = country_id
+    data.name          = name
+    data.user_id       = user_id
     
-    res_add    =  model['medvac_brand'].add(medvac_brand_data)
+    res_add    =  model['medvac_brand'].add(data)
     
     if res_add is None:
         return {
@@ -118,7 +131,7 @@ async def medvac_brand_add(medvac_brand_data: dm.DataMedVacBrand):
 
    
 @app.get("/medvac_brand/list", tags=["Common Lookup"])
-async def medvac_brand_list(country_hid: str):
+async def medvac_brand_list(request: Request, country_hid: str):
     """
     Will get medvac_brand list.
     
@@ -134,6 +147,15 @@ async def medvac_brand_list(country_hid: str):
     inc_user_audit:
         if > 0, will include added_by and last_update info
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(country_hid)
     if len(res) == 0:

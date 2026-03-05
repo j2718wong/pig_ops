@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -34,8 +37,18 @@ from r_utils                import remove_database_null_description
   
 
 @app.post("/pf_feed_buy/add", tags=["Pig Farm"])
-async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
-    uhid    = feed_buy_data.uhid
+async def pig_farm_feed_buy_add(request: Request, data: dm.DataPigFarmFeedBuy):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     
     res = hashids_user.decrypt(uhid)
@@ -61,7 +74,7 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
     
-    pig_farm_hid        = feed_buy_data.pig_farm_hid
+    pig_farm_hid        = data.pig_farm_hid
     
     res = hashids_common.decrypt(pig_farm_hid)
     if len(res) == 0:
@@ -80,7 +93,7 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     pig_farm_id = res[0]
 
     
-    feed_supplier_hid        = feed_buy_data.feed_supplier_hid
+    feed_supplier_hid        = data.feed_supplier_hid
     
     res = hashids_common.decrypt(feed_supplier_hid)
     if len(res) == 0:
@@ -102,11 +115,11 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
     
-    feed_buy_data.user_id           = user_id
-    feed_buy_data.pig_farm_id       = pig_farm_id
-    feed_buy_data.feed_supplier_id  = feed_supplier_id
+    data.user_id           = user_id
+    data.pig_farm_id       = pig_farm_id
+    data.feed_supplier_id  = feed_supplier_id
     
-    res_add    =  model['pf_feed_buy'].add(feed_buy_data)
+    res_add    =  model['pf_feed_buy'].add(data)
     
     if res_add is None:
         return {
@@ -134,8 +147,18 @@ async def pig_farm_feed_buy_add(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
 @app.post("/pf_feed_buy/update", tags=["Pig Farm"])
-async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
-    uhid    = feed_buy_data.uhid
+async def pig_farm_feed_buy_update(request: Request, data: dm.DataPigFarmFeedBuy):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     
     res = hashids_user.decrypt(uhid)
@@ -161,7 +184,7 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
     
-    pf_feed_buy_hid = feed_buy_data.pf_feed_buy_hid
+    pf_feed_buy_hid = data.pf_feed_buy_hid
     
     
     res = hashids_common.decrypt(pf_feed_buy_hid)
@@ -176,7 +199,7 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     pf_feed_buy_id = res[0]
     
     
-    feed_supplier_hid        = feed_buy_data.feed_supplier_hid
+    feed_supplier_hid        = data.feed_supplier_hid
     
     res = hashids_common.decrypt(feed_supplier_hid)
     if len(res) == 0:
@@ -196,11 +219,11 @@ async def pig_farm_feed_buy_update(feed_buy_data: dm.DataPigFarmFeedBuy):
     
     
     
-    feed_buy_data.user_id   = user_id
-    feed_buy_data.pf_feed_buy_id = pf_feed_buy_id
-    feed_buy_data.feed_supplier_id  = feed_supplier_id
+    data.user_id   = user_id
+    data.pf_feed_buy_id = pf_feed_buy_id
+    data.feed_supplier_id  = feed_supplier_id
     
-    res_update    =  model['pf_feed_buy'].update(feed_buy_data)
+    res_update    =  model['pf_feed_buy'].update(data)
     
     if res_update is None:
         return {
@@ -250,7 +273,7 @@ def replace_plain_ids_feed_item(cur_entry):
     
     
 @app.get("/pf_feed_buy/list", tags=["Pig Farm"])
-async def pf_feed_buy_list(pfhid: str, page_number = 1):
+async def pf_feed_buy_list(request: Request, pfhid: str, page_number = 1):
     """
     Will get pig farm feed_buy list.
     
@@ -262,6 +285,14 @@ async def pf_feed_buy_list(pfhid: str, page_number = 1):
 
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_common.decrypt(pfhid)

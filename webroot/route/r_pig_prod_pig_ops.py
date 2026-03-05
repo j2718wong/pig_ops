@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,8 +35,18 @@ from r_utils                import remove_database_null_description
 
 
 @app.post("/pig_prod_pig_ops/update", tags=["Production Details"])
-async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
-    uhid    = pig_prod_pig_ops_data.uhid
+async def pig_prod_pig_ops_update(request: Request, data: dm.DataPigProdPigOps):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -58,7 +71,7 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     
     
     
-    pig_prod_pig_ops_hid = pig_prod_pig_ops_data.pig_prod_pig_ops_hid
+    pig_prod_pig_ops_hid = data.pig_prod_pig_ops_hid
     
     res = hashids_common.decrypt(pig_prod_pig_ops_hid)
     if len(res) == 0:
@@ -73,11 +86,11 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     pig_prod_pig_ops_id = res[0]
     
     
-    staff_hid = pig_prod_pig_ops_data.staff_hid
+    staff_hid = data.staff_hid
     staff_id  = None
     
     # Needs staff info if not done_by_user
-    if pig_prod_pig_ops_data.done_by_user == 0:
+    if data.done_by_user == 0:
         res = hashids_common.decrypt(staff_hid)
         if len(res) == 0:
         
@@ -93,11 +106,11 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     
     
     
-    pig_prod_pig_ops_data.user_id               = user_id
-    pig_prod_pig_ops_data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
-    pig_prod_pig_ops_data.staff_id              = staff_id
+    data.user_id               = user_id
+    data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
+    data.staff_id              = staff_id
     
-    res_update    =  model['pig_prod_pig_ops'].update(pig_prod_pig_ops_data)
+    res_update    =  model['pig_prod_pig_ops'].update(data)
     
     if res_update is None:
         return {
@@ -140,8 +153,19 @@ async def pig_prod_pig_ops_update(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
     
 
 @app.post("/pig_prod_pig_ops/update_medvac", tags=["Production Details"])
-async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPigOps):
-    uhid    = pig_prod_pig_ops_data.uhid
+async def pig_prod_pig_ops_update_medvac(request: Request, 
+        data: dm.DataPigProdPigOps):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -166,7 +190,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     
     
     
-    pig_prod_pig_ops_hid = pig_prod_pig_ops_data.pig_prod_pig_ops_hid
+    pig_prod_pig_ops_hid = data.pig_prod_pig_ops_hid
     
     res = hashids_common.decrypt(pig_prod_pig_ops_hid)
     if len(res) == 0:
@@ -181,11 +205,11 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     pig_prod_pig_ops_id = res[0]
     
     
-    staff_hid = pig_prod_pig_ops_data.staff_hid
+    staff_hid = data.staff_hid
     staff_id  = None
     
     # Needs staff info if not done_by_user
-    if pig_prod_pig_ops_data.done_by_user == 0:
+    if data.done_by_user == 0:
         res = hashids_common.decrypt(staff_hid)
         if len(res) == 0:
         
@@ -200,7 +224,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
         
     
     
-    medvac_brand_hid = pig_prod_pig_ops_data.medvac_brand_hid
+    medvac_brand_hid = data.medvac_brand_hid
     
     res = hashids_common.decrypt(medvac_brand_hid)
     if len(res) == 0:
@@ -220,7 +244,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     
 
     
-    medvac_type_hid = pig_prod_pig_ops_data.medvac_type_hid
+    medvac_type_hid = data.medvac_type_hid
     
     res = hashids_common.decrypt(medvac_type_hid)
     if len(res) == 0:
@@ -239,7 +263,7 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     medvac_type_id = res[0]
     
     
-    acc_medvac_hid = pig_prod_pig_ops_data.acc_medvac_hid
+    acc_medvac_hid = data.acc_medvac_hid
     
     res = hashids_common.decrypt(acc_medvac_hid)
     if len(res) == 0:
@@ -260,17 +284,17 @@ async def pig_prod_pig_ops_update_medvac(pig_prod_pig_ops_data: dm.DataPigProdPi
     
         
     
-    pig_prod_pig_ops_data.user_id               = user_id
-    pig_prod_pig_ops_data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
-    pig_prod_pig_ops_data.staff_id              = staff_id
+    data.user_id               = user_id
+    data.pig_prod_pig_ops_id   = pig_prod_pig_ops_id
+    data.staff_id              = staff_id
     
-    pig_prod_pig_ops_data.medvac_brand_id       = medvac_brand_id
-    pig_prod_pig_ops_data.medvac_type_id        = medvac_type_id
-    pig_prod_pig_ops_data.acc_medvac_id         = acc_medvac_id
+    data.medvac_brand_id       = medvac_brand_id
+    data.medvac_type_id        = medvac_type_id
+    data.acc_medvac_id         = acc_medvac_id
     
     
     
-    res_update    =  model['pig_prod_pig_ops'].update_with_medvac(pig_prod_pig_ops_data)
+    res_update    =  model['pig_prod_pig_ops'].update_with_medvac(data)
     
     if res_update is None:
         return {
@@ -383,7 +407,7 @@ def replace_plain_ids_pig_prod_pig_ops(prod_pig_ops):
 
 
 @app.get("/pig_prod_pig_ops/list", tags=["Production Details"])
-async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int):
+async def pig_prod_pig_ops_list(request: Request, prod_hid: str, operation_type: int):
     """
     Will get pig_prod_pig_ops list.
     
@@ -408,6 +432,14 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int):
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_common.decrypt(prod_hid)
@@ -451,7 +483,7 @@ async def pig_prod_pig_ops_list(prod_hid: str, operation_type: int):
     
 
 @app.get("/pig_prod_pig_ops/entry/{entry_hid}", tags=["Production Details"])
-async def pig_prod_pig_ops_entry(entry_hid: str):
+async def pig_prod_pig_ops_entry(request: Request, entry_hid: str):
     """
     Will get pig_prod_pig_ops entry.
     
@@ -463,6 +495,14 @@ async def pig_prod_pig_ops_entry(entry_hid: str):
 
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_common.decrypt(entry_hid)

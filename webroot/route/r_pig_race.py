@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -19,7 +22,7 @@ import data_model           as dm
 
 
 @app.get("/pig_race/list")
-async def pig_race_list():
+async def pig_race_list(request: Request):
     """
     Will get pig_race list.
     
@@ -29,6 +32,14 @@ async def pig_race_list():
     
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
 
         
@@ -38,8 +49,7 @@ async def pig_race_list():
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
      

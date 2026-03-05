@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -31,9 +34,19 @@ from r_utils                import get_location_address_names_and_replace_ids
 
     
 @app.post("/feed_supplier/add", tags=["Common Lookup"])
-async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
-    name    = feed_supplier_data.name
-    uhid    = feed_supplier_data.uhid
+async def feed_supplier_add(request: Request, data: dm.DataFeedSupplier):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -65,7 +78,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     level_3_id  = 0
     
     
-    level_1_hid = feed_supplier_data.level_1_hid
+    level_1_hid = data.level_1_hid
     res = hashids_common.decrypt(level_1_hid)
     if len(res) == 0:
         return {
@@ -79,7 +92,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     level_1_id = res[0]
     
     
-    level_2_hid = feed_supplier_data.level_2_hid
+    level_2_hid = data.level_2_hid
     res = hashids_common.decrypt(level_2_hid)
     if len(res) == 0:
         return {
@@ -93,7 +106,7 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     level_2_id = res[0]
     
     
-    level_3_hid = feed_supplier_data.level_3_hid
+    level_3_hid = data.level_3_hid
     
     if level_3_hid is not None:
         res = hashids_common.decrypt(level_3_hid)
@@ -111,14 +124,14 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     
     
     
-    feed_supplier_data.name         = name
-    feed_supplier_data.user_id      = user_id
-    feed_supplier_data.level_1_id   = level_1_id
-    feed_supplier_data.level_2_id   = level_2_id
-    feed_supplier_data.level_3_id   = level_3_id
+    data.name         = name
+    data.user_id      = user_id
+    data.level_1_id   = level_1_id
+    data.level_2_id   = level_2_id
+    data.level_3_id   = level_3_id
     
     
-    res_add    =  model['feed_supplier'].add(feed_supplier_data)
+    res_add    =  model['feed_supplier'].add(data)
     
     if res_add is None:
         return {
@@ -144,9 +157,19 @@ async def feed_supplier_add(feed_supplier_data: dm.DataFeedSupplier):
     
 
 @app.post("/feed_supplier/update", tags=["Common Lookup"])
-async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
-    name    = feed_supplier_data.name
-    uhid    = feed_supplier_data.uhid
+async def feed_supplier_update(request: Request, data: dm.DataFeedSupplier):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -173,7 +196,7 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     user_id = res[0]
     
     
-    feed_supplier_hid = feed_supplier_data.feed_supplier_hid
+    feed_supplier_hid = data.feed_supplier_hid
     
     res = hashids_common.decrypt(feed_supplier_hid)
     if len(res) == 0:
@@ -188,11 +211,11 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
     feed_supplier_id = res[0]
     
     
-    feed_supplier_data.name      = name
-    feed_supplier_data.user_id   = user_id
-    feed_supplier_data.feed_supplier_id = feed_supplier_id
+    data.name      = name
+    data.user_id   = user_id
+    data.feed_supplier_id = feed_supplier_id
     
-    res_update      =  model['feed_supplier'].update(feed_supplier_data)
+    res_update      =  model['feed_supplier'].update(data)
     
     if res_update is None:
         return {
@@ -214,7 +237,7 @@ async def feed_supplier_update(feed_supplier_data: dm.DataFeedSupplier):
 
    
 @app.get("/feed_supplier/list", tags=["Common Lookup"])
-async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
+async def feed_supplier_list(request: Request, ahid:str = None, level_2_hid: str = None):
     """
     Will get feed_supplier list.
     
@@ -225,6 +248,15 @@ async def feed_supplier_list(ahid:str = None, level_2_hid: str = None):
         level_2_hid
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     account_id      = 0
     adrs_level_2_id = 0

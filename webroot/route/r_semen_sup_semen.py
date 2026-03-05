@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -31,9 +34,21 @@ from r_utils                import remove_database_null_description
     
     
 @app.post("/semen_sup_semen/add", tags=["Common Lookup"])
-async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
-    name    = semen_data.name
-    uhid    = semen_data.uhid
+async def semen_supplier_semen_add(request: Request, 
+        data: dm.DataSemenSupplierSemen):
+    
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -70,7 +85,7 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
     
     
     semen_supplier_id   = 0
-    semen_supplier_hid  = semen_data.semen_supplier_hid
+    semen_supplier_hid  = data.semen_supplier_hid
     
     res = hashids_common.decrypt(semen_supplier_hid)
     if len(res) == 0:
@@ -84,11 +99,11 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
     semen_supplier_id = res[0]
     
     
-    semen_data.name             = name
-    semen_data.user_id          = user_id
-    semen_data.semen_supplier_id = semen_supplier_id
+    data.name             = name
+    data.user_id          = user_id
+    data.semen_supplier_id = semen_supplier_id
     
-    res_add    =  model['semen_sup_semen'].add(semen_data)
+    res_add    =  model['semen_sup_semen'].add(data)
     
     if res_add is None:
         return {
@@ -114,9 +129,21 @@ async def semen_supplier_semen_add(semen_data: dm.DataSemenSupplierSemen):
     
 
 @app.post("/semen_sup_semen/update", tags=["Common Lookup"])
-async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
-    name    = semen_data.name
-    uhid    = semen_data.uhid
+async def semen_supplier_semen_update(request: Request, 
+        data: dm.DataSemenSupplierSemen):
+    
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -153,7 +180,7 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
     
     
     semen_supplier_id   = 0
-    semen_supplier_hid  = semen_data.semen_supplier_hid
+    semen_supplier_hid  = data.semen_supplier_hid
     
     res = hashids_common.decrypt(semen_supplier_hid)
     if len(res) == 0:
@@ -167,11 +194,11 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
     semen_supplier_id = res[0]
     
     
-    semen_data.name      = name
-    semen_data.user_id   = user_id
-    semen_data.semen_supplier_id = semen_supplier_id
+    data.name      = name
+    data.user_id   = user_id
+    data.semen_supplier_id = semen_supplier_id
     
-    res_update    =  model['semen_sup_semen'].update(semen_data)
+    res_update    =  model['semen_sup_semen'].update(data)
     
     if res_update is None:
         return {
@@ -199,7 +226,16 @@ async def semen_supplier_semen_update(semen_data: dm.DataSemenSupplierSemen):
 
 
 @app.get("/semen_sup_semen/list", tags=["Common Lookup"])
-async def semen_supplier_semen_list(semen_supplier_hid: str):
+async def semen_supplier_semen_list(request: Request, semen_supplier_hid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(semen_supplier_hid)
     if len(res) == 0:

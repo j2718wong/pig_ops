@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -41,6 +44,14 @@ async def pig_dead_type_list():
     
    
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
         
     res = model['prod_pig_dead'].get_pig_dead_type_list()
@@ -76,8 +87,18 @@ async def pig_dead_type_list():
 
    
 @app.post("/prod_pig_dead/add", tags=["Production Details"])
-async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
-    uhid    = prod_pig_dead_data.uhid
+async def prod_pig_dead_add(request: Request, data: dm.DataPigProdDeadPig):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -102,7 +123,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
     
     
     
-    pig_prod_hid        = prod_pig_dead_data.pig_prod_hid
+    pig_prod_hid        = data.pig_prod_hid
     pig_prod_id         = 0
     
     if pig_prod_hid is not None:
@@ -118,7 +139,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
         pig_prod_id = res[0]
         
     
-    pig_prod_group_hid  = prod_pig_dead_data.pig_prod_group_hid
+    pig_prod_group_hid  = data.pig_prod_group_hid
     pig_prod_group_id   = 0
     
     if pig_prod_group_hid is not None:
@@ -134,7 +155,7 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
         pig_prod_group_hid = res[0]
     
     
-    pig_dead_type_hid   = prod_pig_dead_data.pig_dead_type_hid
+    pig_dead_type_hid   = data.pig_dead_type_hid
     pig_dead_type_id    = 0
     
     res = hashids_common.decrypt(pig_dead_type_hid)
@@ -149,12 +170,12 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
     pig_dead_type_id = res[0]
     
     
-    prod_pig_dead_data.user_id          = user_id
-    prod_pig_dead_data.pig_prod_id      = pig_prod_id
-    prod_pig_dead_data.pig_prod_group_id= pig_prod_group_id
-    prod_pig_dead_data.pig_dead_type_id = pig_dead_type_id
+    data.user_id          = user_id
+    data.pig_prod_id      = pig_prod_id
+    data.pig_prod_group_id= pig_prod_group_id
+    data.pig_dead_type_id = pig_dead_type_id
     
-    res_add    =  model['prod_pig_dead'].add(prod_pig_dead_data)
+    res_add    =  model['prod_pig_dead'].add(data)
     
     if res_add is None:
         return {
@@ -180,8 +201,18 @@ async def prod_pig_dead_add(prod_pig_dead_data: dm.DataPigProdDeadPig):
     
 
 @app.post("/prod_pig_dead/update", tags=["Production Details"])
-async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
-    uhid    = prod_pig_dead_data.uhid
+async def prod_pig_dead_update(request: Request, data: dm.DataPigProdDeadPig):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
        
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -206,7 +237,7 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     
     
 
-    prod_pig_dead_hid = prod_pig_dead_data.prod_pig_dead_hid
+    prod_pig_dead_hid = data.prod_pig_dead_hid
     
     res = hashids_common.decrypt(prod_pig_dead_hid)
     if len(res) == 0:
@@ -221,10 +252,10 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     prod_pig_dead_id = res[0]
     
     
-    prod_pig_dead_data.user_id   = user_id
-    prod_pig_dead_data.prod_pig_dead_id = prod_pig_dead_id
+    data.user_id   = user_id
+    data.prod_pig_dead_id = prod_pig_dead_id
     
-    res_update    =  model['prod_pig_dead'].update(prod_pig_dead_data)
+    res_update    =  model['prod_pig_dead'].update(data)
     
     if res_update is None:
         return {
@@ -247,8 +278,8 @@ async def prod_pig_dead_update(prod_pig_dead_data: dm.DataPigProdDeadPig):
     
   
 @app.get("/prod_pig_dead/list", tags=["Production Details"])
-async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1, 
-        pig_prod_hid: str =None):
+async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None, 
+        dead_at_stage:int = 1, pig_prod_hid: str =None):
     """
     Will get prod_pig_dead list.
     
@@ -268,6 +299,15 @@ async def prod_pig_dead_list(pig_farm_hid: str = None, dead_at_stage:int = 1,
     
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     pig_farm_id = 0
     pig_prod_id = 0

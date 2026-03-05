@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -32,9 +35,18 @@ from r_utils                import remove_database_null_description
 
    
 @app.post("/prod_harvest/add", tags=["Production Details"])
-async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
-    uhid    = prod_harvest_data.uhid
+async def prod_harvest_add(request: Request, data: dm.DataProductionHarvest):
+    result = get_uhid_or_redirect(request)
     
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     
     res = hashids_user.decrypt(uhid)
@@ -61,7 +73,7 @@ async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
     
     
     
-    pig_prod_hid    = prod_harvest_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
 
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -75,7 +87,7 @@ async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
     pig_prod_id = res[0]
     
     
-    harvest_type_hid = prod_harvest_data.harvest_type_hid
+    harvest_type_hid = data.harvest_type_hid
     
     res = hashids_common.decrypt(harvest_type_hid)
     if len(res) == 0:
@@ -93,7 +105,7 @@ async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
     
     
     acc_pig_buyer_id    = 0
-    acc_pig_buyer_hid   = prod_harvest_data.acc_pig_buyer_hid
+    acc_pig_buyer_hid   = data.acc_pig_buyer_hid
     
     if acc_pig_buyer_hid is not None:
         res = hashids_common.decrypt(acc_pig_buyer_hid)
@@ -110,12 +122,12 @@ async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
    
 
    
-    prod_harvest_data.user_id           = user_id
-    prod_harvest_data.pig_prod_id       = pig_prod_id
-    prod_harvest_data.harvest_type_id   = harvest_type_id
-    prod_harvest_data.acc_pig_buyer_id  = acc_pig_buyer_id
+    data.user_id           = user_id
+    data.pig_prod_id       = pig_prod_id
+    data.harvest_type_id   = harvest_type_id
+    data.acc_pig_buyer_id  = acc_pig_buyer_id
     
-    res_add    =  model['prod_harvest'].add(prod_harvest_data)
+    res_add    =  model['prod_harvest'].add(data)
     
     if res_add is None:
         return {
@@ -142,8 +154,18 @@ async def prod_harvest_add(prod_harvest_data: dm.DataProductionHarvest):
     
 
 @app.post("/prod_harvest/update", tags=["Production Details"])
-async def prod_harvest_update(prod_harvest_data: dm.DataProductionHarvest):
-    uhid    = prod_harvest_data.uhid
+async def prod_harvest_update(request: Request, data: dm.DataProductionHarvest):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
 
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -157,7 +179,7 @@ async def prod_harvest_update(prod_harvest_data: dm.DataProductionHarvest):
     user_id = res[0]
     
     
-    prod_harvest_hid = prod_harvest_data.prod_harvest_hid
+    prod_harvest_hid = data.prod_harvest_hid
     
     res = hashids_common.decrypt(prod_harvest_hid)
     if len(res) == 0:
@@ -172,7 +194,7 @@ async def prod_harvest_update(prod_harvest_data: dm.DataProductionHarvest):
     prod_harvest_id = res[0]
     
     
-    harvest_type_hid = prod_harvest_data.harvest_type_hid
+    harvest_type_hid = data.harvest_type_hid
     
     res = hashids_common.decrypt(harvest_type_hid)
     if len(res) == 0:
@@ -188,8 +210,8 @@ async def prod_harvest_update(prod_harvest_data: dm.DataProductionHarvest):
     
     
     acc_pig_buyer_id                    = 0
-    prod_harvest_data.harvest_type_id   = harvest_type_id
-    acc_pig_buyer_hid                   = prod_harvest_data.acc_pig_buyer_hid
+    data.harvest_type_id   = harvest_type_id
+    acc_pig_buyer_hid                   = data.acc_pig_buyer_hid
     
     if acc_pig_buyer_hid is not None:
         res = hashids_common.decrypt(acc_pig_buyer_hid)
@@ -206,13 +228,13 @@ async def prod_harvest_update(prod_harvest_data: dm.DataProductionHarvest):
    
     
     
-    prod_harvest_data.user_id           = user_id
-    prod_harvest_data.prod_harvest_id   = prod_harvest_id
-    prod_harvest_data.harvest_type_id   = harvest_type_id
-    prod_harvest_data.acc_pig_buyer_id  = acc_pig_buyer_id
+    data.user_id           = user_id
+    data.prod_harvest_id   = prod_harvest_id
+    data.harvest_type_id   = harvest_type_id
+    data.acc_pig_buyer_id  = acc_pig_buyer_id
     
     
-    res_update    =  model['prod_harvest'].update(prod_harvest_data)
+    res_update    =  model['prod_harvest'].update(data)
     
     if res_update is None:
         return {
@@ -236,7 +258,17 @@ async def prod_harvest_update(prod_harvest_data: dm.DataProductionHarvest):
     
 
 @app.get("/prod_harvest/delete", tags=["Production Details"])
-async def prod_harvest_delete(uhid:str, ehid: str):
+async def prod_harvest_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -335,7 +367,7 @@ def get_data_prod_harvest(pig_farm_id = 0, pig_prod_id = 0):
     
     
 @app.get("/prod_harvest/list", tags=["Production Details"])
-async def prod_harvest_list(pig_prod_hid: str = None):
+async def prod_harvest_list(request: Request, pig_prod_hid: str = None):
     """
     Will get prod_harvest list.
     
@@ -347,6 +379,15 @@ async def prod_harvest_list(pig_prod_hid: str = None):
 
    
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     pig_prod_id     = 0
 

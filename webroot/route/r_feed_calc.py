@@ -8,6 +8,11 @@ import pprint
 import pandas               as pd 
 import numpy                as np
 
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
+
 from datetime               import datetime, timedelta 
 
     
@@ -21,7 +26,7 @@ from fastapi.responses      import PlainTextResponse
 
     
 @app.get("/feed_calc/consumption/report", response_class=PlainTextResponse)
-async def feed_calc_consumption_report(uhid:str, pfhid:str, num_per_prod:int = 5, 
+async def feed_calc_consumption_report(request: Request, uhid:str, pfhid:str, num_per_prod:int = 5, 
         inc_historical: int =0):
     """
     Will feed consumption list.

@@ -7,8 +7,10 @@ import json
 import time
 import pprint
 
-from pydantic               import BaseModel
-from fastapi.responses      import HTMLResponse
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -252,7 +254,7 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
 
 
 @app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
-async def pig_prod(pfhid:str = None, m:int =0):
+async def pig_prod(request: Request, pfhid:str = None, m:int =0):
     """
     Parameters
     ----------
@@ -320,7 +322,7 @@ async def pig_prod(pfhid:str = None, m:int =0):
 
 
 @app.get("/pig_fattening", response_class = HTMLResponse, tags=["Pig Production"])
-async def pig_fattening(pfhid:str = None):
+async def pig_fattening(request: Request, pfhid:str = None):
     pig_farm_id = None
     
     if pfhid is not None:
@@ -410,7 +412,7 @@ async def pig_fattening(pfhid:str = None):
 
 
 @app.get("/pig_prod_status/list", tags=["Pig Production"])
-async def pig_prod_status_list():
+async def pig_prod_status_list(request: Request, ):
     """
     Will get pig_production status list.
     
@@ -418,6 +420,15 @@ async def pig_prod_status_list():
     ----------
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = model['pig_prod'].get_pig_prod_status_list()
     
@@ -450,7 +461,7 @@ async def pig_prod_status_list():
     
 
 @app.get("/pig_prod/public", tags=["Pig Production"])
-async def pig_prod_public(country_hid:str):
+async def pig_prod_public(request: Request, country_hid:str):
     """
     Will get pig_production public data.
     
@@ -458,6 +469,15 @@ async def pig_prod_public(country_hid:str):
     ----------
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     country_id = 0
     
@@ -547,8 +567,18 @@ async def pig_prod_public(country_hid:str):
     
 
 @app.post("/pig_prod/add", tags=["Pig Production"])
-async def pig_prod_add(pig_prod_data: dm.DataPigProd):
-    uhid    = pig_prod_data.uhid
+async def pig_prod_add(request: Request, data: dm.DataPigProd):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -574,7 +604,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
     
 
-    sow_hid    = pig_prod_data.sow_hid
+    sow_hid    = data.sow_hid
     
     res = hashids_common.decrypt(sow_hid)
     if len(res) == 0:
@@ -595,7 +625,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     semen_ai_boar_id    = None
     
     
-    boar_hid        = pig_prod_data.boar_hid
+    boar_hid        = data.boar_hid
     
     if boar_hid is not None:
         
@@ -614,7 +644,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
     else:
         
-        semen_supplier_hid = pig_prod_data.semen_supplier_hid
+        semen_supplier_hid = data.semen_supplier_hid
         
         if semen_supplier_hid is not None:
             res = hashids_common.decrypt(semen_supplier_hid)
@@ -630,7 +660,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
             semen_supplier_id = res[0]
         
         
-        semen_sup_semen_hid = pig_prod_data.semen_sup_semen_hid
+        semen_sup_semen_hid = data.semen_sup_semen_hid
         
         if semen_sup_semen_hid is not None:
             res = hashids_common.decrypt(semen_sup_semen_hid)
@@ -646,7 +676,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
             semen_sup_semen_id = res[0]
         
         
-        semen_ai_boar_hid = pig_prod_data.semen_ai_boar_hid
+        semen_ai_boar_hid = data.semen_ai_boar_hid
         
         if semen_ai_boar_hid is not None:
             res = hashids_common.decrypt(semen_ai_boar_hid)
@@ -676,7 +706,7 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
                 
         
     
-    insem_staff_hid = pig_prod_data.insem_staff_hid
+    insem_staff_hid = data.insem_staff_hid
     insem_staff_id  = None
     
     if insem_staff_hid is not None:
@@ -695,16 +725,16 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
     
 
-    pig_prod_data.user_id           = user_id
-    pig_prod_data.sow_id            = sow_id
-    pig_prod_data.boar_id           = boar_id
-    pig_prod_data.semen_supplier_id = semen_supplier_id
-    pig_prod_data.semen_sup_semen_id = semen_sup_semen_id
-    pig_prod_data.semen_ai_boar_id  = semen_ai_boar_id
-    pig_prod_data.insem_staff_id    = insem_staff_id
+    data.user_id           = user_id
+    data.sow_id            = sow_id
+    data.boar_id           = boar_id
+    data.semen_supplier_id = semen_supplier_id
+    data.semen_sup_semen_id = semen_sup_semen_id
+    data.semen_ai_boar_id  = semen_ai_boar_id
+    data.insem_staff_id    = insem_staff_id
     
     
-    res_add    =  model['pig_prod'].add(pig_prod_data)
+    res_add    =  model['pig_prod'].add(data)
     
     if res_add is None:
         return {
@@ -738,8 +768,18 @@ async def pig_prod_add(pig_prod_data: dm.DataPigProd):
     
 
 @app.post("/pig_prod/fattening/add", tags=["Pig Production"])
-async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
-    uhid    = pig_fattening_data.uhid
+async def pig_prod_fattening_add(request: Request, data: dm.DataPigProdFattening):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -764,7 +804,7 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
     
     
 
-    pig_farm_hid = pig_fattening_data.pig_farm_hid
+    pig_farm_hid = data.pig_farm_hid
     
         
     res = hashids_common.decrypt(insem_staff_hid)
@@ -780,12 +820,12 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
     pig_farm_id = res[0]
 
     
-    pig_fattening_data.user_id           = user_id
-    pig_fattening_data.pig_farm_id       = pig_farm_id
+    data.user_id           = user_id
+    data.pig_farm_id       = pig_farm_id
     
     
     
-    res_add    =  model['pig_prod'].add_fattening(pig_fattening_data)
+    res_add    =  model['pig_prod'].add_fattening(data)
     
     if res_add is None:
         return {
@@ -811,8 +851,18 @@ async def pig_prod_fattening_add(pig_fattening_data: dm.DataPigProdFattening):
 
 
 @app.post("/pig_prod/update_insem", tags=["Pig Production"])
-async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
-    uhid    = pig_prod_data.uhid
+async def pig_prod_update_insem(request: Request, data: dm.DataPigProd):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -837,7 +887,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     
     
 
-    pig_prod_hid    = pig_prod_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -857,7 +907,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     semen_ai_boar_id    = None
     
     
-    boar_hid        = pig_prod_data.boar_hid
+    boar_hid        = data.boar_hid
     
     if boar_hid is not None:
         
@@ -876,7 +926,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     
     else:
         
-        semen_supplier_hid = pig_prod_data.semen_supplier_hid
+        semen_supplier_hid = data.semen_supplier_hid
         
         if semen_supplier_hid is not None:
             res = hashids_common.decrypt(semen_supplier_hid)
@@ -892,7 +942,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
             semen_supplier_id = res[0]
         
         
-        semen_sup_semen_hid = pig_prod_data.semen_sup_semen_hid
+        semen_sup_semen_hid = data.semen_sup_semen_hid
         
         if semen_sup_semen_hid is not None:
             res = hashids_common.decrypt(semen_sup_semen_hid)
@@ -908,7 +958,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
             semen_sup_semen_id = res[0]
             
         
-        semen_ai_boar_hid = pig_prod_data.semen_ai_boar_hid
+        semen_ai_boar_hid = data.semen_ai_boar_hid
         
         if semen_ai_boar_hid is not None:
             res = hashids_common.decrypt(semen_ai_boar_hid)
@@ -937,7 +987,7 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
                 }
         
     
-    insem_staff_hid = pig_prod_data.insem_staff_hid
+    insem_staff_hid = data.insem_staff_hid
         
     res = hashids_common.decrypt(insem_staff_hid)
     if len(res) == 0:
@@ -953,15 +1003,15 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     
     
 
-    pig_prod_data.user_id           = user_id
-    pig_prod_data.pig_prod_id       = pig_prod_id
-    pig_prod_data.boar_id           = boar_id
-    pig_prod_data.semen_supplier_id   = semen_supplier_id
-    pig_prod_data.semen_sup_semen_id  = semen_sup_semen_id
-    pig_prod_data.insem_staff_id    = insem_staff_id
-    pig_prod_data.semen_ai_boar_id  = semen_ai_boar_id
+    data.user_id           = user_id
+    data.pig_prod_id       = pig_prod_id
+    data.boar_id           = boar_id
+    data.semen_supplier_id   = semen_supplier_id
+    data.semen_sup_semen_id  = semen_sup_semen_id
+    data.insem_staff_id    = insem_staff_id
+    data.semen_ai_boar_id  = semen_ai_boar_id
     
-    res_update    =  model['pig_prod'].update_insemination(pig_prod_data)
+    res_update    =  model['pig_prod'].update_insemination(data)
     
     if res_update is None:
         return {
@@ -986,8 +1036,18 @@ async def pig_prod_update_insem(pig_prod_data: dm.DataPigProd):
     
     
 @app.post("/pig_prod/update_status", tags=["Pig Production"])
-async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
-    uhid    = prod_status_data.uhid
+async def pig_prod_update_status(request: Request, data: dm.DataPigProdStatus):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -1012,7 +1072,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     
     
 
-    pig_prod_hid    = prod_status_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1026,7 +1086,7 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     pig_prod_id = res[0]
 
 
-    prod_status_hid = prod_status_data.prod_status_hid
+    prod_status_hid = data.prod_status_hid
         
     res = hashids_common.decrypt(prod_status_hid)
     if len(res) == 0:
@@ -1042,11 +1102,11 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     
     
 
-    prod_status_data.user_id           = user_id
-    prod_status_data.pig_prod_id       = pig_prod_id
-    prod_status_data.prod_status_id    = prod_status_id
+    data.user_id           = user_id
+    data.pig_prod_id       = pig_prod_id
+    data.prod_status_id    = prod_status_id
     
-    res_update    =  model['pig_prod'].update_status(prod_status_data)
+    res_update    =  model['pig_prod'].update_status(data)
     
     if res_update is None:
         return {
@@ -1072,8 +1132,18 @@ async def pig_prod_update_status(prod_status_data: dm.DataPigProdStatus):
     
     
 @app.post("/pig_prod/update_birth", tags=["Pig Production"])
-async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
-    uhid    = pig_birth_data.uhid
+async def pig_prod_update_birth(request: Request, data: dm.DataPigProdBirth):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -1098,7 +1168,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     
 
 
-    pig_prod_hid    = pig_birth_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1113,7 +1183,7 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     
     
     birth_staff_id  = None
-    birth_staff_hid = pig_birth_data.birth_staff_hid
+    birth_staff_hid = data.birth_staff_hid
     
     if birth_staff_hid is not None:
         res = hashids_common.decrypt(birth_staff_hid)
@@ -1130,11 +1200,11 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
 
     
     
-    pig_birth_data.user_id          = user_id
-    pig_birth_data.pig_prod_id      = pig_prod_id
-    pig_birth_data.birth_staff_id   = birth_staff_id
+    data.user_id          = user_id
+    data.pig_prod_id      = pig_prod_id
+    data.birth_staff_id   = birth_staff_id
     
-    res_update    =  model['pig_prod'].update_birth(pig_birth_data)
+    res_update    =  model['pig_prod'].update_birth(data)
     
     if res_update is None:
         return {
@@ -1160,8 +1230,18 @@ async def pig_prod_update_birth(pig_birth_data: dm.DataPigProdBirth):
     
     
 @app.post("/pig_prod/update_weaning", tags=["Pig Production"])
-async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
-    uhid    = pig_weaning_data.uhid
+async def pig_prod_update_weaning(request: Request, data: dm.DataPigProdWeaning):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -1186,7 +1266,7 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     
 
 
-    pig_prod_hid    = pig_weaning_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1201,11 +1281,11 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     
    
     
-    pig_weaning_data.user_id          = user_id
-    pig_weaning_data.pig_prod_id      = pig_prod_id
+    data.user_id          = user_id
+    data.pig_prod_id      = pig_prod_id
     
     
-    res_update    =  model['pig_prod'].update_weaning(pig_weaning_data)
+    res_update    =  model['pig_prod'].update_weaning(data)
     
     if res_update is None:
         return {
@@ -1231,8 +1311,18 @@ async def pig_prod_update_weaning(pig_weaning_data: dm.DataPigProdWeaning):
     
 
 @app.post("/pig_prod/update_feed_start_date", tags=["Pig Production"])
-async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStartDate):
-    uhid    = feed_start_date_data.uhid
+async def pig_prod_update_feed_start_date(request: Request, data: dm.DataFeedStartDate):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -1259,7 +1349,7 @@ async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStart
     
     
 
-    pig_prod_hid    = feed_start_date_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1274,7 +1364,7 @@ async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStart
     pig_prod_id = res[0]
     
     
-    feed_type_hid    = feed_start_date_data.feed_type_hid
+    feed_type_hid    = data.feed_type_hid
     
     res = hashids_common.decrypt(feed_type_hid)
     if len(res) == 0:
@@ -1289,11 +1379,11 @@ async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStart
     feed_type_id = res[0]
     
     
-    feed_start_date_data.user_id         = user_id
-    feed_start_date_data.pig_prod_id     = pig_prod_id
-    feed_start_date_data.feed_type_id    = feed_type_id
+    data.user_id         = user_id
+    data.pig_prod_id     = pig_prod_id
+    data.feed_type_id    = feed_type_id
     
-    res_update    =  model['pig_prod'].update_feed_start_date(feed_start_date_data)
+    res_update    =  model['pig_prod'].update_feed_start_date(data)
     
     if res_update is None:
         return {
@@ -1309,8 +1399,18 @@ async def pig_prod_update_feed_start_date(feed_start_date_data: dm.DataFeedStart
     
 
 @app.post("/pig_prod/update_pig_count", tags=["Pig Production"])
-async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
-    uhid    = pig_count_data.uhid
+async def pig_prod_update_pig_count(request: Request, data: dm.DataPigProdPigCount):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -1336,7 +1436,7 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
     
     
 
-    pig_prod_hid    = pig_count_data.pig_prod_hid
+    pig_prod_hid    = data.pig_prod_hid
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1351,10 +1451,10 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
     pig_prod_id = res[0]
     
     
-    pig_count_data.user_id         = user_id
-    pig_count_data.pig_prod_id     = pig_prod_id
+    data.user_id         = user_id
+    data.pig_prod_id     = pig_prod_id
     
-    res_update    =  model['pig_prod'].update_pig_count(pig_count_data)
+    res_update    =  model['pig_prod'].update_pig_count(data)
     
     if res_update is None:
         return {
@@ -1376,7 +1476,7 @@ async def pig_prod_update_pig_count(pig_count_data: dm.DataPigProdPigCount):
 
 
 @app.get("/pig_prod/feed_summary", tags=["Pig Production"])
-async def pig_prod_feed_summary(pig_prod_hid:str):
+async def pig_prod_feed_summary(request: Request, pig_prod_hid:str):
     """
     Will get pig_production feed summary by pig_prod_hid.
     
@@ -1388,6 +1488,15 @@ async def pig_prod_feed_summary(pig_prod_hid:str):
 
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1422,7 +1531,7 @@ async def pig_prod_feed_summary(pig_prod_hid:str):
 
 
 @app.get("/pig_prod/cur_pig_count", tags=["Pig Production"])
-async def pig_prod_cur_pig_count(pig_prod_hid:str):
+async def pig_prod_cur_pig_count(request: Request, pig_prod_hid:str):
     """
     Will get pig_production.num_pigs_current.
     
@@ -1438,6 +1547,15 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
 
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
@@ -1473,7 +1591,7 @@ async def pig_prod_cur_pig_count(pig_prod_hid:str):
 
 
 @app.get("/pig_prod/entry/{entry_hid}", tags=["Pig Production"])
-async def pig_prod_entry(entry_hid:str):
+async def pig_prod_entry(request: Request, entry_hid:str):
     """
     Will get pig_production list.
     
@@ -1486,6 +1604,15 @@ async def pig_prod_entry(entry_hid:str):
 
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(entry_hid)
     if len(res) == 0:
@@ -1521,7 +1648,7 @@ async def pig_prod_entry(entry_hid:str):
 
 
 @app.get("/pig_prod/list", tags=["Pig Production"])
-async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
+async def pig_prod_list(request: Request, pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
     """
     Will get pig_production list.
     
@@ -1542,6 +1669,15 @@ async def pig_prod_list(pfhid:str, pig_prod_type:int = 0,  is_mob_view:int = 0):
 
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
@@ -1694,7 +1830,17 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
 
 
 @app.get("/pig_prod/data_details", tags=["Pig Production"])
-async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
+async def data_details(request: Request, pig_prod_hid, inc_user_audit:int = 0):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_common.decrypt(pig_prod_hid)
     if len(res) == 0:
         return {
@@ -1761,7 +1907,7 @@ async def pig_prod_data_details(pig_prod_hid, inc_user_audit:int = 0):
 
 
 @app.get("/pig_prod/not_pregnant", tags=["Pig Production"])
-async def pig_prod_not_pregnant(pfhid:str):
+async def pig_prod_not_pregnant(request: Request, pfhid:str):
     """
     Will get pig_production not pregnant list.
     
@@ -1773,6 +1919,15 @@ async def pig_prod_not_pregnant(pfhid:str):
 
 
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
@@ -1811,13 +1966,10 @@ async def pig_prod_not_pregnant(pfhid:str):
         'data': res 
     }
     
-    
-
-
 
 
 @app.get("/pig_prod/data_ver_num", tags=["Pig Production"])
-async def pig_prod_data_ver_num(pig_prod_hid: str):
+async def data_ver_num(request: Request, pig_prod_hid: str):
     """
     Will get pig_prod data_ver_num.
     
@@ -1829,6 +1981,14 @@ async def pig_prod_data_ver_num(pig_prod_hid: str):
 
         
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_common.decrypt(pig_prod_hid)

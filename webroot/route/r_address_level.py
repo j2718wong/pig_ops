@@ -7,6 +7,9 @@ import json
 import pprint
 
 
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -20,7 +23,7 @@ from common_fast_api        import *
 
 
 @app.get("/address/level_1/list", tags=["Location Address"])
-async def address_level_1_list(country_hid:str):
+async def address_level_1_list(request: Request, country_hid:str):
     """
     Will get address_level_1 list.
     
@@ -29,6 +32,15 @@ async def address_level_1_list(country_hid:str):
     country_id : int
         country_id
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     country_id = 0
     
@@ -81,7 +93,7 @@ async def address_level_1_list(country_hid:str):
     
 
 @app.get("/address/level_2/list", tags=["Location Address"])
-async def address_level_2_list(level_1_hid:str):
+async def address_level_2_list(request: Request, level_1_hid:str):
     """
     Will get address_level_2 list.
     
@@ -90,6 +102,15 @@ async def address_level_2_list(level_1_hid:str):
     level_1_hid : str
         adrs_level_1 hashid
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     adrs_level_1_id = 0
     
@@ -141,7 +162,7 @@ async def address_level_2_list(level_1_hid:str):
     
 
 @app.get("/address/level_3/list", tags=["Location Address"])
-async def address_level_3_list(level_2_hid:str):
+async def address_level_3_list(request: Request, level_2_hid:str):
     """
     Will get address_level_3 list.
     
@@ -150,6 +171,15 @@ async def address_level_3_list(level_2_hid:str):
     level_2_hid : str
         adrs_level_2 hashid
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
     
     adrs_level_2_id = 0
     
@@ -202,7 +232,7 @@ async def address_level_3_list(level_2_hid:str):
     
     
 @app.get("/address/level/names", tags=["Location Address"])
-async def address_level_names(adrs_level_1_id:int = 0, 
+async def address_level_names(request: Request, adrs_level_1_id:int = 0, 
     adrs_level_2_id:int = 0, adrs_level_3_id:int = 0):
     """
     Will get address_level names.
@@ -212,6 +242,16 @@ async def address_level_names(adrs_level_1_id:int = 0,
     adrs_level_1_id : int
         adrs_level_1_id
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res  = model_la['address_level'].get_address_level_names(
         address_level_1_id = adrs_level_1_id,
         address_level_2_id = adrs_level_2_id,

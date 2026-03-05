@@ -5,7 +5,6 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
 
 from datetime               import datetime, timedelta
 

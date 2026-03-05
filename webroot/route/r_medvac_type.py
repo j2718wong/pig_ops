@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -31,9 +34,19 @@ from r_utils                import remove_database_null_description
 
     
 @app.post("/medvac_type/add", tags=["Common Lookup"])
-async def medvac_type_add(medvac_type_data: dm.DataMedVacType):
-    name    = medvac_type_data.name
-    uhid    = medvac_type_data.uhid
+async def medvac_type_add(request: Request, data: dm.DataMedVacType):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -69,10 +82,10 @@ async def medvac_type_add(medvac_type_data: dm.DataMedVacType):
 
     
     
-    medvac_type_data.name      = name
-    medvac_type_data.user_id   = user_id
+    data.name      = name
+    data.user_id   = user_id
     
-    res_add    =  model['medvac_type'].add(medvac_type_data)
+    res_add    =  model['medvac_type'].add(data)
     
     if res_add is None:
         return {
@@ -100,7 +113,7 @@ async def medvac_type_add(medvac_type_data: dm.DataMedVacType):
 
    
 @app.get("/medvac_type/list", tags=["Common Lookup"])
-async def medvac_type_list():
+async def medvac_type_list(request: Request):
     """
     Will get medvac_type list.
     
@@ -116,6 +129,14 @@ async def medvac_type_list():
     inc_user_audit:
         if > 0, will include added_by and last_update info
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
         
     res = model['medvac_type'].get_list()

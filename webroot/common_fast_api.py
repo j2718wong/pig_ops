@@ -4,8 +4,10 @@
 import os
 
 from fastapi_offline            import FastAPIOffline
-from fastapi                    import FastAPI, Depends, HTTPException, status
+from fastapi                    import FastAPI, Request, Depends, HTTPException, status
 from fastapi.security           import HTTPBasicCredentials, HTTPBearer
+from fastapi.responses          import RedirectResponse
+from typing                     import Union
 
 from fastapi.staticfiles        import StaticFiles
 
@@ -108,6 +110,75 @@ strict_limit = RateLimiter(
 
 
 
+# Dependency function
+def get_current_uhid(request: Request) -> str:
+    token = request.headers.get("authorization", "").replace("Bearer ", "")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Unauthorized"
+        )
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        uhid = payload.get("uhid")
+        
+        if uhid is None:
+            # For API endpoints, raise exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, 
+                detail="Invalid token: missing uhid"
+            )
+            
+        return uhid
+        
+    except jwt.ExpiredSignatureError:
+        # You might want different behavior for API vs web endpoints
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Token expired"
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Invalid token"
+        )
+
+
+
+def get_uhid_or_redirect(request: Request) -> Union[str, RedirectResponse]:
+    """
+    Returns uhid string if valid token, otherwise returns RedirectResponse to login.
+    """
+    token = request.headers.get("authorization", "").replace("Bearer ", "")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Invalid Token"
+        )
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        uhid = payload.get("uhid")
+        
+        if uhid is None:
+            return RedirectResponse(url="/login", status_code=302)
+            
+        return uhid
+        
+    except jwt.ExpiredSignatureError:
+        return RedirectResponse(url="/login", status_code=302)
+        
+        
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Invalid Token"
+        )
+
+
 
 
 
@@ -159,7 +230,5 @@ JWT_TOKEN_USER_INVALID              = 5
 
 
 
-HTTP_RESPONSE_UNAUTHORIZED          = 401
-HTTP_RESPONSE_METHOD_NOT_ALLOWED    = 405
 
 

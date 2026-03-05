@@ -5,7 +5,10 @@ import os
 import sys
 import pprint
 
-from pydantic               import BaseModel
+
+from fastapi                import Request, HTTPException, status, Depends
+from fastapi.responses      import HTMLResponse, RedirectResponse
+
 
 from datetime               import datetime, timedelta
 
@@ -19,9 +22,19 @@ import data_model           as dm
 
    
 @app.post("/pig_race_line/add")
-async def pig_race_line_add(pig_race_line_data: dm.DataPigRaceLine):
-    name    = pig_race_line_data.name
-    uhid    = pig_race_line_data.uhid
+async def pig_race_line_add(request: Request, data: dm.DataPigRaceLine):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -48,10 +61,10 @@ async def pig_race_line_add(pig_race_line_data: dm.DataPigRaceLine):
     user_id = res[0]
     
     
-    pig_race_line_data.name      = name
-    pig_race_line_data.user_id   = user_id
+    data.name      = name
+    data.user_id   = user_id
     
-    res_add    =  model['pig_race_line'].add(pig_race_line_data)
+    res_add    =  model['pig_race_line'].add(data)
     
     if res_add is None:
         return {
@@ -75,9 +88,19 @@ async def pig_race_line_add(pig_race_line_data: dm.DataPigRaceLine):
     
 
 @app.post("/pig_race_line/update")
-async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
-    name    = pig_race_line_data.name
-    uhid    = pig_race_line_data.uhid
+async def pig_race_line_update(request: Request, data: dm.DataPigRaceLine):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+    #uhid    = data.uhid
     
     name    = name.strip() if name else None 
     
@@ -104,7 +127,7 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     user_id = res[0]
     
     
-    pig_race_line_hid = pig_race_line_data.pig_race_line_hid
+    pig_race_line_hid = data.pig_race_line_hid
     
     res = hashids_common.decrypt(pig_race_line_hid)
     if len(res) == 0:
@@ -120,11 +143,11 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     pig_race_line_id = res[0]
     
     
-    pig_race_line_data.name      = name
-    pig_race_line_data.user_id   = user_id
-    pig_race_line_data.pig_race_line_id = pig_race_line_id
+    data.name      = name
+    data.user_id   = user_id
+    data.pig_race_line_id = pig_race_line_id
     
-    res_update    =  model['pig_race_line'].update(pig_race_line_data)
+    res_update    =  model['pig_race_line'].update(data)
     
     if res_update is None:
         return {
@@ -144,7 +167,17 @@ async def pig_race_line_update(pig_race_line_data: dm.DataPigRaceLine):
     
 
 @app.get("/pig_race_line/delete")
-async def pig_race_line_delete(uhid:str, ehid: str):
+async def pig_race_line_delete(request: Request, ehid: str):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
@@ -198,7 +231,8 @@ async def pig_race_line_delete(uhid:str, ehid: str):
     
     
 @app.get("/pig_race_line/list")
-async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int = 0):
+async def pig_race_line_list(request: Request, ahid: str, inc_deleted: int = 0, 
+        inc_user_audit:int = 0):
     """
     Will get pig_race_line list.
     
@@ -215,6 +249,14 @@ async def pig_race_line_list(ahid: str, inc_deleted: int = 0, inc_user_audit:int
         if > 0, will include added_by and last_update info
     
     """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
     
     
     res = hashids_account.decrypt(ahid)
