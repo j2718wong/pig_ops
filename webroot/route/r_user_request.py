@@ -5,6 +5,10 @@ import os
 import sys
 import pprint
 
+
+import jwt
+
+from fastapi                import Request, HTTPException, status
 from pydantic               import BaseModel
 
 from datetime               import datetime, timedelta
@@ -26,15 +30,35 @@ FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
 
     
 @app.get("/user_request/join_account", tags=["User"])
-async def user_request_join_account(uhid: str, ahid:str):
+async def user_request_join_account(request: Request, ahid:str = None):
+    
+    token = request.headers.get("authorization", "").replace("Bearer ", "")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    
+    token_uhid = None
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        token_uhid = payload.get("uhid")
         
-    res = hashids_user.decrypt(uhid)
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    if token_uhid is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    
+    
+    res = hashids_user.decrypt(token_uhid)
     if len(res) == 0:
         return {
             'result':{
                 'num':  ERROR_USER_REQUEST_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_REQUEST_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_REQUEST_INVALID_USER_HASHID'
             }
         }
     
@@ -46,8 +70,7 @@ async def user_request_join_account(uhid: str, ahid:str):
         return {
             'result':{
                 'num':  ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID',
-                'desc': ''
+                'code': 'ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID'
             }
         }
     

@@ -6,6 +6,10 @@ import sys
 import time
 import pprint
 
+
+import jwt
+
+from fastapi                import Request, HTTPException, status
 from pydantic               import BaseModel
 from fastapi.responses      import HTMLResponse
 
@@ -80,7 +84,7 @@ async def signup():
 
 
 @app.get("/", response_class = HTMLResponse)
-async def root(p:str = None, u:str = None):
+async def root(request: Request, p:str = None):
     """
     2026-01-09 Notes:
     
@@ -108,11 +112,29 @@ async def root(p:str = None, u:str = None):
     p : str
         pig farm hid;  if this is given, will decode pig_farm_id
         
-        
-    u : str
-        user hid, if this is given, will decode pig_farm_id
-        Later on this option will be removed.
+
     """
+    
+    token = request.headers.get("authorization", "").replace("Bearer ", "")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    
+    uhid = None
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        uhid = payload.get("uhid")
+        
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    if uhid is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    
     
     time_init = time.time()
     
@@ -129,20 +151,14 @@ async def root(p:str = None, u:str = None):
     
     user_id = 0
     
-    
-    # This u parameter is temporary until the tokens are implemented
-    if u is not None:
-        res = hashids_user.decrypt(u)
-        if len(res) == 0:
-            # redirect to PAGE_NOT_FOUND
-            
-            return 
-            
-        user_id = res[0]
-    
-    
-    
-    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        # redirect to PAGE_NOT_FOUND
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+        
+    user_id = res[0]
     
     
     user_account = get_user_account_info(user_id)
@@ -150,6 +166,7 @@ async def root(p:str = None, u:str = None):
     account = user_account['account']
     user    = user_account['user']
     
+    print('\n\nroot user account')
     pprint.pprint(user_account)
     
     

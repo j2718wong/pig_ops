@@ -10,6 +10,7 @@ import httpx
 
 
 from fastapi                import Request, HTTPException, status
+from fastapi.responses      import RedirectResponse
 from pydantic               import BaseModel
 from google.oauth2          import id_token
 from google.auth.transport  import requests
@@ -630,6 +631,7 @@ async def google_auth(request: Request, token_data: Token):
     user_name_last  = user_info['family_name']  if 'family_name' in user_info else None
     user_name_first = user_info['given_name']   if 'given_name' in user_info else None
     
+    user_picture    = user_info['picture']
     
     # record client ip
     client_host = request.client.host
@@ -691,11 +693,15 @@ async def google_auth(request: Request, token_data: Token):
     
     # Create JWT token for the app
     access_token = create_access_token(
-        data = {"user_hid": user_hid}
+        data = {"uhid": user_hid}
     )
     
     
+    # To be stored in client
     res_login['bearer_token'] = access_token
+    res_login['user_picture'] = user_picture
+    
+    
     
     return res_login
     
