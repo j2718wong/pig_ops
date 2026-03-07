@@ -8,7 +8,7 @@ from common_constants       import *
 account.flag bits
 
 bit 0: FLAG_BIT_ACCOUNT_ENABLE
-bit 1:
+bit 1: FLAG_BIT_FREE_TRIAL_FINISHED
 bit 2:
 bit 3:  
 
@@ -22,8 +22,10 @@ bit 16: COMPANY_OWNED ACCOUNT
 """
 
 FLAG_BIT_ACCOUNT_ENABLE                 = 1
-FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 1<<4
+FLAG_BIT_FREE_TRIAL_FINISHED            = 2
 
+FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 1<<4
+            
 
 FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED       = 1<<16
 
@@ -76,7 +78,8 @@ class Account:
                     a.id,
                     a.flag,
                     a.status_id, 
-                    b.name AS status_name,
+                    a.country_id,
+                    b.name AS country_name,
                     a.name AS account_name,
                     a.date_trial_start,
                     a.date_trial_end,
@@ -96,8 +99,8 @@ class Account:
                     d.name_first,
                     a.dt_last_update_settings
                 FROM account a
-                LEFT OUTER JOIN account_status b ON a.status_id = b.id
-                LEFT OUTER JOIN account_bill c ON a.current_bill_id = c.id
+                LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
                 LEFT OUTER JOIN user d          ON a.last_update_settings_user_id = d.id
                 
                 WHERE a.id = %s
@@ -139,29 +142,34 @@ class Account:
                 cur_acc_id                  = row[0]
                 cur_acc_flag                = row[1]
                 cur_acc_status_id           = row[2]
-                cur_acc_status_name         = row[3]
-                cur_acc_account_name        = row[4]
-                cur_acc_date_trial_start    = row[5]
-                cur_acc_date_trial_end      = row[6]
+                cur_acc_country_id          = row[3]
+                cur_acc_country_name        = row[4]
+                cur_acc_account_name        = row[5]
+                cur_acc_date_trial_start    = str(row[6])
+                cur_acc_date_trial_end      = str(row[7])
                 
-                cur_acc_current_bill_id     = row[7]
-                cur_acc_current_bill_status = row[8]
+                cur_acc_current_bill_id     = row[8]
+                cur_acc_current_bill_status = row[9]
                 
-                cur_acc_weight_unit         = row[9]
-                cur_acc_currency            = row[10]
-                cur_acc_settings_flag       = row[11]
-                cur_acc_num_days_wean       = row[12]
-                cur_acc_num_days_harvest_from_birth = row[13]
-                cur_acc_num_days_harvest_from_wean  = row[14]
+                cur_acc_weight_unit         = row[10]
+                cur_acc_currency            = row[11]
+                cur_acc_settings_flag       = row[12]
+                cur_acc_num_days_wean       = row[13]
+                cur_acc_num_days_harvest_from_birth = row[14]
+                cur_acc_num_days_harvest_from_wean  = row[15]
                 
                                
-                cur_user_name_last          = row[15]
-                cur_user_name_first         = row[16]
-                cur_settings_last_update    = str(row[17]) if row[17] else None
+                cur_user_name_last          = row[16]
+                cur_user_name_first         = row[17]
+                cur_settings_last_update    = str(row[18]) if row[18] else None
                 
                 
                 temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
                 cur_flag_acc_is_enabled = 1 if temp > 0 else 0
+                
+                
+                temp = cur_acc_flag & FLAG_BIT_FREE_TRIAL_FINISHED
+                cur_flag_acc_free_trial_finished = 1 if temp > 0 else 0
                 
                 
                 temp = cur_acc_flag & FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
@@ -183,12 +191,15 @@ class Account:
                 cur_entry = {
                     'account': {
                         'id':               cur_acc_id,
-                        'account_name':     cur_acc_account_name,
+                        'name':             cur_acc_account_name,
                         'flag':             cur_acc_flag,
                         'status_id':        cur_acc_status_id,
-                        'status_name':      cur_acc_status_name,
+                        'country_id':       cur_acc_country_id,
+                        'country_name':     cur_acc_country_name,
                         
                         'is_enabled':       cur_flag_acc_is_enabled,
+                        'is_trial_finished':cur_flag_acc_free_trial_finished,
+                        
                         'is_bill_exempt':   cur_flag_acc_is_bill_exempt,
                         'is_company_owned': cur_flag_acc_is_company_owned,
                         
@@ -214,6 +225,12 @@ class Account:
                         }
                     }
                 }
+                
+                
+                if cur_flag_acc_free_trial_finished == 0:
+                    cur_entry['account']['date_trial_start'] = cur_acc_date_trial_start
+                    cur_entry['account']['date_trial_end'] = cur_acc_date_trial_end
+                    
                 
                 
                 # Get Farm List

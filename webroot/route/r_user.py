@@ -493,7 +493,7 @@ async def user_info(uhid:str):
     
 
 @app.get("/user/list", tags=["User"])
-async def user_list(ahid: str, inc_deleted : int = 0):
+async def user_list(request: Request, ahid: str, inc_deleted : int = 0):
     """
     Will get user list.
     

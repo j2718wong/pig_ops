@@ -142,9 +142,6 @@ class User:
         return None
     
     
-    
-    
-    
     def get_user_info(self, user_id):
         sql =   """
                 SELECT 

@@ -10,7 +10,7 @@
     <meta name="viewport"                       content="width=device-width, initial-scale=1.0">
     
 
-    <title>PiggyProd - Pig Farm Management System</title>
+    <title>SuperPig - Pig Farm Management System</title>
 
     <link type="image/x-icon"   rel="icon"          href="/static_m/images/favicon.ico" >
     
@@ -68,7 +68,7 @@
             </div>
             
             <div class="nav-center">
-                <div class="pig-farm-name" id="pigFarmName">Sunrise Pig Farm Management</div>
+                <div class="pig-farm-name" id="pigFarmName">&nbsp;</div>
             </div>
             
             <div class="nav-right">
@@ -107,15 +107,15 @@
                         
                         
                         <!-- Dropdown Items -->
-                        <div class="user-dropdown-item">
+                        <div class="user-dropdown-item" id="desktop-my-account">
                             <i class="fas fa-user-circle" style="color: var(--icon-blue);"></i>
                             <span>My Account</span>
                         </div>
-                        <div class="user-dropdown-item dropdown-alert">
+                        <div class="user-dropdown-item dropdown-alert" id="desktop-bill-new">
                             <i class="fas fa-exclamation-circle" style="color: var(--icon-red);"></i>
                             <span>New Bill Available</span>
                         </div>
-                        <div class="user-dropdown-item">
+                        <div class="user-dropdown-item" id="desktop-bill-history">
                             <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
                             <span>Billing</span>
                         </div>
@@ -176,8 +176,10 @@
                     </button>
                     <div class="nav-submenu">
                         <div class="submenu-item" id="desktop-nav-operations-1"> <i class="fas fa-file-spreadsheet" style="color: var(--icon-green);"></i>Feed Balance</div>
+                        <!--
                         <div class="submenu-item" id="desktop-nav-operations-2"> <i class="fas fa-clipboard-list"   style="color: var(--icon-blue);"></i>Reports</div>
                         <div class="submenu-item" id="desktop-nav-operations-3"> <i class="fas fa-calculator"       style="color: var(--icon-green);"></i>Feed Calculator</div>
+                        -->
                     </div>
                 </div>
                 
@@ -357,78 +359,20 @@
         <div class="mobile-nav-header">
             <div class="mobile-logo-container">
                 <div class="company-logo">J</div>
-                <div class="product-name">PiggyProd</div>
+                <div class="product-name">SuperPig</div>
             </div>
             
             <!-- Alerts in mobile header (alerts at left side of user control) -->
             <div style="display: flex; align-items: center; gap: 15px;">
-                <div class="alerts-container" id="mobileAlertsContainer">
-                    <div class="alert-icon" id="mobileAlertIcon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="alert-count" id="mobileAlertCount">6</div>
-                </div>
-                
-                <!-- Single User Control in Mobile -->
-                <div class="user-control" id="mobileUserControl">
-                    <div class="user-avatar" id="mobile-user-initials">JD</div>
-                    <div class="user-dropdown" id="mobileUserDropdown">
-                        <!-- User Profile Header with Full Name (Mobile) -->
-                        <div class="user-dropdown-header">
-                            <div class="user-avatar-large" id="mobile-user-initials-large">JD</div>
-                            <div class="user-info">
-                                <div class="user-full-name" id="mobile-user-full-name">John Doe</div>
-                                <div class="user-role" id="mobile-user-role">Farm Manager</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Language Switch -->
-                        <div class="language-switch">
-                            <div class="language-label">
-                                <i class="fas fa-globe" style="color: var(--icon-blue);"></i>
-                                <span>Language</span>
-                            </div>
-                            <div class="language-options">
-                                <div class="language-option active" data-lang="en" title="English">
-                                    <div class="language-flag" style="background: linear-gradient(to bottom, #012169 0%, #012169 50%, #C8102E 50%, #C8102E 100%);"></div>
-                                </div>
-                                <div class="language-option" data-lang="es" title="Español">
-                                    <div class="language-flag" style="background: linear-gradient(to right, #AA151B 0%, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%, #AA151B 100%);"></div>
-                                </div>
-                                <div class="language-option" data-lang="fr" title="Français">
-                                    <div class="language-flag" style="background: linear-gradient(to right, #002395 0%, #002395 33%, #FFFFFF 33%, #FFFFFF 66%, #ED2939 66%, #ED2939 100%);"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Dropdown Items -->
-                        <div class="user-dropdown-item">
-                            <i class="fas fa-user-circle" style="color: var(--icon-blue);"></i>
-                            <span>My Account</span>
-                        </div>
-                        <div class="user-dropdown-item dropdown-alert">
-                            <i class="fas fa-exclamation-circle" style="color: var(--icon-red);"></i>
-                            <span>New Bill Available</span>
-                        </div>
-                        <div class="user-dropdown-item">
-                            <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
-                            <span>Billing</span>
-                        </div>
-                        <div class="user-dropdown-item" id="mobile-user-logout">
-                            <i class="fas fa-sign-out-alt" style="color: var(--icon-red);"></i>
-                            <span>Logout</span>
-                        </div>
-                    </div>
-                </div>
+                <button class="close-mobile-nav" id="closeMobileNav">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
         
         <!-- Pig Farm Name with Close Button (Second Line) -->
         <div class="mobile-pig-farm-name">
-            <div class="mobile-pig-farm-name-text" id="mobilePigFarmName">Sunrise Pig Farm Management</div>
-            <button class="close-mobile-nav" id="closeMobileNav">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="mobile-pig-farm-name-text" id="mobilePigFarmName">&nbsp;</div>
         </div>
         
         <button class="mobile-special-button" id="mobile-nav-special-btn-summary">
@@ -472,8 +416,10 @@
             </div>
             <div class="mobile-submenu" id="mobile-subnav-operations">
                 <div class="mobile-submenu-item" id="mobile-subnav-operations-1">    <i class="fas fa-weight"        style="color: var(--icon-red);"></i>Feed Balance</div>         
+                <!--
                 <div class="mobile-submenu-item" id="mobile-subnav-operations-2">    <i class="fas fa-clipboard-list" style="color: var(--icon-blue);"></i>Reports</div>
                 <div class="mobile-submenu-item" id="mobile-subnav-operations-3">    <i class="fas fa-calculator"    style="color: var(--icon-green);"></i>Feed Calculator</div>
+                -->
             </div>
         </div>
         
@@ -533,23 +479,26 @@
     
     <!-- Main Content - Dashboard -->
     <div class="main-content">
-        <!-- User control pages -->
-        <div id="container-account-disabled"    class="hidden-container" style="display:none;"></div>
-        <div id="container-user-disabled"       class="hidden-container" style="display:none;"></div>
-        <div id="container-account-bill-unpaid" class="hidden-container" style="display:none;"></div>
-        
-        
-        <!-- Production pages -->
-        <div id="container-prod-gesta-list"     class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-gesta-add"      class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-gesta-entry"    class="hidden-container" style="display:none;"></div>
-        
-        <div id="container-prod-lacta-list"     class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-lacta-entry"    class="hidden-container" style="display:none;"></div>
-        
-        <div id="container-fattening-list"      class="hidden-container" style="display:none;"></div>
-        <div id="container-fattening-add"       class="hidden-container" style="display:none;"></div>
-        <div id="container-fattening-entry"     class="hidden-container" style="display:none;"></div>
+        <div id="container-my-account"              class="hidden-container" style="display:none;"></div>
+        <div id="container-customer-pricing"        class="hidden-container" style="display:none;"></div>
+            
+        <!-- User control pages --> 
+        <div id="container-account-disabled"        class="hidden-container" style="display:none;"></div>
+        <div id="container-user-disabled"           class="hidden-container" style="display:none;"></div>
+        <div id="container-account-bill-unpaid"     class="hidden-container" style="display:none;"></div>
+            
+            
+        <!-- Production pages -->   
+        <div id="container-prod-gesta-list"         class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-gesta-add"          class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-gesta-entry"        class="hidden-container" style="display:none;"></div>
+            
+        <div id="container-prod-lacta-list"         class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-lacta-entry"        class="hidden-container" style="display:none;"></div>
+            
+        <div id="container-fattening-list"          class="hidden-container" style="display:none;"></div>
+        <div id="container-fattening-add"           class="hidden-container" style="display:none;"></div>
+        <div id="container-fattening-entry"         class="hidden-container" style="display:none;"></div>
         
         
         <div id="container-prod-pig-ops-edit"       class="hidden-container" style="display:none;"></div>
@@ -569,20 +518,20 @@
         
         
         <!-- Sow boar pages -->
-        <div id="container-sow-boar-list"       class="hidden-container" style="display:none;"></div>
-        <div id="container-sow-boar-add-edit"   class="hidden-container" style="display:none;"></div>
-        <div id="container-sow-boar-entry"      class="hidden-container" style="display:none;"></div>
-        <div id="container-sow-boar-disposed"   class="hidden-container" style="display:none;"></div>
-        
-        <div id="container-medvac-add-edit"     class="hidden-container" style="display:none;"></div>
-        <div id="container-health-add-edit"     class="hidden-container" style="display:none;"></div>
-        <div id="container-notes-add-edit"      class="hidden-container" style="display:none;"></div>
-        
-        <div id="container-trace-parents"       class="hidden-container" style="display:none;"></div>
-        
-        
-        
-        <div id="container-supplier-add-edit"   class="hidden-container" style="display:none;"></div>
+        <div id="container-sow-boar-list"           class="hidden-container" style="display:none;"></div>
+        <div id="container-sow-boar-add-edit"       class="hidden-container" style="display:none;"></div>
+        <div id="container-sow-boar-entry"          class="hidden-container" style="display:none;"></div>
+        <div id="container-sow-boar-disposed"       class="hidden-container" style="display:none;"></div>
+            
+        <div id="container-medvac-add-edit"         class="hidden-container" style="display:none;"></div>
+        <div id="container-health-add-edit"         class="hidden-container" style="display:none;"></div>
+        <div id="container-notes-add-edit"          class="hidden-container" style="display:none;"></div>
+            
+        <div id="container-trace-parents"           class="hidden-container" style="display:none;"></div>
+            
+            
+            
+        <div id="container-supplier-add-edit"       class="hidden-container" style="display:none;"></div>
         
         
         <div id="container-farm-feed-buy-list"          class="hidden-container" style="display:none;"></div>
@@ -594,34 +543,34 @@
         
         
         <!-- Financials-->
-        <div id="container-prod-sales-list"     class="hidden-container" style="display:none;"></div>
-        <div id="container-prod-sales-entry"    class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-sales-list"         class="hidden-container" style="display:none;"></div>
+        <div id="container-prod-sales-entry"        class="hidden-container" style="display:none;"></div>
         
         
         
-        <div id="container-acc-ops-settings-edit" class="hidden-container" style="display:none;"></div>
-        <div id="container-acc-pig-ops-list"     class="hidden-container" style="display:none;"></div>
-        <div id="container-acc-pig-ops-add-edit" class="hidden-container" style="display:none;"></div>
+        <div id="container-acc-ops-settings-edit"   class="hidden-container" style="display:none;"></div>
+        <div id="container-acc-pig-ops-list"        class="hidden-container" style="display:none;"></div>
+        <div id="container-acc-pig-ops-add-edit"    class="hidden-container" style="display:none;"></div>
         
         
-        <div id="container-user-list"           class="hidden-container" style="display:none;"></div>
-        <div id="container-user-add-edit"       class="hidden-container" style="display:none;"></div>
-        <div id="container-join-acc-req-list"   class="hidden-container" style="display:none;"></div>
+        <div id="container-user-list"               class="hidden-container" style="display:none;"></div>
+        <div id="container-user-add-edit"           class="hidden-container" style="display:none;"></div>
+        <div id="container-join-acc-req-list"       class="hidden-container" style="display:none;"></div>
+        <div id="container-join-acc-req-approve"    class="hidden-container" style="display:none;"></div>
         
-        
-        <div id="container-pig-farm-add-edit"   class="hidden-container" style="display:none;"></div>
-        
-    
-        <div id="container-dashboard"           class="hidden-container" style="display:none"></div>
-    
-    
+        <div id="container-pig-farm-add-edit"       class="hidden-container" style="display:none;"></div>
         
     
-        <div id="container-more-modal"          class="more-container"></div>
+        <div id="container-dashboard"               class="hidden-container" style="display:none"></div>
+    
+    
+        
+    
+        <div id="container-more-modal"              class="more-container"></div>
         
         <div id="container-error-modal"></div>
         
-        <div id="container-toast"               class="toast-container" ></div>
+        <div id="container-toast"                   class="toast-container" ></div>
     </div>
     
     
@@ -728,21 +677,10 @@
             });
         }
         
-        // Mobile user control dropdown
-        const mobileUserControl = document.getElementById('mobileUserControl');
-        const mobileUserDropdown = document.getElementById('mobileUserDropdown');
-        
-        if (mobileUserControl) {
-            mobileUserControl.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent closing immediately
-                mobileUserDropdown.classList.toggle('active');
-            });
-        }
         
         // Close dropdowns when clicking outside
         document.addEventListener('click', () => {
             if (userDropdown) userDropdown.classList.remove('active');
-            if (mobileUserDropdown) mobileUserDropdown.classList.remove('active');
         });
         
         // Prevent dropdown from closing when clicking inside it
@@ -752,21 +690,15 @@
             });
         }
         
-        if (mobileUserDropdown) {
-            mobileUserDropdown.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-        }
+
         
         // Alert Modal Functionality
         const alertIcon = document.getElementById('alertIcon');
-        const mobileAlertIcon = document.getElementById('mobileAlertIcon');
         const alertModal = document.getElementById('alertModal');
         const closeAlertModal = document.getElementById('closeAlertModal');
         const closeAlertModalBtn = document.getElementById('closeAlertModalBtn');
         const markAllAsRead = document.getElementById('markAllAsRead');
         const alertCount = document.getElementById('alertCount');
-        const mobileAlertCount = document.getElementById('mobileAlertCount');
         
         // Open alert modal from desktop
         alertIcon.addEventListener('click', () => {
@@ -774,13 +706,6 @@
             document.body.style.overflow = 'hidden';
         });
         
-        // Open alert modal from mobile
-        mobileAlertIcon.addEventListener('click', () => {
-            alertModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            // Close mobile nav if open
-            mobileNav.classList.remove('active');
-        });
         
         // Close alert modal
         closeAlertModal.addEventListener('click', () => {

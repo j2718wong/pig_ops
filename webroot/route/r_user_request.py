@@ -196,7 +196,7 @@ async def user_request_approve_add_user(urhid: str):
 
 
 @app.get("/user_request/list", tags=["User"])
-async def user_request_list(ahid: str):
+async def user_request_list(request: Request, ahid: str):
     """
     Will get user request list.
     
