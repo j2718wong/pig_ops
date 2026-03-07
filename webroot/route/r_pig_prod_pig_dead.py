@@ -30,7 +30,8 @@ if module_directory not in sys.path:
 
 
 from r_a0_security_checks   import check_if_valid_user_account
-from r_utils                import remove_database_null_description
+from r_utils                import (remove_database_null_description,
+                                    replace_plain_ids_pig_production)
 
 
 
@@ -279,7 +280,7 @@ async def prod_pig_dead_update(request: Request, data: dm.DataPigProdDeadPig):
   
 @app.get("/prod_pig_dead/list", tags=["Production Details"])
 async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None, 
-        dead_at_stage:int = 1, pig_prod_hid: str =None):
+        pig_prod_hid: str =None):
     """
     Will get prod_pig_dead list.
     
@@ -344,7 +345,8 @@ async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None,
         
         
         
-    res = model['prod_pig_dead'].get_list(pig_farm_id, dead_at_stage, pig_prod_id)
+    res = model['prod_pig_dead'].get_list(
+         pig_farm_id = pig_farm_id, pig_prod_id = pig_prod_id)
     
     if res is None:
         return {
@@ -357,27 +359,13 @@ async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None,
     
     if pig_farm_id > 0:
         for cur_entry in res:
-            cur_id  = cur_entry['pig_prod_id']
-            cur_hid = hashids_common.encrypt(cur_id)
-        
-            del cur_entry['pig_prod_id']
-            cur_entry['pig_prod_hid']   = cur_hid
-            
-    else:
-        # Replace plain id
-        for cur_entry in res:
             cur_id  = cur_entry['pig_dead']['id']
             cur_hid = hashids_common.encrypt(cur_id)
-            
+        
             del cur_entry['pig_dead']['id']
             cur_entry['pig_dead']['hid']   = cur_hid
             
-            
-            cur_id  = cur_entry['pig_dead']['dead_type_id']
-            cur_hid = hashids_common.encrypt(cur_id)
-            
-            del cur_entry['pig_dead']['dead_type_id']
-            cur_entry['pig_dead']['dead_type_hid']   = cur_hid
+            replace_plain_ids_pig_production(cur_entry['production'])
             
         
         

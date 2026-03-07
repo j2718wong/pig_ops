@@ -270,67 +270,63 @@ class PigProdPigDead:
         return None
     
     
-    def get_list(self, pig_farm_id = 0, dead_at_stage = 1, pig_prod_id = 0, inc_user_audit = 0):
-        if pig_farm_id > 0:
-            # if pig_farm_id is given, the return is SUM by pig_prod_id
+    def get_list(self, pig_farm_id = 0, pig_prod_id = 0, inc_user_audit = 0):
         
-            if dead_at_stage == 1:
+        
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.date_dead,
+                    a.num_pigs_dead,
+                    
+                    a.dead_type_id,
+                    b.name as dead_type,
+                    
+                    a.pig_prod_id,
+                    c.farm_prod_id,
+                    
+                    c.insemination_type,
+                    c.date_actual_birth,
+                    c.date_weaning,
+                    
+                    c.sow_id,
+                    d.number,
+                    d.name,
+                    
+                    c.boar_id,
+                    e.number,
+                    e.name,
+                    
+                    c.semen_supplier_id,
+                    f.name AS semen_supplier_name,
+                    
+                    c.semen_sup_semen_id,
+                    g.name as semen_supplier_semen_name,
+                    
+                    c.semen_ai_boar_id,
+                    h.number,
+                    h.name,
+                    
+                    
+                    i.notes
+                    
+                    
+                FROM pig_prod_pig_dead a 
+                LEFT OUTER JOIN pig_dead_type b     ON a.dead_type_id   = b.id
                 
-                # prod_status must be PRODUCTION_STATUS_ID_LACTATING = 4
+                LEFT OUTER JOIN pig_production c    ON a.pig_prod_id    = c.id
+                LEFT OUTER JOIN sow_boar d          ON c.sow_id         = d.id
+                LEFT OUTER JOIN sow_boar e          ON c.boar_id        = e.id
                 
-                sql =   """
-                        SELECT 
-                            a.pig_prod_id,
-                            SUM(a.num_pigs_dead)
-                            
-                        FROM pig_prod_pig_dead a 
-                        LEFT OUTER JOIN pig_production b     ON a.pig_prod_id   = b.id
-                        WHERE a.pig_farm_id = %s AND b.prod_status_id = 4 AND a.dead_at_stage = 1
-                        GROUP BY a.pig_prod_id
-                        ORDER BY a.pig_prod_id
-                        """ % pig_farm_id
-            else:
-                # prod_status must be 
-                # PRODUCTION_STATUS_ID_WEANING = 5
-                # PRODUCTION_STATUS_ID_GROWING = 6
+                LEFT OUTER JOIN common_supplier f   ON c.semen_supplier_id = f.id
+                LEFT OUTER JOIN semen_supplier_semen g ON c.semen_sup_semen_id = g.id
+                LEFT OUTER JOIN sow_boar h          ON c.semen_ai_boar_id = h.id
                 
-                sql =   """
-                        SELECT 
-                            a.pig_prod_id,
-                            SUM(a.num_pigs_dead)
-                            
-                        FROM pig_prod_pig_dead a 
-                        LEFT OUTER JOIN pig_production b     ON a.pig_prod_id   = b.id
-                        WHERE a.pig_farm_id = %s AND b.prod_status_id IN(5,6) AND a.dead_at_stage = 2
-                        GROUP BY a.pig_prod_id
-                        ORDER BY a.pig_prod_id
-                        """ % pig_farm_id
+                LEFT OUTER JOIN pig_prod_notes i    ON a.notes_id = i.id
                 
-        else:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        a.date_dead,
-                        a.dead_type_id,
-                        a.num_pigs_dead,
-                        d.notes,
-                        
-                        b.name_last,
-                        b.name_first,
-                        a.dt_entry,
-                        
-                        c.name_last,
-                        c.name_first,
-                        a.dt_last_update
-                        
-                    FROM pig_prod_pig_dead a 
-                    LEFT OUTER JOIN user b          ON a.added_by_user_id   = b.id
-                    LEFT OUTER JOIN user c          ON a.last_update_user_id = c.id
-                    LEFT OUTER JOIN pig_prod_notes d ON a.notes_id = d.id
-                
-                    WHERE a.pig_prod_id = %s
-                    ORDER BY a.date_dead DESC
-                    """ % pig_prod_id
+                WHERE a.pig_farm_id = %s
+                ORDER BY a.date_dead DESC
+                """ % pig_farm_id
         
         
         
@@ -368,38 +364,103 @@ class PigProdPigDead:
         if rows is not None:
             
             for row in rows:
+                cur_id                  = row[0]
+                cur_date_dead           = str(row[1])
+                cur_num_pigs_dead       = row[2]
                 
-                if pig_farm_id > 0:
-                    cur_entry ={
-                        'pig_prod_id':          row[0],
-                        'num_dead':             int(row[1]) if row[1] is not None else None
-                    }
-                else:
+                cur_dead_type_id        = row[3]
+                cur_dead_type           = row[4]
                 
-                    cur_entry = {
-                        'pig_dead':{
-                            'id':               row[0],
-                            'date_dead':        str(row[1]),
-                            'dead_type_id':     row[2],
-                            'num_pigs_dead':    row[3],
-                            'notes':            row[4],
+                cur_pig_prod_id         = row[5]
+                cur_farm_prod_id        = row[6]
+                
+                cur_insemination_type   = row[7]
+                cur_date_actual_birth   = row[8]
+                cur_date_weaning        = row[9]
+                
+                cur_sow_id              = row[10]
+                cur_sow_number          = row[11]
+                cur_sow_name            = row[12]
+                
+                cur_boar_id             = row[13]
+                cur_boar_number         = row[14]
+                cur_boar_name           = row[15]
+                
+                cur_semen_supplier_id   = row[16]
+                cur_semen_supplier_name = row[17]
+                
+                cur_semen_sup_semen_id  = row[18]
+                cur_semen_sup_semen_name= row[19]
+                
+                cur_semen_ai_boar_id    = row[20]
+                cur_semen_ai_boar_number= row[21]
+                cur_semen_ai_boar_name  = row[22]
+                
+                
+                cur_notes               = row[23]
+                
+                cur_entry = {
+                    'pig_dead':{
+                        'id':               cur_id,
+                        'date_dead':        cur_date_dead,
+                        'dead_type_id':     cur_dead_type_id,
+                        'dead_type':        cur_dead_type,
+                        'num_pigs_dead':    cur_num_pigs_dead,
+                        'notes':            cur_notes,
+                    },
+                   
+                    'production':{
+                        'pig_production' :{
+                            'id':               cur_pig_prod_id, 
+                            'farm_prod_id':     cur_farm_prod_id
                         },
-                       
                         
-                        'added_by': {
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_entry':         row[7]
+                        'sow': {
+                            'id':               cur_sow_id,
+                            'number':           cur_sow_number,
+                            'name':             cur_sow_name,
                         },
                         
-                        'last_update':{
-                            'name_last':        row[8],
-                            'name_first':       row[9],
-                            'dt_update':        str(row[10]) if row[10] else None
+                        'insemination': {
+                            'insem_type':       cur_insemination_type,
+                            
+                            'boar': {
+                                'id':           cur_boar_id,
+                                'number':       cur_boar_number,
+                                'name':         cur_boar_name
+                            },
+                            
+                            'ai': {
+                                'semen_supplier':{
+                                    'id':       cur_semen_supplier_id,
+                                    'name':     cur_semen_supplier_name,
+                                    
+                                    'semen': {
+                                        'id':   cur_semen_sup_semen_id,
+                                        'name': cur_semen_sup_semen_name
+                                    }
+                                },
+                                
+                                'internal_boar':{
+                                    'id':           cur_semen_ai_boar_id,
+                                    'number':       cur_semen_ai_boar_number,
+                                    'name':         cur_semen_ai_boar_name
+                                },
+                                
+                            }
+                        },
+                        
+                        'birth': {
+                            'date_actual':      cur_date_actual_birth,
+                        },
+                        
+                        'weaning': {
+                            'date_weaning':     cur_date_weaning,
                         }
                     }
+                }
+            
                 
-                    
                 result.append(cur_entry)
         
         return result

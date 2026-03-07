@@ -74,23 +74,28 @@ class UserRequest:
     def approve_join_account(self, data = None):
         """
         PROCEDURE user_request_join_account_approve(
-            in_user_request_id          INT,
             in_approving_user_id        INT,
-            in_assigned_user_group_id   INT
+            
+            in_user_request_id          INT,
+            in_user_group_num           INT,
+            
+            in_is_approved              INT,
+            
+            in_pig_farm_id              INT
+            
         )
         """
         
-        user_request_id     = data['user_request_id']
-        approving_user_id   = data['approving_user_id']
-        user_group_id       = data['user_group_id']
-        
-        
-        
         sql =  'CALL user_request_join_account_approve('
-        sql += '%s,'    % user_request_id
-        sql += '%s,'    % approving_user_id
-        sql += '%s);'   % user_group_id
+        sql += '%s,'    % data.user_id
         
+        sql += '%s,'    % data.user_req_id
+        sql += '%s,'    % data.group_num
+        
+        sql += '%s,'    % data.is_approved
+        
+        sql += '%s);'   % data.pig_farm_id
+
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -132,17 +137,17 @@ class UserRequest:
                     'status_id':        row[4],
                     
                     'approving_user':{
-                        'email':        row[6],
-                        'name_last':    row[7],
-                        'name_first':   row[8]
+                        'email':        row[5],
+                        'name_last':    row[6],
+                        'name_first':   row[7]
                     },
                     
-                    'dt_approved':      str(row[9]) if row[9] else None,
+                    'dt_approved':      str(row[8]) if row[8] else None,
                 },
                 
                 'requesting_user': {
-                    'id':               row[10],
-                    'email':            row[11]
+                    'id':               row[9],
+                    'email':            row[10]
                 }
             }
 

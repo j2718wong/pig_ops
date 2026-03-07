@@ -114,8 +114,8 @@ async def user_request_join_account(request: Request, ahid:str = None):
     return res_add
     
 
-@app.get("/user_request/approve_add_user", tags=["Account Details"])
-async def user_request_approve_add_user(urhid: str):
+@app.post("/user_request/approve_join_acc", tags=["Account Details"])
+async def user_request_approve_add_user(request: Request, data: dm.DataApproveUserReq):
     result = get_uhid_or_redirect(request)
     
     # If result is RedirectResponse, return it immediately
@@ -124,19 +124,6 @@ async def user_request_approve_add_user(urhid: str):
     
     
     uhid = result
-    
-    
-    
-    res = hashids_common.decrypt(arhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_USER_REQUEST_INVALID_HASHID,
-                'code': 'ERROR_USER_REQUEST_INVALID_HASHID'
-            }
-        }
-    
-    user_request_id = res[0]
     
     
     res = hashids_user.decrypt(uhid)
@@ -152,13 +139,42 @@ async def user_request_approve_add_user(urhid: str):
     
     
     
-    data = {
-        'user_request_id':      user_request_id,
-        'approving_user_id':    user_id
-    }
+    user_req_hid = data.user_req_hid
+    
+    res = hashids_common.decrypt(user_req_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_REQUEST_INVALID_HASHID,
+                'code': 'ERROR_USER_REQUEST_INVALID_HASHID'
+            }
+        }
+    
+    user_request_id = res[0]
     
     
-    res_approve    =  model['acc_req'].approve_add_user(data)
+    pig_farm_id  = 0
+    pig_farm_hid = data.pig_farm_hid
+    
+    if pig_farm_hid is not None:
+        res = hashids_common.decrypt(pig_farm_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_USER_REQUEST_INVALID_HASHID,
+                    'code': 'ERROR_USER_REQUEST_INVALID_HASHID'
+                }
+            }
+        
+        pig_farm_id = res[0]
+        
+    
+    data.user_id            = user_id
+    data.user_req_id        = user_request_id
+    data.pig_farm_id        = pig_farm_id
+    
+    
+    res_approve    =  model['user_req'].approve_join_account(data)
     
     if res_approve is None:
         return {
@@ -170,12 +186,12 @@ async def user_request_approve_add_user(urhid: str):
         }
     
     
-    user_request_id  = res_approve['user_request']['id']
-    user_request_hashid  = hashids_account.encrypt(user_request_id)
+    cur_id  = res_approve['user_request']['id']
+    cur_hid  = hashids_account.encrypt(user_request_id)
     
     # remove plain id
     del res_approve['user_request']['id']
-    res_approve['user_request']['hid'] = user_request_hashid
+    res_approve['user_request']['hid'] = cur_hid
 
 
     requesting_user_id      = res_approve['requesting_user']['id']
@@ -246,7 +262,7 @@ async def user_request_list(request: Request, ahid: str):
     # Replace plain id
     for cur_entry in res:
         cur_id  = cur_entry['user_req']['id']
-        cur_hid = hashids_user.encrypt(cur_id)
+        cur_hid = hashids_common.encrypt(cur_id)
         
         del cur_entry['user_req']['id']
         cur_entry['user_req']['hid']   = cur_hid

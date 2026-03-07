@@ -51,6 +51,22 @@ class DataUser(BaseModel):
     ip_address:             str = None
 
 
+class DataApproveUserReq(BaseModel):
+    uhid:                   str = None
+    user_req_hid:           str = None 
+    pig_farm_hid:           str = None
+    
+    user_id:                int = 0
+    user_req_id:            int = 0
+    pig_farm_id:            int = 0
+    group_num:              int
+    
+    is_approved:            int = 1     # 0 = is_rejected
+    
+
+    
+
+
 class DataAccount(BaseModel):
     uhid:                   str = None
     user_id:                int = 0

@@ -28,7 +28,7 @@ mimetypes.add_type('text/javascript', '.js')
 
 
 # Application secret key 
-JWT_SECRET = b'\xf2Pu\xcf\xbe\x88\x80\xac\x8e\xf1\xc6\xa7\xa4`Ae\x84\x10f\x9a|\xff\xe1r'
+JWT_SECRET = 'MIdkgAL5GXSQO7D6nG9rYV9Xg3TQkQ4tkSlRn5V3gfT4yZF1-JWQO_-WXUVK_R7W'
 
 RELEASE_MODE_DEVELOPMENT    = 0
 RELEASE_MODE_PRODUCTION     = 1
