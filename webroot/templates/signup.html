@@ -17,7 +17,6 @@
     body {
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background:  white; /*#f2f5f9;*/
-      display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
@@ -50,6 +49,7 @@
         --text-light: #ffffff;
         --text-dark: #333333;
         --bg-light: #f8f9fa;
+        --bg-accent: #f9fafb;
         --border-color: #dee2e6;
         --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
@@ -106,6 +106,18 @@
         --farm-row-border: #f5cba0;
         --total-row-bg: #d1ecf1;
         --total-row-border: #bee5eb;
+        
+        
+        --primary-dark: #1e3a8a;       /* deep corporate blue */
+        --primary-medium: #2563eb;
+        --primary-light: #dbeafe;
+        --text-main: #1f2937;
+        --text-muted: #4b5563;
+        --border-light: #e5e7eb;
+        --bg-body: #ffffff;
+        --bg-accent: #f9fafb;
+        --success: #10b981;
+        --warning: #f59e0b;
     }
 
     /* ---------- PRODUCT & LOGO section (centered) ---------- */
@@ -338,14 +350,53 @@
       margin-left: 4px;
     }
 
-    /* ---------- FOOTER (Option 1: Simple Legal) ---------- */
-    .legal-footer {
-      margin-top: 16px;
-      padding-top: 20px;
+    
+    /* ---------- FOOTER (Updated: Full width border, website link added) ---------- */
+    /* Full width border container */
+    .footer-border {
+      width: 100%;              /* Full viewport width */
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;        /* Center the full-width element */
+      margin-right: -50vw;
       border-top: 1px solid #e9eef4;
+    }
+
+    .legal-footer {
+      max-width: 360px;          /* Match card width */
+      margin: 0 auto;            /* Center content */
+      padding: 20px 24px 24px;   /* Consistent padding with card */
       text-align: center;
       font-size: 13px;
       color: #8d99ae;
+    }
+
+    /* Website link - prominently displayed */
+    .website-link {
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      background-color: #f5f8ff;
+      border-radius: 40px;
+      display: inline-block;
+      border: 1px solid #e9eef4;
+    }
+
+    .website-link a {
+      color: var(--corporate-blue-company);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      word-break: break-all;     /* Allow long URLs to wrap */
+    }
+
+    .website-link a:hover {
+      text-decoration: underline;
+    }
+
+    .website-link i {
+      margin-right: 6px;
+      color: var(--corporate-blue-dark);
     }
 
     .footer-links {
@@ -910,9 +961,33 @@
 <div id="container-create-or-join-acc"  class="hidden-container" style="display:none;"></div>
 <div id="container-add-farm"            class="hidden-container" style="display:none;"></div>
 <div id="container-req-join-acc-sent"   class="hidden-container" style="display:none;"></div>
- 
- 
+<div id="container-terms-of-service"    class="hidden-container" style="display:none;"></div>
+<div id="container-privacy-policy"      class="hidden-container" style="display:none;"></div>
 
+ 
+ 
+<!-- Full width border container -->
+<div class="footer-border">
+    <div class="legal-footer">
+        <!-- Website link - prominently displayed for Facebook in-app browser -->
+        <div class="website-link">
+            <i class="fas fa-globe"></i>
+            <a href="http://superpig.jsysdev.com" target="_blank" rel="noopener noreferrer">superpig.jsysdev.com</a>
+        </div>
+    
+        <div class="footer-links">
+            <a href="#" id="footer-terms">Terms</a>
+            <span class="dot">•</span>
+            <a href="#" id="footer-privacy">Privacy</a>
+            <span class="dot">•</span>
+            <a href="#" id="footer-contact">Contact</a>
+        </div>
+  
+        <div class="copyright">
+            © 2026 J SysDev. All rights reserved.
+        </div>
+    </div>
+</div>
   
 
   
