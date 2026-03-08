@@ -35,57 +35,6 @@ from r_utils                import (remove_database_null_description,
 
 
 
-@app.get("/pig_dead_type/list", tags=["Production Details"])
-async def pig_dead_type_list():
-    """
-    Will get feed_type list.
-    
-    Parameters
-    ----------
-    
-   
-    """
-    result = get_uhid_or_redirect(request)
-    
-    # If result is RedirectResponse, return it immediately
-    if isinstance(result, RedirectResponse):
-        return result
-    
-    
-    uhid = result
-    
-        
-    res = model['prod_pig_dead'].get_pig_dead_type_list()
-    
-    if res is None:
-        return {
-            'result':{
-                'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
-            }
-        }
-            
-    
-    # Replace plain id
-    for cur_entry in res:
-        cur_id  = cur_entry['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['id']
-        cur_entry['hid']   = cur_hid
-        
-            
-    return {
-        'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
-        },
-        
-        'data': res
-    }
-
    
 @app.post("/prod_pig_dead/add", tags=["Production Details"])
 async def prod_pig_dead_add(request: Request, data: dm.DataPigProdDeadPig):
@@ -279,7 +228,7 @@ async def prod_pig_dead_update(request: Request, data: dm.DataPigProdDeadPig):
     
   
 @app.get("/prod_pig_dead/list", tags=["Production Details"])
-async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None, 
+async def prod_pig_dead_list(request: Request, pfhid: str = None, 
         pig_prod_hid: str =None):
     """
     Will get prod_pig_dead list.
@@ -314,14 +263,14 @@ async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None,
     pig_prod_id = 0
     
     
-    if pig_farm_hid is not None:
+    if pfhid is not None:
     
-        res = hashids_common.decrypt(pig_farm_hid)
+        res = hashids_common.decrypt(pfhid)
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID,
-                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_PROD_HASHID'
+                    'num':  ERROR_PIG_DEAD_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_PIG_DEAD_INVALID_PIG_FARM_HASHID'
                 }
             }
         
@@ -342,6 +291,16 @@ async def prod_pig_dead_list(request: Request, pig_farm_hid: str = None,
         
         pig_prod_id = res[0]
         
+        
+        
+    if pig_farm_id == 0 and pig_prod_id == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_DEAD_NO_VALID_KEY,
+                'code': 'ERROR_PIG_DEAD_NO_VALID_KEY'
+            }
+        }
+
         
         
         

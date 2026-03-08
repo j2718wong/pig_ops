@@ -122,4 +122,56 @@ async def lookup_harvest_type_list(request: Request):
         'data': res
     }
     
+
+@app.get("/lookup/pig_dead_type/list", tags=["Common Lookup"])
+async def look_up_pig_dead_type_list(request: Request):
+    """
+    Will get pig dead list.
     
+    Parameters
+    ----------
+    
+   
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+        
+    res = model['prod_pig_dead'].get_pig_dead_type_list()
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+            
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id  = cur_entry['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid']   = cur_hid
+        
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS',
+            'desc': ''
+        },
+        
+        'data': res
+    }
+
+

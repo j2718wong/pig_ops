@@ -330,8 +330,6 @@ class PigProdPigDead:
         
         
         
-        
-        
         # Check if still connected to database
         if self.model.check_if_connected() == False:
             # Make new connection
