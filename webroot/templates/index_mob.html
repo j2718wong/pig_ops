@@ -33,22 +33,11 @@
     <script type = "text/javascript" src="/static_m/js/library/bootstrap.bundle.min.js"></script>
     <script type = "text/javascript" src="/static_m/js/library/bootstrap-datepicker.min.js"></script>
 
-    
-    <script>
-    var gIsServerAvailable = true;
-        
-    $(document).ready(function(){ // This is necessary as some JS below this line may need GLOBAL_DATA
-        console.log('\n\ngIsServerAvailable =' + gIsServerAvailable);       
-    });
-    </script>
-
 
 {% for script in js_app_text %}
-    <script type = "application/javascript" src="/static_m/js/{{script}}"></script>
+    <script src="{{ script }}"></script>
 {% endfor %}
-    
 
-<script type = "application/javascript" src="/static/js/bundle.core.min.js"></script>
 
 </head>
 

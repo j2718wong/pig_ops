@@ -4,7 +4,11 @@ __date__ = "2025-10-01 10:00:00"
 
 import sys
 import os
+import json
+import pprint
 
+
+from common_fast_api        import dir_static
 
 """
 2025-12-23 Notes
@@ -92,22 +96,52 @@ class ViewBase:
     def __init__(self, view):
         self.view = view
         self.controller = view.controller
-
+    
+    
+    def get_manifest(self):
+        """Always read manifest from disk - simplest, always fresh"""
+        manifest_path = dir_static + '/js/manifest.json'
+        
+        try:
+            if os.path.exists(manifest_path):
+                with open(manifest_path, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Error reading manifest: {e}")
+        
+        # Fallback defaults
+        return {
+            'login': 'bundle.min.js',
+            'core': 'bundle.core.min.js'
+        }
+    
+    
 
 class SignUp(ViewBase):
     def render(self, page_data = None):
         # Mobile version
         template = env.get_template('signup.html')
+        
+        # Read manifest file to get current bundle filenames
+        manifest = self.get_manifest()
+        
+        pprint.pprint(manifest)
+        
     
         data    = {}
+        
+        # These should have type= text/javascript
+        js_app_text     = [
+            f'/static/js/{manifest.get("login", "bundle.min.js")}'
+        ]
         
         # These should have type= module
         js_app_modules = MODULES_SIGNUP
             
         data    = { 'page_data':        page_data,
                     'js_lib':           [],
-                    'js_app_text':      [],
-                    'js_app_modules':   js_app_modules}
+                    'js_app_text':      js_app_text,
+                    'js_app_modules':   []}
         
                 
         return template.render(data)
@@ -137,17 +171,22 @@ class Root(ViewBase):
         # Mobile version
         template = env.get_template('index_mob.html')
         
+        # Read manifest file to get current bundle filenames
+        manifest = self.get_manifest()
+        
+        
+        
         # These should have type= text/javascript
         js_lib  = []
         
         
-        # TODO minify and obfuscate js
-        
         # These should have type= text/javascript
-        js_app_text     = []
+        js_app_text     = [
+            f'/static/js/{manifest.get("core", "bundle.core.min.js")}'
+        ]
     
         # These should have type= module
-        js_app_modules = MODULES_ROOT
+        js_app_modules = []
             
         data    = { 'page_data':        page_data,
                     'js_lib':           js_lib,
