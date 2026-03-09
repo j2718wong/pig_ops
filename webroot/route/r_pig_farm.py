@@ -392,14 +392,14 @@ async def pig_farm_list(request: Request, ahid: str):
 
 
 @app.get("/pig_farm/data_ver_num", tags=["Pig Farm"])
-async def data_ver_num(pfid: str):
+async def data_ver_num(request: Request, pfhid: str):
     """
     Will get pig farm data_ver_num.
     
     Parameters
     ----------
     
-    pfid:str
+    pfhid:str
         pig farm hashid
 
         
@@ -414,7 +414,7 @@ async def data_ver_num(pfid: str):
     uhid = result
     
     
-    res = hashids_common.decrypt(pfid)
+    res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
         return {
             'result':{
