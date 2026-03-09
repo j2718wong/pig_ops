@@ -70,21 +70,7 @@ MODULES_ROOT = [
 
 
 
-class MinifyScripts:
-    def minify(self, js_root_dir, js_scripts_list ):
-        
-        # Combine first all js files into 1 file
-        
-        s = ''
-        
-        for cur_entry in js_scripts_list:
-            cur_path = os.path.join(js_root_dir, cur_entry)
-            
-            with open(cur_path, 'r') as file:
-                js_code = file.read()
-                s += js_code
-           
-        
+
            
 
 class View:

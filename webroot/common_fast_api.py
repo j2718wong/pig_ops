@@ -80,8 +80,8 @@ JWT_ALGORITHM = "HS256"
 
 
 
-# Old desktop first static directory
-dir_static = '/home/dev01/projects/jsys/pig_ops_ui/pig_ops_app/src/static'
+# JS bundles
+dir_static = '/home/dev01/projects/jsys/pig_ops_ui_mob/static'
 app.mount('/static', StaticFiles(directory=dir_static), name='static')
 
 

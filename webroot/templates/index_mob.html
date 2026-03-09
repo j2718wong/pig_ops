@@ -47,9 +47,9 @@
     <script type = "application/javascript" src="/static_m/js/{{script}}"></script>
 {% endfor %}
     
-{% for script in js_app_modules %}
-    <script type = "module" src="/static_m/js/{{script}}"></script>
-{% endfor %}
+
+<script type = "application/javascript" src="/static/js/bundle.core.min.js"></script>
+
 </head>
 
 
@@ -634,20 +634,7 @@
         </div>
     </footer>
 
-    <script type="module">
-        import {Navigation} from './static_m/js/pages/navigation/navigation.js';
-        
-        var gNavigation = null;
-        
 
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            const gNavigation = new Navigation();
-            globalThis.gNavigation = gNavigation;
-            
-            gNavigation.init();         
-        });
-    </script>
 
 
     <script>

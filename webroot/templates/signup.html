@@ -947,11 +947,9 @@
     
 </style>
   
-<script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
-  
-{% for script in js_app_modules %}
-    <script type = "module" src="/static_m/js/{{script}}"></script>
-{% endfor %}
+<script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>  
+<script type = "text/javascript" src="/static/js/bundle.min.js"></script>
+
 </head>
 
 <body>
@@ -991,26 +989,7 @@
   
 
   
-<script type="module">
-    import {ManagerLogin} from './static_m/js/pages/account_management/manager_login.js';
-    
-     
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log('Full page loaded');
-        // Your code here
-        
-        
-        
-        const managerLogin = new ManagerLogin();
-        managerLogin.init();
-        managerLogin.onPageLoad();
-        
-        globalThis.managerLogin = managerLogin;
 
-        
-    });
-      
-</script>
 
   
   
