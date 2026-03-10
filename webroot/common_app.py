@@ -11,6 +11,11 @@ import json
 import hashids
 import math
 
+
+from pathlib    import Path
+from dotenv     import load_dotenv
+
+
 # import modules from path_common
 import common_logger
 
@@ -163,74 +168,64 @@ model_names_pig_ops = [
 
 
 
-DEV_OFFICE                      = 0
-DEV_HOME                        = 1
+# Try multiple possible locations for .env file
+env_paths = [
+    Path('.env'),  # current directory
+    Path(__file__).parent / '.env',  # same as this file
+    Path.home() / '.pig_ops_env' / '.env',  # user home directory
+    Path('/etc/pig_ops/.env'),  # system config (for production)
+]
 
 
 
-# Change thee settings for development
+# Change this settings for development
 USING_PRODUCTION_DB             = 0
-USING_DEV_AT                    = DEV_HOME
+
 DB_INFO                         = ''
 
+
+env_loaded = False
+for env_path in env_paths:
+    if env_path.exists():
+        load_dotenv(env_path)
+        print(f"Loaded environment from: {env_path}")
+        env_loaded = True
+        break
+
+if not env_loaded:
+    print("Warning: No .env file found, using system environment variables")
+    
+
+# Get APP_ENVI
+app_envi = os.getenv('APP_ENVI', 'development')
+if app_envi == 'production':
+    USING_PRODUCTION_DB = 1
+else:
+    USING_PRODUCTION_DB = 0
+
+print('\n\nAPP_ENVI = %s' %app_envi)
 
 
 
 if USING_PRODUCTION_DB > 0:
-    DATABASE_NAME_PIG_OPERATIONS = 'pig_operations'
-    db_desc     = 'Jackson Farm Production'
+    db_desc     = 'Production'
 
-
-    # Need to improve this
-    
-
-    credentials_po = {
-        'db_host':      '127.0.0.1',
-        'db_user':      'pops_web',
-        'db_password':  '1@PO#db$1234.',
-        'database':     DATABASE_NAME_PIG_OPERATIONS
+    credentials_pig_ops = {
+        'db_host':      os.getenv('PIG_OPS_PROD_DB_HOST', '127.0.0.1'),
+        'db_user':      os.getenv('PIG_OPS_PROD_DB_USER'),
+        'db_password':  os.getenv('PIG_OPS_PROD_DB_PASSWORD'),
+        'database':     os.getenv('PIG_OPS_PROD_DB_NAME', 'pig_operations')
     }
+
+    
 
     
     ssh_tunnel_prod = {
-        'ssh_host':         '10.10.2.62',
-        'ssh_port':         22,
-        'ssh_username':     'dev01',
-        'ssh_password':     '0@DEV12345.',
-        'ssh_pkey':         None,
-
-        'remote_hostname':  '127.0.0.1',
-        'remote_port':      3306,
-        'local_hostname':   '127.0.0.1',
-        'local_port':       3307
-    }
-    
-    if USING_DEV_AT == DEV_HOME:
-        ssh_tunnel_prod['ssh_host'] = '192.168.0.166'
-    
-    
-    # 2026-02-04 Direct at server machine
-    ssh_tunnel_prod = None
-    
-    print('\n\nWill use PRODUCTION database\n\n')
-else:
-    DATABASE_NAME_PIG_OPERATIONS = 'pig_ops_dev'
-    db_desc     = 'Jackson Farm Production'
-
-    credentials_po = {
-        'db_host':      '127.0.0.1',
-        'db_user':      'pops_web3',
-        'db_password':  '1@PO#db$1234.',
-        'database':     DATABASE_NAME_PIG_OPERATIONS
-    }
-
-    
-    ssh_tunnel_prod = {
-        'ssh_host':         '10.10.2.62',
-        'ssh_port':         22,
-        'ssh_username':     'dev01',
-        'ssh_password':     '0@DEV12345.',
-        'ssh_pkey':         None,
+        'ssh_host':         os.getenv('PIG_OPS_SSH_HOST'),
+        'ssh_port':         os.getenv('PIG_OPS_SSH_PORT'),
+        'ssh_username':     os.getenv('PIG_OPS_SSH_USERNAME'),
+        'ssh_password':     os.getenv('PIG_OPS_SSH_PASSWORD'),
+        'ssh_pkey':         os.getenv('PIG_OPS_SSH_PKEY_PATH'),
 
         'remote_hostname':  '127.0.0.1',
         'remote_port':      4306,
@@ -238,8 +233,37 @@ else:
         'local_port':       3307
     }
     
-    if USING_DEV_AT == DEV_HOME:
-        ssh_tunnel_prod['ssh_host'] = '192.168.0.166'
+    
+    # 2026-02-04 Direct at server machine
+    ssh_tunnel_prod = None
+    
+    print('\n\nWill use PRODUCTION database\n\n')
+
+else:
+    db_desc     = 'Development'
+
+    credentials_pig_ops = {
+        'db_host':      os.getenv('PIG_OPS_DEV_DB_HOST', '127.0.0.1'),
+        'db_user':      os.getenv('PIG_OPS_DEV_DB_USER'),
+        'db_password':  os.getenv('PIG_OPS_DEV_DB_PASSWORD'),
+        'database':     os.getenv('PIG_OPS_DEV_DB_NAME', 'pig_ops_dev')
+    }
+
+    
+    ssh_tunnel_prod = {
+        'ssh_host':         os.getenv('PIG_OPS_SSH_HOST'),
+        'ssh_port':         os.getenv('PIG_OPS_SSH_PORT'),
+        'ssh_username':     os.getenv('PIG_OPS_SSH_USERNAME'),
+        'ssh_password':     os.getenv('PIG_OPS_SSH_PASSWORD'),
+        'ssh_pkey':         os.getenv('PIG_OPS_SSH_PKEY_PATH'),
+
+        'remote_hostname':  '127.0.0.1',
+        'remote_port':      4306,
+        'local_hostname':   '127.0.0.1',
+        'local_port':       3307
+    }
+    
+
     
     
     # 2026-02-04; something is wrong with paramiko when using SSH Tunnel
@@ -247,7 +271,8 @@ else:
     
     print('\n\nWill use DEVELOPMENT database\n\n')
     
-DB_INFO = f"Host: {credentials_po['db_host']}; DB_Desc: {db_desc}"
+
+DB_INFO = f"Host: {credentials_pig_ops['db_host']}; DB_Desc: {db_desc}"
 
 
 
@@ -271,7 +296,7 @@ except:
 model = Model(
             database_id     = 1, 
             logger          = logger, 
-            credentials     = credentials_po,
+            credentials     = credentials_pig_ops,
             ssl             = None,
             tunnel_settings = ssh_tunnel_prod)
 
@@ -334,14 +359,6 @@ ssl_la = {'ca': None}
 
 # Read PO_DATABASE_LOC environment variable if there is any.
 # This environment variable is used to control what database to access.
-
-ssh_tunnel = ssh_tunnel_la
-try:
-    database_loc = os.environ['PO_DATABASE_LOC']
-    if database_loc == 'LOCAL':
-        ssh_tunnel = None
-except:
-    ssh_tunnel = ssh_tunnel_la
 
 ssh_tunnel_la = None
 
