@@ -562,8 +562,7 @@ class DataPigProdWeaning(BaseModel):
 class DataPigProdStatus(BaseModel):
     uhid:                   str = None
         
-    pig_prod_hid:           str
-    prod_status_hid:        str
+    pig_prod_hid:           strDispo
         
     user_id:                int = 0
     pig_prod_id:            int = 0

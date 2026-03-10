@@ -12,9 +12,12 @@ class Controller:
     def __init__(self, logger = None, model = None):
         self.TAG                = 'Model'
         
+        self.is_prod_envi       = False        
+        
         self.logger             = logger
         
         self.model              = model
+        
         
         self.view               = None
         

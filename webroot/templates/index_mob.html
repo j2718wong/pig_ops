@@ -34,9 +34,17 @@
     <script type = "text/javascript" src="/static_m/js/library/bootstrap-datepicker.min.js"></script>
 
 
+
 {% for script in js_app_text %}
-    <script src="{{ script }}"></script>
+    {% if is_dev %}
+        <!-- Development: use module type for ES6 imports -->
+        <script type="module" src="{{ script }}"></script>
+    {% else %}
+        <!-- Production: regular script with bundled code -->
+        <script src="{{ script }}"></script>
+    {% endif %}
 {% endfor %}
+
 
 
 </head>

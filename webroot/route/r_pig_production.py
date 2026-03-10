@@ -1086,25 +1086,9 @@ async def pig_prod_update_status(request: Request, data: dm.DataPigProdStatus):
     pig_prod_id = res[0]
 
 
-    prod_status_hid = data.prod_status_hid
-        
-    res = hashids_common.decrypt(prod_status_hid)
-    if len(res) == 0:
-    
-        return {
-            'result':{
-                'num':  ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_PROD_STATUS_HASHID'
-            }
-        }
-    
-    prod_status_id = res[0]
-    
-    
-
     data.user_id           = user_id
     data.pig_prod_id       = pig_prod_id
-    data.prod_status_id    = prod_status_id
+
     
     res_update    =  model['pig_prod'].update_status(data)
     

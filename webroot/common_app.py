@@ -398,5 +398,27 @@ ENABLE_BEARER_TOKEN     = 0
 
 
 
+
+def get_is_prod_environment():
+    """
+    This may change in the future; currently this is temporary
+    
+    Returns 1 if production environment;
+    Returns 0 if development environment;
+    """
+    
+    if USING_PRODUCTION_DB > 0:
+        return 1
+    
+    return 0
+    
+
 controller = Controller(logger, model)
+
+if get_is_prod_environment() > 0:
+    controller.is_prod_envi = True
+
 view = View(controller)
+
+
+    

@@ -8,7 +8,6 @@ import json
 import pprint
 
 
-from common_fast_api        import dir_static
 
 """
 2025-12-23 Notes
@@ -52,26 +51,8 @@ env = Environment(loader=FileSystemLoader('templates'))
 view_names = [
             ('signup',              'SignUp'),
             
-            ('root',                'Root'),
-            
-            ('acc_pig_ops',         'AccPigOps'),
-            ('sow_boar',            'SowBoar'),
-            ('pig_prod',            'PigProd')
-            
-           
-            
+            ('root',                'Root')            
         ]
-
-
-MODULES_SIGNUP =[
-    "pages/account_management/page_user_signup_or_login.js"
-]
-
-
-MODULES_ROOT = [
-    "pages/navigation/navigation.js"
-]
-
 
 
 
@@ -96,6 +77,56 @@ class ViewBase:
     def __init__(self, view):
         self.view = view
         self.controller = view.controller
+        
+        self.manifest_path = 'static/js/manifest.json'
+        self.default_manifest = {
+            'login': 'bundle.min.js',
+            'core': 'bundle.core.min.js'
+        }
+        
+        self.is_dev = False
+        
+        if self.controller.is_prod_envi == False:
+            self.is_dev = True
+    
+    
+    def get_js_files(self, page_type='core'):
+        """
+        Return appropriate JS files based on environment
+        """
+        if self.is_dev == True:
+            # DEVELOPMENT: Return all individual modules for easy debugging
+            return self._get_dev_js_files(page_type)
+        else:
+            # PRODUCTION: Return minified bundle
+            return self._get_prod_js_files(page_type)
+    
+    
+    def _get_prod_js_files(self, page_type='core'):
+        """Production: just the minified bundle"""
+        try:
+            if os.path.exists(self.manifest_path):
+                with open(self.manifest_path, 'r') as f:
+                    manifest = json.load(f)
+                filename = manifest.get(page_type, self.default_manifest[page_type])
+                return [f"/static/js/{filename}"]
+        except:
+            pass
+        return [f"/static/js/{self.default_manifest[page_type]}"]
+    
+    
+    def _get_dev_js_files(self, page_type='core'):
+        """Development: return all individual modules for debugging"""
+        if page_type == 'login':
+            # Login page modules
+            return [
+                "/static_m/js/app.js",
+            ]
+        else:  # core/dashboard
+            # Core navigation and all other modules
+            return [
+                "/static_m/js/app_core.js",
+            ]
     
     
     def get_manifest(self):
@@ -122,26 +153,18 @@ class SignUp(ViewBase):
         # Mobile version
         template = env.get_template('signup.html')
         
-        # Read manifest file to get current bundle filenames
-        manifest = self.get_manifest()
+        # Get appropriate JS files based on environment
+        js_app_text = self.get_js_files('login')
         
-        pprint.pprint(manifest)
-        
-    
         data    = {}
         
-        # These should have type= text/javascript
-        js_app_text     = [
-            f'/static/js/{manifest.get("login", "bundle.min.js")}'
-        ]
         
-        # These should have type= module
-        js_app_modules = MODULES_SIGNUP
             
         data    = { 'page_data':        page_data,
                     'js_lib':           [],
                     'js_app_text':      js_app_text,
-                    'js_app_modules':   []}
+                    'js_app_modules':   [],
+                    'is_dev':           self.is_dev}
         
                 
         return template.render(data)
@@ -150,40 +173,19 @@ class SignUp(ViewBase):
 # Views
 #
 
-"""
-2026-01-03
-1.) The is_mobile parameter in the view pages below is a temporary solution
-to serve static files for mobile web page.
-
-2.) As of this writing there are  two  separate locations for 
-    - initial development web focused; mostly data is presented as tables.
-    
-    - development shift to Mobile first, desktop next
-    
-3.) The desktop version should work regardless of status of the mobile version.
-    
-    
-    
-"""
 
 class Root(ViewBase):
     def render(self, page_data = None):
         # Mobile version
         template = env.get_template('index_mob.html')
         
-        # Read manifest file to get current bundle filenames
-        manifest = self.get_manifest()
-        
+        # Get appropriate JS files based on environment
+        js_app_text = self.get_js_files('core')
         
         
         # These should have type= text/javascript
         js_lib  = []
         
-        
-        # These should have type= text/javascript
-        js_app_text     = [
-            f'/static/js/{manifest.get("core", "bundle.core.min.js")}'
-        ]
     
         # These should have type= module
         js_app_modules = []
@@ -191,7 +193,8 @@ class Root(ViewBase):
         data    = { 'page_data':        page_data,
                     'js_lib':           js_lib,
                     'js_app_text':      js_app_text,
-                    'js_app_modules':   js_app_modules}
+                    'js_app_modules':   js_app_modules,
+                    'is_dev':           self.is_dev}
         
                 
         return template.render(data)
