@@ -97,7 +97,17 @@ class Account:
                     
                     d.name_last,
                     d.name_first,
-                    a.dt_last_update_settings
+                    a.dt_last_update_settings,
+                    
+                    
+                    a.ver_num_gestating_ops,
+                    a.ver_num_lactating_piglets_ops, 
+                    a.ver_num_lactating_sow_ops,     
+                    a.ver_num_gilt_ops,              
+                    a.ver_num_weaning_sow_ops,       
+                    
+                    a.data_ver_num_account
+                    
                 FROM account a
                 LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                 LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
@@ -164,6 +174,20 @@ class Account:
                 cur_settings_last_update    = str(row[18]) if row[18] else None
                 
                 
+                cur_ver_num_gestating_ops           = row[19]
+                cur_ver_num_lactating_piglets_ops   = row[20] 
+                cur_ver_num_lactating_sow_ops       = row[21]     
+                cur_ver_num_gilt_ops                = row[22]              
+                cur_ver_num_weaning_sow_ops         = row[23]       
+                
+                cur_data_ver_num_account            = row[24]
+
+                
+                
+                
+                
+                
+                
                 temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
                 cur_flag_acc_is_enabled = 1 if temp > 0 else 0
                 
@@ -223,7 +247,17 @@ class Account:
                             'name_first':   cur_user_name_first,
                             'dt_update':    cur_settings_last_update
                         }
-                    }
+                    },
+                    
+                    'data_ver_num':[
+                        cur_ver_num_gestating_ops,        
+                        cur_ver_num_lactating_piglets_ops,
+                        cur_ver_num_lactating_sow_ops,    
+                        cur_ver_num_gilt_ops,             
+                        cur_ver_num_weaning_sow_ops,      
+                        
+                        cur_data_ver_num_account
+                    ]
                 }
                 
                 

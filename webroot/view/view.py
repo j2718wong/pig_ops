@@ -221,20 +221,32 @@ class Root(ViewBase):
                     
                     {
                         'img_path': '/static_m/images/mar/mar_gesta.png',
-                        'title': 'Sow Management',
+                        'title': 'Breeding Cycles Management',
                         'desc': 'Track gestation, lactation, and breeding cycles'
                     },
                     
                     {
                         'img_path': '/static_m/images/mar/mar_lacta.png',
-                        'title': 'Sow Management',
+                        'title': 'Pig Operations Management',
                         'desc': 'Automated reminders for vaccinations, farrowing, weaning, and other important pig operations'
                     },
                 
                     {
                         'img_path': '/static_m/images/mar/mar_pig_ops.png',
-                        'title': 'Sow Management',
-                        'desc': 'Clear tracking who did the pig operation and when and what dosages gievn to pigs'
+                        'title': 'Traceability of Pig Operations',
+                        'desc': 'Clear tracking who did the pig operation and when and what dosages given to pigs'
+                    },
+                    
+                    {
+                        'img_path': '/static_m/images/mar/mar_fattening.png',
+                        'title': 'Track and estimate Fatteners feed requirements',
+                        'desc': 'Record every vaccine, medicine, health issue, history for each production cycle'
+                    },
+                    
+                    {
+                        'img_path': '/static_m/images/mar/mar_feed_records.png',
+                        'title': 'Record feeds consumption  per production batch',
+                        'desc': 'Feed Balance and audit can be recorded anytime.'
                     }
                 ]
             }

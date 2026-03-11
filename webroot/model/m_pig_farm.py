@@ -584,7 +584,7 @@ class PigFarm:
                 return cur_entry
     
     
-    def get_data_ver_num(self, pig_farm_id):
+    def get_data_ver_num(self, pig_farm_id, return_array = 0):
         sql =   """
                 SELECT 
                     data_ver_num_sow,
@@ -641,18 +641,28 @@ class PigFarm:
                 cur_data_ver_num_not_pregnant = row[5]
                 
                 
-                
-                cur_entry = {
-                    'data_ver_num': {
-                        'sow':          cur_data_ver_num_sow,       
-                        'boar':         cur_data_ver_num_boar,    
-                        'pig_prod':     cur_data_ver_num_pig_prod,
-                        'staff':        cur_data_ver_num_staff,   
-                        'feed_buy':     cur_data_ver_num_feed_buy,
-                        'not_pregnant': cur_data_ver_num_not_pregnant
+                if return_array == 0:
+                    cur_entry = {
+                        'data_ver_num': {
+                            'sow':          cur_data_ver_num_sow,       
+                            'boar':         cur_data_ver_num_boar,    
+                            'pig_prod':     cur_data_ver_num_pig_prod,
+                            'staff':        cur_data_ver_num_staff,   
+                            'feed_buy':     cur_data_ver_num_feed_buy,
+                            'not_pregnant': cur_data_ver_num_not_pregnant
+                        }
                     }
-                }
+                    
+                    return cur_entry
                 
-                return cur_entry
+                else:
+                    return [
+                        cur_data_ver_num_sow,        
+                        cur_data_ver_num_boar,       
+                        cur_data_ver_num_pig_prod,   
+                        cur_data_ver_num_staff,      
+                        cur_data_ver_num_feed_buy,   
+                        cur_data_ver_num_not_pregnant,
+                    ]
 
     

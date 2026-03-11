@@ -392,7 +392,7 @@ async def pig_farm_list(request: Request, ahid: str):
 
 
 @app.get("/pig_farm/data_ver_num", tags=["Pig Farm"])
-async def data_ver_num(request: Request, pfhid: str):
+async def data_ver_num(request: Request, pfhid: str, r: int = 0):
     """
     Will get pig farm data_ver_num.
     
@@ -401,7 +401,10 @@ async def data_ver_num(request: Request, pfhid: str):
     
     pfhid:str
         pig farm hashid
-
+    
+    r : int
+        return type; 0 = json object; 1 = array of integers
+        
         
     """
     result = get_uhid_or_redirect(request)
@@ -426,8 +429,12 @@ async def data_ver_num(request: Request, pfhid: str):
     
     pig_farm_id = res[0]
         
+        
+    return_array = 0
+    if r > 0:
+        return_array = 1
 
-    res                 = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    res = model['pig_farm'].get_data_ver_num(pig_farm_id, return_array)
 
     
     if res is None:

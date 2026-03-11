@@ -77,65 +77,6 @@ async def signup():
     
 
 
-
-@app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def root(request: Request, p:str = None):
-    """
-    2026-01-09 Notes:
-    
-    
-    1.) An account can have several users. 
-        The user who registered the account is always admin.
-        There can be more than 1 admin user in an account.
-        
-        Non admin users cannot see billing info.
-        
-    2.) Company Internal users
-        These users are connected to the company. 
-        They are connected to a special company account 
-        but the company account has no pig farm.
-        These users can READ ONLY any account 
-        but cannot write any data to the account.  
-    
-    
-    
-    In Normal case the user is read from token
-    
-    Handle all routes:
-    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
-    - Any other path redirects to "/" (users should navigate by clicking, not typing)
-    
-    Parameters
-    ----------
-    p : str
-        pig farm hid;  if this is given, will decode pig_farm_id
-        
-
-    """
-    
-    """
-    # If there's any path other than empty string, redirect to home
-    if full_path and full_path != "":
-        # Optional: Log invalid path attempts for analytics
-        print(f"Invalid path attempted: {full_path} - redirecting to home")
-        return RedirectResponse(url="/", status_code=302)
-    """
-    
-    
-    result = get_current_uhid(request)
-    
-    # If result is RedirectResponse, return it immediately
-    if isinstance(result, RedirectResponse):
-        return result
-    
-    uhid = result
-    
-    page = controller.view['root'].render(uhid)
-    
-    return page
-    
-    
-
 @app.get("/pig_farm/data")
 async def pig_farm_data(request: Request):
     """
@@ -234,12 +175,76 @@ async def pig_farm_data(request: Request):
         'data': data
     }
     
-    
-    
-    
 
 
+@app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+async def root(request: Request, p:str = None):
+    """
+    2026-01-09 Notes:
     
+    
+    1.) An account can have several users. 
+        The user who registered the account is always admin.
+        There can be more than 1 admin user in an account.
+        
+        Non admin users cannot see billing info.
+        
+    2.) Company Internal users
+        These users are connected to the company. 
+        They are connected to a special company account 
+        but the company account has no pig farm.
+        These users can READ ONLY any account 
+        but cannot write any data to the account.  
+    
+    
+    
+    In Normal case the user is read from token
+    
+    Handle all routes:
+    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
+    - Any other path redirects to "/" (users should navigate by clicking, not typing)
+    
+    Parameters
+    ----------
+    p : str
+        pig farm hid;  if this is given, will decode pig_farm_id
+        
 
+    """
+    
+    """
+    # If there's any path other than empty string, redirect to home
+    if full_path and full_path != "":
+        # Optional: Log invalid path attempts for analytics
+        print(f"Invalid path attempted: {full_path} - redirecting to home")
+        return RedirectResponse(url="/", status_code=302)
+    """
     
     
+    result = get_current_uhid(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    uhid = result
+    
+    page = controller.view['root'].render(uhid)
+    
+    return page
+    
+    
+    
+@app.get("/{full_path:path}", response_class=HTMLResponse)
+async def catch_all_frontend(request: Request, full_path: str = None):
+    """
+    This catches any route not matched above and serves the frontend
+    """
+    
+    result = get_current_uhid(request)
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    uhid = result
+    page = controller.view['root'].render(uhid)
+    return page
