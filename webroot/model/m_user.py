@@ -404,6 +404,7 @@ class User:
                     b.group_num,
                     b.name,
                     
+                    a.email,
                     a.name_last,
                     a.name_first
                     
@@ -451,15 +452,17 @@ class User:
                 cur_flag                = row[1]
                 cur_user_group_id       = row[2]
                 cur_group_num           = row[3]
-                cur_name                = row[4]
+                cur_group_name          = row[4]
                 
-                cur_name_last           = row[5]
-                cur_name_first          = row[6]
+                cur_email               = row[5]
+                cur_name_last           = row[6]
+                cur_name_first          = row[7]
                 
                 
                 cur_entry = {
                     'user': {
                         'id':           cur_id,
+                        'email':        cur_email,
                         'name_last':    cur_name_last,
                         'name_first':   cur_name_first,
                         'flag':         cur_flag
@@ -468,7 +471,7 @@ class User:
                     'user_group': {
                         'id':           cur_user_group_id,
                         'group_num':    cur_group_num,
-                        'name':         cur_name
+                        'name':         cur_group_name
                     }
                     
                 }

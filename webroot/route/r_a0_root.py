@@ -90,7 +90,7 @@ async def root(request: Request, p:str = None):
         
         Non admin users cannot see billing info.
         
-    2.) Company  users
+    2.) Company Internal users
         These users are connected to the company. 
         They are connected to a special company account 
         but the company account has no pig farm.
@@ -101,6 +101,9 @@ async def root(request: Request, p:str = None):
     
     In Normal case the user is read from token
     
+    Handle all routes:
+    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
+    - Any other path redirects to "/" (users should navigate by clicking, not typing)
     
     Parameters
     ----------
@@ -110,7 +113,24 @@ async def root(request: Request, p:str = None):
 
     """
     
-    page = controller.view['root'].render()
+    """
+    # If there's any path other than empty string, redirect to home
+    if full_path and full_path != "":
+        # Optional: Log invalid path attempts for analytics
+        print(f"Invalid path attempted: {full_path} - redirecting to home")
+        return RedirectResponse(url="/", status_code=302)
+    """
+    
+    
+    result = get_current_uhid(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    uhid = result
+    
+    page = controller.view['root'].render(uhid)
     
     return page
     
@@ -151,13 +171,32 @@ async def pig_farm_data(request: Request):
         
     user_id = res[0]
     
+    data_app = get_application_data()
     
     user_account = get_user_account_info(user_id)
+    
+    
+    if user_account is None:
+        data = {
+            'application':      data_app,
+            'user_account':     None,
+            'pig_farm_account': None
+        }
+        
+        return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS'
+            },
+            
+            'data': data
+        }
+        
     
     account = user_account['account']
     user    = user_account['user']
     
-
+    
     
     pig_farm_id = 0
     
@@ -169,8 +208,6 @@ async def pig_farm_data(request: Request):
         pig_farm_id = user_pig_farms[0]
     
 
-    data_app = get_application_data()
-    
     
     farm_account = get_page_data_farm_account_pig_prod(
         pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)

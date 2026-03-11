@@ -69,6 +69,22 @@ async def test():
     return {"message": "Hello World"}
 
 
+# Print all routes
+@app.on_event("startup")
+def list_routes():
+    print("\n=== All Registered Routes ===\n")
+    for route in app.routes:
+        methods = getattr(route, "methods", None)
+        name = getattr(route, "name", None)
+        path = getattr(route, "path", None)
+        
+        if methods:
+            methods_str = ", ".join([m for m in methods if m])
+            print(f"{methods_str:10} {path} {name or ''}")
+    print("=" * 40)
+
+
+
 if __name__ == '__main__':
     
     uvicorn.run("pig_ops_web:app", host='0.0.0.0', port=8080)

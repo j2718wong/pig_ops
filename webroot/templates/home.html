@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>SuperPig - Pig Production Data Management</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: white;
+            color: #1f2937;
+            line-height: 1.4;
+        }
+
+        :root {
+            --corporate-blue: #1e3a8a;
+            --corporate-blue-company: #1877F0;
+            --corporate-blue-dark: #15467d;
+            --corporate-blue-light: #4a8adb;
+            --corporate-blue-border: #dbeafe;
+            --corporate-bg: #e0f2fe;
+            --blue-deep: #0a2f6c;
+            --blue-medium: #1e4d8f;
+            --blue-soft: #e6f0ff;
+            --blue-border: #b8d1f0;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.08);
+            --max-content-width: 1024px;
+        }
+
+        /* Fixed Top Section */
+        .fixed-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            border-bottom: 1px solid var(--blue-border);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            padding: 0.5rem 1rem;
+            width: 100%;
+        }
+
+        .product-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .company-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--corporate-blue-company);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            line-height: 1;
+            padding-bottom: 2px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--corporate-blue);
+            letter-spacing: -0.2px;
+        }
+
+        /* Desktop navigation buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .nav-buttons .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .nav-buttons .btn-login {
+            background: transparent;
+            border: 2px solid var(--corporate-blue-company);
+            color: var(--corporate-blue-company);
+        }
+
+        .nav-buttons .btn-signup {
+            background: var(--corporate-blue-company);
+            border: 2px solid var(--corporate-blue-company);
+            color: white;
+        }
+
+        /* Hamburger Menu */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--corporate-blue);
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: var(--shadow-lg);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-left: 1px solid var(--blue-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--blue-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-logo .company-logo {
+            width: 28px;
+            height: 28px;
+            font-size: 28px;
+        }
+
+        .menu-logo .product-name {
+            font-size: 16px;
+        }
+
+        .menu-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--corporate-blue);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .mobile-menu .btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .mobile-menu .btn-login {
+            background: transparent;
+            border: 2px solid var(--corporate-blue-company);
+            color: var(--corporate-blue-company);
+        }
+
+        .mobile-menu .btn-signup {
+            background: var(--corporate-blue-company);
+            border: 2px solid var(--corporate-blue-company);
+            color: white;
+        }
+
+        .mobile-menu .menu-links {
+            margin-top: 1rem;
+            flex: 1;
+        }
+
+        .mobile-menu .menu-links a {
+            display: block;
+            padding: 0.75rem 0;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--blue-border);
+            font-weight: 500;
+        }
+
+        .mobile-menu .menu-links a:last-child {
+            border-bottom: none;
+        }
+
+        /* Main content */
+        .main-content {
+            padding-top: 60px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 1rem 1rem;
+            text-align: center;
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--blue-deep);
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-description {
+            font-size: 1rem;
+            color: #4b5563;
+            margin-bottom: 0.7rem;
+        }
+
+        .btn-primary {
+            background: var(--corporate-blue-company);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(24, 119, 240, 0.3);
+        }
+
+        /* Carousel Section */
+        .carousel-section {
+            padding: 0;
+            background: white;
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+
+        .carousel-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .carousel-wrapper {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Carousel - Fix for horizontal scrolling */
+        .carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+            -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+            gap: 0; /* Remove gap between items */
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .carousel::-webkit-scrollbar {
+            display: none; /* Hide scrollbar Chrome/Safari */
+        }
+
+        .carousel-item {
+            flex: 0 0 100%; /* Each item takes full width */
+            scroll-snap-align: start;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Ensure images don't break layout */
+        .carousel-image {
+            width: 100%;
+            height: 400px;
+            background-color: var(--blue-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .carousel-image img {
+            width: auto;
+            height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+
+        .carousel-caption {
+            padding: 1rem 1rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .carousel-caption strong {
+            color: var(--blue-deep);
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .carousel-caption p {
+            color: #4b5563;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Simple dot indicators */
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue-border);
+            transition: all 0.2s;
+        }
+
+        .indicator.active {
+            background: var(--corporate-blue-company);
+            transform: scale(1.2);
+        }
+
+        /* Marketing Highlights */
+        .highlights-section {
+            padding: 1.5rem 1rem;
+            background: white;
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .highlights-section .section-title {
+            text-align: left;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            margin-bottom: 1.25rem;
+            padding: 0;
+        }
+
+        .highlights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .highlight-item {
+            border-bottom: 1px solid var(--blue-border);
+            padding-bottom: 1rem;
+        }
+
+        .highlight-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .highlight-item strong {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            display: block;
+            margin-bottom: 0.35rem;
+            line-height: 1.3;
+        }
+
+        .highlight-item p {
+            font-size: 1.1rem;
+            color: #4b5563;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 2rem 1rem;
+            text-align: center;
+            background: var(--blue-soft);
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .cta-section h2 {
+            font-size: 1.5rem;
+            color: var(--blue-deep);
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 0.95rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        .footer-border {
+            border-top: 1px solid var(--blue-border);
+            background: white;
+            width: 100%;
+        }
+
+        .legal-footer {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .website-link {
+            margin-bottom: 1rem;
+        }
+
+        .website-link a {
+            color: var(--corporate-blue-company);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .dot {
+            color: var(--blue-border);
+        }
+
+        .copyright {
+            color: #6b7280;
+            font-size: 0.8rem;
+        }
+        
+        
+        @media (max-width: 480px) {
+            .carousel-image {
+                height: 300px;
+            }
+        }
+        
+
+        /* ===== MOBILE STYLES (up to 768px) ===== */
+        @media (max-width: 768px) {
+            .nav-buttons {
+                display: none !important;
+            }
+            
+            .menu-toggle {
+                display: block !important;
+            }
+            
+            .hero-title {
+                font-size: 1.6rem;
+            }
+            
+            .highlight-item strong {
+                font-size: 1rem;
+            }
+            
+            .highlight-item p {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* ===== TABLET/DESKTOP STYLES (769px and above) ===== */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: none;
+            }
+
+            .menu-overlay {
+                display: none !important;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .carousel-image {
+                height: 350px;
+            }
+
+            .highlights-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+
+            .highlight-item {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Top Section -->
+    <div class="fixed-top">
+        <div class="nav-container">
+            <div class="product-row">
+                <div class="company-logo">J</div>
+                <div class="product-name">SuperPig</div>
+            </div>
+            
+            <!-- Desktop buttons -->
+            <div class="nav-buttons">
+                <a href="/login" class="btn btn-login">Login</a>
+                <a href="/signup" class="btn btn-signup">Sign Up</a>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="menu-header">
+            <div class="menu-logo">
+                <div class="company-logo">J</div>
+                <span class="product-name">SuperPig</span>
+            </div>
+            <button class="menu-close" id="menuClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <a href="/login" class="btn btn-login">Login</a>
+        <a href="/signup" class="btn btn-signup">Sign Up</a>
+        
+        <div class="menu-links">
+            <a href="/about">About</a>
+            <a href="/features">Features</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/contact">Contact</a>
+            <a href="/terms">Terms</a>
+            <a href="/privacy">Privacy</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">Pig Production Data Management and Analytics Simplified</h1>
+            <p class="hero-description">
+                Streamline your farm operations with comprehensive data management and AI-powered insights
+            </p>
+            <a href="/signup" class="btn-primary">Try it now →</a>
+        </section>
+
+
+        <!-- Carousel Section - Dynamically loaded from page_data -->
+        <section class="carousel-section">
+            <h2 class="section-title">See SuperPig in Action</h2>
+            <div class="carousel-container">
+                <div class="carousel-wrapper">
+                    <div class="carousel" id="carousel">
+                        {% for item in page_data.carousel %}
+                        <div class="carousel-item">
+                            <div class="carousel-image">
+                                <img src="{{ item.img_path }}" 
+                                     alt="{{ item.title }}"
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='/static_m/images/fallback.png';">
+                            </div>
+                            <div class="carousel-caption">
+                                <strong>{{ item.title }}</strong>
+                                <p>{{ item.desc }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Simple dot indicators -->
+                <div class="carousel-indicators" id="indicators">
+                    {% for item in page_data.carousel %}
+                    <span class="indicator {% if loop.first %}active{% endif %}"></span>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+        </section>
+
+
+
+
+        <!-- Marketing Highlights Section -->
+        <section class="highlights-section">
+            <h2 class="section-title">Why Choose SuperPig?</h2>
+            <div class="highlights-list">
+                <!-- Highlight 1 -->
+                <div class="highlight-item">
+                    <strong>All Your Pig Production Data in One Place</strong>
+                    <p>Centralized platform for all your farm data - from breeding to harvest, accessible anytime, anywhere.</p>
+                </div>
+
+                <!-- Highlight 2 -->
+                <div class="highlight-item">
+                    <strong>Complete Data Management</strong>
+                    <p>From pig breeding stocks, gestation, lactation, fattening, harvest, feeds, financials and more - all seamlessly integrated.</p>
+                </div>
+
+                <!-- Highlight 3 -->
+                <div class="highlight-item">
+                    <strong>Collaborative Data Management</strong>
+                    <p>Seamless collaboration between farm management and staff. Assign tasks, track progress, and share insights in real-time.</p>
+                </div>
+
+                <!-- Highlight 4 -->
+                <div class="highlight-item">
+                    <strong>No More Missed Vaccinations & Operations</strong>
+                    <p>Automated reminders for vaccinations, farrowing, weaning, and other important pig operations.</p>
+                </div>
+
+                <!-- Highlight 5 -->
+                <div class="highlight-item">
+                    <strong>AI-Powered Analytics</strong>
+                    <p>Smart algorithms estimate your feed needs at any given time, predict harvest dates, and optimize your production cycle.</p>
+                </div>
+
+                <!-- Highlight 6 -->
+                <div class="highlight-item">
+                    <strong>Financial Insights</strong>
+                    <p>Track costs, revenues, and profitability per batch, per farm, or across your entire operation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <h2>Ready to Transform Your Pig Production?</h2>
+            <p>Join hundreds of successful farms using SuperPig</p>
+            <a href="/signup" class="btn-primary">Get Started Today →</a>
+        </section>
+
+        <!-- Footer -->
+        <div class="footer-border">
+            <div class="legal-footer">
+                <div class="website-link">
+                    <i class="fas fa-globe"></i>
+                    <a href="https://superpig.jsysdev.com">superpig.jsysdev.com</a>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="/terms">Terms</a>
+                    <span class="dot">•</span>
+                    <a href="/privacy">Privacy</a>
+                    <span class="dot">•</span>
+                    <a href="/contact">Contact</a>
+                </div>
+                
+                <div class="copyright">
+                    © 2026 J SysDev. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Check if there is a access_token stored
+        const bearer_token = localStorage.getItem('access_token');
+        
+        if (bearer_token) {
+            // We're on the homepage ("/") but have a token
+            // We need to request the authenticated version of "/"
+            
+            console.log('Token found, requesting authenticated homepage...');
+            
+            // Show loading state (optional)
+            document.body.style.opacity = '0.5';
+            
+            // Request the authenticated version of "/"
+            fetch('/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${bearer_token}`,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Success - token is valid, get the authenticated HTML
+                    return response.text();
+                } else if (response.status === 401) {
+                    // Token invalid or expired
+                    console.log('Token invalid/expired');
+                    localStorage.removeItem('access_token');
+                    // Stay on public homepage
+                    document.body.style.opacity = '1';
+                    throw new Error('Unauthorized');
+                } else {
+                    throw new Error('Server error');
+                }
+            })
+            .then(html => {
+                // Replace the entire page with authenticated dashboard HTML
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => {
+                console.error('Auth error:', error);
+                document.body.style.opacity = '1';
+                // Stay on public homepage
+            });
+        } else {
+            console.log('No token, showing public homepage');
+        }
+        
+        
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const menuClose = document.getElementById('menuClose');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        function openMenu() {
+            mobileMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openMenu);
+        menuClose.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+
+
+
+        // Carousel functionality
+        const carousel = document.getElementById('carousel');
+        const indicators = document.querySelectorAll('.indicator');
+
+        // Update active indicator on scroll
+        function updateIndicators() {
+            const scrollPosition = carousel.scrollLeft;
+            const itemWidth = carousel.clientWidth;
+            const activeIndex = Math.round(scrollPosition / itemWidth);
+            
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === activeIndex);
+            });
+        }
+
+        // Scroll to specific item when dot is clicked
+        function scrollToItem(index) {
+            const itemWidth = carousel.clientWidth;
+            carousel.scrollTo({
+                left: index * itemWidth,
+                behavior: 'smooth'
+            });
+        }
+
+        // Add click handlers to indicators
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => scrollToItem(index));
+        });
+
+        // Auto-scroll carousel - FIXED: Faster and smoother
+        let scrollInterval;
+        let autoScrollEnabled = true;
+
+        function startAutoScroll() {
+            if (scrollInterval) clearInterval(scrollInterval);
+            
+            scrollInterval = setInterval(() => {
+                if (!autoScrollEnabled) return;
+                
+                const itemWidth = carousel.clientWidth;
+                const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+                const currentIndex = Math.round(carousel.scrollLeft / itemWidth);
+                const totalItems = indicators.length;
+                const nextIndex = (currentIndex + 1) % totalItems;
+                
+                // Calculate next scroll position
+                let nextScroll = nextIndex * itemWidth;
+                
+                // Smooth scroll to next item
+                carousel.scrollTo({
+                    left: nextScroll,
+                    behavior: 'smooth'
+                });
+            }, 2500); // Reduced from 3000ms to 2500ms for faster feel
+        }
+
+        // Pause auto-scroll on hover/touch
+        function pauseAutoScroll() {
+            autoScrollEnabled = false;
+        }
+
+        function resumeAutoScroll() {
+            autoScrollEnabled = true;
+        }
+
+        // Event listeners for user interaction
+        carousel.addEventListener('mouseenter', pauseAutoScroll);
+        carousel.addEventListener('mouseleave', resumeAutoScroll);
+        carousel.addEventListener('touchstart', pauseAutoScroll);
+        carousel.addEventListener('touchend', resumeAutoScroll);
+
+        // Also pause when user manually scrolls
+        let scrollTimeout;
+        carousel.addEventListener('scroll', () => {
+            updateIndicators();
+            
+            // Pause auto-scroll temporarily during manual scroll
+            autoScrollEnabled = false;
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                autoScrollEnabled = true;
+            }, 3000); // Resume after 3 seconds of no scrolling
+        });
+
+        // Start auto-scroll
+        startAutoScroll();
+
+        // Initial update
+        setTimeout(updateIndicators, 100);
+    </script>
+</body>
+</html>

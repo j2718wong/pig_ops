@@ -95,9 +95,11 @@ class ViewBase:
         Return appropriate JS files based on environment
         """
         if self.is_dev == True:
+            print('DEv js modules')
             # DEVELOPMENT: Return all individual modules for easy debugging
             return self._get_dev_js_files(page_type)
         else:
+            print('minified JS')
             # PRODUCTION: Return minified bundle
             return self._get_prod_js_files(page_type)
     
@@ -146,7 +148,7 @@ class ViewBase:
             'core': 'bundle.core.min.js'
         }
     
-    
+
 
 class SignUp(ViewBase):
     def render(self, page_data = None):
@@ -175,29 +177,93 @@ class SignUp(ViewBase):
 
 
 class Root(ViewBase):
-    def render(self, page_data = None):
-        # Mobile version
-        template = env.get_template('index_mob.html')
-        
-        # Get appropriate JS files based on environment
-        js_app_text = self.get_js_files('core')
+    def render(self, uhid = None):
         
         
-        # These should have type= text/javascript
-        js_lib  = []
-        
-    
-        # These should have type= module
-        js_app_modules = []
+        if uhid is not None:
+            # Mobile version
+            template = env.get_template('index_mob.html')
             
-        data    = { 'page_data':        page_data,
-                    'js_lib':           js_lib,
-                    'js_app_text':      js_app_text,
-                    'js_app_modules':   js_app_modules,
-                    'is_dev':           self.is_dev}
+            # Get appropriate JS files based on environment
+            js_app_text = self.get_js_files('core')
+            
+            
+            # These should have type= text/javascript
+            js_lib  = []
+            
         
+            # These should have type= module
+            js_app_modules = []
                 
-        return template.render(data)
+            data    = { 'page_data':        None,
+                        'js_lib':           js_lib,
+                        'js_app_text':      js_app_text,
+                        'js_app_modules':   js_app_modules,
+                        'is_dev':           self.is_dev}
+            
+                    
+            return template.render(data)
+            
+        else:
+            page_data = {
+                'carousel':[
+                    {
+                        'img_path': '/static_m/images/mar/mar_home.png',
+                        'title': 'Dashboard Overview',
+                        'desc': 'Real-time pig farm metrics and KPIs at your fingertips'
+                    },
+                    
+                    {
+                        'img_path': '/static_m/images/mar/mar_sow_list.png',
+                        'title': 'Sow Management',
+                        'desc': 'Manage your breeding sows, boars and gilts'
+                    },
+                    
+                    {
+                        'img_path': '/static_m/images/mar/mar_gesta.png',
+                        'title': 'Sow Management',
+                        'desc': 'Track gestation, lactation, and breeding cycles'
+                    },
+                    
+                    {
+                        'img_path': '/static_m/images/mar/mar_lacta.png',
+                        'title': 'Sow Management',
+                        'desc': 'Automated reminders for vaccinations, farrowing, weaning, and other important pig operations'
+                    },
+                
+                    {
+                        'img_path': '/static_m/images/mar/mar_pig_ops.png',
+                        'title': 'Sow Management',
+                        'desc': 'Clear tracking who did the pig operation and when and what dosages gievn to pigs'
+                    }
+                ]
+            }
+            
+            
+            # Mobile version
+            template = env.get_template('home.html')
+            
+            
+            # Get appropriate JS files based on environment
+            js_app_text = []
+            
+            
+            # These should have type= text/javascript
+            js_lib  = []
+            
+        
+            # These should have type= module
+            js_app_modules = []
+                
+            data    = { 'page_data':        page_data,
+                        'js_lib':           js_lib,
+                        'js_app_text':      js_app_text,
+                        'js_app_modules':   js_app_modules,
+                        'is_dev':           self.is_dev}
+            
+                    
+            return template.render(data)
+            
 
 
 class AccPigOps(ViewBase):

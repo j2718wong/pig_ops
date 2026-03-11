@@ -94,7 +94,7 @@ app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
 
 # Public endpoint: 10 requests per minute per IP
 public_limit = RateLimiter(
-    times=6,        # 6 requests
+    times=10,        # 6 requests
     seconds=60,      # per minute
     trust_proxy=True, # Use X-Forwarded-For if behind proxy
     add_headers=True  # Show rate limit info in response headers
@@ -103,7 +103,7 @@ public_limit = RateLimiter(
 
 # More restrictive endpoint for sensitive operations
 strict_limit = RateLimiter(
-    times=3,
+    times=5,
     seconds=60,
     add_headers=True
 )
@@ -115,30 +115,21 @@ def get_current_uhid(request: Request) -> str:
     token = request.headers.get("authorization", "").replace("Bearer ", "")
     
     if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Unauthorized"
-        )
+        return None
     
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         uhid = payload.get("uhid")
         
         if uhid is None:
-            # For API endpoints, raise exception
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, 
-                detail="Invalid token: missing uhid"
-            )
+            return None
             
         return uhid
         
     except jwt.ExpiredSignatureError:
         # You might want different behavior for API vs web endpoints
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Token expired"
-        )
+        return RedirectResponse(url="/login", status_code=302)
+        
     except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
