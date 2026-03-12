@@ -36,14 +36,16 @@
 
 
 {% for script in js_app_text %}
-    {% if is_dev %}
-        <!-- Development: use module type for ES6 imports -->
-        <script type="module" src="{{ script }}"></script>
-    {% else %}
-        <!-- Production: regular script with bundled code -->
-        <script src="{{ script }}"></script>
-    {% endif %}
+    <!-- Production: regular script with bundled code -->
+    <script type="text/javascript" src="{{ script }}"></script>    
 {% endfor %}
+
+
+{% for script in js_app_modules %}
+    <!-- Development: use module type for ES6 imports -->
+    <script type="module" src="{{ script }}"></script>    
+{% endfor %}
+
 
 
 

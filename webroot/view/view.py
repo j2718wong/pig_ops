@@ -120,26 +120,36 @@ class ViewBase:
                 filename = manifest.get(page_type, self.default_manifest[page_type])
                 
 
-                return [f"/static/js/{filename}"]
+                return {
+                    'text':    [f"/static/js/{filename}"],
+                    'module':  []
+                }
         except:
             pass
             
 
-        return [f"/static/js/{self.default_manifest[page_type]}"]
-    
+        return {
+            'text':    [f"/static/js/{self.default_manifest[page_type]}"],
+            'module':  []
+        }
+        
+        
     
     def _get_dev_js_files(self, page_type='core'):
         """Development: return all individual modules for debugging"""
         if page_type == 'login':
             # Login page modules
-            return [
-                "/static_m/js/app.js",
-            ]
+            return {
+                'text':    [],
+                'module':  ["/static_m/js/app.js"]
+            }
+            
         else:  # core/dashboard
             # Core navigation and all other modules
-            return [
-                "/static_m/js/app_core.js",
-            ]
+            return {
+                'text':     [],
+                'module':  ["/static_m/js/app_core.js"]
+            }
     
     
     def get_manifest(self):
@@ -167,16 +177,13 @@ class SignUp(ViewBase):
         template = env.get_template('signup.html')
         
         # Get appropriate JS files based on environment
-        js_app_text = self.get_js_files('login')
-        
-        data    = {}
-        
+        files = self.get_js_files('login')
         
             
         data    = { 'page_data':        page_data,
                     'js_lib':           [],
-                    'js_app_text':      js_app_text,
-                    'js_app_modules':   [],
+                    'js_app_text':      files['text'],
+                    'js_app_modules':   files['module'],
                     'is_dev':           self.is_dev}
         
                 
@@ -196,21 +203,17 @@ class Root(ViewBase):
             template = env.get_template('index_mob.html')
             
             # Get appropriate JS files based on environment
-            js_app_text = self.get_js_files('core')
+            files = self.get_js_files('core')
             
             
             # These should have type= text/javascript
             js_lib  = []
             
-        
-            # These should have type= module
-            js_app_modules = []
                 
             data    = { 'page_data':        None,
                         'js_lib':           js_lib,
-                        'js_app_text':      js_app_text,
-                        'js_app_modules':   js_app_modules,
-                        'is_dev':           self.is_dev}
+                        'js_app_text':      files['text'],
+                        'js_app_modules':   files['module']}
             
                     
             return template.render(data)
