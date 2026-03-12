@@ -15,6 +15,8 @@ from route.r_user_request       import *
 from route.r_user_group         import *
 from route.r_account            import *
 
+from route.r_customer           import *
+
 from route.r_address_level      import *
 
 from route.r_a0_public_lookup   import *

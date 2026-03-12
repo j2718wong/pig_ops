@@ -105,10 +105,8 @@ def write_user_flag_bits(user, user_flag):
     
 
 @app.post("/user/register", tags=["User"])
-async def user_register(user_data: dm.DataUser):
-    # TODO preprocess 
-    # checking token
-    
+async def user_register(user_data: dm.DataUserLogin):
+
     
 
     res_register    =  model['user'].register(user_data)
@@ -329,7 +327,7 @@ async def user_email_verify_resend(uhid:str):
     
     
 @app.post("/user/login_social", tags=["User"])
-async def user_login_social(request: Request, user_data: dm.DataUser):
+async def user_login_social(request: Request, user_data: dm.DataUserLogin):
     
     social_media_id = user_data.social_media_id
     if social_media_id == 0 or social_media_id not in ALLOWED_SOCIAL_MEDIA_LOGIN:
@@ -644,17 +642,23 @@ async def google_auth(request: Request, token_data: dm.GoogleToken):
     
     
     # This will create account or login
-    user_data = dm.DataUser(
-        email             = user_email,
+    user_data = dm.DataUserLogin(
+        email                   = user_email,
+                
+        name                    = user_name,         
+        name_last               = user_name_last,      
+        name_first              = user_name_first,    
         
-        name              = user_name,         
-        name_last         = user_name_last,      
-        name_first        = user_name_first,    
+        viewport_width          = token_data.viewport_width, 
+        viewport_height         = token_data.viewport_height,
+        ip_address              = client_host,     
+    
+        login_social_media_id   = SOCIAL_MEDIA_GOOGLE,
         
-        social_media_id   = SOCIAL_MEDIA_GOOGLE,
-        viewport_width    = token_data.viewport_width, 
-        viewport_height   = token_data.viewport_height,
-        ip_address        = client_host     
+        login_country_code      = token_data.login_country_code,
+        login_country_name      = token_data.login_country_name,
+        login_city              = token_data.login_city,
+        login_region            = token_data.login_region      
     )
     
     

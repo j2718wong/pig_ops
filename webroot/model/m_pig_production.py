@@ -1166,6 +1166,19 @@ class PigProduction:
                     
                 }
                 
+                
+                # Remove null entries
+                if cur_prod_date_actual_birth is None:
+                    del cur_entry['birth']['num_days_actual'] 
+                    del cur_entry['birth']['num_dead_at_birth']
+                    
+                    del cur_entry['birth']['pigs_live_m']
+                    del cur_entry['birth']['pigs_live_f']   
+                    del cur_entry['birth']['birth_staff_id'] 
+                    del cur_entry['birth']['birth_staff_name']
+                    
+                    
+                
                  
                 result.append(cur_entry)
 

@@ -692,3 +692,92 @@ class Account:
         return result
     
     
+
+
+    def get_data_ver_num(self, account_id, return_array = 0):
+        sql =   """
+                SELECT 
+                    ver_num_gestating_ops,
+                    ver_num_lactating_piglets_ops,
+                    ver_num_lactating_sow_ops,    
+                    ver_num_gilt_ops,             
+                    ver_num_weaning_sow_ops,      
+                    
+                    data_ver_num_account
+                    
+                FROM account 
+                WHERE id = %s
+                """ % account_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            #conn.close()
+            
+        except Exception as e:
+            msg = 'get_data_ver_num(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+        
+
+
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_ver_num_gestating_ops           = row[0]
+                cur_ver_num_lactating_piglets_ops   = row[1]
+                cur_ver_num_lactating_sow_ops       = row[2]    
+                cur_ver_num_gilt_ops                = row[3]             
+                cur_ver_num_weaning_sow_ops         = row[4]      
+                
+                cur_ver_num_account                 = row[5]
+                
+                
+                if return_array == 0:
+                    cur_entry = {
+                        'data_ver_num': {
+                            'gesta_ops':            cur_ver_num_gestating_ops,       
+                            'lacta_piglets_ops':    cur_ver_num_lactating_piglets_ops,    
+                            'lacta_sow_ops':        cur_ver_num_lactating_sow_ops,
+                            'gilt_ops':             cur_ver_num_gilt_ops,   
+                            'weaning_sow_ops':      cur_ver_num_weaning_sow_ops,
+                            
+                            'account':              cur_ver_num_account
+                        }
+                    }
+                    
+                    return cur_entry
+                
+                else:
+                    return [
+                        cur_ver_num_gestating_ops,        
+                        cur_ver_num_lactating_piglets_ops,
+                        cur_ver_num_lactating_sow_ops,    
+                        cur_ver_num_gilt_ops,             
+                        cur_ver_num_weaning_sow_ops,      
+                        
+                        cur_ver_num_account              
+                    ]
+
+        return None
+

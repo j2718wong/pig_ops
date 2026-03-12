@@ -487,13 +487,19 @@ class User:
     def login_social(self, data = None):
         """
         PROCEDURE user_register_or_login(
-            in_social_media_id      INT,
-            
+            in_login_social_media_id INT,
+
             in_name                 VARCHAR(80),
             in_name_last            VARCHAR(50),
             in_name_first           VARCHAR(50),
             
             in_email                VARCHAR(50),
+            
+            in_login_country_code   VARCHAR(3);  /* This should be in upper case*/
+            in_login_country_name   VARCHAR(50);
+            in_login_city           VARCHAR(50); /* This should be in upper case*/
+            in_login_region         VARCHAR(50); /* This should be in upper case*/
+            
             
             in_viewport_width       INT,
             in_viewport_height      INT,
@@ -505,8 +511,8 @@ class User:
         
         sql =  'CALL user_register_or_login('
         
-        if data.social_media_id and data.social_media_id > 0:
-            sql += '%s,'  % data.social_media_id
+        if data.login_social_media_id and data.login_social_media_id > 0:
+            sql += '%s,'  % data.login_social_media_id
         else:
             sql += 'NULL,'
         
@@ -531,6 +537,27 @@ class User:
         
         sql += '"%s",'  % data.email
         
+        
+        if data.login_country_code is not None:
+            sql += '"%s",'  % data.login_country_code
+        else:
+            sql += 'NULL,'
+            
+        if data.login_country_name is not None:
+            sql += '"%s",'  % data.login_country_name
+        else:
+            sql += 'NULL,'
+        
+        if data.login_city is not None:
+            sql += '"%s",'  % data.login_city
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.login_region is not None:
+            sql += '"%s",'  % data.login_region
+        else:
+            sql += 'NULL,'
         
         
         if data.viewport_width and data.viewport_width > 0:

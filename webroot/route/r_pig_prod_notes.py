@@ -134,12 +134,12 @@ async def pig_prod_notes_add(request: Request, data: dm.DataPigProdNotes):
         }
     
     
-    pig_prod_notes_id    = res_add['pig_prod_notes']['id']
-    pig_prod_notes_hid   = hashids_common.encrypt(pig_prod_notes_id)
+    cur_id    = res_add['pig_prod_notes']['id']
+    cur_hid   = hashids_common.encrypt(cur_id)
     
     # remove plain id
     del res_add['pig_prod_notes']['id']
-    res_add['pig_prod_notes']['hid'] = pig_prod_notes_hid
+    res_add['pig_prod_notes']['hid'] = cur_hid
 
     
     # Remove optional desc coming from database

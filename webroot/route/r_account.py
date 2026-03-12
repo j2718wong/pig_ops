@@ -327,3 +327,73 @@ async def account_update_settings(request: Request, data: dm.DataAccountSettings
         
     return res_update
 
+
+
+@app.get("/account/data_ver_num", tags=["Account"])
+async def account_data_ver_num(request: Request, ahid: str, r: int = 0):
+    """
+    Will get account data_ver_num.
+    
+    Parameters
+    ----------
+    
+    ahid:str
+        account hashid
+    
+    r : int
+        return type; 0 = json object; 1 = array of integers
+        
+        
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_account.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID'
+            }
+        }
+    
+    
+    account_id = res[0]
+        
+        
+    return_array = 0
+    if r > 0:
+        return_array = 1
+
+    res = model['account'].get_data_ver_num(account_id, return_array)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+    
+
+
+
+

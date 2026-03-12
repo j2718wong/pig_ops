@@ -1731,15 +1731,15 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
         
         
         # Replace plain_id
-        
-        cur_id  = cur_entry['birth']['birth_staff_id']
-        if cur_id is not None:
-            cur_hid = hashids_common.encrypt(cur_id)
-        else:
-            cur_hid = None
-        
-        del cur_entry['birth']['birth_staff_id']
-        cur_entry['birth']['birth_staff_hid']   = cur_hid
+        if 'birth_staff_id' in cur_entry['birth']:
+            cur_id  = cur_entry['birth']['birth_staff_id']
+            if cur_id is not None:
+                cur_hid = hashids_common.encrypt(cur_id)
+            else:
+                cur_hid = None
+            
+            del cur_entry['birth']['birth_staff_id']
+            cur_entry['birth']['birth_staff_hid']   = cur_hid
             
         
         # Replace plain id

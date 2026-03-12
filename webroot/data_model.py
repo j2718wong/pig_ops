@@ -11,6 +11,11 @@ class GoogleToken(BaseModel):
     viewport_width:         int = None
     viewport_height:        int = None
     
+    login_country_code:     str
+    login_country_name:     str
+    login_city:             str
+    login_region:           str
+    
 
 
 class HasAddressLevel:
@@ -38,17 +43,24 @@ class HasContactDetails:
 
 
 
-class DataUser(BaseModel):
+class DataUserLogin(BaseModel):
     email:                  str
     
     name:                   str = None
     name_last:              str = None
     name_first:             str = None
     
-    social_media_id:        int = 0
     viewport_width:         int = None
     viewport_height:        int = None
     ip_address:             str = None
+
+    login_social_media_id:  int = 0
+    
+    login_country_code:     str
+    login_country_name:     str
+    login_city:             str        
+    login_region:           str      
+
 
 
 class DataApproveUserReq(BaseModel):
@@ -99,6 +111,13 @@ class DataAccountSelection(BaseModel):
     feed_brand_id:          int = 0
     feed_supplier_id:       int = 0
     semen_supplier_id:      int = 0
+    
+
+class DataCustomerFeedback(BaseModel):
+    uhid:                   str = None
+    
+    user_id:                int = 0
+    notes:                  str
     
 
 class DataPigFarm(BaseModel, HasAddressLevel):

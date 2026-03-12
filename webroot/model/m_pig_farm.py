@@ -628,7 +628,7 @@ class PigFarm:
             rows = None
         
 
-        result = []
+
         if rows is not None:
             
             
@@ -662,7 +662,7 @@ class PigFarm:
                         cur_data_ver_num_pig_prod,   
                         cur_data_ver_num_staff,      
                         cur_data_ver_num_feed_buy,   
-                        cur_data_ver_num_not_pregnant,
+                        cur_data_ver_num_not_pregnant
                     ]
 
-    
+        return None

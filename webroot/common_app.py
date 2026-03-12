@@ -45,6 +45,9 @@ from model.m_mfa                import Mfa
 
 from model.m_a0_public_lookup   import PublicLookup
 
+from model.m_customer_feedback  import CustomerFeedback
+
+
 from model.m_user               import User
 from model.m_user_request       import UserRequest
 from model.m_user_group         import UserGroup
@@ -106,6 +109,8 @@ model_names_pig_ops = [
 
     ('account',                 Account),
     ('mfa',                     Mfa),
+    
+    ('cust_feedback',           CustomerFeedback), 
     
     ('user',                    User),
     ('user_req',                UserRequest),

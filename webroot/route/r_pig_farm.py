@@ -392,7 +392,7 @@ async def pig_farm_list(request: Request, ahid: str):
 
 
 @app.get("/pig_farm/data_ver_num", tags=["Pig Farm"])
-async def data_ver_num(request: Request, pfhid: str, r: int = 0):
+async def pig_farm_data_ver_num(request: Request, pfhid: str, r: int = 0):
     """
     Will get pig farm data_ver_num.
     
