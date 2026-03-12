@@ -132,10 +132,27 @@ async def pig_farm_data(request: Request):
             
             'data': data
         }
-        
+       
+    
     
     account = user_account['account']
     user    = user_account['user']
+    
+    if account is None:
+        data = {
+            'application':      data_app,
+            'user_account':     user_account,
+            'pig_farm_account': None
+        }
+        
+        return {
+            'result':{
+                'num':  0,
+                'code': 'SUCCESS'
+            },
+            
+            'data': data
+        }
     
     
     

@@ -49,9 +49,6 @@ async def cust_feedback_add(request: Request, data: dm.DataCustomerFeedback):
     
     #uhid    = data.uhid
     
-    if data.date_notes is None:
-        dt_now          = datetime.now()
-        dt_now_s        = dt_now.strftime('%Y-%m-%d')
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:

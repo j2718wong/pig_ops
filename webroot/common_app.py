@@ -212,6 +212,8 @@ print('\n\nAPP_ENVI = %s' %app_envi)
 
 
 
+
+
 if USING_PRODUCTION_DB > 0:
     db_desc     = 'Production'
 
@@ -439,6 +441,20 @@ controller = Controller(logger, model)
 
 if get_is_prod_environment() > 0:
     controller.is_prod_envi = True
+
+
+
+# Get USE_MINIFIED_JS
+temp = os.getenv('USE_MINIFIED_JS', '1')
+USE_MINIFIED_JS = 1 
+try:
+    USE_MINIFIED_JS = int(temp)
+except:
+    USE_MINIFIED_JS = 1
+
+
+controller.use_minified_js = USE_MINIFIED_JS
+
 
 view = View(controller)
 

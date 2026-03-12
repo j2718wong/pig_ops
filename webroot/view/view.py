@@ -44,6 +44,8 @@ from jinja2             import Environment, FileSystemLoader
 from common_fast_api    import dir_static, dir_static_m
 
 
+
+
 # Set up the Jinja environment to load templates from the current directory
 env = Environment(loader=FileSystemLoader('templates'))
 
@@ -78,7 +80,7 @@ class ViewBase:
         self.view = view
         self.controller = view.controller
         
-        self.manifest_path = 'static/js/manifest.json'
+        self.manifest_path = dir_static + '/js/manifest.json'
         self.default_manifest = {
             'login': 'bundle.min.js',
             'core': 'bundle.core.min.js'
@@ -88,21 +90,24 @@ class ViewBase:
         
         if self.controller.is_prod_envi == False:
             self.is_dev = True
-    
+      
     
     def get_js_files(self, page_type='core'):
         """
         Return appropriate JS files based on environment
         """
         if self.is_dev == True:
-            print('DEv js modules')
             # DEVELOPMENT: Return all individual modules for easy debugging
             return self._get_dev_js_files(page_type)
         else:
-            print('minified JS')
             # PRODUCTION: Return minified bundle
-            return self._get_prod_js_files(page_type)
-    
+            if self.controller.use_minified_js > 0:
+                return self._get_prod_js_files(page_type)
+            
+            # Overide to not to use minified JS
+            return self._get_dev_js_files(page_type)
+            
+            
     
     def _get_prod_js_files(self, page_type='core'):
         """Production: just the minified bundle"""
@@ -110,10 +115,16 @@ class ViewBase:
             if os.path.exists(self.manifest_path):
                 with open(self.manifest_path, 'r') as f:
                     manifest = json.load(f)
+                
+                
                 filename = manifest.get(page_type, self.default_manifest[page_type])
+                
+
                 return [f"/static/js/{filename}"]
         except:
             pass
+            
+
         return [f"/static/js/{self.default_manifest[page_type]}"]
     
     

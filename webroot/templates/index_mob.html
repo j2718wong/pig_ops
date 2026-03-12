@@ -79,11 +79,11 @@
                 
                 <!-- User Control - Single instance for both desktop and mobile -->
                 <div class="user-control" id="userControl">
-                    <div class="user-avatar" id="desktop-user-initials">JD</div>
+                    <div class="user-avatar" id="desktop-user-initials">&nbsp;</div>
                     <div class="user-dropdown" id="userDropdown">
                         <!-- User Profile Header with Full Name -->
                         <div class="user-dropdown-header">
-                            <div class="user-avatar-large" id="desktop-user-initials-large">JD</div>
+                            <div class="user-avatar-large" id="desktop-user-initials-large">&nbsp;</div>
                             <div class="user-info">
                                 <div class="user-full-name" id="desktop-user-full-name">John Doe</div>
                                 <div class="user-role" id="desktop-user-role">Farm Manager</div>
@@ -485,8 +485,19 @@
     </div>
     
     
+    
+    
+    
+    
     <!-- Main Content - Dashboard -->
-    <div class="main-content">
+    <div class="main-content" id="main-content">
+        <!-- Loading page -->
+        <div id="loading-page" class="loading-container">
+            <div class="spinner"></div>
+            <div>Please Wait</div>
+        </div>
+
+        
         <div id="container-my-account"              class="hidden-container" style="display:none;"></div>
         <div id="container-customer-pricing"        class="hidden-container" style="display:none;"></div>
             
@@ -594,17 +605,14 @@
         <div class="footer-content">
             <div class="footer-section">
                 <h3 class="footer-title">J Systems Development</h3>
-                <p style="color: #cccccc; font-size: 18px;">Providing innovative system solutions and automations for your business business processes for since 2020.</p>
-                <div class="social-icons">
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                </div>
+                <p style="color: #cccccc; font-size: 18px;">Providing innovative system solutions and automations for your business processes since 2020.</p>
             </div>
                         
             <div class="footer-section">
                 <h3 class="footer-title">Contact Us</h3>
-                <ul class="footer-links">
+                <ul class="footer-links" style="padding-left:1rem;">
                     <li><a href="#" id="feedback-us">Feedback Us</a></li>
-                    <li><a href="#" id="contact-whatsapp">Whatsapp: +852 60615575</a></li>
+                    <li id="contact-whatsapp-show"><a href="#" id="contact-whatsapp">Whatsapp: +852 60615575</a></li>
                     <li><a href="#" id="contact-email">Email: jsysdev.contact@gmail.com</a></li>
                 </ul>
             </div>
