@@ -79,9 +79,6 @@ async def pig_farm_add(request: Request, data: dm.DataPigFarm):
     data.user_id   = user_id
     
     
-    if data.country_id == 0:
-        data.country_id = 1 # Default
-    
     res_add    =  model['pig_farm'].add(data)
     
     if res_add is None:

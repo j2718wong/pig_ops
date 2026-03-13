@@ -128,7 +128,10 @@ class DataPigFarm(BaseModel, HasAddressLevel):
     user_id:                int = 0
     pig_farm_id:            int = 0
         
-        
+    new_country_code:       str = None
+    new_country_name:       str = None
+    
+    
     name:                   str
 
 

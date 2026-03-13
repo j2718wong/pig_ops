@@ -686,7 +686,7 @@
     }
 
     .hidden-section {
-      display: none !important;
+      display: none;
     }
 
     .visible-section {
@@ -844,6 +844,72 @@
       border: 1px dashed var(--blue-border);
     }
     .info-note span { color: var(--icon-purple); font-weight: 500; }
+
+
+    .country-container {
+        margin-top: 1.5rem; 
+        margin-bottom: 0.5rem;
+    }
+    
+    .different-country-container {
+        text-align: right; 
+        margin-bottom: 1rem; 
+        min-height: 1.8rem;
+    }
+
+
+    .different-country-btn {
+        background: none;
+        border: none;
+        color: var(--corporate-blue-company, #1877F0);
+        font-size: 0.9rem;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0.2rem 0;
+        display: inline-block;
+    }
+
+    /* Optional hover effect for better UX */
+    .different-country-btn:hover {
+        color: var(--corporate-blue-dark, #15467d);
+        text-decoration: none;
+    }
+
+    .different-country-btn:focus {
+        outline: none;
+        ring: 2px solid var(--corporate-blue-light, #4a8adb);
+    }
+
+    /* Country selection styles */
+    .farm-country-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+    }
+
+    .farm-country-label {
+        font-weight: 500;
+        color: var(--neutral-gray, #4b5563);
+        font-size: 0.95rem;
+    }
+
+    .farm-country-value {
+        font-weight: 700;
+        color: var(--blue-deep, #0a2f6c);
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+
+    .country-note {
+        border-left: 4px solid var(--corporate-blue, #1e3a8a);
+        padding: 0.5rem 0 0.5rem 0.5rem;
+        margin: 1rem 0 0.5rem 0;
+        font-size: 1rem;
+        color: var(--text-muted, #4b5563);
+        line-height: 1.5;
+    }
+
 
     @media (max-width: 380px) {
       .content { padding: 1.5rem 1.2rem; }

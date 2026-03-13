@@ -20,7 +20,62 @@ from common_fast_api        import *
 
 import data_model           as dm
 
-   
+
+
+@app.get("/country/list", tags=["Common Lookup"])
+async def country_list(request: Request):
+    """
+    Will get active app_country list.
+    
+    Parameters
+    ----------
+    country_id : int
+        country_id
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res     = model['public_lookup'].get_active_country_list()
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+     
+    
+    # Replace plain id
+    for cur_entry in res:
+        cur_id    = cur_entry['id']
+        cur_hid   = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['id']
+        cur_entry['hid'] = cur_hid
+    
+            
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'data': res
+    }
+
+
+
+
+
+
 @app.get("/lookup/feed_type/list", tags=["Common Lookup"])
 async def lookup_feed_type_list(request: Request):
     """

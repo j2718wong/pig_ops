@@ -40,18 +40,35 @@ class PigFarm:
 
             in_name                 VARCHAR(50),
             
+            in_new_country_code     VARCHAR(5),
+            in_new_country_name     VARCHAR(50),
+            
+            
             in_country_id           INT, 
-            in_address_level_1_id      INT,
-            in_address_level_2_id      INT,
-            in_address_level_3_id      INT,
+            in_address_level_1_id   INT,
+            in_address_level_2_id   INT,
+            in_address_level_3_id   INT,
             in_latitude             DECIMAL(10,5),
             in_longitude            DECIMAL(10,5)
+    
         )  
         """
         
         sql =  'CALL pig_farm_add('
         sql += '%s,'    % data.user_id
         sql += '"%s",'  % data.name
+        
+        if data.new_country_code is not None:
+            sql += '"%s",'  % data.new_country_code
+        else:
+            sql += 'NULL,'
+        
+        if data.new_country_name is not None:
+            sql += '"%s",'  % data.new_country_name
+        else:
+            sql += 'NULL,'
+        
+        
         
         sql += '%s,'    % data.country_id
         sql += '%s,'    % data.level_1_id
@@ -137,9 +154,9 @@ class PigFarm:
             in_name                 VARCHAR(50),
             
             in_country_id           INT, 
-            in_address_level_1_id      INT,
-            in_address_level_2_id      INT,
-            in_address_level_3_id      INT,
+            in_address_level_1_id   INT,
+            in_address_level_2_id   INT,
+            in_address_level_3_id   INT,
             in_latitude             DECIMAL(10,5),
             in_longitude            DECIMAL(10,5)
         )

@@ -21,7 +21,6 @@ from common_fast_api        import *
 
 
 
-
 @app.get("/address/level_1/list", tags=["Location Address"])
 async def address_level_1_list(request: Request, country_hid:str):
     """
@@ -51,8 +50,7 @@ async def address_level_1_list(request: Request, country_hid:str):
         return {
             'result':{
                 'num':  ERROR_ADDRESS_COUNTRY_HID,
-                'code': 'ERROR_ADDRESS_COUNTRY_HID',
-                'desc': ''
+                'code': 'ERROR_ADDRESS_COUNTRY_HID'
             }
         }
     
@@ -135,8 +133,7 @@ async def address_level_2_list(request: Request, level_1_hid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
      
@@ -153,8 +150,7 @@ async def address_level_2_list(request: Request, level_1_hid:str):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res
@@ -190,8 +186,7 @@ async def address_level_3_list(request: Request, level_2_hid:str):
         return {
             'result':{
                 'num':  ERROR_ADDRESS_LEVEL_2_HID,
-                'code': 'ERROR_ADDRESS_LEVEL_2_HID',
-                'desc': ''
+                'code': 'ERROR_ADDRESS_LEVEL_2_HID'
             }
         }
     
@@ -205,8 +200,7 @@ async def address_level_3_list(request: Request, level_2_hid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
      
@@ -223,8 +217,7 @@ async def address_level_3_list(request: Request, level_2_hid:str):
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

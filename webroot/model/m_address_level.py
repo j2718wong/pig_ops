@@ -10,6 +10,8 @@ class AddressLevel:
         self.TAG                = 'AddressLevel'
 
 
+
+
     def get_address_level_1_list(self, country_id, return_tuple = 0):
         """
         Will get address_level_1 list.

@@ -144,6 +144,7 @@ def get_uhid_or_redirect(request: Request) -> Union[str, RedirectResponse]:
     """
     token = request.headers.get("authorization", "").replace("Bearer ", "")
     
+    
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
