@@ -173,15 +173,6 @@ model_names_pig_ops = [
 
 
 
-# Try multiple possible locations for .env file
-env_paths = [
-    Path('.env'),  # current directory
-    Path(__file__).parent / '.env',  # same as this file
-    Path.home() / '.pig_ops_env' / '.env',  # user home directory
-    Path('/etc/pig_ops/.env'),  # system config (for production)
-]
-
-
 
 # Change this settings for development
 USING_PRODUCTION_DB             = 0
@@ -189,17 +180,6 @@ USING_PRODUCTION_DB             = 0
 DB_INFO                         = ''
 
 
-env_loaded = False
-for env_path in env_paths:
-    if env_path.exists():
-        load_dotenv(env_path)
-        print(f"Loaded environment from: {env_path}")
-        env_loaded = True
-        break
-
-if not env_loaded:
-    print("Warning: No .env file found, using system environment variables")
-    
 
 # Get APP_ENVI
 app_envi = os.getenv('APP_ENVI', 'development')
@@ -218,10 +198,10 @@ if USING_PRODUCTION_DB > 0:
     db_desc     = 'Production'
 
     credentials_pig_ops = {
-        'db_host':      os.getenv('PIG_OPS_PROD_DB_HOST', '127.0.0.1'),
-        'db_user':      os.getenv('PIG_OPS_PROD_DB_USER'),
-        'db_password':  os.getenv('PIG_OPS_PROD_DB_PASSWORD'),
-        'database':     os.getenv('PIG_OPS_PROD_DB_NAME', 'pig_operations')
+        'db_host':          os.getenv('PIG_OPS_PROD_DB_HOST', '127.0.0.1'),
+        'db_user':          os.getenv('PIG_OPS_PROD_DB_USER'),
+        'db_password':      os.getenv('PIG_OPS_PROD_DB_PASSWORD'),
+        'database':         os.getenv('PIG_OPS_PROD_DB_NAME', 'pig_operations')
     }
 
     
@@ -250,10 +230,10 @@ else:
     db_desc     = 'Development'
 
     credentials_pig_ops = {
-        'db_host':      os.getenv('PIG_OPS_DEV_DB_HOST', '127.0.0.1'),
-        'db_user':      os.getenv('PIG_OPS_DEV_DB_USER'),
-        'db_password':  os.getenv('PIG_OPS_DEV_DB_PASSWORD'),
-        'database':     os.getenv('PIG_OPS_DEV_DB_NAME', 'pig_ops_dev')
+        'db_host':          os.getenv('PIG_OPS_DEV_DB_HOST', '127.0.0.1'),
+        'db_user':          os.getenv('PIG_OPS_DEV_DB_USER'),
+        'db_password':      os.getenv('PIG_OPS_DEV_DB_PASSWORD'),
+        'database':         os.getenv('PIG_OPS_DEV_DB_NAME', 'pig_ops_dev')
     }
 
     
@@ -325,23 +305,25 @@ if USING_PRODUCTION_DB > 0:
     db_desc     = 'JSysDev Location address'
 
     credentials_la = {
-        'db_host':      '127.0.0.1',
-        'db_user':      'ladrs_web',
-        'db_password':  '1@LADRS#db$1234.',
-        'database':     DATABASE_NAME_LOC_ADDRESS
+        'db_host':          os.getenv('LOC_ADDRESS_DB_HOST', '127.0.0.1'),
+        'db_user':          os.getenv('LOC_ADDRESS_DB_USER'),
+        'db_password':      os.getenv('LOC_ADDRESS_DB_PASSWORD'), 
+        'database':         os.getenv('LOC_ADDRESS_DB_NAME', DATABASE_NAME_LOC_ADDRESS) 
     }
 
 
 
 else:
+    # For now same
+    
     DATABASE_NAME_LOC_ADDRESS = 'loc_address'
     db_desc     = 'JSysDev Location address' 
     
     credentials_la = {
-        'db_host':      '127.0.0.1',
-        'db_user':      'ladrs_web',
-        'db_password':  '1@LADRS#db$1234.',
-        'database':     DATABASE_NAME_LOC_ADDRESS
+        'db_host':          os.getenv('LOC_ADDRESS_DB_HOST', '127.0.0.1'),
+        'db_user':          os.getenv('LOC_ADDRESS_DB_USER'),
+        'db_password':      os.getenv('LOC_ADDRESS_DB_PASSWORD'), 
+        'database':         os.getenv('LOC_ADDRESS_DB_NAME', DATABASE_NAME_LOC_ADDRESS) 
     }
 
 

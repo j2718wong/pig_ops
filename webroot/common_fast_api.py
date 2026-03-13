@@ -2,6 +2,9 @@
 # Jack Wong (zhaoshan99@gmail.com)
 
 import os
+from pathlib                    import Path
+from dotenv                     import load_dotenv
+
 
 from fastapi_offline            import FastAPIOffline
 from fastapi                    import FastAPI, Request, Depends, HTTPException, status
@@ -19,6 +22,8 @@ from fastapi_throttle           import RateLimiter
 import mimetypes
 import jwt
 import secrets
+
+
 
 
 # Add JavaScript MIME type if not already registered
@@ -78,15 +83,42 @@ GOOGLE_CLIENT_ID = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleuse
 JWT_ALGORITHM = "HS256"
 
 
+# Try multiple possible locations for .env file
+env_paths = [
+    Path('.env'),  # current directory
+    Path(__file__).parent / '.env',  # same as this file
+    Path.home() / '.pig_ops_env' / '.env',  # user home directory
+    Path('/etc/pig_ops/.env'),  # system config (for production)
+]
+
+
+
+# Load .env
+env_loaded = False
+for env_path in env_paths:
+    if env_path.exists():
+        load_dotenv(env_path)
+        print(f"Loaded environment from: {env_path}")
+        env_loaded = True
+        break
+
+if not env_loaded:
+    print("Warning: No .env file found, using system environment variables")
+    
+
+
+
+# This is in separate directory
+FRONT_END_DIRECTORY = os.getenv('FRONT_END_DIRECTORY')
 
 
 # JS bundles
-dir_static = '/home/dev01/projects/jsys/pig_ops_ui_mob/static'
+dir_static = '%s/static' % FRONT_END_DIRECTORY
 app.mount('/static', StaticFiles(directory=dir_static), name='static')
 
 
 # New mobile first static directory
-dir_static_m = '/home/dev01/projects/jsys/pig_ops_ui_mob/src/static'
+dir_static_m = '%s/src/static' % FRONT_END_DIRECTORY
 app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
 
 
