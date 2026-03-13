@@ -1,6 +1,6 @@
 # December 13, 2024
 # Jack Wong (zhaoshan99@gmail.com)
-
+import os
 import uvicorn
 
 from common_fast_api            import *
@@ -89,7 +89,10 @@ def list_routes():
 
 if __name__ == '__main__':
     
-    uvicorn.run("pig_ops_web:app", host='0.0.0.0', port=8080)
+    # Get port from environment variable, default to 8080 if not set
+    port = int(os.getenv('PORT_WEB', '8080'))
+    
+    uvicorn.run("pig_ops_web:app", host='0.0.0.0', port=port)
         
 
 
