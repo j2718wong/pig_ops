@@ -252,7 +252,7 @@ async def root(request: Request, p:str = None):
     
     
     
-@app.get("/{full_path:path}", response_class=HTMLResponse)
+@app.get("/{full_path:path}", response_class=HTMLResponse, dependencies=[Depends(strict_limit)])
 async def catch_all_frontend(request: Request, full_path: str = None):
     """
     This catches any route not matched above and serves the frontend

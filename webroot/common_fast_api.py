@@ -135,7 +135,7 @@ public_limit = RateLimiter(
 
 # More restrictive endpoint for sensitive operations
 strict_limit = RateLimiter(
-    times=5,
+    times=4,
     seconds=60,
     add_headers=True
 )

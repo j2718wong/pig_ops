@@ -66,12 +66,14 @@ from route.r_testing            import *
 from route.r_a0_root            import *
 
 
+"""
 @app.get("/test")
 async def test():
     return {"message": "Hello World"}
-
+"""
 
 # Print all routes
+"""
 @app.on_event("startup")
 def list_routes():
     print("\n=== All Registered Routes ===\n")
@@ -84,7 +86,7 @@ def list_routes():
             methods_str = ", ".join([m for m in methods if m])
             print(f"{methods_str:10} {path} {name or ''}")
     print("=" * 40)
-
+"""
 
 
 if __name__ == '__main__':
