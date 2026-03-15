@@ -793,8 +793,8 @@ def replace_plain_ids_production_list(production_list):
 
 
 
-@app.get("/sow_boar/data_details", tags=["Sow Boar"])
-async def data_details(request: Request, sow_boar_hid, inc_user_audit:int = 0):
+@app.get("/sow_boar/data_details/{entry_hid}", tags=["Sow Boar"])
+async def data_details(request: Request, entry_hid:str, inc_user_audit:int = 0):
     result = get_uhid_or_redirect(request)
     
     # If result is RedirectResponse, return it immediately
@@ -805,7 +805,7 @@ async def data_details(request: Request, sow_boar_hid, inc_user_audit:int = 0):
     uhid = result
     
     
-    res = hashids_common.decrypt(sow_boar_hid)
+    res = hashids_common.decrypt(entry_hid)
     if len(res) == 0:
         return {
             'result':{
