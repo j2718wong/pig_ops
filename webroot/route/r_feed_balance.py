@@ -233,6 +233,163 @@ async def feed_balance_update(request: Request, data: dm.DataFeedBalance):
     return res_update
 
 
+
+@app.post("/feed_balance_all/add", tags=["Production Details"])
+async def feed_balance_all_add(request: Request):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
+    
+    data = None
+    
+    try:
+        # Parse JSON data from request body
+        data = await request.json()
+    except:
+        data = None
+        
+    
+    
+    date_balance = data.get('date_balance')
+    entries = data.get('entries', [])
+    
+    # Process the entries
+    for entry in entries:
+        if 'pig_prod_hid' in entry:
+            pig_prod_hid = entry['pig_prod_hid']
+            feed_balance = entry['feed_balance']
+            
+            pig_prod_id  = 0
+    
+            res = hashids_common.decrypt(pig_prod_hid)
+            if len(res) == 0:
+                return {
+                    'result':{
+                        'num':  ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID,
+                        'code': 'ERROR_FEED_BALANCE_INVALID_PIG_PROD_HASHID'
+                    }
+                }
+            
+            pig_prod_id = res[0]
+            
+            
+            # Map the 7-element array to named fields
+            gesta       = feed_balance[0]
+            lacta       = feed_balance[1]
+            booster     = feed_balance[2]
+            prestarter  = feed_balance[3]
+            starter     = feed_balance[4]
+            grower      = feed_balance[5]
+            finisher    = feed_balance[6]
+            
+            
+            cur_data = dm.DataFeedBalance(
+                pig_prod_id     = pig_prod_id,
+                date_balance    = date_balance,
+                
+                num_gesta       = gesta,     
+                num_lacta       = lacta,     
+                num_booster     = booster,   
+                num_prestarter  = prestarter,
+                num_starter     = starter,   
+                num_grower      = grower,    
+                num_finisher    = finisher  
+            )
+            
+            
+            res_add    =  model['feed_balance'].add(cur_data)
+    
+            if res_add is None:
+                return {
+                    'result':{
+                        'num':  ERROR_DATABASE_ERROR,
+                        'code': 'ERROR_DATABASE_ERROR'
+                    }
+                }
+            
+            
+        elif 'pig_farm_hid' in entry:
+            pig_farm_hid = entry['pig_farm_hid']
+            feed_balance = entry
+
+            pig_farm_id  = 0
+    
+            res = hashids_common.decrypt(pig_farm_hid)
+            if len(res) == 0:
+                return {
+                    'result':{
+                        'num':  ERROR_FEED_BALANCE_INVALID_PIG_FARM_HASHID,
+                        'code': 'ERROR_FEED_BALANCE_INVALID_PIG_FARM_HASHID'
+                    }
+                }
+            
+            pig_farm_id = res[0]
+            
+            
+            # Map the 7-element array to named fields
+            gesta       = feed_balance[0]
+            lacta       = feed_balance[1]
+            booster     = feed_balance[2]
+            prestarter  = feed_balance[3]
+            starter     = feed_balance[4]
+            grower      = feed_balance[5]
+            finisher    = feed_balance[6]
+            
+            
+            cur_data = dm.DataFeedBalance(
+                pig_farm_id     = pig_farm_id,
+                date_balance    = date_balance,
+                
+                num_gesta       = gesta,     
+                num_lacta       = lacta,     
+                num_booster     = booster,   
+                num_prestarter  = prestarter,
+                num_starter     = starter,   
+                num_grower      = grower,    
+                num_finisher    = finisher  
+            )
+            
+            
+            res_add    =  model['feed_balance'].add(cur_data)
+    
+            if res_add is None:
+                return {
+                    'result':{
+                        'num':  ERROR_DATABASE_ERROR,
+                        'code': 'ERROR_DATABASE_ERROR'
+                    }
+                }
+
+
+    return {
+        'result':{
+            'num':  ERROR_DATABASE_ERROR,
+            'code': 'ERROR_DATABASE_ERROR'
+        }
+    }
+            
+
+
+
+
+
+
 def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0, 
         date_since = None, inc_user_audit:int = 0): 
     """
@@ -283,7 +440,6 @@ def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0,
         return res
     
     return None
-    
     
     
 @app.get("/feed_balance/list", tags=["Production Details"])
