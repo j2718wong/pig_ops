@@ -18,6 +18,9 @@ from fastapi.middleware.cors    import CORSMiddleware
 
 from fastapi_throttle           import RateLimiter
 
+from guard.middleware           import SecurityMiddleware
+from guard.models               import SecurityConfig
+
 
 import mimetypes
 import jwt
@@ -73,6 +76,32 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# NO IPINFO TOKEN NEEDED for these features!
+config = SecurityConfig(
+    # Manually block known bad IPs
+    blacklist=["82.197.71.28"],  # Add that annoying bot
+    
+    # Auto-ban after suspicious behavior
+    auto_ban_threshold=5,        # Ban after 5 suspicious requests
+    auto_ban_duration=86400,      # Ban for 24 hours
+    
+    # Block common attack patterns (like your PHP scans)
+    enable_penetration_detection=True,  # Detects path traversal, PHP vuln scans
+    
+    # Block common bots
+    blocked_user_agents=["curl", "wget", "python-requests", "Go-http-client"],
+    
+    # Rate limiting
+    rate_limit=100,  # Max 100 requests per minute per IP
+    
+    # Optional: block cloud providers if attacks come from hosting services
+    block_cloud_providers={"AWS", "GCP", "Azure"},
+)
+
+app.add_middleware(SecurityMiddleware, config=config)
+
 
 
 # Configuration
