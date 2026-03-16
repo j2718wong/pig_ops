@@ -649,33 +649,36 @@ async def google_callback(
                 print(f"Token verification failed: {e}")
                 return RedirectResponse(url="/login?error=invalid_token")
             
+            
             # Extract user info (same as your existing endpoint)
-            user_email = user_info['email']
-            email_verified = user_info.get('email_verified', False)
-            user_name = user_info.get('name')
-            user_name_last = user_info.get('family_name')
-            user_name_first = user_info.get('given_name')
-            user_picture = user_info.get('picture')
+            user_email          = user_info['email']
+            email_verified      = user_info.get('email_verified', False)
+            user_name           = user_info.get('name')
+            user_name_last      = user_info.get('family_name')
+            user_name_first     = user_info.get('given_name')
+            user_picture        = user_info.get('picture')
+            
             
             # Get client info
-            client_host = request.client.host
-            viewport_width = request.cookies.get('viewport_width', 0)
-            viewport_height = request.cookies.get('viewport_height', 0)
+            client_host         = request.client.host
+            viewport_width      = request.cookies.get('viewport_width', 0)
+            viewport_height     = request.cookies.get('viewport_height', 0)
+            
             
             # Create user data (same as your existing endpoint)
             user_data = dm.DataUserLogin(
-                email=user_email,
-                name=user_name,
-                name_last=user_name_last,
-                name_first=user_name_first,
-                viewport_width=viewport_width,
-                viewport_height=viewport_height,
-                ip_address=client_host,
-                login_social_media_id=SOCIAL_MEDIA_GOOGLE,
-                login_country_code=None,  # You'll need to get these from request
-                login_country_name=None,
-                login_city=None,
-                login_region=None
+                email           = user_email,
+                name            = user_name,
+                name_last       = user_name_last,
+                name_first      = user_name_first,
+                viewport_width  = viewport_width,
+                viewport_height = viewport_height,
+                ip_address      = client_host,
+                login_social_media_id   = SOCIAL_MEDIA_GOOGLE,
+                login_country_code      = None,  # You'll need to get these from request
+                login_country_name      = None,
+                login_city              = None,
+                login_region            = None
             )
             
             # Login/create user (reuse your existing logic)
@@ -713,12 +716,19 @@ async def google_callback(
             pprint.pprint(data_user_account)
             
             
-            print('user_hid = %s ' % user_hid)
             
             
             # Create JWT token
             user_hid = data_user_account['user']['user']['hid']
+            
+            print('user_hid = %s ' % user_hid)
+            
+            
             access_token = create_access_token(data={"uhid": user_hid})
+            
+            
+            print('access_token = %s' % access_token)
+            print('\n\n\n')
             
             # Set cookie and redirect to home
             response = RedirectResponse(url="/", status_code=302)
@@ -749,6 +759,8 @@ async def google_callback(
         return RedirectResponse(url=f"/login?error={str(e)}")    
     
 
+
+# NEW CODE Using HTTPS
 
 @app.get("/auth/google/login")
 async def google_login(request: Request):
@@ -790,6 +802,7 @@ async def google_login(request: Request):
 
 
 
+# OLD CODE Before HTTPS
 
 @app.post("/api/auth/google")
 async def google_auth(request: Request, token_data: dm.GoogleToken):
