@@ -691,9 +691,12 @@ async def google_callback(
             # Get user_id
             user_id = res_login['user']['id']
             
+            print('\n\nuser_id = %s' % user_id)
+            
             
             # Get user_account info
             data_user_account = get_user_account_info(user_id)
+            
             
 
             
@@ -706,6 +709,11 @@ async def google_callback(
 
             replace_plain_ids_user_account(data_user_account)
 
+            print('data_user_account')
+            pprint.pprint(data_user_account)
+            
+            
+            print('user_hid = %s ' % user_hid)
             
             
             # Create JWT token
