@@ -96,6 +96,13 @@ class CORPHeaderMiddleware(BaseHTTPMiddleware):
 app.add_middleware(CORPHeaderMiddleware)
 """
 
+# Add this exemption
+# Your OAuth paths that should bypass security checks
+OAUTH_PATHS = [
+    "/auth/google/callback",
+    "/auth/google/login",
+    "/api/auth/google"  # If this endpoint receives callbacks
+]
 
 # 
 config_security = SecurityConfig(
@@ -106,21 +113,38 @@ config_security = SecurityConfig(
     auto_ban_threshold=5,        # Ban after 5 suspicious requests
     auto_ban_duration=86400,      # Ban for 24 hours
     
-    # Block common attack patterns (like your PHP scans)
-    enable_penetration_detection=True,  # Detects path traversal, PHP vuln scans
+    # Block common attack patterns
+    enable_penetration_detection=True,
     
-    # Block common bots
-    blocked_user_agents=["curl", "wget", "python-requests", "Go-http-client"],
+    # ✅ CRITICAL: Exempt OAuth paths from all security checks
+    exempt_paths=OAUTH_PATHS,
+    
+    # ✅ Whitelist Google's user agents
+    whitelist_user_agents=[
+        "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+        "Google-Cloud-Scheduler",
+        "APIs-Google",
+        "GoogleHC",
+        "Google-OAuth-Client",
+    ],
+    
+    # ✅ FIXED: Removed "Go-http-client" from blocked list
+    blocked_user_agents=[
+        "curl", 
+        "wget", 
+        "python-requests",
+        # "Go-http-client"  ← REMOVED - Google uses this
+    ],
     
     # Rate limiting
-    rate_limit=100,  # Max 100 requests per minute per IP
+    rate_limit=100,
     
-    # Optional: block cloud providers if attacks come from hosting services
-    block_cloud_providers={"AWS", "GCP", "Azure"},
+    # ❌ REMOVED ENTIRELY: block_cloud_providers
+    # This was blocking all GCP IPs (including Google's callback servers)
+    # block_cloud_providers={"AWS", "GCP", "Azure"},  ← DELETE THIS LINE
 )
 
 app.add_middleware(SecurityMiddleware, config=config_security)
-
 
 
 
