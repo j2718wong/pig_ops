@@ -100,5 +100,33 @@ if __name__ == '__main__':
     
     uvicorn.run("pig_ops_web:app", host='0.0.0.0', port=port)
     """
+    
+    port = int(os.getenv('PORT_WEB', '8080'))
+    use_https = os.getenv('USE_HTTPS', 'false').lower() == 'true'
+    
+    if use_https:
+        # SSL Context for HTTPS
+        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        ssl_context.load_cert_chain(
+            'localhost+4.pem',        # Your certificate
+            keyfile='localhost+4-key.pem'  # Your private key
+        )
+        
+        uvicorn.run(
+            "pig_ops_web:app",
+            host='0.0.0.0',
+            port=8443,  # HTTPS port
+            ssl=ssl_context
+        )
+    else:
+        # Regular HTTP mode
+        uvicorn.run(
+            "pig_ops_web:app",
+            host='0.0.0.0',
+            port=port
+        )
+    
+    
+    
 
 
