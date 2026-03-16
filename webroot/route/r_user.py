@@ -638,7 +638,7 @@ async def google_callback(
                 print(f"No ID token in response: {token_data}")
                 return RedirectResponse(url="/login?error=no_id_token")
             
-            # Verify the ID token (using your existing verification logic)
+            # Verify the ID token
             try:
                 user_info = id_token.verify_oauth2_token(
                     token_data["id_token"], 
@@ -649,8 +649,7 @@ async def google_callback(
                 print(f"Token verification failed: {e}")
                 return RedirectResponse(url="/login?error=invalid_token")
             
-            
-            # Extract user info (same as your existing endpoint)
+            # Extract user info
             user_email          = user_info['email']
             email_verified      = user_info.get('email_verified', False)
             user_name           = user_info.get('name')
@@ -658,14 +657,12 @@ async def google_callback(
             user_name_first     = user_info.get('given_name')
             user_picture        = user_info.get('picture')
             
-            
             # Get client info
             client_host         = request.client.host
             viewport_width      = request.cookies.get('viewport_width', 0)
             viewport_height     = request.cookies.get('viewport_height', 0)
             
-            
-            # Create user data (same as your existing endpoint)
+            # Create user data
             user_data = dm.DataUserLogin(
                 email           = user_email,
                 name            = user_name,
@@ -675,76 +672,73 @@ async def google_callback(
                 viewport_height = viewport_height,
                 ip_address      = client_host,
                 login_social_media_id   = SOCIAL_MEDIA_GOOGLE,
-                login_country_code      = None,  # You'll need to get these from request
+                login_country_code      = None,
                 login_country_name      = None,
                 login_city              = None,
                 login_region            = None
             )
             
-            # Login/create user (reuse your existing logic)
+            # Login/create user
             res_login = model['user'].login_social(user_data)
             if res_login is None:
                 return RedirectResponse(url="/login?error=login_failed")
-            
             
             # Get user_id and account info
             user_id = res_login['user']['id']
             data_user_account = get_user_account_info(user_id)
             
-            # Get user_id
-            user_id = res_login['user']['id']
-            
             print('\n\nuser_id = %s' % user_id)
-            
-            
-            # Get user_account info
-            data_user_account = get_user_account_info(user_id)
-            
-            
-
             
             # replace the user block
             del res_login['user']
             
-            
             # with this block
             res_login['user_account'] = data_user_account
-
             replace_plain_ids_user_account(data_user_account)
 
             print('data_user_account')
             pprint.pprint(data_user_account)
             
-            
-            
-            
             # Create JWT token
             user_hid = data_user_account['user']['user']['hid']
-            
             print('user_hid = %s ' % user_hid)
             
-            
             access_token = create_access_token(data={"uhid": user_hid})
-            
-            
             print('access_token = %s' % access_token)
             print('\n\n\n')
             
-            # Set cookie and redirect to home
-            response = RedirectResponse(url="/", status_code=302)
-            response.set_cookie(key="access_token", value=access_token, httponly=True)
-            response.set_cookie(key="user_picture", value=user_picture)
-    
+            # ✅ FIXED: Create HTML response with script
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Redirecting...</title>
+            </head>
+            <body>
+                <script>
+                    // Store tokens in localStorage
+                    localStorage.setItem('access_token', '{access_token}');
+                    localStorage.setItem('user_picture', '{user_picture}');
+                    
+                    // Also set cookie for server-side auth (optional, can be removed)
+                    document.cookie = "access_token={access_token}; path=/; max-age=" + 60*60*24*7;
+                    
+                    // Redirect to home page
+                    window.location.href = '/';
+                </script>
+                <p>Redirecting to home page...</p>
+            </body>
+            </html>
+            """
             
-            return response
+            # Return the HTML response
+            return HTMLResponse(content=html_content)
     
-            
     except Exception as e:
         print(f"Google callback error: {e}")
         import traceback
         traceback.print_exc()
         return RedirectResponse(url=f"/login?error={str(e)}")    
-    
 
 
 # NEW CODE Using HTTPS
