@@ -11,10 +11,10 @@ class GoogleToken(BaseModel):
     viewport_width:         int = None
     viewport_height:        int = None
     
-    login_country_code:     str
-    login_country_name:     str
-    login_city:             str
-    login_region:           str
+    login_country_code:     str = None
+    login_country_name:     str = None
+    login_city:             str = None
+    login_region:           str = None
     
 
 
