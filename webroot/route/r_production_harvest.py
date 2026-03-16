@@ -198,6 +198,8 @@ async def prod_harvest_update(request: Request, data: dm.DataProductionHarvest):
     
     res = hashids_common.decrypt(harvest_type_hid)
     if len(res) == 0:
+        print('\n\nharvest_type_hid = %s\n' % s)
+        
         return {
             'result':{
                 'num':  ERROR_PRODUCTION_HARVEST_INVALID_TYPE_HASHID,
