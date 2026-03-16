@@ -11,10 +11,10 @@ class GoogleToken(BaseModel):
     viewport_width:         int = None
     viewport_height:        int = None
     
-    login_country_code:     str = None
-    login_country_name:     str = None
-    login_city:             str = None
-    login_region:           str = None
+    login_country_code:     str | None  = None
+    login_country_name:     str | None  = None
+    login_city:             str | None  = None
+    login_region:           str | None  = None
     
 
 
@@ -56,10 +56,10 @@ class DataUserLogin(BaseModel):
 
     login_social_media_id:  int = 0
     
-    login_country_code:     str = None
-    login_country_name:     str = None
-    login_city:             str = None 
-    login_region:           str = None
+    login_country_code:     str | None  = None
+    login_country_name:     str | None  = None
+    login_city:             str | None  = None 
+    login_region:           str | None  = None
 
 
 
