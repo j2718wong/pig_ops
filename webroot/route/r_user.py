@@ -11,6 +11,7 @@ import httpx
 
 from fastapi                import Request, HTTPException, status, Depends
 from fastapi.responses      import HTMLResponse, RedirectResponse
+from fastapi                import BackgroundTasks
 
 
 from google.oauth2          import id_token
@@ -709,7 +710,8 @@ async def google_auth(request: Request, token_data: dm.GoogleToken):
     res_login['bearer_token'] = access_token
     res_login['user_picture'] = user_picture
     
-    
+    # tEST
+    #background_tasks.add_task(send_email, 'j2718wong@gmail.com','login in app', 'Test message')
     
     return res_login
     

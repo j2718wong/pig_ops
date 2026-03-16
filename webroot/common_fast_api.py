@@ -6,7 +6,6 @@ from pathlib                    import Path
 from dotenv                     import load_dotenv
 
 
-from fastapi_offline            import FastAPIOffline
 from fastapi                    import FastAPI, Request, Depends, HTTPException, status
 from fastapi.security           import HTTPBasicCredentials, HTTPBearer
 from fastapi.responses          import RedirectResponse
@@ -20,6 +19,12 @@ from fastapi_throttle           import RateLimiter
 
 from guard.middleware           import SecurityMiddleware
 from guard.models               import SecurityConfig
+
+from fastapi_mail               import FastMail, ConnectionConfig, MessageSchema, MessageType
+
+
+from starlette.middleware.base  import BaseHTTPMiddleware
+
 
 
 import mimetypes
@@ -65,21 +70,35 @@ tags_metadata = [
     {"name": "HashIds",         "description": "HashIds Testing"}
 ]
 
-app = FastAPIOffline(openapi_tags = tags_metadata)
+app = FastAPI(openapi_tags = tags_metadata)
 
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8000", "http://127.0.0.1:8000"],
+    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# NO IPINFO TOKEN NEEDED for these features!
-config = SecurityConfig(
+
+class CORPHeaderMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        # These headers tell the browser to allow cross-origin resources
+        response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+        response.headers["Cross-Origin-Embedder-Policy"] = "unsafe-none"
+        response.headers["Cross-Origin-Opener-Policy"] = "unsafe-none"
+        return response
+
+app.add_middleware(CORPHeaderMiddleware)
+
+
+
+# 
+config_security = SecurityConfig(
     # Manually block known bad IPs
     blacklist=["82.197.71.28"],  # Add that annoying bot
     
@@ -100,11 +119,13 @@ config = SecurityConfig(
     block_cloud_providers={"AWS", "GCP", "Azure"},
 )
 
-app.add_middleware(SecurityMiddleware, config=config)
+app.add_middleware(SecurityMiddleware, config=config_security)
 
 
 
-# Configuration
+
+
+# Signin Using Google configuration 
 GOOGLE_CLIENT_ID = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com"
 
 
@@ -274,14 +295,63 @@ def validate_csrf_token(token: str) -> bool:
 
 
 
-JWT_TOKEN_AUTHENTICATED             = 0
-JWT_TOKEN_EXPIRED                   = 1
-JWT_TOKEN_INVALID                   = 2
-JWT_TOKEN_OTHER_ERROR               = 3
-JWT_TOKEN_USER_UNAUTHORIZED         = 4
-JWT_TOKEN_USER_INVALID              = 5
 
 
 
+"""
+
+# Email configuration
+config_email = ConnectionConfig(
+    MAIL_USERNAME="jsysdev.contact@gmail.com",
+    MAIL_PASSWORD="ndjt lxmz dmby meip",  # Use app password for Gmail
+    MAIL_FROM="no-reply@jsysdev.com",
+    MAIL_PORT=587,
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_STARTTLS=True,  # Equivalent to MAIL_TLS=True in some versions
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True
+)
+
+"""
+
+
+
+
+
+
+# This is your required function signature
+def send_email(recipient: str, subject: str, body: str):
+    """
+    Synchronous function that sends email to a single recipient
+    This matches your required signature
+    """
+    # Create message
+    message = MessageSchema(
+        subject=subject,
+        recipients=[recipient],  # Single recipient as list
+        body=body,
+        subtype=MessageType.html
+    )
+    
+    # Send email using FastMail (async) but run it synchronously
+    fm = FastMail(config_email)
+    
+    # Run the async send_message in a synchronous context
+    # Using asyncio.run() for a standalone async call
+    try:
+        # Get or create an event loop
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            # No event loop in current thread, create a new one
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        # Run the async function
+        loop.run_until_complete(fm.send_message(message))
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        raise
 
 
