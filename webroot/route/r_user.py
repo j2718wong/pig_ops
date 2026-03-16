@@ -732,25 +732,12 @@ async def google_callback(
             
             # Set cookie and redirect to home
             response = RedirectResponse(url="/", status_code=302)
-            response.set_cookie(
-                key="access_token",
-                value=access_token,
-                httponly=True,
-                max_age=3600 * 24 * 7,  # 7 days
-                secure=request.url.scheme == "https",  # True for production
-                samesite="lax"
-            )
-            
-            # Also set a non-http-only cookie for the frontend
-            response.set_cookie(
-                key="user_picture",
-                value=user_picture,
-                max_age=3600 * 24 * 7,
-                secure=request.url.scheme == "https",
-                samesite="lax"
-            )
+            response.set_cookie(key="access_token", value=access_token, httponly=True)
+            response.set_cookie(key="user_picture", value=user_picture)
+    
             
             return response
+    
             
     except Exception as e:
         print(f"Google callback error: {e}")
