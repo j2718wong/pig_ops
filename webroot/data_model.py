@@ -56,10 +56,10 @@ class DataUserLogin(BaseModel):
 
     login_social_media_id:  int = 0
     
-    login_country_code:     str
-    login_country_name:     str
-    login_city:             str        
-    login_region:           str      
+    login_country_code:     str = None
+    login_country_name:     str = None
+    login_city:             str = None 
+    login_region:           str = None
 
 
 
