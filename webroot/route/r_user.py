@@ -404,9 +404,6 @@ async def user_login_social(request: Request, user_data: dm.DataUserLogin):
     data_user_account = get_user_account_info(user_id)
     
     
-    pprint.pprint('login social data_user_account')
-    pprint.pprint(data_user_account)
-    
     # replace the user block
     del res_login['user']
     
@@ -687,7 +684,6 @@ async def google_callback(
             user_id = res_login['user']['id']
             data_user_account = get_user_account_info(user_id)
             
-            print('\n\nuser_id = %s' % user_id)
             
             # replace the user block
             del res_login['user']
@@ -696,16 +692,20 @@ async def google_callback(
             res_login['user_account'] = data_user_account
             replace_plain_ids_user_account(data_user_account)
 
-            print('data_user_account')
-            pprint.pprint(data_user_account)
             
             # Create JWT token
             user_hid = data_user_account['user']['user']['hid']
             print('user_hid = %s ' % user_hid)
             
+            
             access_token = create_access_token(data={"uhid": user_hid})
-            print('access_token = %s' % access_token)
-            print('\n\n\n')
+            
+            
+            # tEST This one works
+            #print('To send email')
+            #msg = 'user new login email = %s ' % user_email
+            #background_tasks.add_task(send_email, 'j2718wong@gmail.com','login in app', msg)
+            
             
             # ✅ FIXED: Create HTML response with script
             html_content = f"""

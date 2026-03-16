@@ -40,15 +40,35 @@ mimetypes.add_type('text/javascript', '.js')
 
 
 
+# Try multiple possible locations for .env file
+env_paths = [
+    Path('.env'),  # current directory
+    Path(__file__).parent / '.env',  # same as this file
+    Path.home() / '.pig_ops_env' / '.env',  # user home directory
+    Path('/etc/pig_ops/.env'),  # system config (for production)
+]
+
+
+
+# Load .env
+env_loaded = False
+for env_path in env_paths:
+    if env_path.exists():
+        load_dotenv(env_path)
+        print(f"Loaded environment from: {env_path}")
+        env_loaded = True
+        break
+
+if not env_loaded:
+    print("Warning: No .env file found, using system environment variables")
+    
+
+
+
 # Application secret key 
 JWT_SECRET = 'MIdkgAL5GXSQO7D6nG9rYV9Xg3TQkQ4tkSlRn5V3gfT4yZF1-JWQO_-WXUVK_R7W'
 
-RELEASE_MODE_DEVELOPMENT    = 0
-RELEASE_MODE_PRODUCTION     = 1
 
-
-# If this is set to RELEASE_MODE_PRODUCTION authentication is needed in the API.
-release_mode                = RELEASE_MODE_PRODUCTION
 
 tags_metadata = [
     {"name": "User",            "description": "User related operations"},
@@ -70,7 +90,16 @@ tags_metadata = [
     {"name": "HashIds",         "description": "HashIds Testing"}
 ]
 
-app = FastAPI(openapi_tags = tags_metadata)
+
+# Get APP_ENVI
+app_envi = os.getenv('APP_ENVI', 'development')
+
+app = FastAPI(
+    openapi_tags    = tags_metadata,
+    docs_url        = "/docs"           if app_envi == "development" else None,
+    redoc_url       = "/redoc"          if app_envi == "development" else None,
+    openapi_url     = "/openapi.json"   if app_envi == "development" else None
+)
 
 
 # CORS middleware
@@ -83,18 +112,7 @@ app.add_middleware(
 )
 
 
-"""
-class CORPHeaderMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        response = await call_next(request)
-        # These headers tell the browser to allow cross-origin resources
-        response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
-        response.headers["Cross-Origin-Embedder-Policy"] = "unsafe-none"
-        response.headers["Cross-Origin-Opener-Policy"] = "unsafe-none"
-        return response
 
-app.add_middleware(CORPHeaderMiddleware)
-"""
 
 # Add this exemption
 # Your OAuth paths that should bypass security checks
@@ -155,28 +173,6 @@ app.add_middleware(SecurityMiddleware, config=config_security)
 JWT_ALGORITHM = "HS256"
 
 
-# Try multiple possible locations for .env file
-env_paths = [
-    Path('.env'),  # current directory
-    Path(__file__).parent / '.env',  # same as this file
-    Path.home() / '.pig_ops_env' / '.env',  # user home directory
-    Path('/etc/pig_ops/.env'),  # system config (for production)
-]
-
-
-
-# Load .env
-env_loaded = False
-for env_path in env_paths:
-    if env_path.exists():
-        load_dotenv(env_path)
-        print(f"Loaded environment from: {env_path}")
-        env_loaded = True
-        break
-
-if not env_loaded:
-    print("Warning: No .env file found, using system environment variables")
-    
 
 
 # Signin Using Google configuration 
@@ -325,7 +321,7 @@ def validate_csrf_token(token: str) -> bool:
 
 
 
-"""
+
 
 # Email configuration
 config_email = ConnectionConfig(
@@ -340,12 +336,12 @@ config_email = ConnectionConfig(
     VALIDATE_CERTS=True
 )
 
-"""
 
 
 
 
 
+import asyncio
 
 # This is your required function signature
 def send_email(recipient: str, subject: str, body: str):
@@ -358,7 +354,8 @@ def send_email(recipient: str, subject: str, body: str):
         subject=subject,
         recipients=[recipient],  # Single recipient as list
         body=body,
-        subtype=MessageType.html
+        subtype=MessageType.html,
+        reply_to=["no-reply@jsysdev.com"] 
     )
     
     # Send email using FastMail (async) but run it synchronously
