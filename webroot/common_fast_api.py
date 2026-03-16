@@ -83,7 +83,7 @@ app.add_middleware(
 )
 
 
-
+"""
 class CORPHeaderMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
@@ -94,7 +94,7 @@ class CORPHeaderMiddleware(BaseHTTPMiddleware):
         return response
 
 app.add_middleware(CORPHeaderMiddleware)
-
+"""
 
 
 # 
