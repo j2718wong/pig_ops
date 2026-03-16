@@ -91,8 +91,9 @@ async def prod_harvest_add(request: Request, data: dm.DataProductionHarvest):
     
     res = hashids_common.decrypt(harvest_type_hid)
     if len(res) == 0:
+        print(f'\n\nharvest_type_hid = {harvest_type_hid}\n')
+            
         return {
-            print('\n\nharvest_type_hid = %s\n' % s)
             'result':{
                 'num':  ERROR_PRODUCTION_HARVEST_INVALID_TYPE_HASHID,
                 'code': 'ERROR_PRODUCTION_HARVEST_INVALID_TYPE_HASHID'
