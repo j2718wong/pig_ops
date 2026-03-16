@@ -683,9 +683,30 @@ async def google_callback(
             if res_login is None:
                 return RedirectResponse(url="/login?error=login_failed")
             
+            
             # Get user_id and account info
             user_id = res_login['user']['id']
             data_user_account = get_user_account_info(user_id)
+            
+            # Get user_id
+            user_id = res_login['user']['id']
+            
+            
+            # Get user_account info
+            data_user_account = get_user_account_info(user_id)
+            
+
+            
+            # replace the user block
+            del res_login['user']
+            
+            
+            # with this block
+            res_login['user_account'] = data_user_account
+
+            replace_plain_ids_user_account(data_user_account)
+
+            
             
             # Create JWT token
             user_hid = data_user_account['user']['user']['hid']
