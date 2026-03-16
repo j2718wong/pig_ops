@@ -125,8 +125,6 @@ app.add_middleware(SecurityMiddleware, config=config_security)
 
 
 
-# Signin Using Google configuration 
-GOOGLE_CLIENT_ID = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com"
 
 
 
@@ -156,6 +154,11 @@ if not env_loaded:
     print("Warning: No .env file found, using system environment variables")
     
 
+
+# Signin Using Google configuration 
+GOOGLE_CLIENT_ID        = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET    = os.getenv('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI     = '/auth/google/callback'
 
 
 # This is in separate directory

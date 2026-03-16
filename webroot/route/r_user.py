@@ -566,7 +566,8 @@ async def user_list(request: Request, ahid: str, inc_deleted : int = 0):
         'data': res
     }
     
-    
+
+
 
 
 def create_access_token(data: dict):
@@ -575,6 +576,189 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return encoded_jwt
+
+
+
+
+
+from fastapi import Request, HTTPException, BackgroundTasks
+from fastapi.responses import RedirectResponse, HTMLResponse
+import httpx
+from google.oauth2 import id_token
+from google.auth.transport import requests
+import os
+from urllib.parse import urlencode
+
+
+@app.get("/auth/google/callback", response_class=HTMLResponse)
+async def google_callback(
+    request: Request, 
+    background_tasks: BackgroundTasks,
+    code: str = None, 
+    state: str = None,
+    error: str = None
+):
+    """
+    Handle the Google OAuth redirect callback
+    """
+    # Check for error from Google
+    if error:
+        print(f"Google OAuth error: {error}")
+        return RedirectResponse(url="/login?error=google_auth_failed")
+    
+    if not code:
+        return RedirectResponse(url="/login?error=no_code")
+    
+    try:
+        # Exchange authorization code for tokens
+        token_url = "https://oauth2.googleapis.com/token"
+        
+        # Build the full redirect URI
+        base_url = str(request.base_url).rstrip('/')
+        redirect_uri = f"{base_url}{GOOGLE_REDIRECT_URI}"
+        
+        data = {
+            "code": code,
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code"
+        }
+        
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(token_url, data=data)
+            
+            if token_response.status_code != 200:
+                print(f"Token exchange failed: {token_response.text}")
+                return RedirectResponse(url="/login?error=token_exchange_failed")
+            
+            token_data = token_response.json()
+            
+            if "id_token" not in token_data:
+                print(f"No ID token in response: {token_data}")
+                return RedirectResponse(url="/login?error=no_id_token")
+            
+            # Verify the ID token (using your existing verification logic)
+            try:
+                user_info = id_token.verify_oauth2_token(
+                    token_data["id_token"], 
+                    requests.Request(), 
+                    GOOGLE_CLIENT_ID
+                )
+            except ValueError as e:
+                print(f"Token verification failed: {e}")
+                return RedirectResponse(url="/login?error=invalid_token")
+            
+            # Extract user info (same as your existing endpoint)
+            user_email = user_info['email']
+            email_verified = user_info.get('email_verified', False)
+            user_name = user_info.get('name')
+            user_name_last = user_info.get('family_name')
+            user_name_first = user_info.get('given_name')
+            user_picture = user_info.get('picture')
+            
+            # Get client info
+            client_host = request.client.host
+            viewport_width = request.cookies.get('viewport_width', 0)
+            viewport_height = request.cookies.get('viewport_height', 0)
+            
+            # Create user data (same as your existing endpoint)
+            user_data = dm.DataUserLogin(
+                email=user_email,
+                name=user_name,
+                name_last=user_name_last,
+                name_first=user_name_first,
+                viewport_width=viewport_width,
+                viewport_height=viewport_height,
+                ip_address=client_host,
+                login_social_media_id=SOCIAL_MEDIA_GOOGLE,
+                login_country_code=None,  # You'll need to get these from request
+                login_country_name=None,
+                login_city=None,
+                login_region=None
+            )
+            
+            # Login/create user (reuse your existing logic)
+            res_login = model['user'].login_social(user_data)
+            if res_login is None:
+                return RedirectResponse(url="/login?error=login_failed")
+            
+            # Get user_id and account info
+            user_id = res_login['user']['id']
+            data_user_account = get_user_account_info(user_id)
+            
+            # Create JWT token
+            user_hid = data_user_account['user']['user']['hid']
+            access_token = create_access_token(data={"uhid": user_hid})
+            
+            # Set cookie and redirect to home
+            response = RedirectResponse(url="/", status_code=302)
+            response.set_cookie(
+                key="access_token",
+                value=access_token,
+                httponly=True,
+                max_age=3600 * 24 * 7,  # 7 days
+                secure=request.url.scheme == "https",  # True for production
+                samesite="lax"
+            )
+            
+            # Also set a non-http-only cookie for the frontend
+            response.set_cookie(
+                key="user_picture",
+                value=user_picture,
+                max_age=3600 * 24 * 7,
+                secure=request.url.scheme == "https",
+                samesite="lax"
+            )
+            
+            return response
+            
+    except Exception as e:
+        print(f"Google callback error: {e}")
+        import traceback
+        traceback.print_exc()
+        return RedirectResponse(url=f"/login?error={str(e)}")    
+    
+
+
+@app.get("/auth/google/login")
+async def google_login(request: Request):
+    """
+    Initiate Google OAuth login flow
+    """
+    encoded = urlencode({
+                'client_id': GOOGLE_CLIENT_ID,
+                'redirect_uri': f"{str(request.base_url).rstrip('/')}{GOOGLE_REDIRECT_URI}",
+                'response_type': 'code',
+                'scope': 'email profile openid',
+                'access_type': 'offline',
+                'prompt': 'consent'
+            })
+            
+    # Store viewport dimensions in cookies for later use
+    response = RedirectResponse(
+        url=f"https://accounts.google.com/o/oauth2/v2/auth?{encoded}"
+    )
+    
+    # Store viewport dimensions if passed as query params
+    if request.query_params.get('viewport_width'):
+        response.set_cookie(
+            key="viewport_width",
+            value=request.query_params.get('viewport_width'),
+            max_age=60,  # Short-lived, just for the callback
+            httponly=True
+        )
+    if request.query_params.get('viewport_height'):
+        response.set_cookie(
+            key="viewport_height",
+            value=request.query_params.get('viewport_height'),
+            max_age=60,
+            httponly=True
+        )
+    
+    return response
+
+
 
 
 

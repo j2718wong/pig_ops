@@ -89,12 +89,16 @@ def list_routes():
 """
 
 
+import ssl
+
+
 if __name__ == '__main__':
-    
+    """
+    2026-03-16 Orig without certificate
     # Get port from environment variable, default to 8080 if not set
     port = int(os.getenv('PORT_WEB', '8080'))
     
     uvicorn.run("pig_ops_web:app", host='0.0.0.0', port=port)
-        
+    """
 
 

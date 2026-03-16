@@ -1,0 +1,51 @@
+Local certificate
+
+(jdev) dev01@raspberrypi:~/projects/jsys/pig_ops_ui_mob $ mkcert -install
+mkcert localhost 127.0.0.1 ::1 superpig.jsysdev.com jsysdev.com
+Created a new local CA 💥
+The local CA is now installed in the system trust store! ⚡️
+The local CA is now installed in the Firefox and/or Chrome/Chromium trust store (requires browser restart)! 🦊
+
+
+Created a new certificate valid for the following names 📜
+ - "localhost"
+ - "127.0.0.1"
+ - "::1"
+ - "superpig.jsysdev.com"
+ - "jsysdev.com"
+
+The certificate is at "./localhost+4.pem" and the key at "./localhost+4-key.pem" ✅
+
+It will expire on 16 June 2028 🗓
+
+
+
+Production server cert
+
+(.venv) root@prod-pig-ops:~/projects/jsys/pig_ops/webroot# sudo nano /etc/nginx/sites-available/superpig
+
+
+server {
+    listen 80;
+    server_name superpig.jsysdev.com www.superpig.jsysdev.com;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+
+# Enable and test
+sudo ln -s /etc/nginx/sites-available/superpig /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+# 3. Install Let's Encrypt (this will auto-configure HTTPS!)
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d superpig.jsysdev.com -d www.superpig.jsysdev.com
+
+# 4. Verify auto-renewal
+sudo systemctl status certbot.timer
+sudo certbot renew --dry-run
