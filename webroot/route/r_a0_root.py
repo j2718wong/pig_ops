@@ -69,7 +69,10 @@ async def signup():
 
 @app.get("/login", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
 async def signup():
-    #generate_csrf_token() 
+    # Add cache control headers to prevent caching
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, private"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
     
     page = controller.view['signup'].render()
     
