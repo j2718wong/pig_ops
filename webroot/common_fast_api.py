@@ -114,7 +114,7 @@ config_security = SecurityConfig(
     auto_ban_duration=86400,      # Ban for 24 hours
     
     # Block common attack patterns
-    enable_penetration_detection=True,
+    enable_penetration_detection=False,
     
     # ✅ CRITICAL: Exempt OAuth paths from all security checks
     exempt_paths=OAUTH_PATHS,
