@@ -122,7 +122,10 @@ OAUTH_PATHS = [
     "/api/auth/google"  # If this endpoint receives callbacks
 ]
 
-# 
+
+from guard.middleware           import SecurityMiddleware
+from guard.models               import SecurityConfig
+# Security Guard
 config_security = SecurityConfig(
     # Manually block known bad IPs
     blacklist=["82.197.71.28"],  # Add that annoying bot
@@ -138,10 +141,9 @@ config_security = SecurityConfig(
         "::1",              # localhost IPv6
         "172.16.0.0/12",    # Docker internal network
         "10.0.0.0/8",       # Private network
-        "192.168.0.0/16"    # Private network
+        "192.168.0.0/16",   # Private network
         
-        # Add your reverse proxy IP here
-        #"182.239.117.12",   # Your current proxy IP (be careful with dynamic IPs)
+        "68.183.225.10"     # Server public ip
     ],
     
     # ✅ ADD THIS: Disable spoof detection for trusted proxies
