@@ -276,88 +276,6 @@ class User:
         return None
     
     
-    def register(self, data = None):
-        """
-        PROCEDURE user_register(
-            in_social_channel_id    INT,
-            
-            in_name_last            VARCHAR(50),
-            in_name_first           VARCHAR(50),
-    
-            in_email                VARCHAR(50)
-        )  
-        """
-        
-
-        email           = data.email.lower()
-        
-        
-        sql =  'CALL user_register('
-        
-        
-        if data.social_channel_id is not None and data.social_channel_id > 0:
-             sql += '%s,'  % data.social_channel_id
-        else:
-            sql += 'NULL,'
-        
-        if data.name_last is not None:
-            sql += '"%s",'  % data.name_last
-        else:
-            sql += 'NULL,'
-            
-        if data.name_first is not None:
-            sql += '"%s",'  % name_first
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '"%s");'  % email
-
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'register(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'user': {
-                    'id':               row[3],
-                    'flag':             row[4]
-                }
-            }
-
-        return None
-
-
     def update_hashid(self, data = None):
         user_id         = data['user_id']
         hashid          = data['hashid']
@@ -372,22 +290,7 @@ class User:
         
         return self.model.execute_sql(sql)
 
-
-    def update_mfa_id_email_verify(self, data = None):
-        user_id         = data['user_id']
-        mfa_id          = data['mfa_id']
-        
-        values = (mfa_id, user_id)
-        
-        sql =   """
-                UPDATE user SET
-                    last_mfa_id_email_verify    = %s
-                WHERE id = %s;
-                """ % values
-        
-        return self.model.execute_sql(sql)
     
-        
     def get_list(self, account_id, inc_deleted = 0 ):
         
         if inc_deleted > 0:
@@ -482,9 +385,7 @@ class User:
         return result
     
     
-
-    
-    def login_social(self, data = None):
+    def register_or_login(self, data = None):
         """
         PROCEDURE user_register_or_login(
             in_login_social_media_id INT,
@@ -607,7 +508,10 @@ class User:
             row = None
 
         if row is not None:
-            return {
+            cur_user_id                 = row[3]
+            cur_user_unverified_id      = row[6]
+            
+            cur_entry =  {
                 'result':{
                     'num':              row[0],
                     'code':             row[1],
@@ -615,383 +519,33 @@ class User:
                 },
                 
                 'user': {
-                    'id':               row[3],
+                    'id':               cur_user_id,
                     'account_id':       row[4],
                     'flag':             row[5]
-                }
-            }
-
-        return None
-
-
-    def update_phone(self, data = None):
-        """
-        PROCEDURE `booking`.`user_phone_update`(
-            in_user_id              INT,
-            in_country_code_id      INT,
-            in_phone_number         VARCHAR(15)
-        )  
-        """
-        
-        user_id         = data['user_id']
-        country_code_id = data['country_code_id']
-        phone_number    = data['phone_number']
-        
-        sql =  'CALL user_phone_update('
-        sql += '%s,'    % user_id
-        sql += '%s,'    % country_code_id
-        sql += '"%s");' % phone_number
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update_phone(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
                 },
                 
-                'user': {
-                    'id':               row[3],
-                    'flag':             row[4]
+                'user_unverified': {
+                    'id':               cur_user_unverified_id,
+                    'verify_id':        row[7],
+                    'verify_code':      row[8],
+                    'verfiy_ts_expiry': row[9],
+                    'verfiy_dt_expiry': str(row[10]) if row[10] else None,
+                    'minutes_expiry':   row[11]
                 }
             }
 
-        return None
 
-    
-    def add_phone_mfa(self, data = None):
-        """
-        PROCEDURE `booking`.`user_mfa_phone_add`(
-            in_user_id                  INT,
+            if cur_user_id == 0:
+                del cur_entry['user']
+
+            if cur_user_unverified_id is None or cur_user_unverified_id == 0:
+                del cur_entry['user_unverified']
+
             
-            in_auth_code                INT,
             
-            in_ts_expiry                BIGINT,
-            in_dt_expiry                VARCHAR(20)
-        )  
-        """
-        
-        
-        user_id         = data['user_id']
-        auth_code       = data['auth_code']
-        ts_expiry       = data['ts_expiry']
-        dt_expiry       = data['dt_expiry']
-        
-        sql =  'CALL user_mfa_phone_add('
-        sql += '%s,'    % user_id
-        sql += '%s,'    % auth_code
-        sql += '%s,'    % ts_expiry
-        sql += '"%s");' % dt_expiry
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
             
-            row = cursor.fetchone()
-            cursor.close()
+            return cur_entry
 
-        except Exception as e:
-            msg = 'add_phone_mfa(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'id':               row[0]
-            }
 
         return None
 
-    
-    def verify_email_mfa(self, data = None):
-        """
-        PROCEDURE user_verify_mfa_email(
-            in_user_id                  INT,
-            in_auth_code                INT
-        )  
-        """
-        
-        user_id         = data['user_id']
-        auth_code       = data['auth_code']
-        
-        sql =  'CALL user_verify_mfa_email('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % auth_code
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'verify_email_mfa(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'user': {
-                    'id':               row[3],
-                    'flag':             row[4]
-                }
-            }
-
-        return None
-
-    
-    def verify_phone_mfa(self, data = None):
-        """
-        PROCEDURE `booking`.`user_mfa_phone_verify`(
-            in_user_id                  INT,
-            
-            in_auth_code                INT
-        )  
-        """
-        
-        user_id         = data['user_id']
-        auth_code       = data['auth_code']
-        
-        sql =  'CALL user_mfa_phone_verify('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % auth_code
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'verify_phone_mfa(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'user': {
-                    'id':               row[3],
-                    'flag':             row[4]
-                }
-            }
-
-        return None
-
-    
-    def app_install(self, data = None):
-        """
-        PROCEDURE `booking`.`app_install_register`(
-            in_email                    VARCHAR(255),
-            in_password                 VARCHAR(255),
-            in_name_first               VARCHAR(50),
-            in_name_last                VARCHAR(50),
-            in_sex                      VARCHAR(3),
-            
-            in_country_code_id          INT,
-            in_phone_number             VARCHAR(15)
-        )  
-        """
-        
-        
-        email           = data['email'].lower()
-        password        = data['password']
-        name_first      = data['name_first']
-        name_last       = data['name_last']
-        sex             = data['sex']
-        
-        country_code_id = data['country_code_id']
-        phone_number    = data['phone_number']
-        
-        sql =  'CALL user_register('
-        sql += '"%s",'  % email
-        sql += '"%s",'  % password
-        sql += '"%s",'  % name_first
-        sql += '"%s",'  % name_last
-        sql += '"%s",'  % sex
-        sql += '%s,'    % country_code_id
-        sql += '"%s");' % phone_number
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'register(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {
-                'result_num':           row[0],
-                'result_code':          row[1],
-                'result_desc':          row[2],
-                
-                'user_id':              row[3],
-                'user_flag':            row[4]
-
-            }
-
-        return None
-
-
-    def add_user_location(self, data = None):
-        """
-        PROCEDURE `booking`.`user_location_add`(
-            in_user_id              INT,
-            in_location_type        INT,
-            in_location_adrs_id     INT
-        )  
-        """
-        
-        
-        user_id             = data['user_id']
-        location_type       = data['location_type']
-        location_adrs_id    = data['location_adrs_id']
-       
-        sql =  'CALL user_location_add('
-        sql += '%s,'    % user_id
-        sql += '%s,'    % location_type
-        sql += '%s);'   % location_adrs_id
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add_user_location(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            return {'id': row[0]}
-
-        return None
-
-    
-    
-    
-    

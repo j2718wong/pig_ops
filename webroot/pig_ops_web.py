@@ -6,6 +6,7 @@ import uvicorn
 from common_fast_api            import *
 from common_app                 import *
 
+from route.r_a0_etc             import *
 
 from route.r_sow_act            import *
 from route.r_prod_ops           import *

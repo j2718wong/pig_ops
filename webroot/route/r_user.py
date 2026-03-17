@@ -26,6 +26,8 @@ from common_fast_api        import *
 from server_messages        import *
 
 
+
+
 import data_model           as dm
 
 
@@ -43,6 +45,9 @@ from r_utils                import replace_plain_ids_user_account
 from r_a0_security_checks   import (check_if_valid_user_account,
                                     get_user_account_info)
                                     
+from email_templates        import *
+
+
 
 
 FLAG_BIT_USER_IS_ACTIVE                 = 1
@@ -67,6 +72,14 @@ ALLOWED_SOCIAL_MEDIA_LOGIN = [
 
 ]
 
+
+
+def create_access_token(data: dict):
+    to_encode   = data.copy()
+    expire      = datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
 
 
 
@@ -105,12 +118,12 @@ def write_user_flag_bits(user, user_flag):
     
     
 
-@app.post("/user/register", tags=["User"])
-async def user_register(user_data: dm.DataUserLogin):
+@app.post("/user/register_or_login", tags=["User"])
+async def user_register_or_login(background_tasks: BackgroundTasks, 
+        user_data: dm.DataUserLogin):
 
-    
 
-    res_register    =  model['user'].register(user_data)
+    res_register    =  model['user'].register_or_login(user_data)
     
     if res_register is None:
         return {
@@ -121,79 +134,48 @@ async def user_register(user_data: dm.DataUserLogin):
         }
     
     
-    # Check for email verification flag
-    user_id         = res_register['user']['id']
-    user_flag       = res_register['user']['flag']
-        
-    user_hashid     = hashids_user.encrypt(user_id)
+    # Check if user is unverified
+    if 'user_unverified' in res_register:
+        user_unverified = res_register[user_unverified]
+
+        del user_unverified['verify_code']
+
+        # Replace plain_id
+        cur_id     = user_unverified['id']
+        cur_hid    = hashids_common.encrypt(cur_id)
     
-    # remove plain id
-    del res_register['user']['id']
-    res_register['user']['hid'] = user_hashid
-
-    result_num      = res_register['result']['num']
-
-    if result_num == 0:
-        verify_code = random.randint(MFA_VERIFICATION_CODE_MIN,
-                        MFA_VERIFICATION_CODE_MAX)
-        
-        dt_now      = datetime.now()
-        dt_expiry   = dt_now + timedelta(
-                        minutes = NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY)
-        
-        expiry_ts   = int(datetime.timestamp(dt_expiry))
-        expiry_str  = dt_expiry.strftime('%Y-%m-%d %H:%M:%S')
+        del user_unverified['id']
+        user_unverified['hid']   = cur_hid
         
         
-        # TODO: send verification code
-        res_send_code   = MFA_SEND_SUCCESS
+        del user_unverified['verify_id']
+        
+        verification_code   = user_unverified['verify_code']
+        expiry_minutes      = user_unverified['expiry_minutes']
         
         
-        if res_send_code  == MFA_SEND_SUCCESS:
-            res_register['mfa']  = {}
-            
-            data = {
-                'business_obj_id':  BUSINESS_OBJ_ID_USER_REGISTER,
-                'b_table_row_id':   user_id,
-                'channel_id':       MFA_CHANNEL_ID_EMAIL,
-                'country_code':     None,
-                'mobile_num':       None,
-                'email':            user_data.email,
-                
-                'auth_code':        verify_code,
-                'ts_expiry':        expiry_ts,
-                'dt_expiry':        expiry_str
-            }
-            
-            
-            res_mfa_add     = model['mfa'].add(data)
-            mfa_id          = res_mfa_add['id']
-            
-            
-            # Update user.last_mfa_id_email_verify
-            data = {
-                'user_id':          user_id,
-                'mfa_id':           mfa_id
-            }
-            model['user'].update_mfa_id_email_verify(data)
-            
-            
-            mfa_hashid      = hashids_common.encrypt(mfa_id)
-            
-            res_register['mfa']['hid'] = mfa_hashid
-
+        # Send verification code email to user
+        template    = EmailVerificationCode()
+        subject     = template.get_email_subject()
+        msg_body    = template.get_email_body(verification_code, expiry_minutes)
         
-        # No more more flag decomposition on transit; for security reasons;
-        # Should be decomposed at JS side
-        # write_user_flag_bits(res_register['user'], user_flag)
+        user_email  = user_data.email
+        
+        background_tasks.add_task(send_email, user_email, subject, msg_body)
+        
+        return res_register
+        
+        
+    
+        
+    # No more more flag decomposition on transit; for security reasons;
+    # Should be decomposed at JS side
+    # write_user_flag_bits(res_register['user'], user_flag)
 
     return res_register
     
     
-MFA_EMAIL_RES_NUM_VERIFIED                          = 0 
-MFA_EMAIL_RES_NUM_EMAIL_ALREADY_VERIFIED            = 1
-MFA_EMAIL_RES_NUM_MFA_INVALID_CODE                  = 2
-MFA_EMAIL_RES_NUM_MFA_EXPIRED                       = 3
+
 
 
 @app.get("/user/email/verify_code", tags=["User"])
@@ -329,6 +311,10 @@ async def user_email_verify_resend(uhid:str):
     
 @app.post("/user/login_social", tags=["User"])
 async def user_login_social(request: Request, user_data: dm.DataUserLogin):
+    """
+    This is signup or login using scoial media.
+    """
+    
     
     social_media_id = user_data.social_media_id
     if social_media_id == 0 or social_media_id not in ALLOWED_SOCIAL_MEDIA_LOGIN:
@@ -384,7 +370,7 @@ async def user_login_social(request: Request, user_data: dm.DataUserLogin):
     
     
     
-    res_login = model['user'].login_social(user_data)
+    res_login = model['user'].register_or_login(user_data)
     if res_login == None:
         return {
             'result':{
@@ -393,10 +379,8 @@ async def user_login_social(request: Request, user_data: dm.DataUserLogin):
             }
         }
     
-    
-    # Temporary encode user.id and user.account_id
-    # Will put later in tokens
-    
+
+    # Get user_id
     user_id = res_login['user']['id']
     
     
@@ -404,12 +388,13 @@ async def user_login_social(request: Request, user_data: dm.DataUserLogin):
     data_user_account = get_user_account_info(user_id)
     
     
-    # replace the user block
+    # Replace the user block
     del res_login['user']
     
     
-    # with this block
+    # With this block
     res_login['user_account'] = data_user_account
+
 
     replace_plain_ids_user_account(data_user_account)
 
@@ -567,16 +552,10 @@ async def user_list(request: Request, ahid: str, inc_deleted : int = 0):
 
 
 
-def create_access_token(data: dict):
-    to_encode   = data.copy()
-    expire      = datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
 
 
 
-
+# NEW CODE Using HTTPS
 
 from fastapi import Request, HTTPException, BackgroundTasks
 from fastapi.responses import RedirectResponse, HTMLResponse
@@ -615,11 +594,11 @@ async def google_callback(
         redirect_uri = f"{base_url}{GOOGLE_REDIRECT_URI}"
         
         data = {
-            "code": code,
-            "client_id": GOOGLE_CLIENT_ID,
+            "code":          code,
+            "client_id":     GOOGLE_CLIENT_ID,
             "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uri": redirect_uri,
-            "grant_type": "authorization_code"
+            "redirect_uri":  redirect_uri,
+            "grant_type":    "authorization_code"
         }
         
         async with httpx.AsyncClient() as client:
@@ -646,6 +625,7 @@ async def google_callback(
                 print(f"Token verification failed: {e}")
                 return RedirectResponse(url="/login?error=invalid_token")
             
+            
             # Extract user info
             user_email          = user_info['email']
             email_verified      = user_info.get('email_verified', False)
@@ -654,20 +634,24 @@ async def google_callback(
             user_name_first     = user_info.get('given_name')
             user_picture        = user_info.get('picture')
             
+            
             # Get client info
             client_host         = request.client.host
             viewport_width      = request.cookies.get('viewport_width', 0)
             viewport_height     = request.cookies.get('viewport_height', 0)
             
+            
             # Create user data
             user_data = dm.DataUserLogin(
-                email           = user_email,
-                name            = user_name,
-                name_last       = user_name_last,
-                name_first      = user_name_first,
-                viewport_width  = viewport_width,
-                viewport_height = viewport_height,
-                ip_address      = client_host,
+                email                   = user_email,
+                name                    = user_name,
+                name_last               = user_name_last,
+                name_first              = user_name_first,
+                
+                viewport_width          = viewport_width,
+                viewport_height         = viewport_height,
+                ip_address              = client_host,
+                
                 login_social_media_id   = SOCIAL_MEDIA_GOOGLE,
                 login_country_code      = None,
                 login_country_name      = None,
@@ -675,29 +659,29 @@ async def google_callback(
                 login_region            = None
             )
             
+            
             # Login/create user
-            res_login = model['user'].login_social(user_data)
+            res_login = model['user'].register_or_login(user_data)
             if res_login is None:
                 return RedirectResponse(url="/login?error=login_failed")
+            
             
             # Get user_id and account info
             user_id = res_login['user']['id']
             data_user_account = get_user_account_info(user_id)
             
             
-            # replace the user block
+            # Replace the user block
             del res_login['user']
             
-            # with this block
+            
+            # With this block
             res_login['user_account'] = data_user_account
             replace_plain_ids_user_account(data_user_account)
 
             
             # Create JWT token
             user_hid = data_user_account['user']['user']['hid']
-            print('user_hid = %s ' % user_hid)
-            
-            
             access_token = create_access_token(data={"uhid": user_hid})
             
             
@@ -741,7 +725,7 @@ async def google_callback(
         return RedirectResponse(url=f"/login?error={str(e)}")    
 
 
-# NEW CODE Using HTTPS
+
 
 @app.get("/auth/google/login")
 async def google_login(request: Request):
@@ -784,6 +768,7 @@ async def google_login(request: Request):
 
 
 # OLD CODE Before HTTPS
+# DO NOT DELETE
 
 @app.post("/api/auth/google")
 async def google_auth(request: Request, token_data: dm.GoogleToken):
@@ -871,7 +856,7 @@ async def google_auth(request: Request, token_data: dm.GoogleToken):
     
     
     
-    res_login = model['user'].login_social(user_data)
+    res_login = model['user'].register_or_login(user_data)
     if res_login == None:
         return {
             'result':{
