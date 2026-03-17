@@ -67,7 +67,7 @@ class DataUserEmailVerify(BaseModel):
     
     unverified_user_id:     int = 0
     
-    code:                   int = 0
+    auth_code:              int = 0
     
     viewport_width:         int = None
     viewport_height:        int = None

@@ -116,7 +116,51 @@ def write_user_flag_bits(user, user_flag):
     else:
         user['is_account_admin'] = 0
     
+
+
+@app.get("/user/verify_token", tags=["User"])
+async def user_verify_token(request: Request):
+    result = get_uhid_or_redirect(request)
     
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    data_user_account = get_user_account_info(user_id)
+            
+            
+    # With this block
+    replace_plain_ids_user_account(data_user_account)
+
+    return {
+        'result':{
+            'num':  0,
+            'code': 'SUCCESS'
+        },
+        
+        'user_account': data_user_account
+    }
+
+    
+
+
+
 
 @app.post("/user/register_or_login", tags=["User"])
 async def user_register_or_login(background_tasks: BackgroundTasks, 
@@ -167,17 +211,35 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         return res_register
         
         
+    # At this point user is verified
     
-        
-    # No more more flag decomposition on transit; for security reasons;
-    # Should be decomposed at JS side
-    # write_user_flag_bits(res_register['user'], user_flag)
+    
+    # Get user_id and account info
+    user_id = res_register['user']['id']
+    data_user_account = get_user_account_info(user_id)
+            
+            
+    # Replace the user block
+    del res_register['user']
+    
+    
+    # With this block
+    res_register['user_account'] = data_user_account
+    replace_plain_ids_user_account(data_user_account)
 
+    
+    # Create JWT token
+    user_hid = data_user_account['user']['user']['hid']
+    access_token = create_access_token(data={"uhid": user_hid})
+    
+    
+    res_register['bearer_token'] = access_token
+    
     return res_register
     
     
 @app.post("/user/email/verify_code", tags=["User"])
-async def user_email_verify_code(data: dm.DataUserEmailVerify):
+async def user_email_verify_code(request: Request, data: dm.DataUserEmailVerify):
     """
     After the user registers, a verification code is sent to the user's email.
     The user should then input this code and send to server for verification.
@@ -202,8 +264,10 @@ async def user_email_verify_code(data: dm.DataUserEmailVerify):
     unverified_user_id = res[0]
     
     
+    client_host         = request.client.host
     
     data.unverified_user_id  = unverified_user_id
+    data.ip_address     = client_host
     
     
     res_verify = model['user'].user_verify_email(data)
@@ -251,9 +315,9 @@ async def user_email_verify_code(data: dm.DataUserEmailVerify):
     
     
 @app.get("/user/email/verify_code/resend", tags=["User"])
-async def user_email_verify_resend(uhid:str):
+async def user_email_verify_resend(uvuhid:str):
     
-    res = hashids_user.decrypt(uhid)
+    res = hashids_common.decrypt(uvuhid)
     if len(res) == 0:
         return {
             'result':{
@@ -263,67 +327,41 @@ async def user_email_verify_resend(uhid:str):
         }
     
     
-    user_id = res[0]
+    unverified_user_id = res[0]
+    
+    res = model['user'].user_resend_verify_code(unverified_user_id)
     
     
-    
-    verify_code = random.randint(MFA_VERIFICATION_CODE_MIN,
-                            MFA_VERIFICATION_CODE_MAX)
-            
-    dt_now      = datetime.now()
-    dt_expiry   = dt_now + timedelta(
-                    minutes = NUM_MINUTES_EXPIRE_USER_REG_EMAIL_VERIFY)
-    
-    expiry_ts   = int(datetime.timestamp(dt_expiry))
-    expiry_str  = dt_expiry.strftime('%Y-%m-%d %H:%M:%S')
-    
-    
-    user_info = model['user'].get_user_info(user_id)
-    
-    # TODO: send verification code
-    res_send_code   = MFA_SEND_SUCCESS
-    
-    if res_send_code  == MFA_SEND_SUCCESS:
-    
-        data = {
-            'business_obj_id':  BUSINESS_OBJ_ID_USER_REGISTER,
-            'b_table_row_id':   user_id,
-            'channel_id':       MFA_CHANNEL_ID_EMAIL,
-            'country_code':     None,
-            'mobile_num':       None,
-            'email':            None,
-            
-            'auth_code':        verify_code,
-            'ts_expiry':        expiry_ts,
-            'dt_expiry':        expiry_str
-        }
-    
-
-        res_mfa_add     = model['mfa'].add(data)
-        mfa_id          = res_mfa_add['id']
+    user_unverified = res['user_unverified']
+    user_email      = res['user_email']
         
         
-        # Update user.last_mfa_id_email_verify
-        data = {
-            'user_id':          user_id,
-            'mfa_id':           mfa_id
-        }
-        model['user'].update_mfa_id_email_verify(data)
+    # Replace plain_id
+    user_unverified['hid']   = uvuhid
+    
+    
+    del user_unverified['verify_id']
+    
+    verification_code   = user_unverified['verify_code']
+    expiry_minutes      = user_unverified['expiry_minutes']
+    
+    del user_unverified['verify_code']
 
-
-        return {
-            'result':{
-                'num':  0,
-                'code': 'SUCCESS'
-            }
-        }
-        
-    return {
-        'result':{
-            'num':  ERROR_DATABASE_ERROR,
-            'code': 'ERROR_DATABASE_ERROR'
-        }
-    }
+    
+    # Send verification code email to user
+    template    = EmailVerificationCode()
+    subject     = template.get_email_subject()
+    msg_body    = template.get_email_body(verification_code, expiry_minutes)
+    
+    
+    background_tasks.add_task(send_email, user_email, subject, msg_body)
+    
+    return res
+    
+    
+    
+    
+    
     
     
 @app.post("/user/login_social", tags=["User"])

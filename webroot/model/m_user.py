@@ -543,9 +543,6 @@ class User:
             if cur_user_unverified_id is None or cur_user_unverified_id == 0:
                 del cur_entry['user_unverified']
 
-            
-            
-            
             return cur_entry
 
 
@@ -627,8 +624,8 @@ class User:
                 },
                 
                 'user': {
-                    'id':               cur_user_id,
-                    'flag':             row[5]
+                    'id':               row[3],
+                    'flag':             row[4]
                 }
             }
 
@@ -637,6 +634,93 @@ class User:
 
 
         return None
+
+
+    def user_resend_verify_code(self, unverified_user_id):
+        """
+        PROCEDURE user_resend_verify_code(
+            in_unverified_user_id   INT
+            
+        )    
+        """
+        
+        
+        
+        sql =  'CALL user_resend_verify_code('
+        sql += '%s);'  % unverified_user_id
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'user_resend_verify_code(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            
+            cur_user_id                 = row[3]
+            cur_user_unverified_id      = row[6]
+            cur_user_email              = row[12]
+            
+            cur_entry =  {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'user': {
+                    'id':               cur_user_id,
+                    'account_id':       row[4],
+                    'flag':             row[5]
+                },
+                
+                'user_unverified': {
+                    'id':               cur_user_unverified_id,
+                    'verify_id':        row[7],
+                    'verify_code':      str(row[8]),
+                    'verify_ts_expiry': row[9],
+                    'verify_dt_expiry': str(row[10]) if row[10] else None,
+                    'expiry_minutes':   row[11]
+                },
+                
+                'user_email':           cur_user_email
+            }
+
+
+            if cur_user_id == 0:
+                del cur_entry['user']
+
+            if cur_user_unverified_id is None or cur_user_unverified_id == 0:
+                del cur_entry['user_unverified']
+
+            return cur_entry
+
+
+
+        return None
+
+
 
 
 
