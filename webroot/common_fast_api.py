@@ -131,6 +131,23 @@ config_security = SecurityConfig(
     auto_ban_threshold=5,        # Ban after 5 suspicious requests
     auto_ban_duration=86400,      # Ban for 24 hours
     
+    
+    # ✅ ADD THIS: Trust these proxy IPs
+    trusted_proxies=[
+        "127.0.0.1",        # localhost
+        "::1",              # localhost IPv6
+        "172.16.0.0/12",    # Docker internal network
+        "10.0.0.0/8",       # Private network
+        "192.168.0.0/16"    # Private network
+        
+        # Add your reverse proxy IP here
+        #"182.239.117.12",   # Your current proxy IP (be careful with dynamic IPs)
+    ],
+    
+    # ✅ ADD THIS: Disable spoof detection for trusted proxies
+    disable_spoof_detection_for_trusted_proxies=True,
+    
+    
     # Block common attack patterns
     enable_penetration_detection=False,
     
