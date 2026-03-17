@@ -62,6 +62,17 @@ class DataUserLogin(BaseModel):
     login_region:           str | None  = None
 
 
+class DataUserEmailVerify(BaseModel):
+    uvuhid:                 str
+    
+    unverified_user_id:     int = 0
+    
+    code:                   int = 0
+    
+    viewport_width:         int = None
+    viewport_height:        int = None
+    ip_address:             str = None
+
 
 class DataApproveUserReq(BaseModel):
     uhid:                   str = None

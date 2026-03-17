@@ -479,6 +479,8 @@ class User:
             sql += 'NULL);'
         
             
+        print('\n\nsql')
+        print(sql)
         
         
         # Check if still connected to database
@@ -499,7 +501,7 @@ class User:
             cursor.close()
 
         except Exception as e:
-            msg = 'login(); error in executing query[] = ' + sql
+            msg = 'register_or_login(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -527,10 +529,10 @@ class User:
                 'user_unverified': {
                     'id':               cur_user_unverified_id,
                     'verify_id':        row[7],
-                    'verify_code':      row[8],
-                    'verfiy_ts_expiry': row[9],
-                    'verfiy_dt_expiry': str(row[10]) if row[10] else None,
-                    'minutes_expiry':   row[11]
+                    'verify_code':      str(row[8]),
+                    'verify_ts_expiry': row[9],
+                    'verify_dt_expiry': str(row[10]) if row[10] else None,
+                    'expiry_minutes':   row[11]
                 }
             }
 
@@ -548,4 +550,93 @@ class User:
 
 
         return None
+
+
+    def user_verify_email(self, data = None):
+        """
+        PROCEDURE user_verify_email(
+            in_unverified_user_id   INT,
+            in_auth_code            INT,
+            
+            in_viewport_width       INT,
+            in_viewport_height      INT,
+            
+            in_ip_address           VARCHAR(24)
+            
+        )    
+        """
+        
+        
+        
+        sql =  'CALL user_verify_email('
+        
+        sql += '%s,'  % data.unverified_user_id
+        sql += '%s,'  % data.auth_code
+        
+        if data.viewport_width and data.viewport_width > 0:
+            sql += '%s,'  % data.viewport_width
+        else:
+            sql += 'NULL,'
+        
+        if data.viewport_height and data.viewport_height > 0:
+            sql += '%s,'  % data.viewport_height
+        else:
+            sql += 'NULL,'
+        
+        
+            
+        if data.ip_address and len(data.ip_address) > 0:
+            sql += '"%s");'  % data.ip_address
+        else:
+            sql += 'NULL);'
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'user_verify_email(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            
+            cur_entry =  {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'user': {
+                    'id':               cur_user_id,
+                    'flag':             row[5]
+                }
+            }
+
+
+            return cur_entry
+
+
+        return None
+
+
 

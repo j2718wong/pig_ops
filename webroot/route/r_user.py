@@ -136,10 +136,9 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
     
     # Check if user is unverified
     if 'user_unverified' in res_register:
-        user_unverified = res_register[user_unverified]
+        user_unverified = res_register['user_unverified']
 
-        del user_unverified['verify_code']
-
+        
         # Replace plain_id
         cur_id     = user_unverified['id']
         cur_hid    = hashids_common.encrypt(cur_id)
@@ -153,6 +152,8 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         verification_code   = user_unverified['verify_code']
         expiry_minutes      = user_unverified['expiry_minutes']
         
+        del user_unverified['verify_code']
+
         
         # Send verification code email to user
         template    = EmailVerificationCode()
@@ -175,26 +176,20 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
     return res_register
     
     
-
-
-
-@app.get("/user/email/verify_code", tags=["User"])
-async def user_email_verify_code(uhid:str, code: int):
+@app.post("/user/email/verify_code", tags=["User"])
+async def user_email_verify_code(data: dm.DataUserEmailVerify):
     """
     After the user registers, a verification code is sent to the user's email.
     The user should then input this code and send to server for verification.
 
-    Parameters
-    ----------
-    uhid : str
-        user hashid
-    
-    code : int
-        verification code
     
     """
+    
+    uvuhid = data.uvuhid
 
-    res = hashids_user.decrypt(uhid)
+    # Note: Since user is not yet verified, the hashids used is hashids_common;
+    # after verified, use hashids_user  
+    res = hashids_common.decrypt(uvuhid)
     if len(res) == 0:
         return {
             'result':{
@@ -204,15 +199,14 @@ async def user_email_verify_code(uhid:str, code: int):
         }
     
     
-    user_id = res[0]
-    
-    data = {
-        'user_id':      user_id,
-        'auth_code':    code
-    }
+    unverified_user_id = res[0]
     
     
-    res_verify = model['user'].verify_email_mfa(data)
+    
+    data.unverified_user_id  = unverified_user_id
+    
+    
+    res_verify = model['user'].user_verify_email(data)
     
     if res_verify is None:
         return {
@@ -223,11 +217,34 @@ async def user_email_verify_code(uhid:str, code: int):
         }
     
     
-    # remove plain id
-    del res_verify['user']['id']
-    res_verify['user']['hid'] = uhid
+    if res_verify['user']['id'] > 0:
+        # User is registered and email verified at this point
+        
+         # Get user_account info
+        user_id = res_verify['user']['id']
+        data_user_account = get_user_account_info(user_id)
+            
+            
+        # Replace the user block
+        del res_verify['user']
+        
+        
+        # With this block
+        res_verify['user_account'] = data_user_account
+        replace_plain_ids_user_account(data_user_account)
+
+        
+        # Create JWT token
+        user_hid = data_user_account['user']['user']['hid']
+        access_token = create_access_token(data={"uhid": user_hid})
+        
+        
+        res_verify['bearer_token'] = access_token
+        
+        return res_verify
     
-    user_flag = res_verify['user']['flag']
+    
+    del res_verify['user']
     
     
     return res_verify
@@ -684,11 +701,6 @@ async def google_callback(
             user_hid = data_user_account['user']['user']['hid']
             access_token = create_access_token(data={"uhid": user_hid})
             
-            
-            # tEST This one works
-            #print('To send email')
-            #msg = 'user new login email = %s ' % user_email
-            #background_tasks.add_task(send_email, 'j2718wong@gmail.com','login in app', msg)
             
             
             # ✅ FIXED: Create HTML response with script
