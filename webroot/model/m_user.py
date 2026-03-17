@@ -149,6 +149,7 @@ class User:
                     a.account_id,
                     a.flag,
                     a.email,
+                    a.signup_social_media_id,
                     a.mobile_num,
                     a.name,
                     a.name_last,
@@ -210,22 +211,23 @@ class User:
                 cur_user_account_id                 = row[1]
                 cur_user_flag                       = row[2]
                 cur_user_email                      = row[3]
-                cur_user_mobile_num                 = row[4]
-                cur_user_name                       = row[5]
-                cur_user_name_last                  = row[6]
-                cur_user_name_first                 = row[7]
+                cur_user_signup_social_media_id     = row[4]
+                cur_user_mobile_num                 = row[5]
+                cur_user_name                       = row[6]
+                cur_user_name_last                  = row[7]
+                cur_user_name_first                 = row[8]
                 
-                cur_user_group_id                   = row[8]
-                cur_user_group_num                  = row[9]
-                cur_user_group_flag_business_obj_1  = row[10]
-                cur_user_group_flag_business_obj_2  = row[11]
-                cur_user_group_name                 = row[12]
+                cur_user_group_id                   = row[9]
+                cur_user_group_num                  = row[10]
+                cur_user_group_flag_business_obj_1  = row[11]
+                cur_user_group_flag_business_obj_2  = row[12]
+                cur_user_group_name                 = row[13]
                 
-                cur_user_req_join_acc_id            = row[13]
-                cur_user_req_account_id             = row[14]
-                cur_user_req_status_id              = row[15]
-                cur_user_req_dt_entry               = str(row[16])[0:10] # extract date only
-                cur_user_req_account_name           = row[17]
+                cur_user_req_join_acc_id            = row[14]
+                cur_user_req_account_id             = row[15]
+                cur_user_req_status_id              = row[16]
+                cur_user_req_dt_entry               = str(row[17])[0:10] # extract date only
+                cur_user_req_account_name           = row[18]
                 
                 
                 
@@ -236,6 +238,7 @@ class User:
                         'account_id':       cur_user_account_id,
                         'flag':             cur_user_flag,
                         'email':            cur_user_email,
+                        'social_media_id':  cur_user_signup_social_media_id,
                         'mobile_num':       cur_user_mobile_num,
                         'name':             cur_user_name,
                         'name_last':        cur_user_name_last,
@@ -275,21 +278,6 @@ class User:
         
         return None
     
-    
-    def update_hashid(self, data = None):
-        user_id         = data['user_id']
-        hashid          = data['hashid']
-        
-        values = (hashid, user_id)
-        
-        sql =   """
-                UPDATE user SET
-                    hashid    = "%s"
-                WHERE id = %s;
-                """ % values
-        
-        return self.model.execute_sql(sql)
-
     
     def get_list(self, account_id, inc_deleted = 0 ):
         
@@ -389,6 +377,7 @@ class User:
         """
         PROCEDURE user_register_or_login(
             in_login_social_media_id INT,
+            in_social_media_user_id VARCHAR(120),
 
             in_name                 VARCHAR(80),
             in_name_last            VARCHAR(50),
@@ -417,6 +406,10 @@ class User:
         else:
             sql += 'NULL,'
         
+        if data.social_media_user_id and len(data.social_media_user_id) > 0:
+             sql += '"%s",'  % data.social_media_user_id
+        else:
+            sql += 'NULL,'
         
         if data.name and len(data.name) > 0:
             sql += '"%s",'  % data.name

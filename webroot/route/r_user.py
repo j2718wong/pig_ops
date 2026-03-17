@@ -758,9 +758,9 @@ async def google_callback(
                     document.cookie = "access_token={access_token}; path=/; max-age=" + 60*60*24*7;
                     
                     // Redirect to home page
-                    window.location.href = '/';
+                    //window.location.href = '/';
                 </script>
-                <p>Redirecting to home page...</p>
+                <!--<p>Redirecting to home page...</p>-->
             </body>
             </html>
             """

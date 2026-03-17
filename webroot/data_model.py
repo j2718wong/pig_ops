@@ -55,6 +55,7 @@ class DataUserLogin(BaseModel):
     ip_address:             str = None
 
     login_social_media_id:  int = 0
+    social_media_user_id:   str = None
     
     login_country_code:     str | None  = None
     login_country_name:     str | None  = None
