@@ -123,8 +123,7 @@ OAUTH_PATHS = [
 ]
 
 
-from guard.middleware           import SecurityMiddleware
-from guard.models               import SecurityConfig
+
 # Security Guard
 config_security = SecurityConfig(
     # Manually block known bad IPs
@@ -133,18 +132,19 @@ config_security = SecurityConfig(
     # Auto-ban after suspicious behavior
     auto_ban_threshold=5,        # Ban after 5 suspicious requests
     auto_ban_duration=86400,      # Ban for 24 hours
+   
     
-    
-    # ✅ ADD THIS: Trust these proxy IPs
-    trusted_proxies=[
-        "127.0.0.1",        # localhost
-        "::1",              # localhost IPv6
-        "172.16.0.0/12",    # Docker internal network
-        "10.0.0.0/8",       # Private network
-        "192.168.0.0/16",   # Private network
-        
-        "68.183.225.10"     # Server public ip
+    # ✅ Explicitly disable IP security checks
+    disable_checks=[
+        "ip_security",
+        "cloud_provider",
+        "suspicious_activity",  # Might also include IP checks
     ],
+    
+    # ✅ Keep log level high
+    log_level="ERROR",
+    
+    
     
     # ✅ ADD THIS: Disable spoof detection for trusted proxies
     disable_spoof_detection_for_trusted_proxies=True,
