@@ -126,34 +126,60 @@ fi
 section "STEP 7: Starting Python app in background"
 cd pig_ops/webroot
 
+# Activate virtual environment and start app
+VENV_PATH="/root/projects/jsys/.venv"
 
-
-# Create logs directory if it doesn't exist
-mkdir -p logs
-
-# Get current date for log file
-LOG_FILE="logs/app_$(date +%Y%m%d_%H%M%S).log"
-
-echo "Starting app with nohup..."
-echo "Log file: $LOG_FILE"
-
-# Use nohup to run in background, disown to detach completely
-nohup python3 pig_ops_web.py > "$LOG_FILE" 2>&1 &
-APP_PID=$!
-
-# Give it a moment to start
-sleep 3
-
-# Check if process is still running
-if kill -0 $APP_PID 2>/dev/null; then
-    echo -e "${GREEN}  ✅ App started with PID: $APP_PID${NC}"
-    echo "  📝 Logs: /root/projects/jsys/pig_ops/webroot/$LOG_FILE"
+if [ -f "$VENV_PATH/bin/activate" ]; then
+    echo "Activating virtual environment..."
+    source "$VENV_PATH/bin/activate"
     
-    # Disown the process so it survives terminal close
-    disown $APP_PID
+    # Create logs directory if it doesn't exist
+    mkdir -p logs
+    
+    # Get current date for log file
+    LOG_FILE="logs/app_$(date +%Y%m%d_%H%M%S).log"
+    
+    echo "Starting app with nohup..."
+    echo "Log file: $LOG_FILE"
+    
+    # Use nohup to run in background with venv python
+    nohup "$VENV_PATH/bin/python" pig_ops_web.py > "$LOG_FILE" 2>&1 &
+    APP_PID=$!
+    
+    # Deactivate venv (doesn't affect running process)
+    deactivate 2>/dev/null || true
+    
+    # Give it a moment to start
+    sleep 3
+    
+    # Check if process is still running
+    if kill -0 $APP_PID 2>/dev/null; then
+        echo -e "${GREEN}  ✅ App started with PID: $APP_PID${NC}"
+        echo "  📝 Logs: /root/projects/jsys/pig_ops/webroot/$LOG_FILE"
+        
+        # Save PID to file
+        echo $APP_PID > /root/projects/jsys/app.pid
+        echo "  💾 PID saved to /root/projects/jsys/app.pid"
+        
+        # Quick health check
+        echo "  🔍 Performing health check..."
+        sleep 2
+        if curl -s http://localhost:8000 > /dev/null 2>&1; then
+            echo -e "${GREEN}  ✅ App is responding${NC}"
+        else
+            echo -e "${YELLOW}  ⚠️  App started but not responding - check logs:${NC}"
+            echo "     tail -f $LOG_FILE"
+        fi
+        
+        # Disown the process so it survives terminal close
+        disown $APP_PID
+    else
+        echo -e "${RED}  ❌ App failed to start - check logs${NC}"
+        tail -20 "$LOG_FILE"
+        exit 1
+    fi
 else
-    echo -e "${RED}  ❌ App failed to start - check logs${NC}"
-    tail -20 "$LOG_FILE"
+    echo -e "${RED}  ❌ Virtual environment not found at $VENV_PATH${NC}"
     exit 1
 fi
 
