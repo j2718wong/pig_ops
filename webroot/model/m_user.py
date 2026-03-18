@@ -378,6 +378,9 @@ class User:
         PROCEDURE user_register_or_login(
             in_login_social_media_id INT,
             in_social_media_user_id VARCHAR(120),
+            
+            in_acc_access_grant_id  INT,
+            
 
             in_name                 VARCHAR(80),
             in_name_last            VARCHAR(50),
@@ -407,9 +410,19 @@ class User:
             sql += 'NULL,'
         
         if data.social_media_user_id and len(data.social_media_user_id) > 0:
-             sql += '"%s",'  % data.social_media_user_id
+            sql += '"%s",'  % data.social_media_user_id
+
         else:
             sql += 'NULL,'
+
+            
+        if data.access_grant_id is not None and data.access_grant_id > 0:
+            sql += '%s,'  % data.access_grant_id
+        else:
+            sql += 'NULL,'
+
+            
+            
         
         if data.name and len(data.name) > 0:
             sql += '"%s",'  % data.name

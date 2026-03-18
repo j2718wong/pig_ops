@@ -68,3 +68,11 @@ async def privacy(response: Response):
     page = controller.view['privacy'].render()
     
     return page
+
+
+@app.get("/terms", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+async def term(response: Response):
+    
+    page = controller.view['terms'].render()
+    
+    return page

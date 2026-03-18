@@ -15,6 +15,7 @@ from route.r_user               import *
 from route.r_user_request       import *
 from route.r_user_group         import *
 from route.r_account            import *
+from route.r_account_access_code import *
 
 from route.r_customer           import *
 

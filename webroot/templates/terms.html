@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>SuperPig Privacy Policy – Global Version</title>
+    <title>SuperPig Terms of Service – Global Version</title>
     <style>
         * {
             margin: 0;
@@ -93,481 +93,414 @@
         }
 
         
-        .last-updated {
-            background: #e9f0ff;
-            color: #1e4a8b;
-            padding: 12px 18px;
-            border-radius: 12px;
-            margin: 20px 0 30px 0;
-            font-weight: 500;
-            border-left: 5px solid #2563eb;
-        }
-        
-        .global-notice {
-            background: #e8f4fd;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 2px dashed #0d6efd;
-        }
-        
-        .trial-box {
-            background: #e3f2fd;
-            border-left: 8px solid #0d6efd;
-            padding: 20px;
-            margin: 30px 0;
-            border-radius: 0 12px 12px 0;
-        }
-        
-        .payment-box {
-            background: #fffbeb;
-            border-left: 8px solid #f97316;
-            padding: 20px;
-            margin: 30px 0;
-            border-radius: 0 12px 12px 0;
-        }
-        
-        .region-block {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 25px 0;
-        }
-        
-        .region-block h3 {
-            margin-top: 0;
-            border-bottom: 2px solid #cbd5e1;
-            padding-bottom: 10px;
-        }
-        
-        .flag {
-            font-size: 1.8rem;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        
-        .data-grid {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .data-grid ul {
-            list-style: none;
-        }
-        
-        .data-grid li {
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
+        /* simple title */
+        .page-title {
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--blue-deep);
+            margin: 0.5rem 0 0.25rem 0;
+            border-bottom: 3px solid var(--corporate-blue-light);
+            padding-bottom: 0.25rem;
             display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .title-sub {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--neutral-gray);
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .effective {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--corporate-blue-dark);
+            white-space: nowrap;
+        }
+
+        
+        .back-nav {
+            margin: 0.8rem 0 1.2rem 0;
+        }
+        
+        .back-button {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        .data-grid li:last-child {
-            border-bottom: none;
-        }
-        
-        .emoji-bullet {
-            font-size: 1.5rem;
-            min-width: 40px;
-        }
-        
-        .reminder-table {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #dee2e6;
-        }
-        
-        .reminder-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .reminder-table td {
-            padding: 8px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .footer {
-            margin-top: 50px;
-            padding-top: 25px;
-            border-top: 2px dashed #cbd5e1;
-            text-align: center;
-            color: #64748b;
-        }
-        
-        .footer a {
-            color: #f97316;
-            text-decoration: none;
+            gap: 0.4rem;
+            background-color: transparent;
+            color: var(--blue-deep);
+            border: 2px solid var(--blue-deep);
+            padding: 0.5rem 1.2rem;
             font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            line-height: 1;
+            transition: background-color 0.2s, color 0.2s;
         }
-        
-        @media (max-width: 600px) {
-            body { font-size: 16px; }
-            .container { padding: 20px 15px; }
-            h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.5rem; }
+        .back-button:hover {
+            background-color: var(--blue-deep);
+            color: white;
+        }
+        /* ensure no rounding */
+        .back-button, .back-button * {
+            border-radius: 0 !important;
+        }
+
+
+
+        /* no cards, no rounded corners, just text and straight lines */
+        .agreement-section {
+            margin: 1.8rem 0 1.2rem 0;
+            border-top: 1px solid var(--medium-gray);
+            padding-top: 0.8rem;
+        }
+
+        .section-number {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--blue-deep);
+            display: inline-block;
+            width: 2rem;
+        }
+
+        .section-head {
+            font-size: 1.4rem;
+            font-weight: 650;
+            color: var(--corporate-blue-dark);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .subsection {
+            margin: 0.8rem 0 0.8rem 0.5rem;
+        }
+
+        .subhead {
+            font-weight: 650;
+            font-size: 1.1rem;
+            color: var(--blue-medium);
+            margin-bottom: 0.2rem;
+        }
+
+        .subhead .subnum {
+            color: var(--icon-indigo);
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        .agreement-section > p {
+            margin-bottom: 0.5rem;
+        }
+
+        .agreement-section > ul {
+            margin: 0.4rem 0 0.6rem 1.8rem;
+        }
+
+        .agreement-section > li {
+            margin-bottom: 0.2rem;
+        }
+
+        agreement-section > li::marker {
+            color: var(--corporate-blue);
+        }
+
+        .inline-highlight {
+            background-color: transparent;
+            border: 1px solid var(--warning-border);
+            color: var(--blue-deep);
+            font-weight: 600;
+            padding: 0.1rem 0.6rem;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-left: 0.3rem;
+            white-space: nowrap;
+        }
+
+        /* payment method block – still flat, no card */
+        .payment-method-row {
+            margin: 1rem 0 0.5rem 0;
+            border-left: 3px solid var(--blue-deep);
+            padding: 0.6rem 0 0.6rem 0.8rem;
+            background-color: transparent;
+        }
+
+        .payment-method-row strong {
+            color: var(--blue-deep);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px dotted var(--border-color);
+            margin: 1.5rem 0;
+        }
+
+        .definition-flat {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+            gap: 0.2rem 0.8rem;
+        }
+
+        .def-item {
+            flex: 0 0 100%;
+            display: flex;
+            border-bottom: 1px dashed var(--medium-gray);
+            padding: 0.4rem 0;
+        }
+
+        .def-term {
+            width: 120px;
+            font-weight: 700;
+            color: var(--blue-deep);
+        }
+
+        .def-desc {
+            flex: 1;
+            color: var(--text-dark-2);
+        }
+
+        .footer-note {
+            margin-top: 2.5rem;
+            padding-top: 1rem;
+            border-top: 3px double var(--corporate-blue-light);
+            font-size: 0.9rem;
+            color: var(--neutral-gray);
+            text-align: left;
+        }
+
+        .footer-note a {
+            color: var(--corporate-blue-dark);
+            text-decoration: underline;
+            text-decoration-style: dotted;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        
-        <div class="product-row">
+        <!-- 1.) PRODUCT & LOGO: centered -->
+        <div class="product-row" onclick="window.location.href='/';">
             <div class="company-logo">J</div>
             <div class="product-name">SuperPig</div>
         </div>
+
+        <!--<h2 class="intro-text">Join Account Request</h2>-->
+            
+        <!-- simple page title -->
+        <div class="page-title">
+            JSysDev Agreement
+            <span class="effective">Oct 7, 2025</span>
+        </div>
         
-        <h1>Global Privacy Policy</h1>
         
-        <div class="last-updated">
-            <strong>📅 Last Updated:</strong> March 18, 2026<br>
-            <strong>📍 Headquarters:</strong> Hong Kong<br>
-            <strong>🌍 Serving:</strong> Global (UK, EU, Canada, Australia, NZ, USA, Asia)
-        </div>
+        <!-- acceptance notice - plain line -->
+        <p style="margin:1.2rem 0 0.5rem; background:transparent; border-left:4px solid var(--corporate-blue); padding-left:0.75rem; font-weight:500;">
+            ⚖️ By registering or using SuperPig, you agree to this contract. If you accept for your employer, you confirm authority to bind them.
+        </p>
 
-        <!-- GLOBAL NOTICE -->
-        <div class="global-notice">
-            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">🌍 This policy applies worldwide</p>
-            <p>SuperPig serves farmers across multiple countries. This policy contains specific sections for different regions. Please refer to the section that applies to your country of residence. If your country is not listed, the core policy applies.</p>
-        </div>
-
-        <!-- QUICK SUMMARY -->
-        <div style="background: #f0f9ff; padding: 20px; border-radius: 16px; margin-bottom: 30px;">
-            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">📱 Quick Summary</p>
-            <ul style="margin-left: 20px;">
-                <li><strong>90-day free trial:</strong> No payment info needed</li>
-                <li><strong>Day 91:</strong> Automatic billing starts if you continue</li>
-                <li><strong>Payment methods:</strong> Credit card, GCash, PayMaya, bank transfer</li>
-                <li><strong>Cancel anytime:</strong> No charge if canceled before Day 90</li>
-                <li><strong>Global compliance:</strong> UK GDPR, EU GDPR, PIPEDA, Australian Privacy Act</li>
-            </ul>
-        </div>
-
-        <!-- SECTION 1: CORE POLICY (APPLIES TO EVERYONE) -->
-        <h2>1. Core Policy (Applies to All Users)</h2>
-        
-        <h3>1.1 What We Collect During Free Trial</h3>
-        <div class="data-grid">
-            <ul>
-                <li><span class="emoji-bullet">📧</span> <strong>Email</strong> – from Google/Facebook/TikTok login</li>
-                <li><span class="emoji-bullet">👤</span> <strong>Name & Profile Picture</strong> – from social account</li>
-                <li><span class="emoji-bullet">🐷</span> <strong>Farm Data</strong> – pigs, feeds, health records, production</li>
-                <li><span class="emoji-bullet">📱</span> <strong>Device Info</strong> – IP, browser, screen size (analytics)</li>
-                <li><span class="emoji-bullet">📍</span> <strong>Location</strong> – country, city (from IP, not GPS)</li>
-                <li><span class="emoji-bullet">🍪</span> <strong>Usage Data</strong> – how you use the app</li>
-            </ul>
-        </div>
-        <p><strong>No payment information is collected during the 90-day trial.</strong></p>
-
-        <!-- 90-DAY TRIAL DETAILS -->
-        <div class="trial-box">
-            <h3 style="margin-top: 0;">⏱️ 90-Day Free Trial</h3>
-            <p><strong>Day 1-90:</strong> Full access, no payment required.</p>
-            
-            <h4>📅 Reminder Schedule</h4>
-            <div class="reminder-table">
-                <table>
-                    <tr><td><strong>Day 75</strong></td><td>"15 days left in trial"</td></tr>
-                    <tr><td><strong>Day 85</strong></td><td>"5 days left"</td></tr>
-                    <tr><td><strong>Day 89</strong></td><td>"Last day of free trial"</td></tr>
-                    <tr><td><strong>Day 91</strong></td><td>First bill processed if you continue</td></tr>
-                </table>
+        <!-- 1. The SuperPig application -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">1</span> The SuperPig application</div>
+            <div class="subsection">
+                <p>SuperPig is a web app that manages pig production data: breeding stocks, breeding, fattening, harvesting, and all other aspects.</p>
             </div>
-            
-            <h4>❌ Cancel Anytime Before Day 90</h4>
-            <p>Go to Account Settings → Subscription → Cancel Trial. Zero cost.</p>
         </div>
 
-        <!-- PAYMENT AFTER TRIAL -->
-        <div class="payment-box">
-            <h3 style="margin-top: 0;">💰 Payments After Day 90</h3>
-            <p><strong>By continuing after the 90-day trial, you authorize automatic charges.</strong></p>
-            
-            <h4>Payment Methods</h4>
-            
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Credit/Debit Cards:</strong> Processed by PCI-compliant partners (we don't store full numbers)</li>
-                    <li><strong>GCash / PayMaya:</strong> Philippine mobile wallets</li>
-                    <li><strong>Bank Transfer:</strong> Account details for direct debit</li>
-                </ul>
+        <!-- 2. Using SuperPig -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">2</span> Using SuperPig</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">2.1</span> Your right to use it</div>
+                <p>During your active subscription, JSysDev grants you a non‑exclusive, worldwide right to use SuperPig for your pig farm business, following the instructions inside the app.</p>
             </div>
-            
-            <h4>Failed Payments</h4>
-            <div style="padding-left: 1.5rem;">
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">2.2</span> Rules you must follow</div>
+                <p>You must not (and must not allow others to):</p>
                 <ul>
-                    <li>We'll notify you and retry every 3 days for 14 days</li>
-                    <li>After 14 days, unpaid accounts may be suspended</li>
-                </ul>
-            </div>
-            
-            <h4>Cancellation After Trial</h4>
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li>Cancel anytime from Account Settings</li>
-                    <li>No refunds for partial periods</li>
-                    <li>Access until end of paid period</li>
+                    <li>Rent, sell, or share access with non‑authorized users.</li>
+                    <li>Use SuperPig to build a competing product.</li>
+                    <li>Copy, reverse engineer, or steal the source code.</li>
+                    <li>Interfere with the app or bypass usage limits.</li>
+                    <li>Remove any copyright notices.</li>
+                    <li>Use the app for anything illegal.</li>
                 </ul>
             </div>
         </div>
 
-        <!-- SECTION 2: REGION-SPECIFIC RIGHTS -->
-        <h2>2. Your Rights by Region</h2>
-        <p>Depending on where you live, you have additional rights under local law.</p>
-
-        <!-- UK/EU GDPR -->
-        <div class="region-block">
-            <h3><span class="flag">🇪🇺</span> European Union & <span class="flag">🇬🇧</span> United Kingdom</h3>
-            <p><strong>Legal framework:</strong> UK GDPR / EU General Data Protection Regulation</p>
-            <p><strong>Lawful basis:</strong> We process your data based on consent (marketing), contract (service delivery), and legitimate interests (analytics).</p>
-            
-            <h4>Your Rights:</h4>
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Right to access:</strong> Request a copy of your data</li>
-                    <li><strong>Right to rectification:</strong> Correct inaccurate information</li>
-                    <li><strong>Right to erasure:</strong> "Right to be forgotten"</li>
-                    <li><strong>Right to restriction:</strong> Limit how we process your data</li>
-                    <li><strong>Right to portability:</strong> Receive data in machine-readable format</li>
-                    <li><strong>Right to object:</strong> Object to processing based on legitimate interests</li>
-                    <li><strong>Right to withdraw consent:</strong> Anytime, with equal ease as given</li>
-                </ul>
+        <!-- 3. User Accounts -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">3</span> User accounts</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">3.1</span> Your responsibility</div>
+                <p>You may let your employees and staff use SuperPig. You are responsible for everything they do.</p>
             </div>
-                
-            <p><strong>Cookie consent:</strong> Non-essential cookies require explicit opt-in before loading.</p>
-            <p><strong>Data Protection Officer:</strong> {{ page_data.eu_privacy_officer }}, {{ page_data.eu_privacy_email }}</p>
-            <p><strong>EU Representative:</strong> For EU users, you may contact our representative at {{ page_data.eu_representrative }} (required under Article 27).</p>
-        </div>
-
-        <!-- CANADA -->
-        <div class="region-block">
-            <h3><span class="flag">🇨🇦</span> Canada</h3>
-            <p><strong>Legal framework:</strong> Personal Information Protection and Electronic Documents Act (PIPEDA) + Québec Law 25</p>
-            <h4>Your Rights:</h4>
-            
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Consent:</strong> We obtain meaningful consent before collection</li>
-                    <li><strong>Access:</strong> Request access to your personal information</li>
-                    <li><strong>Correction:</strong> Challenge accuracy and request corrections</li>
-                    <li><strong>Withdrawal:</strong> Withdraw consent at any time, subject to legal restrictions</li>
-                </ul>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">3.2</span> Login details</div>
+                <p>Keep your username and password secret. Tell JSysDev immediately if you suspect unauthorized use.</p>
             </div>
-            
-            <p><strong>Privacy Officer:</strong> {{ page_data.privacy_officer }}, {{ page_data.privacy_email }}</p>
-            <p><strong>Cross-border transfer:</strong> Your data may be processed in Singapore; we ensure protection through contractual clauses.</p>
-        </div>
-
-        <!-- AUSTRALIA -->
-        <div class="region-block">
-            <h3><span class="flag">🇦🇺</span> Australia</h3>
-            <p><strong>Legal framework:</strong> Privacy Act 1988 (including 2025 amendments) – Australian Privacy Principles (APPs)</p>
-            <h4>Your Rights:</h4>
-            
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>APP compliance:</strong> We adhere to the 13 Australian Privacy Principles</li>
-                    <li><strong>Anonymous options:</strong> Where possible, you may interact anonymously</li>
-                    <li><strong>Cross-border disclosure:</strong> Your data may be transferred to Singapore; we ensure overseas recipients comply with Australian standards</li>
-                    <li><strong>Notifiable Data Breaches:</strong> We will notify you and the OAIC if a serious data breach occurs</li>
-                    <li><strong>Access & correction:</strong> Request access or correction of your personal information</li>
-                </ul>
-            </div>
-            <p><strong>Complaints:</strong> You may lodge a complaint with the Office of the Australian Information Commissioner (OAIC).</p>
-        </div>
-
-        <!-- NEW ZEALAND -->
-        <div class="region-block">
-            <h3><span class="flag">🇳🇿</span> New Zealand</h3>
-            <p><strong>Legal framework:</strong> Privacy Act 2020</p>
-            
-            <h4>Your Rights:</h4>
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Information Privacy Principles (IPPs):</strong> We comply with the 13 IPPs</li>
-                    <li><strong>Access:</strong> Request access to your personal information</li>
-                    <li><strong>Correction:</strong> Request correction of inaccurate information</li>
-                    <li><strong>Notifiable breaches:</strong> We will notify you and the Privacy Commissioner if a serious breach occurs</li>
-                </ul>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">3.3</span> Age requirement</div>
+                <p>You must be at least 16 years old to use SuperPig.</p>
             </div>
         </div>
 
-        <!-- UNITED STATES -->
-        <div class="region-block">
-            <h3><span class="flag">🇺🇸</span> United States</h3>
-            <p><strong>Note:</strong> Privacy laws vary by state. The following applies based on your state of residence.</p>
-            
-            <h4>California (CCPA/CPRA)</h4>
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Right to know:</strong> What personal information we collect, use, disclose</li>
-                    <li><strong>Right to delete:</strong> Request deletion of your personal information</li>
-                    <li><strong>Right to opt-out:</strong> We do not sell your personal information</li>
-                    <li><strong>Right to non-discrimination:</strong> No retaliation for exercising rights</li>
-                    <li><strong>Right to correct:</strong> Correct inaccurate information</li>
-                    <li><strong>Right to limit:</strong> Limit use of sensitive personal information</li>
-                </ul>
+        <!-- 4. Your Data -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">4</span> Your data</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">4.1</span> Your data is yours</div>
+                <p>All information you enter into SuperPig (“Customer Data”) belongs to you. JSysDev only uses it to provide and improve the service.</p>
             </div>
-            
-            <h4>Virginia (VCDPA), Colorado (CPA), Connecticut (CTDPA), Utah (UCPA)</h4>
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Right to access</strong></li>
-                    <li><strong>Right to delete</strong></li>
-                    <li><strong>Right to correct</strong></li>
-                    <li><strong>Right to opt-out</strong> of targeted advertising (we do not engage in this)</li>
-                    <li><strong>Right to appeal</strong> if we decline to take action</li>
-                </ul>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">4.2</span> Security & export</div>
+                <p>JSysDev uses appropriate security measures to protect your data. You can export your data at any time via the app.</p>
             </div>
-            <p><strong>We do not sell your personal information</strong> as defined under any US state law.</p>
         </div>
 
-        <!-- PHILIPPINES (HOME BASE) -->
-        <div class="region-block">
-            <h3><span class="flag">🇵🇭</span> Philippines</h3>
-            <p><strong>Legal framework:</strong> Data Privacy Act 2012 (Republic Act No. 10173)</p>
-            <h4>Your Rights:</h4>
-            
-            <div style="padding-left: 1.5rem;">
-                <ul>
-                    <li><strong>Right to be informed:</strong> How your data is processed</li>
-                    <li><strong>Right to access:</strong> Request a copy of your data</li>
-                    <li><strong>Right to correction:</strong> Dispute inaccuracy and request correction</li>
-                    <li><strong>Right to erasure:</strong> Suspend, withdraw, or remove personal information</li>
-                    <li><strong>Right to object:</strong> Opt out of processing</li>
-                    <li><strong>Right to data portability:</strong> Receive data in electronic format</li>
-                    <li><strong>Right to complain:</strong> File with National Privacy Commission</li>
-                </ul>
+        <!-- 5. Billing and Payment (highlighted payment method) -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">5</span> Billing and payment</div>
+
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.1</span> Free trial</div>
+                <p>90‑day free trial after signup. No payment during this period. No payment options details will be asked. Just use the app and check if it is useful.</p>
             </div>
-            <p><strong>Cross-border transfer:</strong> Your data may be transferred to Singapore; this is permitted under NPC Circular 16-03.</p>
-            <p><strong>BSP compliance:</strong> For GCash/Maya payments, we follow BSP Circular 982 regulations.</p>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.2</span> Subscription fees</div>
+                <p>After the trial, we will start sending your account first bill and charged your account every 30 days. The fee is based on a <strong>per‑head rate for your breeding stocks (sows, boars and gilts). Fattening pigs no charge </strong>.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.3</span> Country‑based pricing</div>
+                <p>The per‑head rate depends on the country where your pig farm is located. Exact price will be shown after you set your country of where the pig farm is located.</p>
+            </div>
+
+            <!-- 5.4 PAYMENT METHODS – modified as requested: mailed every billing cycle -->
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.4</span> Payment methods</div>
+
+                <div class="payment-method-row">
+                    <strong>5.4.1 Credit card</strong> – If you pay by credit card, you authorise JSysDev to automatically charge that card every 30 days.
+                </div>
+                <div class="payment-method-row">
+                    <strong>5.4.2 Other payment methods</strong> – If you use a payment method other than credit card (other electronic payment methods), JSysDev will 
+                    <strong>mail you a payment instructions of every billing cycle</strong>. Payment must be made using the method and by the due date specified on that document.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.5</span> Taxes</div>
+                <p>Fees are exclusive of taxes. You are responsible for any sales tax, VAT, or similar.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.6</span> No refunds</div>
+                <p>Fees are non‑refundable except as stated in the money‑back guarantee.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">5.7</span> Suspension for non‑payment</div>
+                <p>If payment is overdue, JSysDev may suspend your access after 10 days’ written notice.</p>
+            </div>
         </div>
 
-        <!-- OTHER COUNTRIES -->
-        <div class="region-block">
-            <h3><span class="flag">🌐</span> Other Countries</h3>
-            <p>If your country is not listed above, the core policy applies. We process your data fairly, lawfully, and transparently. You may contact us with any privacy concerns at privacy@superpig.com.</p>
+        <!-- 6. Our commitment -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">6</span> Our commitment</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">6.1</span> Performance warranty</div>
+                <p>JSysDev promises SuperPig will work as described in the documentation.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">6.2</span> What we don’t promise</div>
+                <p>Other than the above, the app is provided “AS IS”. We don’t guarantee error‑free or uninterrupted operation, and we aren’t liable for problems outside our control.</p>
+            </div>
         </div>
 
-        <!-- SECTION 3: DATA PROTECTION (GLOBAL) -->
-        <h2>3. Data Protection & Security</h2>
-        <div class="data-grid">
-            <ul>
-                <li><span class="emoji-bullet">🔐</span> <strong>Encryption:</strong> TLS 1.3 for all data (banking-grade)</li>
-                <li><span class="emoji-bullet">🔑</span> <strong>Access Control:</strong> Only authorized personnel</li>
-                <li><span class="emoji-bullet">📋</span> <strong>Audit Logs:</strong> All access monitored</li>
-                <li><span class="emoji-bullet">🔄</span> <strong>Backups:</strong> Encrypted, regular</li>
-                <li><span class="emoji-bullet">🛡️</span> <strong>PCI-DSS:</strong> Payment processing follows industry standards</li>
-            </ul>
+        <!-- 7. Term and termination -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">7</span> Term and termination</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">7.1</span> Agreement term</div>
+                <p>This agreement starts when you accept it and continues until your subscription ends or it’s terminated.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">7.2</span> Cancelling by you</div>
+                <p>You can cancel anytime via your account settings. No refund for already paid period.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">7.3</span> Termination for cause</div>
+                <p>Either party can end this agreement if the other breaks a key term (like not paying) and doesn’t fix it within 30 days. If we breach and you terminate, we refund any unused prepaid fees.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">7.4</span> What happens when you cancel</div>
+                <p>Your right to use SuperPig stops, and we delete your data according to our standard procedures.</p>
+            </div>
         </div>
 
-        <!-- SECTION 4: DATA RETENTION -->
-        <h2>4. Data Retention</h2>
-        <div style="padding-left: 1.5rem;">
-            <ul>
-                <li><strong>Active accounts:</strong> Data retained while you use SuperPig</li>
-                <li><strong>Deleted accounts:</strong> Data removed within 30 days</li>
-                <li><strong>Transaction records:</strong> Kept for 10 years (tax/AML requirements)</li>
-                <li><strong>Trial cancellations:</strong> Data deleted within 30 days of cancellation</li>
-            </ul>
+        <!-- 8. Ownership -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">8</span> Ownership</div>
+            <p>You own your data. JSysDev owns the SuperPig application, code, and technology. Neither party gets rights to the other’s property except to use SuperPig as described.</p>
         </div>
 
-        <!-- SECTION 5: COOKIES -->
-        <h2>5. Cookies & Local Storage</h2>
-        <div style="padding-left: 1.5rem;">
-            <ul>
-                <li>Authentication tokens (keep you logged in)</li>
-                <li>User preferences</li>
-                <li>Session information</li>
-                <li>No third-party advertising cookies</li>
-            </ul>
-        </div>
-        <p><strong>EU/UK users:</strong> Non-essential cookies are blocked until you provide explicit consent.</p>
-
-        <!-- SECTION 6: CHILDREN -->
-        <h2>6. Children's Privacy</h2>
-        <p>SuperPig is not intended for users under 18. We do not knowingly collect data from minors. If you believe a minor has provided data, contact us immediately.</p>
-
-        <!-- SECTION 7: INTERNATIONAL TRANSFERS -->
-        <h2>7. International Data Transfers</h2>
-        <p>Your data is stored on servers in Singapore (DigitalOcean). For users outside Singapore, this constitutes a cross-border transfer. We ensure adequate protection through:</p>
-        
-        <div style="padding-left: 1.5rem;">
-            <ul>
-                <li>Standard Contractual Clauses (for EU/UK)</li>
-                <li>Binding Corporate Rules (where applicable)</li>
-                <li>Privacy Act compliance (for Australia/NZ)</li>
-                <li>NPC Circular 16-03 compliance (for Philippines)</li>
-            </ul>
+        <!-- 9. Limitation of liability -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">9</span> Limitation of liability</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">9.1</span> No indirect damages</div>
+                <p>Neither party is liable for lost profits, lost data, or indirect damages, even if advised of the possibility.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">9.2</span> Cap on liability</div>
+                <p>Our total liability to you is limited to the amount you paid us for SuperPig in the 12 months before the claim.</p>
+            </div>
         </div>
 
-        <!-- SECTION 8: POLICY UPDATES -->
-        <h2>8. Changes to This Policy</h2>
-        <p>We'll notify you of material changes by:</p>
-        
-        <div style="padding-left: 1.5rem;">
-            <ul>
-                <li>Email notification (if you have an account)</li>
-                <li>Notice on the website</li>
-                <li>Updated "Last Updated" date above</li>
-            </ul>
+        <!-- 10. General legal terms (condensed) -->
+        <div class="agreement-section">
+            <div class="section-head"><span class="section-number">10</span> General legal terms</div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">10.1</span> Changes to this agreement</div>
+                <p>We may update this agreement with 30 days’ notice (by email or in-app). If you don’t agree, you can cancel before the changes take effect.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">10.2</span> Governing law</div>
+                <p>This agreement is governed by the laws of Hong Kong, without regard to conflict of law principles. Both parties submit to the exclusive jurisdiction of Hong Kong courts.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">10.3</span> Notices</div>
+                <p>Legal notices in writing. We send notices to your email or via the app. You can send legal notices to: JSysDev (address on request).</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">10.4</span> Entire agreement</div>
+                <p>This is the entire agreement between you and JSysDev. We are independent contractors – not partners.</p>
+            </div>
+            <div class="subsection">
+                <div class="subhead"><span class="subnum">10.5</span> Force majeure</div>
+                <p>Neither party is liable for delays caused by events beyond reasonable control (natural disasters, war, widespread net outages).</p>
+            </div>
         </div>
 
-        <!-- SECTION 9: CONTACT -->
-        <h2>9. Contact Information</h2>
-        <div style="background: #f1f5f9; padding: 25px; border-radius: 16px; margin: 30px 0;">
-            <p><strong>📧 Privacy Officer:</strong> {{ page_data.privacy_officer }}</p>
-            <p><strong>📧 Email:</strong> <a href="mailto:{{ page_data.contact_email }}">{{ page_data.contact_email }}</a></p>
-            <!--
-            <p><strong>🇪🇺 EU Representative:</strong> eu-rep@superpig.com (for EU users)</p>
-            <p><strong>🇬🇧 UK Representative:</strong> uk-rep@superpig.com (for UK users)</p>
-            <p><strong>🇦🇺 Australia:</strong> oaic@superpig.com (for complaints)</p>
-            -->
+        <!-- simple definitions (no cards) -->
+        <hr>
+        <div style="font-weight:700; color:var(--blue-deep); margin: 1.5rem 0 0.5rem;">🐖 quick definitions</div>
+        <div class="definition-flat">
+            <div class="def-item"><span class="def-term">Customer Data</span><span class="def-desc">All farm data you enter.</span></div>
+            <div class="def-item"><span class="def-term">Subscription Term</span><span class="def-desc">Your active 30‑day cycle.</span></div>
+            <div class="def-item"><span class="def-term">Breeding stocks</span><span class="def-desc">Sows, boars, breeding animals.</span></div>
         </div>
 
-        <!-- SECTION 10: REGULATORY AUTHORITIES -->
-        <h2>10. Supervisory Authorities</h2>
-        <p>You have the right to lodge a complaint with your local data protection authority:</p>
-        <div style="padding-left: 1.5rem;">
-            <ul>
-                <li><strong>🇵🇭 Philippines:</strong> National Privacy Commission – <a href="https://privacy.gov.ph">privacy.gov.ph</a></li>
-                <li><strong>🇪🇺 EU:</strong> Your local Data Protection Authority</li>
-                <li><strong>🇬🇧 UK:</strong> Information Commissioner's Office – <a href="https://ico.org.uk">ico.org.uk</a></li>
-                <li><strong>🇨🇦 Canada:</strong> Office of the Privacy Commissioner – <a href="https://priv.gc.ca">priv.gc.ca</a></li>
-                <li><strong>🇦🇺 Australia:</strong> Office of the Australian Information Commissioner – <a href="https://oaic.gov.au">oaic.gov.au</a></li>
-                <li><strong>🇳🇿 New Zealand:</strong> Office of the Privacy Commissioner – <a href="https://privacy.org.nz">privacy.org.nz</a></li>
-                <li><strong>🇺🇸 California:</strong> California Privacy Protection Agency – <a href="https://cppa.ca.gov">cppa.ca.gov</a></li>
-            </ul>
+        <!-- footer -->
+        <div class="footer-note">
+            ⚖️ By using SuperPig you agree to these terms. If you do not wish to be bound, do not register.
         </div>
 
-        <!-- CONSENT SECTION -->
-        <h2>11. Your Consent</h2>
-        <p>By using SuperPig:</p>
-        <div style="padding-left: 1.5rem;">
-            <ul>
-                <li><strong>During trial:</strong> You consent to collection of social login and farm data</li>
-                <li><strong>After trial:</strong> Continued use constitutes consent to automatic billing</li>
-                <li><strong>EU/UK users:</strong> You acknowledge our lawful bases and your GDPR rights</li>
-                <li><strong>Canadian users:</strong> You provide meaningful consent under PIPEDA</li>
-                <li><strong>Australian users:</strong> You acknowledge APP compliance</li>
-                <li><strong>You confirm</strong> you are at least 18 years old</li>
-            </ul>
-        </div>
 
-        <!-- FOOTER -->
-        <div class="footer">
-            <p>🐷 SuperPig – Built for farmers, by farmers. Serving farmers worldwide.</p>
-            <p><a href="/">← Return to SuperPig App</a></p>
-            <p>© {{ page_data.current_year }} J SysDev. All rights reserved.</p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">v2.0 – Global Version (UK/EU/CA/AU/NZ/US/PH)</p>
-        </div>
+
     </div>
+
 </body>
 </html>

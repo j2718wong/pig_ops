@@ -44,7 +44,9 @@ class HasContactDetails:
 
 
 class DataUserLogin(BaseModel):
-    email:                  str
+    access_grant_hid:       str = None
+    
+    email:                  str = None
     
     name:                   str = None
     name_last:              str = None
@@ -53,6 +55,8 @@ class DataUserLogin(BaseModel):
     viewport_width:         int = None
     viewport_height:        int = None
     ip_address:             str = None
+
+    access_grant_id:        int = None
 
     login_social_media_id:  int = 0
     social_media_user_id:   str = None
@@ -98,6 +102,18 @@ class DataAccount(BaseModel):
     user_id:                int = 0
     name:                   str
     country_id:             int = COUNTRY_ID_PHILIPPINES
+
+
+class DataAccountAccessCode(BaseModel):
+    uhid:                   str = None
+    usergroup_hid:          str = None
+    access_code_hid:        str = None
+    
+    user_id:                int = 0
+    usergroup_id:           int = 0
+    access_code_id:         int = 0
+    
+
     
 
 class DataAccountSettings(BaseModel):

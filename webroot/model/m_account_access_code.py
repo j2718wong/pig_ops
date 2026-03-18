@@ -1,34 +1,28 @@
-# January 14, 2026
+# March 18, 2026
 # Jack Wong
 
 from common_constants       import *
 
 
 
-class AccountMedVac:
+class AccountAccessCode:
     def __init__(self, model):
         self.model              = model
-        self.TAG                = 'AccountMedVac'
+        self.TAG                = 'AccountAccessCode'
 
 
     def add(self, data = None):
         """
-        PROCEDURE account_medvac_add(
+        PROCEDURE account_access_code(
             in_user_id              INT,
-            in_medvac_brand_id      INT,
-            in_medvac_type_id       INT,
-    
-            in_medvac_name          VARCHAR(50)
+            
+            in_user_group_id        INT
         )  
         """
         
-        sql =  'CALL account_medvac_add('
+        sql =  'CALL account_access_code('
         sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.medvac_brand_id
-        sql += '%s,'    % data.medvac_type_id
-        
-        
-        sql += '"%s")'  % data.name
+        sql += '%s);'   % data.user_group_id
         
         
         # Check if still connected to database
@@ -65,7 +59,7 @@ class AccountMedVac:
                     'desc':             row[2],
                 },
                 
-                'account_medvac': {
+                'access_code': {
                     'id':               row[3]
                 }
             }
@@ -212,53 +206,34 @@ class AccountMedVac:
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0):
+    def get_list(self, account_id):
         
         where_clause = 'WHERE a.account_id = %s ' %account_id
-            
-        if inc_deleted == 0:
-            where_clause += ' AND (a.flag & 1) = 0' 
+        where_clause += ' AND (a.flag & 1) = 0' 
             
         
-        if inc_user_audit == 0:
-            sql =   """
-                    SELECT 
-                        a.id,
-                        
-                        a.medvac_brand_id,
-                        a.medvac_type_id,
-                        
-                        a.name
-                    FROM account_medvac a
-                    %s
-                    ORDER BY a.name
-                    """ % (where_clause)
-        else:
-            
-            sql =   """
-                    SELECT 
-                        a.id,
-                        
-                        a.medvac_brand_id,
-                        a.medvac_type_id,
-                        
-                        a.name
+        sql =   """
+                SELECT 
+                    a.id,
+                    a.user_group_id,
+                    b.group_num,
                     
-                        c.name_last,
-                        c.name_first,
-                        a.dt_entry,
-                        
-                        d.name_last,
-                        d.name_first,
-                        a.dt_last_update
-                        
-                    FROM account_medvac a
-                    LEFT OUTER JOIN user c          ON a.added_by_user_id   = c.id
-                    LEFT OUTER JOIN user d          ON a.last_update_user_id = d.id
-                    %s
-                    ORDER BY a.name
-                    """ % where_clause
-
+                    c.name_last,
+                    c.name_first,
+                    
+                    d.name_last,
+                    d.name_first,
+                    
+                    
+                    e.dt_entry
+                FROM account_access_code a
+                LEFT OUTER JOIN user_group b    ON a.user_group.id = b.id
+                LEFT OUTER JOIN user c          ON a.used_by_user_id = c.id
+                LEFT OUTER JOIN user d          ON a.issued_by_user_id = d.id
+                %s
+                ORDER BY a.id DESC
+                """ % (where_clause)
+    
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -292,33 +267,30 @@ class AccountMedVac:
         if rows is not None:
             
             for row in rows:
+                name_last =    row[3]
+                
                     
                 cur_entry = {
-                    'acc_medvac': {
+                
+                    'access_code': {
                         'id':               row[0],
-                        'brand_id':         row[1],
-                        'type_id':          row[2],
-                        'name':             row[3]
+                        'user_group':{  
+                            'id':           row[1],
+                            'number':       row[2]
+                        },
+                        
+                        'used_by_user':{
+                            'name_last':    name_last,
+                            'name_first':   row[4]
+                        },
+                        
+                        'dt_entry':         str(row[5])
                     }
                 }
                 
-                if inc_user_audit > 0:
-                        
-                    added_by = {
-                        'name_last':        row[4],
-                        'name_first':       row[5],
-                        'dt_entry':         str(row[6])
-                    }
-                    
-                    last_update = {
-                        'name_last':        row[7],
-                        'name_first':       row[8],
-                        'dt_update':        str(row[9]) if row[9] else None
-                    }
-                    
-                    cur_entry['added_by']   = added_by 
-                    cur_entry['last_update'] = last_update
-                    
+                
+                if name_last is None:
+                    del cur_entry['used_by_user']
                     
                 result.append(cur_entry)
         

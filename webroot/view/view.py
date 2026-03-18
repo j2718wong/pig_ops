@@ -53,7 +53,8 @@ env = Environment(loader=FileSystemLoader('templates'))
 view_names = [
             ('signup',              'SignUp'),
             
-            ('privacy',             'Privacy'), 
+            ('privacy',             'Privacy'),
+            ('terms',               'Terms'), 
             ('root',                'Root')            
         ]
 
@@ -214,15 +215,34 @@ class Privacy(ViewBase):
         }
         
             
-        data    = { 'page_data':        page_data,
-                    'js_lib':           [],
-                    'js_app_text':      [],
-                    'js_app_modules':   [],
-                    'is_dev':           False}
+        data    = { 'page_data':        page_data}
         
                 
         return template.render(data)
    
+
+class Terms(ViewBase):
+    def render(self, page_data = None):
+        # Mobile version
+        template = env.get_template('terms.html')
+        
+        application_data = get_application_data()
+        
+        current_year    = datetime.now().year
+        
+        
+        page_data ={
+            
+            
+        }
+        
+            
+        data    = { 'page_data':        page_data}
+        
+                
+        return template.render(data)
+
+
    
     
 #

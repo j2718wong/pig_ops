@@ -40,7 +40,7 @@ logger.append(tag = 'Main', msg = s)
 from model.m_app_analytics      import AppAnalytics
 
 from model.m_account            import Account
-from model.m_mfa                import Mfa
+from model.m_account_access_code import AccountAccessCode
 
 
 from model.m_a0_public_lookup   import PublicLookup
@@ -108,7 +108,7 @@ model_names_pig_ops = [
     ('app_analytics',           AppAnalytics),
 
     ('account',                 Account),
-    ('mfa',                     Mfa),
+    ('access_code',             AccountAccessCode),
     
     ('cust_feedback',           CustomerFeedback), 
     
@@ -392,6 +392,18 @@ HASHID_MIN_LENGTH_ACCOUNT               = 8
 hashids_account = hashids.Hashids(  salt        = HASHID_SALT_ACCOUNT, 
                                     min_length  = HASHID_MIN_LENGTH_ACCOUNT,
                                     alphabet    = COMMON_HASH_ALPHABET)
+
+
+
+HASHID_SALT_ACCOUNT_ACCESS_CODE         = '18FB40903'
+HASHID_MIN_LENGTH_ACCOUNT               = 8
+
+hashids_access_code = hashids.Hashids(  salt    = HASHID_SALT_ACCOUNT_ACCESS_CODE, 
+                                    min_length  = HASHID_MIN_LENGTH_ACCOUNT,
+                                    alphabet    = COMMON_HASH_ALPHABET)
+
+
+
 
 
 # Manager to to request address level names from a different server
