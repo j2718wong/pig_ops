@@ -190,13 +190,16 @@ echo "  💾 PID saved to /root/projects/jsys/app.pid"
 
 # Quick health check
 echo "  🔍 Performing health check..."
-sleep 2
+sleep 5
 if curl -s http://localhost:8000 > /dev/null 2>&1; then
     echo -e "${GREEN}  ✅ App is responding${NC}"
 else
     echo -e "${YELLOW}  ⚠️  App started but not responding - check logs:${NC}"
     echo "     tail -f /root/projects/jsys/pig_ops/webroot/$LOG_FILE"
 fi
+
+# After app starts, go back to project root
+cd /root/projects/jsys
 
 
 # 8️⃣ After starting the app, add:
