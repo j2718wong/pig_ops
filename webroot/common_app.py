@@ -398,8 +398,8 @@ hashids_account = hashids.Hashids(  salt        = HASHID_SALT_ACCOUNT,
 adrs_level_mngr = AddressManager(logger)
 
 
-ENABLE_HASHIDS          = 1
-ENABLE_BEARER_TOKEN     = 0
+
+
 
 
 

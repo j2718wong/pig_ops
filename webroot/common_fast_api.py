@@ -412,5 +412,22 @@ def send_email(recipient: str, subject: str, body: str):
 
 
 
+def get_application_data():
+    return {
+        "product_name":     "SuperPig",
+        "contact_whatsapp": "+85260615575",
+        "contact_email":    "jsysdev.contact@gmail.com",
+        "privacy_officer":  "Jack Wong",
+        "privacy_email":    "privacy@jsysdev.com",
+        "website":          "https://superpig.jsysdev.com",
+        
+        
+        "eu_privacy_officer":   "Richard Lee",
+        "eu_privacy_email":     "eu-privacy@jsysdev.com",
+        "eu_representrative":   "eu-rep-superpig@jsysdev.com",
+        
+        "rt_updates_enabled": 0
+    }
+
 
 

@@ -41,9 +41,9 @@ sys.path.append(os.path.join(module_directory, '..'))
 
 from jinja2             import Environment, FileSystemLoader
 
-from common_fast_api    import dir_static, dir_static_m
+from common_fast_api    import dir_static, dir_static_m, get_application_data
 
-
+from datetime           import datetime
 
 
 # Set up the Jinja environment to load templates from the current directory
@@ -196,6 +196,22 @@ class Privacy(ViewBase):
         # Mobile version
         template = env.get_template('privacy.html')
         
+        application_data = get_application_data()
+        
+        current_year    = datetime.now().year
+        
+        
+        page_data ={
+            
+            'current_year':         current_year,
+            'contact_email':        application_data['contact_email'],
+            'privacy_officer':      application_data['privacy_officer'],
+            'privacy_email':        application_data['privacy_email'],
+            
+            'eu_privacy_officer':   application_data['eu_privacy_officer'],
+            'eu_privacy_email':     application_data['eu_privacy_email'],
+            'eu_representrative':   application_data['eu_representrative']
+        }
         
             
         data    = { 'page_data':        page_data,

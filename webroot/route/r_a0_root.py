@@ -47,14 +47,6 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
                                 PIG_OPERATION_TYPE_LACTATING_SOW)
 
 
-def get_application_data():
-    return {
-        "product_name":     "SuperPig",
-        "contact_whatsapp": "+85260615575",
-        "contact_email":    "jsysdev.contact@gmail.com",
-        "website":          "http://superpig.jsysdev.com",
-        "rt_updates_enabled": 0
-    }
 
 
 @app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
