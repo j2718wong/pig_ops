@@ -431,3 +431,73 @@ def get_application_data():
 
 
 
+
+import logging
+import logging.handlers
+import os
+from pathlib import Path
+
+# Setup logging with rotation
+def setup_logging():
+    # Create logs directory
+    log_dir = Path(__file__).parent / "logs"
+    log_dir.mkdir(exist_ok=True)
+    
+    log_file = log_dir / "superpig.log"
+    
+    # Rotating file handler - 10MB per file, keep 5 backups
+    handler = logging.handlers.RotatingFileHandler(
+        log_file,
+        maxBytes=10_000_000,  # 10MB
+        backupCount=5
+    )
+    
+    # Format
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    handler.setFormatter(formatter)
+    
+    # Get root logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    
+    # Also log to console if needed
+    console = logging.StreamHandler()
+    console.setFormatter(formatter)
+    logger.addHandler(console)
+    
+    return logger
+    
+
+
+"""
+Note: There are two loggers
+1.) The logger_main below is for the FastAPI logging.
+2.) The common_app.logger is application logger only. will only log application
+errors particulary database calls.
+
+3.) The structure of the application logs is 
+
+is like this
+
+root@prod-pig-ops:~/projects/jsys/pig_ops/webroot/data/logs# ls -lt
+total 20
+drwxr-xr-x 2 root root 4096 Mar 18 01:32 2026-03-18
+drwxr-xr-x 2 root root 4096 Mar 17 22:34 2026-03-16
+drwxr-xr-x 2 root root 4096 Mar 17 01:33 2026-03-17
+drwxr-xr-x 2 root root 4096 Mar 15 03:30 2026-03-15
+drwxr-xr-x 2 root root 4096 Mar 14 03:09 2026-03-14
+
+
+
+"""
+
+
+    
+    
+# Call this at the start of your app
+logger_main = setup_logging()
+logger_main.info("SuperPig starting up...")
+
