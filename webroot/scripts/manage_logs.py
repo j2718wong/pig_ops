@@ -40,10 +40,12 @@ def get_log_directories():
     return sorted(log_dirs, reverse=True)  # Newest first
 
 def get_log_files(log_dir):
-    """Get all log files in a directory"""
+    """Get all log files in a directory with better pattern matching"""
     files = []
-    for ext in ['*.log', '*.log.gz']:
-        files.extend(log_dir.glob(ext))
+    # Match common log file patterns used by your app
+    patterns = ['*.log', '*.log.gz', '*_web.log', 'app_*.log', '*.txt']
+    for pattern in patterns:
+        files.extend(log_dir.glob(pattern))
     return files
 
 def get_directory_size_mb(directory):
@@ -55,26 +57,41 @@ def get_directory_size_mb(directory):
     return total_bytes / (1024 * 1024)
 
 def compress_file(file_path):
-    """Compress a log file with gzip"""
+    """Compress a log file with gzip - with error handling"""
+    # Check if file exists before trying to compress
+    if not file_path.exists():
+        print(f"  ⚠️  File not found, skipping: {file_path.name}")
+        return False
+    
     compressed_path = file_path.with_suffix('.log.gz')
     
     # Skip if already compressed
     if compressed_path.exists():
+        print(f"  ⏭️  Already compressed: {file_path.name}")
         return False
     
-    print(f"  🗜️  Compressing: {file_path.name}")
-    with open(file_path, 'rb') as f_in:
-        with gzip.open(compressed_path, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-    
-    # Remove original after successful compression
-    file_path.unlink()
-    
-    original_size = file_path.stat().st_size / 1024
-    compressed_size = compressed_path.stat().st_size / 1024
-    print(f"     {original_size:.1f}KB → {compressed_size:.1f}KB (saved {original_size - compressed_size:.1f}KB)")
-    
-    return True
+    try:
+        print(f"  🗜️  Compressing: {file_path.name}")
+        with open(file_path, 'rb') as f_in:
+            with gzip.open(compressed_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        
+        # Get sizes after compression
+        original_size = file_path.stat().st_size / 1024
+        compressed_size = compressed_path.stat().st_size / 1024
+        
+        # Remove original after successful compression
+        file_path.unlink()
+        
+        print(f"     {original_size:.1f}KB → {compressed_size:.1f}KB (saved {original_size - compressed_size:.1f}KB)")
+        return True
+        
+    except Exception as e:
+        print(f"  ❌ Error compressing {file_path.name}: {e}")
+        # Clean up partial compressed file if it exists
+        if compressed_path.exists():
+            compressed_path.unlink()
+        return False
 
 def delete_old_directories():
     """Delete entire log directories older than DAYS_TO_KEEP"""
@@ -96,7 +113,7 @@ def delete_old_directories():
     return deleted_count
 
 def compress_old_logs():
-    """Compress logs older than COMPRESS_AFTER_DAYS"""
+    """Compress logs older than COMPRESS_AFTER_DAYS - with better error handling"""
     log_dirs = get_log_directories()
     cutoff_date = datetime.now() - timedelta(days=COMPRESS_AFTER_DAYS)
     
@@ -105,8 +122,13 @@ def compress_old_logs():
         try:
             dir_date = datetime.strptime(log_dir.name, "%Y-%m-%d")
             if dir_date < cutoff_date:
-                # Compress any uncompressed log files in this directory
-                for log_file in log_dir.glob("*.log"):
+                # Get all log files using our improved pattern matching
+                log_files = get_log_files(log_dir)
+                
+                # Filter for uncompressed logs only
+                uncompressed = [f for f in log_files if f.suffix != '.gz']
+                
+                for log_file in uncompressed:
                     if compress_file(log_file):
                         compressed_count += 1
         except ValueError:
