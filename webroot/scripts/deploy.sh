@@ -42,20 +42,11 @@ check_success() {
 section "STEP 1: Stopping Python app"
 echo "Looking for running pig_ops_web.py processes..."
 
-# Find and kill the Python process
-PIDS=$(pgrep -f "python.*pig_ops_web.py")
+# Find and kill the Python process (if exists)
+PIDS=$(pgrep -f "python.*pig_ops_web.py" || true)
 if [ -n "$PIDS" ]; then
     echo "Found PIDs: $PIDS"
-    kill $PIDS
-    sleep 3
-    # Force kill if still running
-    if pgrep -f "python.*pig_ops_web.py" > /dev/null; then
-        echo "Process still running, force killing..."
-        pkill -9 -f "python.*pig_ops_web.py"
-    fi
-    check_success "Python app stopped"
-else
-    echo -e "${YELLOW}⚠️  No running Python app found${NC}"
+    kill $PIDS 2>/dev/null || true
 fi
 
 # 2️⃣ CHANGE TO PROJECT ROOT
