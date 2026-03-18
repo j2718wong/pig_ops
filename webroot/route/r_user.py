@@ -167,7 +167,7 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         user_data: dm.DataUserLogin):
 
 
-    res_register    =  model['user'].register_or_login(user_data)
+    res_register =  model['user'].register_or_login(user_data)
     
     if res_register is None:
         return {
@@ -178,6 +178,11 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         }
     
     
+    user_id = None
+    if 'user' in res_register:
+        user_id = res_register['user']['id']
+    
+    
     # Check if user is unverified
     if 'user_unverified' in res_register:
         user_unverified = res_register['user_unverified']
@@ -185,10 +190,30 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         
         # Replace plain_id
         cur_id     = user_unverified['id']
-        cur_hid    = hashids_common.encrypt(cur_id)
-    
-        del user_unverified['id']
-        user_unverified['hid']   = cur_hid
+        
+        # The user is not in the system and unverified.
+        if cur_id is not None and cur_id > 0:
+            cur_hid    = hashids_common.encrypt(cur_id)
+        
+            del user_unverified['id']
+            user_unverified['hid']   = cur_hid
+        
+        
+        # The user already in the system but needs code authentication, 
+        if user_id is not None:
+            cur_id      = user_id  
+            cur_hid     = hashids_user.encrypt(cur_id)
+            
+            # Need to add this 
+            user_unverified['uhid'] = cur_hid
+            
+            
+        """
+        So two possible keys of user_unverified
+        res_register['user_unverified']['hid']  -> user not in the system yet
+        res_register['user_unverified']['uhid'] -> needs to authenticate user
+        """
+        
         
         
         del user_unverified['verify_id']
@@ -248,25 +273,48 @@ async def user_email_verify_code(request: Request, data: dm.DataUserEmailVerify)
     """
     
     uvuhid = data.uvuhid
-
-    # Note: Since user is not yet verified, the hashids used is hashids_common;
-    # after verified, use hashids_user  
-    res = hashids_common.decrypt(uvuhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID'
+    unverified_user_id = 0
+    
+    if uvuhid is not None:
+        # Note: Since user is not yet verified, the hashids used is hashids_common;
+        # after verified, use hashids_user  
+        res = hashids_common.decrypt(uvuhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_USER_INVALID_USER_HASHID,
+                    'code': 'ERROR_USER_INVALID_USER_HASHID'
+                }
             }
-        }
+        
+        
+        unverified_user_id = res[0]
+        
+    
+    uhid = data.uhid
+    user_id = 0
+    
+    if uhid is not None:
+        res = hashids_user.decrypt(uhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_USER_INVALID_USER_HASHID,
+                    'code': 'ERROR_USER_INVALID_USER_HASHID'
+                }
+            }
+        
+        
+        user_id = res[0]
+        
     
     
-    unverified_user_id = res[0]
     
     
     client_host         = request.client.host
     
     data.unverified_user_id  = unverified_user_id
+    data.user_id        = user_id
     data.ip_address     = client_host
     
     
@@ -317,19 +365,43 @@ async def user_email_verify_code(request: Request, data: dm.DataUserEmailVerify)
 @app.get("/user/email/verify_code/resend", tags=["User"])
 async def user_email_verify_resend(uvuhid:str):
     
-    res = hashids_common.decrypt(uvuhid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_USER_INVALID_USER_HASHID,
-                'code': 'ERROR_USER_INVALID_USER_HASHID'
+    uvuhid = data.uvuhid
+    unverified_user_id = 0
+    
+    if uvuhid is not None:
+        # Note: Since user is not yet verified, the hashids used is hashids_common;
+        # after verified, use hashids_user  
+        res = hashids_common.decrypt(uvuhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_USER_INVALID_USER_HASHID,
+                    'code': 'ERROR_USER_INVALID_USER_HASHID'
+                }
             }
-        }
+        
+        
+        unverified_user_id = res[0]
+        
+    
+    uhid = data.uhid
+    user_id = 0
+    
+    if uhid is not None:
+        res = hashids_user.decrypt(uhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_USER_INVALID_USER_HASHID,
+                    'code': 'ERROR_USER_INVALID_USER_HASHID'
+                }
+            }
+        
+        
+        user_id = res[0]
     
     
-    unverified_user_id = res[0]
-    
-    res = model['user'].user_resend_verify_code(unverified_user_id)
+    res = model['user'].user_resend_verify_code(unverified_user_id, user_id)
     
     
     user_unverified = res['user_unverified']

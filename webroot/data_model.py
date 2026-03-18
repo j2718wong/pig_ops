@@ -64,8 +64,10 @@ class DataUserLogin(BaseModel):
 
 
 class DataUserEmailVerify(BaseModel):
-    uvuhid:                 str
+    uhid:                   str = None
+    uvuhid:                 str = None
     
+    user_id:                int = 0
     unverified_user_id:     int = 0
     
     auth_code:              int = 0

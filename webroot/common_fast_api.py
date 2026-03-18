@@ -25,6 +25,9 @@ from fastapi_mail               import FastMail, ConnectionConfig, MessageSchema
 
 from starlette.middleware.base  import BaseHTTPMiddleware
 
+from fastapi.middleware.trustedhost     import TrustedHostMiddleware
+from fastapi.middleware.httpsredirect   import HTTPSRedirectMiddleware
+
 
 
 import mimetypes
@@ -99,6 +102,16 @@ app = FastAPI(
     docs_url        = "/docs"           if app_envi == "development" else None,
     redoc_url       = "/redoc"          if app_envi == "development" else None,
     openapi_url     = "/openapi.json"   if app_envi == "development" else None
+)
+
+
+# Add this middleware to trust proxy headers
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+# Tell FastAPI to trust X-Forwarded-* headers from your proxy
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["jsysdev.com", "*.jsysdev.com", "localhost"]  # Add your domains
 )
 
 

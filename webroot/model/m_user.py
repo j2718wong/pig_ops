@@ -533,8 +533,12 @@ class User:
             if cur_user_id == 0:
                 del cur_entry['user']
 
-            if cur_user_unverified_id is None or cur_user_unverified_id == 0:
-                del cur_entry['user_unverified']
+            
+            """
+            If cur_user_id > 0 and user_unverified['verify_id'], this means 
+            the user need to autheticate via code. 
+            """
+            
 
             return cur_entry
 
@@ -545,7 +549,9 @@ class User:
     def user_verify_email(self, data = None):
         """
         PROCEDURE user_verify_email(
-            in_unverified_user_id   INT,
+            in_unverified_user_id   INT, /* Only one of this is not NULL and > 0. */
+            in_user_id              INT, /* Only one of this is not NULL and > 0. */
+    
             in_auth_code            INT,
             
             in_viewport_width       INT,
@@ -560,7 +566,13 @@ class User:
         
         sql =  'CALL user_verify_email('
         
-        sql += '%s,'  % data.unverified_user_id
+        if data.unverified_user_id is not None and data.unverified_user_id > 0: 
+            sql += '%s,'  % data.unverified_user_id
+            sql += 'NULL,'
+        else:
+            sql += 'NULL,'
+            sql += '%s,'  % data.user_id
+            
         sql += '%s,'  % data.auth_code
         
         if data.viewport_width and data.viewport_width > 0:
@@ -580,6 +592,9 @@ class User:
         else:
             sql += 'NULL);'
         
+        
+        print('\n\n\n')
+        print(sql)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -629,18 +644,24 @@ class User:
         return None
 
 
-    def user_resend_verify_code(self, unverified_user_id):
+    def user_resend_verify_code(self, unverified_user_id, user_id):
         """
         PROCEDURE user_resend_verify_code(
-            in_unverified_user_id   INT
+            in_unverified_user_id   INT, /* Only one of this is not NULL and > 0. */
+            in_user_id              INT /* Only one of this is not NULL and > 0. */
+
             
         )    
         """
         
-        
-        
         sql =  'CALL user_resend_verify_code('
-        sql += '%s);'  % unverified_user_id
+        
+        if unverified_user_id is not None and unverified_user_id > 0: 
+            sql += '%s,'  % unverified_user_id
+            sql += 'NULL);'
+        else:
+            sql += 'NULL,'
+            sql += '%s);'  % user_id
         
         
         # Check if still connected to database
