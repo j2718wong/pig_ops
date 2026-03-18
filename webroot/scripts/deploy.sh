@@ -12,6 +12,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# 🔑 SSH setup for Git (no passphrase prompts)
+export GIT_SSH_COMMAND="ssh -i /root/.ssh/deploy_key -o IdentitiesOnly=yes"
+
 echo -e "${BLUE}================================${NC}"
 echo -e "${GREEN}🐷 SuperPig Deployment Script${NC}"
 echo -e "${BLUE}================================${NC}"
