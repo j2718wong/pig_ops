@@ -59,3 +59,12 @@ async def sitemap():
     xml += '</urlset>'
     
     return Response(content=xml, media_type="application/xml")
+    
+    
+    
+@app.get("/privacy", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+async def privacy(response: Response):
+    
+    page = controller.view['privacy'].render()
+    
+    return page
