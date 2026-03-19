@@ -1,7 +1,6 @@
 #!/bin/bash
 # SuperPig Complete Deployment Script
 # Run this whenever you need to deploy updates
-# Copy this file this path /root/projects/jsys/deploy.sh:
 
 set -e  # Exit on any error
 
@@ -19,14 +18,11 @@ export GIT_SSH_COMMAND="ssh -i /root/.ssh/deploy_key -o IdentitiesOnly=yes"
 DEPLOY_LOG_DIR="/root/projects/jsys/deploy_logs"
 mkdir -p "$DEPLOY_LOG_DIR"
 
-# Create log filename with timestamp (YYYY-MM-DD_HHMMSS)
 TIMESTAMP=$(date +"%Y-%m-%d_%H%M%S")
 DEPLOY_LOG_FILE="$DEPLOY_LOG_DIR/deploy_$TIMESTAMP.log"
-
-# Also create a symlink to latest log for easy access
 LATEST_LOG_LINK="$DEPLOY_LOG_DIR/latest.log"
 
-# Function to log messages to both console and log file
+# Function to log messages
 log_message() {
     echo -e "$1" | tee -a "$DEPLOY_LOG_FILE"
 }
@@ -59,11 +55,7 @@ log_warning() {
     echo ""
 } >> "$DEPLOY_LOG_FILE"
 
-# Create symlink to this deployment as latest
 ln -sf "$DEPLOY_LOG_FILE" "$LATEST_LOG_LINK"
-
-# Redirect all output to both console and log file
-# This ensures EVERYTHING gets logged
 exec > >(tee -a "$DEPLOY_LOG_FILE") 2>&1
 # ===================================================
 
@@ -74,59 +66,55 @@ echo "Started at: $(date)"
 echo "Deployment log: $DEPLOY_LOG_FILE"
 echo ""
 
-# Override section function to use logging
-section() {
-    log_section "$1"
-}
+# Override functions for logging
+section() { log_section "$1"; }
+check_success() { if [ $? -eq 0 ]; then log_success "$1"; else log_error "$1"; exit 1; fi; }
 
-# Override check_success function to use logging
-check_success() {
-    if [ $? -eq 0 ]; then
-        log_success "$1"
-    else
-        log_error "$1"
-        exit 1
-    fi
-}
+# Initialize flags
+FRONTEND_CHANGED=false
+BACKEND_CHANGED=false
+BUILD_NEEDED=false
+RESTART_NEEDED=false
 
-# 1️⃣ STOP THE PYTHON APP
-section "STEP 1: Stopping Python app"
-echo "Looking for running pig_ops_web.py processes..."
-
-# Find and kill the Python process (if exists)
-PIDS=$(pgrep -f "python.*pig_ops_web.py" || true)
-if [ -n "$PIDS" ]; then
-    echo "Found PIDs: $PIDS"
-    kill $PIDS 2>/dev/null || true
-    sleep 2
-    # Check if still running and force kill if needed
-    if pgrep -f "python.*pig_ops_web.py" > /dev/null; then
-        echo "Process still running, force killing..."
-        pkill -9 -f "python.*pig_ops_web.py" || true
-    fi
-    log_success "Python app stopped"
-else
-    log_warning "No running Python app found"
-fi
-
-# 2️⃣ CHANGE TO PROJECT ROOT
-section "STEP 2: Changing to project root"
+# 1️⃣ CHANGE TO PROJECT ROOT
+section "STEP 1: Changing to project root"
 cd /root/projects/jsys
 echo "Current directory: $(pwd)"
 check_success "Changed to project root"
 
-# 3️⃣ GIT PULL IN PIG_OPS_UI_MOB (Frontend)
-section "STEP 3: Updating frontend (pig_ops_ui_mob)"
+# 2️⃣ FRONTEND: Git pull and build if changes
+section "STEP 2: Updating frontend (pig_ops_ui_mob)"
 if [ -d "pig_ops_ui_mob" ]; then
     cd pig_ops_ui_mob
-    echo "Frontend directory: $(pwd)"
+    
+    # Get current commit hash before pull
+    BEFORE_HASH=$(git rev-parse HEAD)
+    echo "Current frontend commit: ${BEFORE_HASH:0:7}"
     
     # Stash any local changes (optional)
     git stash > /dev/null 2>&1 || true
     
     echo "Pulling latest changes from Bitbucket..."
     git pull origin main
-    check_success "Frontend git pull completed"
+    
+    # Get new commit hash after pull
+    AFTER_HASH=$(git rev-parse HEAD)
+    echo "New frontend commit: ${AFTER_HASH:0:7}"
+    
+    # Check if changes were pulled
+    if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
+        FRONTEND_CHANGED=true
+        BUILD_NEEDED=true
+        RESTART_NEEDED=true  # Frontend changes affect templates, so restart needed
+        log_success "Frontend changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
+        
+        # Show summary of changes
+        echo ""
+        echo "📋 Frontend changes:"
+        git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
+    else
+        log_success "No frontend changes detected (already up to date)"
+    fi
     
     # Go back to project root
     cd /root/projects/jsys
@@ -135,28 +123,25 @@ else
     exit 1
 fi
 
-# ===== NEW: BUILD FRONTEND JS BUNDLES =====
-section "STEP 3.5: Building frontend JS bundles"
-if [ -d "pig_ops_ui_mob" ]; then
+# 3️⃣ BUILD FRONTEND (only if changes detected)
+section "STEP 3: Building frontend JS bundles"
+if [ "$BUILD_NEEDED" = true ]; then
     cd pig_ops_ui_mob
     
-    # Activate virtual environment for Python dependencies (csscompressor)
+    # Activate virtual environment
     source /root/projects/jsys/.venv/bin/activate 2>/dev/null || true
     
-    # Check if build.py exists
     if [ -f "build.py" ]; then
-        echo "Found build.py, building JavaScript bundles..."
+        echo "Building JavaScript bundles (changes detected)..."
         
-        
-        # Build with versioning (production mode)
+        # Build with versioning
         echo "Running: python build.py --version"
         python build.py --version
         
-        # Check if build was successful
         if [ $? -eq 0 ]; then
             log_success "Frontend JS bundles built successfully"
             
-            # Show the generated files
+            # Show generated files
             echo ""
             echo "📦 Generated files in static/js/:"
             ls -la static/js/ | grep -E "bundle.*\.min\.js|manifest\.json" | sed 's/^/   /'
@@ -169,7 +154,7 @@ if [ -d "pig_ops_ui_mob" ]; then
             exit 1
         fi
     else
-        log_warning "build.py not found in pig_ops_ui_mob - skipping JS build"
+        log_warning "build.py not found - skipping JS build"
     fi
     
     # Deactivate virtual environment
@@ -178,36 +163,54 @@ if [ -d "pig_ops_ui_mob" ]; then
     # Go back to project root
     cd /root/projects/jsys
 else
-    log_warning "pig_ops_ui_mob directory not found - skipping JS build"
+    log_success "No frontend changes - skipping build"
 fi
 
-# 4️⃣ RESTORE TEMPLATES BEFORE PIG_OPS PULL
-section "STEP 4: Restoring templates from backup (if exists)"
-if [ -d "pig_ops/webroot/templates_backup" ]; then
-    echo "Found templates backup, restoring..."
-    
-    # Clear current templates
-    rm -f pig_ops/webroot/templates/*.html
-    
-    # Copy back from backup
-    cp pig_ops/webroot/templates_backup/*.html pig_ops/webroot/templates/ 2>/dev/null || true
-    check_success "Templates restored from backup"
-else
-    log_warning "No templates backup found - skipping restore"
+# 4️⃣ RESTORE TEMPLATES (only if frontend changed)
+if [ "$FRONTEND_CHANGED" = true ]; then
+    section "STEP 4: Restoring templates from backup"
+    if [ -d "pig_ops/webroot/templates_backup" ]; then
+        echo "Frontend changed, restoring templates backup..."
+        rm -f pig_ops/webroot/templates/*.html
+        cp pig_ops/webroot/templates_backup/*.html pig_ops/webroot/templates/ 2>/dev/null || true
+        check_success "Templates restored from backup"
+    else
+        log_warning "No templates backup found - skipping restore"
+    fi
 fi
 
-# 5️⃣ GIT PULL IN PIG_OPS (Backend)
+# 5️⃣ BACKEND: Git pull and check for changes
 section "STEP 5: Updating backend (pig_ops)"
 if [ -d "pig_ops" ]; then
     cd pig_ops
-    echo "Backend directory: $(pwd)"
+    
+    # Get current commit hash before pull
+    BEFORE_HASH=$(git rev-parse HEAD)
+    echo "Current backend commit: ${BEFORE_HASH:0:7}"
     
     # Stash any local changes (optional)
     git stash > /dev/null 2>&1 || true
     
     echo "Pulling latest changes from Bitbucket..."
     git pull origin main
-    check_success "Backend git pull completed"
+    
+    # Get new commit hash after pull
+    AFTER_HASH=$(git rev-parse HEAD)
+    echo "New backend commit: ${AFTER_HASH:0:7}"
+    
+    # Check if changes were pulled
+    if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
+        BACKEND_CHANGED=true
+        RESTART_NEEDED=true
+        log_success "Backend changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
+        
+        # Show summary of changes
+        echo ""
+        echo "📋 Backend changes:"
+        git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
+    else
+        log_success "No backend changes detected (already up to date)"
+    fi
     
     # Go back to project root
     cd /root/projects/jsys
@@ -216,86 +219,97 @@ else
     exit 1
 fi
 
-# 6️⃣ MINIFY TEMPLATES
-section "STEP 6: Minifying HTML templates"
-if [ -f "pig_ops/webroot/scripts/minify_templates.py" ]; then
-    cd pig_ops/webroot/scripts
-    python3 minify_templates.py
-    check_success "Templates minified"
-    cd /root/projects/jsys
-else
-    log_warning "Minify script not found - skipping minification"
-    echo "Expected at: pig_ops/webroot/scripts/minify_templates.py"
+# 6️⃣ MINIFY TEMPLATES (only if backend changed OR frontend changed)
+if [ "$RESTART_NEEDED" = true ]; then
+    section "STEP 6: Minifying HTML templates"
+    if [ -f "pig_ops/webroot/scripts/minify_templates.py" ]; then
+        cd pig_ops/webroot/scripts
+        python3 minify_templates.py
+        check_success "Templates minified"
+        cd /root/projects/jsys
+    else
+        log_warning "Minify script not found - skipping minification"
+    fi
 fi
 
-# 7️⃣ START PYTHON APP (Detached)
-section "STEP 7: Starting Python app in background"
-cd pig_ops/webroot
-
-# Activate virtual environment and start app
-VENV_PATH="/root/projects/jsys/.venv"
-
-if [ -f "$VENV_PATH/bin/activate" ]; then
-    echo "Activating virtual environment..."
-    source "$VENV_PATH/bin/activate"
+# 7️⃣ STOP PYTHON APP (only if restart needed)
+if [ "$RESTART_NEEDED" = true ]; then
+    section "STEP 7: Stopping Python app"
+    echo "Looking for running pig_ops_web.py processes..."
     
-    # Create logs directory if it doesn't exist
-    mkdir -p logs
-    
-    # Get current date for app log file (separate from deploy log)
-    APP_LOG_FILE="logs/app_$(date +%Y%m%d_%H%M%S).log"
-    
-    echo "Starting app with nohup..."
-    echo "App log file: $APP_LOG_FILE"
-    
-    # Use nohup to run in background with venv python
-    nohup "$VENV_PATH/bin/python" pig_ops_web.py > "$APP_LOG_FILE" 2>&1 &
-    APP_PID=$!
-    
-    # Deactivate venv (doesn't affect running process)
-    deactivate 2>/dev/null || true
-    
-    # Give it a moment to start
-    sleep 3
-    
-    # Check if process is still running
-    if kill -0 $APP_PID 2>/dev/null; then
-        log_success "App started with PID: $APP_PID"
-        echo "  📝 App logs: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
-        
-        # Save PID to file
-        echo $APP_PID > /root/projects/jsys/app.pid
-        echo "  💾 PID saved to /root/projects/jsys/app.pid"
-        
-        # Quick health check - wait longer for app to initialize
-        echo "  🔍 Performing health check (waiting 10 seconds)..."
-        sleep 10
-        if curl -s http://localhost:8000 > /dev/null 2>&1; then
-            log_success "App is responding"
-        else
-            log_warning "App started but not responding - check app logs:"
-            echo "     tail -f $APP_LOG_FILE"
-            echo "     Last 20 lines of app log:"
-            tail -20 "$APP_LOG_FILE" | sed 's/^/       /'
+    PIDS=$(pgrep -f "python.*pig_ops_web.py" || true)
+    if [ -n "$PIDS" ]; then
+        echo "Found PIDs: $PIDS"
+        kill $PIDS 2>/dev/null || true
+        sleep 2
+        if pgrep -f "python.*pig_ops_web.py" > /dev/null; then
+            echo "Process still running, force killing..."
+            pkill -9 -f "python.*pig_ops_web.py" || true
         fi
-        
-        # Disown the process so it survives terminal close
-        disown $APP_PID
+        log_success "Python app stopped"
     else
-        log_error "App failed to start - check app logs"
-        tail -20 "$APP_LOG_FILE"
-        exit 1
+        log_warning "No running Python app found"
     fi
 else
-    log_error "Virtual environment not found at $VENV_PATH"
-    exit 1
+    log_success "No changes requiring restart - app remains running"
 fi
 
-# After app starts, go back to project root
-cd /root/projects/jsys
+# 8️⃣ START PYTHON APP (only if restart needed)
+if [ "$RESTART_NEEDED" = true ]; then
+    section "STEP 8: Starting Python app in background"
+    cd pig_ops/webroot
+    
+    VENV_PATH="/root/projects/jsys/.venv"
+    
+    if [ -f "$VENV_PATH/bin/activate" ]; then
+        echo "Activating virtual environment..."
+        source "$VENV_PATH/bin/activate"
+        
+        mkdir -p logs
+        APP_LOG_FILE="logs/app_$(date +%Y%m%d_%H%M%S).log"
+        
+        echo "Starting app with nohup..."
+        echo "App log file: $APP_LOG_FILE"
+        
+        nohup "$VENV_PATH/bin/python" pig_ops_web.py > "$APP_LOG_FILE" 2>&1 &
+        APP_PID=$!
+        
+        deactivate 2>/dev/null || true
+        sleep 3
+        
+        if kill -0 $APP_PID 2>/dev/null; then
+            log_success "App started with PID: $APP_PID"
+            echo "  📝 App logs: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
+            echo $APP_PID > /root/projects/jsys/app.pid
+            echo "  💾 PID saved"
+            
+            echo "  🔍 Health check (waiting 10 seconds)..."
+            sleep 10
+            if curl -s http://localhost:8000 > /dev/null 2>&1; then
+                log_success "App is responding"
+            else
+                log_warning "App started but not responding - check logs"
+                tail -20 "$APP_LOG_FILE" | sed 's/^/       /'
+            fi
+            
+            disown $APP_PID
+        else
+            log_error "App failed to start"
+            tail -20 "$APP_LOG_FILE"
+            exit 1
+        fi
+    else
+        log_error "Virtual environment not found"
+        exit 1
+    fi
+    
+    cd /root/projects/jsys
+else
+    log_success "No restart needed - app continues running"
+fi
 
-# 8️⃣ MANAGE LOGS
-section "STEP 8: Managing logs"
+# 9️⃣ MANAGE LOGS (always run)
+section "STEP 9: Managing logs"
 if [ -f "pig_ops/webroot/scripts/manage_logs.py" ]; then
     cd pig_ops/webroot/scripts
     python3 manage_logs.py
@@ -305,37 +319,32 @@ else
     log_warning "manage_logs.py not found - skipping log management"
 fi
 
-# 9️⃣ SUMMARY
+# 🔟 SUMMARY
 section "✅ DEPLOYMENT COMPLETE"
 echo -e "${GREEN}Started at: $(date)${NC}"
 echo -e "${GREEN}Completed at: $(date)${NC}"
 echo ""
 echo "📊 Summary:"
-echo "  • Frontend: Updated from Bitbucket"
-echo "  • Frontend JS: Built with versioning"
-echo "  • Backend: Updated from Bitbucket"
-echo "  • Templates: Minified"
-echo "  • App: Running in background (PID: $APP_PID)"
+echo "  • Frontend changes: $FRONTEND_CHANGED"
+echo "  • Frontend build: $BUILD_NEEDED"
+echo "  • Backend changes: $BACKEND_CHANGED"
+echo "  • Restart performed: $RESTART_NEEDED"
+if [ "$RESTART_NEEDED" = true ]; then
+    echo "  • App PID: $APP_PID"
+else
+    echo "  • App: Already running (no changes)"
+fi
 echo ""
 echo "📝 Deployment Logs:"
-echo "  • This deployment log: $DEPLOY_LOG_FILE"
-echo "  • Latest log symlink: $LATEST_LOG_LINK"
-echo "  • View with: cat $LATEST_LOG_LINK"
+echo "  • This log: $DEPLOY_LOG_FILE"
+echo "  • Latest: $LATEST_LOG_LINK"
 echo ""
-echo "📝 App Logs:"
-echo "  • Current app log: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
-echo "  • View with: tail -f /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
-echo ""
-echo "📝 Useful commands:"
-echo "  • Check app status:     ps aux | grep python"
-echo "  • View deployment history: ls -la $DEPLOY_LOG_DIR"
-echo "  • Stop app manually:    pkill -f pig_ops_web.py"
-echo "  • Run this script:      ./deploy.sh"
-echo ""
-echo -e "${GREEN}🐷 SuperPig is now live!${NC}"
 
-# Record final status in log
-echo ""
+# Record final status
+echo "" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
 echo "✅ Deployment completed at $(date)" >> "$DEPLOY_LOG_FILE"
+echo "   Frontend changed: $FRONTEND_CHANGED" >> "$DEPLOY_LOG_FILE"
+echo "   Backend changed: $BACKEND_CHANGED" >> "$DEPLOY_LOG_FILE"
+echo "   Restart needed: $RESTART_NEEDED" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
