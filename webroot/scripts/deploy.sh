@@ -76,6 +76,9 @@ BACKEND_CHANGED=false
 BUILD_NEEDED=false
 RESTART_NEEDED=false
 
+# Store app log file path for summary
+APP_LOG_FILE=""
+
 # 1️⃣ CHANGE TO PROJECT ROOT
 section "STEP 1: Changing to project root"
 cd /root/projects/jsys
@@ -289,7 +292,6 @@ if [ "$RESTART_NEEDED" = true ]; then
                 log_success "App is responding"
             else
                 log_warning "App started but not responding - check logs"
-                tail -20 "$APP_LOG_FILE" | sed 's/^/       /'
             fi
             
             disown $APP_PID
@@ -319,7 +321,42 @@ else
     log_warning "manage_logs.py not found - skipping log management"
 fi
 
-# 🔟 SUMMARY
+# 🔟 SHOW APP LOG PREVIEW (always show if app is running)
+section "STEP 10: App Log Preview"
+if [ -n "$APP_LOG_FILE" ] && [ -f "pig_ops/webroot/$APP_LOG_FILE" ]; then
+    echo "📋 Last 20 lines of app log ($APP_LOG_FILE):"
+    echo "----------------------------------------"
+    tail -20 "pig_ops/webroot/$APP_LOG_FILE" | sed 's/^/   /'
+    echo "----------------------------------------"
+    echo ""
+    echo "🔍 To follow logs in real-time:"
+    echo "   tail -f /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
+elif [ -f "pig_ops/webroot/logs/current.log" ]; then
+    # Fallback to current.log symlink if exists
+    echo "📋 Last 20 lines of current app log:"
+    echo "----------------------------------------"
+    tail -20 "pig_ops/webroot/logs/current.log" 2>/dev/null | sed 's/^/   /' || echo "   No logs available"
+    echo "----------------------------------------"
+    echo ""
+    echo "🔍 To follow logs in real-time:"
+    echo "   tail -f /root/projects/jsys/pig_ops/webroot/logs/current.log"
+else
+    # Try to find the most recent log file
+    LATEST_LOG=$(ls -t /root/projects/jsys/pig_ops/webroot/logs/app_*.log 2>/dev/null | head -1)
+    if [ -n "$LATEST_LOG" ]; then
+        echo "📋 Last 20 lines of most recent log ($(basename "$LATEST_LOG")):"
+        echo "----------------------------------------"
+        tail -20 "$LATEST_LOG" | sed 's/^/   /'
+        echo "----------------------------------------"
+        echo ""
+        echo "🔍 To follow logs in real-time:"
+        echo "   tail -f $LATEST_LOG"
+    else
+        echo "   No app logs found"
+    fi
+fi
+
+# 1️⃣1️⃣ SUMMARY
 section "✅ DEPLOYMENT COMPLETE"
 echo -e "${GREEN}Started at: $(date)${NC}"
 echo -e "${GREEN}Completed at: $(date)${NC}"
@@ -331,16 +368,28 @@ echo "  • Backend changes: $BACKEND_CHANGED"
 echo "  • Restart performed: $RESTART_NEEDED"
 if [ "$RESTART_NEEDED" = true ]; then
     echo "  • App PID: $APP_PID"
+    echo "  • App log: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
 else
     echo "  • App: Already running (no changes)"
+    # Find current app PID
+    CURRENT_PID=$(pgrep -f "python.*pig_ops_web.py" | head -1)
+    if [ -n "$CURRENT_PID" ]; then
+        echo "  • App PID: $CURRENT_PID"
+    fi
 fi
 echo ""
 echo "📝 Deployment Logs:"
 echo "  • This log: $DEPLOY_LOG_FILE"
 echo "  • Latest: $LATEST_LOG_LINK"
 echo ""
+echo "📝 Quick Commands:"
+echo "  • Follow app log:    tail -f /root/projects/jsys/pig_ops/webroot/logs/current.log"
+echo "  • Check app status:  ps aux | grep python"
+echo "  • Stop app:          pkill -f pig_ops_web.py"
+echo "  • Deploy again:      ./deploy.sh"
+echo ""
 
-# Record final status
+# Record final status in log
 echo "" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
 echo "✅ Deployment completed at $(date)" >> "$DEPLOY_LOG_FILE"
