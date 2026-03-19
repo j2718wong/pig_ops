@@ -135,6 +135,54 @@ else
     exit 1
 fi
 
+# ===== NEW: BUILD FRONTEND JS BUNDLES =====
+section "STEP 3.5: Building frontend JS bundles"
+if [ -d "pig_ops_ui_mob" ]; then
+    cd pig_ops_ui_mob
+    
+    # Activate virtual environment for Python dependencies (csscompressor)
+    source /root/projects/jsys/.venv/bin/activate 2>/dev/null || true
+    
+    # Check if build.py exists
+    if [ -f "build.py" ]; then
+        echo "Found build.py, building JavaScript bundles..."
+        
+        # Install CSS compressor if needed (quietly)
+        pip install csscompressor > /dev/null 2>&1 || true
+        
+        # Build with versioning (production mode)
+        echo "Running: python build.py --version"
+        python build.py --version
+        
+        # Check if build was successful
+        if [ $? -eq 0 ]; then
+            log_success "Frontend JS bundles built successfully"
+            
+            # Show the generated files
+            echo ""
+            echo "📦 Generated files in static/js/:"
+            ls -la static/js/ | grep -E "bundle.*\.min\.js|manifest\.json" | sed 's/^/   /'
+            
+            echo ""
+            echo "📦 Generated files in static/css/:"
+            ls -la static/css/ 2>/dev/null | grep -E "main.*\.min\.css|manifest\.json" | sed 's/^/   /' || echo "   No CSS files found"
+        else
+            log_error "Frontend build failed!"
+            exit 1
+        fi
+    else
+        log_warning "build.py not found in pig_ops_ui_mob - skipping JS build"
+    fi
+    
+    # Deactivate virtual environment
+    deactivate 2>/dev/null || true
+    
+    # Go back to project root
+    cd /root/projects/jsys
+else
+    log_warning "pig_ops_ui_mob directory not found - skipping JS build"
+fi
+
 # 4️⃣ RESTORE TEMPLATES BEFORE PIG_OPS PULL
 section "STEP 4: Restoring templates from backup (if exists)"
 if [ -d "pig_ops/webroot/templates_backup" ]; then
@@ -266,6 +314,7 @@ echo -e "${GREEN}Completed at: $(date)${NC}"
 echo ""
 echo "📊 Summary:"
 echo "  • Frontend: Updated from Bitbucket"
+echo "  • Frontend JS: Built with versioning"
 echo "  • Backend: Updated from Bitbucket"
 echo "  • Templates: Minified"
 echo "  • App: Running in background (PID: $APP_PID)"
