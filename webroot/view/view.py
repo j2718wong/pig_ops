@@ -59,9 +59,6 @@ view_names = [
         ]
 
 
-
-           
-
 class View:
     def __init__(self, controller):
         controller.set_view(self)

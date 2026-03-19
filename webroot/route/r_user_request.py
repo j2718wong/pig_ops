@@ -23,15 +23,26 @@ from common_fast_api        import *
 import data_model           as dm
 
 
-FLAG_BIT_USER_IS_ACTIVE                 = 1
-FLAG_BIT_USER_EMAIL_VERIFIED            = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import (check_if_valid_user_account,
+                                    get_user_account_info)
+
+from r_utils                import (replace_plain_ids_user_account,
+                                    remove_database_null_description)
+                                    
+from r_user                 import create_access_token
 
 
     
 @app.get("/user_request/join_account", tags=["User"])
-async def user_request_join_account(request: Request, ahid:str = None):
+async def user_request_join_account(request: Request, code:str = None):
     
     result = get_uhid_or_redirect(request)
     
@@ -56,28 +67,29 @@ async def user_request_join_account(request: Request, ahid:str = None):
     user_id = res[0]
     
     
-    res = hashids_account.decrypt(ahid)
+    res = hashids_access_code.decrypt(code)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_USER_REQUEST_INVALID_ACCOUNT_HASHID'
+                'num':  ERROR_USER_REQUEST_INVALID_ACCESS_CODE,
+                'code': 'ERROR_USER_REQUEST_INVALID_ACCESS_CODE'
             }
         }
     
-    account_id = res[0]
+    access_code_id = res[0]
+    
     
     
     
     data = {
-        'account_id':       account_id,
+        'access_code_id':   access_code_id,
         'user_id':          user_id
     }
     
     
-    res_add    =  model['user_req'].join_account(data)
+    res_join    =  model['user_req'].join_account(data)
     
-    if res_add is None:
+    if res_join is None:
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
@@ -85,33 +97,43 @@ async def user_request_join_account(request: Request, ahid:str = None):
             }
         }
     
-    user_req_id         = res_add['user_request']['id']
-    user_req_status_id  = res_add['user_request']['status_id']
-      
-    # Replace Plain Id
-    cur_id              = user_req_id
-    cur_hid             = hashids_common.encrypt(cur_id)
     
-    # remove plain id
-    del res_add['user_request']['id']
-    res_add['user_request']['hid'] = cur_hid
+    # Check if user has an account_id already
+    if res_join['user']['account_id'] > 0:
+        # Already has account
+        
+        
+        # Get user_id and account info
+        data_user_account = get_user_account_info(user_id)
+                
+                
+        # Replace the user block
+        del res_join['user']
+        
+        
+        # With this block
+        res_join['user_account'] = data_user_account
+        replace_plain_ids_user_account(data_user_account)
 
-
-    result_num      = res_add['result']['num']
+        
+        # Create JWT token
+        user_hid = data_user_account['user']['user']['hid']
+        access_token = create_access_token(data={"uhid": user_hid})
+        
+        
+        res_join['bearer_token'] = access_token
+        
+        remove_database_null_description(res_join)
+        
+        return res_join
     
-    if result_num == 0:
-        # Get account admin emails
-        account_admins = model['account'].get_list_account_admin(account_id)
-        
-        print('\n\nACcount admins; account_id = %s' % account_id)
-        pprint.pprint(account_admins)
-        
-        
-        # TODO send email notification to account_admins
-        
-        # TODO send email to user
-        
-    return res_add
+    
+    del res_join['user']
+    remove_database_null_description(res_join)
+    
+    return res_join
+    
+    
     
 
 @app.post("/user_request/approve_join_acc", tags=["Account Details"])

@@ -13,20 +13,19 @@ class UserRequest:
     def join_account(self, data = None):
         """
         PROCEDURE user_request_join_account(
-            in_account_id               INT,
-            in_user_id                  INT
-            
+            in_access_code_id           INT,
+            in_requesting_user_id       INT          
         )
         """
         
-        account_id      = data['account_id']
+        access_code_id  = data['access_code_id']
         user_id         = data['user_id']
                 
-        values = (user_id, account_id)
         
         sql =  'CALL user_request_join_account('
-        sql += '%s,'    % account_id
+        sql += '%s,'    % access_code_id
         sql += '%s);'   % user_id
+        
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -62,9 +61,9 @@ class UserRequest:
                     'desc':             row[2],
                 },
                 
-                'user_request': {
-                    'id':               row[3],
-                    'status_id':        row[4]
+                'user': {
+                    'account_id':       row[3],
+                    'email':            row[4]
                 }
             }
 
