@@ -14,6 +14,127 @@ from common_app             import *
 from common_fast_api        import *
 
 
+# utils/browser_detector.py
+import re
+from typing import Dict, Tuple, Optional
+
+
+class BrowserDetector:
+    """Detect browser, OS, device and webview from User-Agent"""
+    
+    @staticmethod
+    def parse_user_agent(user_agent: str) -> Dict:
+        """Parse User-Agent string to get browser, OS, device info"""
+        ua = user_agent.lower()
+        result = {
+            'browser': 'unknown',
+            'browser_version': None,
+            'os': 'unknown',
+            'os_version': None,
+            'device': 'unknown',
+            'device_type': 'desktop',
+            'is_mobile': False,
+            'is_webview': False,
+            'webview_platform': None,
+            'user_agent': user_agent[:500]  # Truncate for storage
+        }
+        
+        # Detect browser
+        if 'firefox' in ua:
+            result['browser'] = 'firefox'
+            version = re.search(r'firefox/(\d+)', ua)
+            if version:
+                result['browser_version'] = version.group(1)
+        elif 'edg' in ua:
+            result['browser'] = 'edge'
+            version = re.search(r'edg/(\d+)', ua)
+            if version:
+                result['browser_version'] = version.group(1)
+        elif 'chrome' in ua and not 'edg' in ua:
+            result['browser'] = 'chrome'
+            version = re.search(r'chrome/(\d+)', ua)
+            if version:
+                result['browser_version'] = version.group(1)
+        elif 'safari' in ua and not 'chrome' in ua:
+            result['browser'] = 'safari'
+            version = re.search(r'safari/(\d+)', ua)
+            if version:
+                result['browser_version'] = version.group(1)
+        
+        # Detect OS
+        if 'windows' in ua:
+            result['os'] = 'windows'
+            version = re.search(r'windows nt (\d+\.\d+)', ua)
+            if version:
+                result['os_version'] = version.group(1)
+        elif 'mac os' in ua:
+            result['os'] = 'macos'
+            version = re.search(r'mac os x (\d+[._]\d+)', ua)
+            if version:
+                result['os_version'] = version.group(1).replace('_', '.')
+        elif 'android' in ua:
+            result['os'] = 'android'
+            result['is_mobile'] = True
+            version = re.search(r'android (\d+\.?\d*)', ua)
+            if version:
+                result['os_version'] = version.group(1)
+        elif 'ios' in ua or 'iphone' in ua or 'ipad' in ua:
+            result['os'] = 'ios'
+            result['is_mobile'] = True
+            version = re.search(r'os (\d+[._]\d+)', ua)
+            if version:
+                result['os_version'] = version.group(1).replace('_', '.')
+        
+        # Detect device type
+        if 'mobile' in ua:
+            result['device_type'] = 'mobile'
+        elif 'tablet' in ua or 'ipad' in ua:
+            result['device_type'] = 'tablet'
+        
+        # Detect specific device
+        if 'iphone' in ua:
+            result['device'] = 'iphone'
+        elif 'ipad' in ua:
+            result['device'] = 'ipad'
+        elif 'android' in ua:
+            if 'mobile' in ua:
+                result['device'] = 'android_phone'
+            else:
+                result['device'] = 'android_tablet'
+        
+        # WebView detection
+        webview_patterns = {
+            'facebook': ['fban', 'fbav', 'fbsv', 'fb_iab', 'fb4a'],
+            'instagram': ['instagram', 'ig_iab'],
+            'twitter': ['twitter', 'tweet', 'tw_iab'],
+            'tiktok': ['tiktok', 'musically'],
+            'snapchat': ['snapchat'],
+            'line': ['line', 'line/'],
+            'wechat': ['wechat', 'micromessenger'],
+            'messenger': ['messenger']
+        }
+        
+        for platform, patterns in webview_patterns.items():
+            for pattern in patterns:
+                if pattern in ua:
+                    result['is_webview'] = True
+                    result['webview_platform'] = platform
+                    break
+        
+        # Generic webview indicators
+        if not result['is_webview']:
+            generic = ['webview', 'wv', 'appbrowser']
+            for g in generic:
+                if g in ua:
+                    result['is_webview'] = True
+                    result['webview_platform'] = 'generic'
+                    break
+        
+        return result
+
+
+
+
 def remove_database_null_description(database_result):
     if 'desc' in database_result['result']:
         if database_result['result']['desc'] is not None:

@@ -65,6 +65,21 @@ class DataUserLogin(BaseModel):
     login_country_name:     str | None  = None
     login_city:             str | None  = None 
     login_region:           str | None  = None
+    
+    
+    
+    is_mobile:              int = None
+    is_webview:             int = None
+    
+    browser:                str = None
+    browser_version:        str = None
+    webview_platform:       str = None
+    os:                     str = None
+    os_version:             str = None
+    device:                 str = None
+    device_type:            str = None
+
+
 
 
 class DataUserEmailVerify(BaseModel):

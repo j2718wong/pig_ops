@@ -200,6 +200,12 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         }
     
     
+    # Get user_id is tehre is any
+    user_id = None
+    if 'user' in res_register:
+        user_id = res_register['user']['id']
+    
+    
     
     # Check if user is unverified
     if 'user_unverified' in res_register:
@@ -248,6 +254,7 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         msg_body    = template.get_email_body(verification_code, expiry_minutes)
         
         user_email  = user_data.email
+        print('\n\nAbout to send verification email to: %s' % user_email)
         
         background_tasks.add_task(send_email, user_email, subject, msg_body)
         

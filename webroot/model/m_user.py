@@ -396,7 +396,18 @@ class User:
             
             in_viewport_width       INT,
             in_viewport_height      INT,
-            in_ip_address           VARCHAR(24)            
+            in_ip_address           VARCHAR(24),
+            
+            in_is_mobile            INT,
+            in_is_webview           INT,
+            
+            in_browser              VARCHAR(50),
+            in_browser_version      VARCHAR(20),
+            in_webview_platform     VARCHAR(30),
+            in_os                   VARCHAR(50),
+            in_os_version           VARCHAR(20),
+            in_device               VARCHAR(50),
+            in_device_type          VARCHAR(20)            
         )    
         """
         
@@ -477,12 +488,62 @@ class User:
         else:
             sql += 'NULL,'
         
-        
             
         if data.ip_address and len(data.ip_address) > 0:
-            sql += '"%s");'  % data.ip_address
+            sql += '"%s",'  % data.ip_address
+        else:
+            sql += 'NULL,'
+        
+        
+        
+        if data.is_mobile is not None:
+            sql += '%s,'  % data.is_mobile
+        else:
+            sql += 'NULL,'
+        
+        if data.is_webview is not None:
+            sql += '%s,'  % data.is_webview
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.browser and len(data.browser) > 0:
+            sql += '"%s",'  % data.browser
+        else:
+            sql += 'NULL,'
+        
+        if data.browser_version and len(data.browser_version) > 0:
+            sql += '"%s",'  % data.browser_version
+        else:
+            sql += 'NULL,'
+        
+        if data.webview_platform and len(data.webview_platform) > 0:
+            sql += '"%s",'  % data.webview_platform
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.os and len(data.os) > 0:
+            sql += '"%s",'  % data.os
+        else:
+            sql += 'NULL,'
+        
+        if data.os_version and len(data.os_version) > 0:
+            sql += '"%s",'  % data.os_version
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.device and len(data.device) > 0:
+            sql += '"%s",'  % data.device
+        else:
+            sql += 'NULL,'
+        
+        if data.device_type and len(data.device_type) > 0:
+            sql += '"%s");'  % data.device_type
         else:
             sql += 'NULL);'
+        
         
             
         print('\n\nsql')
