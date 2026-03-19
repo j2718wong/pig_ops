@@ -379,7 +379,7 @@ class User:
             in_login_social_media_id INT,
             in_social_media_user_id VARCHAR(120),
             
-            in_acc_access_grant_id  INT,
+            in_acc_access_code_id  INT,
             
 
             in_name                 VARCHAR(80),
@@ -416,8 +416,8 @@ class User:
             sql += 'NULL,'
 
             
-        if data.access_grant_id is not None and data.access_grant_id > 0:
-            sql += '%s,'  % data.access_grant_id
+        if data.access_code_id is not None and data.access_code_id > 0:
+            sql += '%s,'  % data.access_code_id
         else:
             sql += 'NULL,'
 
@@ -517,6 +517,7 @@ class User:
 
         if row is not None:
             cur_user_id                 = row[3]
+            cur_user_account_id         = row[4]
             cur_user_unverified_id      = row[6]
             
             cur_entry =  {
@@ -528,7 +529,7 @@ class User:
                 
                 'user': {
                     'id':               cur_user_id,
-                    'account_id':       row[4],
+                    'account_id':       cur_user_account_id,
                     'flag':             row[5]
                 },
                 
@@ -545,6 +546,9 @@ class User:
 
             if cur_user_id == 0:
                 del cur_entry['user']
+                
+            if cur_user_account_id > 0 and cur_user_account_id > 0:
+                del cur_entry['user_unverified']
 
             
             """

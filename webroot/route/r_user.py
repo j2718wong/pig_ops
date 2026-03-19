@@ -166,8 +166,30 @@ async def user_verify_token(request: Request):
 async def user_register_or_login(background_tasks: BackgroundTasks, 
         user_data: dm.DataUserLogin):
 
+    access_code_id = None
+    
+    access_code_hid        = user_data.access_code_hid
+
+    if access_code_hid is not None:
+        res = hashids_access_code.decrypt(access_code_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_USER_REQUEST_INVALID_ACCESS_CODE,
+                    'code': 'ERROR_USER_REQUEST_INVALID_ACCESS_CODE'
+                }
+            }
+        
+        access_code_id = res[0]
+        
+        user_data.access_code_id = access_code_id
+         
+
 
     res_register =  model['user'].register_or_login(user_data)
+    
+    print('res_register')
+    pprint.pprint(res_register)
     
     if res_register is None:
         return {
@@ -177,10 +199,6 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
             }
         }
     
-    
-    user_id = None
-    if 'user' in res_register:
-        user_id = res_register['user']['id']
     
     
     # Check if user is unverified

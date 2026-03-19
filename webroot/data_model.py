@@ -44,7 +44,7 @@ class HasContactDetails:
 
 
 class DataUserLogin(BaseModel):
-    access_grant_hid:       str = None
+    access_code_hid:        str = None
     
     email:                  str = None
     
@@ -56,7 +56,7 @@ class DataUserLogin(BaseModel):
     viewport_height:        int = None
     ip_address:             str = None
 
-    access_grant_id:        int = None
+    access_code_id:         int = None
 
     login_social_media_id:  int = 0
     social_media_user_id:   str = None
