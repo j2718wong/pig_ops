@@ -106,11 +106,10 @@ class DataAccount(BaseModel):
 
 class DataAccountAccessCode(BaseModel):
     uhid:                   str = None
-    usergroup_hid:          str = None
     access_code_hid:        str = None
     
     user_id:                int = 0
-    usergroup_id:           int = 0
+    group_num:              int = 0
     access_code_id:         int = 0
     
 

@@ -13,17 +13,18 @@ class AccountAccessCode:
 
     def add(self, data = None):
         """
-        PROCEDURE account_access_code(
+        PROCEDURE account_access_code_add(
             in_user_id              INT,
             
-            in_user_group_id        INT
+            in_user_group_num       INT
         )  
         """
         
-        sql =  'CALL account_access_code('
+        sql =  'CALL account_access_code_add('
         sql += '%s,'    % data.user_id
-        sql += '%s);'   % data.user_group_id
+        sql += '%s);'   % data.group_num
         
+        print(sql)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
@@ -215,7 +216,6 @@ class AccountAccessCode:
         sql =   """
                 SELECT 
                     a.id,
-                    a.user_group_id,
                     b.group_num,
                     
                     c.name_last,
@@ -225,9 +225,9 @@ class AccountAccessCode:
                     d.name_first,
                     
                     
-                    e.dt_entry
+                    a.dt_entry
                 FROM account_access_code a
-                LEFT OUTER JOIN user_group b    ON a.user_group.id = b.id
+                LEFT OUTER JOIN user_group b    ON a.user_group_id = b.id
                 LEFT OUTER JOIN user c          ON a.used_by_user_id = c.id
                 LEFT OUTER JOIN user d          ON a.issued_by_user_id = d.id
                 %s
@@ -267,7 +267,7 @@ class AccountAccessCode:
         if rows is not None:
             
             for row in rows:
-                name_last =    row[3]
+                name_last =    row[2]
                 
                     
                 cur_entry = {
@@ -275,22 +275,21 @@ class AccountAccessCode:
                     'access_code': {
                         'id':               row[0],
                         'user_group':{  
-                            'id':           row[1],
-                            'number':       row[2]
+                            'number':       row[1]
                         },
                         
                         'used_by_user':{
                             'name_last':    name_last,
-                            'name_first':   row[4]
+                            'name_first':   row[3]
                         },
                         
-                        'dt_entry':         str(row[5])
+                        'dt_entry':         str(row[6])
                     }
                 }
                 
                 
                 if name_last is None:
-                    del cur_entry['used_by_user']
+                    del cur_entry['access_code']['used_by_user']
                     
                 result.append(cur_entry)
         

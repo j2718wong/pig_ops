@@ -46,8 +46,6 @@ async def account_access_code_add(request: Request, data: dm.DataAccountAccessCo
     
     uhid = result
     
-    
-    name    = data.name
     #uhid    = data.uhid
     
     
@@ -64,21 +62,6 @@ async def account_access_code_add(request: Request, data: dm.DataAccountAccessCo
     
     
     
-    user_group_hid = data.user_group_hid
-    res = hashids_common.decrypt(user_group_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_ACCOUNT_ACCESS_CODE_INVALID_USERGROUP_HASHID,
-                'code': 'ERROR_ACCOUNT_ACCESS_CODE_INVALID_USERGROUP_HASHID'
-            }
-        }
-    
-    user_group_id = res[0]
-    
-    
-    
-    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -91,7 +74,6 @@ async def account_access_code_add(request: Request, data: dm.DataAccountAccessCo
 
 
     data.user_id            = user_id
-    data.user_group_id      = user_group_id
 
     
     res_add    =  model['access_code'].add(data)
@@ -217,7 +199,7 @@ async def account_access_code_update(request: Request, data: dm.DataAccountAcces
     return res_update
     
 
-@app.get("/account_access_code/delete", tags=["Account"])
+@app.get("/access_code/delete", tags=["Account"])
 async def account_access_code_delete(request: Request, ehid: str):
     result = get_uhid_or_redirect(request)
     
@@ -350,17 +332,11 @@ async def account_access_code_list(request: Request, ahid: str):
         cur_entry['access_code']['hid']   = cur_hid
         
         
-        cur_id  = cur_entry['access_code']['user_group']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['access_code']['user_group']['id']
-        cur_entry['access_code']['user_group']['hid']   = cur_hid
         
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

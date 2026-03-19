@@ -23,6 +23,12 @@ def remove_database_null_description(database_result):
             del database_result['result']['desc']
 
 
+    if controller.is_prod_envi == True:
+        if database_result['result']['num'] == 0:
+            del database_result['result']['code']
+
+
+
 def check_if_valid_user_account(user_id):
     res_user = model['user'].get_user_account_info(user_id)
     
