@@ -2,53 +2,37 @@
 <html>
 
 <head>
-    <meta http-equiv="content-type"             content="text/html; charset=utf-8"/>
-    <meta http-equiv="cache-control"            content="no-cache">
-    <meta name="description"                    content="J Systems"/>
-    <meta name="keywords"                       content="Pig production analytics"/>
-    <meta name="author"                         content="J Systems"/>
-    <meta name="viewport"                       content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type"   content="text/html; charset=utf-8"/>
+    <meta http-equiv="cache-control"  content="no-cache">
+    <meta name="description"          content="J Systems"/>
+    <meta name="keywords"             content="Pig production analytics"/>
+    <meta name="author"               content="J Systems"/>
+    <meta name="viewport"             content="width=device-width, initial-scale=1.0">
     
 
     <title>SuperPig - Pig Farm Management System</title>
-
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐷</text></svg>">
-    
-    
-    
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/all.min.css"/>
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/bootstrap.min.css"/>
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/bootstrap-datepicker.min.css"/>
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/bootstrap-icons.css">
-    
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/css2.css"/>
-    <link type="text/css"       rel="stylesheet"    href="/static_m/css/main.css"/>
-    
+    <link type="text/css" rel="stylesheet" href="/static_m/css/all.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static_m/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static_m/css/bootstrap-datepicker.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static_m/css/bootstrap-icons.css">
+{% for css in css_files %}
+    <link type="text/css" rel="stylesheet" href="{{ css }}"/>   
+{% endfor %}    
 
-    
-    
     
     <script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
     <script type = "text/javascript" src="/static_m/js/jquery/jquery-ui.min-1.14.1.js"></script>
     <script type = "text/javascript" src="/static_m/js/library/bootstrap.bundle.min.js"></script>
     <script type = "text/javascript" src="/static_m/js/library/bootstrap-datepicker.min.js"></script>
 
-
-
 {% for script in js_app_text %}
-    <!-- Production: regular script with bundled code -->
     <script type="text/javascript" src="{{ script }}"></script>    
 {% endfor %}
 
-
 {% for script in js_app_modules %}
-    <!-- Development: use module type for ES6 imports -->
     <script type="module" src="{{ script }}"></script>    
 {% endfor %}
-
-
-
-
 </head>
 
 

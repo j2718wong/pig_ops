@@ -84,8 +84,9 @@ class ViewBase:
         
         self.manifest_path = dir_static + '/js/manifest.json'
         self.default_manifest = {
-            'login': 'bundle.min.js',
-            'core': 'bundle.core.min.js'
+            'login':    'bundle.min.js',
+            'core':     'bundle.core.min.js',
+            'main_css': 'main.min.css'  # Default CSS fallback
         }
         
         self.is_dev = False
@@ -93,6 +94,8 @@ class ViewBase:
         if self.controller.is_prod_envi == False:
             self.is_dev = True
       
+    
+    
     
     def get_js_files(self, page_type='core'):
         """
@@ -171,7 +174,42 @@ class ViewBase:
             'core': 'bundle.core.min.js'
         }
     
-
+    
+    def get_css_manifest(self):
+        """Get CSS manifest - separate for CSS versioning"""
+        try:
+            if os.path.exists(self.css_manifest_path):
+                with open(self.css_manifest_path, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Error reading CSS manifest: {e}")
+        
+        # Fallback defaults
+        return {
+            'main_css': 'main.min.css'
+        }
+    
+    
+    def get_css_files(self):
+        """
+        Return appropriate CSS files based on environment
+        Returns list of CSS files to include
+        """
+        if self.is_dev:
+            # DEVELOPMENT: Return original CSS for debugging
+            return ["/static_m/css/main.css"]
+        else:
+            # PRODUCTION: Return versioned/minified CSS
+            if self.controller.use_minified_js > 0:
+                manifest = self.get_css_manifest()
+                css_file = manifest.get('main_css', self.default_manifest['main_css'])
+                return [f"/static/css/{css_file}"]
+            else:
+                # Override to use unminified CSS
+                return ["/static_m/css/main.css"]
+    
+    
+    
 
 class SignUp(ViewBase):
     def render(self, page_data = None):
@@ -261,12 +299,15 @@ class Root(ViewBase):
             # Get appropriate JS files based on environment
             files = self.get_js_files('core')
             
+            css_files = self.get_css_files()
+            
             
             # These should have type= text/javascript
             js_lib  = []
             
                 
             data    = { 'page_data':        None,
+                        'css_files':        css_files,
                         'js_lib':           js_lib,
                         'js_app_text':      files['text'],
                         'js_app_modules':   files['module']}
