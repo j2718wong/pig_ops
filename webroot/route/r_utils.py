@@ -27,16 +27,16 @@ class BrowserDetector:
         """Parse User-Agent string to get browser, OS, device info"""
         ua = user_agent.lower()
         result = {
-            'browser': 'unknown',
-            'browser_version': None,
-            'os': 'unknown',
-            'os_version': None,
-            'device': 'unknown',
-            'device_type': 'desktop',
-            'is_mobile': False,
-            'is_webview': False,
+            'browser':          'unknown',
+            'browser_version':  None,
+            'os':               'unknown',
+            'os_version':       None,
+            'device':           'unknown',
+            'device_type':      'desktop',
+            'is_mobile':        False,
+            'is_webview':       False,
             'webview_platform': None,
-            'user_agent': user_agent[:500]  # Truncate for storage
+            'user_agent':       user_agent[:500]  # Truncate for storage
         }
         
         # Detect browser
@@ -130,8 +130,56 @@ class BrowserDetector:
                     result['webview_platform'] = 'generic'
                     break
         
+        
+        # Set string limits
+        if len(result['browser']) > 50:
+            result['browser'] = result['browser'][0:50]
+        
+        if result['browser_version'] is not None and len(result['browser_version']) > 20:
+            result['browser_version'] = result['browser_version'][0:20]
+        
+        if result['webview_platform'] is not None and len(result['webview_platform']) > 30:
+            result['webview_platform'] = result['webview_platform'][0:30]
+        
+        if len(result['os']) > 50:
+            result['os'] = result['os'][0:50]
+        
+        if result['os_version'] is not None and len(result['os_version']) > 20:
+            result['os_version'] = result['os_version'][0:20]
+        
+        if len(result['device']) > 50:
+            result['device'] = result['device'][0:50]
+        
+        if len(result['device_type']) > 20:
+            result['device_type'] = result['device_type'][0:20]
+        
+        
         return result
 
+
+
+from fastapi                import Request
+
+
+def get_browser_info(request: Request) -> dict:
+    """FastAPI dependency to get browser info from request"""
+    
+    # Get User-Agent
+    user_agent = request.headers.get('user-agent', '')
+    
+    # Parse browser info
+    browser_info = BrowserDetector.parse_user_agent(user_agent)
+    
+    # Add request-specific info
+    browser_info['ip_address'] = request.client.host
+    
+    # Get forwarded IP if behind proxy
+    forwarded = request.headers.get('x-forwarded-for')
+    if forwarded:
+        browser_info['ip_address'] = forwarded.split(',')[0].strip()
+    
+    
+    return browser_info
 
 
 

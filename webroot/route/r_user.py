@@ -40,7 +40,8 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import replace_plain_ids_user_account
+from r_utils                import (replace_plain_ids_user_account,
+                                    get_browser_info)
 
 from r_a0_security_checks   import (check_if_valid_user_account,
                                     get_user_account_info)
@@ -163,7 +164,8 @@ async def user_verify_token(request: Request):
 
 
 @app.post("/user/register_or_login", tags=["User"])
-async def user_register_or_login(background_tasks: BackgroundTasks, 
+async def user_register_or_login(request: Request,
+        background_tasks: BackgroundTasks, 
         user_data: dm.DataUserLogin):
 
     access_code_id = None
@@ -184,8 +186,23 @@ async def user_register_or_login(background_tasks: BackgroundTasks,
         
         user_data.access_code_id = access_code_id
          
-
-
+         
+    # Get browser info 
+    browser_info                = get_browser_info(request)
+    
+    user_data.is_mobile         = 1 if browser_info['is_mobile'] else 0
+    user_data.is_webview        = 1 if browser_info['is_webview'] else 0
+    user_data.browser           = browser_info['browser']
+    user_data.browser_version   = browser_info['browser_version']
+    user_data.webview_platform  = browser_info['webview_platform']
+    
+    user_data.os                = browser_info['os']
+    user_data.os_version        = browser_info['os_version']
+    user_data.device            = browser_info['device']
+    user_data.device_type       = browser_info['device_type'] 
+    user_data.ip_address        = browser_info['ip_address']
+    
+    
     res_register =  model['user'].register_or_login(user_data)
     
     print('res_register')
@@ -513,13 +530,21 @@ async def user_login_social(request: Request, user_data: dm.DataUserLogin):
         )
     
     
-    # record client ip
-    client_host = request.client.host
     
-    # should port also be recorded?
+    # Get browser info 
+    browser_info                = get_browser_info(request)
     
-    user_data.ip_address = client_host 
+    user_data.is_mobile         = 1 if browser_info['is_mobile'] else 0
+    user_data.is_webview        = 1 if browser_info['is_webview'] else 0
+    user_data.browser           = browser_info['browser']
+    user_data.browser_version   = browser_info['browser_version']
+    user_data.webview_platform  = browser_info['webview_platform']
     
+    user_data.os                = browser_info['os']
+    user_data.os_version        = browser_info['os_version']
+    user_data.device            = browser_info['device']
+    user_data.device_type       = browser_info['device_type'] 
+    user_data.ip_address        = browser_info['ip_address']
     
     
     res_login = model['user'].register_or_login(user_data)
@@ -788,10 +813,11 @@ async def google_callback(
             
             
             # Get client info
-            client_host         = request.client.host
-            viewport_width      = request.cookies.get('viewport_width', 0)
-            viewport_height     = request.cookies.get('viewport_height', 0)
+            viewport_width              = request.cookies.get('viewport_width', 0)
+            viewport_height             = request.cookies.get('viewport_height', 0)
+            ip_address                  = request.client.host
             
+
             
             # Create user data
             user_data = dm.DataUserLogin(
@@ -802,7 +828,7 @@ async def google_callback(
                 
                 viewport_width          = viewport_width,
                 viewport_height         = viewport_height,
-                ip_address              = client_host,
+                ip_address              = ip_address, 
                 
                 login_social_media_id   = SOCIAL_MEDIA_GOOGLE,
                 login_country_code      = None,
@@ -919,6 +945,7 @@ async def google_login(request: Request):
 
 @app.post("/api/auth/google")
 async def google_auth(request: Request, token_data: dm.GoogleToken):
+    print('\n\ngoogle_auth')
     
     user_info = None
     
@@ -975,10 +1002,23 @@ async def google_auth(request: Request, token_data: dm.GoogleToken):
     
     user_picture    = user_info['picture']
     
-    # record client ip
-    client_host = request.client.host
     
-    # should port also be recorded?
+    # Get browser info 
+    browser_info                = get_browser_info(request)
+    
+    user_data.is_mobile         = 1 if browser_info['is_mobile'] else 0
+    user_data.is_webview        = 1 if browser_info['is_webview'] else 0
+    user_data.browser           = browser_info['browser']
+    user_data.browser_version   = browser_info['browser_version']
+    user_data.webview_platform  = browser_info['webview_platform']
+    
+    user_data.os                = browser_info['os']
+    user_data.os_version        = browser_info['os_version']
+    user_data.device            = browser_info['device']
+    user_data.device_type       = browser_info['device_type'] 
+    user_data.ip_address        = browser_info['ip_address']
+
+    
     
     
     # This will create account or login
@@ -991,14 +1031,27 @@ async def google_auth(request: Request, token_data: dm.GoogleToken):
         
         viewport_width          = token_data.viewport_width, 
         viewport_height         = token_data.viewport_height,
-        ip_address              = client_host,     
+    
     
         login_social_media_id   = SOCIAL_MEDIA_GOOGLE,
         
         login_country_code      = token_data.login_country_code,
         login_country_name      = token_data.login_country_name,
         login_city              = token_data.login_city,
-        login_region            = token_data.login_region      
+        login_region            = token_data.login_region,
+                
+                
+        is_mobile               = user_data.is_mobile,
+        is_webview              = user_data.is_webview,      
+        browser                 = user_data.browser,         
+        browser_version         = user_data.browser_version, 
+        webview_platform        = user_data.webview_platform,
+                                
+        os                      = user_data.os,              
+        os_version              = user_data.os_version,      
+        device                  = user_data.device,          
+        device_type             = user_data.device_type,     
+        ip_address              = user_data.ip_address
     )
     
     

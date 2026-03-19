@@ -380,7 +380,8 @@ class User:
             in_social_media_user_id VARCHAR(120),
             
             in_acc_access_code_id  INT,
-            
+            in_acc_access_code      VARCHAR(10),
+
 
             in_name                 VARCHAR(80),
             in_name_last            VARCHAR(50),
@@ -432,7 +433,12 @@ class User:
         else:
             sql += 'NULL,'
 
-            
+        if data.access_code_hid is not None:
+            sql += '"%s",'  % data.access_code_hid
+        else:
+            sql += 'NULL,'
+    
+        
             
         
         if data.name and len(data.name) > 0:
