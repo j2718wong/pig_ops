@@ -15,25 +15,76 @@ NC='\033[0m' # No Color
 # 🔑 SSH setup for Git (no passphrase prompts)
 export GIT_SSH_COMMAND="ssh -i /root/.ssh/deploy_key -o IdentitiesOnly=yes"
 
+# ============= DEPLOYMENT LOGGING SETUP =============
+DEPLOY_LOG_DIR="/root/projects/jsys/deploy_logs"
+mkdir -p "$DEPLOY_LOG_DIR"
+
+# Create log filename with timestamp (YYYY-MM-DD_HHMMSS)
+TIMESTAMP=$(date +"%Y-%m-%d_%H%M%S")
+DEPLOY_LOG_FILE="$DEPLOY_LOG_DIR/deploy_$TIMESTAMP.log"
+
+# Also create a symlink to latest log for easy access
+LATEST_LOG_LINK="$DEPLOY_LOG_DIR/latest.log"
+
+# Function to log messages to both console and log file
+log_message() {
+    echo -e "$1" | tee -a "$DEPLOY_LOG_FILE"
+}
+
+# Function to log section headers
+log_section() {
+    log_message ""
+    log_message "${YELLOW}▶ $1${NC}"
+    log_message "----------------------------------------"
+}
+
+# Function to log success/failure
+log_success() {
+    log_message "${GREEN}  ✅ $1${NC}"
+}
+
+log_error() {
+    log_message "${RED}  ❌ $1${NC}"
+}
+
+log_warning() {
+    log_message "${YELLOW}  ⚠️  $1${NC}"
+}
+
+# Start logging
+{
+    echo "========================================"
+    echo "🐷 SuperPig Deployment Log - $TIMESTAMP"
+    echo "========================================"
+    echo ""
+} >> "$DEPLOY_LOG_FILE"
+
+# Create symlink to this deployment as latest
+ln -sf "$DEPLOY_LOG_FILE" "$LATEST_LOG_LINK"
+
+# Redirect all output to both console and log file
+# This ensures EVERYTHING gets logged
+exec > >(tee -a "$DEPLOY_LOG_FILE") 2>&1
+# ===================================================
+
 echo -e "${BLUE}================================${NC}"
 echo -e "${GREEN}🐷 SuperPig Deployment Script${NC}"
 echo -e "${BLUE}================================${NC}"
 echo "Started at: $(date)"
+echo "Deployment log: $DEPLOY_LOG_FILE"
 echo ""
 
-# Function to print section headers
+# Override section function to use logging
 section() {
-    echo ""
-    echo -e "${YELLOW}▶ $1${NC}"
-    echo "----------------------------------------"
+    log_section "$1"
 }
 
-# Function to check if last command succeeded
+# Override check_success function to use logging
 check_success() {
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}  ✅ $1${NC}"
+        log_success "$1"
     else
-        echo -e "${RED}  ❌ $1${NC}"
+        log_error "$1"
         exit 1
     fi
 }
@@ -47,6 +98,15 @@ PIDS=$(pgrep -f "python.*pig_ops_web.py" || true)
 if [ -n "$PIDS" ]; then
     echo "Found PIDs: $PIDS"
     kill $PIDS 2>/dev/null || true
+    sleep 2
+    # Check if still running and force kill if needed
+    if pgrep -f "python.*pig_ops_web.py" > /dev/null; then
+        echo "Process still running, force killing..."
+        pkill -9 -f "python.*pig_ops_web.py" || true
+    fi
+    log_success "Python app stopped"
+else
+    log_warning "No running Python app found"
 fi
 
 # 2️⃣ CHANGE TO PROJECT ROOT
@@ -71,7 +131,7 @@ if [ -d "pig_ops_ui_mob" ]; then
     # Go back to project root
     cd /root/projects/jsys
 else
-    echo -e "${RED}❌ pig_ops_ui_mob directory not found!${NC}"
+    log_error "pig_ops_ui_mob directory not found!"
     exit 1
 fi
 
@@ -87,7 +147,7 @@ if [ -d "pig_ops/webroot/templates_backup" ]; then
     cp pig_ops/webroot/templates_backup/*.html pig_ops/webroot/templates/ 2>/dev/null || true
     check_success "Templates restored from backup"
 else
-    echo -e "${YELLOW}⚠️  No templates backup found - skipping restore${NC}"
+    log_warning "No templates backup found - skipping restore"
 fi
 
 # 5️⃣ GIT PULL IN PIG_OPS (Backend)
@@ -106,7 +166,7 @@ if [ -d "pig_ops" ]; then
     # Go back to project root
     cd /root/projects/jsys
 else
-    echo -e "${RED}❌ pig_ops directory not found!${NC}"
+    log_error "pig_ops directory not found!"
     exit 1
 fi
 
@@ -118,7 +178,7 @@ if [ -f "pig_ops/webroot/scripts/minify_templates.py" ]; then
     check_success "Templates minified"
     cd /root/projects/jsys
 else
-    echo -e "${YELLOW}⚠️  Minify script not found - skipping minification${NC}"
+    log_warning "Minify script not found - skipping minification"
     echo "Expected at: pig_ops/webroot/scripts/minify_templates.py"
 fi
 
@@ -136,14 +196,14 @@ if [ -f "$VENV_PATH/bin/activate" ]; then
     # Create logs directory if it doesn't exist
     mkdir -p logs
     
-    # Get current date for log file
-    LOG_FILE="logs/app_$(date +%Y%m%d_%H%M%S).log"
+    # Get current date for app log file (separate from deploy log)
+    APP_LOG_FILE="logs/app_$(date +%Y%m%d_%H%M%S).log"
     
     echo "Starting app with nohup..."
-    echo "Log file: $LOG_FILE"
+    echo "App log file: $APP_LOG_FILE"
     
     # Use nohup to run in background with venv python
-    nohup "$VENV_PATH/bin/python" pig_ops_web.py > "$LOG_FILE" 2>&1 &
+    nohup "$VENV_PATH/bin/python" pig_ops_web.py > "$APP_LOG_FILE" 2>&1 &
     APP_PID=$!
     
     # Deactivate venv (doesn't affect running process)
@@ -154,64 +214,50 @@ if [ -f "$VENV_PATH/bin/activate" ]; then
     
     # Check if process is still running
     if kill -0 $APP_PID 2>/dev/null; then
-        echo -e "${GREEN}  ✅ App started with PID: $APP_PID${NC}"
-        echo "  📝 Logs: /root/projects/jsys/pig_ops/webroot/$LOG_FILE"
+        log_success "App started with PID: $APP_PID"
+        echo "  📝 App logs: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
         
         # Save PID to file
         echo $APP_PID > /root/projects/jsys/app.pid
         echo "  💾 PID saved to /root/projects/jsys/app.pid"
         
-        # Quick health check
-        echo "  🔍 Performing health check..."
-        sleep 2
+        # Quick health check - wait longer for app to initialize
+        echo "  🔍 Performing health check (waiting 10 seconds)..."
+        sleep 10
         if curl -s http://localhost:8000 > /dev/null 2>&1; then
-            echo -e "${GREEN}  ✅ App is responding${NC}"
+            log_success "App is responding"
         else
-            echo -e "${YELLOW}  ⚠️  App started but not responding - check logs:${NC}"
-            echo "     tail -f $LOG_FILE"
+            log_warning "App started but not responding - check app logs:"
+            echo "     tail -f $APP_LOG_FILE"
+            echo "     Last 20 lines of app log:"
+            tail -20 "$APP_LOG_FILE" | sed 's/^/       /'
         fi
         
         # Disown the process so it survives terminal close
         disown $APP_PID
     else
-        echo -e "${RED}  ❌ App failed to start - check logs${NC}"
-        tail -20 "$LOG_FILE"
+        log_error "App failed to start - check app logs"
+        tail -20 "$APP_LOG_FILE"
         exit 1
     fi
 else
-    echo -e "${RED}  ❌ Virtual environment not found at $VENV_PATH${NC}"
+    log_error "Virtual environment not found at $VENV_PATH"
     exit 1
-fi
-
-
-# Save PID to file
-echo $APP_PID > /root/projects/jsys/app.pid
-echo "  💾 PID saved to /root/projects/jsys/app.pid"
-
-# Quick health check
-echo "  🔍 Performing health check..."
-sleep 5
-if curl -s http://localhost:8000 > /dev/null 2>&1; then
-    echo -e "${GREEN}  ✅ App is responding${NC}"
-else
-    echo -e "${YELLOW}  ⚠️  App started but not responding - check logs:${NC}"
-    echo "     tail -f /root/projects/jsys/pig_ops/webroot/$LOG_FILE"
 fi
 
 # After app starts, go back to project root
 cd /root/projects/jsys
 
-
-# 8️⃣ After starting the app, add:
+# 8️⃣ MANAGE LOGS
+section "STEP 8: Managing logs"
 if [ -f "pig_ops/webroot/scripts/manage_logs.py" ]; then
     cd pig_ops/webroot/scripts
     python3 manage_logs.py
     check_success "Logs managed"
     cd /root/projects/jsys
 else
-    echo -e "${YELLOW}⚠️  manage_logs.py not found - skipping log management${NC}"
+    log_warning "manage_logs.py not found - skipping log management"
 fi
-
 
 # 9️⃣ SUMMARY
 section "✅ DEPLOYMENT COMPLETE"
@@ -224,10 +270,25 @@ echo "  • Backend: Updated from Bitbucket"
 echo "  • Templates: Minified"
 echo "  • App: Running in background (PID: $APP_PID)"
 echo ""
+echo "📝 Deployment Logs:"
+echo "  • This deployment log: $DEPLOY_LOG_FILE"
+echo "  • Latest log symlink: $LATEST_LOG_LINK"
+echo "  • View with: cat $LATEST_LOG_LINK"
+echo ""
+echo "📝 App Logs:"
+echo "  • Current app log: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
+echo "  • View with: tail -f /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
+echo ""
 echo "📝 Useful commands:"
 echo "  • Check app status:     ps aux | grep python"
-echo "  • View logs:            tail -f ~/projects/jsys/pig_ops/webroot/$LOG_FILE"
+echo "  • View deployment history: ls -la $DEPLOY_LOG_DIR"
 echo "  • Stop app manually:    pkill -f pig_ops_web.py"
 echo "  • Run this script:      ./deploy.sh"
 echo ""
 echo -e "${GREEN}🐷 SuperPig is now live!${NC}"
+
+# Record final status in log
+echo ""
+echo "========================================" >> "$DEPLOY_LOG_FILE"
+echo "✅ Deployment completed at $(date)" >> "$DEPLOY_LOG_FILE"
+echo "========================================" >> "$DEPLOY_LOG_FILE"
