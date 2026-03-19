@@ -82,8 +82,9 @@ class ViewBase:
         self.view = view
         self.controller = view.controller
         
-        self.manifest_path = dir_static + '/js/manifest.json'
-        self.default_manifest = {
+        self.manifest_path      = dir_static + '/js/manifest.json'
+        self.css_manifest_path  = dir_static + '/css/manifest.json'
+        self.default_manifest   = {
             'login':    'bundle.min.js',
             'core':     'bundle.core.min.js',
             'main_css': 'main.min.css'  # Default CSS fallback

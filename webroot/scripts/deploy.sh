@@ -147,8 +147,6 @@ if [ -d "pig_ops_ui_mob" ]; then
     if [ -f "build.py" ]; then
         echo "Found build.py, building JavaScript bundles..."
         
-        # Install CSS compressor if needed (quietly)
-        pip install csscompressor > /dev/null 2>&1 || true
         
         # Build with versioning (production mode)
         echo "Running: python build.py --version"
