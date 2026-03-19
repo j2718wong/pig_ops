@@ -286,6 +286,12 @@ if [ "$RESTART_NEEDED" = true ]; then
             echo $APP_PID > /root/projects/jsys/app.pid
             echo "  💾 PID saved"
             
+            # 🔗 CREATE SYMLINK TO CURRENT APP LOG (FIX)
+            cd logs
+            ln -sf "$(basename "$APP_LOG_FILE")" current.log
+            cd ..
+            echo "  🔗 Created symlink: logs/current.log -> $APP_LOG_FILE"
+            
             echo "  🔍 Health check (waiting 10 seconds)..."
             sleep 10
             if curl -s http://localhost:8000 > /dev/null 2>&1; then
@@ -330,7 +336,7 @@ if [ -n "$APP_LOG_FILE" ] && [ -f "pig_ops/webroot/$APP_LOG_FILE" ]; then
     echo "----------------------------------------"
     echo ""
     echo "🔍 To follow logs in real-time:"
-    echo "   tail -f /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
+    echo "   tail -f /root/projects/jsys/pig_ops/webroot/logs/current.log"
 elif [ -f "pig_ops/webroot/logs/current.log" ]; then
     # Fallback to current.log symlink if exists
     echo "📋 Last 20 lines of current app log:"
@@ -369,6 +375,7 @@ echo "  • Restart performed: $RESTART_NEEDED"
 if [ "$RESTART_NEEDED" = true ]; then
     echo "  • App PID: $APP_PID"
     echo "  • App log: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
+    echo "  • App log symlink: logs/current.log"
 else
     echo "  • App: Already running (no changes)"
     # Find current app PID
