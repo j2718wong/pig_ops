@@ -792,7 +792,7 @@ class SowBoar:
                         a.data_ver_num_medvac,
                         a.data_ver_num_health_notes,
                         a.data_ver_num_output,
-                        a.data_ver_num_mates
+                        a.data_ver_num_mates,
                         
                         
                         j.name_last,
