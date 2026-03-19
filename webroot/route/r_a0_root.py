@@ -91,24 +91,21 @@ async def pig_farm_data(request: Request):
     
     uhid = result
     
-    
-    time_init = time.time()
-    
-    
-    # Get the current logged in user;
-    # This should be read from a token
-    # If not logged in, redirect to HOME_PAGE_USER_NOT_LOGGED_IN
-    
-    user_id = 0
-    
+
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         # redirect to PAGE_NOT_FOUND
         raise HTTPException(status_code=401, detail="Invalid token")
-
-
         
     user_id = res[0]
+    
+    
+    pig_farm_data = get_farm_data(user_id)
+    return pig_farm_data
+    
+    
+def get_farm_data(user_id):
+    time_init = time.time()
     
     data_app = get_application_data()
     
@@ -189,6 +186,35 @@ async def pig_farm_data(request: Request):
         
         'data': data
     }
+    
+
+@app.post("/pig_farm/data")
+async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        # redirect to PAGE_NOT_FOUND
+        raise HTTPException(status_code=401, detail="Invalid token")
+        
+    user_id = res[0]
+    
+    pig_farm_data = get_farm_data(user_id)
+    
+    
+    # Update user_login
+    model['user'].update_login(user_id, user_data)
+    
+    
+    return pig_farm_data
     
 
 

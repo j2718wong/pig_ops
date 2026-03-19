@@ -630,6 +630,175 @@ class User:
         return None
 
 
+    def update_login(self, user_id, data = None):
+        """
+        PROCEDURE user_update_login(
+            in_user_id              INT,
+            
+            
+            in_login_country_code   VARCHAR(3),  /* This should be in upper case*/
+            in_login_country_name   VARCHAR(50),
+            in_login_city           VARCHAR(50), /* This should be in upper case*/
+            in_login_region         VARCHAR(50), /* This should be in upper case*/
+            
+            
+            in_viewport_width       INT,
+            in_viewport_height      INT,
+            in_ip_address           VARCHAR(24),
+            
+            in_is_mobile            INT,
+            in_is_webview           INT,
+            
+            in_browser              VARCHAR(50),
+            in_browser_version      VARCHAR(20),
+            in_webview_platform     VARCHAR(30),
+            in_os                   VARCHAR(50),
+            in_os_version           VARCHAR(20),
+            in_device               VARCHAR(50),
+            in_device_type          VARCHAR(20)
+                
+        )    
+        """
+        
+        
+        
+        sql =  'CALL user_update_login('
+        
+        sql += '%s,'  % user_id
+        
+        if data.login_country_code is not None:
+            sql += '"%s",'  % data.login_country_code
+        else:
+            sql += 'NULL,'
+            
+        if data.login_country_name is not None:
+            sql += '"%s",'  % data.login_country_name
+        else:
+            sql += 'NULL,'
+        
+        if data.login_city is not None:
+            sql += '"%s",'  % data.login_city
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.login_region is not None:
+            sql += '"%s",'  % data.login_region
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.viewport_width and data.viewport_width > 0:
+            sql += '%s,'  % data.viewport_width
+        else:
+            sql += 'NULL,'
+        
+        if data.viewport_height and data.viewport_height > 0:
+            sql += '%s,'  % data.viewport_height
+        else:
+            sql += 'NULL,'
+        
+            
+        if data.ip_address and len(data.ip_address) > 0:
+            sql += '"%s",'  % data.ip_address
+        else:
+            sql += 'NULL,'
+        
+        
+        
+        if data.is_mobile is not None:
+            sql += '%s,'  % data.is_mobile
+        else:
+            sql += 'NULL,'
+        
+        if data.is_webview is not None:
+            sql += '%s,'  % data.is_webview
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.browser and len(data.browser) > 0:
+            sql += '"%s",'  % data.browser
+        else:
+            sql += 'NULL,'
+        
+        if data.browser_version and len(data.browser_version) > 0:
+            sql += '"%s",'  % data.browser_version
+        else:
+            sql += 'NULL,'
+        
+        if data.webview_platform and len(data.webview_platform) > 0:
+            sql += '"%s",'  % data.webview_platform
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.os and len(data.os) > 0:
+            sql += '"%s",'  % data.os
+        else:
+            sql += 'NULL,'
+        
+        if data.os_version and len(data.os_version) > 0:
+            sql += '"%s",'  % data.os_version
+        else:
+            sql += 'NULL,'
+        
+        
+        if data.device and len(data.device) > 0:
+            sql += '"%s",'  % data.device
+        else:
+            sql += 'NULL,'
+        
+        if data.device_type and len(data.device_type) > 0:
+            sql += '"%s");'  % data.device_type
+        else:
+            sql += 'NULL);'
+        
+        
+            
+        print('\n\nsql')
+        print(sql)
+        
+        
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        row = None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            row = cursor.fetchone()
+            cursor.close()
+
+        except Exception as e:
+            msg = 'update_login(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            row = None
+
+        if row is not None:
+            
+
+            return {
+                'user_login_id': row[0]
+            }
+
+
+        return None
+
+
+
+
     def user_verify_email(self, data = None):
         """
         PROCEDURE user_verify_email(
