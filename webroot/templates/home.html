@@ -27,7 +27,7 @@
 
         :root {
             --corporate-blue: #1e3a8a;
-            --corporate-blue-company: #1877F0;
+            --corporate-blue-company: #1877F2;
             --corporate-blue-dark: #15467d;
             --corporate-blue-light: #4a8adb;
             --corporate-blue-border: #dbeafe;
@@ -97,6 +97,7 @@
         /* Desktop navigation buttons */
         .nav-buttons {
             display: flex;
+            align-items: center;
             gap: 0.75rem;
         }
 
@@ -225,24 +226,6 @@
             color: white;
         }
 
-        .mobile-menu .menu-links {
-            margin-top: 1rem;
-            flex: 1;
-        }
-
-        .mobile-menu .menu-links a {
-            display: block;
-            padding: 0.75rem 0;
-            color: var(--text-dark);
-            text-decoration: none;
-            border-bottom: 1px solid var(--blue-border);
-            font-weight: 500;
-        }
-
-        .mobile-menu .menu-links a:last-child {
-            border-bottom: none;
-        }
-
         /* Main content */
         .main-content {
             padding-top: 60px;
@@ -315,33 +298,31 @@
             position: relative;
         }
 
-        /* Carousel - Fix for horizontal scrolling */
         .carousel {
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            scrollbar-width: none; /* Hide scrollbar Firefox */
-            -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
-            gap: 0; /* Remove gap between items */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            gap: 0;
             padding: 0;
             margin: 0;
             width: 100%;
         }
 
         .carousel::-webkit-scrollbar {
-            display: none; /* Hide scrollbar Chrome/Safari */
+            display: none;
         }
 
         .carousel-item {
-            flex: 0 0 100%; /* Each item takes full width */
+            flex: 0 0 100%;
             scroll-snap-align: start;
             width: 100%;
             box-sizing: border-box;
             cursor: pointer;
         }
 
-        /* Ensure images don't break layout */
         .carousel-image {
             width: 100%;
             height: 400px;
@@ -361,7 +342,6 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-
         .carousel-caption {
             padding: 1rem 1rem 1.5rem 1rem;
             text-align: center;
@@ -380,7 +360,6 @@
             margin: 0;
         }
 
-        /* Simple dot indicators */
         .carousel-indicators {
             display: flex;
             justify-content: center;
@@ -394,6 +373,7 @@
             border-radius: 50%;
             background: var(--blue-border);
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .indicator.active {
@@ -497,6 +477,26 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.95rem;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ccc;
+            color: #1e3a8a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .fb-footer {
+            margin: 15px 0;
         }
 
         .footer-links {
@@ -683,7 +683,7 @@
             justify-content: center;
             gap: 8px;
             z-index: 2001;
-            pointer-events: none; /* Prevents interference with modal content */
+            pointer-events: none;
         }
 
         .modal-indicator {
@@ -693,12 +693,18 @@
             background-color: rgba(255, 255, 255, 0.5);
             transition: all 0.2s;
             cursor: pointer;
-            pointer-events: auto; /* Allows clicking on indicators */
+            pointer-events: auto;
         }
 
         .modal-indicator.active {
             background-color: white;
             transform: scale(1.3);
+        }
+
+        /* Mobile Facebook Like Button */
+        .mobile-fb-like {
+            margin-bottom: 1rem;
+            text-align: center;
         }
 
         @media (max-width: 480px) {
@@ -784,6 +790,7 @@
     </style>
 </head>
 <body>
+    
     <!-- Fixed Top Section -->
     <div class="fixed-top">
         <div class="nav-container">
@@ -792,8 +799,17 @@
                 <div class="product-name">SuperPig</div>
             </div>
             
-            <!-- Desktop buttons -->
+            <!-- Desktop buttons with Facebook Like -->
             <div class="nav-buttons">
+
+                <a href="https://www.facebook.com/superpig.jsysdev" target="_blank" 
+                   style="display: inline-flex; align-items: center; gap: 6px; 
+                          background: #1877F2; color: white; text-decoration: none; 
+                          padding: 6px 12px; border-radius: 40px; font-size: 0.9rem; font-weight: 600;">
+                    <i class="fab fa-facebook"></i>
+                    <span>Like</span>
+                </a>
+                
                 <a href="/login" class="btn btn-login">Login</a>
                 <a href="/signup" class="btn btn-signup">Sign Up</a>
             </div>
@@ -808,7 +824,7 @@
     <!-- Mobile Menu Overlay -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- Mobile Menu -->
+    <!-- Mobile Menu with Facebook Like -->
     <div class="mobile-menu" id="mobileMenu">
         <div class="menu-header">
             <div class="menu-logo">
@@ -820,9 +836,19 @@
             </button>
         </div>
         
+        <!-- Facebook Like Button for Mobile -->
+        <div class="mobile-fb-like">
+            <a href="https://www.facebook.com/superpig.jsysdev" target="_blank" 
+               style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
+                      background: #1877F2; color: white; text-decoration: none; 
+                      padding: 10px; border-radius: 40px; font-weight: 600; width: 100%;">
+                <i class="fab fa-facebook" style="font-size: 18px;"></i>
+                <span>Like us on Facebook</span>
+            </a>
+        </div>
+        
         <a href="/login" class="btn btn-login">Login</a>
         <a href="/signup" class="btn btn-signup">Sign Up</a>
-        
     </div>
 
     <!-- Main Content -->
@@ -912,38 +938,31 @@
         <section class="highlights-section">
             <h2 class="section-title">Why Choose SuperPig?</h2>
             <div class="highlights-list">
-                <!-- Highlight 1 -->
                 <div class="highlight-item">
                     <strong>All Your Pig Production Data in One Place</strong>
                     <p>Centralized platform for all your farm data - from breeding to harvest, accessible anytime, anywhere.</p>
                 </div>
 
-                <!-- Highlight 2 -->
                 <div class="highlight-item">
                     <strong>Complete Data Management</strong>
                     <p>From pig breeding stocks, gestation, lactation, fattening, harvest, feeds, financials and more - all seamlessly integrated.</p>
                 </div>
 
-                <!-- Highlight 3 -->
                 <div class="highlight-item">
                     <strong>Collaborative Data Management</strong>
                     <p>Seamless collaboration between farm management and staff. Farm Staff, managers and owners can input and track pig farm data in real-time.</p>
-                    
                 </div>
 
-                <!-- Highlight 4 -->
                 <div class="highlight-item">
                     <strong>No More Missed Vaccinations & Operations</strong>
                     <p>Automated reminders for vaccinations, farrowing, weaning, and other important pig operations.</p>
                 </div>
 
-                <!-- Highlight 5 -->
                 <div class="highlight-item">
                     <strong>AI-Powered Analytics</strong>
                     <p>Smart algorithms estimate your feed needs at any given time, predict harvest dates, and optimize your production cycle.</p>
                 </div>
 
-                <!-- Highlight 6 -->
                 <div class="highlight-item">
                     <strong>Financial Insights</strong>
                     <p>Track costs, revenues, and profitability per batch, per farm, or across your entire operation.</p>
@@ -958,12 +977,28 @@
             <a href="/signup" class="btn-primary">Get Started Today →</a>
         </section>
 
-        <!-- Footer -->
+        <!-- Footer with Facebook Like and Share -->
         <div class="footer-border">
             <div class="legal-footer">
+                <!-- Website Link with Copy Button -->
                 <div class="website-link">
                     <i class="fas fa-globe"></i>
                     <a href="https://superpig.jsysdev.com">superpig.jsysdev.com</a>
+                    <button class="copy-btn" onclick="copyWebsiteLink(this)">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                
+                <!-- Facebook Like Button in Footer -->
+                <div class="fb-footer">
+                    <a href="https://www.facebook.com/superpig.jsysdev" target="_blank" 
+                       style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
+                              background: #1877F2; color: white; text-decoration: none; 
+                              padding: 8px 20px; border-radius: 40px; font-weight: 500;">
+                        <i class="fab fa-facebook"></i>
+                        <span>Like us on Facebook</span>
+                        <i class="fas fa-thumbs-up"></i>
+                    </a>
                 </div>
                 
                 <div class="footer-links">
@@ -987,15 +1022,9 @@
         const bearer_token = localStorage.getItem('access_token');
         
         if (bearer_token) {
-            // We're on the homepage ("/") but have a token
-            // We need to request the authenticated version of "/"
-            
             console.log('Token found, requesting authenticated homepage...');
-            
-            // Show loading state (optional)
             document.body.style.opacity = '0.5';
             
-            // Request the authenticated version of "/"
             fetch('/', {
                 method: 'GET',
                 headers: {
@@ -1005,13 +1034,10 @@
             })
             .then(response => {
                 if (response.ok) {
-                    // Success - token is valid, get the authenticated HTML
                     return response.text();
                 } else if (response.status === 401) {
-                    // Token invalid or expired
                     console.log('Token invalid/expired');
                     localStorage.removeItem('access_token');
-                    // Stay on public homepage
                     document.body.style.opacity = '1';
                     throw new Error('Unauthorized');
                 } else {
@@ -1019,7 +1045,6 @@
                 }
             })
             .then(html => {
-                // Replace the entire page with authenticated dashboard HTML
                 document.open();
                 document.write(html);
                 document.close();
@@ -1027,12 +1052,46 @@
             .catch(error => {
                 console.error('Auth error:', error);
                 document.body.style.opacity = '1';
-                // Stay on public homepage
             });
         } else {
             console.log('No token, showing public homepage');
         }
         
+        // Copy website link function
+        function copyWebsiteLink(button) {
+            const link = 'https://superpig.jsysdev.com';
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = link;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    button.style.backgroundColor = '#4CAF50';
+                    button.style.color = 'white';
+                    button.style.borderColor = '#4CAF50';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalHTML;
+                        button.style.backgroundColor = 'transparent';
+                        button.style.color = '#1e3a8a';
+                        button.style.borderColor = '#ccc';
+                    }, 2000);
+                } else {
+                    alert('Please manually copy: ' + link);
+                }
+            } catch (err) {
+                alert('Please manually copy: ' + link);
+            }
+            
+            document.body.removeChild(textarea);
+        }
         
         // Mobile menu toggle
         const menuToggle = document.getElementById('menuToggle');
@@ -1060,7 +1119,6 @@
         const carousel = document.getElementById('carousel');
         const indicators = document.querySelectorAll('.indicator');
 
-        // Update active indicator on scroll
         function updateIndicators() {
             const scrollPosition = carousel.scrollLeft;
             const itemWidth = carousel.clientWidth;
@@ -1071,7 +1129,6 @@
             });
         }
 
-        // Scroll to specific item when dot is clicked
         function scrollToItem(index) {
             const itemWidth = carousel.clientWidth;
             carousel.scrollTo({
@@ -1080,12 +1137,10 @@
             });
         }
 
-        // Add click handlers to indicators
         indicators.forEach((indicator, index) => {
             indicator.addEventListener('click', () => scrollToItem(index));
         });
 
-        // Auto-scroll carousel - FIXED: Faster and smoother
         let scrollInterval;
         let autoScrollEnabled = true;
 
@@ -1096,23 +1151,18 @@
                 if (!autoScrollEnabled) return;
                 
                 const itemWidth = carousel.clientWidth;
-                const maxScroll = carousel.scrollWidth - carousel.clientWidth;
                 const currentIndex = Math.round(carousel.scrollLeft / itemWidth);
                 const totalItems = indicators.length;
                 const nextIndex = (currentIndex + 1) % totalItems;
-                
-                // Calculate next scroll position
                 let nextScroll = nextIndex * itemWidth;
                 
-                // Smooth scroll to next item
                 carousel.scrollTo({
                     left: nextScroll,
                     behavior: 'smooth'
                 });
-            }, 2500); // Reduced from 3000ms to 2500ms for faster feel
+            }, 2500);
         }
 
-        // Pause auto-scroll on hover/touch
         function pauseAutoScroll() {
             autoScrollEnabled = false;
         }
@@ -1121,29 +1171,22 @@
             autoScrollEnabled = true;
         }
 
-        // Event listeners for user interaction
         carousel.addEventListener('mouseenter', pauseAutoScroll);
         carousel.addEventListener('mouseleave', resumeAutoScroll);
         carousel.addEventListener('touchstart', pauseAutoScroll);
         carousel.addEventListener('touchend', resumeAutoScroll);
 
-        // Also pause when user manually scrolls
         let scrollTimeout;
         carousel.addEventListener('scroll', () => {
             updateIndicators();
-            
-            // Pause auto-scroll temporarily during manual scroll
             autoScrollEnabled = false;
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 autoScrollEnabled = true;
-            }, 3000); // Resume after 3 seconds of no scrolling
+            }, 3000);
         });
 
-        // Start auto-scroll
         startAutoScroll();
-
-        // Initial update
         setTimeout(updateIndicators, 100);
 
         // Modal functionality
@@ -1157,7 +1200,6 @@
         
         let currentModalIndex = 0;
 
-        // Open modal when clicking carousel item
         carouselItems.forEach((item, index) => {
             item.addEventListener('click', () => {
                 currentModalIndex = index;
@@ -1169,14 +1211,12 @@
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // Scroll to the selected item in modal carousel
             setTimeout(() => {
                 const itemWidth = modalCarousel.clientWidth;
                 modalCarousel.scrollLeft = currentModalIndex * itemWidth;
                 updateModalIndicators();
             }, 50);
             
-            // Pause main carousel auto-scroll
             pauseAutoScroll();
         }
 
@@ -1212,25 +1252,20 @@
             });
         }
 
-        // Modal event listeners
         modalClose.addEventListener('click', closeModal);
-
         modalPrev.addEventListener('click', () => navigateModal(-1));
         modalNext.addEventListener('click', () => navigateModal(1));
 
-        // Close modal when clicking outside content
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeModal();
             }
         });
 
-        // Update modal indicators on scroll
         modalCarousel.addEventListener('scroll', () => {
             updateModalIndicators();
         });
 
-        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (!modal.classList.contains('active')) return;
             
@@ -1243,7 +1278,6 @@
             }
         });
 
-        // Touch events for modal
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -1253,25 +1287,18 @@
 
         modalCarousel.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
             const swipeThreshold = 50;
             const difference = touchStartX - touchEndX;
             
             if (Math.abs(difference) > swipeThreshold) {
                 if (difference > 0) {
-                    // Swipe left - next
                     navigateModal(1);
                 } else {
-                    // Swipe right - previous
                     navigateModal(-1);
                 }
             }
-        }
+        });
 
-        // Click on modal indicators
         modalIndicators.forEach((indicator, index) => {
             indicator.addEventListener('click', () => {
                 const itemWidth = modalCarousel.clientWidth;
@@ -1282,5 +1309,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
