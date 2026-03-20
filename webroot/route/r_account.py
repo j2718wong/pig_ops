@@ -209,6 +209,61 @@ async def account_register(request: Request, account_data: dm.DataAccount):
         
     return res_register
     
+
+@app.get("/user_account", tags=["Account"])
+async def user_account(request: Request):
+    """
+    Will get user_account info
+
+    Parameters
+    ----------
+
+
+    
+    """
+    
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
+            }
+        }
+    
+    
+    user_id = res[0]
+
+
+    # This will return user and account info
+    data_user_account = get_user_account_info(user_id)
+    
+    
+    
+    # Remove not useful data
+    del data_user_account['account']['settings_operations']
+    del data_user_account['account']['account']['current_bill']
+    
+    
+    replace_plain_ids_user_account(data_user_account)
+
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'user_account': data_user_account
+    }
+
     
 @app.post("/account/update", tags=["Account"])
 async def account_update(request: Request, account_data: dm.DataAccount):

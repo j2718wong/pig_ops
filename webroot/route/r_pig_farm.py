@@ -75,8 +75,32 @@ async def pig_farm_add(request: Request, data: dm.DataPigFarm):
     
     user_id = res[0]
     
+    
+    
+    if 'country_hid' in data:
+        country_hid = data['country_hid']
+        
+        res = hashids_common.decrypt(country_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_COUNTRY_HID,
+                    'code': 'ERROR_ADDRESS_COUNTRY_HID'
+                }
+            }
+        
+        country_id = res[0]
+        data.country_id = country_id
+        
+    
+    
+    
     data.name      = name
     data.user_id   = user_id
+    
+    
+    if data.country_id == 0:
+        data.country_id = dm.COUNTRY_ID_PHILIPPINES
     
     
     res_add    =  model['pig_farm'].add(data)

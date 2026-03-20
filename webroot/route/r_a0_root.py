@@ -154,18 +154,27 @@ def get_farm_data(user_id):
     
     pig_farm_id = 0
     
-    # Get use user assigned farm id
+    # Get user assigned farm id
     # This is the first pig_farm id in user.pig_farms
-    user_pig_farms =  user['pig_farms']
+    #
+    # It is possible that the user has user_id, account_id but no farm_ids.
+    # This is because the user did not finish adding a pig farm
+    # in the Add Pig Farm page. Users can do this.
+    user_pig_farms = None
     
-    if len(user_pig_farms) > 0:
+    if 'pig_farms' in user:
+        user_pig_farms =  user['pig_farms']
+    
+    if user_pig_farms is not None and len(user_pig_farms) > 0:
         pig_farm_id = user_pig_farms[0]
     
+    
+    farm_account = None
 
-    
-    farm_account = get_page_data_farm_account_pig_prod(
-        pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
-    
+    if pig_farm_id > 0:    
+        farm_account = get_page_data_farm_account_pig_prod(
+            pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
+        
     
     data = {
         'application':      data_app,

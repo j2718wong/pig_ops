@@ -19,12 +19,14 @@ class GoogleToken(BaseModel):
 
 
 class HasAddressLevel:
+    country_hid:            str = None
+    
     level_1_hid:            str = None
     level_2_hid:            str = None
     level_3_hid:            str = None
     
     
-    country_id:             int = 0
+    country_id:             int = COUNTRY_ID_PHILIPPINES
     
     level_1_id:             int = 0
     level_2_id:             int = 0
