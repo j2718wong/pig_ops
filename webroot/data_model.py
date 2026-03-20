@@ -841,13 +841,13 @@ class DataFeedBalance(BaseModel):
     
     num_pigs:               int = None
     
-    num_gesta:              float = None
-    num_lacta:              float = None
-    num_booster:            float = None
-    num_prestarter:         float = None
-    num_starter:            float = None
-    num_grower:             float = None
-    num_finisher:           float = None
+    num_gesta:              float | None = None
+    num_lacta:              float | None = None
+    num_booster:            float | None = None
+    num_prestarter:         float | None = None
+    num_starter:            float | None = None
+    num_grower:             float | None = None
+    num_finisher:           float | None = None
     
     
 class DataProductionHarvest(BaseModel):

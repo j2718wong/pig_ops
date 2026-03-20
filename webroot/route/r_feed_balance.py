@@ -246,6 +246,20 @@ async def feed_balance_all_add(request: Request):
     uhid = result
     
     
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_BALANCE_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    
     # Checks if user is valid, if account is valid, if account has due bill
     res_check = check_if_valid_user_account(user_id)
 
@@ -271,6 +285,9 @@ async def feed_balance_all_add(request: Request):
     
     # Process the entries
     for entry in entries:
+        print('\n\nentry')
+        print(entry)
+        
         if 'pig_prod_hid' in entry:
             pig_prod_hid = entry['pig_prod_hid']
             feed_balance = entry['feed_balance']
@@ -289,6 +306,7 @@ async def feed_balance_all_add(request: Request):
             pig_prod_id = res[0]
             
             
+            
             # Map the 7-element array to named fields
             gesta       = feed_balance[0]
             lacta       = feed_balance[1]
@@ -300,6 +318,7 @@ async def feed_balance_all_add(request: Request):
             
             
             cur_data = dm.DataFeedBalance(
+                user_id         = user_id,
                 pig_prod_id     = pig_prod_id,
                 date_balance    = date_balance,
                 
@@ -326,7 +345,7 @@ async def feed_balance_all_add(request: Request):
             
         elif 'pig_farm_hid' in entry:
             pig_farm_hid = entry['pig_farm_hid']
-            feed_balance = entry
+            feed_balance = entry['feed_balance']
 
             pig_farm_id  = 0
     
@@ -353,6 +372,7 @@ async def feed_balance_all_add(request: Request):
             
             
             cur_data = dm.DataFeedBalance(
+                user_id         = user_id,
                 pig_farm_id     = pig_farm_id,
                 date_balance    = date_balance,
                 
@@ -379,8 +399,7 @@ async def feed_balance_all_add(request: Request):
 
     return {
         'result':{
-            'num':  ERROR_DATABASE_ERROR,
-            'code': 'ERROR_DATABASE_ERROR'
+            'num':  0
         }
     }
             
