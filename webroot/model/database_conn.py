@@ -399,7 +399,7 @@ class Model:
 
 
     def disconnect_db(self):
-        self.db_#conn.close()
+        self.db_conn.close()
         
         if self.ssh_tunnel is not None:
             try:
