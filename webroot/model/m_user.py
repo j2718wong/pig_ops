@@ -614,7 +614,7 @@ class User:
             if cur_user_id == 0:
                 del cur_entry['user']
                 
-            if cur_user_account_id > 0 and cur_user_account_id > 0:
+            if cur_user_account_id and cur_user_account_id > 0 and cur_user_id > 0:
                 del cur_entry['user_unverified']
 
             
