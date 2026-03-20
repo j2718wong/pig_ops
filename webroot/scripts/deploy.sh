@@ -21,7 +21,7 @@ mkdir -p "$DEPLOY_LOG_DIR"
 # ============= LOG ROTATION: KEEP ONLY LAST 3 =============
 # Delete old deployment logs, keep only the 3 most recent
 if [ -d "$DEPLOY_LOG_DIR" ]; then
-    # Count number of log files
+    # Count number of log files (excluding latest symlink)
     LOG_COUNT=$(ls -1 "$DEPLOY_LOG_DIR"/deploy_*.log 2>/dev/null | wc -l)
     
     if [ "$LOG_COUNT" -gt 3 ]; then
@@ -89,11 +89,13 @@ echo ""
 section() { log_section "$1"; }
 check_success() { if [ $? -eq 0 ]; then log_success "$1"; else log_error "$1"; exit 1; fi; }
 
-# Initialize flags
+# Initialize flags and store commit hashes
 FRONTEND_CHANGED=false
 BACKEND_CHANGED=false
 BUILD_NEEDED=false
 RESTART_NEEDED=false
+FRONTEND_COMMIT=""
+BACKEND_COMMIT=""
 
 # Store app log file path for summary
 APP_LOG_FILE=""
@@ -121,6 +123,7 @@ if [ -d "pig_ops_ui_mob" ]; then
     
     # Get new commit hash after pull
     AFTER_HASH=$(git rev-parse HEAD)
+    FRONTEND_COMMIT="$AFTER_HASH"
     echo "New frontend commit: ${AFTER_HASH:0:7}"
     
     # Check if changes were pulled
@@ -136,6 +139,7 @@ if [ -d "pig_ops_ui_mob" ]; then
         git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
     else
         log_success "No frontend changes detected (already up to date)"
+        FRONTEND_COMMIT="$BEFORE_HASH"
     fi
     
     # Go back to project root
@@ -218,6 +222,7 @@ if [ -d "pig_ops" ]; then
     
     # Get new commit hash after pull
     AFTER_HASH=$(git rev-parse HEAD)
+    BACKEND_COMMIT="$AFTER_HASH"
     echo "New backend commit: ${AFTER_HASH:0:7}"
     
     # Check if changes were pulled
@@ -232,6 +237,7 @@ if [ -d "pig_ops" ]; then
         git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
     else
         log_success "No backend changes detected (already up to date)"
+        BACKEND_COMMIT="$BEFORE_HASH"
     fi
     
     # Go back to project root
@@ -404,6 +410,10 @@ else
     fi
 fi
 echo ""
+echo "📝 Git Commit Hashes:"
+echo "  • Frontend: ${FRONTEND_COMMIT:0:8}"
+echo "  • Backend:  ${BACKEND_COMMIT:0:8}"
+echo ""
 echo "📝 Deployment Logs:"
 echo "  • This log: $DEPLOY_LOG_FILE"
 echo "  • Latest: $LATEST_LOG_LINK"
@@ -422,5 +432,15 @@ echo "========================================" >> "$DEPLOY_LOG_FILE"
 echo "✅ Deployment completed at $(date)" >> "$DEPLOY_LOG_FILE"
 echo "   Frontend changed: $FRONTEND_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Backend changed: $BACKEND_CHANGED" >> "$DEPLOY_LOG_FILE"
+echo "   Frontend commit: ${FRONTEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
+echo "   Backend commit: ${BACKEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
 echo "   Restart needed: $RESTART_NEEDED" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
+
+# Force log rotation by removing any remaining old logs that might have been missed
+# This runs again to ensure only 3 remain
+cd "$DEPLOY_LOG_DIR"
+ls -1t deploy_*.log 2>/dev/null | tail -n +4 | while read old_log; do
+    rm -f "$old_log"
+done
+cd /root/projects/jsys
