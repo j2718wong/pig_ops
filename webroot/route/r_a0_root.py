@@ -33,7 +33,8 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import replace_plain_ids_user_account
+from r_utils                import (replace_plain_ids_user_account,
+                                    get_browser_info)
 
 
 from r_a0_security_checks   import get_user_account_info
@@ -208,6 +209,22 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
     user_id = res[0]
     
     pig_farm_data = get_farm_data(user_id)
+    
+    
+    # Get browser info 
+    browser_info                = get_browser_info(request)
+    
+    user_data.is_mobile         = 1 if browser_info['is_mobile'] else 0
+    user_data.is_webview        = 1 if browser_info['is_webview'] else 0
+    user_data.browser           = browser_info['browser']
+    user_data.browser_version   = browser_info['browser_version']
+    user_data.webview_platform  = browser_info['webview_platform']
+    
+    user_data.os                = browser_info['os']
+    user_data.os_version        = browser_info['os_version']
+    user_data.device            = browser_info['device']
+    user_data.device_type       = browser_info['device_type'] 
+    user_data.ip_address        = browser_info['ip_address']
     
     
     # Update user_login
