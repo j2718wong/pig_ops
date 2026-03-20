@@ -208,7 +208,15 @@ JWT_ALGORITHM = "HS256"
 
 
 # Signin Using Google configuration 
-GOOGLE_CLIENT_ID        = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com"
+
+# This is the first Google Client ID used; working but the problem is cannot
+# create token for sending email using port 443
+# This project is from jsysdev.contact@gmail.com, SuperPig project 
+# GOOGLE_CLIENT_ID        = "466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com"
+
+
+# 2026-03-20: New project created from jsysdev.contact@gmail.com, SuperPig2 project
+GOOGLE_CLIENT_ID        = "528524387884-cgehid63a3k9813421ajctmf280p2o7c.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET    = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI     = '/auth/google/callback'
 
