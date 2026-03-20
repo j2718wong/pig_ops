@@ -18,6 +18,24 @@ export GIT_SSH_COMMAND="ssh -i /root/.ssh/deploy_key -o IdentitiesOnly=yes"
 DEPLOY_LOG_DIR="/root/projects/jsys/deploy_logs"
 mkdir -p "$DEPLOY_LOG_DIR"
 
+# ============= LOG ROTATION: KEEP ONLY LAST 3 =============
+# Delete old deployment logs, keep only the 3 most recent
+if [ -d "$DEPLOY_LOG_DIR" ]; then
+    # Count number of log files
+    LOG_COUNT=$(ls -1 "$DEPLOY_LOG_DIR"/deploy_*.log 2>/dev/null | wc -l)
+    
+    if [ "$LOG_COUNT" -gt 3 ]; then
+        echo "🧹 Cleaning up old deployment logs (keeping last 3)..."
+        # List files by modification time, skip the newest 3, delete the rest
+        ls -1t "$DEPLOY_LOG_DIR"/deploy_*.log 2>/dev/null | tail -n +4 | while read old_log; do
+            echo "   Removing: $(basename "$old_log")"
+            rm -f "$old_log"
+        done
+        echo ""
+    fi
+fi
+# =======================================================
+
 TIMESTAMP=$(date +"%Y-%m-%d_%H%M%S")
 DEPLOY_LOG_FILE="$DEPLOY_LOG_DIR/deploy_$TIMESTAMP.log"
 LATEST_LOG_LINK="$DEPLOY_LOG_DIR/latest.log"
@@ -64,6 +82,7 @@ echo -e "${GREEN}🐷 SuperPig Deployment Script${NC}"
 echo -e "${BLUE}================================${NC}"
 echo "Started at: $(date)"
 echo "Deployment log: $DEPLOY_LOG_FILE"
+echo "Keeping last 3 deployment logs only"
 echo ""
 
 # Override functions for logging
@@ -388,6 +407,7 @@ echo ""
 echo "📝 Deployment Logs:"
 echo "  • This log: $DEPLOY_LOG_FILE"
 echo "  • Latest: $LATEST_LOG_LINK"
+echo "  • Only last 3 logs are kept automatically"
 echo ""
 echo "📝 Quick Commands:"
 echo "  • Follow app log:    tail -f /root/projects/jsys/pig_ops/webroot/logs/current.log"
