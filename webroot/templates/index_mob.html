@@ -606,7 +606,7 @@
                        style="color: #ffffff; text-decoration: none; font-size: 1.3rem; font-weight: 600;">
                         superpig.jsysdev.com
                     </a>
-                    <button onclick="copyWebsiteLink()" 
+                    <button onclick="copyWebsiteLink(this);" 
                             style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; 
                                    padding: 4px 8px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px;">
                         <i class="fas fa-copy"></i> Copy
@@ -753,6 +753,68 @@
             alert('All alerts have been marked as read. The alert counter has been reset.');
         });
         
+        
+        function copyWebsiteLink(button) {
+            const link = 'https://superpig.jsysdev.com';
+            
+            
+            // Check if clipboard API is available
+            if (!navigator.clipboard) {
+                console.log('Clipboard API not available');
+                alert('Please manually copy: ' + link);
+                return;
+            }
+            
+            navigator.clipboard.writeText(link)
+                .then(() => {
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    button.style.borderColor = '#4CAF50';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalHTML;
+                        button.style.borderColor = 'rgba(255,255,255,0.3)';
+                    }, 2000);
+                })
+                .catch((err) => {
+                    console.log('Copy failed:', err);
+                    // Fallback method
+                    fallbackCopyText(link, button);
+                });
+        }
+
+        // Fallback for browsers that block clipboard API
+        function fallbackCopyText(text, button) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    console.log('Fallback copy successful');
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    button.style.borderColor = '#4CAF50';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalHTML;
+                        button.style.borderColor = 'rgba(255,255,255,0.3)';
+                    }, 2000);
+                } else {
+                    console.log('Fallback copy failed');
+                    alert('Please manually copy: ' + text);
+                }
+            } catch (err) {
+                console.log('Fallback error:', err);
+                alert('Please manually copy: ' + text);
+            }
+            
+            document.body.removeChild(textarea);
+        }
         
         
 
