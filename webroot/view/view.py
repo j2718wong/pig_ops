@@ -34,11 +34,6 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-# Include the directory one level up from this script
-sys.path.append(os.path.join(module_directory, '..')) 
-
-
-
 from jinja2             import Environment, FileSystemLoader
 
 from common_fast_api    import dir_static, dir_static_m, get_application_data

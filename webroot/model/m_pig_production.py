@@ -733,40 +733,69 @@ class PigProduction:
         """
         Will get pig_production list.
         
-       
+        Parameters
+        ==========
+        pig_farm_id : int
+            Farm ID to filter by
+            
+        pig_prod_type : int
+            Type of production records to return:
+            1 = Gestating only (status_id = 1) - Pregnant sows
+            2 = Lactating only (status_id = 4) - Sows with piglets
+            3 = Active sows (status_id = 1, 4) - Gestating + Lactating
+            4 = Post-lactation (status_id = 5, 6) - Weaning + Growing
+            5 = All active (status_id = 1, 4, 5, 6) - All non-harvested/closed
+            6 = Completed (status_id = 8, 9) - Harvested + Closed
+        pig_prod_id : int
+            Specific production ID (overrides farm filter)
         
         Returns
         -------
         list of dictionary
-
         """
         order_clause = 'ORDER BY a.date_insemination'
             
-        
         if pig_farm_id > 0:
             
+            # pig_prod_type = 1: Gestating only
+            # Status: 1 = Gestating (pregnant sows, not yet farrowed)
             if pig_prod_type == 1:
-                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 1 ' % pig_farm_id
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id = 1 ' % pig_farm_id
             
+            # pig_prod_type = 2: Lactating only
+            # Status: 4 = Lactating (sows with piglets, before weaning)
             if pig_prod_type == 2:
-                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id = 4 ' % pig_farm_id
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id = 4 ' % pig_farm_id
             
+            # pig_prod_type = 3: Active sows (Gestating + Lactating)
+            # Statuses: 1 = Gestating, 4 = Lactating
+            # These are sows currently in production cycle
             if pig_prod_type == 3:
-                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4) ' % pig_farm_id
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (1, 4) ' % pig_farm_id
             
+            # pig_prod_type = 4: Post-lactation (Weaning + Growing)
+            # Statuses: 5 = Weaning (piglets separated from sow), 6 = Growing (piglets growing)
+            # These are piglets after weaning, before harvest
             if pig_prod_type == 4:
-                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (5, 6) ' % pig_farm_id
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (5, 6) ' % pig_farm_id
                 
+            # pig_prod_type = 5: All active production
+            # Statuses: 1=Gestating, 4=Lactating, 5=Weaning, 6=Growing
+            # Everything except terminated, not pregnant, harvested, closed
             if pig_prod_type == 5:
-                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (1, 4, 5, 6) ' % pig_farm_id
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (1, 4, 5, 6) ' % pig_farm_id
                 
+            # pig_prod_type = 6: Completed/Harvested
+            # Statuses: 8 = Harvested (sold for meat), 9 = Closed (production ended)
+            # Historical records, sorted by weaning date descending (most recent first)
             if pig_prod_type == 6:
-                where_clause = 'WHERE a.pig_farm_id = %s AND  a.prod_status_id IN (8, 9) ' % pig_farm_id
-                
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (8, 9) ' % pig_farm_id
                 order_clause = 'ORDER BY a.date_weaning DESC'
             
         else:
+            # Get specific production record by ID (overrides all other filters)
             where_clause = 'WHERE a.id = %s ' % pig_prod_id
+        
                 
     
         sql =   """

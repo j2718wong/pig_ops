@@ -473,8 +473,7 @@ async def pig_prod_pig_ops_list(request: Request, prod_hid: str, operation_type:
     return {
         'result':{
             'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'code': 'SUCCESS'
         },
         
         'data': res

@@ -231,6 +231,136 @@ class PigFarm:
         return None
         
     
+    def get_pig_farm_info(self, pig_farm_id):
+        """
+        Get pig farm information with associated account and country details.
+        
+        Parameters
+        ==========
+        pig_farm_id : int
+            The ID of the pig farm to retrieve
+        
+        Returns
+        -------
+        dict
+            Dictionary containing farm, account, and country information
+        """
+        
+        sql = """
+            SELECT 
+                a.id,
+                a.name,
+                
+                a.account_id,
+                b.name,
+                
+                a.country_id,
+                c.name,
+                
+                a.address_level_1_id,
+                a.address_level_2_id,
+                a.address_level_3_id,
+                a.latitude,
+                a.longitude
+            FROM pig_farm a
+            LEFT OUTER JOIN account b       ON a.account_id = b.id
+            LEFT OUTER JOIN app_country c   ON a.country_id = c.id
+            WHERE a.id = %s
+        """ % pig_farm_id
+
+        # Check if still connected to database
+        if self.model.check_if_connected() == False:
+            # Make new connection
+            self.model.connect_to_db()
+
+        # Get database connection
+        conn = self.model.db_conn
+        
+        rows = None
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            
+            rows = cursor.fetchall()
+            cursor.close()
+            
+        except Exception as e:
+            msg = 'get_pig_farm_info(); error in executing query[] = ' + sql
+            msg += '\n'
+            msg += str(e)
+            msg += '\n\n'
+            self.model.logger.append(
+                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
+            rows = None
+
+        if rows is not None:
+            for row in rows:
+                # Farm basic info
+                cur_farm_id                     = row[0]
+                cur_farm_name                   = row[1]
+                
+                # Account info
+                cur_account_id                  = row[2]
+                cur_account_name                = row[3]
+                
+                # Country info
+                cur_country_id                  = row[4]
+                cur_country_name                = row[5]
+                
+                # Address levels
+                cur_address_level_1_id          = row[6]
+                cur_address_level_2_id          = row[7]
+                cur_address_level_3_id          = row[8]
+                
+                # Location
+                cur_farm_latitude               = row[9]
+                cur_farm_longitude              = row[10]
+                
+                # Build the result dictionary
+                cur_entry = {
+                    'pig_farm': {
+                        'id':           cur_farm_id, 
+                        'name':         cur_farm_name
+                    },
+                    
+                    'account': {
+                        'id':           cur_account_id,
+                        'name':         cur_account_name
+                    },
+                    
+                    'location':{
+                        'country': {
+                            'id':       cur_country_id,
+                            'name':     cur_country_name,
+                        },
+                        
+                        'address':{
+                            'level_1':  {
+                                'id':   cur_address_level_1_id
+                            },
+                            
+                            'level_2':  {
+                                'id':   cur_address_level_2_id
+                            },
+                            
+                            'level_3': {
+                                'id':   cur_address_level_3_id
+                            }
+                        },
+                        
+                        'geoloc':{
+                            'latitude':  cur_farm_latitude,
+                            'longitude': cur_farm_longitude,
+                        }
+                    }
+                }
+                
+                return cur_entry
+        
+        return None
+    
+    
     def get_pig_farm_account_info(self, pig_farm_id):
         sql =   """
                 SELECT 

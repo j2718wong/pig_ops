@@ -62,6 +62,9 @@ from route.r_pig_medvac         import *
 
 from route.r_production_harvest import *
 
+
+from route.r_report             import *
+
 from route.r_testing            import *
 
 

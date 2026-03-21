@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jackson Farm (Punod) - Farm Summary Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        @page {
+            size: A4 landscape;
+            margin: 1.5cm;
+        }
+        
+        body {
+            font-size: 9pt;
+            line-height: 1.4;
+            color: #1f2937;
+            background: white;
+        }
+        
+        /* Branding Header - Centered */
+        .branding-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1877F0;
+            display: flex;
+            align-items: flex-end;  /* Align to bottom */
+            justify-content: center;
+            font-size: 42px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+            line-height: 0.5;  /* Reduce line height */
+            padding-bottom: 2px;  /* Fine-tune vertical position */
+            margin-right: 10px;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #15467d;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Report Header */
+        .report-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1e3a8a;
+        }
+        
+        .report-name {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .farm-name {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #15467d;
+            margin-bottom: 5px;
+        }
+        
+        .farm-address {
+            font-size: 9pt;
+            color: #6b7280;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .generated-date {
+            font-size: 8pt;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        
+        /* Section Title */
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            background-color: #e6f0ff;
+            padding: 8px 12px;
+            margin: 20px 0 12px 0;
+            border-left: 4px solid #1877F0;
+        }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 8pt;
+        }
+        
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 8px 6px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        th {
+            background-color: #1e3a8a;
+            color: white;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        /* Zebra striping */
+        tbody tr:nth-child(even) {
+            background-color: #eff7ff;
+        }
+        
+        tbody tr:hover {
+            background-color: #e0f2fe;
+        }
+        
+        /* Status indicators */
+        .status-done {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .status-overdue {
+            color: #ef4444;
+            font-weight: bold;
+            background-color: #fef5f5;
+        }
+        
+        .status-pending {
+            color: #f59e0b;
+            font-style: italic;
+        }
+        
+        /* Summary box */
+        .summary-box {
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #d1d5db;
+            text-align: right;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        /* Footer with Pig Icon */
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 7pt;
+            color: #6b7280;
+        }
+        
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .pig-icon {
+            font-size: 20px;
+            opacity: 0.6;
+        }
+        
+        .footer .app-name {
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        .footer-text {
+            margin-top: 5px;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+            font-style: italic;
+            background-color: #f8f9fa;
+            border: 1px dashed #d1d5db;
+        }
+    </style>
+</head>
+<body>
+    <!-- Branding Header - Centered with Large "J" -->
+    <div class="branding-header">
+        <div class="company-logo">J</div>
+        <div class="product-name">SuperPig</div>
+    </div>
+    
+    <!-- Report Header -->
+    <div class="report-header">
+        <div class="report-name">PIG FARM SUMMARY REPORT</div>
+        <div class="farm-name">Jackson Farm (Punod)</div>
+        
+        <!-- Farm Address - Format: Philippines | Cebu, City of Naga, Tagjaguimit -->
+        <div class="farm-address">
+            
+            
+                
+                
+                
+                
+                
+                    
+                
+                
+                
+                
+                    
+                
+                
+                
+                
+                    
+                
+                
+                
+                
+                    Philippines
+                
+                
+                
+                
+                     | 
+                    Cebu, City of Naga, Tagjaguimit
+                
+            
+        </div>
+        
+        <div class="generated-date">Generated on: March 21, 2026 at 21:59</div>
+    </div>
+
+    <!-- Gestating Sows Section -->
+    <div class="section-title">1. GESTATING SOWS (6)</div>
+    
+    
+     <table>
+        <thead>
+            <tr>
+                <th>PID</th>
+                <th>Sow</th>
+                <th>Date Mating</th>
+                <th>Boar/Semen</th>
+                
+                <th>Check Reheat</th>
+                
+                <th>Inject Iron</th>
+                
+                <th>Deworm</th>
+                
+                <th>Expected Birth</th>
+            </thead>
+        <tbody>
+            
+            <tr>
+                 <td>28</td>
+                 <td>Sheryl</td>
+                 <td>
+                    
+                        20 NOV 2025
+                        (Day 121)
+                    
+                 </td>
+                 <td>Bob</td>
+                
+                
+                    
+                    
+                        
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                
+                 <td>15 MAR 2026</td>
+             </tr>
+            
+            <tr>
+                 <td>29</td>
+                 <td>Jennifer</td>
+                 <td>
+                    
+                        14 JAN 2026
+                        (Day 66)
+                    
+                 </td>
+                 <td>PIC 337 (from Growbest Agrivet)</td>
+                
+                
+                    
+                    
+                        
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                
+                 <td>08 MAY 2026</td>
+             </tr>
+            
+            <tr>
+                 <td>19</td>
+                 <td>Tifanny</td>
+                 <td>
+                    
+                        18 JAN 2026
+                        (Day 62)
+                    
+                 </td>
+                 <td>Charlie</td>
+                
+                
+                    
+                    
+                        
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                
+                 <td>12 MAY 2026</td>
+             </tr>
+            
+            <tr>
+                 <td>26</td>
+                 <td>Fiona</td>
+                 <td>
+                    
+                        26 JAN 2026
+                        (Day 54)
+                    
+                 </td>
+                 <td>Randy</td>
+                
+                
+                    
+                    
+                        
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                
+                 <td>20 MAY 2026</td>
+             </tr>
+            
+            <tr>
+                 <td>27</td>
+                 <td>Lala</td>
+                 <td>
+                    
+                        30 JAN 2026
+                        (Day 50)
+                    
+                 </td>
+                 <td>PIC 337 (from Growbest Agrivet)</td>
+                
+                
+                    
+                    
+                        
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                
+                 <td>24 MAY 2026</td>
+             </tr>
+            
+            <tr>
+                 <td>30</td>
+                 <td>Gemma</td>
+                 <td>
+                    
+                        03 MAR 2026
+                        (Day 18)
+                    
+                 </td>
+                 <td>Charlie</td>
+                
+                
+                    
+                    
+                        
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                    
+                        
+                    
+                    
+                    
+                        <td class="status-pending">&nbsp;</td>
+                    
+                
+                
+                 <td>25 JUN 2026</td>
+             </tr>
+            
+        </tbody>
+     </table>
+    <div class="summary-box">Total: 6 gestating sows</div>
+    
+
+    <!-- Other sections placeholder -->
+    <div class="section-title">2. LACTATING SOWS</div>
+    <div class="no-data">Coming soon...</div>
+
+    <div class="section-title">3. FATTENING ENTRIES</div>
+    <div class="no-data">Coming soon...</div>
+
+    <div class="section-title">4. FEED CONSUMPTION & COST</div>
+    <div class="no-data">Coming soon...</div>
+
+    <div class="section-title">5. SOW/BOAR INVENTORY</div>
+    <div class="no-data">Coming soon...</div>
+
+    <!-- Footer with Pig Icon -->
+    <div class="footer">
+        <div class="footer-content">
+            <span class="app-name">SuperPig</span>
+        </div>
+        <div class="footer-text">
+            https://superpig.jsysdev.com | jsysdev.contact@gmail.com
+        </div>
+    </div>
+</body>
+</html>

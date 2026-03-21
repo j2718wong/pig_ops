@@ -247,6 +247,48 @@ else
     exit 1
 fi
 
+# ============= NEW: INSTALL/UPDATE PYTHON PACKAGES =============
+section "STEP 5.5: Installing/updating Python packages"
+cd pig_ops
+
+# Check if requirements.txt exists
+if [ -f "requirements.txt" ]; then
+    # Activate virtual environment
+    source /root/projects/jsys/.venv/bin/activate
+    
+    echo "Checking for Python package changes..."
+    
+    # Check if requirements.txt has changed since last deploy
+    REQ_HASH_FILE="/root/projects/jsys/.requirements_hash"
+    CURRENT_HASH=$(md5sum requirements.txt | cut -d' ' -f1)
+    
+    if [ -f "$REQ_HASH_FILE" ] && [ "$(cat $REQ_HASH_FILE)" = "$CURRENT_HASH" ]; then
+        echo "✅ requirements.txt unchanged - skipping package installation"
+    else
+        echo "📦 requirements.txt changed - installing/updating packages..."
+        echo "   This may take a moment..."
+        
+        # Install/update packages from requirements.txt
+        pip install --upgrade -r requirements.txt
+        
+        # Show what was installed (optional)
+        echo "   Latest packages installed:"
+        pip list | grep -E "$(cat requirements.txt | grep -v '^#' | cut -d'=' -f1 | tr '\n' '|' | sed 's/|$//')" 2>/dev/null || true
+        
+        # Save hash for next run
+        echo "$CURRENT_HASH" > "$REQ_HASH_FILE"
+        log_success "Python packages updated"
+    fi
+    
+    # Deactivate virtual environment
+    deactivate
+else
+    log_warning "requirements.txt not found - skipping package installation"
+fi
+
+cd /root/projects/jsys
+# =============================================================
+
 # 6️⃣ MINIFY TEMPLATES (only if backend changed OR frontend changed)
 if [ "$RESTART_NEEDED" = true ]; then
     section "STEP 6: Minifying HTML templates"

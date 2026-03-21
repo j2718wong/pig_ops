@@ -19,6 +19,9 @@ dist/
 # Log files
 *.log
 
+# PDF
+*.pdf
+
 # Package files
 *.jar
 

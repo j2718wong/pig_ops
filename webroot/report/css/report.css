@@ -1,0 +1,149 @@
+cat > ~/projects/jsys/pig_ops/webroot/templates_report/css/report.css << 'EOF'
+/* Report Styles - Matching Web App Corporate Theme */
+@page {
+    size: A4 landscape;
+    margin: 1.5cm;
+}
+
+body {
+    font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif;
+    font-size: 9pt;
+    line-height: 1.4;
+    color: #1f2937;
+    background: white;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #1e3a8a;
+}
+
+.report-name {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.farm-name {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #15467d;
+    margin-bottom: 5px;
+}
+
+.farm-address {
+    font-size: 9pt;
+    color: #6b7280;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.generated-date {
+    font-size: 8pt;
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+/* Section Title */
+.section-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #1e3a8a;
+    background-color: #e6f0ff;
+    padding: 8px 12px;
+    margin: 20px 0 12px 0;
+    border-left: 4px solid #1877F0;
+}
+
+/* Table Styles - Using Gray Borders */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 8pt;
+}
+
+th, td {
+    border: 1px solid #d1d5db;
+    padding: 8px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #1e3a8a;
+    color: white;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Zebra striping */
+tbody tr:nth-child(even) {
+    background-color: #eff7ff;
+}
+
+tbody tr:hover {
+    background-color: #e0f2fe;
+}
+
+/* Status indicators */
+.status-done {
+    color: #10b981;
+    font-weight: bold;
+}
+
+.status-overdue {
+    color: #ef4444;
+    font-weight: bold;
+    background-color: #fef5f5;
+}
+
+.status-pending {
+    color: #f59e0b;
+    font-style: italic;
+}
+
+/* Summary box */
+.summary-box {
+    margin-top: 12px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #d1d5db;
+    text-align: right;
+    font-weight: bold;
+    color: #1e3a8a;
+}
+
+/* Footer */
+.footer {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+    font-size: 7pt;
+    color: #6b7280;
+}
+
+.footer .app-name {
+    font-weight: bold;
+    color: #1e3a8a;
+}
+
+.no-data {
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+    font-style: italic;
+    background-color: #f8f9fa;
+    border: 1px dashed #d1d5db;
+}
+EOF
