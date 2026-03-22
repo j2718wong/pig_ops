@@ -1,0 +1,162 @@
+<!-- feed_change_report.html - Feed Change Schedule Section -->
+<div class="section-title">3. FEED CHANGE SCHEDULE</div>
+
+{% set all_feed_entries = list_lactating + list_fattening %}
+
+{% if all_feed_entries and all_feed_entries|length > 0 %}
+
+<!-- Calculate totals using namespace -->
+{% set ns = namespace(total_lactating_pigs=0, total_fattening_pigs=0) %}
+{% for entry in all_feed_entries %}
+    {% set pig_count = entry.pig_production.cur_pig_count|default(0) %}
+    {% set prod_status_id = entry.pig_production.prod_status_id %}
+    {% if prod_status_id == 4 %}
+        {% set ns.total_lactating_pigs = ns.total_lactating_pigs + pig_count %}
+    {% else %}
+        {% set ns.total_fattening_pigs = ns.total_fattening_pigs + pig_count %}
+    {% endif %}
+{% endfor %}
+{% set total_all_pigs = ns.total_lactating_pigs + ns.total_fattening_pigs %}
+
+<!-- Summary Row -->
+<div style="margin-bottom: 10px; padding: 8px; background-color: #f8f9fa; border: 1px solid #d1d5db; border-radius: 4px; display: flex; justify-content: space-around; flex-wrap: wrap;">
+    <div><strong>Lactating Piglets:</strong> <span class="piglet-count">{{ ns.total_lactating_pigs }}</span></div>
+    <div><strong>Fattening Pigs:</strong> <span class="piglet-count">{{ ns.total_fattening_pigs }}</span></div>
+    <div><strong>Total Pigs:</strong> <span class="piglet-count" style="color: #1e3a8a; font-size: 11pt;">{{ total_all_pigs }}</span></div>
+</div>
+
+<table class="feed-change-table">
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Pigs</th>
+            <th>Prod Status</th>
+            <th>Date of Birth</th>
+            <th>Lactating Feed</th>
+            <th>Booster</th>
+            <th>Prestarter</th>
+            <th>Date Wean</th>
+            <th>Starter</th>
+            <th>Grower</th>
+            <th>Finisher</th>
+            <th>Date Harvest</th>
+         </thead>
+    <tbody>
+        {% for entry in all_feed_entries %}
+        {% set pig_prod = entry.pig_production %}
+        {% set feeds = entry.feeds %}
+        {% set prod_status_id = pig_prod.prod_status_id %}
+        
+        {% set birth_date = entry.birth.date_actual if entry.birth else None %}
+        {% set birth_days = entry.birth.days_old if entry.birth else None %}
+        {% set wean_date = entry.weaning.date_weaning if entry.weaning else None %}
+        {% set expected_wean = entry.weaning.expected_wean_date if entry.weaning else None %}
+        {% set harvest_date = entry.dates.harvest if entry.dates else None %}
+        
+        {% set harvest_info = calculate_harvest_date(entry, acc_settings_ops) %}
+        {% set is_combined = (prod_status_id == 7) %}
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">{{ pig_prod.farm_prod_id }}</span>
+                {% if is_combined %}
+                    <span style="font-size: 7pt; color: #6b7280;"> (Combined)</span>
+                {% elif entry.sow and entry.sow.name %}
+                    , {{ entry.sow.name }}
+                {% elif entry.sow and entry.sow.number %}
+                    , {{ entry.sow.number }}
+                {% endif %}
+            </td>
+            <td class="text-right piglet-count">{{ pig_prod.cur_pig_count or 0 }}</td>
+            <td class="text-right">
+                {{ pig_prod.prod_status_name }}
+                {% if is_combined %}
+                    <span style="font-size: 6pt; display: block; color: #6b7280;">(Merged batch)</span>
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if is_combined %}
+                    -
+                {% elif birth_date %}
+                    {{ birth_date|format_date }} (Day {{ birth_days }})
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if prod_status_id == 4 and feeds.date_change_feed and feeds.date_change_feed.lactating %}
+                    {{ feeds.date_change_feed.lactating|format_date }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if feeds.date_change_feed and feeds.date_change_feed.booster %}
+                    {{ feeds.date_change_feed.booster|format_date }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if feeds.date_change_feed and feeds.date_change_feed.prestarter %}
+                    {{ feeds.date_change_feed.prestarter|format_date }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if is_combined %}
+                    -
+                {% elif wean_date %}
+                    {{ wean_date|format_date }}
+                {% elif expected_wean %}
+                    {{ expected_wean|format_date }} (Exp)
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if feeds.date_change_feed and feeds.date_change_feed.starter %}
+                    {{ feeds.date_change_feed.starter|format_date }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if feeds.date_change_feed and feeds.date_change_feed.grower %}
+                    {{ feeds.date_change_feed.grower|format_date }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if feeds.date_change_feed and feeds.date_change_feed.finisher %}
+                    {{ feeds.date_change_feed.finisher|format_date }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if harvest_date %}
+                    {{ harvest_date|format_date }}
+                {% elif harvest_info and harvest_info.date_target_harvest %}
+                    {{ harvest_info.date_target_harvest|format_date }} (Target)
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="summary-box">
+    Total Entries: {{ all_feed_entries|length }} 
+    | Lactating: {{ list_lactating|length }} batches ({{ ns.total_lactating_pigs }} piglets)
+    | Fattening: {{ list_fattening|length }} batches ({{ ns.total_fattening_pigs }} pigs)
+    | <strong>Total Pigs: {{ total_all_pigs }}</strong>
+</div>
+
+{% else %}
+<div class="no-data">No feed change entries found.</div>
+{% endif %}

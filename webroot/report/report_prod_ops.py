@@ -64,6 +64,8 @@ class ReportProdOps(ReportBasic):
         pig_farm_info       = model['pig_farm'].get_pig_farm_info(pig_farm_id)
         get_location_address_names_and_replace_ids(pig_farm_info)
         
+        print('pig_farm_info')
+        print(pig_farm_info)
         
         # Get account info
         account_id          = pig_farm_info['account']['id']  
@@ -71,9 +73,6 @@ class ReportProdOps(ReportBasic):
         settings_operations = account_info['settings_operations'] 
         
         
-        
-        print('acc_settings_ops')
-        pprint.pprint(settings_operations)
         
         
 
@@ -86,6 +85,7 @@ class ReportProdOps(ReportBasic):
         
         list_lactating  = []
         
+        list_fattening  = []
         
         for cur_entry in pig_prod_list:
             prod_status_id = cur_entry['pig_production']['prod_status_id']
@@ -128,16 +128,20 @@ class ReportProdOps(ReportBasic):
                     order_by=0
                 )
                 
-
-                
                 cur_entry['lactating_ops'] = res
                 list_lactating.append(cur_entry)
             
+            
+            if  prod_status_id == PROD_STATUS_ID_WEANING  or prod_status_id == PROD_STATUS_ID_GROWING:
+                
+                
+                list_fattening.append(cur_entry)
 
 
         farm_settings = self._get_farm_settings(pig_farm_id)
 
         
+        pprint.pprint(list_fattening[0])
         
         
         # Prepare data for template
@@ -147,9 +151,11 @@ class ReportProdOps(ReportBasic):
             'farm_settings':        farm_settings,
             'list_gestating':       list_gestating,
             'list_lactating':       list_lactating,
+            'list_fattening':       list_fattening,
+            
             'inc_historical':       False,
             'inc_cost':             False,
-            'inc_target_harvest':   False
+            'inc_target_harvest':   inc_target_harvest
         }
         
         return data

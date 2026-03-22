@@ -432,6 +432,94 @@ How to distinguish this in table? maybe different table head color?
 
  
 
+The section is Production Change Feed 
+
+1.) PID, Sow
+
+2.) Pigs,
+
+3.) Prod Status - this is read from pig_production['prod_status_name']
+
+
+The next columns are talking about dates
+4.) date of birth
+
+5.) Booster    --> this is a feed type
+
+6.) Prestarter --> this is a feed type
+
+7.) Date Wean   --> target date of wean or actual date of wean
+
+8.) Starter     --> this is a feed type
+
+9.) Grower     --> this is a feed type
+
+
+10.) Finisher  --> this is a feed type
+
+11.) Date Harvest  -> target date harvest
+
+
+the data for teh change of feed dates, is in the feeds block.
+
+This is how this is computed in JS
+
+this.calculateDateTargetHarvest = function(data_pig_prod, dt_current, acc_settings_ops){
+        if (!dt_current){
+            dt_current = new Date();
+            dt_current.setHours(0, 0, 0, 0);
+        }
+        
+        let diff_msecs;
+        let diff_days_birth = null;
+        let diff_days_wean  = null;
+        
+        let num_days_harvest;
+        let msecs_harvest;
+        let dt_target_harvest;
+        
+        if (data_pig_prod.birth.date_actual){
+            const dt_birth  = new Date(data_pig_prod.birth.date_actual);
+            
+            diff_msecs      = dt_current - dt_birth;
+            diff_days_birth = Math.round(diff_msecs / APPLICATION.NUM_MSECS_1DAY);
+            
+            
+            // num_days from birth
+            num_days_harvest    = acc_settings_ops.num_days_harvest_from_birth;
+                
+            
+            msecs_harvest = dt_birth.getTime() + num_days_harvest * APPLICATION.NUM_MSECS_1DAY;
+            dt_target_harvest   = new Date(msecs_harvest);
+            
+        }
+        else{
+            // No cur_entry.birth.date_actual are fatteners brought from outside
+            
+            if (data_pig_prod.weaning.date_weaning){
+                const dt_wean   = new Date(cur_entry.weaning.date_weaning);
+                
+                diff_msecs      = dt_current - dt_wean;
+                diff_days_wean  = Math.round(diff_msecs / APPLICATION.NUM_MSECS_1DAY);
+            
+                
+                // num_days from wean
+                num_days_harvest    = acc_settings_ops.num_days_harvest_from_wean;
+
+
+                msecs_harvest = dt_wean.getTime() + num_days_harvest * APPLICATION.NUM_MSECS_1DAY;
+                dt_target_harvest   = new Date(msecs_harvest);
+            }
+        }
+        
+        return {
+            date_target_harvest:  formatDate(dt_target_harvest, FORMAT_COMPACT),
+            days_since_birth:     diff_days_birth,
+            days_since_wean:      diff_days_wean  
+        }
+    
+    }
+    
 
 
 

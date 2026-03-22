@@ -27,6 +27,10 @@ class F_PDF:
         self.jinja_env.filters['string_to_date'] = self._string_to_date
     
     
+        # Add global functions
+        self.jinja_env.globals['calculate_harvest_date'] = self._calculate_harvest_date
+    
+    
     def _format_date(self, date_string):
         """Format date from YYYY-MM-DD to DD MMM YYYY"""
         if not date_string:
@@ -81,6 +85,57 @@ class F_PDF:
             return dt_wean.strftime('%Y-%m-%d')
         except:
             return None
+    
+    
+    def _calculate_harvest_date(self, entry, acc_settings_ops):
+        """
+        Calculate target harvest date based on birth date or weaning date.
+        Returns dict with date_target_harvest, days_since_birth, days_since_wean
+        """
+        result = {
+            'date_target_harvest': None,
+            'days_since_birth': None,
+            'days_since_wean': None
+        }
+        
+        # Check if we have birth date
+        birth_date = entry.get('birth', {}).get('date_actual')
+        if birth_date:
+            dt_birth = datetime.strptime(birth_date, '%Y-%m-%d')
+            dt_now = datetime.now()
+            diff_days = (dt_now - dt_birth).days
+            
+            # Adjust for Day 1 on date of birth
+            if acc_settings_ops.get('day_1_on_date_of_birth', 0) == 1:
+                diff_days += 1
+            
+            result['days_since_birth'] = diff_days
+            
+            # Calculate harvest date from birth
+            num_days_harvest = acc_settings_ops.get('num_days_harvest_from_birth', 142)
+            
+            # Adjust for Day 1 on date of birth
+            if acc_settings_ops.get('day_1_on_date_of_birth', 0) == 1:
+                num_days_harvest -= 1
+            
+            dt_harvest = dt_birth + timedelta(days=num_days_harvest)
+            result['date_target_harvest'] = dt_harvest.strftime('%Y-%m-%d')
+            
+        else:
+            # No birth date - check if we have weaning date (for purchased piglets)
+            weaning_date = entry.get('weaning', {}).get('date_weaning')
+            if weaning_date:
+                dt_wean = datetime.strptime(weaning_date, '%Y-%m-%d')
+                dt_now = datetime.now()
+                diff_days = (dt_now - dt_wean).days
+                result['days_since_wean'] = diff_days
+                
+                # Calculate harvest date from weaning
+                num_days_harvest = acc_settings_ops.get('num_days_harvest_from_wean', 97)
+                dt_harvest = dt_wean + timedelta(days=num_days_harvest)
+                result['date_target_harvest'] = dt_harvest.strftime('%Y-%m-%d')
+        
+        return result
     
     
     def _get_boar_display(self, sow):
