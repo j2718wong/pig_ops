@@ -5,136 +5,6 @@
 {% set feed_entries = list_lactating + list_fattening %}
 {% if feed_entries and feed_entries|length > 0 %}
 
-{# Calculate totals first - use namespace at top level #}
-{% set ns = namespace(
-    total_pigs=0,
-    total_lactating_buy=0, total_lactating_cons=0, total_lactating_bal=0,
-    total_booster_buy=0, total_booster_cons=0, total_booster_bal=0,
-    total_prestarter_buy=0, total_prestarter_cons=0, total_prestarter_bal=0,
-    total_starter_buy=0, total_starter_cons=0, total_starter_bal=0,
-    total_grower_buy=0, total_grower_cons=0, total_grower_bal=0,
-    total_finisher_buy=0, total_finisher_cons=0, total_finisher_bal=0
-) %}
-
-{% for entry in feed_entries %}
-    {% set pig_prod = entry.pig_production %}
-    {% set feeds = entry.feeds %}
-    
-    {# Get pig count safely #}
-    {% set pig_count = pig_prod.cur_pig_count %}
-    {% if pig_count is none %}
-        {% set pig_count = 0 %}
-    {% endif %}
-    {% set ns.total_pigs = ns.total_pigs + pig_count %}
-    
-    {% if feeds %}
-        {# For each feed type, calculate consumed = BUY - BAL (if both exist) #}
-        
-        {# Lactating Feed #}
-        {% set lactating_buy = 0 %}
-        {% set lactating_bal = 0 %}
-        {% if feeds.bought and feeds.bought.lactating is not none and feeds.bought.lactating > 0 %}
-            {% set lactating_buy = feeds.bought.lactating %}
-        {% endif %}
-        {% if feeds.balance and feeds.balance.lactating is not none and feeds.balance.lactating != 0 %}
-            {% set lactating_bal = feeds.balance.lactating %}
-        {% endif %}
-        {% set lactating_cons = 0 %}
-        {% if lactating_buy > 0 and lactating_bal is not none %}
-            {% set lactating_cons = lactating_buy - lactating_bal %}
-        {% endif %}
-        {% set ns.total_lactating_buy = ns.total_lactating_buy + lactating_buy %}
-        {% set ns.total_lactating_cons = ns.total_lactating_cons + lactating_cons %}
-        {% set ns.total_lactating_bal = ns.total_lactating_bal + lactating_bal %}
-        
-        {# Booster Feed #}
-        {% set booster_buy = 0 %}
-        {% set booster_bal = 0 %}
-        {% if feeds.bought and feeds.bought.booster is not none and feeds.bought.booster > 0 %}
-            {% set booster_buy = feeds.bought.booster %}
-        {% endif %}
-        {% if feeds.balance and feeds.balance.booster is not none and feeds.balance.booster != 0 %}
-            {% set booster_bal = feeds.balance.booster %}
-        {% endif %}
-        {% set booster_cons = 0 %}
-        {% if booster_buy > 0 and booster_bal is not none %}
-            {% set booster_cons = booster_buy - booster_bal %}
-        {% endif %}
-        {% set ns.total_booster_buy = ns.total_booster_buy + booster_buy %}
-        {% set ns.total_booster_cons = ns.total_booster_cons + booster_cons %}
-        {% set ns.total_booster_bal = ns.total_booster_bal + booster_bal %}
-        
-        {# Pre-Starter Feed #}
-        {% set prestarter_buy = 0 %}
-        {% set prestarter_bal = 0 %}
-        {% if feeds.bought and feeds.bought.prestarter is not none and feeds.bought.prestarter > 0 %}
-            {% set prestarter_buy = feeds.bought.prestarter %}
-        {% endif %}
-        {% if feeds.balance and feeds.balance.prestarter is not none and feeds.balance.prestarter != 0 %}
-            {% set prestarter_bal = feeds.balance.prestarter %}
-        {% endif %}
-        {% set prestarter_cons = 0 %}
-        {% if prestarter_buy > 0 and prestarter_bal is not none %}
-            {% set prestarter_cons = prestarter_buy - prestarter_bal %}
-        {% endif %}
-        {% set ns.total_prestarter_buy = ns.total_prestarter_buy + prestarter_buy %}
-        {% set ns.total_prestarter_cons = ns.total_prestarter_cons + prestarter_cons %}
-        {% set ns.total_prestarter_bal = ns.total_prestarter_bal + prestarter_bal %}
-        
-        {# Starter Feed #}
-        {% set starter_buy = 0 %}
-        {% set starter_bal = 0 %}
-        {% if feeds.bought and feeds.bought.starter is not none and feeds.bought.starter > 0 %}
-            {% set starter_buy = feeds.bought.starter %}
-        {% endif %}
-        {% if feeds.balance and feeds.balance.starter is not none and feeds.balance.starter != 0 %}
-            {% set starter_bal = feeds.balance.starter %}
-        {% endif %}
-        {% set starter_cons = 0 %}
-        {% if starter_buy > 0 and starter_bal is not none %}
-            {% set starter_cons = starter_buy - starter_bal %}
-        {% endif %}
-        {% set ns.total_starter_buy = ns.total_starter_buy + starter_buy %}
-        {% set ns.total_starter_cons = ns.total_starter_cons + starter_cons %}
-        {% set ns.total_starter_bal = ns.total_starter_bal + starter_bal %}
-        
-        {# Grower Feed #}
-        {% set grower_buy = 0 %}
-        {% set grower_bal = 0 %}
-        {% if feeds.bought and feeds.bought.grower is not none and feeds.bought.grower > 0 %}
-            {% set grower_buy = feeds.bought.grower %}
-        {% endif %}
-        {% if feeds.balance and feeds.balance.grower is not none and feeds.balance.grower != 0 %}
-            {% set grower_bal = feeds.balance.grower %}
-        {% endif %}
-        {% set grower_cons = 0 %}
-        {% if grower_buy > 0 and grower_bal is not none %}
-            {% set grower_cons = grower_buy - grower_bal %}
-        {% endif %}
-        {% set ns.total_grower_buy = ns.total_grower_buy + grower_buy %}
-        {% set ns.total_grower_cons = ns.total_grower_cons + grower_cons %}
-        {% set ns.total_grower_bal = ns.total_grower_bal + grower_bal %}
-        
-        {# Finisher Feed #}
-        {% set finisher_buy = 0 %}
-        {% set finisher_bal = 0 %}
-        {% if feeds.bought and feeds.bought.finisher is not none and feeds.bought.finisher > 0 %}
-            {% set finisher_buy = feeds.bought.finisher %}
-        {% endif %}
-        {% if feeds.balance and feeds.balance.finisher is not none and feeds.balance.finisher != 0 %}
-            {% set finisher_bal = feeds.balance.finisher %}
-        {% endif %}
-        {% set finisher_cons = 0 %}
-        {% if finisher_buy > 0 and finisher_bal is not none %}
-            {% set finisher_cons = finisher_buy - finisher_bal %}
-        {% endif %}
-        {% set ns.total_finisher_buy = ns.total_finisher_buy + finisher_buy %}
-        {% set ns.total_finisher_cons = ns.total_finisher_cons + finisher_cons %}
-        {% set ns.total_finisher_bal = ns.total_finisher_bal + finisher_bal %}
-        
-    {% endif %}
-{% endfor %}
-
 <style>
     .feed-consumption-table {
         width: 100%;
@@ -172,7 +42,6 @@
         background-color: #f0f4f9;
         font-weight: bold;
     }
-    /* Ensure thead repeats on page break */
     thead {
         display: table-header-group;
     }
@@ -183,136 +52,63 @@
 
 <table class="feed-consumption-table">
     <thead>
-        <!-- First row: Main category headers with colspan -->
         <tr style="background-color: #1e3a8a;">
-            <th rowspan="2">PID</th>
-            <th rowspan="2">Prod Status</th>
-            <th rowspan="2">Date Birth</th>
-            <th rowspan="2">Pigs</th>
-            <th rowspan="2">Feed Bal Date</th>
-            <th colspan="3">Lactating</th>
+            <th>PID</th>
+            <th>Prod Status</th>
+            <th>Date Birth</th>
+            <th>Pigs</th>
+            <th>Feed Bal Date</th>
+            
+            <th colspan="3">Lacta</th>
             <th colspan="3">Booster</th>
-            <th colspan="3">Pre-Starter</th>
+            <th colspan="3">PreStarter</th>
             <th colspan="3">Starter</th>
             <th colspan="3">Grower</th>
             <th colspan="3">Finisher</th>
         </tr>
-        <!-- Second row: Sub-headers for BUY/CONS/BAL -->
         <tr style="background-color: #1e3a8a;">
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
-        </tr>
+         </tr>
     </thead>
     <tbody>
         {% for entry in feed_entries %}
-        {% set pig_prod = entry.pig_production %}
-        {% set feeds = entry.feeds %}
-        {% set birth_date = entry.birth.date_actual if entry.birth else None %}
-        
-        {# Get feed balance date #}
-        {% set feed_bal_date = feeds.balance.date_balance if feeds and feeds.balance else None %}
-        
-        {# Calculate days since birth only if birth_date exists #}
-        {% set birth_days = 0 %}
-        {% if birth_date and today_date_obj %}
-            {% set dt_birth = birth_date|string_to_date %}
-            {% if dt_birth %}
-                {% set days_old = (today_date_obj - dt_birth).days %}
-                {% if acc_settings_ops and acc_settings_ops.day_1_on_date_of_birth == 1 %}
-                    {% set days_old = days_old + 1 %}
+            {% set pig_prod = entry.pig_production %}
+            {% set feeds = entry.feeds %}
+            {% set consumed = entry.consumed %}
+            {% set birth_date = entry.birth.date_actual if entry.birth else None %}
+            
+            {# Get feed balance date #}
+            {% set feed_bal_date = feeds.balance.date_balance if feeds and feeds.balance else None %}
+            
+            {# Calculate days since birth only if birth_date exists #}
+            {% set birth_days = 0 %}
+            {% if birth_date and today_date_obj %}
+                {% set dt_birth = birth_date|string_to_date %}
+                {% if dt_birth %}
+                    {% set days_old = (today_date_obj - dt_birth).days %}
+                    {% if acc_settings_ops and acc_settings_ops.day_1_on_date_of_birth == 1 %}
+                        {% set days_old = days_old + 1 %}
+                    {% endif %}
+                    {% set birth_days = days_old %}
                 {% endif %}
-                {% set birth_days = days_old %}
             {% endif %}
-        {% endif %}
-        
-        {# Get pig count safely #}
-        {% set pig_count = pig_prod.cur_pig_count %}
-        {% if pig_count is none %}
-            {% set pig_count = 0 %}
-        {% endif %}
-        
-        {# Calculate consumed for each feed type #}
-        {% set lactating_buy = 0 %}
-        {% set lactating_bal = 0 %}
-        {% if feeds and feeds.bought and feeds.bought.lactating is not none and feeds.bought.lactating > 0 %}
-            {% set lactating_buy = feeds.bought.lactating %}
-        {% endif %}
-        {% if feeds and feeds.balance and feeds.balance.lactating is not none and feeds.balance.lactating != 0 %}
-            {% set lactating_bal = feeds.balance.lactating %}
-        {% endif %}
-        {% set lactating_cons = 0 %}
-        {% if lactating_buy > 0 and lactating_bal is not none %}
-            {% set lactating_cons = lactating_buy - lactating_bal %}
-        {% endif %}
-        
-        {% set booster_buy = 0 %}
-        {% set booster_bal = 0 %}
-        {% if feeds and feeds.bought and feeds.bought.booster is not none and feeds.bought.booster > 0 %}
-            {% set booster_buy = feeds.bought.booster %}
-        {% endif %}
-        {% if feeds and feeds.balance and feeds.balance.booster is not none and feeds.balance.booster != 0 %}
-            {% set booster_bal = feeds.balance.booster %}
-        {% endif %}
-        {% set booster_cons = 0 %}
-        {% if booster_buy > 0 and booster_bal is not none %}
-            {% set booster_cons = booster_buy - booster_bal %}
-        {% endif %}
-        
-        {% set prestarter_buy = 0 %}
-        {% set prestarter_bal = 0 %}
-        {% if feeds and feeds.bought and feeds.bought.prestarter is not none and feeds.bought.prestarter > 0 %}
-            {% set prestarter_buy = feeds.bought.prestarter %}
-        {% endif %}
-        {% if feeds and feeds.balance and feeds.balance.prestarter is not none and feeds.balance.prestarter != 0 %}
-            {% set prestarter_bal = feeds.balance.prestarter %}
-        {% endif %}
-        {% set prestarter_cons = 0 %}
-        {% if prestarter_buy > 0 and prestarter_bal is not none %}
-            {% set prestarter_cons = prestarter_buy - prestarter_bal %}
-        {% endif %}
-        
-        {% set starter_buy = 0 %}
-        {% set starter_bal = 0 %}
-        {% if feeds and feeds.bought and feeds.bought.starter is not none and feeds.bought.starter > 0 %}
-            {% set starter_buy = feeds.bought.starter %}
-        {% endif %}
-        {% if feeds and feeds.balance and feeds.balance.starter is not none and feeds.balance.starter != 0 %}
-            {% set starter_bal = feeds.balance.starter %}
-        {% endif %}
-        {% set starter_cons = 0 %}
-        {% if starter_buy > 0 and starter_bal is not none %}
-            {% set starter_cons = starter_buy - starter_bal %}
-        {% endif %}
-        
-        {% set grower_buy = 0 %}
-        {% set grower_bal = 0 %}
-        {% if feeds and feeds.bought and feeds.bought.grower is not none and feeds.bought.grower > 0 %}
-            {% set grower_buy = feeds.bought.grower %}
-        {% endif %}
-        {% if feeds and feeds.balance and feeds.balance.grower is not none and feeds.balance.grower != 0 %}
-            {% set grower_bal = feeds.balance.grower %}
-        {% endif %}
-        {% set grower_cons = 0 %}
-        {% if grower_buy > 0 and grower_bal is not none %}
-            {% set grower_cons = grower_buy - grower_bal %}
-        {% endif %}
-        
-        {% set finisher_buy = 0 %}
-        {% set finisher_bal = 0 %}
-        {% if feeds and feeds.bought and feeds.bought.finisher is not none and feeds.bought.finisher > 0 %}
-            {% set finisher_buy = feeds.bought.finisher %}
-        {% endif %}
-        {% if feeds and feeds.balance and feeds.balance.finisher is not none and feeds.balance.finisher != 0 %}
-            {% set finisher_bal = feeds.balance.finisher %}
-        {% endif %}
-        {% set finisher_cons = 0 %}
-        {% if finisher_buy > 0 and finisher_bal is not none %}
-            {% set finisher_cons = finisher_buy - finisher_bal %}
-        {% endif %}
+            
+            {# Get pig count safely #}
+            {% set pig_count = pig_prod.cur_pig_count %}
+            {% if pig_count is none %}
+                {% set pig_count = 0 %}
+            {% endif %}
         
         <tr>
             <td class="text-right">{{ pig_prod.farm_prod_id }}</td>
@@ -332,70 +128,155 @@
                 {% if feed_bal_date %}
                     {{ feed_bal_date|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
             <!-- Lactating Feed -->
-            <td class="text-right">{{ lactating_buy if lactating_buy > 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(lactating_cons) if lactating_cons != 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(lactating_bal) if lactating_bal != 0 else '-' }}</td>
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.lactating is not none -%}
+                    {{ "%.1f"|format(feeds.bought.lactating) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if consumed and consumed.lactating is not none -%}
+                    {{ "%.1f"|format(consumed.lactating) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if feeds.balance and feeds.balance.lactating is not none -%}
+                    {{ "%.1f"|format(feeds.balance.lactating) }}
+                {%- endif -%}
+            </td>
             
             <!-- Booster Feed -->
-            <td class="text-right">{{ booster_buy if booster_buy > 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(booster_cons) if booster_cons != 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(booster_bal) if booster_bal != 0 else '-' }}</td>
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.booster is not none -%}
+                    {{ "%.1f"|format(feeds.bought.booster) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if consumed and consumed.booster is not none -%}
+                    {{ "%.1f"|format(consumed.booster) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if feeds.balance and feeds.balance.booster is not none -%}
+                    {{ "%.1f"|format(feeds.balance.booster) }}
+                {%- endif -%}
+            </td>
             
             <!-- Pre-Starter Feed -->
-            <td class="text-right">{{ prestarter_buy if prestarter_buy > 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(prestarter_cons) if prestarter_cons != 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(prestarter_bal) if prestarter_bal != 0 else '-' }}</td>
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.prestarter is not none -%}
+                    {{ "%.1f"|format(feeds.bought.prestarter) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if consumed and consumed.prestarter is not none -%}
+                    {{ "%.1f"|format(consumed.prestarter) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if feeds.balance and feeds.balance.prestarter is not none -%}
+                    {{ "%.1f"|format(feeds.balance.prestarter) }}
+                {%- endif -%}
+            </td>
             
             <!-- Starter Feed -->
-            <td class="text-right">{{ starter_buy if starter_buy > 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(starter_cons) if starter_cons != 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(starter_bal) if starter_bal != 0 else '-' }}</td>
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.starter is not none -%}
+                    {{ "%.1f"|format(feeds.bought.starter) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if consumed and consumed.starter is not none -%}
+                    {{ "%.1f"|format(consumed.starter) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if feeds.balance and feeds.balance.starter is not none -%}
+                    {{ "%.1f"|format(feeds.balance.starter) }}
+                {%- endif -%}
+            </td>
             
             <!-- Grower Feed -->
-            <td class="text-right">{{ grower_buy if grower_buy > 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(grower_cons) if grower_cons != 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(grower_bal) if grower_bal != 0 else '-' }}</td>
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.grower is not none -%}
+                    {{ "%.1f"|format(feeds.bought.grower) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if consumed and consumed.grower is not none -%}
+                    {{ "%.1f"|format(consumed.grower) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if feeds.balance and feeds.balance.grower is not none -%}
+                    {{ "%.1f"|format(feeds.balance.grower) }}
+                {%- endif -%}
+            </td>
             
             <!-- Finisher Feed -->
-            <td class="text-right">{{ finisher_buy if finisher_buy > 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(finisher_cons) if finisher_cons != 0 else '-' }}</td>
-            <td class="text-right">{{ "%.1f"|format(finisher_bal) if finisher_bal != 0 else '-' }}</td>
-        </tr>
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.finisher is not none -%}
+                    {{ "%.1f"|format(feeds.bought.finisher) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if consumed and consumed.finisher is not none -%}
+                    {{ "%.1f"|format(consumed.finisher) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if feeds.balance and feeds.balance.finisher is not none -%}
+                    {{ "%.1f"|format(feeds.balance.finisher) }}
+                {%- endif -%}
+            </td>
+         </tr>
         {% endfor %}
-    </tbody>
-    <tfoot>
+    
         <tr class="balance-row">
             <td colspan="5" style="text-align: right;"><strong>Balance Total</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_lactating_buy) if ns.total_lactating_buy > 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_lactating_cons) if ns.total_lactating_cons != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_lactating_bal) if ns.total_lactating_bal != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_booster_buy) if ns.total_booster_buy > 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_booster_cons) if ns.total_booster_cons != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_booster_bal) if ns.total_booster_bal != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_prestarter_buy) if ns.total_prestarter_buy > 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_prestarter_cons) if ns.total_prestarter_cons != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_prestarter_bal) if ns.total_prestarter_bal != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_starter_buy) if ns.total_starter_buy > 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_starter_cons) if ns.total_starter_cons != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_starter_bal) if ns.total_starter_bal != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_grower_buy) if ns.total_grower_buy > 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_grower_cons) if ns.total_grower_cons != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_grower_bal) if ns.total_grower_bal != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_buy) if ns.total_finisher_buy > 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_cons) if ns.total_finisher_cons != 0 else '-' }}</strong></td>
-            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_bal) if ns.total_finisher_bal != 0 else '-' }}</strong></td>
-        </tr>
-    </tfoot>
+            <td class="text-right"></td>
+            <td class="text-right"></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.lactating) if prod_feed_balance.lactating is not none else '' }}</strong></td>
+            <td class="text-right"></td>
+            <td class="text-right"></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.booster) if prod_feed_balance.booster is not none else '' }}</strong></td>
+            <td class="text-right"></td>
+            <td class="text-right"></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.prestarter) if prod_feed_balance.prestarter is not none else '' }}</strong></td>
+            <td class="text-right"></td>
+            <td class="text-right"></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.starter) if prod_feed_balance.starter is not none else '' }}</strong></td>
+            <td class="text-right"></td>
+            <td class="text-right"></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.grower) if prod_feed_balance.grower is not none else '' }}</strong></td>
+            <td class="text-right"></td>
+            <td class="text-right"></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.finisher) if prod_feed_balance.finisher is not none else '' }}</strong></td>
+         </tr>
+    
+    </tbody>
+    
+        
 </table>
 
+
 <div class="summary-box">
-    Total Pigs: {{ ns.total_pigs }}
+    <strong>Total Pigs:</strong> 
+    {% set ns = namespace(total=0) %}
+    {% for entry in feed_entries %}
+        {% set pig_count = entry.pig_production.cur_pig_count %}
+        {% if pig_count is not none %}
+            {% set ns.total = ns.total + pig_count %}
+        {% endif %}
+    {% endfor %}
+    {{ ns.total }}
 </div>
+
+
 {% else %}
 <div class="no-data">No feed consumption data available.</div>
 {% endif %}

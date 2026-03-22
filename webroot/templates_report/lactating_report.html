@@ -1,3 +1,4 @@
+
 <!-- lactating_report.html - Lactating Sows Section -->
 <div class="section-title">2. LACTATING SOWS ({{ list_lactating|length }})</div>
 
@@ -5,7 +6,7 @@
 
 <!-- Sow Operations Table -->
 <div class="subsection-title">Sow Operations</div>
-<table>
+<table class="lactating-table">
     <thead>
         <tr>
             <th>PID / Sow</th>
@@ -17,7 +18,7 @@
                 {% endif %}
             {% endfor %}
             <th>Expected Wean</th>
-        </tr>
+         </thead>
     </thead>
     <tbody>
         {% for sow in list_lactating %}
@@ -29,7 +30,7 @@
             <td class="pid-sow">
                 <span class="pid-number">{{ sow.pig_production.farm_prod_id }}</span>, 
                 {% if sow.sow.name %}{{ sow.sow.name }}{% else %}{{ sow.sow.number }}{% endif %}
-            </td>
+              </td>
             <td class="text-right piglet-count">{{ sow.pig_production.cur_pig_count or 0 }}</td>
             <td class="text-right">{{ sow.birth_display }}</td>
             
@@ -51,33 +52,45 @@
                             <td class="status-done">
                                 {{ date_actual|format_date }}<br>
                                 <span class="status-text">Done</span>
-                            </td>
+                              </td>
                         {% elif days_diff <= 3 %}
                             <td class="status-late">
                                 {{ date_actual|format_date }}<br>
                                 <span class="status-text">Done (+{{ days_diff }}d)</span>
-                            </td>
+                              </td>
                         {% else %}
                             <td class="status-very-late">
                                 {{ date_actual|format_date }}<br>
                                 <span class="status-text">Done (+{{ days_diff }}d)</span>
-                            </td>
+                              </td>
                         {% endif %}
                         
                     {% elif found_op and found_op.pig_prod_pig_ops.date_target %}
                         {% set date_target = found_op.pig_prod_pig_ops.date_target %}
                         {% set dt_target = date_target|string_to_date %}
                         
-                        {% if dt_target and dt_target < today_date_obj %}
+                        {# Compare dates without time #}
+                        {% if dt_target %}
                             {% set days_overdue = (today_date_obj - dt_target).days %}
-                            <td class="status-overdue">
-                                {{ date_target|format_date }}<br>
-                                <span class="status-text">Overdue ({{ days_overdue }}d)</span>
-                            </td>
+                            {% if days_overdue > 0 %}
+                                <td class="status-overdue">
+                                    {{ date_target|format_date }}<br>
+                                    <span class="status-text">Overdue ({{ days_overdue }}D)</span>
+                                  </td>
+                            {% elif days_overdue == 0 %}
+                                <td class="status-pending">
+                                    {{ date_target|format_date }}<br>
+                                    <span class="status-text">Today</span>
+                                  </td>
+                            {% else %}
+                                <td class="status-pending">
+                                    {{ date_target|format_date }}
+                                  </td>
+                            {% endif %}
                         {% else %}
                             <td class="status-pending">
                                 {{ date_target|format_date }}
-                            </td>
+                              </td>
                         {% endif %}
                         
                     {% else %}
@@ -87,14 +100,14 @@
             {% endfor %}
             
             <td class="text-right">{{ sow.expected_wean_display }}</td>
-        </tr>
+          </tr>
         {% endfor %}
     </tbody>
 </table>
 
 <!-- Piglet Operations Table -->
 <div class="subsection-title">Piglet Operations</div>
-<table>
+<table class="lactating-table">
     <thead>
         <tr>
             <th>PID / Sow</th>
@@ -106,7 +119,7 @@
                 {% endif %}
             {% endfor %}
             <th>Expected Wean</th>
-        </tr>
+         </thead>
     </thead>
     <tbody>
         {% for sow in list_lactating %}
@@ -118,7 +131,7 @@
             <td class="pid-sow">
                 <span class="pid-number">{{ sow.pig_production.farm_prod_id }}</span>, 
                 {% if sow.sow.name %}{{ sow.sow.name }}{% else %}{{ sow.sow.number }}{% endif %}
-            </td>
+              </td>
             <td class="text-right piglet-count">{{ sow.pig_production.cur_pig_count or 0 }}</td>
             <td class="text-right">{{ sow.birth_display }}</td>
             
@@ -140,33 +153,45 @@
                             <td class="status-done">
                                 {{ date_actual|format_date }}<br>
                                 <span class="status-text">Done</span>
-                            </td>
+                              </td>
                         {% elif days_diff <= 3 %}
                             <td class="status-late">
                                 {{ date_actual|format_date }}<br>
                                 <span class="status-text">Done (+{{ days_diff }}d)</span>
-                            </td>
+                              </td>
                         {% else %}
                             <td class="status-very-late">
                                 {{ date_actual|format_date }}<br>
                                 <span class="status-text">Done (+{{ days_diff }}d)</span>
-                            </td>
+                              </td>
                         {% endif %}
                         
                     {% elif found_op and found_op.pig_prod_pig_ops.date_target %}
                         {% set date_target = found_op.pig_prod_pig_ops.date_target %}
                         {% set dt_target = date_target|string_to_date %}
                         
-                        {% if dt_target and dt_target < today_date_obj %}
+                        {# Compare dates without time #}
+                        {% if dt_target %}
                             {% set days_overdue = (today_date_obj - dt_target).days %}
-                            <td class="status-overdue">
-                                {{ date_target|format_date }}<br>
-                                <span class="status-text">Overdue ({{ days_overdue }}d)</span>
-                            </td>
+                            {% if days_overdue > 0 %}
+                                <td class="status-overdue">
+                                    {{ date_target|format_date }}<br>
+                                    <span class="status-text">Overdue ({{ days_overdue }}D)</span>
+                                  </td>
+                            {% elif days_overdue == 0 %}
+                                <td class="status-pending">
+                                    {{ date_target|format_date }}<br>
+                                    <span class="status-text">Today</span>
+                                  </td>
+                            {% else %}
+                                <td class="status-pending">
+                                    {{ date_target|format_date }}
+                                  </td>
+                            {% endif %}
                         {% else %}
                             <td class="status-pending">
                                 {{ date_target|format_date }}
-                            </td>
+                              </td>
                         {% endif %}
                         
                     {% else %}
@@ -176,7 +201,7 @@
             {% endfor %}
             
             <td class="text-right">{{ sow.expected_wean_display }}</td>
-        </tr>
+          </tr>
         {% endfor %}
     </tbody>
 </table>

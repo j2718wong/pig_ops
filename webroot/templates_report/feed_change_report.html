@@ -33,7 +33,7 @@
             <th>Pigs</th>
             <th>Prod Status</th>
             <th>Date of Birth</th>
-            <th>Lactating Feed</th>
+            <th>Lacta</th>
             <th>Booster</th>
             <th>Prestarter</th>
             <th>Date Wean</th>
@@ -107,7 +107,7 @@
                 {% if prod_status_id == 4 and feeds.date_change_feed and feeds.date_change_feed.lactating %}
                     {{ feeds.date_change_feed.lactating|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
@@ -116,7 +116,7 @@
                 {% if feeds.date_change_feed and feeds.date_change_feed.booster %}
                     {{ feeds.date_change_feed.booster|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
@@ -125,20 +125,20 @@
                 {% if feeds.date_change_feed and feeds.date_change_feed.prestarter %}
                     {{ feeds.date_change_feed.prestarter|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
             <!-- Date Wean -->
             <td class="text-right">
                 {% if is_combined %}
-                    -
+                    &nbsp;
                 {% elif wean_date %}
                     {{ wean_date|format_date }}
                 {% elif expected_wean %}
                     {{ expected_wean|format_date }} (Exp)
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
@@ -147,7 +147,7 @@
                 {% if feeds.date_change_feed and feeds.date_change_feed.starter %}
                     {{ feeds.date_change_feed.starter|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
@@ -156,7 +156,7 @@
                 {% if feeds.date_change_feed and feeds.date_change_feed.grower %}
                     {{ feeds.date_change_feed.grower|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
@@ -165,7 +165,7 @@
                 {% if feeds.date_change_feed and feeds.date_change_feed.finisher %}
                     {{ feeds.date_change_feed.finisher|format_date }}
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
             
@@ -176,7 +176,7 @@
                 {% elif harvest_info and harvest_info.date_target_harvest %}
                     {{ harvest_info.date_target_harvest|format_date }} (Target)
                 {% else %}
-                    -
+                    &nbsp;
                 {% endif %}
             </td>
          </tr>
