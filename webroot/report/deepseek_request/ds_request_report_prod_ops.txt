@@ -140,6 +140,296 @@ e.) sow boar inventory.
 
 it is an all in one report
 
+
+
+Lactating Operations columns
+1.) PID - read from cur_entry['pig_production']['farm_prod_id']
+
+2.) Sow - same logic as how the sow is name in getsating
+
+
+3.) Date of birth
+
+20 NOV 2025 (Day 1) 
+
+Buy the number of days is calculated differently
+
+This is how this is calculated in JS; the acc_settings_ops is read from data['settings_operations']
+
+settings_operations
+{'currency': 'PHP',
+ 'day_1_on_date_of_birth': 1,
+ 'day_1_on_date_of_insem': 0,
+ 'last_update': {'dt_update': '2026-03-05 18:19:03',
+                 'name_first': 'Jack',
+                 'name_last': 'Wong'},
+ 'num_days_harvest_from_birth': 142,
+ 'num_days_harvest_from_wean': 97,
+ 'num_days_wean': 42,
+ 'weight_unit': 'kg'}
+
+
+
+
+
+this.calculateNumDaysSinceBirth = function(date_of_birth, dt_current, acc_settings_ops){
+        if (!dt_current){
+            dt_current = new Date();
+            dt_current.setHours(0, 0, 0, 0);
+        }
+        
+        const dt_birth            = new Date(date_of_birth);
+        const diff_msecs          = dt_current - dt_birth;
+        
+        let   diff_days           = Math.round(diff_msecs / APPLICATION.NUM_MSECS_1DAY);
+        
+        // Adjust Day 1 on date of birth if needed
+        if (acc_settings_ops){
+            if (acc_settings_ops.day_1_on_date_of_birth > 0){
+                diff_days += 1;
+            }
+        }
+        return diff_days;
+    }
+    
+    
+    this.calculateDateExpectedWean = function(date_of_birth, acc_settings_ops){
+        const dt_actual = new Date(date_of_birth);
+            
+        let num_days_wean = APPLICATION.DEFAULT_NUM_DAYS_WEAN;
+        
+        // check if the account has set num_days_wean
+        if (acc_settings_ops){
+            num_days_wean = acc_settings_ops.num_days_wean;
+            
+            // Adjust Day 1 on date of birth if needed
+            if (acc_settings_ops.day_1_on_date_of_birth > 0){
+                num_days_wean -= 1;
+            }
+        }
+        
+        let msecs_wean = dt_actual.getTime() + num_days_wean * APPLICATION.NUM_MSECS_1DAY;
+        let dt_wean = new Date(msecs_wean);
+        
+        return formatDate(dt_wean, FORMAT_COMPACT);
+    }
+    
+    
+
+4.) The next columns are lactating_ops, similar to gestating ops.
+
+
+The last column should be the Expected Date of Wean.
+This is calculated using this.calculateDateExpectedWean
+
+
+    
+This is a sample lactating_entry
+{'birth': {'birth_staff_id': 2,
+           'birth_staff_name': 'Elmer Paquit',
+           'date_actual': '2026-02-25',
+           'date_expected': '2026-03-01',
+           'num_days_actual': 111,
+           'num_dead_at_birth': 0,
+           'pigs_live_f': 11,
+           'pigs_live_m': 11},
+ 'data_ver_num': {'feed_balance': 0,
+                  'harvest': 0,
+                  'health_notes': 0,
+                  'medvac': 0,
+                  'pig_prod': 2,
+                  'prod_feed': 0},
+ 'feeds': {'balance': {'booster': None,
+                       'date_balance': None,
+                       'finisher': None,
+                       'gestating': None,
+                       'grower': None,
+                       'lactating': None,
+                       'prestarter': None,
+                       'starter': None},
+           'bought': {'booster': None,
+                      'finisher': None,
+                      'gestating': None,
+                      'grower': None,
+                      'lactating': None,
+                      'prestarter': None,
+                      'starter': None},
+           'cost': {'booster': None,
+                    'finisher': None,
+                    'gestating': None,
+                    'grower': None,
+                    'lactating': None,
+                    'prestarter': None,
+                    'starter': None},
+           'date_change_feed': {'booster': None,
+                                'finisher': None,
+                                'gestating': None,
+                                'grower': None,
+                                'lactating': None,
+                                'prestarter': None,
+                                'starter': None}},
+ 'insemination': {'ai': {'internal_boar': {'farm_sow_id': None,
+                                           'id': None,
+                                           'name': None,
+                                           'number': None},
+                         'semen_cost': 0.0,
+                         'semen_supplier': {'id': None,
+                                            'name': None,
+                                            'semen': {'id': None,
+                                                      'name': None}}},
+                  'boar': {'farm_sow_id': 1,
+                           'id': 6,
+                           'name': 'Joker',
+                           'number': None},
+                  'insem_cost': 0.0,
+                  'insem_date': '2025-11-06',
+                  'insem_notes': None,
+                  'insem_staff_id': 2,
+                  'insem_staff_name': 'Elmer Paquit',
+                  'insem_type': 'B'},
+ 'lactating_ops': [{'account_pig_ops': {'description': 'Cut piglets Teeth',
+                                        'id': 11,
+                                        'is_medvac': 0,
+                                        'name': 'Cut Teeth',
+                                        'num_days_since': 1},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-02-25',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 92,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Mix Multivitamins to '
+                                                       'sow feed',
+                                        'id': 13,
+                                        'is_medvac': 1,
+                                        'name': 'MultiVitamins',
+                                        'num_days_since': 2},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-02-26',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 91,
+                                         'operation_type': 3},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Cut piglets Tail',
+                                        'id': 4,
+                                        'is_medvac': 0,
+                                        'name': 'Cut Tail',
+                                        'num_days_since': 3},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-02-27',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 93,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Inject Iron 1',
+                                        'id': 5,
+                                        'is_medvac': 1,
+                                        'name': 'Inject Iron_1',
+                                        'num_days_since': 3},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-02-27',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 94,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Inject Iron 2',
+                                        'id': 6,
+                                        'is_medvac': 1,
+                                        'name': 'Inject Iron_2',
+                                        'num_days_since': 13},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-03-09',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 95,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Inject Vitamins 1',
+                                        'id': 7,
+                                        'is_medvac': 1,
+                                        'name': 'Inject Vitamins_1',
+                                        'num_days_since': 14},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-03-10',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 96,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Inject Vitamins 2',
+                                        'id': 8,
+                                        'is_medvac': 1,
+                                        'name': 'Inject Vitamins_2',
+                                        'num_days_since': 21},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-03-17',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 97,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Castration of Males',
+                                        'id': 9,
+                                        'is_medvac': 0,
+                                        'name': 'Castration',
+                                        'num_days_since': 22},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-03-18',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 98,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}},
+                   {'account_pig_ops': {'description': 'Deworm',
+                                        'id': 10,
+                                        'is_medvac': 1,
+                                        'name': 'Deworm',
+                                        'num_days_since': 25},
+                    'notes': {'id': None, 'notes': None},
+                    'pig_prod_pig_ops': {'date_actual': None,
+                                         'date_target': '2026-03-21',
+                                         'dt_entry': '2026-02-25 08:41:31',
+                                         'id': 99,
+                                         'operation_type': 2},
+                    'staff': {'id': None, 'name': None}}],
+ 'pig_production': {'cur_pig_count': 21,
+                    'dead_after_birth': 1,
+                    'farm_prod_id': 17,
+                    'id': 17,
+                    'prod_status_id': 4,
+                    'prod_status_name': 'Lactating'},
+ 'sow': {'farm_sow_id': 1, 'id': 1, 'name': 'Shine', 'number': '342271'},
+ 'weaning': {'date_weaning': None,
+             'num_pigs': None,
+             'num_pigs_f': None,
+             'num_pigs_m': None,
+             'weight': None,
+             'weight_pp': None}}
+
+
+ 
+
+ok i see the problem. its fixed now. the other issue is the lactating ops, 
+its a combined operations for both lactating sow and piglets. 
+but the majority of teh operations are for piglets. originally it was separately 
+presented, but later on i combined for better usability.  This is indicated in
+
+pig_prod_pig_ops.operation_type 
+
+PIG_OPERATION_TYPE_LACTATING_PIGLETS                = 2
+PIG_OPERATION_TYPE_LACTATING_SOW                    = 3
+
+
+
+
+How to distinguish this in table? maybe different table head color?
+
+
+
  
 
 

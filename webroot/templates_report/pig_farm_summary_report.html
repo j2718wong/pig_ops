@@ -21,14 +21,16 @@
             line-height: 1.4;
             color: #1f2937;
             background: white;
+            padding: 20px;
         }
         
-        /* Branding Header - Centered */
         .branding-header {
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         
         .company-logo {
@@ -37,27 +39,23 @@
             border-radius: 50%;
             background-color: #1877F0;
             display: flex;
-            align-items: flex-end;  /* Align to bottom */
+            align-items: flex-end;
             justify-content: center;
             font-size: 42px;
             font-weight: bold;
             color: white;
             flex-shrink: 0;
-            line-height: 0.5;  /* Reduce line height */
-            padding-bottom: 2px;  /* Fine-tune vertical position */
-            margin-right: 10px;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 0.8;
+            padding-bottom: 4px;
         }
         
         .product-name {
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 700;
-            color: #15467d;
+            color: #1877F0;
             white-space: nowrap;
-            letter-spacing: 0.5px;
         }
         
-        /* Report Header */
         .report-header {
             text-align: center;
             margin-bottom: 25px;
@@ -71,7 +69,6 @@
             color: #1e3a8a;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
         
         .farm-name {
@@ -85,7 +82,6 @@
             font-size: 9pt;
             color: #6b7280;
             margin-top: 5px;
-            margin-bottom: 5px;
         }
         
         .generated-date {
@@ -94,7 +90,6 @@
             margin-top: 8px;
         }
         
-        /* Section Title */
         .section-title {
             font-size: 12pt;
             font-weight: bold;
@@ -105,7 +100,33 @@
             border-left: 4px solid #1877F0;
         }
         
-        /* Table Styles */
+        .subsection-title {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            background-color: #f0f4f9;
+            padding: 6px 10px;
+            margin: 15px 0 10px 0;
+            border-left: 3px solid #1877F0;
+        }
+        
+        .legend {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .legend-box {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 7pt;
+            font-weight: 500;
+            text-align: center;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -115,9 +136,9 @@
         
         th, td {
             border: 1px solid #d1d5db;
-            padding: 8px 6px;
+            padding: 8px 4px;
             text-align: left;
-            vertical-align: top;
+            vertical-align: middle;
         }
         
         th {
@@ -125,35 +146,51 @@
             color: white;
             font-weight: bold;
             white-space: nowrap;
+            text-align: center;
         }
         
-        /* Zebra striping */
-        tbody tr:nth-child(even) {
-            background-color: #eff7ff;
+        .op-header-sow {
+            background-color: #e83e8c !important;
         }
         
-        tbody tr:hover {
-            background-color: #e0f2fe;
+        .op-header-piglet {
+            background-color: #2394EF !important;
         }
         
-        /* Status indicators */
+        .status-text {
+            display: block;
+            font-size: 7pt;
+            font-weight: normal;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+        
         .status-done {
-            color: #10b981;
-            font-weight: bold;
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+        
+        .status-late {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-very-late {
+            background-color: #ffedd5;
+            color: #9a3412;
         }
         
         .status-overdue {
-            color: #ef4444;
+            background-color: #fee2e2;
+            color: #991b1b;
             font-weight: bold;
-            background-color: #fef5f5;
         }
         
         .status-pending {
-            color: #f59e0b;
-            font-style: italic;
+            background-color: transparent;
+            color: #1f2937;
         }
         
-        /* Summary box */
         .summary-box {
             margin-top: 12px;
             padding: 10px;
@@ -164,7 +201,6 @@
             color: #1e3a8a;
         }
         
-        /* Footer with Pig Icon */
         .footer {
             margin-top: 30px;
             padding-top: 15px;
@@ -182,18 +218,13 @@
             margin-bottom: 8px;
         }
         
-        .pig-icon {
-            font-size: 20px;
-            opacity: 0.6;
-        }
-        
         .footer .app-name {
             font-weight: bold;
             color: #1e3a8a;
         }
         
-        .footer-text {
-            margin-top: 5px;
+        .text-right {
+            text-align: right;
         }
         
         .no-data {
@@ -204,128 +235,69 @@
             background-color: #f8f9fa;
             border: 1px dashed #d1d5db;
         }
+        
+        .piglet-count {
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 10pt;
+        }
+        
+        .pid-sow {
+            font-weight: 500;
+        }
+        
+        .pid-number {
+            font-weight: bold;
+            color: #1e3a8a;
+        }
     </style>
 </head>
 <body>
-    <!-- Branding Header - Centered with Large "J" -->
     <div class="branding-header">
         <div class="company-logo">J</div>
         <div class="product-name">SuperPig</div>
     </div>
     
-    <!-- Report Header -->
     <div class="report-header">
         <div class="report-name">PIG FARM SUMMARY REPORT</div>
         <div class="farm-name">{{ pig_farm_info.pig_farm.name }}</div>
         
-        <!-- Farm Address - Format: Philippines | Cebu, City of Naga, Tagjaguimit -->
+        {% set location = pig_farm_info.location %}
+        {% if location and location.country and location.country.name %}
         <div class="farm-address">
-            {% set location = pig_farm_info.location %}
-            {% if location %}
-                {# Build address parts list #}
-                {% set address_parts = [] %}
-                
-                {# Add level 1 if exists #}
-                {% if location.address.level_1 and location.address.level_1.name %}
-                    {% set _ = address_parts.append(location.address.level_1.name) %}
-                {% endif %}
-                
-                {# Add level 2 if exists #}
-                {% if location.address.level_2 and location.address.level_2.name %}
-                    {% set _ = address_parts.append(location.address.level_2.name) %}
-                {% endif %}
-                
-                {# Add level 3 if exists #}
-                {% if location.address.level_3 and location.address.level_3.name %}
-                    {% set _ = address_parts.append(location.address.level_3.name) %}
-                {% endif %}
-                
-                {# Display country #}
-                {% if location.country and location.country.name %}
-                    {{ location.country.name }}
-                {% endif %}
-                
-                {# Display address parts with commas #}
-                {% if address_parts|length > 0 %}
-                    {% if location.country and location.country.name %} | {% endif %}
-                    {{ address_parts|join(', ') }}
-                {% endif %}
+            {{ location.country.name }}
+            {% if location.address.level_1 and location.address.level_1.name %}
+                | {{ location.address.level_1.name }}
+            {% endif %}
+            {% if location.address.level_2 and location.address.level_2.name %}
+                , {{ location.address.level_2.name }}
+            {% endif %}
+            {% if location.address.level_3 and location.address.level_3.name %}
+                , {{ location.address.level_3.name }}
             {% endif %}
         </div>
+        {% endif %}
         
         <div class="generated-date">Generated on: {{ generated_date.strftime('%B %d, %Y at %H:%M') }}</div>
     </div>
 
-    <!-- Gestating Sows Section -->
-    <div class="section-title">1. GESTATING SOWS ({{ list_gestating|length }})</div>
-    
-    {% if list_gestating and list_gestating|length > 0 %}
-     <table>
-        <thead>
-            <tr>
-                <th>PID</th>
-                <th>Sow</th>
-                <th>Date Mating</th>
-                <th>Boar/Semen</th>
-                {% for op in gestating_operations %}
-                <th>{{ op.name }}</th>
-                {% endfor %}
-                <th>Expected Birth</th>
-            </thead>
-        <tbody>
-            {% for sow in list_gestating %}
-            <tr>
-                 <td>{{ sow.pig_production.farm_prod_id }}</td>
-                 <td>{% if sow.sow.name %}{{ sow.sow.name }}{% else %}{{ sow.sow.number }}{% endif %}</td>
-                 <td>
-                    {% if sow.insemination.insem_date %}
-                        {{ sow.insemination.insem_date|format_date }}
-                        (Day {{ sow.insemination.days_since_insem }})
-                    {% endif %}
-                 </td>
-                 <td>{{ sow.boar_display }}</td>
-                
-                {% for op_template in gestating_operations %}
-                    {% set found_op = None %}
-                    {% for op in sow.gestating_ops %}
-                        {% if op.account_pig_ops.id == op_template.id %}
-                            {% set found_op = op %}
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if found_op and found_op.pig_prod_pig_ops.date_actual %}
-                        <td class="status-done">{{ found_op.pig_prod_pig_ops.date_actual|format_date }}</td>
-                    {% elif found_op and found_op.pig_prod_pig_ops.date_target and found_op.pig_prod_pig_ops.date_target < today_date %}
-                        <td class="status-overdue">Not yet Done</td>
-                    {% else %}
-                        <td class="status-pending">&nbsp;</td>
-                    {% endif %}
-                {% endfor %}
-                
-                 <td>{% if sow.birth.date_expected %}{{ sow.birth.date_expected|format_date }}{% endif %}</td>
-             </tr>
-            {% endfor %}
-        </tbody>
-     </table>
-    <div class="summary-box">Total: {{ list_gestating|length }} gestating sows</div>
-    {% else %}
-    <div class="no-data">No gestating sows found.</div>
-    {% endif %}
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-box" style="background-color: #f0fdf4; color: #166534; border: 1px solid #166534;">Done on time</div>
+        <div class="legend-box" style="background-color: #fff3cd; color: #856404; border: 1px solid #856404;">Done late (+1-3d)</div>
+        <div class="legend-box" style="background-color: #ffedd5; color: #9a3412; border: 1px solid #9a3412;">Done very late (+4+d)</div>
+        <div class="legend-box" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #991b1b;">Overdue</div>
+        <div class="legend-box" style="background-color: #e83e8c; color: white;">Sow operation</div>
+        <div class="legend-box" style="background-color: #2394EF; color: white;">Piglet operation</div>
+    </div>
 
-    <!-- Other sections placeholder -->
-    <div class="section-title">2. LACTATING SOWS</div>
-    <div class="no-data">Coming soon...</div>
+    <!-- Include Gestating Section -->
+    {% include 'gestating_report.html' %}
 
-    <div class="section-title">3. FATTENING ENTRIES</div>
-    <div class="no-data">Coming soon...</div>
+    <!-- Include Lactating Section -->
+    {% include 'lactating_report.html' %}
 
-    <div class="section-title">4. FEED CONSUMPTION & COST</div>
-    <div class="no-data">Coming soon...</div>
-
-    <div class="section-title">5. SOW/BOAR INVENTORY</div>
-    <div class="no-data">Coming soon...</div>
-
-    <!-- Footer with Pig Icon -->
+    <!-- Footer -->
     <div class="footer">
         <div class="footer-content">
             <span class="app-name">{{ app_data.product_name }}</span>
@@ -336,3 +308,4 @@
     </div>
 </body>
 </html>
+

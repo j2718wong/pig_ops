@@ -1,0 +1,193 @@
+<!-- lactating_report.html - Lactating Sows Section -->
+<div class="section-title">2. LACTATING SOWS ({{ list_lactating|length }})</div>
+
+{% if list_lactating and list_lactating|length > 0 %}
+
+<!-- Sow Operations Table -->
+<div class="subsection-title">Sow Operations</div>
+<table>
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Pigs</th>
+            <th>Date of Birth</th>
+            {% for op in lactating_operations %}
+                {% if op.operation_type == 3 %}
+                    <th class="op-header-sow">{{ op.name }}</th>
+                {% endif %}
+            {% endfor %}
+            <th>Expected Wean</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sow in list_lactating %}
+        {% set ops_dict = {} %}
+        {% for op in sow.lactating_ops %}
+            {% set _ = ops_dict.update({op.account_pig_ops.id: op}) %}
+        {% endfor %}
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">{{ sow.pig_production.farm_prod_id }}</span>, 
+                {% if sow.sow.name %}{{ sow.sow.name }}{% else %}{{ sow.sow.number }}{% endif %}
+            </td>
+            <td class="text-right piglet-count">{{ sow.pig_production.cur_pig_count or 0 }}</td>
+            <td class="text-right">{{ sow.birth_display }}</td>
+            
+            {% for op_template in lactating_operations %}
+                {% if op_template.operation_type == 3 %}
+                    {% set found_op = ops_dict.get(op_template.id) %}
+                    
+                    {% if found_op and found_op.pig_prod_pig_ops.date_actual %}
+                        {% set date_actual = found_op.pig_prod_pig_ops.date_actual %}
+                        {% set date_target = found_op.pig_prod_pig_ops.date_target %}
+                        {% set days_diff = 0 %}
+                        {% if date_target %}
+                            {% set dt_actual = date_actual|string_to_date %}
+                            {% set dt_target = date_target|string_to_date %}
+                            {% set days_diff = (dt_actual - dt_target).days %}
+                        {% endif %}
+                        
+                        {% if days_diff <= 0 %}
+                            <td class="status-done">
+                                {{ date_actual|format_date }}<br>
+                                <span class="status-text">Done</span>
+                            </td>
+                        {% elif days_diff <= 3 %}
+                            <td class="status-late">
+                                {{ date_actual|format_date }}<br>
+                                <span class="status-text">Done (+{{ days_diff }}d)</span>
+                            </td>
+                        {% else %}
+                            <td class="status-very-late">
+                                {{ date_actual|format_date }}<br>
+                                <span class="status-text">Done (+{{ days_diff }}d)</span>
+                            </td>
+                        {% endif %}
+                        
+                    {% elif found_op and found_op.pig_prod_pig_ops.date_target %}
+                        {% set date_target = found_op.pig_prod_pig_ops.date_target %}
+                        {% set dt_target = date_target|string_to_date %}
+                        
+                        {% if dt_target and dt_target < today_date_obj %}
+                            {% set days_overdue = (today_date_obj - dt_target).days %}
+                            <td class="status-overdue">
+                                {{ date_target|format_date }}<br>
+                                <span class="status-text">Overdue ({{ days_overdue }}d)</span>
+                            </td>
+                        {% else %}
+                            <td class="status-pending">
+                                {{ date_target|format_date }}
+                            </td>
+                        {% endif %}
+                        
+                    {% else %}
+                        <td class="status-pending">&nbsp;</td>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            <td class="text-right">{{ sow.expected_wean_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Piglet Operations Table -->
+<div class="subsection-title">Piglet Operations</div>
+<table>
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Pigs</th>
+            <th>Date of Birth</th>
+            {% for op in lactating_operations %}
+                {% if op.operation_type == 2 %}
+                    <th class="op-header-piglet">{{ op.name }}</th>
+                {% endif %}
+            {% endfor %}
+            <th>Expected Wean</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sow in list_lactating %}
+        {% set ops_dict = {} %}
+        {% for op in sow.lactating_ops %}
+            {% set _ = ops_dict.update({op.account_pig_ops.id: op}) %}
+        {% endfor %}
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">{{ sow.pig_production.farm_prod_id }}</span>, 
+                {% if sow.sow.name %}{{ sow.sow.name }}{% else %}{{ sow.sow.number }}{% endif %}
+            </td>
+            <td class="text-right piglet-count">{{ sow.pig_production.cur_pig_count or 0 }}</td>
+            <td class="text-right">{{ sow.birth_display }}</td>
+            
+            {% for op_template in lactating_operations %}
+                {% if op_template.operation_type == 2 %}
+                    {% set found_op = ops_dict.get(op_template.id) %}
+                    
+                    {% if found_op and found_op.pig_prod_pig_ops.date_actual %}
+                        {% set date_actual = found_op.pig_prod_pig_ops.date_actual %}
+                        {% set date_target = found_op.pig_prod_pig_ops.date_target %}
+                        {% set days_diff = 0 %}
+                        {% if date_target %}
+                            {% set dt_actual = date_actual|string_to_date %}
+                            {% set dt_target = date_target|string_to_date %}
+                            {% set days_diff = (dt_actual - dt_target).days %}
+                        {% endif %}
+                        
+                        {% if days_diff <= 0 %}
+                            <td class="status-done">
+                                {{ date_actual|format_date }}<br>
+                                <span class="status-text">Done</span>
+                            </td>
+                        {% elif days_diff <= 3 %}
+                            <td class="status-late">
+                                {{ date_actual|format_date }}<br>
+                                <span class="status-text">Done (+{{ days_diff }}d)</span>
+                            </td>
+                        {% else %}
+                            <td class="status-very-late">
+                                {{ date_actual|format_date }}<br>
+                                <span class="status-text">Done (+{{ days_diff }}d)</span>
+                            </td>
+                        {% endif %}
+                        
+                    {% elif found_op and found_op.pig_prod_pig_ops.date_target %}
+                        {% set date_target = found_op.pig_prod_pig_ops.date_target %}
+                        {% set dt_target = date_target|string_to_date %}
+                        
+                        {% if dt_target and dt_target < today_date_obj %}
+                            {% set days_overdue = (today_date_obj - dt_target).days %}
+                            <td class="status-overdue">
+                                {{ date_target|format_date }}<br>
+                                <span class="status-text">Overdue ({{ days_overdue }}d)</span>
+                            </td>
+                        {% else %}
+                            <td class="status-pending">
+                                {{ date_target|format_date }}
+                            </td>
+                        {% endif %}
+                        
+                    {% else %}
+                        <td class="status-pending">&nbsp;</td>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            <td class="text-right">{{ sow.expected_wean_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="summary-box">Total: {{ list_lactating|length }} lactating sows | Total piglets: 
+    {% set total_piglets = 0 %}
+    {% for sow in list_lactating %}
+        {% set total_piglets = total_piglets + (sow.pig_production.cur_pig_count or 0) %}
+    {% endfor %}
+    {{ total_piglets }}
+</div>
+{% else %}
+<div class="no-data">No lactating sows found.</div>
+{% endif %}

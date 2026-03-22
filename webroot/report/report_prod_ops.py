@@ -53,16 +53,27 @@ class ReportProdOps(ReportBasic):
         super().__init__()
         
         
-    def get_data(self, pig_farm_id, inc_historical=0, inc_cost=0, inc_target_harvest=0):
+    def get_data(self, pig_farm_id, inc_historical=0, inc_cost=0, 
+            inc_target_harvest = 0):
         """
         Fetch all data needed for the report.
         """
+        
+        
         # Get pig farm info
-        pig_farm_info = model['pig_farm'].get_pig_farm_info(pig_farm_id)
+        pig_farm_info       = model['pig_farm'].get_pig_farm_info(pig_farm_id)
         get_location_address_names_and_replace_ids(pig_farm_info)
         
-        print('pig_farm_info')
-        pprint.pprint(pig_farm_info)
+        
+        # Get account info
+        account_id          = pig_farm_info['account']['id']  
+        account_info        = model['account'].get_info(account_id)
+        settings_operations = account_info['settings_operations'] 
+        
+        
+        
+        print('acc_settings_ops')
+        pprint.pprint(settings_operations)
         
         
 
@@ -71,10 +82,15 @@ class ReportProdOps(ReportBasic):
         pig_prod_list = model['pig_prod'].get_list(pig_farm_id, pig_prod_type=5)
         
         # Filter and enhance gestating sows with their operations
-        list_gestating = []
+        list_gestating  = []
+        
+        list_lactating  = []
+        
         
         for cur_entry in pig_prod_list:
-            if cur_entry['pig_production']['prod_status_id'] == PROD_STATUS_ID_GESTATING:
+            prod_status_id = cur_entry['pig_production']['prod_status_id']
+            
+            if prod_status_id == PROD_STATUS_ID_GESTATING:
                 
                 # Calculate days since insemination
                 insem_date = cur_entry['insemination']['insem_date']
@@ -82,6 +98,7 @@ class ReportProdOps(ReportBasic):
                     dt_insem = datetime.strptime(insem_date, '%Y-%m-%d')
                     days_since = (datetime.now() - dt_insem).days
                     cur_entry['insemination']['days_since_insem'] = days_since
+                
                 
                 # Get gestating operations for this production
                 operation_type = PIG_OPERATION_TYPE_GESTATING
@@ -91,21 +108,45 @@ class ReportProdOps(ReportBasic):
                     operation_type, 
                     pig_prod_id=pig_prod_id, 
                     inc_user_audit=0, 
-                    order_by=1
+                    order_by=0
                 )
                 
                 cur_entry['gestating_ops'] = res
                 list_gestating.append(cur_entry)
+            
+            
+            if prod_status_id == PROD_STATUS_ID_LACTATING:
+                # Get lactating operations for this production
+                
+                operation_type = PIG_OPERATION_TYPE_LACTATING_COMBINED
+                pig_prod_id = cur_entry['pig_production']['id']
+                
+                res = model['pig_prod_pig_ops'].get_list(
+                    operation_type, 
+                    pig_prod_id=pig_prod_id, 
+                    inc_user_audit=0, 
+                    order_by=0
+                )
+                
+
+                
+                cur_entry['lactating_ops'] = res
+                list_lactating.append(cur_entry)
+            
 
 
         farm_settings = self._get_farm_settings(pig_farm_id)
 
         
+        
+        
         # Prepare data for template
         data = {
             'pig_farm_info':        pig_farm_info,
+            'acc_settings_ops':     settings_operations,
             'farm_settings':        farm_settings,
             'list_gestating':       list_gestating,
+            'list_lactating':       list_lactating,
             'inc_historical':       False,
             'inc_cost':             False,
             'inc_target_harvest':   False
