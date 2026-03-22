@@ -184,7 +184,7 @@
 <table class="feed-consumption-table">
     <thead>
         <!-- First row: Main category headers with colspan -->
-        <tr>
+        <tr style="background-color: #1e3a8a;">
             <th rowspan="2">PID</th>
             <th rowspan="2">Prod Status</th>
             <th rowspan="2">Date Birth</th>
@@ -196,16 +196,17 @@
             <th colspan="3">Starter</th>
             <th colspan="3">Grower</th>
             <th colspan="3">Finisher</th>
-         </thead>
+        </tr>
         <!-- Second row: Sub-headers for BUY/CONS/BAL -->
-         <thead>
+        <tr style="background-color: #1e3a8a;">
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
             <th>BUY</th><th>CONS</th><th>BAL</th>
-         </thead>
+        </tr>
+    </thead>
     <tbody>
         {% for entry in feed_entries %}
         {% set pig_prod = entry.pig_production %}
@@ -313,7 +314,7 @@
             {% set finisher_cons = finisher_buy - finisher_bal %}
         {% endif %}
         
-        </td>
+        <tr>
             <td class="text-right">{{ pig_prod.farm_prod_id }}</td>
             <td class="text-left">{{ pig_prod.prod_status_name }}</td>
             <td class="text-left">
@@ -364,7 +365,7 @@
             <td class="text-right">{{ finisher_buy if finisher_buy > 0 else '-' }}</td>
             <td class="text-right">{{ "%.1f"|format(finisher_cons) if finisher_cons != 0 else '-' }}</td>
             <td class="text-right">{{ "%.1f"|format(finisher_bal) if finisher_bal != 0 else '-' }}</td>
-         </tbody>
+        </tr>
         {% endfor %}
     </tbody>
     <tfoot>
@@ -388,8 +389,9 @@
             <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_buy) if ns.total_finisher_buy > 0 else '-' }}</strong></td>
             <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_cons) if ns.total_finisher_cons != 0 else '-' }}</strong></td>
             <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_bal) if ns.total_finisher_bal != 0 else '-' }}</strong></td>
-         </tfoot>
-        </table>
+        </tr>
+    </tfoot>
+</table>
 
 <div class="summary-box">
     Total Pigs: {{ ns.total_pigs }}
