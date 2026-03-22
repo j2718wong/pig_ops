@@ -1,0 +1,3732 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jackson Farm (Punod) - Farm Summary Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        @page {
+            size: A4 landscape;
+            margin: 1.5cm;
+            
+            /* Page numbering */
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 8pt;
+                color: #6b7280;
+            }
+        }
+        
+        body {
+            font-size: 9pt;
+            line-height: 1.4;
+            color: #1f2937;
+            background: white;
+            padding: 20px;
+        }
+        
+        .branding-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1877F0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+            line-height: 0.8;
+            padding-bottom: 4px;
+        }
+        
+        .product-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1877F0;
+            white-space: nowrap;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1e3a8a;
+        }
+        
+        .report-name {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .farm-name {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #15467d;
+            margin-bottom: 5px;
+        }
+        
+        .farm-address {
+            font-size: 9pt;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .generated-date {
+            font-size: 8pt;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            background-color: #e6f0ff;
+            padding: 8px 12px;
+            margin: 20px 0 12px 0;
+            border-left: 4px solid #1877F0;
+        }
+        
+        .subsection-title {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            background-color: #f0f4f9;
+            padding: 6px 10px;
+            margin: 15px 0 10px 0;
+            border-left: 3px solid #1877F0;
+        }
+        
+        .legend {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .legend-box {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 7pt;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 8pt;
+        }
+        
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 8px 4px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        
+        th {
+            background-color: #1e3a8a;
+            color: white;
+            font-weight: bold;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        .op-header-sow {
+            background-color: #e83e8c !important;
+        }
+        
+        .op-header-piglet {
+            background-color: #2394EF !important;
+        }
+        
+        .status-text {
+            display: block;
+            font-size: 7pt;
+            font-weight: normal;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+        
+        .status-done {
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+        
+        .status-late {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-very-late {
+            background-color: #ffedd5;
+            color: #9a3412;
+        }
+        
+        .status-overdue {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background-color: transparent;
+            color: #1f2937;
+        }
+        
+        .summary-box {
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #d1d5db;
+            text-align: right;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 7pt;
+            color: #6b7280;
+        }
+        
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .footer .app-name {
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+            font-style: italic;
+            background-color: #f8f9fa;
+            border: 1px dashed #d1d5db;
+        }
+        
+        .piglet-count {
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 10pt;
+        }
+        
+        .pid-sow {
+            font-weight: 500;
+        }
+        
+        .pid-number {
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        .balance-row {
+            background-color: #f0f4f9;
+            font-weight: bold;
+        }
+        
+        /* Page break handling */
+        thead {
+            display: table-header-group;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div class="branding-header">
+        <div class="company-logo">J</div>
+        <div class="product-name">SuperPig</div>
+    </div>
+    
+    <div class="report-header">
+        <div class="report-name">PIG FARM SUMMARY REPORT</div>
+        <div class="farm-name">Jackson Farm (Punod)</div>
+        
+        
+        
+        <div class="farm-address">
+            Philippines
+            
+                | Cebu
+            
+            
+                , City of Naga
+            
+            
+                , Tagjaguimit
+            
+        </div>
+        
+        
+        <div class="generated-date">Generated on: March 22, 2026 at 12:37</div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-box" style="background-color: #f0fdf4; color: #166534; border: 1px solid #166534;">Done on time</div>
+        <div class="legend-box" style="background-color: #fff3cd; color: #856404; border: 1px solid #856404;">Done late (+1-3d)</div>
+        <div class="legend-box" style="background-color: #ffedd5; color: #9a3412; border: 1px solid #9a3412;">Done very late (+4+d)</div>
+        <div class="legend-box" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #991b1b;">Overdue</div>
+        <div class="legend-box" style="background-color: #e83e8c; color: white;">Sow operation</div>
+        <div class="legend-box" style="background-color: #2394EF; color: white;">Piglet operation</div>
+    </div>
+
+    <!-- Include Gestating Section -->
+    <div class="section-title">1. GESTATING SOWS (6)</div>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Date Mating</th>
+            <th>Boar/Semen</th>
+            
+            <th>Check Reheat</th>
+            
+            <th>Inject Iron</th>
+            
+            <th>Deworm</th>
+            
+            <th>Expected Birth</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">28</span>, 
+                Sheryl
+            </td>
+            <td class="text-right">
+                
+                    20 NOV 2025
+                    (Day 122)
+                
+            </td>
+            <td>Bob</td>
+            
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        
+                        
+                    
+                    
+                    
+                        <td class="status-late">
+                            13 DEC 2025<br>
+                            <span class="status-text">Done (+2d)</span>
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        
+                        
+                    
+                    
+                    
+                        <td class="status-late">
+                            10 FEB 2026<br>
+                            <span class="status-text">Done (+2d)</span>
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        
+                        
+                    
+                    
+                    
+                        <td class="status-late">
+                            02 MAR 2026<br>
+                            <span class="status-text">Done (+2d)</span>
+                        </td>
+                    
+                    
+                
+            
+            
+            <td class="text-right">15 MAR 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">29</span>, 
+                Jennifer
+            </td>
+            <td class="text-right">
+                
+                    14 JAN 2026
+                    (Day 67)
+                
+            </td>
+            <td>PIC 337 (from Growbest Agrivet)</td>
+            
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        
+                        
+                    
+                    
+                    
+                        <td class="status-done">
+                            04 FEB 2026<br>
+                            <span class="status-text">Done</span>
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            04 APR 2026
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            24 APR 2026
+                        </td>
+                    
+                    
+                
+            
+            
+            <td class="text-right">08 MAY 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">19</span>, 
+                Tifanny
+            </td>
+            <td class="text-right">
+                
+                    18 JAN 2026
+                    (Day 63)
+                
+            </td>
+            <td>Charlie</td>
+            
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        
+                        
+                    
+                    
+                    
+                        <td class="status-done">
+                            08 FEB 2026<br>
+                            <span class="status-text">Done</span>
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            08 APR 2026
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            28 APR 2026
+                        </td>
+                    
+                    
+                
+            
+            
+            <td class="text-right">12 MAY 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">26</span>, 
+                Fiona
+            </td>
+            <td class="text-right">
+                
+                    26 JAN 2026
+                    (Day 55)
+                
+            </td>
+            <td>Randy</td>
+            
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        <td class="status-overdue">
+                            16 FEB 2026<br>
+                            <span class="status-text">Overdue (34d)</span>
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            16 APR 2026
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            06 MAY 2026
+                        </td>
+                    
+                    
+                
+            
+            
+            <td class="text-right">20 MAY 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">27</span>, 
+                Lala
+            </td>
+            <td class="text-right">
+                
+                    30 JAN 2026
+                    (Day 51)
+                
+            </td>
+            <td>PIC 337 (from Growbest Agrivet)</td>
+            
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        
+                        <td class="status-overdue">
+                            20 FEB 2026<br>
+                            <span class="status-text">Overdue (30d)</span>
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            20 APR 2026
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            10 MAY 2026
+                        </td>
+                    
+                    
+                
+            
+            
+            <td class="text-right">24 MAY 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">30</span>, 
+                Gemma
+            </td>
+            <td class="text-right">
+                
+                    03 MAR 2026
+                    (Day 19)
+                
+            </td>
+            <td>Charlie</td>
+            
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            24 MAR 2026
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            22 MAY 2026
+                        </td>
+                    
+                    
+                
+            
+                
+                
+                
+                    
+                    
+                    
+                    
+                        <td class="status-pending">
+                            11 JUN 2026
+                        </td>
+                    
+                    
+                
+            
+            
+            <td class="text-right">25 JUN 2026</td>
+        </tr>
+        
+    </tbody>
+</table>
+<div class="summary-box">Total: 6 gestating sows</div>
+
+
+    <!-- Include Lactating Section -->
+    <!-- lactating_report.html - Lactating Sows Section -->
+<div class="section-title">2. LACTATING SOWS (2)</div>
+
+
+
+<!-- Sow Operations Table -->
+<div class="subsection-title">Sow Operations</div>
+<table>
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Pigs</th>
+            <th>Date of Birth</th>
+            
+                
+            
+                
+                    <th class="op-header-sow">MultiVitamins</th>
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+            <th>Expected Wean</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">17</span>, 
+                Shine
+            </td>
+            <td class="text-right piglet-count">21</td>
+            <td class="text-right">25 FEB 2026 (Day 26)</td>
+            
+            
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                26 FEB 2026<br>
+                                <span class="status-text">Overdue (24d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+            
+            <td class="text-right">07 APR 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">18</span>, 
+                Tanya
+            </td>
+            <td class="text-right piglet-count">15</td>
+            <td class="text-right">01 MAR 2026 (Day 22)</td>
+            
+            
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            
+                            
+                        
+                        
+                        
+                            <td class="status-done">
+                                03 MAR 2026<br>
+                                <span class="status-text">Done</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+                
+            
+            
+            <td class="text-right">11 APR 2026</td>
+        </tr>
+        
+    </tbody>
+</table>
+
+<!-- Piglet Operations Table -->
+<div class="subsection-title">Piglet Operations</div>
+<table>
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Pigs</th>
+            <th>Date of Birth</th>
+            
+                
+                    <th class="op-header-piglet">Cut Teeth</th>
+                
+            
+                
+            
+                
+                    <th class="op-header-piglet">Cut Tail</th>
+                
+            
+                
+                    <th class="op-header-piglet">Inject Iron_1</th>
+                
+            
+                
+                    <th class="op-header-piglet">Inject Iron_2</th>
+                
+            
+                
+                    <th class="op-header-piglet">Inject Vitamins_1</th>
+                
+            
+                
+                    <th class="op-header-piglet">Inject Vitamins_2</th>
+                
+            
+                
+                    <th class="op-header-piglet">Castration</th>
+                
+            
+                
+                    <th class="op-header-piglet">Deworm</th>
+                
+            
+            <th>Expected Wean</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">17</span>, 
+                Shine
+            </td>
+            <td class="text-right piglet-count">21</td>
+            <td class="text-right">25 FEB 2026 (Day 26)</td>
+            
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                25 FEB 2026<br>
+                                <span class="status-text">Overdue (25d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                27 FEB 2026<br>
+                                <span class="status-text">Overdue (23d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                27 FEB 2026<br>
+                                <span class="status-text">Overdue (23d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                09 MAR 2026<br>
+                                <span class="status-text">Overdue (13d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                10 MAR 2026<br>
+                                <span class="status-text">Overdue (12d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                17 MAR 2026<br>
+                                <span class="status-text">Overdue (5d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                18 MAR 2026<br>
+                                <span class="status-text">Overdue (4d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                21 MAR 2026<br>
+                                <span class="status-text">Overdue (1d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+            
+            <td class="text-right">07 APR 2026</td>
+        </tr>
+        
+        
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">18</span>, 
+                Tanya
+            </td>
+            <td class="text-right piglet-count">15</td>
+            <td class="text-right">01 MAR 2026 (Day 22)</td>
+            
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            
+                            
+                        
+                        
+                        
+                            <td class="status-done">
+                                02 MAR 2026<br>
+                                <span class="status-text">Done</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                04 MAR 2026<br>
+                                <span class="status-text">Overdue (18d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                04 MAR 2026<br>
+                                <span class="status-text">Overdue (18d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                14 MAR 2026<br>
+                                <span class="status-text">Overdue (8d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                15 MAR 2026<br>
+                                <span class="status-text">Overdue (7d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            
+                            <td class="status-overdue">
+                                22 MAR 2026<br>
+                                <span class="status-text">Overdue (0d)</span>
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            <td class="status-pending">
+                                23 MAR 2026
+                            </td>
+                        
+                        
+                    
+                
+            
+                
+                    
+                    
+                    
+                        
+                        
+                        
+                        
+                            <td class="status-pending">
+                                26 MAR 2026
+                            </td>
+                        
+                        
+                    
+                
+            
+            
+            <td class="text-right">11 APR 2026</td>
+        </tr>
+        
+    </tbody>
+</table>
+
+<div class="summary-box">Total: 2 lactating sows | Total piglets: 
+    
+    
+        
+    
+        
+    
+    0
+</div>
+
+
+    <!-- Include Feed Change Section -->
+    
+<!-- feed_change_report.html - Feed Change Schedule Section -->
+<div class="section-title">3. FEED CHANGE SCHEDULE</div>
+
+
+
+
+
+<!-- Calculate totals -->
+
+
+    
+    
+    
+        
+    
+
+    
+    
+    
+        
+    
+
+    
+    
+    
+        
+    
+
+    
+    
+    
+        
+    
+
+    
+    
+    
+        
+    
+
+    
+    
+    
+        
+    
+
+    
+    
+    
+        
+    
+
+
+
+<!-- Summary Row -->
+<div style="margin-bottom: 10px; padding: 8px; background-color: #f8f9fa; border: 1px solid #d1d5db; border-radius: 4px; display: flex; justify-content: space-around; flex-wrap: wrap;">
+    <div><strong>Lactating Piglets:</strong> <span class="piglet-count">36</span></div>
+    <div><strong>Fattening Pigs:</strong> <span class="piglet-count">61</span></div>
+    <div><strong>Total Pigs:</strong> <span class="piglet-count" style="color: #1e3a8a; font-size: 11pt;">97</span></div>
+</div>
+
+<table class="feed-change-table">
+    <thead>
+        <tr>
+            <th>PID / Sow</th>
+            <th>Pigs</th>
+            <th>Prod Status</th>
+            <th>Date of Birth</th>
+            <th>Lactating Feed</th>
+            <th>Booster</th>
+            <th>Prestarter</th>
+            <th>Date Wean</th>
+            <th>Starter</th>
+            <th>Grower</th>
+            <th>Finisher</th>
+            <th>Date Harvest</th>
+         </thead>
+    <tbody>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">17</span>
+                
+                    , Shine
+                
+            </td>
+            <td class="text-right piglet-count">21</td>
+            <td class="text-right">
+                Lactating
+                
+            </td>
+            <td class="text-right">
+                
+                    25 FEB 2026
+                    
+                        (Day 26)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    16 JUL 2026 (Target)
+                
+            </td>
+         </tr>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">18</span>
+                
+                    , Tanya
+                
+            </td>
+            <td class="text-right piglet-count">15</td>
+            <td class="text-right">
+                Lactating
+                
+            </td>
+            <td class="text-right">
+                
+                    01 MAR 2026
+                    
+                        (Day 22)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    20 JUL 2026 (Target)
+                
+            </td>
+         </tr>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">22</span>
+                
+                    , Sheryl
+                
+            </td>
+            <td class="text-right piglet-count">14</td>
+            <td class="text-right">
+                Weaning
+                
+            </td>
+            <td class="text-right">
+                
+                    12 APR 2025
+                    
+                        (Day 345)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    2025-05-27
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    31 AUG 2025 (Target)
+                
+            </td>
+         </tr>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">23</span>
+                
+                    , Joyna
+                
+            </td>
+            <td class="text-right piglet-count">15</td>
+            <td class="text-right">
+                Weaning
+                
+            </td>
+            <td class="text-right">
+                
+                    19 MAY 2025
+                    
+                        (Day 308)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    2025-07-03
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    07 OCT 2025 (Target)
+                
+            </td>
+         </tr>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">24</span>
+                
+                    , Gemma
+                
+            </td>
+            <td class="text-right piglet-count">16</td>
+            <td class="text-right">
+                Weaning
+                
+            </td>
+            <td class="text-right">
+                
+                    03 JUL 2025
+                    
+                        (Day 263)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    2025-08-15
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    21 NOV 2025 (Target)
+                
+            </td>
+         </tr>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">21</span>
+                
+                    , Jennifer
+                
+            </td>
+            <td class="text-right piglet-count">15</td>
+            <td class="text-right">
+                Weaning
+                
+            </td>
+            <td class="text-right">
+                
+                    23 NOV 2025
+                    
+                        (Day 120)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    2026-01-06
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    13 APR 2026 (Target)
+                
+            </td>
+         </tr>
+        
+        
+        
+        
+        
+        <!-- Get dates from entry structure -->
+        
+        
+        
+        <!-- Calculate days from birth date -->
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <tr>
+            <td class="pid-sow">
+                <span class="pid-number">16</span>
+                
+                    , Rose
+                
+            </td>
+            <td class="text-right piglet-count">1</td>
+            <td class="text-right">
+                Weaning
+                
+            </td>
+            <td class="text-right">
+                
+                    01 FEB 2026
+                    
+                        (Day 50)
+                    
+                
+            </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Prestarter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Wean -->
+            <td class="text-right">
+                
+                    2026-03-15
+                
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Date Harvest -->
+            <td class="text-right">
+                
+                    22 JUN 2026 (Target)
+                
+            </td>
+         </tr>
+        
+    </tbody>
+</table>
+
+<div class="summary-box">
+    Total Entries: 7 
+    | Lactating: 2 batches (36 piglets)
+    | Fattening: 5 batches (61 pigs)
+    | <strong>Total Pigs: 97</strong>
+</div>
+
+
+
+    <!-- Include Feed Consumption Section -->
+    
+<!-- feed_consumption_report.html - Feed Consumption Section -->
+<div class="section-title">4. FEED CONSUMPTION</div>
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+            
+        
+        
+        
+        
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+        
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+
+
+<style>
+    .feed-consumption-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-size: 7.5pt;
+    }
+    .feed-consumption-table th, .feed-consumption-table td {
+        border: 1px solid #d1d5db;
+        padding: 6px 3px;
+        vertical-align: middle;
+    }
+    .feed-consumption-table th {
+        background-color: #1e3a8a;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+    }
+    .feed-consumption-table td {
+        text-align: right;
+    }
+    .feed-consumption-table td:first-child,
+    .feed-consumption-table th:first-child {
+        text-align: left;
+    }
+    .feed-consumption-table td:nth-child(2),
+    .feed-consumption-table th:nth-child(2) {
+        text-align: left;
+    }
+    .feed-consumption-table td:nth-child(3),
+    .feed-consumption-table th:nth-child(3) {
+        text-align: left;
+    }
+    .balance-row {
+        background-color: #f0f4f9;
+        font-weight: bold;
+    }
+    /* Ensure thead repeats on page break */
+    thead {
+        display: table-header-group;
+    }
+    tr {
+        page-break-inside: avoid;
+    }
+</style>
+
+<table class="feed-consumption-table">
+    <thead>
+        <!-- First row: Main category headers with colspan -->
+        <tr>
+            <th rowspan="2">PID</th>
+            <th rowspan="2">Prod Status</th>
+            <th rowspan="2">Date Birth</th>
+            <th rowspan="2">Pigs</th>
+            <th rowspan="2">Feed Bal Date</th>
+            <th colspan="3">Lactating</th>
+            <th colspan="3">Booster</th>
+            <th colspan="3">Pre-Starter</th>
+            <th colspan="3">Starter</th>
+            <th colspan="3">Grower</th>
+            <th colspan="3">Finisher</th>
+         </thead>
+        <!-- Second row: Sub-headers for BUY/CONS/BAL -->
+         <thead>
+            <th>BUY</th><th>CONS</th><th>BAL</th>
+            <th>BUY</th><th>CONS</th><th>BAL</th>
+            <th>BUY</th><th>CONS</th><th>BAL</th>
+            <th>BUY</th><th>CONS</th><th>BAL</th>
+            <th>BUY</th><th>CONS</th><th>BAL</th>
+            <th>BUY</th><th>CONS</th><th>BAL</th>
+         </thead>
+    <tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">17</td>
+            <td class="text-left">Lactating</td>
+            <td class="text-left">
+                
+                    25 FEB 2026
+                    
+                        (Day 26)
+                    
+                
+            </td>
+            <td class="text-right">21</td>
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">18</td>
+            <td class="text-left">Lactating</td>
+            <td class="text-left">
+                
+                    01 MAR 2026
+                    
+                        (Day 22)
+                    
+                
+            </td>
+            <td class="text-right">15</td>
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">22</td>
+            <td class="text-left">Weaning</td>
+            <td class="text-left">
+                
+                    12 APR 2025
+                    
+                        (Day 345)
+                    
+                
+            </td>
+            <td class="text-right">14</td>
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">23</td>
+            <td class="text-left">Weaning</td>
+            <td class="text-left">
+                
+                    19 MAY 2025
+                    
+                        (Day 308)
+                    
+                
+            </td>
+            <td class="text-right">15</td>
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">24</td>
+            <td class="text-left">Weaning</td>
+            <td class="text-left">
+                
+                    03 JUL 2025
+                    
+                        (Day 263)
+                    
+                
+            </td>
+            <td class="text-right">16</td>
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">21</td>
+            <td class="text-left">Weaning</td>
+            <td class="text-left">
+                
+                    23 NOV 2025
+                    
+                        (Day 120)
+                    
+                
+            </td>
+            <td class="text-right">15</td>
+            <td class="text-right">
+                
+                    -
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            
+                
+                
+                    
+                
+                
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+        
+        
+        
+        
+            
+        
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+        
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </td>
+            <td class="text-right">16</td>
+            <td class="text-left">Weaning</td>
+            <td class="text-left">
+                
+                    01 FEB 2026
+                    
+                        (Day 50)
+                    
+                
+            </td>
+            <td class="text-right">1</td>
+            <td class="text-right">
+                
+                    31 JAN 2026
+                
+            </td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">2</td>
+            <td class="text-right">2.0</td>
+            <td class="text-right">-</td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">4</td>
+            <td class="text-right">3.0</td>
+            <td class="text-right">1.0</td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+            <td class="text-right">-</td>
+         </tbody>
+        
+    </tbody>
+    <tfoot>
+        <tr class="balance-row">
+            <td colspan="5" style="text-align: right;"><strong>Balance Total</strong></td>
+            <td class="text-right"><strong>2.0</strong></td>
+            <td class="text-right"><strong>2.0</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>4.0</strong></td>
+            <td class="text-right"><strong>3.0</strong></td>
+            <td class="text-right"><strong>1.0</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+            <td class="text-right"><strong>-</strong></td>
+         </tfoot>
+        </table>
+
+<div class="summary-box">
+    Total Pigs: 97
+</div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <span class="app-name">SuperPig</span>
+        </div>
+        <div class="footer-text">
+            https://superpig.jsysdev.com | jsysdev.contact@gmail.com
+        </div>
+    </div>
+</body>
+</html>

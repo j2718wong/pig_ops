@@ -176,6 +176,11 @@ class F_PDF:
     def generate_pig_farm_summary_report(self, context):
         """Generate complete pig farm summary report PDF."""
         
+        today = datetime.now()
+        context['today_date'] = today.strftime('%Y-%m-%d')
+        context['today_date_obj'] = today  # This is important for calculations
+
+        
         # Add generated date and today's date
         context['generated_date'] = datetime.now()
         today = datetime.now()

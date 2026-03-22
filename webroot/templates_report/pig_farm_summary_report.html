@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +15,13 @@
         @page {
             size: A4 landscape;
             margin: 1.5cm;
+            
+            /* Page numbering */
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 8pt;
+                color: #6b7280;
+            }
         }
         
         body {
@@ -41,7 +49,7 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            font-size: 42px;
+            font-size: 40px;
             font-weight: bold;
             color: white;
             flex-shrink: 0;
@@ -250,6 +258,20 @@
             font-weight: bold;
             color: #1e3a8a;
         }
+        
+        .balance-row {
+            background-color: #f0f4f9;
+            font-weight: bold;
+        }
+        
+        /* Page break handling */
+        thead {
+            display: table-header-group;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+        }
     </style>
 </head>
 <body>
@@ -296,10 +318,12 @@
 
     <!-- Include Lactating Section -->
     {% include 'lactating_report.html' %}
-    
+
     <!-- Include Feed Change Section -->
     {% include 'feed_change_report.html' %}
-    
+
+    <!-- Include Feed Consumption Section -->
+    {% include 'feed_consumption_report.html' %}
 
     <!-- Footer -->
     <div class="footer">

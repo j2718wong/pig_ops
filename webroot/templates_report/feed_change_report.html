@@ -1,3 +1,4 @@
+
 <!-- feed_change_report.html - Feed Change Schedule Section -->
 <div class="section-title">3. FEED CHANGE SCHEDULE</div>
 
@@ -5,7 +6,7 @@
 
 {% if all_feed_entries and all_feed_entries|length > 0 %}
 
-<!-- Calculate totals using namespace -->
+<!-- Calculate totals -->
 {% set ns = namespace(total_lactating_pigs=0, total_fattening_pigs=0) %}
 {% for entry in all_feed_entries %}
     {% set pig_count = entry.pig_production.cur_pig_count|default(0) %}
@@ -47,8 +48,22 @@
         {% set feeds = entry.feeds %}
         {% set prod_status_id = pig_prod.prod_status_id %}
         
-        {% set birth_date = entry.birth.date_actual if entry.birth else None %}
-        {% set birth_days = entry.birth.days_old if entry.birth else None %}
+        <!-- Get dates from entry structure -->
+        {% set birth_date_str = entry.birth.date_actual if entry.birth else None %}
+        {% set birth_days = 0 %}
+        
+        <!-- Calculate days from birth date -->
+        {% if birth_date_str and today_date_obj %}
+            {% set dt_birth = birth_date_str|string_to_date %}
+            {% if dt_birth %}
+                {% set days_old = (today_date_obj - dt_birth).days %}
+                {% if acc_settings_ops and acc_settings_ops.day_1_on_date_of_birth == 1 %}
+                    {% set days_old = days_old + 1 %}
+                {% endif %}
+                {% set birth_days = days_old %}
+            {% endif %}
+        {% endif %}
+        
         {% set wean_date = entry.weaning.date_weaning if entry.weaning else None %}
         {% set expected_wean = entry.weaning.expected_wean_date if entry.weaning else None %}
         {% set harvest_date = entry.dates.harvest if entry.dates else None %}
@@ -77,12 +92,17 @@
             <td class="text-right">
                 {% if is_combined %}
                     -
-                {% elif birth_date %}
-                    {{ birth_date|format_date }} (Day {{ birth_days }})
+                {% elif birth_date_str %}
+                    {{ birth_date_str|format_date }}
+                    {% if birth_days > 0 %}
+                        (Day {{ birth_days }})
+                    {% endif %}
                 {% else %}
                     -
                 {% endif %}
             </td>
+            
+            <!-- Lactating Feed (only for lactating sows) -->
             <td class="text-right">
                 {% if prod_status_id == 4 and feeds.date_change_feed and feeds.date_change_feed.lactating %}
                     {{ feeds.date_change_feed.lactating|format_date }}
@@ -90,6 +110,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Booster Feed -->
             <td class="text-right">
                 {% if feeds.date_change_feed and feeds.date_change_feed.booster %}
                     {{ feeds.date_change_feed.booster|format_date }}
@@ -97,6 +119,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Prestarter Feed -->
             <td class="text-right">
                 {% if feeds.date_change_feed and feeds.date_change_feed.prestarter %}
                     {{ feeds.date_change_feed.prestarter|format_date }}
@@ -104,6 +128,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Date Wean -->
             <td class="text-right">
                 {% if is_combined %}
                     -
@@ -115,6 +141,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Starter Feed -->
             <td class="text-right">
                 {% if feeds.date_change_feed and feeds.date_change_feed.starter %}
                     {{ feeds.date_change_feed.starter|format_date }}
@@ -122,6 +150,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Grower Feed -->
             <td class="text-right">
                 {% if feeds.date_change_feed and feeds.date_change_feed.grower %}
                     {{ feeds.date_change_feed.grower|format_date }}
@@ -129,6 +159,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Finisher Feed -->
             <td class="text-right">
                 {% if feeds.date_change_feed and feeds.date_change_feed.finisher %}
                     {{ feeds.date_change_feed.finisher|format_date }}
@@ -136,6 +168,8 @@
                     -
                 {% endif %}
             </td>
+            
+            <!-- Date Harvest -->
             <td class="text-right">
                 {% if harvest_date %}
                     {{ harvest_date|format_date }}
@@ -145,7 +179,7 @@
                     -
                 {% endif %}
             </td>
-        </tr>
+         </tr>
         {% endfor %}
     </tbody>
 </table>

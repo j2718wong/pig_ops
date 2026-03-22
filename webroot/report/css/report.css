@@ -1,8 +1,14 @@
-cat > ~/projects/jsys/pig_ops/webroot/templates_report/css/report.css << 'EOF'
 /* Report Styles - Matching Web App Corporate Theme */
 @page {
     size: A4 landscape;
     margin: 1.5cm;
+    
+    /* Page numbering */
+    @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 8pt;
+        color: #6b7280;
+    }
 }
 
 body {
@@ -146,4 +152,3 @@ tbody tr:hover {
     background-color: #f8f9fa;
     border: 1px dashed #d1d5db;
 }
-EOF
