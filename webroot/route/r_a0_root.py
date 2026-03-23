@@ -75,6 +75,19 @@ async def signup(response: Response):
     return page
     
 
+@app.get("/logout", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+async def logout(response: Response):
+    # Add cache control headers to prevent caching
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, private"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    
+    
+    page = controller.view['signup'].render()
+    
+    return page
+    
+
 
 @app.get("/pig_farm/data")
 async def pig_farm_data(request: Request):
@@ -130,11 +143,15 @@ def get_farm_data(user_id):
         }
        
     
+
     
     account = user_account['account']
     user    = user_account['user']
     
+    
+    
     if account is None:
+        
         data = {
             'application':      data_app,
             'user_account':     user_account,
@@ -164,6 +181,8 @@ def get_farm_data(user_id):
     
     if 'pig_farms' in user:
         user_pig_farms =  user['pig_farms']
+    else:
+        print('\n\nuser has no pig farms; user_id = %s\n\n' % user_id)
     
     if user_pig_farms is not None and len(user_pig_farms) > 0:
         pig_farm_id = user_pig_farms[0]
@@ -171,7 +190,9 @@ def get_farm_data(user_id):
     
     farm_account = None
 
-    if pig_farm_id > 0:    
+    if pig_farm_id > 0:  
+        
+          
         farm_account = get_page_data_farm_account_pig_prod(
             pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
         
@@ -217,8 +238,11 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
         
     user_id = res[0]
     
+
+    
     pig_farm_data = get_farm_data(user_id)
     
+
     
     # Get browser info 
     browser_info                = get_browser_info(request)

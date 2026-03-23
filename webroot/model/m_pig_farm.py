@@ -1,7 +1,20 @@
 # January 3, 2024
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
+
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
 
 
 # The account.flag_settings will be broken down so that
@@ -27,9 +40,10 @@ FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH     = 1
 FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
             
 
-class PigFarm:
+class PigFarm(BaseModel):
     def __init__(self, model):
-        self.model              = model
+        super().__init__(model)  # Inherit from BaseModel
+        
         self.TAG                = 'PigFarm'
 
         
@@ -54,66 +68,33 @@ class PigFarm:
         )  
         """
         
-        sql =  'CALL pig_farm_add('
-        sql += '%s,'    % data.user_id
-        sql += '"%s",'  % data.name
-        
-        if data.new_country_code is not None:
-            sql += '"%s",'  % data.new_country_code
-        else:
-            sql += 'NULL,'
-        
-        if data.new_country_name is not None:
-            sql += '"%s",'  % data.new_country_name
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.level_1_id
-        sql += '%s,'    % data.level_2_id
-        sql += '%s,'    % data.level_3_id
-        
-        if data.latitude is not None:   
-            sql += '%s,'    % data.latitude
-        else:
-            sql += 'NULL,'
+        params = [
+            data.user_id,
+            data.name               if data.name and data.name.strip() else None,
             
-        if data.longitude is not None:
-            sql += '%s);'   % data.longitude
-        else:
-            sql += 'NULL);'
+            data.new_country_code   if data.new_country_code else None,
+            data.new_country_name   if data.new_country_name else None,
+            
+            data.country_id,
+            data.level_1_id,
+            data.level_2_id,
+            data.level_3_id,
+            
+            data.latitude           if data.latitude is not None else None,
+            data.longitude          if data.longitude is not None else None
+        ]
         
+        # DEBUG: Print the procedure call string 
+        debug_sql = self._generate_debug_procedure('pig_farm_add', params)
         print('\n\n')
-        print(sql)
+        print(debug_sql)
         
+        rows = self._call_procedure('pig_farm_add', params)
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        if rows is None:
+            return None
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        row = rows[0]
 
         if row is not None:
             return {
@@ -165,52 +146,26 @@ class PigFarm:
         )
         """
        
-        sql =  'CALL pig_farm_update('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_farm_id
-        sql += '"%s",'  % data.name
-        
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.level_1_id
-        sql += '%s,'    % data.level_2_id
-        sql += '%s,'    % data.level_3_id
-        
-        if data.latitude is not None:
-            sql += '%s,'    % data.latitude
-        else:
-            sql += 'NULL,'
+        params = [
+            data.user_id,
+            data.pig_farm_id,
+            data.name               if data.name and data.name.strip() else None,
             
-        if data.longitude is not None:
-            sql += '%s);'   % data.longitude
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.country_id,
+            data.level_1_id,
+            data.level_2_id,
+            data.level_3_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.latitude           if data.latitude is not None else None,
+            data.longitude          if data.longitude is not None else None
+        ]
+        
+        rows = self._call_procedure('pig_farm_update', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
 
         if row is not None:
             return {

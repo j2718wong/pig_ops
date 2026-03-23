@@ -1,0 +1,293 @@
+
+<!-- feed_cost_report.html - Feed Cost Section -->
+<div class="section-title">5. FEED COST</div>
+
+{% set feed_entries = list_lactating + list_fattening %}
+{% if feed_entries and feed_entries|length > 0 %}
+
+{# Calculate totals for cost #}
+{% set ns = namespace(
+    total_pigs=0,
+    total_lactating_buy=0, total_lactating_cost=0,
+    total_booster_buy=0, total_booster_cost=0,
+    total_prestarter_buy=0, total_prestarter_cost=0,
+    total_starter_buy=0, total_starter_cost=0,
+    total_grower_buy=0, total_grower_cost=0,
+    total_finisher_buy=0, total_finisher_cost=0,
+    total_all_cost=0
+) %}
+
+{% for entry in feed_entries %}
+    {% set pig_prod = entry.pig_production %}
+    {% set feeds = entry.feeds %}
+    {% set costs = entry.costs %}
+    
+    {# Get pig count safely #}
+    {% set pig_count = pig_prod.cur_pig_count %}
+    {% if pig_count is none %}
+        {% set pig_count = 0 %}
+    {% endif %}
+    {% set ns.total_pigs = ns.total_pigs + pig_count %}
+    
+    {% if feeds and feeds.bought %}
+        {% set lactating_buy = feeds.bought.lactating if feeds.bought.lactating is not none else 0 %}
+        {% set booster_buy = feeds.bought.booster if feeds.bought.booster is not none else 0 %}
+        {% set prestarter_buy = feeds.bought.prestarter if feeds.bought.prestarter is not none else 0 %}
+        {% set starter_buy = feeds.bought.starter if feeds.bought.starter is not none else 0 %}
+        {% set grower_buy = feeds.bought.grower if feeds.bought.grower is not none else 0 %}
+        {% set finisher_buy = feeds.bought.finisher if feeds.bought.finisher is not none else 0 %}
+        
+        {% set ns.total_lactating_buy = ns.total_lactating_buy + lactating_buy %}
+        {% set ns.total_booster_buy = ns.total_booster_buy + booster_buy %}
+        {% set ns.total_prestarter_buy = ns.total_prestarter_buy + prestarter_buy %}
+        {% set ns.total_starter_buy = ns.total_starter_buy + starter_buy %}
+        {% set ns.total_grower_buy = ns.total_grower_buy + grower_buy %}
+        {% set ns.total_finisher_buy = ns.total_finisher_buy + finisher_buy %}
+    {% endif %}
+    
+    {% if costs %}
+        {% set lactating_cost = costs.lactating if costs.lactating is not none else 0 %}
+        {% set booster_cost = costs.booster if costs.booster is not none else 0 %}
+        {% set prestarter_cost = costs.prestarter if costs.prestarter is not none else 0 %}
+        {% set starter_cost = costs.starter if costs.starter is not none else 0 %}
+        {% set grower_cost = costs.grower if costs.grower is not none else 0 %}
+        {% set finisher_cost = costs.finisher if costs.finisher is not none else 0 %}
+        
+        {% set ns.total_lactating_cost = ns.total_lactating_cost + lactating_cost %}
+        {% set ns.total_booster_cost = ns.total_booster_cost + booster_cost %}
+        {% set ns.total_prestarter_cost = ns.total_prestarter_cost + prestarter_cost %}
+        {% set ns.total_starter_cost = ns.total_starter_cost + starter_cost %}
+        {% set ns.total_grower_cost = ns.total_grower_cost + grower_cost %}
+        {% set ns.total_finisher_cost = ns.total_finisher_cost + finisher_cost %}
+    {% endif %}
+{% endfor %}
+
+{% set ns.total_all_cost = ns.total_lactating_cost + ns.total_booster_cost + ns.total_prestarter_cost + ns.total_starter_cost + ns.total_grower_cost + ns.total_finisher_cost %}
+
+<style>
+    .feed-cost-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+        font-size: 7.5pt;
+    }
+    .feed-cost-table th, .feed-cost-table td {
+        border: 1px solid #d1d5db;
+        padding: 6px 3px;
+        vertical-align: middle;
+    }
+    .feed-cost-table th {
+        background-color: #1e3a8a;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+    }
+    .feed-cost-table td {
+        text-align: right;
+    }
+    .feed-cost-table td:first-child,
+    .feed-cost-table th:first-child {
+        text-align: left;
+    }
+    .feed-cost-table td:nth-child(2),
+    .feed-cost-table th:nth-child(2) {
+        text-align: left;
+    }
+    .feed-cost-table td:nth-child(3),
+    .feed-cost-table th:nth-child(3) {
+        text-align: left;
+    }
+    .balance-row {
+        background-color: #f0f4f9;
+        font-weight: bold;
+    }
+    thead {
+        display: table-header-group;
+    }
+    tr {
+        page-break-inside: avoid;
+    }
+    .currency {
+        font-size: 7pt;
+        color: #6b7280;
+    }
+</style>
+
+<table class="feed-cost-table">
+    <thead>
+        <tr style="background-color: #1e3a8a;">
+            <th>PID</th>
+            <th>Prod Status</th>
+            <th>Date Birth</th>
+            <th>Pigs</th>
+            <th>Total Cost</th>
+            <th colspan="2">Lactating</th>
+            <th colspan="2">Booster</th>
+            <th colspan="2">Pre-Starter</th>
+            <th colspan="2">Starter</th>
+            <th colspan="2">Grower</th>
+            <th colspan="2">Finisher</th>
+        </tr>
+        <tr style="background-color: #1e3a8a;">
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>BUY</th><th>COST</th>
+            <th>BUY</th><th>COST</th>
+            <th>BUY</th><th>COST</th>
+            <th>BUY</th><th>COST</th>
+            <th>BUY</th><th>COST</th>
+            <th>BUY</th><th>COST</th>
+         </tr>
+    </thead>
+    <tbody>
+        {% for entry in feed_entries %}
+            {% set pig_prod = entry.pig_production %}
+            {% set feeds = entry.feeds %}
+            {% set costs = entry.costs %}
+            {% set birth_date = entry.birth.date_actual if entry.birth else None %}
+            
+            {# Calculate days since birth only if birth_date exists #}
+            {% set birth_days = 0 %}
+            {% if birth_date and today_date_obj %}
+                {% set dt_birth = birth_date|string_to_date %}
+                {% if dt_birth %}
+                    {% set days_old = (today_date_obj - dt_birth).days %}
+                    {% if acc_settings_ops and acc_settings_ops.day_1_on_date_of_birth == 1 %}
+                        {% set days_old = days_old + 1 %}
+                    {% endif %}
+                    {% set birth_days = days_old %}
+                {% endif %}
+            {% endif %}
+            
+            {# Get pig count safely #}
+            {% set pig_count = pig_prod.cur_pig_count %}
+            {% if pig_count is none %}
+                {% set pig_count = 0 %}
+            {% endif %}
+            
+            {# Calculate total cost for this batch #}
+            {% set batch_total_cost = 0 %}
+            {% if costs %}
+                {% set batch_total_cost = (costs.lactating|default(0)) + (costs.booster|default(0)) + (costs.prestarter|default(0)) + (costs.starter|default(0)) + (costs.grower|default(0)) + (costs.finisher|default(0)) %}
+            {% endif %}
+        
+        <tr>
+            <td class="text-right">{{ pig_prod.farm_prod_id }}</td>
+            <td class="text-left">{{ pig_prod.prod_status_name }}</td>
+            <td class="text-left">
+                {% if birth_date %}
+                    {{ birth_date|format_date }}
+                    {% if birth_days > 0 %}
+                        (Day {{ birth_days }})
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="text-right">{{ pig_count }}</td>
+            <td class="text-right"><strong>{{ "%.2f"|format(batch_total_cost) if batch_total_cost > 0 else '-' }}</strong></td>
+            
+            <!-- Lactating Feed -->
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.lactating is not none -%}
+                    {{ "%.1f"|format(feeds.bought.lactating) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if costs and costs.lactating is not none -%}
+                    {{ "%.2f"|format(costs.lactating) }}
+                {%- endif -%}
+            </td>
+            
+            <!-- Booster Feed -->
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.booster is not none -%}
+                    {{ "%.1f"|format(feeds.bought.booster) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if costs and costs.booster is not none -%}
+                    {{ "%.2f"|format(costs.booster) }}
+                {%- endif -%}
+            </td>
+            
+            <!-- Pre-Starter Feed -->
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.prestarter is not none -%}
+                    {{ "%.1f"|format(feeds.bought.prestarter) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if costs and costs.prestarter is not none -%}
+                    {{ "%.2f"|format(costs.prestarter) }}
+                {%- endif -%}
+            </td>
+            
+            <!-- Starter Feed -->
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.starter is not none -%}
+                    {{ "%.1f"|format(feeds.bought.starter) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if costs and costs.starter is not none -%}
+                    {{ "%.2f"|format(costs.starter) }}
+                {%- endif -%}
+            </td>
+            
+            <!-- Grower Feed -->
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.grower is not none -%}
+                    {{ "%.1f"|format(feeds.bought.grower) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if costs and costs.grower is not none -%}
+                    {{ "%.2f"|format(costs.grower) }}
+                {%- endif -%}
+            </td>
+            
+            <!-- Finisher Feed -->
+            <td class="text-right">
+                {%- if feeds.bought and feeds.bought.finisher is not none -%}
+                    {{ "%.1f"|format(feeds.bought.finisher) }}
+                {%- endif -%}
+            </td>
+            <td class="text-right">
+                {%- if costs and costs.finisher is not none -%}
+                    {{ "%.2f"|format(costs.finisher) }}
+                {%- endif -%}
+            </td>
+         </tr>
+        {% endfor %}
+        
+        <tr class="balance-row">
+            <td colspan="5" style="text-align: right;"><strong>Total Cost</strong></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_lactating_buy) if ns.total_lactating_buy > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.2f"|format(ns.total_lactating_cost) if ns.total_lactating_cost > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_booster_buy) if ns.total_booster_buy > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.2f"|format(ns.total_booster_cost) if ns.total_booster_cost > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_prestarter_buy) if ns.total_prestarter_buy > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.2f"|format(ns.total_prestarter_cost) if ns.total_prestarter_cost > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_starter_buy) if ns.total_starter_buy > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.2f"|format(ns.total_starter_cost) if ns.total_starter_cost > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_grower_buy) if ns.total_grower_buy > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.2f"|format(ns.total_grower_cost) if ns.total_grower_cost > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.1f"|format(ns.total_finisher_buy) if ns.total_finisher_buy > 0 else '' }}</strong></td>
+            <td class="text-right"><strong>{{ "%.2f"|format(ns.total_finisher_cost) if ns.total_finisher_cost > 0 else '' }}</strong></td>
+         </tr>
+        
+    </tbody>
+   
+</table>
+
+<div class="summary-box">
+    <strong>Grand Total Cost:</strong> {{ "%.2f"|format(ns.total_all_cost) }}<br>
+    Total Pigs: {{ ns.total_pigs }}
+</div>
+{% else %}
+<div class="no-data">No feed cost data available.</div>
+{% endif %}

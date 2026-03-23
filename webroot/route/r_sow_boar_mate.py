@@ -232,8 +232,8 @@ async def boar_external_mate_update(request: Request, data: dm.DataBoarExternalM
     return res_update
     
 
-def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0):
-    res = model['sow_boar_mate'].get_list(sow_boar_id, is_external)
+def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0, pig_farm_id = 0):
+    res = model['sow_boar_mate'].get_list(sow_boar_id, is_external, pig_farm_id)
     
     
     if res is None:
@@ -286,7 +286,8 @@ def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0):
 
 
 @app.get("/sow_boar_mate/list", tags=["Sow Boar"])
-async def sow_boar_mate_list(request: Request, sow_boar_hid:str, is_external:int = 0):
+async def sow_boar_mate_list(request: Request, sow_boar_hid:str = None, 
+        is_external:int = 0, pfhid: str = None):
     """
     Will get sow boar list.
     
@@ -296,7 +297,6 @@ async def sow_boar_mate_list(request: Request, sow_boar_hid:str, is_external:int
         sow_boar_hid; 
     
     
-
     is_external:
         only applicable if sow_boar_hid is a boar
         if > 0, will get external mates only
@@ -314,18 +314,34 @@ async def sow_boar_mate_list(request: Request, sow_boar_hid:str, is_external:int
     
     
     sow_boar_id = 0
+    pig_farm_id = 0
     
-    res = hashids_common.decrypt(sow_boar_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID,
-                'code': 'ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID'
+    
+    if sow_boar_hid is not None:
+        res = hashids_common.decrypt(sow_boar_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID,
+                    'code': 'ERROR_SOW_BOAR_MATE_INVALID_SOW_BOAR_HASHID'
+                }
             }
-        }
+        
+        sow_boar_id = res[0]
+        
     
-    sow_boar_id = res[0]
-    
+    if pfhid is not None:
+        res = hashids_common.decrypt(pfhid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SOW_BOAR_MATE_INVALID_PIG_FARM_HASHID,
+                    'code': 'ERROR_SOW_BOAR_MATE_INVALID_PIG_FARM_HASHID'
+                }
+            }
+        
+        pig_farm_id = res[0]
+        
     
     res = get_data_sow_boar_mate_list(sow_boar_id, is_external)
             

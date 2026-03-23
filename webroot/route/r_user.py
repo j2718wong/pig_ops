@@ -205,8 +205,6 @@ async def user_register_or_login(request: Request,
     
     res_register =  model['user'].register_or_login(user_data)
     
-    print('res_register')
-    pprint.pprint(res_register)
     
     if res_register is None:
         return {

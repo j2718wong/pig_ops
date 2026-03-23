@@ -1,379 +1,272 @@
-# January 3, 2024
+# January 3, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
-"""
-/* user.flag bits*/
-DECLARE FLAG_BIT_USER_IS_ACTIVE                 INT             DEFAULT 1;
-DECLARE FLAG_BIT_USER_EMAIL_VERIFIED            INT             DEFAULT 2;
-DECLARE FLAG_BIT_USER_MOBILE_NUM_VERIFIED       INT             DEFAULT 4;
-DECLARE FLAG_BIT_USER_IS_DELETED                INT             DEFAULT 8;
 
-DECLARE FLAG_BIT_USER_IS_ACCOUNT_ADMIN          INT             DEFAULT 16;
-"""
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
-FLAG_BIT_USER_IS_ACTIVE             = 1
-FLAG_BIT_USER_EMAIL_VERIFIED        = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED   = 4
-FLAG_BIT_USER_IS_DELETED            = 8
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
 
-FLAG_BIT_USER_IS_ACCOUNT_ADMIN      = 16
+from base_model             import BaseModel
 
 
-"""
-/* account.flag bits
-bit 0: FLAG_BIT_ACCOUNT_ENABLE
-bit 1:
-bit 2:
-bit 3:  
+#/* user.flag bits*/
+FLAG_BIT_USER_IS_ACTIVE                 = 1
+FLAG_BIT_USER_EMAIL_VERIFIED            = 2
+FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
+FLAG_BIT_USER_IS_DELETED                = 8
+FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
 
-bit 4:  FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
-0 = not exempted has to pay bill
-1 = exempted
-
-
-
-bit 16: FLAG_BIT_COMPANY_OWNED_ACCOUNT
-
-*/
-"""
-FLAG_BIT_ACCOUNT_ENABLE             = 1
+#/* account.flag bits */
+FLAG_BIT_ACCOUNT_ENABLE                 = 1
 FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT = 16
 
 
 
-class User:
+class User(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'User'
+        super().__init__(model)  # Inherit from BaseModel
     
     
     def get_user_account_info(self, user_id):
-        sql =   """
-                SELECT 
-                    a.account_id,
-                    a.flag AS user_flag,
-                    b.flag AS account_flag,
-                    b.current_bill_id,
-                    c.status_id 
-               
-                FROM user a
-                LEFT OUTER JOIN account b ON a.account_id = b.id
-                LEFT OUTER JOIN account_bill c ON b.current_bill_id = c.id
-                WHERE a.id = %s
-                """ % user_id
+        """
+        Get user and account information
+        """
+        sql = """
+            SELECT 
+                a.account_id,
+                a.flag AS user_flag,
+                b.flag AS account_flag,
+                b.current_bill_id,
+                c.status_id 
+           
+            FROM user a
+            LEFT OUTER JOIN account b ON a.account_id = b.id
+            LEFT OUTER JOIN account_bill c ON b.current_bill_id = c.id
+            WHERE a.id = %s
+        """
+        
+        rows = self._execute_query(sql, [user_id])
+        
+        if rows is None:
+            return None
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        for row in rows:
+            cur_user_account_id         = row[0]
+            cur_user_flag               = row[1]
+            cur_account_flag            = row[2]
+            cur_account_bill_id         = row[3]
+            cur_account_bill_status_id  = row[4]
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
+            user_is_active              = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACTIVE > 0 else 0
+            user_is_email_verified      = 1 if cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED > 0 else 0
+            user_is_mobile_verified     = 1 if cur_user_flag & FLAG_BIT_USER_MOBILE_NUM_VERIFIED > 0 else 0
+            user_is_deleted             = 1 if cur_user_flag & FLAG_BIT_USER_IS_DELETED > 0 else 0
+            user_is_account_admin       = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN > 0 else 0
             
-        except Exception as e:
-            msg = 'get_user_account_info(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-        if rows is not None:
+            acc_is_enabled              = 1 if cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE > 0 else 0
+            acc_is_company_owned        = 1 if cur_account_flag & FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT > 0 else 0
             
-            for row in rows:
-                cur_user_account_id         = row[0]
-                cur_user_flag               = row[1]
-                cur_account_flag            = row[2]
-                cur_account_bill_id         = row[3]
-                cur_account_bill_status_id  = row[4]
+            cur_entry = {
+                'user': {
+                    'id':               user_id,
+                    'is_active':        user_is_active,
+                    'is_email_verified': user_is_email_verified,
+                    'is_mobile_verified': user_is_mobile_verified
+                },
                 
-                
-                user_is_active              = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACTIVE > 0 else 0
-                user_is_email_verified      = 1 if cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED  > 0 else 0
-                user_is_mobile_verified     = 1 if cur_user_flag & FLAG_BIT_USER_MOBILE_NUM_VERIFIED  > 0 else 0
-                
-                user_is_deleted             = 1 if cur_user_flag & FLAG_BIT_USER_IS_DELETED  > 0 else 0
-                user_is_account_admin       = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN  > 0 else 0
-                
-                
-                acc_is_enabled              = 1 if cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE  > 0 else 0
-                         
-                acc_is_company_owned        = 1 if cur_account_flag & FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT  > 0 else 0
-                   
-                
-                cur_entry = {
-                    'user': {
-                        'id':               user_id,
-                        'is_active':        user_is_active,
-                        'is_email_verified':  user_is_email_verified,
-                        'is_mobile_verified': user_is_mobile_verified
-                    },
-                    
-                    'account': {
-                        'id':               cur_user_account_id,
-                        'is_enabled':       acc_is_enabled,
-                        'is_company_owned': acc_is_company_owned,
-                        
-                        'cur_bill_id':      cur_account_bill_id,
-                        'cur_bill_status_id':  cur_account_bill_status_id
-                    }
+                'account': {
+                    'id':               cur_user_account_id,
+                    'is_enabled':       acc_is_enabled,
+                    'is_company_owned': acc_is_company_owned,
+                    'cur_bill_id':      cur_account_bill_id,
+                    'cur_bill_status_id': cur_account_bill_status_id
                 }
-                    
-                return cur_entry
-                
-
+            }
+            return cur_entry
         
         return None
     
     
     def get_user_info(self, user_id):
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.account_id,
-                    a.flag,
-                    a.email,
-                    a.signup_social_media_id,
-                    a.mobile_num,
-                    a.name,
-                    a.name_last,
-                    a.name_first,
-                    
-                    a.user_group_id,
-                    b.group_num,
-                    b.flag_business_obj_1,
-                    b.flag_business_obj_2,
-                    b.name AS group_name,
-                    
-                    a.user_req_join_acc_id,
-                    c.account_id,
-                    c.status_id,
-                    c.dt_entry,
-                    d.name AS account_name
-                    
-                FROM user a
-                LEFT OUTER JOIN user_group b    ON a.user_group_id = b.id
-                LEFT OUTER JOIN user_request c  ON a.user_req_join_acc_id = c.id
-                LEFT OUTER JOIN account d       ON c.account_id = d.id 
-                WHERE a.id = %s
-                """ % user_id
+        """
+        Get complete user information
+        """
+        sql = """
+            SELECT 
+                a.id,
+                a.account_id,
+                a.flag,
+                a.email,
+                a.signup_social_media_id,
+                a.mobile_num,
+                a.name,
+                a.name_last,
+                a.name_first,
+                
+                a.user_group_id,
+                b.group_num,
+                b.flag_business_obj_1,
+                b.flag_business_obj_2,
+                b.name AS group_name,
+                
+                a.user_req_join_acc_id,
+                c.account_id,
+                c.status_id,
+                c.dt_entry,
+                d.name AS account_name
+                
+            FROM user a
+            LEFT OUTER JOIN user_group b    ON a.user_group_id = b.id
+            LEFT OUTER JOIN user_request c  ON a.user_req_join_acc_id = c.id
+            LEFT OUTER JOIN account d       ON c.account_id = d.id 
+            WHERE a.id = %s
+        """
         
+        rows = self._execute_query(sql, [user_id])
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        if rows is None:
+            return None
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        for row in rows:
+            cur_user_id                         = row[0]
+            cur_user_account_id                 = row[1]
+            cur_user_flag                       = row[2]
+            cur_user_email                      = row[3]
+            cur_user_signup_social_media_id     = row[4]
+            cur_user_mobile_num                 = row[5]
+            cur_user_name                       = row[6]
+            cur_user_name_last                  = row[7]
+            cur_user_name_first                 = row[8]
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
+            cur_user_group_id                   = row[9]
+            cur_user_group_num                  = row[10]
+            cur_user_group_flag_business_obj_1  = row[11]
+            cur_user_group_flag_business_obj_2  = row[12]
+            cur_user_group_name                 = row[13]
             
-        except Exception as e:
-            msg = 'get_user_info(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-        if rows is not None:
+            cur_user_req_join_acc_id            = row[14]
+            cur_user_req_account_id             = row[15]
+            cur_user_req_status_id              = row[16]
+            cur_user_req_dt_entry               = str(row[17])[0:10] if row[17] else None
+            cur_user_req_account_name           = row[18]
             
-            for row in rows:
-                cur_user_id                         = row[0]
-                cur_user_account_id                 = row[1]
-                cur_user_flag                       = row[2]
-                cur_user_email                      = row[3]
-                cur_user_signup_social_media_id     = row[4]
-                cur_user_mobile_num                 = row[5]
-                cur_user_name                       = row[6]
-                cur_user_name_last                  = row[7]
-                cur_user_name_first                 = row[8]
+            cur_entry = {
+                'user': {
+                    'id':               cur_user_id,
+                    'account_id':       cur_user_account_id,
+                    'flag':             cur_user_flag,
+                    'email':            cur_user_email,
+                    'social_media_id':  cur_user_signup_social_media_id,
+                    'mobile_num':       cur_user_mobile_num,
+                    'name':             cur_user_name,
+                    'name_last':        cur_user_name_last,
+                    'name_first':       cur_user_name_first
+                },
                 
-                cur_user_group_id                   = row[9]
-                cur_user_group_num                  = row[10]
-                cur_user_group_flag_business_obj_1  = row[11]
-                cur_user_group_flag_business_obj_2  = row[12]
-                cur_user_group_name                 = row[13]
-                
-                cur_user_req_join_acc_id            = row[14]
-                cur_user_req_account_id             = row[15]
-                cur_user_req_status_id              = row[16]
-                cur_user_req_dt_entry               = str(row[17])[0:10] # extract date only
-                cur_user_req_account_name           = row[18]
-                
-                
-                
-                                
-                cur_entry = {
-                    'user': {
-                        'id':               cur_user_id,
-                        'account_id':       cur_user_account_id,
-                        'flag':             cur_user_flag,
-                        'email':            cur_user_email,
-                        'social_media_id':  cur_user_signup_social_media_id,
-                        'mobile_num':       cur_user_mobile_num,
-                        'name':             cur_user_name,
-                        'name_last':        cur_user_name_last,
-                        'name_first':       cur_user_name_first
-                    },
-                    
-                    'user_group': {
-                        'id':               cur_user_group_id,
-                        'group_num':        cur_user_group_num,
-                        'flag_business_obj_1': cur_user_group_flag_business_obj_1,
-                        'flag_business_obj_2': cur_user_group_flag_business_obj_2,
-                        'name':             cur_user_group_name
-                    }
+                'user_group': {
+                    'id':               cur_user_group_id,
+                    'group_num':        cur_user_group_num,
+                    'flag_business_obj_1': cur_user_group_flag_business_obj_1,
+                    'flag_business_obj_2': cur_user_group_flag_business_obj_2,
+                    'name':             cur_user_group_name
                 }
+            }
+            
+            if cur_user_req_join_acc_id is not None:
+                user_request = {
+                    'id':               cur_user_req_join_acc_id,
+                    'account_id':       cur_user_req_account_id,
+                    'account_name':     cur_user_req_account_name,
+                    'status_id':        cur_user_req_status_id,
+                    'date_req_sent':    cur_user_req_dt_entry
+                }
+                cur_entry['user_request'] = user_request
+            
+            
+            # Get pig farms for this user
+            user_pig_farm_ids = self.model['user_farm'].get_list(user_id=user_id)
+            if user_pig_farm_ids:
+                cur_entry['pig_farms'] = user_pig_farm_ids
+            
                 
-                
-                if cur_user_req_join_acc_id is not None:
-                    user_request = {
-                        'id':               cur_user_req_join_acc_id,
-                        'account_id':       cur_user_req_account_id,
-                        'account_name':     cur_user_req_account_name,
-                        'status_id':        cur_user_req_status_id,
-                        'date_req_sent':    cur_user_req_dt_entry
-                    }
-                    
-                    cur_entry['user_request'] = user_request
-                
-                
-                user_pig_farm_ids = self.model['user_farm'].get_list(user_id = user_id)
-                
-                if user_pig_farm_ids:
-                    cur_entry['pig_farms'] = user_pig_farm_ids
-                    
-                return cur_entry
-                
-
+            return cur_entry
         
         return None
     
     
-    def get_list(self, account_id, inc_deleted = 0 ):
-        
-        if inc_deleted > 0:
-            where_clause = 'WHERE a.account_id = %s' % account_id 
-        else:
-            where_clause = 'WHERE a.account_id = %s AND (a.flag & 8) = 0' % account_id 
-        
-    
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.flag,
-                    a.user_group_id,
-                    b.group_num,
-                    b.name,
-                    
-                    a.email,
-                    a.name_last,
-                    a.name_first
-                    
-                FROM user a 
-                LEFT OUTER JOIN user_group b        ON a.user_group_id   = b.id
+    def get_list(self, account_id, inc_deleted=0):
+        """
+        Get user list for an account
+        """
+        sql = """
+            SELECT 
+                a.id,
+                a.flag,
+                a.user_group_id,
+                b.group_num,
+                b.name,
                 
-                %s
-                ORDER BY a.name_first
-                """ % where_clause
+                a.email,
+                a.name_last,
+                a.name_first
+                
+            FROM user a 
+            LEFT OUTER JOIN user_group b ON a.user_group_id = b.id
+            WHERE a.account_id = %s
+        """
         
+        params = [account_id]
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        if inc_deleted == 0:
+            sql += " AND (a.flag & 8) = 0"
         
+        sql += " ORDER BY a.name_first"
         
-        rows = None
+        rows = self._execute_query(sql, params)
         
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return []
         
         result = []
-        if rows is not None:
+        for row in rows:
+            cur_id                  = row[0]
+            cur_flag                = row[1]
+            cur_user_group_id       = row[2]
+            cur_group_num           = row[3]
+            cur_group_name          = row[4]
+            cur_email               = row[5]
+            cur_name_last           = row[6]
+            cur_name_first          = row[7]
             
-            for row in rows:
-                cur_id                  = row[0]
-                cur_flag                = row[1]
-                cur_user_group_id       = row[2]
-                cur_group_num           = row[3]
-                cur_group_name          = row[4]
+            cur_entry = {
+                'user': {
+                    'id':           cur_id,
+                    'email':        cur_email,
+                    'name_last':    cur_name_last,
+                    'name_first':   cur_name_first,
+                    'flag':         cur_flag
+                },
                 
-                cur_email               = row[5]
-                cur_name_last           = row[6]
-                cur_name_first          = row[7]
-                
-                
-                cur_entry = {
-                    'user': {
-                        'id':           cur_id,
-                        'email':        cur_email,
-                        'name_last':    cur_name_last,
-                        'name_first':   cur_name_first,
-                        'flag':         cur_flag
-                    },
-                    
-                    'user_group': {
-                        'id':           cur_user_group_id,
-                        'group_num':    cur_group_num,
-                        'name':         cur_group_name
-                    }
-                    
+                'user_group': {
+                    'id':           cur_user_group_id,
+                    'group_num':    cur_group_num,
+                    'name':         cur_group_name
                 }
-                
-                    
-                result.append(cur_entry)
+            }
+            result.append(cur_entry)
         
         return result
     
     
-    def register_or_login(self, data = None):
+    def register_or_login(self, data=None):
         """
         PROCEDURE user_register_or_login(
             in_login_social_media_id INT,
@@ -412,225 +305,98 @@ class User:
         )    
         """
         
-        
-        
-        sql =  'CALL user_register_or_login('
-        
-        if data.login_social_media_id and data.login_social_media_id > 0:
-            sql += '%s,'  % data.login_social_media_id
-        else:
-            sql += 'NULL,'
-        
-        if data.social_media_user_id and len(data.social_media_user_id) > 0:
-            sql += '"%s",'  % data.social_media_user_id
-
-        else:
-            sql += 'NULL,'
-
-            
-        if data.access_code_id is not None and data.access_code_id > 0:
-            sql += '%s,'  % data.access_code_id
-        else:
-            sql += 'NULL,'
-
-        if data.access_code_hid is not None:
-            sql += '"%s",'  % data.access_code_hid
-        else:
-            sql += 'NULL,'
-    
-        
-            
-        
-        if data.name and len(data.name) > 0:
-            sql += '"%s",'  % data.name
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.name_last and len(data.name_last) > 0:
-            sql += '"%s",'  % data.name_last
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.name_first and len(data.name_first) > 0:
-            sql += '"%s",'  % data.name_first
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '"%s",'  % data.email
-        
-        
-        if data.login_country_code is not None:
-            sql += '"%s",'  % data.login_country_code
-        else:
-            sql += 'NULL,'
-            
-        if data.login_country_name is not None:
-            sql += '"%s",'  % data.login_country_name
-        else:
-            sql += 'NULL,'
-        
-        if data.login_city is not None:
-            sql += '"%s",'  % data.login_city
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.login_region is not None:
-            sql += '"%s",'  % data.login_region
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.viewport_width and data.viewport_width > 0:
-            sql += '%s,'  % data.viewport_width
-        else:
-            sql += 'NULL,'
-        
-        if data.viewport_height and data.viewport_height > 0:
-            sql += '%s,'  % data.viewport_height
-        else:
-            sql += 'NULL,'
-        
-            
-        if data.ip_address and len(data.ip_address) > 0:
-            sql += '"%s",'  % data.ip_address
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        if data.is_mobile is not None:
-            sql += '%s,'  % data.is_mobile
-        else:
-            sql += 'NULL,'
-        
-        if data.is_webview is not None:
-            sql += '%s,'  % data.is_webview
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.browser and len(data.browser) > 0:
-            sql += '"%s",'  % data.browser
-        else:
-            sql += 'NULL,'
-        
-        if data.browser_version and len(data.browser_version) > 0:
-            sql += '"%s",'  % data.browser_version
-        else:
-            sql += 'NULL,'
-        
-        if data.webview_platform and len(data.webview_platform) > 0:
-            sql += '"%s",'  % data.webview_platform
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.os and len(data.os) > 0:
-            sql += '"%s",'  % data.os
-        else:
-            sql += 'NULL,'
-        
-        if data.os_version and len(data.os_version) > 0:
-            sql += '"%s",'  % data.os_version
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.device and len(data.device) > 0:
-            sql += '"%s",'  % data.device
-        else:
-            sql += 'NULL,'
-        
-        if data.device_type and len(data.device_type) > 0:
-            sql += '"%s");'  % data.device_type
-        else:
-            sql += 'NULL);'
-        
-        
-            
-        print('\n\nsql')
-        print(sql)
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'register_or_login(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
-            cur_user_id                 = row[3]
-            cur_user_account_id         = row[4]
-            cur_user_unverified_id      = row[6]
-            
-            cur_entry =  {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
+        params = [
+            data.login_social_media_id  if data.login_social_media_id and data.login_social_media_id > 0 else None,
+            data.social_media_user_id   if data.social_media_user_id else None,
                 
-                'user': {
-                    'id':               cur_user_id,
-                    'account_id':       cur_user_account_id,
-                    'flag':             row[5]
-                },
+            data.access_code_id         if data.access_code_id and data.access_code_id > 0 else None,
+            data.access_code_hid        if data.access_code_hid else None,
                 
-                'user_unverified': {
-                    'id':               cur_user_unverified_id,
-                    'verify_id':        row[7],
-                    'verify_code':      str(row[8]),
-                    'verify_ts_expiry': row[9],
-                    'verify_dt_expiry': str(row[10]) if row[10] else None,
-                    'expiry_minutes':   row[11]
-                }
+                
+            data.name                   if data.name and data.name.strip() else None,
+            data.name_last              if data.name_last and data.name_last.strip() else None,
+            data.name_first             if data.name_first and data.name_first.strip() else None,
+                
+            data.email, 
+                
+            data.login_country_code     if data.login_country_code and data.login_country_code.strip() else None,
+            data.login_country_name     if data.login_country_name and data.login_country_name.strip() else None,
+            data.login_city             if data.login_city and data.login_city.strip() else None,
+            data.login_region           if data.login_region and data.login_region.strip() else None,
+            
+                
+            data.viewport_width         if data.viewport_width and data.viewport_width > 0 else None,
+            data.viewport_height        if data.viewport_height and data.viewport_height > 0 else None,
+            data.ip_address,    
+                
+            data.is_mobile              if data.is_mobile is not None else None,
+            data.is_webview             if data.is_webview is not None else None,
+                
+            data.browser                if data.browser and data.browser.strip() else None,
+            data.browser_version        if data.browser_version and data.browser_version.strip() else None,
+            data.webview_platform       if data.webview_platform and data.webview_platform.strip() else None,
+            data.os                     if data.os and data.os.strip() else None,
+            data.os_version             if data.os_version and data.os_version.strip() else None,
+            data.device                 if data.device and data.device.strip() else None,
+            data.device_type            if data.device_type and data.device_type.strip() else None
+        ]
+        
+        rows = self._call_procedure('user_register_or_login', params)
+        
+        if rows is None:
+            return None
+        
+        
+        row = rows[0]
+        
+        
+        cur_result_num              = row[0]
+        cur_result_code             = row[1]
+        cur_result_desc             = row[2]
+        
+        cur_user_id                 = row[3]
+        cur_user_account_id         = row[4]
+        cur_user_flag               = row[5]
+        cur_user_unverified_id      = row[6]
+        cur_verify_id               = row[7]
+        cur_verify_code             = row[8]
+        cur_verify_ts_expiry        = row[9]
+        cur_verify_dt_expiry        = str(row[10]) if row[10] else None
+        cur_expiry_minutes          = row[11]
+        
+        cur_entry = {
+            'result': {
+                'num':              cur_result_num,
+                'code':             cur_result_code,
+                'desc':             cur_result_desc,
+            },
+            
+            'user': {
+                'id':               cur_user_id,
+                'account_id':       cur_user_account_id,
+                'flag':             cur_user_flag
+            },
+            
+            'user_unverified': {
+                'id':               cur_user_unverified_id,
+                'verify_id':        cur_verify_id,
+                'verify_code':      str(cur_verify_code),
+                'verify_ts_expiry': cur_verify_ts_expiry,
+                'verify_dt_expiry': cur_verify_dt_expiry,
+                'expiry_minutes':   cur_expiry_minutes
             }
-
-
-            if cur_user_id == 0:
-                del cur_entry['user']
-                
-            if cur_user_account_id and cur_user_account_id > 0 and cur_user_id > 0:
-                del cur_entry['user_unverified']
-
-            
-            """
-            If cur_user_id > 0 and user_unverified['verify_id'], this means 
-            the user need to autheticate via code. 
-            """
-            
-
-            return cur_entry
-
-
-        return None
-
-
-    def update_login(self, user_id, data = None):
+        }
+        
+        if cur_user_id == 0:
+            del cur_entry['user']
+        
+        if cur_user_account_id and cur_user_account_id > 0 and cur_user_id > 0:
+            del cur_entry['user_unverified']
+        
+        return cur_entry
+    
+    
+    def update_login(self, user_id, data=None):
         """
         PROCEDURE user_update_login(
             in_user_id              INT,
@@ -660,146 +426,47 @@ class User:
         )    
         """
         
-        
-        
-        sql =  'CALL user_update_login('
-        
-        sql += '%s,'  % user_id
-        
-        if data.login_country_code is not None:
-            sql += '"%s",'  % data.login_country_code
-        else:
-            sql += 'NULL,'
+        params = [
+            user_id,
             
-        if data.login_country_name is not None:
-            sql += '"%s",'  % data.login_country_name
-        else:
-            sql += 'NULL,'
-        
-        if data.login_city is not None:
-            sql += '"%s",'  % data.login_city
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.login_region is not None:
-            sql += '"%s",'  % data.login_region
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.viewport_width and data.viewport_width > 0:
-            sql += '%s,'  % data.viewport_width
-        else:
-            sql += 'NULL,'
-        
-        if data.viewport_height and data.viewport_height > 0:
-            sql += '%s,'  % data.viewport_height
-        else:
-            sql += 'NULL,'
-        
             
-        if data.ip_address and len(data.ip_address) > 0:
-            sql += '"%s",'  % data.ip_address
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        if data.is_mobile is not None:
-            sql += '%s,'  % data.is_mobile
-        else:
-            sql += 'NULL,'
-        
-        if data.is_webview is not None:
-            sql += '%s,'  % data.is_webview
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.browser and len(data.browser) > 0:
-            sql += '"%s",'  % data.browser
-        else:
-            sql += 'NULL,'
-        
-        if data.browser_version and len(data.browser_version) > 0:
-            sql += '"%s",'  % data.browser_version
-        else:
-            sql += 'NULL,'
-        
-        if data.webview_platform and len(data.webview_platform) > 0:
-            sql += '"%s",'  % data.webview_platform
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.os and len(data.os) > 0:
-            sql += '"%s",'  % data.os
-        else:
-            sql += 'NULL,'
-        
-        if data.os_version and len(data.os_version) > 0:
-            sql += '"%s",'  % data.os_version
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.device and len(data.device) > 0:
-            sql += '"%s",'  % data.device
-        else:
-            sql += 'NULL,'
-        
-        if data.device_type and len(data.device_type) > 0:
-            sql += '"%s");'  % data.device_type
-        else:
-            sql += 'NULL);'
-        
-        
+            data.login_country_code     if data.login_country_code and data.login_country_code.strip() else None,
+            data.login_country_name     if data.login_country_name and data.login_country_name.strip() else None,
+            data.login_city             if data.login_city and data.login_city.strip() else None,
+            data.login_region           if data.login_region and data.login_region.strip() else None,
             
-        print('\n\nsql')
-        print(sql)
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update_login(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
+            data.viewport_width         if data.viewport_width and data.viewport_width > 0 else None,
+            data.viewport_height        if data.viewport_height and data.viewport_height > 0 else None,
+            data.ip_address,
             
-
-            return {
-                'user_login_id': row[0]
-            }
-
-
-        return None
-
-
-
-
-    def user_verify_email(self, data = None):
+            data.is_mobile              if data.is_mobile is not None else None,
+            data.is_webview             if data.is_webview is not None else None,
+                
+            data.browser                if data.browser and data.browser.strip() else None,
+            data.browser_version        if data.browser_version and data.browser_version.strip() else None,
+            data.webview_platform       if data.webview_platform and data.webview_platform.strip() else None,
+            data.os                     if data.os and data.os.strip() else None,
+            data.os_version             if data.os_version and data.os_version.strip() else None,
+            data.device                 if data.device and data.device.strip() else None,
+            data.device_type            if data.device_type and data.device_type.strip() else None
+        ]
+        
+        rows = self._call_procedure('user_update_login', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+        
+        cur_user_login_id           = row[0]
+        
+        return {
+            'user_login_id':        cur_user_login_id
+        }
+    
+    
+    def user_verify_email(self, data=None):
         """
         PROCEDURE user_verify_email(
             in_unverified_user_id   INT, /* Only one of this is not NULL and > 0. */
@@ -815,88 +482,47 @@ class User:
         )    
         """
         
-        
-        
-        sql =  'CALL user_verify_email('
-        
-        if data.unverified_user_id is not None and data.unverified_user_id > 0: 
-            sql += '%s,'  % data.unverified_user_id
-            sql += 'NULL,'
-        else:
-            sql += 'NULL,'
-            sql += '%s,'  % data.user_id
+        params = [
+            data.unverified_user_id     if data.unverified_user_id and data.unverified_user_id > 0 else None,
+            data.user_id                if data.user_id and data.user_id > 0 else None,
             
-        sql += '%s,'  % data.auth_code
-        
-        if data.viewport_width and data.viewport_width > 0:
-            sql += '%s,'  % data.viewport_width
-        else:
-            sql += 'NULL,'
-        
-        if data.viewport_height and data.viewport_height > 0:
-            sql += '%s,'  % data.viewport_height
-        else:
-            sql += 'NULL,'
-        
-        
+            data.auth_code,
             
-        if data.ip_address and len(data.ip_address) > 0:
-            sql += '"%s");'  % data.ip_address
-        else:
-            sql += 'NULL);'
-        
-        
-        print('\n\n\n')
-        print(sql)
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.viewport_width         if data.viewport_width and data.viewport_width > 0 else None,
+            data.viewport_height        if data.viewport_height and data.viewport_height > 0 else None,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'user_verify_email(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
+            data.ip_address
+        ]
+        
+        rows = self._call_procedure('user_verify_email', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+        
+        cur_result_num              = row[0]
+        cur_result_code             = row[1]
+        cur_result_desc             = row[2]
+        cur_user_id                 = row[3]
+        cur_user_flag               = row[4]
+        
+        cur_entry = {
+            'result': {
+                'num':              cur_result_num,
+                'code':             cur_result_code,
+                'desc':             cur_result_desc,
+            },
             
-            cur_entry =  {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'user': {
-                    'id':               row[3],
-                    'flag':             row[4]
-                }
+            'user': {
+                'id':               cur_user_id,
+                'flag':             cur_user_flag
             }
-
-
-            return cur_entry
-
-
-        return None
-
-
+        }
+        
+        return cur_entry
+    
+    
     def user_resend_verify_code(self, unverified_user_id, user_id):
         """
         PROCEDURE user_resend_verify_code(
@@ -907,87 +533,63 @@ class User:
         )    
         """
         
-        sql =  'CALL user_resend_verify_code('
+        params = [
+            unverified_user_id if unverified_user_id and unverified_user_id > 0 else None,
+            user_id if user_id and user_id > 0 else None
+        ]
         
-        if unverified_user_id is not None and unverified_user_id > 0: 
-            sql += '%s,'  % unverified_user_id
-            sql += 'NULL);'
-        else:
-            sql += 'NULL,'
-            sql += '%s);'  % user_id
+        rows = self._call_procedure('user_resend_verify_code', params)
         
+        if rows is None:
+            return None
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        row = rows[0]
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        cur_result_num              = row[0]
+        cur_result_code             = row[1]
+        cur_result_desc             = row[2]
+        
+        cur_user_id                 = row[3]
+        cur_user_account_id         = row[4]
+        cur_user_flag               = row[5]
+        cur_user_unverified_id      = row[6]
+        
+        cur_verify_id               = row[7]
+        cur_verify_code             = row[8]
+        cur_verify_ts_expiry        = row[9]
+        cur_verify_dt_expiry        = str(row[10]) if row[10] else None
+        cur_expiry_minutes          = row[11]
+        cur_user_email              = row[12]
+        
+        cur_entry = {
+            'result': {
+                'num':              cur_result_num,
+                'code':             cur_result_code,
+                'desc':             cur_result_desc,
+            },
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'user_resend_verify_code(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
-        if row is not None:
+            'user': {
+                'id':               cur_user_id,
+                'account_id':       cur_user_account_id,
+                'flag':             cur_user_flag
+            },
             
-            cur_user_id                 = row[3]
-            cur_user_unverified_id      = row[6]
-            cur_user_email              = row[12]
+            'user_unverified': {
+                'id':               cur_user_unverified_id,
+                'verify_id':        cur_verify_id,
+                'verify_code':      str(cur_verify_code),
+                'verify_ts_expiry': cur_verify_ts_expiry,
+                'verify_dt_expiry': cur_verify_dt_expiry,
+                'expiry_minutes':   cur_expiry_minutes
+            },
             
-            cur_entry =  {
-                'result':{
-                    'num':              row[0],
-                    'code':             row[1],
-                    'desc':             row[2],
-                },
-                
-                'user': {
-                    'id':               cur_user_id,
-                    'account_id':       row[4],
-                    'flag':             row[5]
-                },
-                
-                'user_unverified': {
-                    'id':               cur_user_unverified_id,
-                    'verify_id':        row[7],
-                    'verify_code':      str(row[8]),
-                    'verify_ts_expiry': row[9],
-                    'verify_dt_expiry': str(row[10]) if row[10] else None,
-                    'expiry_minutes':   row[11]
-                },
-                
-                'user_email':           cur_user_email
-            }
-
-
-            if cur_user_id == 0:
-                del cur_entry['user']
-
-            if cur_user_unverified_id is None or cur_user_unverified_id == 0:
-                del cur_entry['user_unverified']
-
-            return cur_entry
-
-
-
-        return None
-
-
-
-
-
+            'user_email':           cur_user_email
+        }
+        
+        if cur_user_id == 0:
+            del cur_entry['user']
+        
+        if cur_user_unverified_id is None or cur_user_unverified_id == 0:
+            del cur_entry['user_unverified']
+        
+        return cur_entry

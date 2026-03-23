@@ -203,30 +203,34 @@ async def pig_farm_update(request: Request, data: dm.DataPigFarm):
     
     
     level_1_hid = data.level_1_hid
-    res = hashids_common.decrypt(level_1_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_INVALID_ADDRESS_LEVEL_1,
-                'code': 'ERROR_INVALID_ADDRESS_LEVEL_1'
+    
+    if level_1_hid is not None:
+        res = hashids_common.decrypt(level_1_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_LEVEL_1_HID,
+                    'code': 'ERROR_ADDRESS_LEVEL_1_HID'
+                }
             }
-        }
-        
-    level_1_id = res[0]
+            
+        level_1_id = res[0]
     
     
     level_2_hid = data.level_2_hid
-    res = hashids_common.decrypt(level_2_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_INVALID_ADDRESS_LEVEL_2,
-                'code': 'ERROR_INVALID_ADDRESS_LEVEL_2'
+    
+    if level_2_hid is not None:
+        res = hashids_common.decrypt(level_2_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_LEVEL_2_HID,
+                    'code': 'ERROR_ADDRESS_LEVEL_2_HID'
+                }
             }
-        }
-    
-    level_2_id = res[0]
-    
+        
+        level_2_id = res[0]
+        
     
     level_3_hid = data.level_3_hid
     
@@ -235,8 +239,8 @@ async def pig_farm_update(request: Request, data: dm.DataPigFarm):
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_INVALID_ADDRESS_LEVEL_3,
-                    'code': 'ERROR_INVALID_ADDRESS_LEVEL_3'
+                    'num':  ERROR_ADDRESS_LEVEL_3_HID,
+                    'code': 'ERROR_ADDRESS_LEVEL_3_HID'
                 }
             }
         

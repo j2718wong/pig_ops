@@ -344,6 +344,8 @@ class DataBoarExternalMate(BaseModel):
     
     customer_sow_name:      str    
     date_mate:              str
+    date_expected_birth:    str = None
+    date_expected_payment:  str = None
     notes:                  str = None
 
 

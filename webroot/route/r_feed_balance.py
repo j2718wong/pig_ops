@@ -285,8 +285,7 @@ async def feed_balance_all_add(request: Request):
     
     # Process the entries
     for entry in entries:
-        print('\n\nentry')
-        print(entry)
+
         
         if 'pig_prod_hid' in entry:
             pig_prod_hid = entry['pig_prod_hid']

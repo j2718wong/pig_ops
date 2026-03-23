@@ -91,7 +91,6 @@ async def prod_harvest_add(request: Request, data: dm.DataProductionHarvest):
     
     res = hashids_common.decrypt(harvest_type_hid)
     if len(res) == 0:
-        print(f'\n\nharvest_type_hid = {harvest_type_hid}\n')
             
         return {
             'result':{

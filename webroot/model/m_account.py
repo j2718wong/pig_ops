@@ -1,7 +1,21 @@
-# January 3, 2024
+# January 3, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
+
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
 
 
 """
@@ -65,9 +79,10 @@ FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH     = 1
 FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
             
 
-class Account:
+class Account(BaseModel):
     def __init__(self, model):
-        self.model              = model
+        super().__init__(model)  # Inherit from BaseModel
+        
         self.TAG                = 'Account'
 
     
@@ -289,37 +304,20 @@ class Account:
         )  
         """
         
-        sql =  'CALL account_register('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.country_id
-        sql += '"%s");' % data.name
+        params = [
+            data.user_id,
+            data.country_id,
+            data.name               if data.name and data.name.strip() else None
+        ]
+        
+        rows = self._call_procedure('account_register', params)
+        
+        if rows is None:
+            return None
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        row = rows[0]
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'register(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
 
         if row is not None:
             return {
@@ -367,36 +365,19 @@ class Account:
         )  
         """
         
-        sql =  'CALL account_update('
-        sql += '%s,'    % data.user_id
-        sql += '"%s");' % data.name
+        params = [
+            data.user_id,
+            data.name if data.name and data.name.strip() else None
+        ]
+        
+        rows = self._call_procedure('account_update', params)
+        
+        if rows is None:
+            return None
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        row = rows[0]
+    
 
         if row is not None:
             return {
@@ -437,42 +418,24 @@ class Account:
         )  
         """
         
-        sql =  'CALL account_update_settings('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.day_1_on_date_of_birth
-        sql += '%s,'    % data.day_1_on_date_insem
-        sql += '%s,'    % data.days_wean
-        sql += '%s,'    % data.days_harvest_from_birth
-        sql += '%s,'    % data.days_harvest_from_wean
-        sql += '"%s");' % data.weight_unit
+        params = [
+            data.user_id,
+            data.day_1_on_date_of_birth,
+            data.day_1_on_date_insem,
+            data.days_wean,
+            data.days_harvest_from_birth,
+            data.days_harvest_from_wean,
+            data.weight_unit                if data.weight_unit and data.weight_unit.strip() else None
+        ]
         
+        rows = self._call_procedure('account_update_settings', params)
         
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        if rows is None:
+            return None
 
-        # Get database connection
-        conn = self.model.db_conn
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        row = rows[0]
+    
 
         if row is not None:
             cur_res_num                 = row[0]
@@ -692,8 +655,6 @@ class Account:
         return result
     
     
-
-
     def get_data_ver_num(self, account_id, return_array = 0):
         sql =   """
                 SELECT 

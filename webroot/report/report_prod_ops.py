@@ -277,6 +277,7 @@ class ReportProdOps(ReportBasic):
         cur_feeds           = cur_entry['feeds']
         cur_feed_buy        = cur_feeds['bought']
         cur_feed_balance    = cur_feeds['balance']
+        cur_feed_cost       = cur_feeds['cost']
         
         
         if cur_feed_balance['lactating'] is not None:
@@ -320,6 +321,35 @@ class ReportProdOps(ReportBasic):
             else:
                 total['finisher'] += cur_feed_balance['finisher']
         
+        
+        
+        prod_feed_cost = 0.0
+        
+        
+        if cur_feed_cost['lactating'] is not None:
+            prod_feed_cost += cur_feed_cost['lactating']
+        
+        
+        if cur_feed_cost['booster'] is not None:
+            prod_feed_cost += cur_feed_cost['booster']
+        
+        
+        if cur_feed_cost['prestarter'] is not None:
+            prod_feed_cost += cur_feed_cost['prestarter']
+        
+        
+        if cur_feed_cost['starter'] is not None:
+            prod_feed_cost += cur_feed_cost['starter']
+        
+        
+        if cur_feed_cost['grower'] is not None:
+            prod_feed_cost += cur_feed_cost['grower']
+        
+        
+        if cur_feed_cost['finisher'] is not None:
+            prod_feed_cost += cur_feed_cost['finisher']
+        
+        return prod_feed_cost
         
         
         
@@ -366,6 +396,8 @@ class ReportProdOps(ReportBasic):
             'grower':       None,
             'finisher':     None
         }
+        
+        prod_feed_cost = 0.0
         
 
         for cur_entry in pig_prod_list:
@@ -416,7 +448,7 @@ class ReportProdOps(ReportBasic):
                 
                 
                 # Add to feed Balance
-                self._add_feed_balance(prod_feed_balance, cur_entry)
+                prod_feed_cost += self._add_feed_balance(prod_feed_balance, cur_entry)
                 
             
             if  prod_status_id == PROD_STATUS_ID_WEANING  or prod_status_id == PROD_STATUS_ID_GROWING:
@@ -425,7 +457,7 @@ class ReportProdOps(ReportBasic):
                 list_fattening.append(cur_entry)
 
                 # Add to feed Balance
-                self._add_feed_balance(prod_feed_balance, cur_entry)
+                prod_feed_cost += self._add_feed_balance(prod_feed_balance, cur_entry)
             
 
 
@@ -445,9 +477,10 @@ class ReportProdOps(ReportBasic):
             'list_fattening':       list_fattening,
             
             'prod_feed_balance':    prod_feed_balance,
+            'prod_feed_cost':       prod_feed_cost,
             
             'inc_historical':       False,
-            'inc_cost':             False,
+            'inc_cost':             inc_cost,
             'inc_target_harvest':   inc_target_harvest
         }
         

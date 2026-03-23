@@ -101,6 +101,8 @@ def check_if_valid_user_account(user_id):
 
 def get_user_account_info(user_id):
     data_user = model['user'].get_user_info(user_id)
+    
+    
     if data_user == None:
         # TODO what to do in case no result
         print('Error 1')

@@ -324,6 +324,12 @@
 
     <!-- Include Feed Consumption Section -->
     {% include 'feed_consumption_report.html' %}
+    
+    <!-- Include Feed Cost Section (only if inc_cost is True) -->
+    {% if inc_cost %}
+        <!-- Include Feed Cost Section -->
+        {% include 'feed_cost_report.html' %}
+    {% endif %}
 
     <!-- Footer -->
     <div class="footer">
