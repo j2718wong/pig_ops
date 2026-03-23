@@ -351,6 +351,12 @@ class Root(ViewBase):
                         'img_path': '/static_m/images/mar/mar_feed_records.png',
                         'title': 'Record feeds consumption  per production batch',
                         'desc': 'Feed Balance and audit can be recorded anytime.'
+                    },
+                    
+                    {
+                        'img_path': '/static_m/images/mar/mar_report.png',
+                        'title': 'Generate Status Report for your Farm',
+                        'desc': 'Comprehensive reporting to know the status of your pig farm.'
                     }
                 ]
             }

@@ -302,6 +302,11 @@ def get_location_address_names_and_replace_ids(data):
     
     
     
+    geoloc = data['location']['geoloc']
+    if geoloc['latitude'] is None:
+        del data['location']['geoloc']
+    
+    
     # Nothing to request; nothing to change
     if level_1_id == 0 and level_2_id == 0 and level_3_id == 0:
         return
@@ -324,6 +329,15 @@ def get_location_address_names_and_replace_ids(data):
     
     
     cur_id      = data['location']['address']['level_1']['id']
+    if cur_id == 0: 
+        # No address at all; delete address 
+        del  data['location']['address']['level_1']
+        del  data['location']['address']['level_2']
+        del  data['location']['address']['level_3']
+        
+        return
+        
+    
     cur_hid     = hashids_common.encrypt(cur_id)
     
     del data['location']['address']['level_1']['id']
@@ -331,19 +345,38 @@ def get_location_address_names_and_replace_ids(data):
 
     
     cur_id      = data['location']['address']['level_2']['id']
+    if cur_id == 0:
+        # No level 2 address
+        del  data['location']['address']['level_2']
+        del  data['location']['address']['level_3']
+        
+        return
+        
+
     cur_hid     = hashids_common.encrypt(cur_id)
     
     del data['location']['address']['level_2']['id']
     data['location']['address']['level_2']['hid']   = cur_hid
 
 
-    cur_id      = data['location']['address']['level_3']['id']
-    if cur_id is not None and cur_id > 0:
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del data['location']['address']['level_3']['id']
-        data['location']['address']['level_3']['hid']   = cur_hid
 
+    cur_id      = data['location']['address']['level_3']['id']
+    if cur_id == 0:
+        # No level 3 address
+        del  data['location']['address']['level_3']
+        
+        return
+        
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
+    del data['location']['address']['level_3']['id']
+    data['location']['address']['level_3']['hid']   = cur_hid
+
+    
+    
+    
+
+    
 
 
 def replace_plain_ids_account(data):
