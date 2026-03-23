@@ -1039,7 +1039,7 @@ async def sow_boar_list(request: Request, pfhid:str, sex:str = None,
     
 
     if is_disposed > 0:
-        res = model['sow_boar'].get_list(pig_farm_id = pig_farm_id, is_disposed = 1)
+        res = model['sow_boar'].get_list_disposed(pig_farm_id)
     else:
         res = model['sow_boar'].get_list(pig_farm_id = pig_farm_id,
                 sex = sex, inc_user_audit = inc_user_audit, order_by = order_by)
