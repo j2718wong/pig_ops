@@ -301,11 +301,11 @@ def get_location_address_names_and_replace_ids(data):
     data['location']['country']['hid']   = cur_hid
     
     
-    
-    geoloc = data['location']['geoloc']
-    if geoloc['latitude'] is None:
-        del data['location']['geoloc']
-    
+    if 'geoloc' in data['location']:
+        geoloc = data['location']['geoloc']
+        if geoloc['latitude'] is None:
+            del data['location']['geoloc']
+        
     
     # Nothing to request; nothing to change
     if level_1_id == 0 and level_2_id == 0 and level_3_id == 0:
