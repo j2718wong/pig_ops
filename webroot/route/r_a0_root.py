@@ -269,7 +269,7 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
 
 
 @app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def root(request: Request, p:str = None):
+async def root(request: Request, p:str = None, lang:str= None):
     """
     2026-01-09 Notes:
     
@@ -320,7 +320,15 @@ async def root(request: Request, p:str = None):
     
     uhid = result
     
-    page = controller.view['root'].render(uhid)
+    
+    translation = None
+    
+    if lang is not None:
+        print('\n\n = ' + lang)
+        translation = controller.get_translation(lang)
+    
+    
+    page = controller.view['root'].render(uhid = uhid, translation = translation)
     
     return page
     

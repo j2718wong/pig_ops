@@ -282,7 +282,7 @@ class Terms(ViewBase):
 
 
 class Root(ViewBase):
-    def render(self, uhid = None):
+    def render(self, uhid = None, translation = None):
         
         
         if uhid is not None:
@@ -298,12 +298,22 @@ class Root(ViewBase):
             # These should have type= text/javascript
             js_lib  = []
             
+            
+
+            s_translation = None
+            if translation is not None:
+                s_translation = json.dumps(translation)
+            
+            print('s_translation Root page; user authenticated')
+            print(s_translation)
                 
             data    = { 'page_data':        None,
                         'css_files':        css_files,
                         'js_lib':           js_lib,
                         'js_app_text':      files['text'],
-                        'js_app_modules':   files['module']}
+                        'js_app_modules':   files['module'],
+                        'translation':      s_translation
+                    }
             
                     
             return template.render(data)
@@ -376,12 +386,21 @@ class Root(ViewBase):
         
             # These should have type= module
             js_app_modules = []
+            
+            
+            s_translation = None
+            if translation is not None:
+                s_translation = json.dumps(translation)
+            
+
                 
             data    = { 'page_data':        page_data,
                         'js_lib':           js_lib,
                         'js_app_text':      js_app_text,
                         'js_app_modules':   js_app_modules,
-                        'is_dev':           self.is_dev}
+                        'is_dev':           self.is_dev,
+                        'translation':      s_translation
+                    }
             
                     
             return template.render(data)
