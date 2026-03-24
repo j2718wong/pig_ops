@@ -52,11 +52,30 @@
             "Admin1":           "Lista sa Users",
             "Admin2":           "Lista sa Access Codes",
             "Admin3":           ""
-             
-             
-             
         }
-
+    },
+    
+    
+    "page_dashboard":{
+        "labels":{
+            "stats_card":{
+                
+                "LactaPiglets":     "Baktin", 
+                "FatteningPigs":    "Fattening",
+                             
+                "LactaSows":        "Lacta Anay",
+                "GestaSows":        "Gesta Anay",
+                             
+                "Boars":            "Butakal",
+                "Gilts":            "Dumalaga",
+                
+                "WeanedSows":       "Gilutas Anay",
+                "ToHarvest":        "140 Days+"
+            },
+            
+            "ExpectingSows":        "Manganakay sa sunod 7 ka adlaw"
+            
+        }     
     }
 
 
