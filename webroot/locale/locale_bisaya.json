@@ -167,7 +167,11 @@
             "dead_before_wean": "Dedz wala pa Lutas",
             "live_pigs_wean":   "Pila ang Nalutas",
             
-            "boar_mate_count":  "Pila ka Takal"
+            "boar_mate_count":  "Pila ka Takal",
+            
+            "date_disposed":    "Petsa",
+            "disposed_type":    "Klase",
+            "disposed_name":    "Ngalan"
             
             
         }
