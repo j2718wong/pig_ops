@@ -19,7 +19,14 @@ if locale_dir not in sys.path:
     sys.path.insert(0, locale_dir)
 
 
-LANG_KEY_PH_BISAYA  = ['ph-bis', 'bis', 'bisaya']
+TRANSLATED_LANGUAGES = [
+    {'key': 'en',       'lang_input': ['default', 'en', 'english']},
+
+    {'key': 'ph-bis',   'lang_input': ['ph-bis', 'bis', 'bisaya']},
+    {'key': 'ph-tag',   'lang_input': ['ph-tag', 'tag', 'tagalog']}
+
+]
+
 
 
 class Controller:
@@ -63,17 +70,41 @@ class Controller:
         if translation is not None:
             self.translations['ph-bis'] = translation
 
+    
+    def get_language_key(self, input_lang):
+        """
+        Convert user input language (e.g., 'bis', 'bisaya', 'en') to internal language key
+        Returns the language key or None if not found
+        """
+        if input_lang is None:
+            return None
+            
+        input_lang_lower = input_lang.lower().strip()
         
+        # Loop through TRANSLATED_LANGUAGES to find matching input
+        for lang_entry in TRANSLATED_LANGUAGES:
+            for lang_input in lang_entry['lang_input']:
+                if lang_input == input_lang_lower:
+                    return lang_entry['key']
+        
+        return None
+
 
     
-    def get_translation(self, lang_key):
-        lower_lang_key = lang_key.lower()
-
-        print('lang_key=' + lang_key);
-
-        if lower_lang_key in LANG_KEY_PH_BISAYA:
-            return self.translations['ph-bis']
-
+    def get_translation(self, language_key):
+        """
+        Returns the translation dictionary for the given language key
+        Returns None if no translation exists (use default English from frontend)
+        """
+        if language_key is None:
+            return None
+            
+        
+        # Check if translation exists for this language key
+        if language_key in self.translations:
+            return self.translations[language_key]
+        
+        # No translation found - frontend will use default English
         return None
     
 

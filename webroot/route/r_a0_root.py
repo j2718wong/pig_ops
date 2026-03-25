@@ -10,6 +10,7 @@ import pprint
 import jwt
 
 from fastapi                import Request, HTTPException, status, Depends, Response
+from fastapi                import BackgroundTasks
 from fastapi.responses      import HTMLResponse, RedirectResponse
 from pydantic               import BaseModel
 
@@ -324,7 +325,29 @@ async def root(request: Request, p:str = None, lang:str= None):
     translation = None
     
     if lang is not None:
-        translation = controller.get_translation(lang)
+        
+        language_key = controller.get_language_key(lang)
+        if language_key:
+            
+            # Update user language
+            if uhid is not None:
+                res = hashids_user.decrypt(uhid)
+                if len(res) == 0:
+                    return {
+                        'result':{
+                            'num':  ERROR_USER_INVALID_USER_HASHID,
+                            'code': 'ERROR_USER_INVALID_USER_HASHID'
+                        }
+                    }
+                
+                user_id = res[0]
+                
+                # No need to save
+                #model['user'].user_update_language(user_id, language_key)
+                
+                
+            
+            translation = controller.get_translation(language_key)
     
     
     page = controller.view['root'].render(uhid = uhid, translation = translation)

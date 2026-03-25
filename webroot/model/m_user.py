@@ -110,6 +110,7 @@ class User(BaseModel):
                 a.name,
                 a.name_last,
                 a.name_first,
+                a.language_preference,
                 
                 a.user_group_id,
                 b.group_num,
@@ -145,18 +146,19 @@ class User(BaseModel):
             cur_user_name                       = row[6]
             cur_user_name_last                  = row[7]
             cur_user_name_first                 = row[8]
+            cur_user_language_preference        = row[9]
             
-            cur_user_group_id                   = row[9]
-            cur_user_group_num                  = row[10]
-            cur_user_group_flag_business_obj_1  = row[11]
-            cur_user_group_flag_business_obj_2  = row[12]
-            cur_user_group_name                 = row[13]
+            cur_user_group_id                   = row[10]
+            cur_user_group_num                  = row[11]
+            cur_user_group_flag_business_obj_1  = row[12]
+            cur_user_group_flag_business_obj_2  = row[13]
+            cur_user_group_name                 = row[14]
             
-            cur_user_req_join_acc_id            = row[14]
-            cur_user_req_account_id             = row[15]
-            cur_user_req_status_id              = row[16]
-            cur_user_req_dt_entry               = str(row[17])[0:10] if row[17] else None
-            cur_user_req_account_name           = row[18]
+            cur_user_req_join_acc_id            = row[15]
+            cur_user_req_account_id             = row[16]
+            cur_user_req_status_id              = row[17]
+            cur_user_req_dt_entry               = str(row[18])[0:10] if row[18] else None
+            cur_user_req_account_name           = row[19]
             
             cur_entry = {
                 'user': {
@@ -169,6 +171,7 @@ class User(BaseModel):
                     'name':             cur_user_name,
                     'name_last':        cur_user_name_last,
                     'name_first':       cur_user_name_first
+
                 },
                 
                 'user_group': {
@@ -179,6 +182,10 @@ class User(BaseModel):
                     'name':             cur_user_group_name
                 }
             }
+            
+            if cur_user_language_preference is not None:
+                cur_entry['user']['language'] = cur_user_language_preference
+            
             
             if cur_user_req_join_acc_id is not None:
                 user_request = {
@@ -593,3 +600,41 @@ class User(BaseModel):
             del cur_entry['user_unverified']
         
         return cur_entry
+
+
+    def user_update_language(self, user_id, language):
+        """
+        PROCEDURE user_update_language(
+            in_user_id              INT, 
+            in_language             VARCHAR(10)
+
+            
+        )    
+        """
+        
+        params = [
+            user_id,
+            language
+        ]
+        
+        rows = self._call_procedure('user_update_language', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+        
+        cur_result_num              = row[0]
+        cur_result_code             = row[1]
+        cur_result_desc             = row[2]
+        
+        cur_entry = {
+            'result': {
+                'num':              cur_result_num,
+                'code':             cur_result_code,
+                'desc':             cur_result_desc,
+            }        }
+        
+        
+        return cur_entry
+
