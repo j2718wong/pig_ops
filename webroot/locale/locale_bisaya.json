@@ -188,6 +188,16 @@
     },
     
     
+    "page_boar_external_mates":{
+        "labels":{
+            "external_sow":     "Anay Silingan",
+            "date_mate":        "Petsa sa Takal",
+            "date_expected":    "Petsa Manganak"
+        }
+        
+    },
+    
+    
     "page_gestating_add":{
         "labels":{
             "DateMating":       "Petsa sa Takal or AI",
