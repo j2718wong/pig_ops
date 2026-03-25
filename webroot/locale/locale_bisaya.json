@@ -156,7 +156,17 @@
             
             "target_wean":      "Petsa sa Lutas",
             "num_piglets":      "Baktin",
-            "dead_before_wean": "Patay wala pa Lutasa"
+            "dead_before_wean": "Dedz wala pa Lutas",
+            
+            "date_weaned":      "Petsa Gilutas",
+            "operation":        "Unsay Buhatonon",
+            
+            
+            "live_pigs_birth":  "Buhi Pag anak",
+            "dead_at_birth":    "Dedz Pag anak",
+            "dead_before_wean": "Dedz wala pa Lutas",
+            "live_pigs_wean":   "Pila ang Nalutas"
+            
         }
     },
     
