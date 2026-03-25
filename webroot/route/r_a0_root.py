@@ -324,7 +324,6 @@ async def root(request: Request, p:str = None, lang:str= None):
     translation = None
     
     if lang is not None:
-        print('\n\n = ' + lang)
         translation = controller.get_translation(lang)
     
     

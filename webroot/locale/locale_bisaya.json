@@ -1,5 +1,43 @@
 {
     "language": "PH-BIS",
+    
+    
+    "common":{
+        "labels":{
+            "entries":          "Kabuok",
+            "no_entries":       "Walay lista"
+        },
+        
+        "messages":{
+            "input_a_date":     "Palihug butangi petsa."
+        }
+    },
+    
+    
+    "common_app": {
+        "labels":{
+            "sow":              "Anay",
+            "boar":             "Butakal",
+            "gilt":             "Dumalaga",
+            "piglets":          "Baktin",
+            "wean":             "Lutas",
+            "status":           "Status",
+            "age":              "Edad",
+            "output":           "Output",
+            
+            "today":            "Petsa Karon",
+            "year":             "tuig",
+            "month":            "bulan",
+            "years":            "tuig",
+            "months":           "bulan",
+            
+            
+            "select_sow":       "Anay",
+            "select_boar":      "Butakal",
+            "done_by_me":       "Ako"
+            
+        }
+    },
 
     "navigation":{
         "nav_links":{
@@ -60,23 +98,93 @@
         "labels":{
             "stats_card":{
                 
-                "LactaPiglets":     "Baktin", 
-                "FatteningPigs":    "Fattening",
+                "LactaPiglets":  "Baktin", 
+                "FatteningPigs": "Fattening",
                              
-                "LactaSows":        "Lacta Anay",
-                "GestaSows":        "Gesta Anay",
+                "LactaSows":     "Lacta Anay",
+                "GestaSows":     "Gesta Anay",
                              
-                "Boars":            "Butakal",
-                "Gilts":            "Dumalaga",
+                "Boars":         "Butakal",
+                "Gilts":         "Dumalaga",
                 
-                "WeanedSows":       "Gilutas Anay",
-                "ToHarvest":        "140 Days+"
+                "WeanedSows":    "Gilutas Anay",
+                "ToHarvest":     "140 Days+"
             },
             
-            "ExpectingSows":        "Manganakay sa sunod 7 ka adlaw"
+            "ExpectingSows":      "Manganakay sa sunod 7 ka adlaw"
             
         }     
+    },
+    
+    
+    "page_sow_boar_list":{
+        "labels":{
+            "search_pig":       "Ngalan sa Baboy",
+            
+            "sow_list":         "Lista sa Anay",
+            "boar_list":        "Lista sa Butakal",
+            "gilt_list":        "Lista sa Dumalaga",
+            "disposed_list":    "Lista sa Gi Dispose",
+            
+            "sow_all":          "Tanan",
+            "sow_gesta":        "Gesta",
+            "sow_lacta":        "Lacta",
+            "sow_wean":         "Gilutas",
+            "sow_output":       "Output",
+            
+            "status_growing":   "Tambay",
+            "status_gesta":     "Gesta",
+            "status_lacta":     "Lacta",
+            "status_wean":      "Gilutas",
+            "status_culled":    "Gi Ihaw",
+            "status_dead":      "Namatay",
+            "status_sold":      "Gibaligya",
+            "status_delete":    "Gi Delete",
+            
+            
+            "output_at_wean":   "Output sa Lutas",
+            "number_births":    "Pila ka Anakan",
+            
+            "last_mate":        "Last Takal",
+            "expected":         "Manganak",
+            
+            "target_wean":      "Petsa sa Lutas",
+            "num_piglets":      "Baktin",
+            "dead_after_birth": "Patay sa wala pa Lutas"
+        }
+    },
+    
+    
+    "page_gesta_lacta_list":{
+        "labels":{
+            "Expected":         "Petsa Manganak",
+            "Operation":        "Unsay Buhatonon",
+            "Weaning":          "Petsa sa Lutas"
+        }
+        
+    },
+    
+    
+    "page_gestating_add":{
+        "labels":{
+            "DateMating":       "Petsa sa Takal or AI",
+            "InseminationType": "Klase sa Takal",
+            
+            "SemenSupplier":     "Supplier sa Semilya",
+            "SemenType":        "Klase sa Semilya",
+            "SemenCost":        "Gasto sa Semilya",
+            "OtherGasto":       "Unsa pa na Gasto",
+            "StaffMember":      "Kinsa",
+            
+            "WhoDidOperation":  "Kinsay nagpatakal or nag AI"
+            
+            
+        }   
+        
     }
+    
+    
+    
 
 
 }

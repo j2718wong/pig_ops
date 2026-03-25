@@ -304,8 +304,6 @@ class Root(ViewBase):
             if translation is not None:
                 s_translation = json.dumps(translation)
             
-            print('s_translation Root page; user authenticated')
-            print(s_translation)
                 
             data    = { 'page_data':        None,
                         'css_files':        css_files,
