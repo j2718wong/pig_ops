@@ -441,14 +441,9 @@ async def account_data_ver_num(request: Request, ahid: str, r: int = 0):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
     }
     
-
-
-
-

@@ -37,7 +37,7 @@ from r_utils                import remove_database_null_description
 
    
    
-@app.post("/boar_external_mate/add", tags=["Sow Boar"])
+@app.post("/boar_ext_mate/add", tags=["Sow Boar"])
 async def boar_external_mate_add(request: Request, data: dm.DataBoarExternalMate):
     result = get_uhid_or_redirect(request)
     
@@ -74,9 +74,9 @@ async def boar_external_mate_add(request: Request, data: dm.DataBoarExternalMate
     
     
     
-    sow_boar_hid       = data.sow_boar_hid
+    boar_hid       = data.boar_hid
     
-    res = hashids_common.decrypt(sow_boar_hid)
+    res = hashids_common.decrypt(boar_hid)
     if len(res) == 0:
         result =  {
             'result':{
@@ -90,7 +90,7 @@ async def boar_external_mate_add(request: Request, data: dm.DataBoarExternalMate
     
         return result
     
-    sow_boar_id = res[0]
+    boar_id = res[0]
     
     
     boar_customer_hid       = data.boar_customer_hid
@@ -112,11 +112,21 @@ async def boar_external_mate_add(request: Request, data: dm.DataBoarExternalMate
     boar_customer_id = res[0]
     
     
+    # Compute date_expected_birth and date_expected_payment
+    
+    dt_mate                 = datetime.strptime(data.date_mate, '%Y-%m-%d')
+    dt_expected_birth       = dt_mate + timedelta(days=114)
+    dt_expected_payment     = dt_mate + timedelta(days=156) # birth + 42 days
+    
+    dt_expected_birth_s     = datetime.strftime(dt_expected_birth, '%Y-%m-%d')
+    dt_expected_payment_s   = datetime.strftime(dt_expected_payment, '%Y-%m-%d')
     
     
-    data.user_id          = user_id
-    data.sow_boar_id      = sow_boar_id
-    data.boar_customer_id = boar_customer_id
+    data.user_id            = user_id
+    data.boar_id            = boar_id
+    data.boar_customer_id   = boar_customer_id
+    data.date_expected_birth    = dt_expected_birth_s
+    data.date_expected_payment  = dt_expected_payment_s
     
     
     res_add    =  model['sow_boar_mate'].add_boar_external_mate(data)
@@ -149,7 +159,7 @@ async def boar_external_mate_add(request: Request, data: dm.DataBoarExternalMate
     return res_add
     
 
-@app.post("/boar_external_mate/update", tags=["Sow Boar"])
+@app.post("/boar_ext_mate/update", tags=["Sow Boar"])
 async def boar_external_mate_update(request: Request, data: dm.DataBoarExternalMate):
     result = get_uhid_or_redirect(request)
     
@@ -278,9 +288,17 @@ def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0, pig_farm_id = 0):
             cur_id     = cur_entry['boar_customer']['id']
             cur_hid    = hashids_common.encrypt(cur_id)
                
-            
             del cur_entry['boar_customer']['id']
             cur_entry['boar_customer']['hid'] = cur_hid
+            
+            
+            cur_id     = cur_entry['sow_boar']['id']
+            cur_hid    = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['sow_boar']['id']
+            cur_entry['sow_boar']['hid'] = cur_hid
+            
+            
 
     return res
 
@@ -343,7 +361,7 @@ async def sow_boar_mate_list(request: Request, sow_boar_hid:str = None,
         pig_farm_id = res[0]
         
     
-    res = get_data_sow_boar_mate_list(sow_boar_id, is_external)
+    res = get_data_sow_boar_mate_list(sow_boar_id, is_external, pig_farm_id)
             
     
     if res is None:

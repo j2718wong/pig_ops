@@ -664,7 +664,8 @@ class Account(BaseModel):
                     ver_num_gilt_ops,             
                     ver_num_weaning_sow_ops,      
                     
-                    data_ver_num_account
+                    data_ver_num_account,
+                    data_ver_num_pig_buyer
                     
                 FROM account 
                 WHERE id = %s
@@ -688,7 +689,7 @@ class Account(BaseModel):
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+
             
         except Exception as e:
             msg = 'get_data_ver_num(); error in executing query[] = ' + sql
@@ -712,6 +713,7 @@ class Account(BaseModel):
                 cur_ver_num_weaning_sow_ops         = row[4]      
                 
                 cur_ver_num_account                 = row[5]
+                cur_ver_num_pig_buyer               = row[6]
                 
                 
                 if return_array == 0:
@@ -723,7 +725,8 @@ class Account(BaseModel):
                             'gilt_ops':             cur_ver_num_gilt_ops,   
                             'weaning_sow_ops':      cur_ver_num_weaning_sow_ops,
                             
-                            'account':              cur_ver_num_account
+                            'account':              cur_ver_num_account,
+                            'pig_buyer':            cur_ver_num_pig_buyer
                         }
                     }
                     
@@ -737,7 +740,8 @@ class Account(BaseModel):
                         cur_ver_num_gilt_ops,             
                         cur_ver_num_weaning_sow_ops,      
                         
-                        cur_ver_num_account              
+                        cur_ver_num_account,
+                        cur_ver_num_pig_buyer              
                     ]
 
         return None

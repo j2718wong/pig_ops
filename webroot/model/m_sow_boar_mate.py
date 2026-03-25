@@ -182,8 +182,8 @@ class SowBoarMate(BaseModel):
                     LEFT OUTER JOIN sow_boar c          ON a.mate_sow_boar_id = c.id
                     WHERE a.sow_boar_id = %s 
                     ORDER BY a.date_mate DESC
-                """
-                params = [sow_boar_id]
+                """ % sow_boar_id
+                
                 
             else:
                 # External: mated external sows
@@ -207,8 +207,8 @@ class SowBoarMate(BaseModel):
                     LEFT OUTER JOIN pig_prod_notes c        ON a.notes_id = c.id
                     WHERE a.sow_boar_id = %s AND a.boar_customer_id IS NOT NULL
                     ORDER BY a.date_mate DESC
-                """
-                params = [sow_boar_id]
+                """ % sow_boar_id 
+                
         
         else:
             # Get boar external mates for all boars in a farm
@@ -237,11 +237,11 @@ class SowBoarMate(BaseModel):
                 LEFT OUTER JOIN pig_prod_notes d        ON a.notes_id = d.id
                 WHERE a.pig_farm_id = %s AND a.boar_customer_id IS NOT NULL
                 ORDER BY a.date_mate DESC
-            """
-            params = [pig_farm_id]
+            """ % pig_farm_id
+            
         
         # Execute query using BaseModel method
-        rows = self._execute_query(sql, params)
+        rows = self._execute_query(sql)
         
         if rows is None:
             return []

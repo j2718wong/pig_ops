@@ -332,17 +332,17 @@ class DataSowBoar(BaseModel):
 
 class DataBoarExternalMate(BaseModel):
     uhid:                   str = None
-    sow_boar_hid:           str = None
-    sow_boar_mate_hid:      str = None
+    boar_hid:               str = None
+    boar_ext_mate_hid:      str = None
     boar_customer_hid:      str = None
         
         
     user_id:                int = 0
-    sow_boar_id:            int = 0
-    sow_boar_mate_id:       int = 0
+    boar_id:                int = 0
+    boar_ext_mate_id:       int = 0
     boar_customer_id:       int = 0
     
-    customer_sow_name:      str    
+    customer_sow_name:      str = None   
     date_mate:              str
     date_expected_birth:    str = None
     date_expected_payment:  str = None

@@ -88,7 +88,11 @@ class BaseModel:
         
         try:
             with conn.cursor() as cursor:
-                cursor.execute(sql, params)
+                if params:
+                    cursor.execute(sql, params)
+                else:
+                    cursor.execute(sql)
+                
                 rows = cursor.fetchall()
                 return rows
                 
