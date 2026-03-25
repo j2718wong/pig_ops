@@ -253,6 +253,9 @@ def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0, pig_farm_id = 0):
     if is_external == 0:
         # Replace plain id
         for cur_entry in res:
+            print('sow_boar_mate_entry')
+            pprint.pprint(cur_entry)
+            
             cur_id     = cur_entry['id']
             cur_hid    = hashids_common.encrypt(cur_id)
             
@@ -292,12 +295,14 @@ def get_data_sow_boar_mate_list(sow_boar_id, is_external = 0, pig_farm_id = 0):
             cur_entry['boar_customer']['hid'] = cur_hid
             
             
-            cur_id     = cur_entry['sow_boar']['id']
-            cur_hid    = hashids_common.encrypt(cur_id)
+            if 'sow_boar' in cur_entry:
             
-            del cur_entry['sow_boar']['id']
-            cur_entry['sow_boar']['hid'] = cur_hid
-            
+                cur_id     = cur_entry['sow_boar']['id']
+                cur_hid    = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['sow_boar']['id']
+                cur_entry['sow_boar']['hid'] = cur_hid
+                
             
 
     return res

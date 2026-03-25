@@ -180,7 +180,7 @@ class SowBoarMate(BaseModel):
                     FROM sow_boar_mate a
                     LEFT OUTER JOIN pig_production b    ON a.pig_prod_id = b.id 
                     LEFT OUTER JOIN sow_boar c          ON a.mate_sow_boar_id = c.id
-                    WHERE a.sow_boar_id = %s 
+                    WHERE a.sow_boar_id = %s AND a.boar_customer_id IS NULL
                     ORDER BY a.date_mate DESC
                 """ % sow_boar_id
                 
