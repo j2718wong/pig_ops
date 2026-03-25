@@ -5,7 +5,7 @@
     "common":{
         "labels":{
             "entries":          "Kabuok",
-            "no_entries":       "Walay lista"
+            "no_entries":       ["Walay nakalista", "Walay dyamo", "Walay dyamo"]
         },
         
         "messages":{
@@ -140,6 +140,12 @@
             "status_dead":      "Namatay",
             "status_sold":      "Gibaligya",
             "status_delete":    "Gi Delete",
+            
+            "due":              "Manganak sunod",
+            "due_days":         "Adlaw",
+            "due_soon":         "Hapit na manganak",
+            "due_today":        "Manganak karon",
+            "overdue":          "Manganak na na!",
             
             
             "output_at_wean":   "Output sa Lutas",
