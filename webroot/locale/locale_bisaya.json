@@ -10,6 +10,7 @@
             "please_select":    "Paglihug Pagpili",
             "select_no_entries":"Walay nakalista",
             
+            "entry":            "Kabuok",
             "entries":          "Kabuok",
             "no_entries":       ["Walay nakalista", "Walay dyamo", "Way sulod"]
         },
