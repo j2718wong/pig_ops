@@ -37,6 +37,7 @@ async def sitemap():
     pages = [
         {"loc": "https://superpig.jsysdev.com/", "priority": "1.0", "changefreq": "daily"},
         {"loc": "https://superpig.jsysdev.com/login", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": "https://superpig.jsysdev.com/signup", "priority": "0.8", "changefreq": "monthly"},
         
         {"loc": "https://superpig.jsysdev.com/terms", "priority": "0.5", "changefreq": "yearly"},
         {"loc": "https://superpig.jsysdev.com/privacy", "priority": "0.5", "changefreq": "yearly"}
