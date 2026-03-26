@@ -12,11 +12,10 @@
             
             "entry":            "Kabuok",
             "entries":          "Kabuok",
-            "no_entries":       ["Walay nakalista", "Walay dyamo", "Way sulod"]
-        },
-        
-        "messages":{
-            "input_a_date":     "Palihug butangi petsa."
+            "no_entries":       ["Walay nakalista", "Walay dyamo", "Way sulod"],
+            
+            
+            "valid_date":       "Palihug butangi petsa."
         }
     },
     
@@ -228,9 +227,13 @@
             "num_nipples":          "Pilay Totoy?",
             "num_nipples_help":     "Lili a na ug Ihapa na",
             
+            "is_external":          "Butakal sa Silingan",
+            "external":             "Silingan ang tagiya sa butakal",
+            "is_external_help":     "I check ni kung nagpatakal ramo sa butakal silingan"
+            
             "ready_for_mating":     "Pwede naba kastahan or mutakal?",       
             "production_ready":     "Ready na para Production",
-            "ready_help":           "I check ni para ma apil sa pagpili as anay or butakal; ",
+            "ready_help":           "I check ni para ma apil sa pagpili as anay or butakal",
             
             "notes":                "Notes"
             
@@ -251,17 +254,32 @@
     
     "page_gestating_add":{
         "labels":{
-            "DateMating":       "Petsa sa Takal or AI",
-            "InseminationType": "Klase sa Takal",
+            "date_mating":      "Petsa sa Takal or AI",
+            "insem_type":       "Klase sa Takal",
             
-            "SemenSupplier":     "Supplier sa Semilya",
-            "SemenType":        "Klase sa Semilya",
-            "SemenCost":        "Gasto sa Semilya",
-            "OtherGasto":       "Unsa pa na Gasto",
-            "StaffMember":      "Kinsa",
+            "semen_supplier":   "Supplier sa Semilya",
+            "semen_type":       "Klase sa Semilya",
+            "semen_type_help":  "Semilya gikan sa supplier",
             
-            "WhoDidOperation":  "Kinsay nagpatakal or nag AI"
+            "semen_cost":       "Gasto sa Semilya",
+            "other_cost":       "Unsa pa na Gasto",
+            "staff_member":     "Kinsa?",
             
+            "who_did":          "Kinsay nagpatakal or nag AI",
+            
+            
+            "insem_type_boar":  "Takal Butakal",
+            "insem_ai_external": "AI gipalit ang semilya",
+            "insem_ai_internal": "AI gamit butakal sa farm",
+            
+            
+            "add_semen_type":   "Bag-o klase na semilya",
+            "save_semen_type":  "Save",
+            
+            
+            "boar_semen_source": "Butakal asa gikuha ang semilya",
+            
+            "notes":            "Notes"
             
         }   
         
