@@ -4,6 +4,12 @@
     
     "common":{
         "labels":{
+            "add":              "Dugang",
+            "edit":             "Edit",
+            
+            "please_select":    "Paglihug Pagpili",
+            "select_no_entries":"Walay nakalista",
+            
             "entries":          "Kabuok",
             "no_entries":       ["Walay nakalista", "Walay dyamo", "Way sulod"]
         },
@@ -184,6 +190,40 @@
             "Operation":        "Unsay Buhatonon",
             "Weaning":          "Petsa sa Lutas"
         }
+        
+    },
+    
+    
+    
+    "page_sow_boar_add":{
+        "labels":{
+            "name":                 "Pangalan sa Baboy",
+            "name_invalid":         "Palihug enter ug insakto na Ngalan",
+            "name_help":            "Ngalan sa baboy na dali timan an",
+                
+            "number":               "Numero",
+            "number_invalid":       "Palihug enter ug insakto na Numero",
+            "number_help":          "Pwede eartag, pwede wala sad",
+            
+            "date_birth":           "Petsa Gi anak",
+            "date_birth_help":      "Pwede wala. Gamiton sa pag compute edad sa baboy",
+            
+            "parent_sow":           "Pili kinsay Mama?",
+            "parent_sow_help":      "Pwede wala",
+            
+            "parent_boar":          "Pili kinsay Papa?",
+            "parent_boar_help":     "Pwede wala",
+            
+            "num_nipples":          "Pilay Totoy?",
+            "num_nipples_help":     "Lili a na ug Ihapa na",
+            
+            "ready_for_mating":     "Pwede naba kastahan or mutakal?",       
+            "production_ready":     "Ready na para Production",
+            "ready_help":           "I check ni para ma apil sa pagpili as anay or butakal; ",
+            
+            "notes":                "Notes"
+            
+        }   
         
     },
     

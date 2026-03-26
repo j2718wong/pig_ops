@@ -890,6 +890,31 @@
     </footer>
 
 
+    <script type="text/javascript">
+        // Global translations object
+        window.SUPERPIG_TRANSLATIONS = {{ translation if translation else 'null' }};
+        
+        console.log('window.SUPERPIG_TRANSLATIONS');
+        console.log(window.SUPERPIG_TRANSLATIONS);
+        
+        
+        // Also store current language from URL/localStorage if needed
+        (function() {
+            // Get language from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlLang = urlParams.get('lang');
+            
+            // Get from localStorage if exists
+            const savedLang = localStorage.getItem('pig_farm_language');
+            
+            // Determine current language
+            let currentLang = urlLang || savedLang || 'default';
+            
+            // Store in window object
+            window.SUPERPIG_CURRENT_LANG = currentLang;
+        })();
+    </script>
+
 
 
     <script>
@@ -1091,30 +1116,7 @@
         });
     </script>
 
-    <script type="text/javascript">
-        // Global translations object
-        window.SUPERPIG_TRANSLATIONS = {{ translation if translation else 'null' }};
-        
-        console.log('window.SUPERPIG_TRANSLATIONS');
-        console.log(window.SUPERPIG_TRANSLATIONS);
-        
-        
-        // Also store current language from URL/localStorage if needed
-        (function() {
-            // Get language from URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlLang = urlParams.get('lang');
-            
-            // Get from localStorage if exists
-            const savedLang = localStorage.getItem('pig_farm_language');
-            
-            // Determine current language
-            let currentLang = urlLang || savedLang || 'default';
-            
-            // Store in window object
-            window.SUPERPIG_CURRENT_LANG = currentLang;
-        })();
-    </script>
+    
  
 </body>
 
