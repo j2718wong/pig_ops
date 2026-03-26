@@ -198,6 +198,16 @@
     
     "page_sow_boar_add":{
         "labels":{
+            "add_sow":              "Dugang Anay",
+            "edit_sow":             "Edit Anay",
+            
+            "add_boar":             "Dugang Butakal",
+            "edit_boar":            "Edit Butakal",
+            
+            "add_gilt":             "Dugang Dumalaga",
+            "edit_gilt":            "Edit Dumalaga",
+            
+            
             "name":                 "Pangalan sa Baboy",
             "name_invalid":         "Palihug enter ug insakto na Ngalan",
             "name_help":            "Ngalan sa baboy na dali timan an",
