@@ -192,9 +192,12 @@
     
     "page_gesta_lacta_list":{
         "labels":{
-            "Expected":         "Petsa Manganak",
-            "Operation":        "Unsay Buhatonon",
-            "Weaning":          "Petsa sa Lutas"
+            "prod_gestating":   "Prod Gesta",
+            "prod_lactating":   "Prod Lacta",
+            
+            "expected":         "Petsa Manganak",
+            "operation":        "Unsay Buhatonon",
+            "weaning":          "Petsa sa Lutas"
         }
         
     },
