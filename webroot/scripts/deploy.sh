@@ -289,6 +289,9 @@ fi
 cd /root/projects/jsys
 # =============================================================
 
+
+# Find the pig_ops_db repo
+DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
 # ============= NEW: RUN DATABASE MIGRATIONS =============
 section "STEP 5.6: Running database migrations"
 
@@ -305,8 +308,19 @@ if [ -d "$DB_REPO_DIR" ]; then
     # Run migrations for production
     if [ -f "migrate.sh" ]; then
         echo "Running database migrations..."
+        
+        # Temporarily disable exit-on-error to prevent migration from killing script
+        set +e
         ./migrate.sh prod
-        check_success "Database migrations applied"
+        MIGRATION_EXIT=$?
+        set -e
+        
+        if [ $MIGRATION_EXIT -eq 0 ]; then
+            log_success "Database migrations applied"
+        else
+            log_error "Database migrations failed (exit code: $MIGRATION_EXIT)"
+            exit 1
+        fi
     else
         log_warning "migrate.sh not found in $DB_REPO_DIR"
     fi
