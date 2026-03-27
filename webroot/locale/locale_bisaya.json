@@ -221,7 +221,7 @@
             "number_invalid":       "Palihug enter ug insakto na Numero",
             "number_help":          "Pwede eartag, pwede wala sad",
             
-            "cannot_both_blank":    "Dile pwede blanko ang Ngalan ug Numero",
+            "cannot_be_blank":      "Dile pwede blanko ang Ngalan ug Numero",
             
             "date_birth":           "Petsa Gi anak",
             "date_birth_help":      "Pwede wala. Gamiton sa pag compute edad sa baboy",
