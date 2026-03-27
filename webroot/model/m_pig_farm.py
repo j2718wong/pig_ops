@@ -86,8 +86,6 @@ class PigFarm(BaseModel):
         
         # DEBUG: Print the procedure call string 
         debug_sql = self._generate_debug_procedure('pig_farm_add', params)
-        print('\n\n')
-        print(debug_sql)
         
         rows = self._call_procedure('pig_farm_add', params)
         

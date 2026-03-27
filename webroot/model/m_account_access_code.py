@@ -24,7 +24,6 @@ class AccountAccessCode:
         sql += '%s,'    % data.user_id
         sql += '%s);'   % data.group_num
         
-        print(sql)
         
         # Check if still connected to database
         if self.model.check_if_connected() == False:
