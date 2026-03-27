@@ -502,6 +502,7 @@ class PigFarm(BaseModel):
                     a.data_ver_num_pig_prod, 
                     a.data_ver_num_staff,    
                     a.data_ver_num_feed_buy,
+                    a.data_ver_num_feed_balance,
                     a.data_ver_num_not_pregnant 
                     
                     
@@ -528,7 +529,7 @@ class PigFarm(BaseModel):
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql
@@ -564,7 +565,8 @@ class PigFarm(BaseModel):
                 cur_data_ver_num_pig_prod   = row[12]
                 cur_data_ver_num_staff      = row[13]  
                 cur_data_ver_num_feed_buy   = row[14]
-                cur_data_ver_num_not_pregnant = row[15]
+                cur_data_ver_num_feed_balance = row[15]
+                cur_data_ver_num_not_pregnant = row[16]
                 
                 cur_entry = {
                     'pig_farm': {
@@ -605,6 +607,7 @@ class PigFarm(BaseModel):
                         'pig_prod':     cur_data_ver_num_pig_prod,
                         'staff':        cur_data_ver_num_staff,   
                         'feed_buy':     cur_data_ver_num_feed_buy,
+                        'feed_balance': cur_data_ver_num_feed_balance,
                         'not_pregnant': cur_data_ver_num_not_pregnant
                     }
                     
@@ -697,6 +700,7 @@ class PigFarm(BaseModel):
                     data_ver_num_pig_prod, 
                     data_ver_num_staff,    
                     data_ver_num_feed_buy,
+                    data_ver_num_feed_balance,
                     data_ver_num_not_pregnant
                     
                 FROM pig_farm 
@@ -743,7 +747,8 @@ class PigFarm(BaseModel):
                 cur_data_ver_num_pig_prod   = row[2]
                 cur_data_ver_num_staff      = row[3]  
                 cur_data_ver_num_feed_buy   = row[4]
-                cur_data_ver_num_not_pregnant = row[5]
+                cur_data_ver_num_feed_balance   = row[5]
+                cur_data_ver_num_not_pregnant   = row[6]
                 
                 
                 if return_array == 0:
@@ -754,6 +759,7 @@ class PigFarm(BaseModel):
                             'pig_prod':     cur_data_ver_num_pig_prod,
                             'staff':        cur_data_ver_num_staff,   
                             'feed_buy':     cur_data_ver_num_feed_buy,
+                            'feed_balance': cur_data_ver_num_feed_balance,
                             'not_pregnant': cur_data_ver_num_not_pregnant
                         }
                     }
@@ -766,7 +772,8 @@ class PigFarm(BaseModel):
                         cur_data_ver_num_boar,       
                         cur_data_ver_num_pig_prod,   
                         cur_data_ver_num_staff,      
-                        cur_data_ver_num_feed_buy,   
+                        cur_data_ver_num_feed_buy,
+                        cur_data_ver_num_feed_balance,   
                         cur_data_ver_num_not_pregnant
                     ]
 

@@ -40,6 +40,8 @@
             "age":              "Edad",
             "output":           "Output",
             
+            "date":             "Petsa",
+            
             "today":            "Petsa Karon",
             "year":             "tuig",
             "month":            "bulan",
@@ -321,7 +323,28 @@
             
         }   
         
+    },
+    
+    "prod_entry_pig_ops":{
+        "labels":{
+            "scheduled_pig_ops": "Nakaschedule na PigOps",
+            "operation":        "Unsay Buhaton",
+            "done_by":          "Kinsa ang nagbuhat",
+            
+            "all":              "Tanan",
+            
+            "hide_completed":   "Ayaw pakita ang nahuman na"
+        }
+    },
+    
+    
+    "feed_balance": {
+        "labels":{
+            "feed_balance": "Feed Balance"
+        }
+        
     }
+    
     
     
     

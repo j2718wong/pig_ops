@@ -289,6 +289,34 @@ fi
 cd /root/projects/jsys
 # =============================================================
 
+# ============= NEW: RUN DATABASE MIGRATIONS =============
+section "STEP 5.6: Running database migrations"
+
+# Find the pig_ops_db repo
+DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
+if [ -d "$DB_REPO_DIR" ]; then
+    cd "$DB_REPO_DIR"
+    
+    # Pull latest database changes
+    echo "Pulling latest database changes from Bitbucket..."
+    git pull origin main
+    check_success "Database git pull completed"
+    
+    # Run migrations for production
+    if [ -f "migrate.sh" ]; then
+        echo "Running database migrations..."
+        ./migrate.sh prod
+        check_success "Database migrations applied"
+    else
+        log_warning "migrate.sh not found in $DB_REPO_DIR"
+    fi
+    
+    cd /root/projects/jsys
+else
+    log_warning "pig_ops_db directory not found at $DB_REPO_DIR"
+fi
+# =========================================================
+
 # 6️⃣ MINIFY TEMPLATES (only if backend changed OR frontend changed)
 if [ "$RESTART_NEEDED" = true ]; then
     section "STEP 6: Minifying HTML templates"
@@ -438,6 +466,7 @@ echo "📊 Summary:"
 echo "  • Frontend changes: $FRONTEND_CHANGED"
 echo "  • Frontend build: $BUILD_NEEDED"
 echo "  • Backend changes: $BACKEND_CHANGED"
+echo "  • Database migrations: applied"
 echo "  • Restart performed: $RESTART_NEEDED"
 if [ "$RESTART_NEEDED" = true ]; then
     echo "  • App PID: $APP_PID"
