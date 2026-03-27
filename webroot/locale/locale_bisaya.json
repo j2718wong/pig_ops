@@ -18,7 +18,8 @@
             "no_entries":       ["Walay nakalista", "Walay dyamo", "Way sulod"],
             
             
-            "valid_date":       "Palihug butangi petsa."
+            "valid_date":       "Palihug butangi petsa.",
+            "numeric_value":    "Numero lang ibutang."
         }
     },
     
@@ -238,7 +239,12 @@
             "production_ready":     "Ready na para Production",
             "ready_help":           "I check ni para ma apil sa pagpili as anay or butakal",
             
-            "notes":                "Notes"
+            "notes":                "Notes",
+            
+            
+            "gilt_add_message": {
+                
+            }
             
         }   
         
@@ -266,16 +272,13 @@
             
             "semen_cost":       "Gasto sa Semilya",
             "other_cost":       "Unsa pa na Gasto",
-            "staff_member":     "Kinsa?",
-            
-            "who_did":          "Kinsay nagpatakal or nag AI",
             
             
             "insem_type":       "Klase sa Takal",
             "insem_boar":       "Takal Butakal",
             "insem_ai_external": "AI gipalit ang semilya",
             "insem_ai_internal": "AI gamit butakal sa farm",
-            
+       
             
             "add_semen_type":   "Bag-o klase na semilya",
             "save_semen_type":  "Save",
@@ -284,6 +287,12 @@
             "boar_semen_source": "Butakal asa gikuha ang semilya",
             
             "notes":            "Notes",
+            
+            "add_new_staff":    "Bag-o na Sakop sa Farm",
+            "save_new_staff":   "Save",
+            "select_staff":     "Kinsa?",
+            "select_staff_help":"Kinsay nagpatakal or nag AI",
+            
             
             
             "breeding_warning":{
