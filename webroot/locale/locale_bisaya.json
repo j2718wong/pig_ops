@@ -4,6 +4,9 @@
     
     "common":{
         "labels":{
+            "save":             "Save",
+            "cancel":           "Cancel",
+            
             "add":              "Dugang",
             "edit":             "Edit",
             
@@ -255,7 +258,7 @@
     "page_gestating_add":{
         "labels":{
             "date_mating":      "Petsa sa Takal or AI",
-            "insem_type":       "Klase sa Takal",
+            
             
             "semen_supplier":   "Supplier sa Semilya",
             "semen_type":       "Klase sa Semilya",
@@ -268,7 +271,8 @@
             "who_did":          "Kinsay nagpatakal or nag AI",
             
             
-            "insem_type_boar":  "Takal Butakal",
+            "insem_type":       "Klase sa Takal",
+            "insem_boar":       "Takal Butakal",
             "insem_ai_external": "AI gipalit ang semilya",
             "insem_ai_internal": "AI gamit butakal sa farm",
             
@@ -279,7 +283,16 @@
             
             "boar_semen_source": "Butakal asa gikuha ang semilya",
             
-            "notes":            "Notes"
+            "notes":            "Notes",
+            
+            
+            "breeding_warning":{
+                "header":       "Natakalan na ang Anay niagi",
+                "message":      "Kani na anay natakalan sa petsa {date} na naay PID: {pid}. Kung i save ni, ang daan na Gesta Entry malista na {not_pregnant} ug tangtangon sa  {prod_gestating_list}. Tanawa tarong kung mao bani na anay ang nanguwag balik. {cannot_undo}",
+                "cannot_undo":  "Dile na mausab kung masayop.",  
+                "not_pregnant": "Wala Nabuntis",       
+                "prod_gestating_list": "Lista sa Gesta Anay" 
+            }
             
         }   
         
