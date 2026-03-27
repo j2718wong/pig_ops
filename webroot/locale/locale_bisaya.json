@@ -49,10 +49,14 @@
             
             "select_sow":       "Anay",
             "select_boar":      "Butakal",
-            "done_by_me":       "Ako"
+            "done_by_me":       "Ako",
+            
+            "num_days":         "Days",
+            "num_pigs":         "Baboy"
             
         }
     },
+
 
     "navigation":{
         "nav_links":{
@@ -188,9 +192,9 @@
             "disposed_type":    "Klase",
             "disposed_name":    "Ngalan",
             
-            "date_mate":        "Petsa sa Takal"
+            "date_mate":        "Petsa sa Takal",
             
-            
+            "date_harvest":     "Petsa sa Harvest"
         }
     },
     
