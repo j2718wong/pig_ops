@@ -4,6 +4,9 @@
     
     "common":{
         "labels":{
+            "add_entry":        "Add Entry",
+            "search":           "Search",
+            
             "save":             "Save",
             "cancel":           "Cancel",
             
@@ -183,7 +186,9 @@
             
             "date_disposed":    "Petsa",
             "disposed_type":    "Klase",
-            "disposed_name":    "Ngalan"
+            "disposed_name":    "Ngalan",
+            
+            "date_mate":        "Petsa sa Takal"
             
             
         }
