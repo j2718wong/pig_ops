@@ -85,11 +85,11 @@
                     <div class="alert-count" id="alertCount">6</div>
                 </div>
                 
-                <!-- User Control - Single instance for both desktop and mobile -->
+
                 <div class="user-control" id="userControl">
                     <div class="user-avatar" id="desktop-user-initials">&nbsp;</div>
                     <div class="user-dropdown" id="userDropdown">
-                        <!-- User Profile Header with Full Name -->
+
                         <div class="user-dropdown-header">
                             <div class="user-avatar-large" id="desktop-user-initials-large">&nbsp;</div>
                             <div class="user-info">
@@ -98,18 +98,20 @@
                             </div>
                         </div>
                         
-                        <!-- Language Switch -->
-                        <!--
-                        <div class="language-switch">
+                        
+                        <div class="language-switch" id="languageSwitch">
                             <div class="language-label">
-                                <i class="fas fa-globe" style="color: var(--icon-blue);"></i>
+                                <i class="fas fa-globe"></i>
                                 <span>Language</span>
+                                <span class="current-lang" id="currentLang">English</span>
                             </div>
-                            <div class="language-options">
-                                <span class="language-name">English</span>
+                            <div class="language-dropdown" id="languageDropdown">
+                                <div class="lang-item" data-lang="en">English</div>
+                                <div class="lang-item" data-lang="tl">Tagalog</div>
+                                <div class="lang-item" data-lang="ceb">Bisdak</div>
                             </div>
                         </div>
-                        -->
+                                                
                         
                         
                         <!-- Dropdown Items -->
@@ -870,13 +872,6 @@
                 </ul>
             </div>
             
-            <!--
-            <div class="footer-section">
-                <h3 class="footer-title">Social Media</h3>
-                <ul class="footer-links">
-                    <li><a href="#"><i class="fab fa-facebook" style="margin-right: 8px;"></i> Facebook</a></li>
-                </ul>
-            </div>-->
         </div>
         
         <div class="copyright">
@@ -918,6 +913,67 @@
 
 
     <script>
+        
+        // Language Switcher with URL Redirect
+        const langSwitch = document.getElementById('languageSwitch');
+        const langDropdown = document.getElementById('languageDropdown');
+        const currentLangSpan = document.getElementById('currentLang');
+
+        if (langSwitch) {
+            // Toggle dropdown
+            langSwitch.addEventListener('click', (e) => {
+                e.stopPropagation();
+                langSwitch.classList.toggle('active');
+            });
+            
+            // Close when clicking outside
+            document.addEventListener('click', () => {
+                langSwitch.classList.remove('active');
+            });
+            
+            // Select language and redirect
+            document.querySelectorAll('.lang-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const lang = item.getAttribute('data-lang');
+                    
+                    // Close dropdown
+                    langSwitch.classList.remove('active');
+                    
+                    // Get current URL without lang parameter
+                    const url = new URL(window.location.href);
+                    
+                    // Set or update lang parameter
+                    url.searchParams.set('lang', lang);
+                    
+                    // Redirect to new URL
+                    window.location.href = url.toString();
+                });
+            });
+            
+            // Set active language based on URL parameter on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentLang = urlParams.get('lang') || 'en';
+            
+            // Update active class and display
+            document.querySelectorAll('.lang-item').forEach(item => {
+                const lang = item.getAttribute('data-lang');
+                if (lang === currentLang) {
+                    item.classList.add('active');
+                    currentLangSpan.textContent = item.textContent;
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Also save to localStorage as backup (optional)
+            localStorage.setItem('pig_farm_language', currentLang);
+        }
+        
+        
+        
+        
+        
         // Mobile navigation toggle
         const mobileToggle = document.getElementById('mobileToggle');
         const closeMobileNav = document.getElementById('closeMobileNav');
@@ -1043,6 +1099,7 @@
                     fallbackCopyText(link, button);
                 });
         }
+
 
         // Fallback for browsers that block clipboard API
         function fallbackCopyText(text, button) {

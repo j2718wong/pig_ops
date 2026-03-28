@@ -22,7 +22,7 @@ if locale_dir not in sys.path:
 TRANSLATED_LANGUAGES = [
     {'key': 'en',       'lang_input': ['default', 'en', 'english']},
 
-    {'key': 'ph-bis',   'lang_input': ['ph-bis', 'bis', 'bisaya']},
+    {'key': 'ph-bis',   'lang_input': ['ph-bis', 'bis', 'bisaya', 'ceb']},
     {'key': 'ph-tag',   'lang_input': ['ph-tag', 'tag', 'tagalog']}
 
 ]
