@@ -14,6 +14,8 @@
             "add":              "Dugang",
             "edit":             "Edit",
             
+            "new":              "New",
+            
             "duplicate_entry":  "Duplicate. Naa na sa lista",
             
             "please_select":    "Paglihug Pagpili",
@@ -57,6 +59,8 @@
             
             "num_days":         "Days",
             "num_pigs":         "Baboy",
+            
+            
             
             "new_staff_name":   "Ngalan sa Bag-o na Staff",
             "done_by_me":       "Ako ang nagbuhat",
@@ -331,6 +335,7 @@
         
     },
     
+    
     "prod_entry_pig_ops":{
         "labels":{
             "scheduled_pig_ops": "Nakaschedule na PigOps",
@@ -340,6 +345,42 @@
             "all":              "Tanan",
             
             "hide_completed":   "Ayaw pakita ang nahuman na"
+        }
+    },
+    
+    
+    "prod_pig_ops_edit":{
+        "labels": {
+            "mark_as_done":         "E Update ang PigOps",
+            "edit_pig_ops":         "E Update ang PigOps",
+            "piglets_operation":    "Para sa Baktin",
+            "sow_operation":        "Para sa Anay",
+
+            "date_completed":       "Petsa Nahuman",
+            
+            "add_medvac_brand":     "Dugang MedVac Brand",
+            "save_medvac_brand":    "Save MedVac Brand",
+            "select_medvac_brand":  "Unsay Brand sa MedVac?",
+            "medvac_brand_help":    "Brand or nagbuhat ana",
+            
+            "add_medvac_type":      "Dugang Klase sa Medvac",
+            "save_medvac_type":     "Save Klase sa Medvac",
+            "select_medvac_type":   "Unsa na Klase sa MedVac?",
+            "medvac_type_help":     "Para unsa ang MedVac or Generic na Ngalan",
+            
+            "add_medvac_name":      "Dugang Bag-o na MedVac Ngalan",
+            "save_medvac_name":     "Save Pangalan sa Medvac",
+            "select_medvac_name":   "Unsay Ngalan sa Medvac?",
+            "medvac_name_help":     "Pangalan sa MedVac; Product Name",
+            
+            "notes":                "Detalye, Unsay gibuhat",
+            "notes_help":           "Isulat pilay dosage gi inject; sample: 2mL injection",
+            
+            
+            "medvac_brand":         "Brand sa MedVac",
+            "medvac_type":          "Klase sa MedVac",
+            "medvac_name":          "Pangalan sa MedVac; Product Name"
+            
         }
     },
     
