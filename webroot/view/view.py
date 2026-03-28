@@ -38,6 +38,7 @@ from jinja2             import Environment, FileSystemLoader
 
 from common_fast_api    import dir_static, dir_static_m, get_application_data
 
+
 from datetime           import datetime
 
 
@@ -304,8 +305,16 @@ class Root(ViewBase):
             if translation is not None:
                 s_translation = json.dumps(translation)
             
+            
+            
+            
+            page_data = {
+                'app_version':              self.controller.APP_VERSION
+            }
+            
+            
                 
-            data    = { 'page_data':        None,
+            data    = { 'page_data':        page_data,
                         'css_files':        css_files,
                         'js_lib':           js_lib,
                         'js_app_text':      files['text'],

@@ -89,6 +89,53 @@ echo ""
 section() { log_section "$1"; }
 check_success() { if [ $? -eq 0 ]; then log_success "$1"; else log_error "$1"; exit 1; fi; }
 
+# ============= VERSION MANAGEMENT =============
+VERSION_FILE="/root/projects/jsys/version.txt"
+
+# Read current version
+read_version() {
+    if [ -f "$VERSION_FILE" ]; then
+        IFS='.' read -r MAJOR DB_VER BACKEND_VER FRONTEND_VER < "$VERSION_FILE"
+    else
+        MAJOR=1
+        DB_VER=0
+        BACKEND_VER=0
+        FRONTEND_VER=0
+        echo "$MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" > "$VERSION_FILE"
+    fi
+}
+
+# Write version back
+write_version() {
+    echo "$MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" > "$VERSION_FILE"
+    log_message "📦 Version updated to: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
+}
+
+# Increment database version
+inc_db_version() {
+    read_version
+    DB_VER=$((DB_VER + 1))
+    write_version
+    log_success "Database version incremented to $DB_VER"
+}
+
+# Increment backend version
+inc_backend_version() {
+    read_version
+    BACKEND_VER=$((BACKEND_VER + 1))
+    write_version
+    log_success "Backend version incremented to $BACKEND_VER"
+}
+
+# Increment frontend version
+inc_frontend_version() {
+    read_version
+    FRONTEND_VER=$((FRONTEND_VER + 1))
+    write_version
+    log_success "Frontend version incremented to $FRONTEND_VER"
+}
+# ================================================
+
 # Initialize flags and store commit hashes
 FRONTEND_CHANGED=false
 BACKEND_CHANGED=false
@@ -175,6 +222,9 @@ if [ "$BUILD_NEEDED" = true ]; then
             echo ""
             echo "📦 Generated files in static/css/:"
             ls -la static/css/ 2>/dev/null | grep -E "main.*\.min\.css|manifest\.json" | sed 's/^/   /' || echo "   No CSS files found"
+            
+            # Increment frontend version
+            inc_frontend_version
         else
             log_error "Frontend build failed!"
             exit 1
@@ -235,6 +285,9 @@ if [ -d "pig_ops" ]; then
         echo ""
         echo "📋 Backend changes:"
         git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
+        
+        # Increment backend version
+        inc_backend_version
     else
         log_success "No backend changes detected (already up to date)"
         BACKEND_COMMIT="$BEFORE_HASH"
@@ -289,13 +342,9 @@ fi
 cd /root/projects/jsys
 # =============================================================
 
-
-# Find the pig_ops_db repo
-DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
-# ============= NEW: RUN DATABASE MIGRATIONS =============
+# ============= RUN DATABASE MIGRATIONS =============
 section "STEP 5.6: Running database migrations"
 
-# Find the pig_ops_db repo
 DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
 if [ -d "$DB_REPO_DIR" ]; then
     cd "$DB_REPO_DIR"
@@ -317,6 +366,8 @@ if [ -d "$DB_REPO_DIR" ]; then
         
         if [ $MIGRATION_EXIT -eq 0 ]; then
             log_success "Database migrations applied"
+            # Increment database version
+            inc_db_version
         else
             log_error "Database migrations failed (exit code: $MIGRATION_EXIT)"
             exit 1
@@ -476,12 +527,16 @@ section "✅ DEPLOYMENT COMPLETE"
 echo -e "${GREEN}Started at: $(date)${NC}"
 echo -e "${GREEN}Completed at: $(date)${NC}"
 echo ""
+
+# Read final version for summary
+read_version
 echo "📊 Summary:"
 echo "  • Frontend changes: $FRONTEND_CHANGED"
 echo "  • Frontend build: $BUILD_NEEDED"
 echo "  • Backend changes: $BACKEND_CHANGED"
 echo "  • Database migrations: applied"
 echo "  • Restart performed: $RESTART_NEEDED"
+echo "  • App Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
 if [ "$RESTART_NEEDED" = true ]; then
     echo "  • App PID: $APP_PID"
     echo "  • App log: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
@@ -519,6 +574,7 @@ echo "   Frontend changed: $FRONTEND_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Backend changed: $BACKEND_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Frontend commit: ${FRONTEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
 echo "   Backend commit: ${BACKEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
+echo "   App Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" >> "$DEPLOY_LOG_FILE"
 echo "   Restart needed: $RESTART_NEEDED" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
 

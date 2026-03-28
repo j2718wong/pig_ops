@@ -453,4 +453,61 @@ controller.use_minified_js = USE_MINIFIED_JS
 view = View(controller)
 
 
+
+
+def ensure_version_file():
+    """Create a default version file if none exists"""
+    default_path = os.path.expanduser("~/projects/jsys/version.txt")
+    os.makedirs(os.path.dirname(default_path), exist_ok=True)
     
+    if not os.path.exists(default_path):
+        with open(default_path, 'w') as f:
+            f.write("1.0.0.0")
+        print(f"Created default version file at {default_path}")
+
+# Create version file if needed
+ensure_version_file()
+
+
+
+
+import os
+from pathlib import Path
+
+def get_app_version():
+    """
+    Read and return the current app version from version.txt
+    Works in both production and development environments.
+    Returns a dict with version info.
+    """
+    # Try multiple possible locations
+    possible_paths = [
+        "/root/projects/jsys/version.txt",           # Production
+        os.path.expanduser("~/projects/jsys/version.txt"),  # Local dev (Raspberry Pi)
+        os.path.join(os.path.dirname(__file__), "../../version.txt"),  # Relative to this file
+    ]
+    
+    version_str = None
+    
+    for path in possible_paths:
+        try:
+            if os.path.exists(path):
+                with open(path, 'r') as f:
+                    version_str = f.read().strip()
+                    break
+        except:
+            continue
+    
+    # If no version file found, use default
+    if not version_str:
+        version_str = "1.0.0.0"
+    
+    return version_str
+    
+    
+
+controller.APP_VERSION = get_app_version()
+
+print('\n\nSuperPig APP_VERSION = %s\n\n' % controller.APP_VERSION)
+
+

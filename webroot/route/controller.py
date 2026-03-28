@@ -33,6 +33,8 @@ class Controller:
     
     def __init__(self, logger = None, model = None):
         self.TAG                = 'Model'
+
+        self.APP_VERSION        = ''
         
         self.is_prod_envi       = False
         
