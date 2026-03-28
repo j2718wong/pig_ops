@@ -24,6 +24,7 @@
             "no_entries":       ["Walay nakalista", "Walay dyamo", "Way sulod"],
             
             
+            "valid_name":       "Palihug butangi pangalan.",
             "valid_date":       "Palihug butangi petsa.",
             "numeric_value":    "Numero lang ibutang."
         }
@@ -55,7 +56,11 @@
             "done_by_me":       "Ako",
             
             "num_days":         "Days",
-            "num_pigs":         "Baboy"
+            "num_pigs":         "Baboy",
+            
+            "new_staff_name":   "Ngalan sa Bag-o na Staff",
+            "done_by_me":       "Ako ang nagbuhat",
+            "need_to_select":   "Palihug ug pili kung dile Ikaw"
             
         }
     },
@@ -347,7 +352,13 @@
             
             "num_live_female":  "Pila ang buhi na bae baktin?",
             "num_live_male":    "Pila ang buhi na lake baktin?",
-            "num_still_birth":  "Pila ang patay daan pag anak sa anay?"
+            "num_still_birth":  "Pila ang patay daan pag anak sa anay?",
+            
+            "add_new_staff":    "Bag-o na Sakop sa Farm",
+            "save_new_staff":   "Save",
+            "select_staff":     "Kinsa nag atiman pag anak?",
+            "select_staff_help":"Kinsay nag atiman"
+            
         },
         
         
