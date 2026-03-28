@@ -346,6 +346,14 @@ cd /root/projects/jsys
 section "STEP 5.6: Running database migrations"
 
 DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
+MIGRATION_APPLIED_FILE="/root/.db_migrations_prod_last_run"
+OLD_TIMESTAMP=""
+
+# Store old timestamp if exists
+if [ -f "$MIGRATION_APPLIED_FILE" ]; then
+    OLD_TIMESTAMP=$(cat "$MIGRATION_APPLIED_FILE")
+fi
+
 if [ -d "$DB_REPO_DIR" ]; then
     cd "$DB_REPO_DIR"
     
@@ -364,10 +372,20 @@ if [ -d "$DB_REPO_DIR" ]; then
         MIGRATION_EXIT=$?
         set -e
         
+        # Check if new timestamp was created (meaning migrations were applied)
+        NEW_TIMESTAMP=""
+        if [ -f "$MIGRATION_APPLIED_FILE" ]; then
+            NEW_TIMESTAMP=$(cat "$MIGRATION_APPLIED_FILE")
+        fi
+        
         if [ $MIGRATION_EXIT -eq 0 ]; then
-            log_success "Database migrations applied"
-            # Increment database version
-            inc_db_version
+            # Compare timestamps to see if migrations were actually applied
+            if [ "$OLD_TIMESTAMP" != "$NEW_TIMESTAMP" ]; then
+                log_success "Database migrations applied"
+                inc_db_version
+            else
+                log_success "No new migrations to apply"
+            fi
         else
             log_error "Database migrations failed (exit code: $MIGRATION_EXIT)"
             exit 1
