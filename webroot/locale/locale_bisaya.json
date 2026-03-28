@@ -8,6 +8,7 @@
             "search":           "Search",
             
             "save":             "Save",
+            "save_changes":     "Save",
             "cancel":           "Cancel",
             
             "add":              "Dugang",
@@ -335,6 +336,24 @@
             
             "hide_completed":   "Ayaw pakita ang nahuman na"
         }
+    },
+    
+    
+    "prod_entry_birth":{
+        "labels":{
+            "birth_info":       "Detalye sa pag panganak sa Anay",
+            "date_expected":    "Expected petsa Manganak",
+            "date_birth":       "Petsa kanus-a Nanganak",
+            
+            "num_live_female":  "Pila ang buhi na bae baktin?",
+            "num_live_male":    "Pila ang buhi na lake baktin?",
+            "num_still_birth":  "Pila ang patay daan pag anak sa anay?"
+        },
+        
+        
+        "warning_1": "Kung butangan ug actual na petsa kanus a nanganak ang Anay, mo update ang production entry gikan sa Gesta Status to Lacta Status. Tangtangon ang kani na entry ug automatic mabalhin padulong sa lista sa Prod Lacta. <b><span style=\"color:red;\">Dile na pwede ibalik to Gesta paghuman save.</span></b>",
+        
+        "warning_2": "Kung ilisan ang petsa sa actual na panganak sa Anay, mo calculate balik sa naka schedule na PigOps buhatunon sa baktin ug Anay."
     },
     
     
