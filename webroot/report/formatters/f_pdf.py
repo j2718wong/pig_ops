@@ -248,9 +248,11 @@ class F_PDF:
         html = template.render(**context)
         
         # Save debug HTML
+        """
         debug_path = os.path.join(self.template_dir, 'debug_output.html')
         with open(debug_path, 'w', encoding='utf-8') as f:
             f.write(html)
+        """
         
         # Generate PDF
         css_path = os.path.join(self.template_dir, 'css', 'report.css')
