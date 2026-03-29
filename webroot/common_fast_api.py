@@ -145,7 +145,24 @@ config_security = SecurityConfig(
     # Auto-ban after suspicious behavior
     auto_ban_threshold=5,        # Ban after 5 suspicious requests
     auto_ban_duration=86400,      # Ban for 24 hours
-   
+    
+    
+    
+    # Trusted proxies (add your proxy IPs)
+    trusted_proxies=[
+        "127.0.0.1",
+        "::1",
+        "10.0.0.0/8",      # If using internal network
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+        "68.183.225.10",    # Your DigitalOcean IP (if needed)
+    ],
+    
+    # Disable IP spoof detection entirely 
+    disable_ip_spoof_detection=True,  # 
+    
+
+    
     
     # ✅ Explicitly disable IP security checks
     disable_checks=[
