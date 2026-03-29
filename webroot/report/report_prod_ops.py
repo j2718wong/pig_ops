@@ -462,8 +462,7 @@ class ReportProdOps(ReportBasic):
         farm_settings = self._get_farm_settings(pig_farm_id)
 
         
-        pprint.pprint(list_fattening[0])
-        
+
         
         # Prepare data for template
         data = {
