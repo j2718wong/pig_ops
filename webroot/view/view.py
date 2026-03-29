@@ -326,52 +326,58 @@ class Root(ViewBase):
             return template.render(data)
             
         else:
+            
+            app_version = self.controller.APP_VERSION
+            
+            
             page_data = {
+                'app_version':              app_version,
+            
                 'carousel':[
                     {
-                        'img_path': '/static_m/images/mar/mar_home.png',
+                        'img_path': '/static_m/images/mar/mar_home.png?v=%s' % app_version,
                         'title': 'Dashboard Overview',
                         'desc': 'Real-time pig farm metrics and KPIs at your fingertips'
                     },
                     
                     {
-                        'img_path': '/static_m/images/mar/mar_sow_list.png',
+                        'img_path': '/static_m/images/mar/mar_sow_list.png?v=%s' % app_version,
                         'title': 'Sow Management',
                         'desc': 'Manage your breeding sows, boars and gilts'
                     },
                     
                     {
-                        'img_path': '/static_m/images/mar/mar_gesta.png',
+                        'img_path': '/static_m/images/mar/mar_gesta.png?v=%s' % app_version,
                         'title': 'Breeding Cycles Management',
                         'desc': 'Track gestation, lactation, and breeding cycles'
                     },
                     
                     {
-                        'img_path': '/static_m/images/mar/mar_lacta.png',
+                        'img_path': '/static_m/images/mar/mar_lacta.png?v=%s' % app_version,
                         'title': 'Pig Operations Management',
                         'desc': 'Automated reminders for vaccinations, farrowing, weaning, and other important pig operations'
                     },
                 
                     {
-                        'img_path': '/static_m/images/mar/mar_pig_ops.png',
+                        'img_path': '/static_m/images/mar/mar_pig_ops.png?v=%s' % app_version,
                         'title': 'Traceability of Pig Operations',
                         'desc': 'Clear tracking who did the pig operation and when and what dosages given to pigs'
                     },
                     
                     {
-                        'img_path': '/static_m/images/mar/mar_fattening.png',
+                        'img_path': '/static_m/images/mar/mar_fattening.png?v=%s' % app_version,
                         'title': 'Track and estimate Fatteners feed requirements',
                         'desc': 'Record every vaccine, medicine, health issue, history for each production cycle'
                     },
                     
                     {
-                        'img_path': '/static_m/images/mar/mar_feed_records.png',
+                        'img_path': '/static_m/images/mar/mar_feed_records.png?v=%s' % app_version,
                         'title': 'Record feeds consumption  per production batch',
                         'desc': 'Feed Balance and audit can be recorded anytime.'
                     },
                     
                     {
-                        'img_path': '/static_m/images/mar/mar_report.png',
+                        'img_path': '/static_m/images/mar/mar_report.png?v=%s' % app_version,
                         'title': 'Generate Status Report for your Farm',
                         'desc': 'Comprehensive reporting to know the status of your pig farm.'
                     }
