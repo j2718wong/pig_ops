@@ -57,6 +57,9 @@ class DataUserLogin(BaseModel):
     viewport_width:         int = None
     viewport_height:        int = None
     ip_address:             str = None
+    
+    latitude:               float | None = None
+    longitude:              float | None = None
 
     access_code_id:         int = None
 

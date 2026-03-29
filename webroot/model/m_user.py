@@ -414,6 +414,9 @@ class User(BaseModel):
             in_login_city           VARCHAR(50), /* This should be in upper case*/
             in_login_region         VARCHAR(50), /* This should be in upper case*/
             
+            in_latitude             DECIMAL(10,5),
+            in_longitude            DECIMAL(10,5),
+    
             
             in_viewport_width       INT,
             in_viewport_height      INT,
@@ -446,6 +449,10 @@ class User(BaseModel):
             data.viewport_width         if data.viewport_width and data.viewport_width > 0 else None,
             data.viewport_height        if data.viewport_height and data.viewport_height > 0 else None,
             data.ip_address,
+            
+            data.latitude               if data.latitude else None,
+            data.longitude              if data.longitude else None,
+            
             
             data.is_mobile              if data.is_mobile is not None else None,
             data.is_webview             if data.is_webview is not None else None,
