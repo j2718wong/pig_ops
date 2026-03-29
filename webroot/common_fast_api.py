@@ -105,6 +105,30 @@ app = FastAPI(
 )
 
 
+
+# This is to remove that annoying WARNING - Potential IP spoof attempt: X-Forwarded-For header
+import logging
+
+# Create a filter to block the specific warning
+class IPWarningFilter(logging.Filter):
+    def filter(self, record):
+        # If the log message contains this specific warning, block it
+        if "Potential IP spoof attempt" in record.getMessage():
+            return False
+        return True
+
+# Apply the filter to the root logger's handlers
+for handler in logging.root.handlers:
+    handler.addFilter(IPWarningFilter())
+
+# Also ensure any future handlers get the filter
+logging.basicConfig(level=logging.INFO)
+for handler in logging.root.handlers:
+    handler.addFilter(IPWarningFilter())
+
+
+
+
 # Add this middleware to trust proxy headers
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
