@@ -433,6 +433,27 @@
     },
     
     
+    "prod_summary":{
+        "labels":{
+            "pig_count_birth":  "Pila ang buhi pag anak",    
+            "pig_count_wean":   "Pila ang buhi pag lutas",     
+            "pig_count_latest": "Pila ang ihap karon",   
+            "days_since_birth": "Pila ka adlaw gikan pag anak",   
+            "target_harvest":   "Target petsa e Harvest",     
+            "pigs_harvested":   "Pila na ang na harvest",     
+            "pigs_sold":        "Pila na ang nabaligya",          
+            "gilt_boar_harvested": "Pila ka butakal, dumalaga na harvest",
+            "gilt_boar_sold":   "Pila ka butakal, dumalaga nabaligya",     
+            "feeds_cost":       "Gasto sa Feeds",         
+            "total_sales":      "Pilay Halin",        
+            "gross_profit":     "Ginancya, Halin minus Feeds",       
+            "gross_profit_pp":  "Ginancya kada baboy"    
+            
+        }
+        
+    },
+    
+    
     "feed_balance": {
         "labels":{
             "feed_balance": "Feed Balance"
