@@ -495,6 +495,8 @@ class PigFarm(BaseModel):
                     a.latitude,
                     a.longitude,
                     
+                    a.last_summary_report_id,
+                    
                     a.data_ver_num_sow,
                     a.data_ver_num_boar,     
                     a.data_ver_num_pig_prod, 
@@ -557,14 +559,15 @@ class PigFarm(BaseModel):
                 cur_farm_latitude           = float(row[8]) if row[8] else None
                 cur_farm_longitude          = float(row[9]) if row[9] else None
                 
+                cur_summary_report_id       = row[10]
                 
-                cur_data_ver_num_sow        = row[10]
-                cur_data_ver_num_boar       = row[11]   
-                cur_data_ver_num_pig_prod   = row[12]
-                cur_data_ver_num_staff      = row[13]  
-                cur_data_ver_num_feed_buy   = row[14]
-                cur_data_ver_num_feed_balance = row[15]
-                cur_data_ver_num_not_pregnant = row[16]
+                cur_data_ver_num_sow        = row[11]
+                cur_data_ver_num_boar       = row[12]   
+                cur_data_ver_num_pig_prod   = row[13]
+                cur_data_ver_num_staff      = row[14]  
+                cur_data_ver_num_feed_buy   = row[15]
+                cur_data_ver_num_feed_balance = row[16]
+                cur_data_ver_num_not_pregnant = row[17]
                 
                 cur_entry = {
                     'pig_farm': {
@@ -600,6 +603,8 @@ class PigFarm(BaseModel):
                     },
                     
                     'data_ver_num':{
+                        'summary_report_id': cur_summary_report_id,
+                    
                         'sow':          cur_data_ver_num_sow,       
                         'boar':         cur_data_ver_num_boar,    
                         'pig_prod':     cur_data_ver_num_pig_prod,
@@ -692,7 +697,9 @@ class PigFarm(BaseModel):
     
     def get_data_ver_num(self, pig_farm_id, return_array = 0):
         sql =   """
-                SELECT 
+                SELECT
+                    last_summary_report_id,
+                 
                     data_ver_num_sow,
                     data_ver_num_boar,     
                     data_ver_num_pig_prod, 
@@ -740,25 +747,29 @@ class PigFarm(BaseModel):
             
             
             for row in rows:
-                cur_data_ver_num_sow        = row[0]
-                cur_data_ver_num_boar       = row[1]   
-                cur_data_ver_num_pig_prod   = row[2]
-                cur_data_ver_num_staff      = row[3]  
-                cur_data_ver_num_feed_buy   = row[4]
-                cur_data_ver_num_feed_balance   = row[5]
-                cur_data_ver_num_not_pregnant   = row[6]
+                cur_summary_report_id           = row[0]
+                
+                cur_data_ver_num_sow            = row[1]
+                cur_data_ver_num_boar           = row[2]   
+                cur_data_ver_num_pig_prod       = row[3]
+                cur_data_ver_num_staff          = row[4]  
+                cur_data_ver_num_feed_buy       = row[5]
+                cur_data_ver_num_feed_balance   = row[6]
+                cur_data_ver_num_not_pregnant   = row[7]
                 
                 
                 if return_array == 0:
                     cur_entry = {
                         'data_ver_num': {
-                            'sow':          cur_data_ver_num_sow,       
-                            'boar':         cur_data_ver_num_boar,    
-                            'pig_prod':     cur_data_ver_num_pig_prod,
-                            'staff':        cur_data_ver_num_staff,   
-                            'feed_buy':     cur_data_ver_num_feed_buy,
-                            'feed_balance': cur_data_ver_num_feed_balance,
-                            'not_pregnant': cur_data_ver_num_not_pregnant
+                            'summary_report_id': cur_summary_report_id,
+                            
+                            'sow':               cur_data_ver_num_sow,       
+                            'boar':              cur_data_ver_num_boar,    
+                            'pig_prod':          cur_data_ver_num_pig_prod,
+                            'staff':             cur_data_ver_num_staff,   
+                            'feed_buy':          cur_data_ver_num_feed_buy,
+                            'feed_balance':      cur_data_ver_num_feed_balance,
+                            'not_pregnant':      cur_data_ver_num_not_pregnant
                         }
                     }
                     
@@ -766,6 +777,8 @@ class PigFarm(BaseModel):
                 
                 else:
                     return [
+                        cur_summary_report_id,
+                    
                         cur_data_ver_num_sow,        
                         cur_data_ver_num_boar,       
                         cur_data_ver_num_pig_prod,   
