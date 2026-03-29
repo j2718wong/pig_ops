@@ -66,7 +66,31 @@
             "done_by_me":       "Ako ang nagbuhat",
             "need_to_select":   "Palihug ug pili kung dile Ikaw"
             
+        },
+
+        
+        "label_tabs":{
+            "production":       "Prod",
+            "feeds":            "Feeds",
+            "feed_balance":     "Bal",
+            "harvest":          "Harvest",
+            
+            "pigops":           "PigOps",
+            "birth":            "Birth",
+            "wean":             "Lutas",
+            "medvac":           "MedVac",
+            "health":           "Health",
+            
+            
+            "feed_summary":     "Feed Summary",
+            "feed_add":         "Feed Add",
+            "notes":            "Notes",
+            "mating":           "Takal",
+            "extra":            "Extra",
+            
+            "status":           "Status"
         }
+        
     },
 
 
