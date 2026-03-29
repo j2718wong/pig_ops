@@ -141,6 +141,9 @@ OAUTH_PATHS = [
 
 
 # Security Guard
+"""
+# Disabled until potential warning IP spoof messages is solved
+
 config_security = SecurityConfig(
     # Manually block known bad IPs
     blacklist=["82.197.71.28"],  # Add that annoying bot
@@ -214,8 +217,9 @@ config_security = SecurityConfig(
     # block_cloud_providers={"AWS", "GCP", "Azure"},  ← DELETE THIS LINE
 )
 
-app.add_middleware(SecurityMiddleware, config=config_security)
 
+#app.add_middleware(SecurityMiddleware, config=config_security)
+"""
 
 
 
