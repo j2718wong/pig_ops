@@ -364,8 +364,6 @@ class ReportProdOps(ReportBasic):
         pig_farm_info       = model['pig_farm'].get_pig_farm_info(pig_farm_id)
         get_location_address_names_and_replace_ids(pig_farm_info)
         
-        print('pig_farm_info')
-        print(pig_farm_info)
         
         # Get account info
         account_id          = pig_farm_info['account']['id']  

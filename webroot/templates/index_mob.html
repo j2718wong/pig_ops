@@ -141,7 +141,7 @@
             
             <div class="nav-center-group">
             
-                <button class="special-button" id="desktop-nav-special-btn-summary" style="display:none;">
+                <button class="special-button" id="desktop-nav-special-btn-summary">
                     <i class="fas fa-file-pdf"></i>
                     <span class="nav-label">Summary</span>
                 </button>
@@ -485,7 +485,7 @@
             <div class="mobile-pig-farm-name-text" id="mobilePigFarmName">&nbsp;</div>
         </div>
         
-        <button class="mobile-special-button" id="mobile-nav-special-btn-summary" style="display:none;">
+        <button class="mobile-special-button" id="mobile-nav-special-btn-summary">
             <span class="nav-label">Farm Summary</span>
         </button>
         
@@ -1136,15 +1136,6 @@
         
         
 
-        
-        // Summary button functionality
-        const summaryButtons = document.querySelectorAll('.special-button, .mobile-special-button');
-        
-        summaryButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                alert('Generating PDF summary report of your pig farm operation...\n\nThis would normally generate and download a comprehensive PDF report.');
-            });
-        });
         
         // Close mobile nav when clicking on a menu item (optional)
         const mobileMenuItems = document.querySelectorAll('.mobile-submenu-item');
