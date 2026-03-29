@@ -69,9 +69,7 @@ async def user_group_list(ahid:str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res

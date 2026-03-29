@@ -313,9 +313,7 @@ async def feed_supplier_list(request: Request, ahid:str = None, level_2_hid: str
                 
         return {
             'result':{
-                'num':  0,
-                'code': 'SUCCESS',
-                'desc': ''
+                'num':  0
             },
             
             'data': res
@@ -359,9 +357,7 @@ async def feed_supplier_list(request: Request, ahid:str = None, level_2_hid: str
                     
             return {
                 'result':{
-                    'num':  0,
-                    'code': 'SUCCESS',
-                    'desc': ''
+                    'num':  0
                 },
                 
                 'data': res

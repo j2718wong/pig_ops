@@ -379,8 +379,7 @@ async def sow_boar_mate_list(request: Request, sow_boar_hid:str = None,
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

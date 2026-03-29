@@ -90,6 +90,9 @@ tags_metadata = [
     {"name": "Pig Production",  "description": "Pig Production related operations"},
     {"name": "Production Details",  "description": "Pig Production Details related operations"},
     
+    
+    {"name": "Report",          "description": "Report generation"},
+    
     {"name": "HashIds",         "description": "HashIds Testing"}
 ]
 

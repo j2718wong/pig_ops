@@ -330,8 +330,7 @@ async def prod_pig_dead_list(request: Request, pfhid: str = None,
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

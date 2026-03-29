@@ -387,8 +387,7 @@ async def pig_farm_staff_list(request: Request, pfhid: str,
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

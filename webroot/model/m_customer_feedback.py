@@ -1,14 +1,24 @@
 # March 12, 2026
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
 
 
-class CustomerFeedback:
+
+class CustomerFeedback(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PigProdNotes'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -20,36 +30,19 @@ class CustomerFeedback:
         )  
         """
         
-        sql =  'CALL customer_feedback_add('
-        sql += '%s,'    % data.user_id
-        sql += '"%s");'  % data.notes
+        params = [
+            data.user_id,
+            data.notes              if data.notes and data.notes.strip() else None
+        ]
+        
+        res = self._call_procedure('customer_feedback_add', params)
+        
+        if res is None:
+            return None
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        row = res[0]
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
 
         if row is not None:
             return {

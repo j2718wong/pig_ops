@@ -98,6 +98,8 @@ from model.m_production_harvest import ProductionHarvest
 
 from model.m_pig_medvac         import PigMedVac
 
+from model.m_report             import Report
+
 from route.controller           import Controller
 
 from view.view                  import View
@@ -165,6 +167,8 @@ model_names_pig_ops = [
     ('prod_harvest',            ProductionHarvest),
     
     ('pig_medvac',              PigMedVac),
+    
+    ('report',                  Report),
     
     ('sow_act',                 SowActivity)
     

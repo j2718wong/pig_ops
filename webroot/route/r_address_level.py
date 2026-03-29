@@ -81,9 +81,7 @@ async def address_level_1_list(request: Request, country_hid:str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res
@@ -149,8 +147,7 @@ async def address_level_2_list(request: Request, level_1_hid:str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -216,8 +213,7 @@ async def address_level_3_list(request: Request, level_2_hid:str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -253,8 +249,7 @@ async def address_level_names(request: Request, adrs_level_1_id:int = 0,
     
     return {
         'result': {
-            'num':  0,
-            'code': "SUCCESS"
+            'num':  0
         },
         
         'data': res

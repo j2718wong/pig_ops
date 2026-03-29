@@ -302,9 +302,7 @@ async def pig_race_line_list(request: Request, ahid: str, inc_deleted: int = 0,
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res

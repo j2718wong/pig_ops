@@ -203,9 +203,7 @@ async def sow_status_list(request: Request, is_dispose: int = 0):
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res
@@ -891,8 +889,7 @@ async def data_details(request: Request, entry_hid:str, inc_user_audit:int = 0):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': data
@@ -975,8 +972,7 @@ async def sow_boar_entry(request: Request, entry_hid:str):
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': cur_sow_boar
@@ -1062,8 +1058,7 @@ async def sow_boar_list(request: Request, pfhid:str, sex:str = None,
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -1131,8 +1126,7 @@ async def sow_production_output(request: Request, sow_hid:str = None):
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': production_list
@@ -1195,8 +1189,7 @@ async def sow_production_output(request: Request, pfhid:str = None):
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -1387,8 +1380,7 @@ async def sow_boar_get_parent_trace(request: Request, sow_hid:str = None,
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -1445,8 +1437,7 @@ async def data_ver_num(request: Request, sow_boar_hid: str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

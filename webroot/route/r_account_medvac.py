@@ -427,8 +427,7 @@ async def account_medvac_list(request: Request, ahid: str,  inc_deleted: int = 0
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

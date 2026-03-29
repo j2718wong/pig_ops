@@ -64,8 +64,7 @@ async def country_list(request: Request):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -117,8 +116,7 @@ async def lookup_feed_type_list(request: Request):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -170,8 +168,7 @@ async def lookup_harvest_type_list(request: Request):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -221,9 +218,7 @@ async def look_up_pig_dead_type_list(request: Request):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res

@@ -65,9 +65,7 @@ async def pig_race_list(request: Request):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res

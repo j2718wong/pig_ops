@@ -1,15 +1,25 @@
 # August 23, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
 
 
 FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE      = 2
 
-class PigProdNotes:
+class PigProdNotes(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PigProdNotes'
+        super().__init__(model)
 
 
     def add(self, data = None):

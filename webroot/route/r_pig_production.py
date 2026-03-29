@@ -451,9 +451,7 @@ async def pig_prod_status_list(request: Request, ):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res
@@ -552,9 +550,7 @@ async def pig_prod_public(request: Request, country_hid:str):
     return {
         
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
     
         'data': {
@@ -1506,8 +1502,7 @@ async def pig_prod_feed_summary(request: Request, pig_prod_hid:str):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res 
@@ -1565,8 +1560,7 @@ async def pig_prod_cur_pig_count(request: Request, pig_prod_hid:str):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res 
@@ -1622,8 +1616,7 @@ async def pig_prod_entry(request: Request, entry_hid:str):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res[0]
@@ -1678,8 +1671,7 @@ async def pig_prod_list(request: Request, pfhid:str, pig_prod_type:int = 0,  is_
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res 
@@ -1881,8 +1873,7 @@ async def data_details(request: Request, pig_prod_hid, inc_user_audit:int = 0):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': data
@@ -1943,8 +1934,7 @@ async def pig_prod_not_pregnant(request: Request, pfhid:str):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res 
@@ -2002,8 +1992,7 @@ async def data_ver_num(request: Request, pig_prod_hid: str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

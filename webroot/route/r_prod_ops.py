@@ -20,10 +20,6 @@ from common_fast_api        import *
 from fastapi.responses      import PlainTextResponse
 
 
-RES_NUM_SUCCESS                         = 0
-
-
-
 MONDAY                          = 0
 TUESDAY                         = 1
 WEDNESDAY                       = 2

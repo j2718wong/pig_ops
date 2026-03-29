@@ -542,8 +542,7 @@ async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_far
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

@@ -293,8 +293,7 @@ async def user_request_list(request: Request, ahid: str):
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

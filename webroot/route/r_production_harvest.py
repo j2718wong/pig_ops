@@ -421,8 +421,7 @@ async def prod_harvest_list(request: Request, pig_prod_hid: str = None):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

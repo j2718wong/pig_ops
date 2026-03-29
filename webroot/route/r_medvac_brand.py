@@ -192,8 +192,7 @@ async def medvac_brand_list(request: Request, country_hid: str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

@@ -512,8 +512,7 @@ async def account_pig_ops_list(request: Request, ahid: str, operation_type: int 
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

@@ -98,8 +98,7 @@ async def user_account_info(request: Request, ahid: str):
         
     result = {
             'result':{
-                'num':  0,
-                'code': 'SUCCESS'
+                'num':  0
             }
         }
         

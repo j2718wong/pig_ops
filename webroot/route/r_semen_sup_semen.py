@@ -270,8 +270,7 @@ async def semen_supplier_semen_list(request: Request, semen_supplier_hid: str):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

@@ -215,8 +215,7 @@ async def account_selection(request: Request, ahid: str, sel_f_brand: int = 0,
     
     return {
             'result':{
-                'num':  0,
-                'code': 'SUCCESS'
+                'num':  0
             },
             
             'account_lookup': res

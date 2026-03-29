@@ -681,8 +681,7 @@ async def pig_medvac_list(request: Request, sow_boar_hid: str = None,
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -749,8 +748,7 @@ async def pig_medvac_search_keys(request: Request, ahid: str, search_keyword: No
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

@@ -889,3 +889,17 @@ class DataProductionHarvest(BaseModel):
     weight_pp_lw_csv:       str = None
     weight_pp_sw_csv:       str = None
     
+    
+class DataReport(BaseModel):
+    uhid:                   str = None
+    report_hid:             str = None
+    pig_farm_hid:           str = None
+    
+    user_id:                int = 0
+    report_id:              int = 0
+    report_type_id:         int
+    
+    report_date:            str = None
+    notes:                  str = None
+    file_path:              str = None
+    

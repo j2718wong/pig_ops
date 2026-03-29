@@ -344,8 +344,7 @@ async def pf_feed_buy_list(request: Request, pfhid: str, page_number = 1):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

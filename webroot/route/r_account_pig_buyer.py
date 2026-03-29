@@ -397,8 +397,7 @@ async def account_pig_buyer_list(request: Request, ahid: str, inc_deleted: int =
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

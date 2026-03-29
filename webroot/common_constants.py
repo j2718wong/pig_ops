@@ -27,8 +27,6 @@ BUSINESS_OBJ_ID_FEED_BRAND                          = 15
 
 
 
-
-
 MFA_CHANNEL_ID_EMAIL                                = 1
 MFA_CHANNEL_ID_PHONE_NUMBER                         = 2
 

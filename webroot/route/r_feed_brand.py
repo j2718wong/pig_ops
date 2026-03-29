@@ -156,8 +156,7 @@ async def feed_brand_list(request: Request, country_id: int = 1, inc_deleted: in
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

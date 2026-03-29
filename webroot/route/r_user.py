@@ -151,8 +151,7 @@ async def user_verify_token(request: Request):
 
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'user_account': data_user_account
@@ -640,8 +639,7 @@ async def user_info(uhid:str):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res_get
@@ -716,8 +714,7 @@ async def user_list(request: Request, ahid: str, inc_deleted : int = 0):
         
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

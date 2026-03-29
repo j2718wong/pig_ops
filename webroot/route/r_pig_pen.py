@@ -304,9 +304,7 @@ async def pig_pen_list(request: Request, ahid: str, inc_deleted: int = 0,
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS',
-            'desc': ''
+            'num':  0
         },
         
         'data': res

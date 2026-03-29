@@ -78,8 +78,10 @@ class BaseModel:
         Generic SELECT query executor
         Returns rows as list of tuples
         """
+        """
         if params is None:
             params = []
+        """
         
         if not self.model.check_if_connected():
             self.model.connect_to_db()
@@ -89,8 +91,10 @@ class BaseModel:
         try:
             with conn.cursor() as cursor:
                 if params:
+                    # Parametrized query
                     cursor.execute(sql, params)
                 else:
+                    # Plain string query
                     cursor.execute(sql)
                 
                 rows = cursor.fetchall()
@@ -98,7 +102,10 @@ class BaseModel:
                 
         except Exception as e:
             # Generate debug SQL for troubleshooting
-            debug_sql = self._generate_debug_query(sql, params)
+            if params:
+                debug_sql = self._generate_debug_query(sql, params)
+            else:
+                debug_sql = sql
             
             self.model.logger.append(
                 log_level=LOG_FATAL,

@@ -306,8 +306,7 @@ async def pig_farm_update(request: Request, data: dm.DataPigFarm):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
@@ -407,8 +406,7 @@ async def pig_farm_list(request: Request, ahid: str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

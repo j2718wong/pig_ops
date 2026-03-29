@@ -44,8 +44,6 @@ class PigFarm(BaseModel):
     def __init__(self, model):
         super().__init__(model)  # Inherit from BaseModel
         
-        self.TAG                = 'PigFarm'
-
         
     def add(self, data = None):
         """

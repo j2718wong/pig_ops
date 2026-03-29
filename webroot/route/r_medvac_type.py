@@ -161,8 +161,7 @@ async def medvac_type_list(request: Request):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

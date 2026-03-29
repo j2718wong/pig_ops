@@ -136,8 +136,7 @@ def get_farm_data(user_id):
         
         return {
             'result':{
-                'num':  0,
-                'code': 'SUCCESS'
+                'num':  0
             },
             
             'data': data
@@ -161,8 +160,7 @@ def get_farm_data(user_id):
         
         return {
             'result':{
-                'num':  0,
-                'code': 'SUCCESS'
+                'num':  0
             },
             
             'data': data
@@ -212,8 +210,7 @@ def get_farm_data(user_id):
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': data

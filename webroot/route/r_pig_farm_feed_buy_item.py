@@ -339,8 +339,7 @@ async def pig_farm_feed_buy_item_list(request: Request, pf_feed_buy_hid: str):
             
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

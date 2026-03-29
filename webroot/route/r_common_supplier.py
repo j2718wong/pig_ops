@@ -448,8 +448,7 @@ async def supplier_list(request: Request, ahid:str = None,
                 
         return {
             'result':{
-                'num':  0,
-                'code': 'SUCCESS'
+                'num':  0
             },
             
             'data': res
@@ -531,8 +530,7 @@ async def supplier_count(request: Request, country_id: int = 1,
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res

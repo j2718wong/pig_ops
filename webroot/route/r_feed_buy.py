@@ -349,8 +349,7 @@ async def feed_buy_list(request: Request, pig_prod_hid: str, inc_user_audit:int 
     
     return {
         'result':{
-            'num':  0,
-            'code': 'SUCCESS'
+            'num':  0
         },
         
         'data': res
