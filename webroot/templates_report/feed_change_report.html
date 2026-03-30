@@ -1,6 +1,5 @@
-
-<!-- feed_change_report.html - Feed Change Schedule Section -->
-<div class="section-title">3. FEED CHANGE SCHEDULE</div>
+<!-- feed_change_report.html - Feed Change Section -->
+<div class="section-title">{{ t.get('feed_change_record', 'FEED CHANGE') }}</div>
 
 {% set all_feed_entries = list_lactating + list_fattening %}
 
@@ -21,27 +20,28 @@
 
 <!-- Summary Row -->
 <div style="margin-bottom: 10px; padding: 8px; background-color: #f8f9fa; border: 1px solid #d1d5db; border-radius: 4px; display: flex; justify-content: space-around; flex-wrap: wrap;">
-    <div><strong>Lactating Piglets:</strong> <span class="piglet-count">{{ ns.total_lactating_pigs }}</span></div>
-    <div><strong>Fattening Pigs:</strong> <span class="piglet-count">{{ ns.total_fattening_pigs }}</span></div>
-    <div><strong>Total Pigs:</strong> <span class="piglet-count" style="color: #1e3a8a; font-size: 11pt;">{{ total_all_pigs }}</span></div>
+    <div><strong>{{ t.get('lactating_piglets', 'Lactating Piglets') }}:</strong> <span class="piglet-count">{{ ns.total_lactating_pigs }}</span></div>
+    <div><strong>{{ t.get('fattening_pigs', 'Fattening Pigs') }}:</strong> <span class="piglet-count">{{ ns.total_fattening_pigs }}</span></div>
+    <div><strong>{{ t.get('total_pigs', 'Total Pigs') }}:</strong> <span class="piglet-count" style="color: #1e3a8a; font-size: 11pt;">{{ total_all_pigs }}</span></div>
 </div>
 
 <table class="feed-change-table">
     <thead>
         <tr>
-            <th>PID / Sow</th>
-            <th>Pigs</th>
-            <th>Prod Status</th>
-            <th>Date of Birth</th>
-            <th>Lacta</th>
+            <th>{{ t.get('pid_sow', 'PID / Sow') }}</th>
+            <th>{{ t.get('pigs', 'Pigs') }}</th>
+            <th>{{ t.get('prod_status', 'Prod Status') }}</th>
+            <th>{{ t.get('date_of_birth', 'Date of Birth') }}</th>
+            <th>{{ t.get('lactating_feed', 'Lacta') }}</th>
             <th>Booster</th>
             <th>Prestarter</th>
-            <th>Date Wean</th>
+            <th>{{ t.get('date_wean', 'Date Wean') }}</th>
             <th>Starter</th>
             <th>Grower</th>
             <th>Finisher</th>
-            <th>Date Harvest</th>
-         </thead>
+            <th>{{ t.get('date_harvest', 'Date Harvest') }}</th>
+        </tr>
+    </thead>
     <tbody>
         {% for entry in all_feed_entries %}
         {% set pig_prod = entry.pig_production %}
@@ -82,7 +82,7 @@
                     , {{ entry.sow.number }}
                 {% endif %}
             </td>
-            <td class="text-right piglet-count">{{ pig_prod.cur_pig_count or 0 }}</td>
+            <td class="text-center piglet-count">{{ pig_prod.cur_pig_count or 0 }}</td>
             <td class="text-right">
                 {{ pig_prod.prod_status_name }}
                 {% if is_combined %}
@@ -136,7 +136,7 @@
                 {% elif wean_date %}
                     {{ wean_date|format_date }}
                 {% elif expected_wean %}
-                    {{ expected_wean|format_date }} (Exp)
+                    {{ expected_wean|format_date }} ({{ t.get('target', 'Target') }})
                 {% else %}
                     &nbsp;
                 {% endif %}
@@ -174,7 +174,7 @@
                 {% if harvest_date %}
                     {{ harvest_date|format_date }}
                 {% elif harvest_info and harvest_info.date_target_harvest %}
-                    {{ harvest_info.date_target_harvest|format_date }} (Target)
+                    {{ harvest_info.date_target_harvest|format_date }} ({{ t.get('target', 'Target') }})
                 {% else %}
                     &nbsp;
                 {% endif %}
@@ -185,12 +185,12 @@
 </table>
 
 <div class="summary-box">
-    Total Entries: {{ all_feed_entries|length }} 
-    | Lactating: {{ list_lactating|length }} batches ({{ ns.total_lactating_pigs }} piglets)
-    | Fattening: {{ list_fattening|length }} batches ({{ ns.total_fattening_pigs }} pigs)
-    | <strong>Total Pigs: {{ total_all_pigs }}</strong>
+    {{ t.get('total_entries', 'Total Entries') }}: {{ all_feed_entries|length }} 
+    | {{ t.get('lactating_sows', 'Lactating') }}: {{ list_lactating|length }} {{ t.get('batches', 'batches') }} ({{ ns.total_lactating_pigs }} {{ t.get('piglets', 'piglets') }})
+    | {{ t.get('fattening', 'Fattening') }}: {{ list_fattening|length }} {{ t.get('batches', 'batches') }} ({{ ns.total_fattening_pigs }} {{ t.get('pigs', 'pigs') }})
+    | <strong>{{ t.get('total_pigs', 'Total Pigs') }}: {{ total_all_pigs }}</strong>
 </div>
 
 {% else %}
-<div class="no-data">No feed change entries found.</div>
+<div class="no-data">{{ t.get('no_entries', 'No feed change entries found.') }}</div>
 {% endif %}

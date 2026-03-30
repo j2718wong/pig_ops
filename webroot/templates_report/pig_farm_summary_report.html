@@ -153,9 +153,13 @@
             background-color: #1e3a8a;
             color: white;
             font-weight: bold;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
             text-align: center;
         }
+        
+
         
         .op-header-sow {
             background-color: #e83e8c !important;
@@ -235,6 +239,10 @@
             text-align: right;
         }
         
+        .text-center {
+            text-align: center;
+        }
+        
         .no-data {
             text-align: center;
             padding: 30px;
@@ -272,6 +280,42 @@
         tr {
             page-break-inside: avoid;
         }
+        
+        
+        /* Add to your main CSS */
+        .lactating-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .lactating-table th,
+        .lactating-table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+        }
+
+        /* Fixed width for operation columns */
+        .lactating-table th.op-header-piglet,
+        .lactating-table td.op-cell-piglet {
+            width: 80px;
+            min-width: 70px;
+            max-width: 100px;
+        }
+
+        /* Allow PID/Sow and other columns to auto-size */
+        .lactating-table th:first-child,
+        .lactating-table td:first-child {
+            width: auto;
+            min-width: 100px;
+        }
+        
+        /* For operation headers that might be longer */
+        th.op-header-sow,
+        th.op-header-piglet {
+            max-width: 100px;
+        }
+        
     </style>
 </head>
 <body>
@@ -282,7 +326,7 @@
     
     <div class="report-header">
         <div class="report-name">PIG FARM SUMMARY REPORT</div>
-        <div class="farm-name">{{ pig_farm_info.pig_farm.name }}</div>
+        <div class="farm-name">{{ pig_farm_info.pig_farm.name }} on {{report_date}}</div>
         
         {% set location = pig_farm_info.location %}
         {% if location and location.country and location.country.name %}
@@ -300,17 +344,17 @@
         </div>
         {% endif %}
         
-        <div class="generated-date">Generated on: {{ generated_date.strftime('%B %d, %Y at %H:%M') }}</div>
+        <div class="generated-date">{{ t.get('generated_on', 'Generated on') }}: {{ generated_date.strftime('%B %d, %Y at %H:%M') }}</div>
     </div>
 
     <!-- Legend -->
     <div class="legend">
-        <div class="legend-box" style="background-color: #f0fdf4; color: #166534; border: 1px solid #166534;">Done on time</div>
-        <div class="legend-box" style="background-color: #fff3cd; color: #856404; border: 1px solid #856404;">Done late (+1d to 3d)</div>
-        <div class="legend-box" style="background-color: #ffedd5; color: #9a3412; border: 1px solid #9a3412;">Done very late (4d)</div>
-        <div class="legend-box" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #991b1b;">Overdue</div>
-        <div class="legend-box" style="background-color: #e83e8c; color: white;">Sow operation</div>
-        <div class="legend-box" style="background-color: #2394EF; color: white;">Piglet operation</div>
+        <div class="legend-box" style="background-color: #f0fdf4; color: #166534; border: 1px solid #166534;">{{ t.get('leg_done_on_time', 'Done on time') }}</div>
+        <div class="legend-box" style="background-color: #fff3cd; color: #856404; border: 1px solid #856404;">{{ t.get('leg_done_late', 'Done late (+1d to 3d)') }}</div>
+        <div class="legend-box" style="background-color: #ffedd5; color: #9a3412; border: 1px solid #9a3412;">{{ t.get('leg_done_very_late', 'Done very late (4d)') }}</div>
+        <div class="legend-box" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #991b1b;">{{ t.get('leg_overdue', 'Overdue') }}</div>
+        <div class="legend-box" style="background-color: #e83e8c; color: white;">{{ t.get('leg_sow_operation', 'Sow operation') }}</div>
+        <div class="legend-box" style="background-color: #2394EF; color: white;">{{ t.get('leg_piglet_operation', 'Piglet operation') }}</div>
     </div>
 
     <!-- Include Gestating Section -->

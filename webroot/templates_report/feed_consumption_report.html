@@ -1,6 +1,5 @@
-
 <!-- feed_consumption_report.html - Feed Consumption Section -->
-<div class="section-title">4. PROD FEED CONSUMPTION</div>
+<div class="section-title">{{ t.get('prod_feed_consumption', 'PROD FEED CONSUMPTION') }}</div>
 
 {% set feed_entries = list_lactating + list_fattening %}
 {% if feed_entries and feed_entries|length > 0 %}
@@ -53,11 +52,11 @@
 <table class="feed-consumption-table">
     <thead>
         <tr style="background-color: #1e3a8a;">
-            <th>PID</th>
-            <th>Prod Status</th>
-            <th>Date Birth</th>
-            <th>Pigs</th>
-            <th>Feed Bal Date</th>
+            <th>{{ t.get('pid', 'PID') }}</th>
+            <th>{{ t.get('prod_status', 'Prod Status') }}</th>
+            <th>{{ t.get('date_of_birth', 'Date Birth') }}</th>
+            <th>{{ t.get('prod_pig_count', 'Pigs') }}</th>
+            <th>{{ t.get('feed_bal_date', 'Feed Bal Date') }}</th>
             
             <th colspan="3">Lacta</th>
             <th colspan="3">Booster</th>
@@ -65,7 +64,7 @@
             <th colspan="3">Starter</th>
             <th colspan="3">Grower</th>
             <th colspan="3">Finisher</th>
-        </tr>
+         </tr>
         <tr style="background-color: #1e3a8a;">
             <th>&nbsp;</th>
             <th>&nbsp;</th>
@@ -123,7 +122,7 @@
                     -
                 {% endif %}
             </td>
-            <td class="text-right">{{ pig_count }}</td>
+            <td class="text-center piglet-count">{{ pig_count }}</td>
             <td class="text-right">
                 {% if feed_bal_date %}
                     {{ feed_bal_date|format_date }}
@@ -237,7 +236,7 @@
         {% endfor %}
     
         <tr class="balance-row">
-            <td colspan="5" style="text-align: right;"><strong>Balance Total</strong></td>
+            <td colspan="5" style="text-align: right;"><strong>{{ t.get('balance_total', 'Balance Total') }}</strong></td>
             <td class="text-right"></td>
             <td class="text-right"></td>
             <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.lactating) if prod_feed_balance.lactating is not none else '' }}</strong></td>
@@ -256,16 +255,16 @@
             <td class="text-right"></td>
             <td class="text-right"></td>
             <td class="text-right"><strong>{{ "%.1f"|format(prod_feed_balance.finisher) if prod_feed_balance.finisher is not none else '' }}</strong></td>
-         </tr>
+          </tr>
     
     </tbody>
     
         
-</table>
+   </table>
 
 
 <div class="summary-box">
-    <strong>Total Pigs:</strong> 
+    <strong>{{ t.get('total_pigs', 'Total Pigs') }}:</strong> 
     {% set ns = namespace(total=0) %}
     {% for entry in feed_entries %}
         {% set pig_count = entry.pig_production.cur_pig_count %}
@@ -278,5 +277,5 @@
 
 
 {% else %}
-<div class="no-data">No feed consumption data available.</div>
+<div class="no-data">{{ t.get('no_entries', 'No feed consumption data available.') }}</div>
 {% endif %}

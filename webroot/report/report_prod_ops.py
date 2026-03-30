@@ -352,12 +352,51 @@ class ReportProdOps(ReportBasic):
         return prod_feed_cost
         
         
+    def _format_report_date(self, date):
+        # date is a string in YYYY-MM-DD format
+        # Currently should return a string in 31 MAR 2026  format until changed
         
-    def get_data(self, pig_farm_id, inc_historical=0, inc_cost=0, 
-            inc_target_harvest = 0):
+        if not date:
+            return ''
+        
+        if isinstance(date, str):
+            try:
+                dt = datetime.strptime(date, '%Y-%m-%d')
+            except ValueError:
+                return date
+        else:
+            dt = date
+            
+        
+        return dt.strftime('%d %b %Y').upper()
+        
+        
+        
+    def get_data(self, pig_farm_id, report_date = None, inc_historical=0, 
+            inc_cost=0, inc_target_harvest = 0):
         """
         Fetch all data needed for the report.
         """
+        
+        """
+        The report_date is a  date coming from user browser or device; 
+        If coming from user, this should have a format of YYYY-MM-DD;
+        
+        if not given, will use current server date; 
+        
+        s_report_date is the formatted date to be displayed in the report 
+         
+        """
+        
+        if report_date is None:
+            dt_now      = datetime.now()
+            dt_now_s    = dt_now.strftime('%Y-%m-%d')
+            
+            report_date = dt_now_s
+        
+        
+        # formatter report_date
+        s_report_date = self._format_report_date(report_date)
         
         
         # Get pig farm info
@@ -466,6 +505,8 @@ class ReportProdOps(ReportBasic):
         
         # Prepare data for template
         data = {
+            'report_date':          s_report_date,
+        
             'pig_farm_info':        pig_farm_info,
             'acc_settings_ops':     settings_operations,
             'farm_settings':        farm_settings,

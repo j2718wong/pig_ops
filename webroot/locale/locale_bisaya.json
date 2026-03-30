@@ -317,11 +317,12 @@
     },
     
     
-    "page_summary_reports":{
+    "page_summary_report":{
         "labels":{
-            "sow_owner":        "Tagiya sa Anay",
-            "date_mate":        "Petsa sa Takal",
-            "date_expected":    "Petsa Manganak"
+            "add_summary_report":  "Buhat Summary Report",
+            "add_info":         "Magbuhat ug Pig Farm Summary Report para karong adalawa. Kani na report makita sa tanan users sa Farm.",      
+            "pig_farm_name":    "Ngalan sa Baboyan",
+            "date_report":      "Petsa sa Report"
         }
     },
     
@@ -474,8 +475,58 @@
             "feed_balance": "Feed Balance"
         }
         
-    }
+    },
     
+    
+    "reports":{
+        "generated_on":         "Petsa Pagbuhat",
+        
+        "leg_done_on_time":     "Nahuman na",
+        "leg_done_late":        "Na-Late",
+        "leg_done_very_late":   "Dugay",
+        "leg_overdue":          "Wa pa nabuhat",
+        "leg_sow_operation":    "Para sa Anay",
+        "leg_piglet_operation": "Para sa Baktin",
+        
+        "gestating_sows_title": "Gesta Anay, Buntis",
+        "gestating_sows":       "Gesta Anay",
+        "pid_sow":              "PID / Anay",
+        "date_mating":          "Petsa Takal",
+        "boar_semen":           "Butakal/Semilya",
+        "expected_birth":       "Petsa Manganak",
+            
+        "lactating_sows_title": "Lacta Anay, Nagpatotoy",
+        "lactating_sows":       "Gesta Anay",
+        "sow_operations":       "Buhatunon para sa Anay",
+        "piglet_operations":    "Buhatunon para sa Baktin",
+        "date_of_birth":        "Petsa<br>Paganak",
+        "expected_wean":        "Petsa<br>Lutas",
+        "pigs":                 "Baktin",
+        
+        "feed_change_record":   "Petsa Nag bag-o Feeds",
+        
+        "lactating_piglets":    "Baktin",
+        "fattening_pigs":       "Fattening",
+        "total_pigs":           "Total Baboy",
+        "total_piglets":        "Total Baktin",
+        
+        "date_harvest":         "Petsa e Harvest",
+        "target":               "Target",
+            
+        "total_entries":        "Pila ka batch",
+        "batches":              "batch",
+        
+        
+        "prod_feed_consumption": "Consumo sa kada Prod Batch",
+        
+        "pid":                  "PID",
+        "prod_status":          "Prod Status",
+        "feed_bal_date":        "Petsa Balanse",
+        "prod_pig_count":       "Baboy",
+        
+        "balance_total":        "Total Balanse"
+        
+    }
     
     
     

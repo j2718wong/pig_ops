@@ -32,7 +32,7 @@ TRANSLATED_LANGUAGES = [
 class Controller:
     
     def __init__(self, logger = None, model = None):
-        self.TAG                = 'Model'
+        self.TAG                = 'Controller'
 
         self.APP_VERSION        = ''
         
@@ -117,7 +117,177 @@ class Controller:
         
         
 
+    def get_directory_where_to_save_report_file(self, pig_farm_id, 
+        report_type_id, report_date):
+        """
+        1.) The reports directory should be saved in ~/projects/jsys/pig_ops/webroot/data/user/reports
+
+        2.) The reports directory should be organized by pig_farm_id; example 
+        ..webroot/data/user/reports/0001
+
+        where 1 is the pig_farm_id
+
+        3.) The subdirectory structure is further organized into year month folder
+
+        ..webroot/data/user/reports/0001/202603
+
+        where 202603 is the year month taken from report_date
+
+        Returns:
+            str: Full path to the directory where report should be saved
+            None: If directory creation fails
+        """
+        try:
+            # Base reports directory
+            reports_base_dir = os.path.join(webroot_directory, 'data', 'user', 'reports')
+            
+            # Create base directory if it doesn't exist
+            if not os.path.exists(reports_base_dir):
+                os.makedirs(reports_base_dir, exist_ok=True)
+            
+            # Farm ID directory (padded to 4 digits)
+            farm_dir = f"{pig_farm_id:04d}"
+            farm_path = os.path.join(reports_base_dir, farm_dir)
+            
+            if not os.path.exists(farm_path):
+                os.makedirs(farm_path, exist_ok=True)
+            
+            # Year-month directory from report_date
+            if isinstance(report_date, str):
+                dt_report = datetime.strptime(report_date, '%Y-%m-%d')
+            elif isinstance(report_date, datetime):
+                dt_report = report_date
+            else:
+                # If report_date is not a date object, use current date
+                dt_report = datetime.now()
+            
+            year_month = dt_report.strftime('%Y%m')
+            year_month_path = os.path.join(farm_path, year_month)
+            
+            if not os.path.exists(year_month_path):
+                os.makedirs(year_month_path, exist_ok=True)
+            
+            return year_month_path
+            
+        except Exception as e:
+            if self.logger:
+                self.logger.append(
+                    log_level='ERROR',
+                    tag=self.TAG,
+                    msg=f'Error creating report directory: {e}'
+                )
+            return None
+
+    
+    def save_report_file(self, pdf_bytes, pig_farm_id, report_type_id, 
+        report_date, report_name):
+        """
+        Will save a pdf_bytes to a file.
+
+        Parameters:
+        ==========
+        pdf_bytes : bytes
+            The PDF content to save
+        pig_farm_id : int
+            The farm ID
+        report_type_id : int
+            Type of report (1=summary, 2=gestating, etc.)
+        report_date : str or datetime
+            The date of the report (used for folder structure)
+        report_name : str
+            The name of the report file (without extension)
+
+        Returns: str
+            relative path of the file starting from data/...
+            returns None if not saved
+        """
+        try:
+            # Get the directory to save the report
+            save_dir = self.get_directory_where_to_save_report_file(
+                pig_farm_id, report_type_id, report_date
+            )
+            
+            if save_dir is None:
+                return None
+            
+            # Generate filename with timestamp
+            if isinstance(report_date, str):
+                dt_report = datetime.strptime(report_date, '%Y-%m-%d')
+            elif isinstance(report_date, datetime):
+                dt_report = report_date
+            else:
+                dt_report = datetime.now()
+            
+            # Format: report_name_20260330_143022.pdf
+            timestamp = dt_report.strftime('%Y%m%d_%H%M%S')
+            filename = f"{report_name}_{timestamp}.pdf"
+            
+            # Full file path
+            file_path = os.path.join(save_dir, filename)
+            
+            # Save the PDF bytes
+            with open(file_path, 'wb') as f:
+                f.write(pdf_bytes)
+            
+            # Get relative path from webroot/data
+            # Convert to relative path starting from data/...
+            relative_path = os.path.relpath(file_path, os.path.join(webroot_directory, 'data'))
+            
+            if self.logger:
+                self.logger.append(
+                    log_level='INFO',
+                    tag=self.TAG,
+                    msg=f'Report saved: {relative_path}'
+                )
+            
+            return relative_path
+            
+        except Exception as e:
+            if self.logger:
+                self.logger.append(
+                    log_level='ERROR',
+                    tag=self.TAG,
+                    msg=f'Error saving report: {e}'
+                )
+            return None
+
+    
+    def save_report_with_auto_name(self, pdf_bytes, pig_farm_id, report_type_id, 
+        report_date):
+        """
+        Saves report with auto-generated name based on report type.
+
+        Parameters:
+        ==========
+        pdf_bytes : bytes
+            The PDF content to save
+        pig_farm_id : int
+            The farm ID
+        report_type_id : int
+            Type of report (1=summary, 2=gestating, etc.)
+        report_date : str or datetime
+            The date of the report
+
+        Returns: str
+            relative path of the file starting from data/...
+            returns None if not saved
+        """
+        # Get report type name
+        report_type_name = REPORT_TYPES.get(report_type_id, 'report')
         
+        # Generate farm name (you may want to fetch this from database)
+        farm_name = f"farm_{pig_farm_id:04d}"
+        
+        # Generate report name
+        report_name = f"{farm_name}_{report_type_name}"
+        
+        return self.save_report_file(
+            pdf_bytes, 
+            pig_farm_id, 
+            report_type_id, 
+            report_date, 
+            report_name
+        )
         
         
         

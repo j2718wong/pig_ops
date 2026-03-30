@@ -38,63 +38,25 @@ class PigProdNotes(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_notes_add('
-        sql += '%s,'    % data.user_id
+        params = [
+            data.user_id,
+            data.pig_prod_id         if data.pig_prod_id is not None and data.pig_prod_id > 0 else None,
+            data.sow_boar_id         if data.sow_boar_id is not None and data.sow_boar_id > 0 else None,
+            data.production_group_id if data.production_group_id is not None and data.production_group_id > 0 else None,
+            data.is_health_issue,
+            data.date_notes,
+            data.notes
+        ]
         
-        if data.pig_prod_id is not None and data.pig_prod_id > 0:
-            sql += '%s,'    % data.pig_prod_id
-        else:
-            sql += 'NULL,'
-            
-        if data.sow_boar_id is not None and data.sow_boar_id > 0:
-            sql += '%s,'    % data.sow_boar_id
-        else:
-            sql += 'NULL,'
+        res = self._call_procedure('pig_prod_notes_add', params)
         
-            
-        if data.production_group_id is not None and data.production_group_id > 0:
-            sql += '%s,'    % data.production_group_id
-        else:
-            sql += 'NULL,'
+        if res is None:
+            return None
         
         
-        sql += '%s,'    % data.is_health_issue
+        row = res[0]
         
         
-        if data.date_notes is not None:
-            sql += '"%s",'  % data.date_notes
-        else:
-            sql += 'NULL,'
-            
-        sql += '"%s");'  % data.notes
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
         if row is not None:
             return {
                 'result':{
@@ -122,43 +84,22 @@ class PigProdNotes(BaseModel):
         )
         """
        
-        sql =  'CALL pig_prod_notes_update('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_prod_notes_id
+        params = [
+            data.user_id,
         
-        if data.date_notes is not None:
-            sql += '"%s",'  % data.date_notes
-        else:
-            sql += 'NULL,'
+            data.pig_prod_notes_id,
+            data.date_notes,
+            data.notes
+        ]
+       
+        res = self._call_procedure('pig_prod_notes_update', params)
         
-        sql += '"%s");'  % data.notes
+        if res is None:
+            return None
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        row = res[0]
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
 
         if row is not None:
             return {
@@ -188,36 +129,17 @@ class PigProdNotes(BaseModel):
         )
         """
        
-        sql =  'CALL pig_prod_notes_delete('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % pig_prod_notes_id
+        params = [user_id, pig_prod_notes_id]
+       
+        res = self._call_procedure('pig_prod_notes_update', params)
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        if res is None:
+            return None
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'delete(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+        
+        row = res[0]
+        
+        
         if row is not None:
             return {
                 'result':{
@@ -289,33 +211,11 @@ class PigProdNotes(BaseModel):
                 ORDER BY a.date_notes DESC
                 """ % where_clause
        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
         if rows is not None:

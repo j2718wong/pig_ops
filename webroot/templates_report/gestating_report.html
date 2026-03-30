@@ -1,16 +1,17 @@
-<div class="section-title">1. GESTATING SOWS ({{ list_gestating|length }})</div>
+<!-- gestating_report.html - Gestating Sows Section -->
+<div class="section-title">{{ t.get('gestating_sows_title', 'GESTATING SOWS') }} ({{ list_gestating|length }})</div>
 
 {% if list_gestating and list_gestating|length > 0 %}
-<table>
+<table class="gestating-table">
     <thead>
         <tr>
-            <th>PID / Sow</th>
-            <th>Date Mating</th>
-            <th>Boar/Semen</th>
+            <th>{{ t.get('pid_sow', 'PID / Sow') }}</th>
+            <th>{{ t.get('date_mating', 'Date Mating') }}</th>
+            <th>{{ t.get('boar_semen', 'Boar/Semen') }}</th>
             {% for op in gestating_operations %}
             <th>{{ op.name }}</th>
             {% endfor %}
-            <th>Expected Birth</th>
+            <th>{{ t.get('expected_birth', 'Expected Birth') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -19,18 +20,18 @@
         {% for op in sow.gestating_ops %}
             {% set _ = ops_dict.update({op.account_pig_ops.id: op}) %}
         {% endfor %}
-        <tr>
+         <tr>
             <td class="pid-sow">
                 <span class="pid-number">{{ sow.pig_production.farm_prod_id }}</span>, 
                 {% if sow.sow.name %}{{ sow.sow.name }}{% else %}{{ sow.sow.number }}{% endif %}
-            </td>
+             </td>
             <td class="text-right">
                 {% if sow.insemination.insem_date %}
                     {{ sow.insemination.insem_date|format_date }}
                     (Day {{ sow.insemination.days_since_insem }})
                 {% endif %}
-            </td>
-            <td>{{ sow.boar_display }}</td>
+             </td>
+             <td>{{ sow.boar_display }}</td>
             
             {% for op_template in gestating_operations %}
                 {% set found_op = ops_dict.get(op_template.id) %}
@@ -48,18 +49,18 @@
                     {% if days_diff <= 0 %}
                         <td class="status-done">
                             {{ date_actual|format_date }}<br>
-                            <span class="status-text">Done</span>
-                        </td>
+                            <span class="status-text">{{ t.get('leg_done_on_time', 'Done') }}</span>
+                         </td>
                     {% elif days_diff <= 3 %}
                         <td class="status-late">
                             {{ date_actual|format_date }}<br>
-                            <span class="status-text">Done (+{{ days_diff }}d)</span>
-                        </td>
+                            <span class="status-text">{{ t.get('leg_done_late', 'Done') }} (+{{ days_diff }}d)</span>
+                         </td>
                     {% else %}
                         <td class="status-very-late">
                             {{ date_actual|format_date }}<br>
-                            <span class="status-text">Done (+{{ days_diff }}d)</span>
-                        </td>
+                            <span class="status-text">{{ t.get('leg_done_very_late', 'Done') }} (+{{ days_diff }}d)</span>
+                         </td>
                     {% endif %}
                     
                 {% elif found_op and found_op.pig_prod_pig_ops.date_target %}
@@ -70,12 +71,12 @@
                         {% set days_overdue = (today_date_obj - dt_target).days %}
                         <td class="status-overdue">
                             {{ date_target|format_date }}<br>
-                            <span class="status-text">Overdue ({{ days_overdue }}d)</span>
-                        </td>
+                            <span class="status-text">{{ t.get('leg_overdue', 'Overdue') }} ({{ days_overdue }}d)</span>
+                         </td>
                     {% else %}
                         <td class="status-pending">
                             {{ date_target|format_date }}
-                        </td>
+                         </td>
                     {% endif %}
                     
                 {% else %}
@@ -84,11 +85,11 @@
             {% endfor %}
             
             <td class="text-right">{% if sow.birth.date_expected %}{{ sow.birth.date_expected|format_date }}{% endif %}</td>
-        </tr>
+         </tr>
         {% endfor %}
     </tbody>
-</table>
-<div class="summary-box">Total: {{ list_gestating|length }} gestating sows</div>
+ </table>
+<div class="summary-box">{{ t.get('total_entries', 'Total') }}: {{ list_gestating|length }} {{ t.get('batches', 'batches') }}</div>
 {% else %}
-<div class="no-data">No gestating sows found.</div>
+<div class="no-data">{{ t.get('no_entries', 'No gestating sows found.') }}</div>
 {% endif %}

@@ -899,6 +899,8 @@ class DataReport(BaseModel):
     report_id:              int = 0
     report_type_id:         int
     
+    language:               str = None
+    
     report_date:            str = None
     notes:                  str = None
     file_path:              str = None

@@ -219,96 +219,77 @@ class PigFarm(BaseModel):
             WHERE a.id = %s
         """ % pig_farm_id
 
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
         
-        rows = None
+        rows = self._execute_query(sql)
         
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        if rows is None:
+            return None
+        
+        
+        
+        for row in rows:
+            # Farm basic info
+            cur_farm_id                     = row[0]
+            cur_farm_name                   = row[1]
             
-            rows = cursor.fetchall()
-            cursor.close()
+            # Account info
+            cur_account_id                  = row[2]
+            cur_account_name                = row[3]
             
-        except Exception as e:
-            msg = 'get_pig_farm_info(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-
-        if rows is not None:
-            for row in rows:
-                # Farm basic info
-                cur_farm_id                     = row[0]
-                cur_farm_name                   = row[1]
+            # Country info
+            cur_country_id                  = row[4]
+            cur_country_name                = row[5]
+            
+            # Address levels
+            cur_address_level_1_id          = row[6]
+            cur_address_level_2_id          = row[7]
+            cur_address_level_3_id          = row[8]
+            
+            # Location
+            cur_farm_latitude               = row[9]
+            cur_farm_longitude              = row[10]
+            
+            # Build the result dictionary
+            cur_entry = {
+                'pig_farm': {
+                    'id':           cur_farm_id, 
+                    'name':         cur_farm_name
+                },
                 
-                # Account info
-                cur_account_id                  = row[2]
-                cur_account_name                = row[3]
+                'account': {
+                    'id':           cur_account_id,
+                    'name':         cur_account_name
+                },
                 
-                # Country info
-                cur_country_id                  = row[4]
-                cur_country_name                = row[5]
-                
-                # Address levels
-                cur_address_level_1_id          = row[6]
-                cur_address_level_2_id          = row[7]
-                cur_address_level_3_id          = row[8]
-                
-                # Location
-                cur_farm_latitude               = row[9]
-                cur_farm_longitude              = row[10]
-                
-                # Build the result dictionary
-                cur_entry = {
-                    'pig_farm': {
-                        'id':           cur_farm_id, 
-                        'name':         cur_farm_name
+                'location':{
+                    'country': {
+                        'id':       cur_country_id,
+                        'name':     cur_country_name,
                     },
                     
-                    'account': {
-                        'id':           cur_account_id,
-                        'name':         cur_account_name
-                    },
-                    
-                    'location':{
-                        'country': {
-                            'id':       cur_country_id,
-                            'name':     cur_country_name,
+                    'address':{
+                        'level_1':  {
+                            'id':   cur_address_level_1_id
                         },
                         
-                        'address':{
-                            'level_1':  {
-                                'id':   cur_address_level_1_id
-                            },
-                            
-                            'level_2':  {
-                                'id':   cur_address_level_2_id
-                            },
-                            
-                            'level_3': {
-                                'id':   cur_address_level_3_id
-                            }
+                        'level_2':  {
+                            'id':   cur_address_level_2_id
                         },
                         
-                        'geoloc':{
-                            'latitude':  cur_farm_latitude,
-                            'longitude': cur_farm_longitude,
+                        'level_3': {
+                            'id':   cur_address_level_3_id
                         }
+                    },
+                    
+                    'geoloc':{
+                        'latitude':  cur_farm_latitude,
+                        'longitude': cur_farm_longitude,
                     }
                 }
-                
-                return cur_entry
-        
+            }
+            
+            return cur_entry
+    
         return None
     
     
@@ -346,112 +327,87 @@ class PigFarm(BaseModel):
                 """ % pig_farm_id
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return None
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
+        for row in rows:
+            cur_acc_id                  = row[0]
+            cur_acc_name                = row[1]
+                
+                
+            cur_bill_id                 = row[2]
+            cur_bill_status_id          = row[3]
+            cur_bill_reference          = row[4]
+            cur_bill_date_bill_start    = str(row[5]) if row[5] else None
+            cur_bill_date_bill_end      = str(row[6]) if row[6] else None
+            cur_bill_date_issue         = str(row[7]) if row[7] else None
+            cur_bill_date_due           = str(row[8]) if row[8] else None
+            cur_bill_currency_code      = row[9]
+            cur_bill_amount             = float(row[10]) if row[10] is not None else None
             
-        except Exception as e:
-            msg = 'get_pig_farm_account_info(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-        if rows is not None:
+            cur_acc_weight_unit         = row[11]
+            cur_acc_currency            = row[12]
+            cur_acc_settings_flag       = row[13]
+            cur_acc_num_days_wean       = row[14]
+            cur_acc_num_days_harvest_from_birth = row[15]
+            cur_acc_num_days_harvest_from_wean  = row[16]
             
-            for row in rows:
-                cur_acc_id                  = row[0]
-                cur_acc_name                = row[1]
-                    
-                    
-                cur_bill_id                 = row[2]
-                cur_bill_status_id          = row[3]
-                cur_bill_reference          = row[4]
-                cur_bill_date_bill_start    = str(row[5]) if row[5] else None
-                cur_bill_date_bill_end      = str(row[6]) if row[6] else None
-                cur_bill_date_issue         = str(row[7]) if row[7] else None
-                cur_bill_date_due           = str(row[8]) if row[8] else None
-                cur_bill_currency_code      = row[9]
-                cur_bill_amount             = float(row[10]) if row[10] is not None else None
+                           
+            cur_user_name_last          = row[17]
+            cur_user_name_first         = row[18]
+            cur_settings_last_update    = str(row[19]) if row[19] else None
+            
+            
+            
+            
+            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+            cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+            
+            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+            cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+            
+            
+            
+            cur_entry = {
+                'account': {
+                    'id':               cur_acc_id,
+                    'name':             cur_acc_name
+                },
                 
-                cur_acc_weight_unit         = row[11]
-                cur_acc_currency            = row[12]
-                cur_acc_settings_flag       = row[13]
-                cur_acc_num_days_wean       = row[14]
-                cur_acc_num_days_harvest_from_birth = row[15]
-                cur_acc_num_days_harvest_from_wean  = row[16]
+                'account_bill':{
+                    'id':               cur_bill_id,
+                    'status_id':        cur_bill_status_id,
+                    'reference':        cur_bill_reference,
+                    'date_bill_start':  cur_bill_date_bill_start,
+                    'date_bill_end':    cur_bill_date_bill_end,
+                    'date_issue':       cur_bill_date_issue,
+                    'date_due':         cur_bill_date_due,
+                    'currency_code':    cur_bill_currency_code,
+                    'amount':           cur_bill_amount
+                },
                 
-                               
-                cur_user_name_last          = row[17]
-                cur_user_name_first         = row[18]
-                cur_settings_last_update    = str(row[19]) if row[19] else None
+                'settings_operations': {
+                    'weight_unit':                  cur_acc_weight_unit,
+                    'currency':                     cur_acc_currency,
+                    'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
+                    'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
+                    'num_days_wean':                cur_acc_num_days_wean,
+                    'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
+                    'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
                 
-                
-                
-                
-                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
-                cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
-                
-                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
-                cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
-                
-                
-                
-                cur_entry = {
-                    'account': {
-                        'id':               cur_acc_id,
-                        'name':             cur_acc_name
-                    },
-                    
-                    'account_bill':{
-                        'id':               cur_bill_id,
-                        'status_id':        cur_bill_status_id,
-                        'reference':        cur_bill_reference,
-                        'date_bill_start':  cur_bill_date_bill_start,
-                        'date_bill_end':    cur_bill_date_bill_end,
-                        'date_issue':       cur_bill_date_issue,
-                        'date_due':         cur_bill_date_due,
-                        'currency_code':    cur_bill_currency_code,
-                        'amount':           cur_bill_amount
-                    },
-                    
-                    'settings_operations': {
-                        'weight_unit':                  cur_acc_weight_unit,
-                        'currency':                     cur_acc_currency,
-                        'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
-                        'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
-                        'num_days_wean':                cur_acc_num_days_wean,
-                        'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
-                        'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
-                    
-                        'last_update':{
-                            'name_last':    cur_user_name_last,
-                            'name_first':   cur_user_name_first,
-                            'dt_update':    cur_settings_last_update
-                        }
+                    'last_update':{
+                        'name_last':    cur_user_name_last,
+                        'name_first':   cur_user_name_first,
+                        'dt_update':    cur_settings_last_update
                     }
                 }
-                
-                return cur_entry
-        
+            }
+            
+            return cur_entry
+    
         return None
         
     
@@ -510,33 +466,10 @@ class PigFarm(BaseModel):
                 """ % where_clause
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return []
         
 
         result = []
@@ -636,62 +569,37 @@ class PigFarm(BaseModel):
                 """ % pig_farm_id
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return None
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_sow_boar_balance(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-        result = []
-        if rows is not None:
-            
-            
-            for row in rows:
-               
-                cur_entry = {
-                    'date_balance':         str(row[0]), 
-                    
-                    'sows': {
-                        'total':            row[1],
-                        'num_gestating':    row[2],
-                        'num_lactating':    row[3],
-                    },
-                    
-                    'boars':                row[4],
-                    
-                    'feed_balance': {
-                        'num_gestating':    float(row[5]) if row[5] else None,
-                        'num_finisher':     float(row[6]) if row[6] else None
-                    }
-                    
-                    
+        for row in rows:
+           
+            cur_entry = {
+                'date_balance':         str(row[0]), 
+                
+                'sows': {
+                    'total':            row[1],
+                    'num_gestating':    row[2],
+                    'num_lactating':    row[3],
+                },
+                
+                'boars':                row[4],
+                
+                'feed_balance': {
+                    'num_gestating':    float(row[5]) if row[5] else None,
+                    'num_finisher':     float(row[6]) if row[6] else None
                 }
                 
-                return cur_entry
-    
+                
+            }
+            
+            return cur_entry
+        
+        return None
+        
     
     def get_data_ver_num(self, pig_farm_id, return_array = 0):
         sql =   """
@@ -711,79 +619,52 @@ class PigFarm(BaseModel):
                 """ % pig_farm_id
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
+        for row in rows:
+            cur_summary_report_id           = row[0]
             
-        except Exception as e:
-            msg = 'get_data_ver_num(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-
-
-        if rows is not None:
+            cur_data_ver_num_sow            = row[1]
+            cur_data_ver_num_boar           = row[2]   
+            cur_data_ver_num_pig_prod       = row[3]
+            cur_data_ver_num_staff          = row[4]  
+            cur_data_ver_num_feed_buy       = row[5]
+            cur_data_ver_num_feed_balance   = row[6]
+            cur_data_ver_num_not_pregnant   = row[7]
             
             
-            for row in rows:
-                cur_summary_report_id           = row[0]
-                
-                cur_data_ver_num_sow            = row[1]
-                cur_data_ver_num_boar           = row[2]   
-                cur_data_ver_num_pig_prod       = row[3]
-                cur_data_ver_num_staff          = row[4]  
-                cur_data_ver_num_feed_buy       = row[5]
-                cur_data_ver_num_feed_balance   = row[6]
-                cur_data_ver_num_not_pregnant   = row[7]
-                
-                
-                if return_array == 0:
-                    cur_entry = {
-                        'data_ver_num': {
-                            'summary_report_id': cur_summary_report_id,
-                            
-                            'sow':               cur_data_ver_num_sow,       
-                            'boar':              cur_data_ver_num_boar,    
-                            'pig_prod':          cur_data_ver_num_pig_prod,
-                            'staff':             cur_data_ver_num_staff,   
-                            'feed_buy':          cur_data_ver_num_feed_buy,
-                            'feed_balance':      cur_data_ver_num_feed_balance,
-                            'not_pregnant':      cur_data_ver_num_not_pregnant
-                        }
+            if return_array == 0:
+                cur_entry = {
+                    'data_ver_num': {
+                        'summary_report_id': cur_summary_report_id,
+                        
+                        'sow':               cur_data_ver_num_sow,       
+                        'boar':              cur_data_ver_num_boar,    
+                        'pig_prod':          cur_data_ver_num_pig_prod,
+                        'staff':             cur_data_ver_num_staff,   
+                        'feed_buy':          cur_data_ver_num_feed_buy,
+                        'feed_balance':      cur_data_ver_num_feed_balance,
+                        'not_pregnant':      cur_data_ver_num_not_pregnant
                     }
-                    
-                    return cur_entry
+                }
                 
-                else:
-                    return [
-                        cur_summary_report_id,
-                    
-                        cur_data_ver_num_sow,        
-                        cur_data_ver_num_boar,       
-                        cur_data_ver_num_pig_prod,   
-                        cur_data_ver_num_staff,      
-                        cur_data_ver_num_feed_buy,
-                        cur_data_ver_num_feed_balance,   
-                        cur_data_ver_num_not_pregnant
-                    ]
+                return cur_entry
+            
+            else:
+                return [
+                    cur_summary_report_id,
+                
+                    cur_data_ver_num_sow,        
+                    cur_data_ver_num_boar,       
+                    cur_data_ver_num_pig_prod,   
+                    cur_data_ver_num_staff,      
+                    cur_data_ver_num_feed_buy,
+                    cur_data_ver_num_feed_balance,   
+                    cur_data_ver_num_not_pregnant
+                ]
 
         return None

@@ -173,8 +173,16 @@ class F_PDF:
         return "Unknown"
     
     
-    def generate_pig_farm_summary_report(self, context):
+    def generate_pig_farm_summary_report(self, context, translations = None):
         """Generate complete pig farm summary report PDF."""
+        
+        # Add translations to context
+        if translations:
+            context['t'] = translations
+        else:
+            # Default empty translations (will use English from template)
+            context['t'] = {}
+        
         
         today = datetime.now()
         context['today_date'] = today.strftime('%Y-%m-%d')
@@ -183,6 +191,8 @@ class F_PDF:
         
         # Add generated date and today's date
         context['generated_date'] = datetime.now()
+        
+        
         today = datetime.now()
         context['today_date'] = today.strftime('%Y-%m-%d')
         context['today_date_obj'] = today
