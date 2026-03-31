@@ -479,3 +479,63 @@ async def pig_farm_data_ver_num(request: Request, pfhid: str, r: int = 0):
     
 
 
+@app.get("/pig_farm/last_feed_balance", tags=["Pig Farm"])
+async def pig_farm_last_feed_balance(request: Request, pfhid: str):
+    """
+    Will get pig farm data_ver_num.
+    
+    Parameters
+    ----------
+    
+    pfhid:str
+        pig farm hashid
+    
+
+        
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID'
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+        
+        
+
+    res = model['feed_balance'].get_last_feed_balance(pig_farm_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res
+    }
+    
+
+

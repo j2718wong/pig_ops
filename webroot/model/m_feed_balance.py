@@ -670,3 +670,76 @@ class FeedBalance(BaseModel):
         return result
     
     
+    def get_last_feed_balance(self, pig_farm_id):
+        
+        sql =   """
+                SELECT 
+                    
+                    b.id,
+                    b.pig_farm_id,
+                    b.pig_prod_id,
+                    
+                    a.last_feed_balance_date,
+                    
+                    b.num_gestating,
+                    b.num_lactating,
+                    b.num_booster,
+                    b.num_prestarter,
+                    b.num_starter,
+                    b.num_grower,
+                    b.num_finisher
+                    
+                FROM pig_farm a
+                RIGHT JOIN feed_balance b ON a.id = b.pig_farm_id AND a.last_feed_balance_date = b.date_balance
+                WHERE a.id = %s
+                ORDER BY b.id
+                """ % pig_farm_id
+        
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return []
+        
+        
+        result = []
+        
+            
+        for row in rows:
+            cur_id                  = row[0]
+            cur_pig_farm_id         = row[1]
+            cur_pig_prod_id         = row[2]
+            cur_date_balance        = str(row[3])
+            
+            # These are all going to be added anyway
+            cur_num_gestating       = float(row[4]) if row[4] else 0
+            cur_num_lactating       = float(row[5]) if row[5] else 0
+            cur_num_booster         = float(row[6]) if row[6] else 0
+            cur_num_prestarter      = float(row[7]) if row[7] else 0
+            cur_num_starter         = float(row[8]) if row[8] else 0
+            cur_num_grower          = float(row[9]) if row[9] else 0
+            cur_num_finisher        = float(row[10]) if row[10] else 0
+            
+        
+            cur_entry ={
+                'id':               cur_id,
+                'pig_prod_id':      cur_pig_prod_id,
+                'date_balance':     cur_date_balance,
+                'feeds':[
+                    cur_num_gestating, 
+                    cur_num_lactating, 
+                    cur_num_booster,   
+                    cur_num_prestarter,
+                    cur_num_starter,   
+                    cur_num_grower,    
+                    cur_num_finisher  
+                ]
+                
+            }
+            
+            result.append(cur_entry)
+        
+            
+        return result
+    
+    
+

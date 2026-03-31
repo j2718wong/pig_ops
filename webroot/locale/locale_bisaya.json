@@ -29,7 +29,11 @@
             "valid_name":       "Palihug butangi pangalan.",
             "valid_date":       "Palihug butangi petsa.",
             "numeric_value":    "Numero lang ibutang."
-        }
+        },
+        
+        "day_of_week":[
+            "Dominggo", "Lunes", "Martes", "Merkules", "Huwebes", "Biyernes", "Sabado"
+        ]
     },
     
     
