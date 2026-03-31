@@ -351,13 +351,33 @@ async def root(request: Request, p:str = None, lang:str= None):
     
     return page
     
-    
+
+# List of suspicious patterns that should return 404
+SUSPICIOUS_PATHS = [
+    '.env', '.git', 'config', 'secret', 'backup', '.sql', '.ini',
+    '.yml', '.yaml', '.xml', '.json', 'wp-admin', 'phpmyadmin',
+    'api/.env', 'app/.env', 'admin', 'login', 'cgi-bin'
+]
+
     
 @app.get("/{full_path:path}", response_class=HTMLResponse, dependencies=[Depends(strict_limit)])
 async def catch_all_frontend(request: Request, full_path: str = None):
     """
     This catches any route not matched above and serves the frontend
     """
+    
+    # Check for suspicious paths that should not serve the app
+    if full_path:
+        full_path_lower = full_path.lower()
+        for pattern in SUSPICIOUS_PATHS:
+            if pattern in full_path_lower:
+                # Return 404 for security scanners
+                raise HTTPException(status_code=404, detail="Not found")
+    
+    # Also block dot files and hidden directories
+    if full_path and full_path.startswith('.'):
+        raise HTTPException(status_code=404, detail="Not found")
+    
     
     result = get_current_uhid(request)
     if isinstance(result, RedirectResponse):
