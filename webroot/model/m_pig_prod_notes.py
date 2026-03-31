@@ -218,66 +218,66 @@ class PigProdNotes(BaseModel):
         
         
         result = []
-        if rows is not None:
+
             
-            for row in rows:
-                cur_id                  = row[0]
-                cur_farm_prod_id        = row[1]
-                cur_date_notes          = str(row[2])
-                cur_flag                = row[3]
-                cur_notes               = row[4]
+        for row in rows:
+            cur_id                  = row[0]
+            cur_farm_prod_id        = row[1]
+            cur_date_notes          = str(row[2])
+            cur_flag                = row[3]
+            cur_notes               = row[4]
+            
+            cur_pig_medvac_id       = row[5]
+            cur_acc_medvac_id       = row[6]
+            cur_acc_medvac_name     = row[7]
+            cur_pig_medvac_notes    = row[8]
+            
+            
+            is_health_issue = 0
+            if cur_flag & FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE > 0:
+                is_health_issue = 1
+            
+            cur_entry = {
+                'prod_notes': {
+                    'id':               cur_id,
+                    'farm_prod_id':     cur_farm_prod_id,
+                    'date_notes':       cur_date_notes,
+                    'notes':            cur_notes
+                },
                 
-                cur_pig_medvac_id       = row[5]
-                cur_acc_medvac_id       = row[6]
-                cur_acc_medvac_name     = row[7]
-                cur_pig_medvac_notes    = row[8]
+                'added_by':{
+                    'name_last':        row[9],
+                    'name_first':       row[10],
+                    'dt_entry':         str(row[11])
+                },
                 
-                
-                is_health_issue = 0
-                if cur_flag & FLAG_BIT_NOTES_IS_PIG_HEALTH_ISSUE > 0:
-                    is_health_issue = 1
-                
-                cur_entry = {
-                    'prod_notes': {
-                        'id':               cur_id,
-                        'farm_prod_id':     cur_farm_prod_id,
-                        'date_notes':       cur_date_notes,
-                        'notes':            cur_notes
-                    },
-                    
-                    'added_by':{
-                        'name_last':        row[9],
-                        'name_first':       row[10],
-                        'dt_entry':         str(row[11])
-                    },
-                    
-                    'last_update':{
-                        'name_last':        row[12],
-                        'name_first':       row[13],
-                        'dt_update':        str(row[14]) if row[14] else None
-                    }
+                'last_update':{
+                    'name_last':        row[12],
+                    'name_first':       row[13],
+                    'dt_update':        str(row[14]) if row[14] else None
+                }
+            }
+            
+            if cur_pig_medvac_id is not None:
+                pig_medvac = {
+                    'id':               cur_pig_medvac_id,
+                    'acc_medvac_name':  cur_acc_medvac_name,
+                    'medvac_notes':     cur_pig_medvac_notes
                 }
                 
-                if cur_pig_medvac_id is not None:
-                    pig_medvac = {
-                        'id':               cur_pig_medvac_id,
-                        'acc_medvac_name':  cur_acc_medvac_name,
-                        'medvac_notes':     cur_pig_medvac_notes
-                    }
-                    
-                    cur_entry['pig_medvac'] = pig_medvac
+                cur_entry['pig_medvac'] = pig_medvac
+            
+            
+            if is_health_issue > 0:
+                cur_entry['prod_notes']['is_health_issue'] = 1
+            
+            
+            
+            if cur_entry['last_update']['dt_update'] is None:
+                del cur_entry['last_update']
                 
-                
-                if is_health_issue > 0:
-                    cur_entry['prod_notes']['is_health_issue'] = 1
-                
-                
-                
-                if cur_entry['last_update']['dt_update'] is None:
-                    del cur_entry['last_update']
-                    
-                
-                result.append(cur_entry)
+            
+            result.append(cur_entry)
         
         return result
     

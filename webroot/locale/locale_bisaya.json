@@ -478,6 +478,19 @@
     },
     
     
+    "page_report_list":{
+        "labels":{
+            "rep_type_farm_summary": "Pig Farm Summary"
+        }
+    },
+    
+    "page_report_add":{
+        "labels":{
+            "report_language": "Report Language",
+            "language_help": "Pilia ang report language na magkacinabot mo tanan inyong baboyan."
+        }
+    },
+    
     "reports":{
         "generated_on":         "Petsa Pagbuhat",
         

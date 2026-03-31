@@ -81,10 +81,8 @@ FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
 
 class Account(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
         
-        self.TAG                = 'Account'
-
     
     def get_info(self, account_id):
         

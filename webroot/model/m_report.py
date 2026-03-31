@@ -29,6 +29,8 @@ class Report(BaseModel):
             in_report_type_id       INT,
             
             in_report_date          VARCHAR(10),
+            in_report_language      VARCHAR(8),
+            
             in_file_path            VARCHAR(255),
             in_notes                VARCHAR(160)
         )    
@@ -41,8 +43,9 @@ class Report(BaseModel):
             data.report_type_id,
             
             data.report_date,
-            data.file_path,
+            data.language,
             
+            data.file_path,
             data.notes              if data.notes and data.notes.strip() else None
         ]
         
@@ -74,9 +77,9 @@ class Report(BaseModel):
 
 
 
-    def get_list(self, pig_farm_id, report_id, date_min = None):
-        values = (pig_farm_id, report_id)
-        where_clause = 'WHERE a.pig_farm_id = %s AND a.report_id = %s' % values
+    def get_list(self, pig_farm_id, report_type_id, date_min = None):
+        values = (pig_farm_id, report_type_id)
+        where_clause = 'WHERE a.pig_farm_id = %s AND a.report_type_id = %s' % values
         
         if date_min is not None:
             where_clause += ' AND a.report_date >= "%s"' % date_min 
@@ -108,7 +111,8 @@ class Report(BaseModel):
         
         
         result = []
-        if rows is not None:
+            
+        for row in rows:
             cur_id                      = row[0]
             cur_report_type_id          = row[1]
             cur_report_date             = str(row[2])
@@ -118,27 +122,58 @@ class Report(BaseModel):
             cur_name_first              = row[5]
             cur_dt_entry                = str(row[6])    
             
-            for row in rows:
-                cur_entry = {
-                    'report': {
-                        'id':               cur_id,
-                        'type_id':          cur_report_type_id,
-                        'date':             cur_report_date
-                    },
-                    
-                    'added_by': {
-                        'name_last':        row[3],
-                        'name_first':       row[4],
-                        'dt_entry':         str(row[5])
-                    }
+            
+            
+            cur_entry = {
+                'report': {
+                    'id':               cur_id,
+                    'type_id':          cur_report_type_id,
+                    'date':             cur_report_date
+                },
+                
+                'added_by': {
+                    'name_last':        row[3],
+                    'name_first':       row[4],
+                    'dt_entry':         str(row[5])
                 }
-            
-                if cur_notes is not None:
-                    cur_entry['report']['notes'] = cur_notes
-            
-                    
-                result.append(cur_entry)
+            }
         
+            if cur_notes is not None:
+                cur_entry['report']['notes'] = cur_notes
+        
+                
+            result.append(cur_entry)
+    
         return result
+    
+    
+    def get_report_file_path(self, report_id):
+        
+        sql =   """
+                SELECT 
+                    file_path
+                    
+                FROM pig_farm_report 
+                WHERE id = %s
+                """ % report_id
+    
+    
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
+        
+        
+        result = []
+            
+        for row in rows:
+            cur_file_path               = row[0]
+    
+            return cur_file_path
+    
+        return None
+    
+    
     
     

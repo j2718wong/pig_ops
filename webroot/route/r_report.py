@@ -33,6 +33,20 @@ if report_dir not in sys.path:
     sys.path.insert(0, report_dir)
 
 
+# Include the directory where this file is located 
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from r_a0_security_checks   import check_if_valid_user_account
+from r_utils                import remove_database_null_description
+
+
+
+
+
 DEFAULT_REPORT_TRANSLATION = {
     "generated_on":         "Petsa Pagbuhat",
         
@@ -101,6 +115,34 @@ pdf_formatter       = F_PDF(template_dir=os.path.join(webroot_directory, 'templa
 MIN_DAYS_REPORT     = 8
 
 
+def get_report_translations(language):
+    translations = DEFAULT_REPORT_TRANSLATION
+    
+    if language is not None:
+        lang_code = controller.get_language_key(language)
+        
+        if lang_code:
+            if lang_code not in controller.translations:
+                return translations
+                
+            
+            all_translations = controller.translations[lang_code]
+            
+            if all_translations:
+                translations = all_translations['reports']
+                
+                # Special case for No entries
+                translated_no_entries = all_translations['common']['labels']['no_entries']
+                
+                en_no_entries       = random.choice(DEFAULT_NO_ENTRIES_TABLE)
+                local_no_entries    = random.choice(translated_no_entries)
+                
+                translations['no_entries'] = en_no_entries + '; ' + local_no_entries
+    
+    
+    return translations
+
+
     
 @app.get("/report/pig_farm/summary", tags=["Report"])
 async def report_pig_farm_summary(uhid:str, pfhid:str, language = None,
@@ -161,25 +203,8 @@ async def report_pig_farm_summary(uhid:str, pfhid:str, language = None,
     data = report_generator.get_data(pig_farm_id, inc_historical=inc_historical)
 
 
-    # Set report language
-    translations = DEFAULT_REPORT_TRANSLATION
-    
-    if language is not None:
-        lang_code = controller.get_language_key(language)
-        
-        if lang_code:
-            all_translations = controller.translations[lang_code]
-            
-            if all_translations:
-                translations = all_translations['reports']
-                
-                # Special case for No entries
-                translated_no_entries = all_translations['common']['labels']['no_entries']
-                
-                en_no_entries       = random.choice(DEFAULT_NO_ENTRIES_TABLE)
-                local_no_entries    = random.choice(translated_no_entries)
-                
-                translations['no_entries'] = en_no_entries + '; ' + local_no_entries
+    # Get report translations
+    translations = get_report_translations(language)
                 
 
     # Generate PDF
@@ -209,6 +234,97 @@ async def report_pig_farm_summary(uhid:str, pfhid:str, language = None,
         }
     )
     
+
+@app.get("/report/read", tags=["Report"])
+async def report_pig_farm_summary(request: Request, rhid:str):
+    """
+    Will return PDF report from given rhid for inline display
+    
+    Parameters
+    ==========
+    
+    rhid : str
+        report hash id
+    
+    
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result': {
+                'num': ERROR_PIG_PROD_OPS_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_OPS_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    res = hashids_common.decrypt(rhid)
+    if len(res) == 0:
+        result =  {
+            'result':{
+                'num':  ERROR_REPORT_INVALID_HASHID,
+                'code': 'ERROR_REPORT_INVALID_HASHID'
+            }
+        }
+        
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        
+        return result
+        
+    report_id = res[0]
+    
+    
+    # Read report file path
+    report_path = model['report'].get_report_file_path(report_id)
+    abspath = os.path.join(webroot_directory, report_path)
+    
+    print('abspath = ' + abspath)
+    
+    # To be continued; how to return PDF to be displayed on web page; not download
+    
+    return None
+    
+    
+
 
 
 @app.post("/report/pig_farm/summary/add", tags=["Report"])
@@ -271,8 +387,8 @@ async def report_pig_farm_summary_add(request: Request, data: dm.DataReport):
     if len(res) == 0:
         result =  {
             'result':{
-                'num':  ERROR_PF_FEED_BUY_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_PF_FEED_BUY_INVALID_PIG_FARM_HASHID'
+                'num':  ERROR_PIG_FARM_INVALID_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
             }
         }
         
@@ -293,44 +409,78 @@ async def report_pig_farm_summary_add(request: Request, data: dm.DataReport):
     data_report = report_generator.get_data(pig_farm_id)
     
     
-    # Get Report language
-    report_language = data.language
+    language    = data.language
     
-    lang_code = controller.get_language_key(report_language)
+    # Get report translations
+    translations = get_report_translations(language)
     
 
-    
     # Generate PDF
-    pdf_bytes           = pdf_formatter.generate_pig_farm_summary_report(data)
+    pdf_bytes           = pdf_formatter.generate_pig_farm_summary_report(
+                    data_report, translations)
     
-    
-    # Generate filename
-    farm_name           = data['pig_farm_info']['pig_farm']['name'].replace(' ', '_')
-    filename            = f"gestating_report_{farm_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    
+    if pdf_bytes:
+        print('PDF report created')
+    else:
+        print('PDF report not created')
     
     # Record analytics
     data_analytics = {
         'user_id':          user_id,
-        'app_function_id':  APP_ANALYTICS_ID_REPORT_GESTATING_PDF  
+        'app_function_id':  APP_ANALYTICS_ID_REPORT_PIG_FARM_SUMMARY  
     }
     model['app_analytics'].add(data_analytics)
     
     
-    # Return PDF response
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename={filename}",
-            "Content-Type": "application/pdf"
+    report_type_id      = data.report_type_id
+    report_date         = data.report_date
+    
+    
+    report_name = None
+    
+    if report_type_id == REPORT_ID_FARM_SUMMARY_REPORT:
+        report_name = 'farm_summary'
+        
+    
+    # Save report file to directory
+    path_report = controller.save_report_file(pdf_bytes, pig_farm_id, 
+            report_type_id, report_date, report_name)
+
+    if path_report:
+        print('PDF report saved to directory')
+    else:
+        print('PDF report saved is None')
+    
+
+
+    # Save path to database
+    data.file_path  = path_report
+    
+    res_add = model['report'].add(data)
+
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
         }
-    )
+    
+    
+    # remove plain id
+    cur_id      = res_add['report']['id']
+    cur_hid     = hashids_common.encrypt(cur_id)
+    
+    del res_add['report']['id']
+    res_add['report']['hid'] = cur_hid
 
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
 
-
-
-
+    
+    return res_add
+    
 
 
 

@@ -896,6 +896,7 @@ class DataReport(BaseModel):
     pig_farm_hid:           str = None
     
     user_id:                int = 0
+    pig_farm_id:            int = 0
     report_id:              int = 0
     report_type_id:         int
     

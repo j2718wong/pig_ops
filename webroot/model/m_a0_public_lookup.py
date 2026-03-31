@@ -1,14 +1,26 @@
 # August 24, 2025
 # Jack Wong
+import os
+import sys
+
 
 from common_constants       import *
 
 
-class PublicLookup:
-    def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PublicLookup'
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class PublicLookup(BaseModel):
+    def __init__(self, model):
+        super().__init__(model)
+        
     
     def get_active_country_list(self):
         sql =   """
@@ -21,33 +33,10 @@ class PublicLookup:
                 ORDER BY  name
                 """
         
+        rows = self._execute_query(sql)
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            
-        except Exception as e:
-            msg = 'get_active_country_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return []
         
         
         result = []
@@ -67,6 +56,43 @@ class PublicLookup:
         return result
     
     
+    def get_country_details(self, country_id):
+        sql =   """
+                SELECT 
+                    id,
+                    country_code,
+                    name,
+                    report_languages
+                FROM app_country
+                WHERE id = %s 
+                """ %country_id
+        
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
+        
+        
+        if rows is not None:
+            
+            
+            for row in rows:
+                cur_entry = {
+                    'id':               row[0], 
+                    'country_code':     row[1],
+                    'name':             row[2]
+                }
+                
+                if row[3] is not None:
+                    cur_entry['report_languages'] = row[3]
+                
+                return cur_entry
+
+        
+        return None
+    
+    
     
     def get_list_feed_type(self):
         
@@ -80,33 +106,11 @@ class PublicLookup:
                 ORDER BY id
                 """ 
     
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list_feed_type(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
         if rows is not None:
@@ -136,33 +140,11 @@ class PublicLookup:
                 ORDER BY id
                 """ 
     
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list_harvest_type(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
         if rows is not None:

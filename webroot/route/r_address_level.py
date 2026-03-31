@@ -40,9 +40,6 @@ async def address_level_1_list(request: Request, country_hid:str):
     
     uhid = result
     
-    
-    country_id = 0
-    
             
     res = hashids_common.decrypt(country_hid)
     if len(res) == 0:
@@ -64,8 +61,7 @@ async def address_level_1_list(request: Request, country_hid:str):
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
      
@@ -117,8 +113,7 @@ async def address_level_2_list(request: Request, level_1_hid:str):
         return {
             'result':{
                 'num':  ERROR_ADDRESS_LEVEL_1_HID,
-                'code': 'ERROR_ADDRESS_LEVEL_1_HID',
-                'desc': ''
+                'code': 'ERROR_ADDRESS_LEVEL_1_HID'
             }
         }
     

@@ -10,7 +10,7 @@ LOG_FATAL               = 3
 
 
 
-APP_ANALYTICS_ID_REPORT_PIG_PROD_OPERATIONS         = 1
+APP_ANALYTICS_ID_REPORT_PIG_FARM_SUMMARY            = 1
 APP_ANALYTICS_ID_REPORT_PIG_PROD_WEANING            = 2
 APP_ANALYTICS_ID_REPORT_FEED_CONSUMPTION            = 3
 
@@ -19,22 +19,11 @@ APP_ANALYTICS_ID_REPORT_GESTATING_PDF               = 20
 
 
 
-BUSINESS_OBJ_ID_USER_REGISTER                       = 1
-BUSINESS_OBJ_ID_SEMEN_SUPPLIER                      = 13
-BUSINESS_OBJ_ID_FEED_SUPPLIER                       = 14
-BUSINESS_OBJ_ID_FEED_BRAND                          = 15
+
+REPORT_ID_FARM_SUMMARY_REPORT                       = 1
 
 
 
-
-MFA_CHANNEL_ID_EMAIL                                = 1
-MFA_CHANNEL_ID_PHONE_NUMBER                         = 2
-
-MFA_VERIFICATION_CODE_MIN                           = 100000
-MFA_VERIFICATION_CODE_MAX                           = 999999
-
-
-MFA_SEND_SUCCESS                                    = 0
 
 
 
@@ -124,7 +113,7 @@ ERROR_SERVER_ERROR                                  = 0x02
 ERROR_USER_EMAIL                                    = 0x03
 ERROR_USER_INACTIVE                                 = 0x04
 
-
+                        
 
 
 ERROR_ACCOUNT_DISABLED                              = 0x08
@@ -140,6 +129,7 @@ ERROR_ADDRESS_LEVEL_2_HID                           = 0x0C
 ERROR_ADDRESS_LEVEL_3_HID                           = 0x0D
 
 
+ERROR_REPORT_INVALID_HASHID                         = 0x0F
 
 ERROR_PIG_PROD_OPS_INVALID_USER_HASHID              = 0x10
 ERROR_PIG_PROD_OPS_INVALID_PIG_FARM_HASHID          = 0x11

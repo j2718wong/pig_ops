@@ -6,6 +6,8 @@ import sys
 import json
 import pprint
 
+from datetime               import datetime, timedelta
+
 
 # Include the directory where this file is located 
 module_file_path            = os.path.abspath(__file__)
@@ -18,6 +20,8 @@ locale_dir = os.path.join(webroot_directory, 'locale')
 if locale_dir not in sys.path:
     sys.path.insert(0, locale_dir)
 
+
+from common_constants       import *
 
 TRANSLATED_LANGUAGES = [
     {'key': 'en',       'lang_input': ['default', 'en', 'english']},
@@ -114,8 +118,6 @@ class Controller:
     def set_view(self, view):
         self.view = view
         
-        
-        
 
     def get_directory_where_to_save_report_file(self, pig_farm_id, 
         report_type_id, report_date):
@@ -172,7 +174,7 @@ class Controller:
         except Exception as e:
             if self.logger:
                 self.logger.append(
-                    log_level='ERROR',
+                    log_level= LOG_ERROR,
                     tag=self.TAG,
                     msg=f'Error creating report directory: {e}'
                 )
@@ -210,21 +212,22 @@ class Controller:
             if save_dir is None:
                 return None
             
-            # Generate filename with timestamp
-            if isinstance(report_date, str):
-                dt_report = datetime.strptime(report_date, '%Y-%m-%d')
-            elif isinstance(report_date, datetime):
-                dt_report = report_date
-            else:
-                dt_report = datetime.now()
-            
+            # Use CURRENT TIME for timestamp, not report_date
+            # This ensures unique filenames and shows actual generation time
+            current_time = datetime.now()
+            timestamp = current_time.strftime('%Y%m%d_%H%M%S')
+                
             # Format: report_name_20260330_143022.pdf
-            timestamp = dt_report.strftime('%Y%m%d_%H%M%S')
             filename = f"{report_name}_{timestamp}.pdf"
             
+            
+
+
             # Full file path
             file_path = os.path.join(save_dir, filename)
             
+            print('tosave = ' + str(file_path))
+
             # Save the PDF bytes
             with open(file_path, 'wb') as f:
                 f.write(pdf_bytes)
@@ -233,19 +236,12 @@ class Controller:
             # Convert to relative path starting from data/...
             relative_path = os.path.relpath(file_path, os.path.join(webroot_directory, 'data'))
             
-            if self.logger:
-                self.logger.append(
-                    log_level='INFO',
-                    tag=self.TAG,
-                    msg=f'Report saved: {relative_path}'
-                )
-            
             return relative_path
             
         except Exception as e:
             if self.logger:
                 self.logger.append(
-                    log_level='ERROR',
+                    log_level=LOG_ERROR,
                     tag=self.TAG,
                     msg=f'Error saving report: {e}'
                 )

@@ -1,13 +1,23 @@
 # August 31, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
-class FeedBalance:
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class FeedBalance(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'FeedBalance'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -439,246 +449,222 @@ class FeedBalance:
                         """ % where_clause
             
                 
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return []
         
         
         result = []
-        if rows is not None:
             
-            if pig_prod_id > 0:
-            
-                for row in rows:
-                    cur_num_gestating       = float(row[3]) if row[3] else None
-                    cur_num_lactating       = float(row[4]) if row[4] else None
-                    cur_num_booster         = float(row[5]) if row[5] else None
-                    cur_num_prestarter      = float(row[6]) if row[6] else None
-                    cur_num_starter         = float(row[7]) if row[7] else None
-                    cur_num_grower          = float(row[8]) if row[8] else None
-                    cur_num_finisher        = float(row[9]) if row[9] else None
-                    
-                    
-                    
-                    cur_entry = {
-                        'feed_balance': {
-                            'id':               row[0],
-                            'date_balance':     str(row[1]),
-                            'num_pigs':         row[2]
-                        }
+        if pig_prod_id > 0:
+        
+            for row in rows:
+                cur_num_gestating       = float(row[3]) if row[3] else None
+                cur_num_lactating       = float(row[4]) if row[4] else None
+                cur_num_booster         = float(row[5]) if row[5] else None
+                cur_num_prestarter      = float(row[6]) if row[6] else None
+                cur_num_starter         = float(row[7]) if row[7] else None
+                cur_num_grower          = float(row[8]) if row[8] else None
+                cur_num_finisher        = float(row[9]) if row[9] else None
+                
+                
+                
+                cur_entry = {
+                    'feed_balance': {
+                        'id':               row[0],
+                        'date_balance':     str(row[1]),
+                        'num_pigs':         row[2]
+                    }
+                }
+                
+                
+                if cur_num_gestating is not None:
+                    cur_entry['feed_balance']['num_gestating'] = cur_num_gestating
+                
+                if cur_num_lactating is not None:
+                    cur_entry['feed_balance']['num_lactating'] = cur_num_lactating
+                
+                if cur_num_booster is not None:
+                    cur_entry['feed_balance']['num_booster'] = cur_num_booster
+                
+                if cur_num_prestarter is not None:
+                    cur_entry['feed_balance']['num_prestarter'] = cur_num_prestarter
+                
+                if cur_num_starter is not None:
+                    cur_entry['feed_balance']['num_starter'] = cur_num_starter
+                
+                if cur_num_grower is not None:
+                    cur_entry['feed_balance']['num_grower'] = cur_num_grower
+                
+                if cur_num_finisher is not None:
+                    cur_entry['feed_balance']['num_finisher'] = cur_num_finisher
+                
+                
+                if inc_user_audit > 0:
+                
+                    added_by = {
+                        'name_last':        row[10],
+                        'name_first':       row[11],
+                        'dt_entry':         row[12]
                     }
                     
+                    last_update = {
+                        'name_last':        row[13],
+                        'name_first':       row[14],
+                        'dt_update':        str(row[15]) if row[15] else None
+                    }
+                
+                    cur_entry['added_by']   = added_by
+                    cur_entry['last_update'] = last_update
+                
                     
-                    if cur_num_gestating is not None:
-                        cur_entry['feed_balance']['num_gestating'] = cur_num_gestating
-                    
-                    if cur_num_lactating is not None:
-                        cur_entry['feed_balance']['num_lactating'] = cur_num_lactating
-                    
-                    if cur_num_booster is not None:
-                        cur_entry['feed_balance']['num_booster'] = cur_num_booster
-                    
-                    if cur_num_prestarter is not None:
-                        cur_entry['feed_balance']['num_prestarter'] = cur_num_prestarter
-                    
-                    if cur_num_starter is not None:
-                        cur_entry['feed_balance']['num_starter'] = cur_num_starter
-                    
-                    if cur_num_grower is not None:
-                        cur_entry['feed_balance']['num_grower'] = cur_num_grower
-                    
-                    if cur_num_finisher is not None:
-                        cur_entry['feed_balance']['num_finisher'] = cur_num_finisher
-                    
-                    
-                    if inc_user_audit > 0:
-                    
-                        added_by = {
-                            'name_last':        row[10],
-                            'name_first':       row[11],
-                            'dt_entry':         row[12]
-                        }
-                        
-                        last_update = {
-                            'name_last':        row[13],
-                            'name_first':       row[14],
-                            'dt_update':        str(row[15]) if row[15] else None
-                        }
-                    
-                        cur_entry['added_by']   = added_by
-                        cur_entry['last_update'] = last_update
-                    
-                        
-                    result.append(cur_entry)
+                result.append(cur_entry)
+    
+    
+        if pig_farm_id > 0:
+            last_date_balance = None
         
-        
-            if pig_farm_id > 0:
-                last_date_balance = None
-            
-                for row in rows:
-                    cur_id                  = row[0]
-                    cur_pig_prod_id         = row[1]
-                    cur_date_balance        = str(row[2])
-                    
-                    cur_num_gestating       = float(row[3]) if row[3] else None
-                    cur_num_lactating       = float(row[4]) if row[4] else None
-                    cur_num_booster         = float(row[5]) if row[5] else None
-                    cur_num_prestarter      = float(row[6]) if row[6] else None
-                    cur_num_starter         = float(row[7]) if row[7] else None
-                    cur_num_grower          = float(row[8]) if row[8] else None
-                    cur_num_finisher        = float(row[9]) if row[9] else None
-                    
-                    cur_farm_prod_id        = row[10]
-                    cur_insemination_type   = row[11]
-                            
-                    cur_sow_id              = row[12]
-                    cur_sow_number          = row[13]
-                    cur_sow_name            = row[14]
-                            
-                    cur_boar_id             = row[15]
-                    cur_boar_number         = row[16]
-                    cur_boar_name           = row[17]
-                            
-                    cur_semen_supplier_id   = row[18]
-                    cur_semen_supplier_name = row[19]
-                            
-                    cur_semen_sup_semen_id  = row[20]
-                    cur_semen_name          = row[21]
-                            
-                    cur_semen_ai_boar_id    = row[22]
-                    cur_semen_ai_boar_number= row[23]
-                    cur_semen_ai_boar_name  = row[24]
-                    
+            for row in rows:
+                cur_id                  = row[0]
+                cur_pig_prod_id         = row[1]
+                cur_date_balance        = str(row[2])
+                
+                cur_num_gestating       = float(row[3]) if row[3] else None
+                cur_num_lactating       = float(row[4]) if row[4] else None
+                cur_num_booster         = float(row[5]) if row[5] else None
+                cur_num_prestarter      = float(row[6]) if row[6] else None
+                cur_num_starter         = float(row[7]) if row[7] else None
+                cur_num_grower          = float(row[8]) if row[8] else None
+                cur_num_finisher        = float(row[9]) if row[9] else None
+                
+                cur_farm_prod_id        = row[10]
+                cur_insemination_type   = row[11]
+                        
+                cur_sow_id              = row[12]
+                cur_sow_number          = row[13]
+                cur_sow_name            = row[14]
+                        
+                cur_boar_id             = row[15]
+                cur_boar_number         = row[16]
+                cur_boar_name           = row[17]
+                        
+                cur_semen_supplier_id   = row[18]
+                cur_semen_supplier_name = row[19]
+                        
+                cur_semen_sup_semen_id  = row[20]
+                cur_semen_name          = row[21]
+                        
+                cur_semen_ai_boar_id    = row[22]
+                cur_semen_ai_boar_number= row[23]
+                cur_semen_ai_boar_name  = row[24]
+                
 
-                    
-                    if last_date_balance is None or last_date_balance !=  cur_date_balance:
-                        cur_entry = {
-                            'date_balance': cur_date_balance,
-                            'feed_balance': []
-                        }
-                        
-                        result.append(cur_entry)
-                        last_date_balance =  cur_date_balance
-                    
-                    
-                    cur_feed_balance = {
-                        'id':               cur_id
+                
+                if last_date_balance is None or last_date_balance !=  cur_date_balance:
+                    cur_entry = {
+                        'date_balance': cur_date_balance,
+                        'feed_balance': []
                     }
                     
+                    result.append(cur_entry)
+                    last_date_balance =  cur_date_balance
+                
+                
+                cur_feed_balance = {
+                    'id':               cur_id
+                }
+                
+                
+                if cur_num_gestating is not None:
+                    cur_feed_balance['num_gestating'] = cur_num_gestating
+                
+                if cur_num_lactating is not None:
+                    cur_feed_balance['num_lactating'] = cur_num_lactating
+                
+                if cur_num_booster is not None:
+                    cur_feed_balance['num_booster'] = cur_num_booster
+                
+                if cur_num_prestarter is not None:
+                    cur_feed_balance['num_prestarter'] = cur_num_prestarter
+                
+                if cur_num_starter is not None:
+                    cur_feed_balance['num_starter'] = cur_num_starter
+                
+                if cur_num_grower is not None:
+                    cur_feed_balance['num_grower'] = cur_num_grower
+                
+                if cur_num_finisher is not None:
+                    cur_feed_balance['num_finisher'] = cur_num_finisher
+                
+                
+                
+                if cur_pig_prod_id is not None:
                     
-                    if cur_num_gestating is not None:
-                        cur_feed_balance['num_gestating'] = cur_num_gestating
+                    pig_prod = {
+                        'pig_production':{
+                            'id':               cur_pig_prod_id,
+                            'farm_prod_id':     cur_farm_prod_id
+                        },
                     
-                    if cur_num_lactating is not None:
-                        cur_feed_balance['num_lactating'] = cur_num_lactating
+                        'sow': {
+                            'id':               cur_sow_id,
+                            'number':           cur_sow_number,
+                            'name':             cur_sow_name
+                        },
                     
-                    if cur_num_booster is not None:
-                        cur_feed_balance['num_booster'] = cur_num_booster
-                    
-                    if cur_num_prestarter is not None:
-                        cur_feed_balance['num_prestarter'] = cur_num_prestarter
-                    
-                    if cur_num_starter is not None:
-                        cur_feed_balance['num_starter'] = cur_num_starter
-                    
-                    if cur_num_grower is not None:
-                        cur_feed_balance['num_grower'] = cur_num_grower
-                    
-                    if cur_num_finisher is not None:
-                        cur_feed_balance['num_finisher'] = cur_num_finisher
-                    
-                    
-                    
-                    if cur_pig_prod_id is not None:
-                        
-                        pig_prod = {
-                            'pig_production':{
-                                'id':               cur_pig_prod_id,
-                                'farm_prod_id':     cur_farm_prod_id
+                        'insemination': {
+                            'insem_type':       cur_insemination_type,
+                            
+                            'boar': {
+                                'id':           cur_boar_id,
+                                'number':       cur_boar_number,
+                                'name':         cur_boar_name
                             },
-                        
-                            'sow': {
-                                'id':               cur_sow_id,
-                                'number':           cur_sow_number,
-                                'name':             cur_sow_name
-                            },
-                        
-                            'insemination': {
-                                'insem_type':       cur_insemination_type,
-                                
-                                'boar': {
-                                    'id':           cur_boar_id,
-                                    'number':       cur_boar_number,
-                                    'name':         cur_boar_name
+                            
+                            'ai': {
+                                'semen_supplier':{
+                                    'id':       cur_semen_supplier_id,
+                                    'name':     cur_semen_supplier_name,
+                                    
+                                    'semen': {
+                                        'id':   cur_semen_sup_semen_id,
+                                        'name': cur_semen_name
+                                    }
                                 },
                                 
-                                'ai': {
-                                    'semen_supplier':{
-                                        'id':       cur_semen_supplier_id,
-                                        'name':     cur_semen_supplier_name,
-                                        
-                                        'semen': {
-                                            'id':   cur_semen_sup_semen_id,
-                                            'name': cur_semen_name
-                                        }
-                                    },
-                                    
-                                    'internal_boar':{
-                                        'id':           cur_semen_ai_boar_id,
-                                        'number':       cur_semen_ai_boar_number,
-                                        'name':         cur_semen_ai_boar_name
-                                    }
+                                'internal_boar':{
+                                    'id':           cur_semen_ai_boar_id,
+                                    'number':       cur_semen_ai_boar_number,
+                                    'name':         cur_semen_ai_boar_name
                                 }
                             }
                         }
+                    }
+                
+                    cur_feed_balance['pig_prod'] = pig_prod
+                
+                
+                if inc_user_audit > 0:
+                
+                    added_by = {
+                        'name_last':        row[25],
+                        'name_first':       row[26],
+                        'dt_entry':         row[27]
+                    }
                     
-                        cur_feed_balance['pig_prod'] = pig_prod
+                    last_update = {
+                        'name_last':        row[28],
+                        'name_first':       row[29],
+                        'dt_update':        str(row[30]) if row[30] else None
+                    }
+                
+                    cur_feed_balance['added_by']   = added_by
+                    cur_feed_balance['last_update'] = last_update
+                
                     
-                    
-                    if inc_user_audit > 0:
-                    
-                        added_by = {
-                            'name_last':        row[25],
-                            'name_first':       row[26],
-                            'dt_entry':         row[27]
-                        }
-                        
-                        last_update = {
-                            'name_last':        row[28],
-                            'name_first':       row[29],
-                            'dt_update':        str(row[30]) if row[30] else None
-                        }
-                    
-                        cur_feed_balance['added_by']   = added_by
-                        cur_feed_balance['last_update'] = last_update
-                    
-                        
-                    cur_entry['feed_balance'].append(cur_feed_balance)
-                    
+                cur_entry['feed_balance'].append(cur_feed_balance)
+                
         
             
         return result

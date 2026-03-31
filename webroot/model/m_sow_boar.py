@@ -30,7 +30,7 @@ FLAG_BIT_SOW_BOAR_IS_PRODUCTION_READY   = 4
 
 class SowBoar(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
 
     
     def get_sow_status_list(self, is_dispose=0):

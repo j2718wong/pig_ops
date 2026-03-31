@@ -26,11 +26,7 @@ import data_model           as dm
 async def country_list(request: Request):
     """
     Will get active app_country list.
-    
-    Parameters
-    ----------
-    country_id : int
-        country_id
+
     """
     result = get_uhid_or_redirect(request)
     
@@ -61,6 +57,71 @@ async def country_list(request: Request):
         del cur_entry['id']
         cur_entry['hid'] = cur_hid
     
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res
+    }
+
+
+
+@app.get("/country/details/{entry_hid}", tags=["Common Lookup"])
+async def country_details(request: Request, entry_hid:str):
+    """
+    Will get active app_country list.
+    
+    Parameters
+    ----------
+    entry_hid : str
+        country_hid
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_common.decrypt(entry_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_ADDRESS_COUNTRY_HID,
+                'code': 'ERROR_ADDRESS_COUNTRY_HID'
+            }
+        }
+    
+    country_id = res[0]
+
+    
+    
+    
+    res     = model['public_lookup'].get_country_details(country_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    cur_entry = res 
+    
+    # Replace plain id
+    cur_id    = cur_entry['id']
+    cur_hid   = hashids_common.encrypt(cur_id)
+    
+    del cur_entry['id']
+    cur_entry['hid'] = cur_hid
+
             
     return {
         'result':{
