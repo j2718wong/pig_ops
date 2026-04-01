@@ -445,13 +445,13 @@ class User(BaseModel):
             data.login_city             if data.login_city and data.login_city.strip() else None,
             data.login_region           if data.login_region and data.login_region.strip() else None,
             
+            data.latitude               if data.latitude else None,
+            data.longitude              if data.longitude else None,
+            
             
             data.viewport_width         if data.viewport_width and data.viewport_width > 0 else None,
             data.viewport_height        if data.viewport_height and data.viewport_height > 0 else None,
             data.ip_address,
-            
-            data.latitude               if data.latitude else None,
-            data.longitude              if data.longitude else None,
             
             
             data.is_mobile              if data.is_mobile is not None else None,
