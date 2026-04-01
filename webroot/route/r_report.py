@@ -26,6 +26,7 @@ import data_model           as dm
 # Include the directory where this file is located 
 module_file_path            = os.path.abspath(__file__)
 webroot_directory           = os.path.dirname(os.path.dirname(module_file_path))
+data_directory              = os.path.join(webroot_directory, 'data')
 
 
 report_dir = os.path.join(webroot_directory, 'report')
@@ -235,10 +236,10 @@ async def report_pig_farm_summary(uhid:str, pfhid:str, language = None,
     )
     
 
-@app.get("/report/read", tags=["Report"])
-async def report_pig_farm_summary(request: Request, rhid:str):
+@app.get("/report/download", tags=["Report"])
+async def report_download(request: Request, rhid:str):
     """
-    Will return PDF report from given rhid for inline display
+    Will return PDF report from given rhid for download
     
     Parameters
     ==========
@@ -315,13 +316,57 @@ async def report_pig_farm_summary(request: Request, rhid:str):
     
     # Read report file path
     report_path = model['report'].get_report_file_path(report_id)
-    abspath = os.path.join(webroot_directory, report_path)
     
-    print('abspath = ' + abspath)
     
-    # To be continued; how to return PDF to be displayed on web page; not download
+    abspath = os.path.join(data_directory, report_path)
     
-    return None
+
+    
+    print(f'Downloading report: {abspath}')
+    
+    # Read file
+    try:
+        with open(abspath, 'rb') as f:
+            pdf_bytes = f.read()
+    except FileNotFoundError:
+        print(f'File not found: {abspath}')
+        result = {
+            'result': {
+                'num': ERROR_REPORT_FILE_NOT_FOUND,
+                'code': 'ERROR_REPORT_FILE_NOT_FOUND'
+            }
+        }
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        return result
+    except Exception as e:
+        print(f'Error reading file: {e}')
+        result = {
+            'result': {
+                'num': ERROR_REPORT_READ_ERROR,
+                'code': 'ERROR_REPORT_READ_ERROR'
+            }
+        }
+        if new_bill_hid is not None:
+            result['result']['new_bill_hid'] = new_bill_hid
+        return result
+    
+    
+    # Get report filename
+    index = abspath.rfind('/')
+    filename = abspath[index+1:]
+    
+    # Return PDF response
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}",
+            "Content-Type": "application/pdf"
+        }
+    )
+
+
     
     
 

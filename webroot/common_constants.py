@@ -379,5 +379,7 @@ ERROR_SOW_BOAR_MATE_INVALID_PIG_FARM_HASHID         = 0x14C
 
 
 
+ERROR_REPORT_FILE_NOT_FOUND                         = 0x154
+ERROR_REPORT_READ_ERROR                             = 0x155
 
 
