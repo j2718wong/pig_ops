@@ -1,0 +1,96 @@
+{
+    "hero_section":{
+        "title": "Mag manage sa production data sa imong baboyan",
+        "desc": "Streamline your pig farm operations with comprehensive data management",
+        
+        "try": "Sulayi Libre"
+    },
+    
+    
+    "carousel": {
+        "section_title": "Tanawa  ang SuperPig in Action",
+        
+        "items": {
+            "dashboard_overview": {
+                "title": "Dashboard",
+                "desc": "Automatic makita ang mga importante na mga numero ug petsa sa imong baboyan"
+            },
+            
+            "sow_management": {
+                "title": "Management sa mga Anay",
+                "desc": "E Manage ang imong mga anay, butakal ug dumalaga"
+            },
+                    
+            "breeding_cycles": {
+                "title": "Management sa pagtakal ug production",
+                "desc": "E record ang gestation, lactation, ug breeding cycles"
+            },
+                    
+            "pig_operations": {
+                "title": "Naka record tanan operation sa baboy",
+                "desc": "Automatic and pag pa timaan sa bakuna, petsa kanus a manganak, lutas ug ubang imporatante na petsa"
+            },
+            
+                
+            "traceability": {
+                "title": "Ma trace unsay gibuhat sa baboy",
+                "desc": "Marecord unsay gi inject, gikapaon sa mga anay. Ug kinsa ang nabuhat sa operation sa baboy."
+            },
+                    
+            "fattening": {
+                "title": "E record Tanan gibuhat sa baboy",
+                "desc": "E record ang mga bakuna, sakit2x, history sa baboy"
+            },
+                    
+            "feed_records": {
+                "title": "Recording sa lawog na konsumo kada batch",
+                "desc": "Maestimate pajud ang kinahanlanon na lawog sa kanus a na petsa sa kada batch."
+            },
+                    
+            "farm_reports": {
+                "title": "Maka buhat ug farm reports",
+                "desc": "Reporting sa tanan nahitabo sa imong farm. "
+            }
+            
+        }
+    },
+    
+    "highlights": {
+        "section_title": "Unsay naa sa SuperPig",
+        
+        "items": {
+            "all_data_one_place":{
+                "title": "Tanan na pig production data, makita sa imong cellphone.",
+                "desc":  "App na makita sa cellphone, laptop or unsa na device para sa  data sa baboy; makita bisang asa, kanus-a, bisang maghigda kapa"
+            },
+            
+            "complete_data_management":{
+                "title": "Kumpleto na baboy data management",
+                "desc":  "Gikan anay, butakal, dumalaga, gesta, lacta, fattening, harvest, feeds, kwarta ug uban pa - gi usa tanan na sayon gamiton."
+            },
+            
+            "data_collaboration": {
+                "title": "Magtina bangay mag manage sa baboy data",
+                "desc":  "Mga sakop sa baboyan, manager ug tagiya maka input ug sa track baboy data automatic."
+            },
+            
+            "pig_operations": {
+                "title": "Dili na malimtan ang pagbakuna",
+                "desc":  "Automatic na alarms para bakuna, farrowing, pag lutas, ug ubang importante buhatunon sa baboy."
+            },
+                
+            "data_analytics": {
+                "title": "Gipasayon na mag analyze sa baboy data", 
+                "desc":  "Automatic na mo compute sa kinahanlanon na lawog sa kanus a na petsa, kanus a mag target harvest, ug kompara sa mga ni aging batch."
+            },
+                
+            "financial_insights": {
+                "title": "Financial Insights",
+                "desc":  "Ma record ang tanan gasto ug halin ug ginanciya kada batch, per baboyan."
+            }
+            
+        }
+    
+    }
+    
+}

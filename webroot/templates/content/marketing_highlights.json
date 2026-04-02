@@ -1,0 +1,10 @@
+{
+    "items": [
+        { "key": "all_data_one_place" },
+        { "key": "complete_data_management" },
+        { "key": "data_collaboration" },
+        { "key": "pig_operations" },
+        { "key": "data_analytics" },
+        { "key": "financial_insights" }
+    ]
+}

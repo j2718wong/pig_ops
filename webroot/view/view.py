@@ -7,6 +7,7 @@ import os
 import json
 import pprint
 
+from pathlib                import Path
 
 
 """
@@ -29,6 +30,8 @@ versions are integrated.
 # Include the directory where this file is located 
 module_file_path        = os.path.abspath(__file__)
 module_directory        = os.path.dirname(module_file_path)
+webroot_directory       = os.path.dirname(module_directory)
+
 
 if module_directory not in sys.path:
    sys.path.append(module_directory)
@@ -282,8 +285,61 @@ class Terms(ViewBase):
 #
 
 
+
+# Map language to image folder
+lang_image_map = {
+    'en':  'mar',
+    'zh':  'mar_zh',
+    'fil': 'mar_fil',
+    'ceb': 'mar_ceb'
+}
+
+
+# Add a helper function to check if a static file exists
+def static_file_exists(relative_path):
+    """
+    Check if a static file exists in the static_m directory
+    relative_path: e.g., "images/mar_zh/mar_home.png"
+    """
+    try:
+        full_path = os.path.join(dir_static_m, relative_path)
+        return os.path.exists(full_path)
+    except Exception as e:
+        print(f"Error checking static file: {e}")
+        return False
+
+
+
+
 class Root(ViewBase):
-    def render(self, uhid = None, translation = None):
+    
+
+    
+    def render(self, uhid = None, translation = None, lang = 'en'):
+        """
+        Will render root page "/"
+        
+        if uhid is None:
+            should return home page; user not logged in
+        
+        else:
+            should return SPA; user is logged in
+            
+        Parameters
+        ----------
+        
+        uhid : string
+            user_id hid
+            
+        translation : dictionary
+            This is used when user is logged in; the language which the
+            translation uses is alredey determined before.
+            
+        lang : str
+            language key for user not logged in 
+        
+        
+        """
         
         
         if uhid is not None:
@@ -326,62 +382,26 @@ class Root(ViewBase):
             return template.render(data)
             
         else:
+            # Public homepage for non-logged-in users
+            
             
             app_version = self.controller.APP_VERSION
             
             
-            page_data = {
-                'app_version':              app_version,
+            # Load carousel from JSON with language support
+            carousel_items  = self.load_carousel_with_lang(lang, app_version)
             
-                'carousel':[
-                    {
-                        'img_path': '/static_m/images/mar/mar_home.png?v=%s' % app_version,
-                        'title': 'Dashboard Overview',
-                        'desc': 'Real-time pig farm metrics and KPIs at your fingertips'
-                    },
-                    
-                    {
-                        'img_path': '/static_m/images/mar/mar_sow_list.png?v=%s' % app_version,
-                        'title': 'Sow Management',
-                        'desc': 'Manage your breeding sows, boars and gilts'
-                    },
-                    
-                    {
-                        'img_path': '/static_m/images/mar/mar_gesta.png?v=%s' % app_version,
-                        'title': 'Breeding Cycles Management',
-                        'desc': 'Track gestation, lactation, and breeding cycles'
-                    },
-                    
-                    {
-                        'img_path': '/static_m/images/mar/mar_lacta.png?v=%s' % app_version,
-                        'title': 'Pig Operations Management',
-                        'desc': 'Automated reminders for vaccinations, farrowing, weaning, and other important pig operations'
-                    },
+            # Load marketing items
+            marketing_items = self.load_marketing_highlights_with_lang(lang)
+            
+
+            
+            page_data = {
+                'app_version':          app_version,
+            
+                'carousel':             carousel_items,
                 
-                    {
-                        'img_path': '/static_m/images/mar/mar_pig_ops.png?v=%s' % app_version,
-                        'title': 'Traceability of Pig Operations',
-                        'desc': 'Clear tracking who did the pig operation and when and what dosages given to pigs'
-                    },
-                    
-                    {
-                        'img_path': '/static_m/images/mar/mar_fattening.png?v=%s' % app_version,
-                        'title': 'Track and estimate Fatteners feed requirements',
-                        'desc': 'Record every vaccine, medicine, health issue, history for each production cycle'
-                    },
-                    
-                    {
-                        'img_path': '/static_m/images/mar/mar_feed_records.png?v=%s' % app_version,
-                        'title': 'Record feeds consumption  per production batch',
-                        'desc': 'Feed Balance and audit can be recorded anytime.'
-                    },
-                    
-                    {
-                        'img_path': '/static_m/images/mar/mar_report.png?v=%s' % app_version,
-                        'title': 'Generate Status Report for your Farm',
-                        'desc': 'Comprehensive reporting to know the status of your pig farm.'
-                    }
-                ]
+                'marketing_highlights': marketing_items
             }
             
             
@@ -401,9 +421,12 @@ class Root(ViewBase):
             js_app_modules = []
             
             
-            s_translation = None
-            if translation is not None:
-                s_translation = json.dumps(translation)
+            # Get translations once
+            translations = self.load_translations(lang)
+            en_translations = self.load_translations('en')
+            
+            if translations is None:
+                translations = en_translations
             
 
                 
@@ -412,13 +435,149 @@ class Root(ViewBase):
                         'js_app_text':      js_app_text,
                         'js_app_modules':   js_app_modules,
                         'is_dev':           self.is_dev,
-                        'translation':      s_translation
+                        'translations':     translations
                     }
             
                     
             return template.render(data)
-            
 
+
+    def load_carousel_with_lang(self, lang='en', app_version=''):
+        """Load carousel items with language-specific images, fallback to English"""
+        
+        # Get image folder for this language, fallback to English
+        image_folder = lang_image_map.get(lang, 'mar')
+        default_folder = 'mar'  # English folder
+        
+        # Load base carousel structure
+        carousel_base = self.load_carousel()
+        
+        # Get translations for this language
+        translations = self.load_translations(lang)
+        en_translations = self.load_translations('en')
+        
+        
+        # Pre-fetch translations
+        carousel_items_trans = translations.get('carousel', {}).get('items', {})
+        en_carousel_items_trans = en_translations.get('carousel', {}).get('items', {})
+        
+        carousel_items = []
+        
+        for item in carousel_base:
+            image_key = item.get('image_key', '')
+            text_key = item.get('key', '')
+            
+            # Get title and description
+            title = carousel_items_trans.get(text_key, {}).get('title', '')
+            desc = carousel_items_trans.get(text_key, {}).get('desc', '')
+            
+            if not title:
+                title = en_carousel_items_trans.get(text_key, {}).get('title', image_key)
+                desc = en_carousel_items_trans.get(text_key, {}).get('desc', '')
+            
+            # Check if localized image exists
+            lang_relative_path = f"images/{image_folder}/{image_key}.png"
+            default_relative_path = f"images/{default_folder}/{image_key}.png"
+            
+            # Use controller's method to check if file exists
+            if static_file_exists(lang_relative_path):
+                img_path = f"/static_m/{lang_relative_path}"
+            else:
+                img_path = f"/static_m/{default_relative_path}"
+                # Optional: log missing image
+                # print(f"Missing image: {lang_relative_path}, using default")
+            
+            carousel_items.append({
+                'img_path': f"{img_path}?v={app_version}",
+                'title': title,
+                'desc': desc
+            })
+        
+        return carousel_items
+        
+        
+    def load_carousel(self):
+        """Load carousel items from JSON file"""
+        try:
+            filepath = os.path.join(webroot_directory, "templates/content/carousel.json")
+            
+            with open(filepath, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get("items", [])
+        except Exception as e:
+            print(f"Error loading carousel: {e}")
+            return []
+
+
+    def load_marketing_highlights_with_lang(self, lang='en'):
+        """Load marketing highlights with language-specific text, fallback to English"""
+        
+        # Load base structure
+        highlights_base = self.load_marketing_highlights()
+        
+        # Get translations once
+        translations = self.load_translations(lang)
+        en_translations = self.load_translations('en')
+        
+        # Pre-fetch highlights translations
+        highlights_trans = translations.get('highlights', {}).get('items', {})
+        en_highlights_trans = en_translations.get('highlights', {}).get('items', {})
+        
+        marketing_items = []
+        
+        for item in highlights_base:
+            text_key = item.get('key', '')
+            
+            # Get translated text
+            title = highlights_trans.get(text_key, {}).get('title', '')
+            desc = highlights_trans.get(text_key, {}).get('desc', '')
+            
+            # Fallback to English
+            if not title:
+                title = en_highlights_trans.get(text_key, {}).get('title', '')
+                desc = en_highlights_trans.get(text_key, {}).get('desc', '')
+            
+            # Final fallback to original JSON
+            if not title:
+                title = item.get('title', '')
+                desc = item.get('desc', '')
+            
+            marketing_items.append({
+                'title': title,
+                'desc': desc
+            })
+        
+        return marketing_items
+
+
+    def load_marketing_highlights(self):
+        """Load marketing highlights from JSON file"""
+        try:
+            filepath = os.path.join(webroot_directory, "templates/content/marketing_highlights.json")
+            with open(filepath, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get("items", [])
+        except Exception as e:
+            print(f"Error loading marketing highlights: {e}")
+            return []
+
+
+    def load_translations(self, lang="en"):
+        """Load translations for specific language"""
+        try:
+            filepath = os.path.join(webroot_directory, "templates", "translations", f"{lang}.json")
+            
+            # Check if file exists
+            if not os.path.exists(filepath):
+                # Fallback to English
+                filepath = os.path.join(webroot_directory, "templates", "translations", "en.json")
+            
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading translations for {lang}: {e}")
+            return {}    
+    
 
 class AccPigOps(ViewBase):
     def render(self, page_data = None):

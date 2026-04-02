@@ -501,7 +501,10 @@ class ReportProdOps(ReportBasic):
         farm_settings = self._get_farm_settings(pig_farm_id)
 
         
-
+        print('\nprod_feed_balance\n')
+        pprint.pprint(prod_feed_balance)
+        
+        
         
         # Prepare data for template
         data = {

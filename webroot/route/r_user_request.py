@@ -98,6 +98,11 @@ async def user_request_join_account(request: Request, code:str = None):
         }
     
     
+    print('res_join')
+    
+    pprint.pprint(res_join)
+    
+    
     # Check if user has an account_id already
     if res_join['user']['account_id'] > 0:
         # Already has account

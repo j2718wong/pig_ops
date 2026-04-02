@@ -911,9 +911,9 @@
     <div class="main-content">
         <!-- Hero Section -->
         <section class="hero-section">
-            <h1 class="hero-title">Pig Production Data Management and Analytics Simplified</h1>
+            <h1 class="hero-title">{{ translations.hero_section.title }}</h1>
             <p class="hero-description">
-                Streamline your farm operations with comprehensive data management and AI-powered insights
+                {{ translations.hero_section.desc }}
             </p>
             <a href="/signup" class="btn-primary">Try for Free →</a>
         </section>
@@ -921,7 +921,7 @@
 
         <!-- Carousel Section - Dynamically loaded from page_data -->
         <section class="carousel-section">
-            <h2 class="section-title">See SuperPig in Action</h2>
+            <h2 class="section-title">{{ translations.carousel.section_title }}</h2>
             <div class="carousel-container">
                 <div class="carousel-wrapper">
                     <div class="carousel" id="carousel">
@@ -992,37 +992,14 @@
 
         <!-- Marketing Highlights Section -->
         <section class="highlights-section">
-            <h2 class="section-title">Why Choose SuperPig?</h2>
+            <h2 class="section-title">{{ translations.highlights.section_title }}</h2>
             <div class="highlights-list">
+                {% for item in page_data.marketing_highlights %}
                 <div class="highlight-item">
-                    <strong>All Your Pig Production Data in One Place</strong>
-                    <p>Centralized platform for all your farm data - from breeding to harvest, accessible anytime, anywhere.</p>
+                    <strong>{{ item.title }}</strong>
+                    <p>{{ item.desc }}</p>
                 </div>
-
-                <div class="highlight-item">
-                    <strong>Complete Data Management</strong>
-                    <p>From pig breeding stocks, gestation, lactation, fattening, harvest, feeds, financials and more - all seamlessly integrated.</p>
-                </div>
-
-                <div class="highlight-item">
-                    <strong>Collaborative Data Management</strong>
-                    <p>Seamless collaboration between farm management and staff. Farm Staff, managers and owners can input and track pig farm data in real-time.</p>
-                </div>
-
-                <div class="highlight-item">
-                    <strong>No More Missed Vaccinations & Operations</strong>
-                    <p>Automated reminders for vaccinations, farrowing, weaning, and other important pig operations.</p>
-                </div>
-
-                <div class="highlight-item">
-                    <strong>AI-Powered Analytics</strong>
-                    <p>Smart algorithms estimate your feed needs at any given time, predict harvest dates, and optimize your production cycle.</p>
-                </div>
-
-                <div class="highlight-item">
-                    <strong>Financial Insights</strong>
-                    <p>Track costs, revenues, and profitability per batch, per farm, or across your entire operation.</p>
-                </div>
+                {% endfor %}
             </div>
         </section>
 
