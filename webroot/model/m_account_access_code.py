@@ -67,6 +67,21 @@ class AccountAccessCode:
         return None
     
     
+    def update_hashid(self, data = None):
+        access_id       = data['access_id']
+        hashid          = data['hashid']
+        
+        values = (hashid, access_id)
+        
+        sql =   """
+                UPDATE account_access_code SET
+                    access_code    = "%s"
+                WHERE id = %s;
+                """ % values
+        
+        return self.model.execute_sql(sql)
+    
+    
     def update(self, data = None):
         """
         PROCEDURE account_pig_ops_update(

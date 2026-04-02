@@ -98,9 +98,6 @@ async def user_request_join_account(request: Request, code:str = None):
         }
     
     
-    print('res_join')
-    
-    pprint.pprint(res_join)
     
     if res_join['user']['account_id'] is None:
         del res_join['user']

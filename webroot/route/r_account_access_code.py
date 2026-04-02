@@ -95,6 +95,14 @@ async def account_access_code_add(request: Request, data: dm.DataAccountAccessCo
     res_add['access_code']['hid'] = cur_hid
 
 
+    # Update account_access_code.access_code;
+    # This is to add visible access code in the database.
+    model['access_code'].update_hashid({
+        'access_id':    cur_id,
+        'hashid':       cur_hid
+    })
+
+
     # Remove optional desc coming from database
     remove_database_null_description(res_add)
 
