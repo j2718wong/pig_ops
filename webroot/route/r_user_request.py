@@ -102,6 +102,12 @@ async def user_request_join_account(request: Request, code:str = None):
     
     pprint.pprint(res_join)
     
+    if res_join['user']['account_id'] is None:
+        del res_join['user']
+        remove_database_null_description(res_join)
+        
+        return res_join
+    
     
     # Check if user has an account_id already
     if res_join['user']['account_id'] > 0:
