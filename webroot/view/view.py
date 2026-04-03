@@ -290,8 +290,8 @@ class Terms(ViewBase):
 lang_image_map = {
     'en':  'mar',
     'zh':  'mar_zh',
-    'fil': 'mar_fil',
-    'ceb': 'mar_ceb'
+    'tag': 'mar_tag',
+    'bis': 'mar_bis'
 }
 
 
@@ -309,13 +309,82 @@ def static_file_exists(relative_path):
         return False
 
 
+"""
+2026-04-02: Notes on translations
+1.) There are several sets for translations
+
+Translations for public pages; user not yet logged in
+=====================================================
+- only for end points /  /login /signup
+- including subsequent pages after signup; generally pages
+  rendered via ManagerLogin JS class
+
+- For / end point (home page), the translations to home page are
+ loaded via jinja templates, because the home page of different languages 
+  needs to be searchable by search engines
+  
+- For /login and /signup   are rendered by JS and the translated contents
+ are loaded via JS. Therefore these pages are not searchable by search engines 
+
+- the translations are located in
+dev01@raspberrypi:~/projects/jsys/pig_ops/webroot/templates $ tree
+.
+├── content
+│   ├── carousel.json
+│   └── marketing_highlights.json
+└── translations
+    ├── ceb.json
+    └── en.json
+
+- the content directory is for home page translation with images
+  and variable contents items. 
+
+- the translations directory are for text translations
+
+
+- the translated images are located in 
+
+dev01@raspberrypi:~/projects/jsys/pig_ops_ui_mob/src/static/images $ tree
+.
+├── box_check.png
+├── mar
+│   ├── mar_fattening.png
+│   ├── mar_feed_records.png
+│   ├── mar_gesta.png
+│   ├── mar_home.png
+│   ├── mar_lacta.png
+│   ├── mar_pig_ops.png
+│   ├── mar_report.png
+│   └── mar_sow_list.png
+├── mar_bis
+└── mar_tag
+
+
+
+
+Translations for user already logged in  including reports generation.
+=====================================================================
+- this is located in 
+
+dev01@raspberrypi:~/projects/jsys/pig_ops/webroot/locale $ tree
+.
+└── locale_bisaya.json
+
+
+- There is no translation for english as the english text are hardcoded
+in html templates or JS page classes
+
+"""
+
+
 
 
 class Root(ViewBase):
     
 
     
-    def render(self, uhid = None, translation = None, lang = 'en'):
+    def render(self, uhid = None, translation = None, lang = None,
+            available_languages = None):
         """
         Will render root page "/"
         
@@ -332,14 +401,34 @@ class Root(ViewBase):
             user_id hid
             
         translation : dictionary
-            This is used when user is logged in; the language which the
-            translation uses is alredey determined before.
+            if uhid is not None:
+                This is the translation to be used when user is ALREADY logged in;
+                if None, the user logged in pages will use the default 
+                english text hardcoded via JS or HTML.
+                
+            if uhid is None:
+                this is ignored;
+                
+            
             
         lang : str
             language key for user not logged in 
         
-        
+        available_languages : list of dictionaries for available languages 
+            for drop down
         """
+        
+        if lang is None:
+            lang = 'en'
+        
+        
+        # Get the language to be displayed
+        language_display = 'English'
+        if available_languages is not None:
+            for cur_entry in available_languages:
+                if 'active' in cur_entry:
+                    language_display = cur_entry['local_name']
+                    break
         
         
         if uhid is not None:
@@ -359,6 +448,7 @@ class Root(ViewBase):
 
             s_translation = None
             if translation is not None:
+                # This is a json string  to be attached to HTML template
                 s_translation = json.dumps(translation)
             
             
@@ -398,9 +488,11 @@ class Root(ViewBase):
             
             page_data = {
                 'app_version':          app_version,
+                'lang':                 lang,
+                'language_display':     language_display,
+                'available_languages':  available_languages,
             
                 'carousel':             carousel_items,
-                
                 'marketing_highlights': marketing_items
             }
             
@@ -421,21 +513,36 @@ class Root(ViewBase):
             js_app_modules = []
             
             
-            # Get translations once
-            translations = self.load_translations(lang)
-            en_translations = self.load_translations('en')
+            # Get public pages translations once; this is a dictionary object
+            public_pages_trans    = self.load_public_pages_translations(lang)
+            public_pages_trans_en = self.load_public_pages_translations('en')
             
-            if translations is None:
-                translations = en_translations
             
-
+            # Get home translation; This is populated via jinja templates
+            home_translation = None
+            
+            if public_pages_trans is None:
+                public_pages_trans  = public_pages_trans_en
+                home_translation    = public_pages_trans_en['page_home']
+            else:
+                home_translation    = public_pages_trans['page_home']
+            
+            
+            # Remove page_home from public_pages 
+            del public_pages_trans['page_home']
+            
+            
+            # Convert to json string; this will be embedded to template
+            s_public_pages = json.dumps(public_pages_trans)
+            
                 
             data    = { 'page_data':        page_data,
                         'js_lib':           js_lib,
                         'js_app_text':      js_app_text,
                         'js_app_modules':   js_app_modules,
                         'is_dev':           self.is_dev,
-                        'translations':     translations
+                        'home_translation': home_translation,
+                        'public_pages':     s_public_pages
                     }
             
                     
@@ -453,27 +560,29 @@ class Root(ViewBase):
         carousel_base = self.load_carousel()
         
         # Get translations for this language
-        translations = self.load_translations(lang)
-        en_translations = self.load_translations('en')
+        translations    = self.load_public_pages_translations(lang)
+        translations_en = self.load_public_pages_translations('en')
         
+        page_home       = translations.get('page_home', {})
+        page_home_en    = translations_en.get('page_home', {})
         
         # Pre-fetch translations
-        carousel_items_trans = translations.get('carousel', {}).get('items', {})
-        en_carousel_items_trans = en_translations.get('carousel', {}).get('items', {})
+        carousel_items_trans    = page_home.get('carousel', {}).get('items', {})
+        carousel_items_trans_en = page_home_en.get('carousel', {}).get('items', {})
         
         carousel_items = []
         
         for item in carousel_base:
-            image_key = item.get('image_key', '')
-            text_key = item.get('key', '')
+            image_key   = item.get('image_key', '')
+            text_key    = item.get('key', '')
             
             # Get title and description
-            title = carousel_items_trans.get(text_key, {}).get('title', '')
-            desc = carousel_items_trans.get(text_key, {}).get('desc', '')
+            title   = carousel_items_trans.get(text_key, {}).get('title', '')
+            desc    = carousel_items_trans.get(text_key, {}).get('desc', '')
             
             if not title:
-                title = en_carousel_items_trans.get(text_key, {}).get('title', image_key)
-                desc = en_carousel_items_trans.get(text_key, {}).get('desc', '')
+                title   = carousel_items_trans_en.get(text_key, {}).get('title', image_key)
+                desc    = carousel_items_trans_en.get(text_key, {}).get('desc', '')
             
             # Check if localized image exists
             lang_relative_path = f"images/{image_folder}/{image_key}.png"
@@ -516,12 +625,15 @@ class Root(ViewBase):
         highlights_base = self.load_marketing_highlights()
         
         # Get translations once
-        translations = self.load_translations(lang)
-        en_translations = self.load_translations('en')
+        translations    = self.load_public_pages_translations(lang)
+        translations_en = self.load_public_pages_translations('en')
+        
+        page_home       = translations.get('page_home', {})
+        page_home_en    = translations_en.get('page_home', {})
         
         # Pre-fetch highlights translations
-        highlights_trans = translations.get('highlights', {}).get('items', {})
-        en_highlights_trans = en_translations.get('highlights', {}).get('items', {})
+        highlights_trans    = page_home.get('highlights', {}).get('items', {})
+        highlights_trans_en = page_home_en.get('highlights', {}).get('items', {})
         
         marketing_items = []
         
@@ -534,8 +646,8 @@ class Root(ViewBase):
             
             # Fallback to English
             if not title:
-                title = en_highlights_trans.get(text_key, {}).get('title', '')
-                desc = en_highlights_trans.get(text_key, {}).get('desc', '')
+                title = highlights_trans_en.get(text_key, {}).get('title', '')
+                desc = highlights_trans_en.get(text_key, {}).get('desc', '')
             
             # Final fallback to original JSON
             if not title:
@@ -562,8 +674,8 @@ class Root(ViewBase):
             return []
 
 
-    def load_translations(self, lang="en"):
-        """Load translations for specific language"""
+    def load_public_pages_translations(self, lang="en"):
+        """Load public pages translations for specific language"""
         try:
             filepath = os.path.join(webroot_directory, "templates", "translations", f"{lang}.json")
             

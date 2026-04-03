@@ -843,6 +843,108 @@
                 padding-bottom: 0;
             }
         }
+        
+        
+/* Language Switcher Styles */
+.lang-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+.lang-current {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
+    background: #f0f2f5;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.lang-current:hover {
+    background: #e4e6e9;
+}
+
+.lang-current i {
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+
+.lang-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 120px;
+    overflow: hidden;
+    z-index: 1002;
+    display: none;
+}
+
+.lang-dropdown.active {
+    display: block;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+}
+
+.lang-option:hover {
+    background: #f0f2f5;
+}
+
+.lang-option.active {
+    background: var(--blue-soft);
+    color: var(--corporate-blue-company);
+    font-weight: 600;
+}
+
+/* Mobile adjustments - keep text visible */
+@media (max-width: 768px) {
+    /* No hiding of text - keep "Language" visible */
+    .lang-current {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .lang-current i:first-child {
+        font-size: 14px;
+    }
+}
+
+/* Desktop adjustments */
+@media (min-width: 769px) {
+    .nav-buttons {
+        gap: 0.5rem;
+    }
+}
+
+/* Hide mobile-only elements on desktop */
+@media (min-width: 769px) {
+    .mobile-only-container {
+        display: none !important;
+    }
+}
+
+/* Hide desktop-only elements on mobile */
+@media (max-width: 768px) {
+    .desktop-only-lang {
+        display: none !important;
+    }
+}
+        
     </style>
 </head>
 <body>
@@ -866,14 +968,55 @@
                     <span>Like</span>
                 </a>
                 
+                <!-- Language Switcher (Desktop) -->
+                <div class="lang-switcher" id="langSwitcherDesktop">
+                    <div class="lang-current">
+                        <i class="fas fa-globe"></i>
+                        <span>{{ page_data.language_display }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="lang-dropdown">
+                        {% for lang_option in page_data.available_languages %}
+                        <a href="{{ lang_option.url }}" 
+                           class="lang-option {% if lang_option.active %}active{% endif %}" 
+                           data-lang="{{ lang_option.code }}">
+                            {{ lang_option.local_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
                 <a href="/login" class="btn btn-login">Login</a>
                 <a href="/signup" class="btn btn-signup">Sign Up</a>
             </div>
+            
+            
+            <div class="mobile-only-container" style="display: flex; align-items: center; gap: 8px;">
+                <!-- Language Switcher (Mobile - Explicit text) -->
+                <div class="lang-switcher" id="langSwitcherMobile">
+                    <div class="lang-current">
+                        <i class="fas fa-globe"></i>
+                        <span>{{ page_data.language_display }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="lang-dropdown">
+                        {% for lang_option in page_data.available_languages %}
+                        <a href="{{ lang_option.url }}" 
+                           class="lang-option {% if lang_option.active %}active{% endif %}" 
+                           data-lang="{{ lang_option.code }}">
+                            {{ lang_option.local_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
 
-            <!-- Mobile hamburger -->
-            <button class="menu-toggle" id="menuToggle">
-                <i class="fas fa-bars"></i>
-            </button>
+                <!-- Mobile hamburger -->
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -911,17 +1054,17 @@
     <div class="main-content">
         <!-- Hero Section -->
         <section class="hero-section">
-            <h1 class="hero-title">{{ translations.hero_section.title }}</h1>
+            <h1 class="hero-title">{{ home_translation.hero_section.title }}</h1>
             <p class="hero-description">
-                {{ translations.hero_section.desc }}
+                {{ home_translation.hero_section.desc }}
             </p>
-            <a href="/signup" class="btn-primary">Try for Free →</a>
+            <a href="/signup" class="btn-primary">{{ home_translation.hero_section.try }}</a>
         </section>
 
 
         <!-- Carousel Section - Dynamically loaded from page_data -->
         <section class="carousel-section">
-            <h2 class="section-title">{{ translations.carousel.section_title }}</h2>
+            <h2 class="section-title">{{ home_translation.carousel.section_title }}</h2>
             <div class="carousel-container">
                 <div class="carousel-wrapper">
                     <div class="carousel" id="carousel">
@@ -992,7 +1135,7 @@
 
         <!-- Marketing Highlights Section -->
         <section class="highlights-section">
-            <h2 class="section-title">{{ translations.highlights.section_title }}</h2>
+            <h2 class="section-title">{{ home_translation.highlights.section_title }}</h2>
             <div class="highlights-list">
                 {% for item in page_data.marketing_highlights %}
                 <div class="highlight-item">
@@ -1005,9 +1148,9 @@
 
         <!-- Call to Action -->
         <section class="cta-section">
-            <h2>Ready to Transform Your Pig Production?</h2>
-            <p>Join hundreds of successful farms using SuperPig</p>
-            <a href="/signup" class="btn-primary">Get Started Today →</a>
+            <h2>{{ home_translation.call_to_action.title }}</h2>
+            <p>{{ home_translation.call_to_action.desc }}</p>
+            <a href="/signup" class="btn-primary">{{ home_translation.call_to_action.action_label }}</a>
         </section>
 
         <!-- Footer with Facebook Like and Share -->
@@ -1055,6 +1198,56 @@
 
     <!-- JavaScript -->
     <script>
+        // Global translations object
+        window.SUPERPIG_PUBLIC_PAGES = {{ public_pages if public_pages else 'null' }};
+        
+        console.log('window.SUPERPIG_PUBLIC_PAGES');
+        console.log(window.SUPERPIG_PUBLIC_PAGES);
+        
+        
+        // Simple language dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all language switchers
+            const langSwitchers = document.querySelectorAll('.lang-switcher');
+            
+            langSwitchers.forEach(function(switcher) {
+                const currentBtn = switcher.querySelector('.lang-current');
+                const dropdown = switcher.querySelector('.lang-dropdown');
+                
+                if (!currentBtn || !dropdown) return;
+                
+                // Toggle dropdown on click
+                currentBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function() {
+                    dropdown.classList.remove('active');
+                });
+                
+                // Prevent closing when clicking inside dropdown
+                dropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+            
+            // Handle language selection
+            const langOptions = document.querySelectorAll('.lang-option');
+            langOptions.forEach(function(option) {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+        
+        
+        
         // Immediately capture language from URL when page loads
         (function() {
             const urlParams = new URLSearchParams(window.location.search);

@@ -9,6 +9,27 @@ LOG_ERROR               = 2
 LOG_FATAL               = 3
 
 
+# Language mapping (user-friendly -> internal)
+LANGUAGE_MAPPING = {
+    'en':       'en', 
+    'english':  'en',
+    
+    'fil':      'fil', 
+    'tag':      'fil', 
+    'tagalog':  'fil', 
+    'tl':       'fil',
+    
+    'ceb':      'ceb', 
+    'bis':      'ceb', 
+    'bisaya':   'ceb', 
+    'cebuano':  'ceb',
+    
+    'zh':       'zh', 
+    'chinese':  'zh'
+}
+
+
+
 
 APP_ANALYTICS_ID_REPORT_PIG_FARM_SUMMARY            = 1
 APP_ANALYTICS_ID_REPORT_PIG_PROD_WEANING            = 2

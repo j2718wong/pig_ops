@@ -2,34 +2,34 @@
     "page_home": {
         
         "hero_section":{
-            "title": "Mag manage sa production data sa imong baboyan",
-            "desc": "Mapadali ang pag manage sa imong baboyan bisang pila pa kabuok imong mga anay. Makita tanan ra sa imong cellphone",
+            "title": "Mag manage ng production data sa inyong baboyan",
+            "desc": "Mapadali ang pag manage sa inyong baboyan kahit ilan pa ang mga inahin. Makikita lahat sa iyong cellphone",
             
-            "try": "Sulayi Libre"
+            "try": "Subukan Libre"
         },
         
         
         "carousel": {
-            "section_title": "Tanawa  ang SuperPig in Action",
+            "section_title": "Tingnan ang SuperPig in Action",
             
             "items": {
                 "dashboard_overview": {
                     "title": "Dashboard",
-                    "desc": "Automatic makita ang mga importante na mga numero ug petsa sa imong baboyan"
+                    "desc": "Makikita lahat ang mga importante na mga numero at araw sa inyong baboyan"
                 },
                 
                 "sow_management": {
-                    "title": "Management sa mga Anay",
-                    "desc": "E Manage ang imong mga anay, butakal ug dumalaga"
+                    "title": "Management sa mga Inahin",
+                    "desc": "E Manage ang inyong mga inahin, barako at gilts"
                 },
                         
                 "breeding_cycles": {
-                    "title": "Management sa pagtakal ug production",
-                    "desc": "E record ang gestation, lactation, ug breeding cycles"
+                    "title": "Management sa breeding cycles",
+                    "desc": "E record ang gestation, lactation, at breeding cycles"
                 },
                         
                 "pig_operations": {
-                    "title": "Naka record tanan operation sa baboy",
+                    "title": "Naka record ang lahat na gagawin para sa baboy",
                     "desc": "Automatic and pag pa timaan sa bakuna, petsa kanus a manganak, lutas ug ubang imporatante na petsa"
                 },
                 

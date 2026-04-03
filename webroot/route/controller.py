@@ -23,14 +23,6 @@ if locale_dir not in sys.path:
 
 from common_constants       import *
 
-TRANSLATED_LANGUAGES = [
-    {'key': 'en',       'lang_input': ['default', 'en', 'english']},
-
-    {'key': 'ph-bis',   'lang_input': ['ph-bis', 'bis', 'bisaya', 'ceb']},
-    {'key': 'ph-tag',   'lang_input': ['ph-tag', 'tag', 'tagalog']}
-
-]
-
 
 
 class Controller:
@@ -74,7 +66,7 @@ class Controller:
 
         
         if translation is not None:
-            self.translations['ph-bis'] = translation
+            self.translations['ceb'] = translation
 
     
     def get_language_key(self, input_lang):
@@ -85,16 +77,10 @@ class Controller:
         if input_lang is None:
             return None
             
-        input_lang_lower = input_lang.lower().strip()
+        return LANGUAGE_MAPPING.get(input_lang.lower(), 'en')
         
-        # Loop through TRANSLATED_LANGUAGES to find matching input
-        for lang_entry in TRANSLATED_LANGUAGES:
-            for lang_input in lang_entry['lang_input']:
-                if lang_input == input_lang_lower:
-                    return lang_entry['key']
-        
-        return None
-
+    
+    
 
     
     def get_translation(self, language_key):
@@ -110,7 +96,7 @@ class Controller:
         if language_key in self.translations:
             return self.translations[language_key]
         
-        # No translation found - frontend will use default English
+        # No translation found - frontend should use default English
         return None
     
 

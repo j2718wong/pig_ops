@@ -1,0 +1,23 @@
+{
+    "PH": {
+        "languages":[
+            {
+                "code":     "en",
+                "display":  "English"
+            },
+            
+            {
+                "code":     "tag",
+                "display":  "Tagalog"
+            },
+            
+            {
+                "code":     "bis",
+                "display":  "Bisdak"
+            }
+            
+        ]
+    }
+    
+    
+}

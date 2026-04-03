@@ -1,94 +1,114 @@
 {
-    "hero_section":{
-        "title": "Pig Production Data Management and Analytics Simplified",
-        "desc": "Streamline your pig farm operations with comprehensive data management",
-        
-        "try": "Try for Free →"     
-    },
+    "page_home": {
     
-    
-    "carousel": {
-        "section_title": "See SuperPig in Action",
-        
-        "items": {
-            "dashboard_overview": {
-                "title": "Dashboard Overview",
-                "desc": "Real-time pig farm metrics and numbers at your fingertips"
-            },
+        "hero_section":{
+            "title": "Pig Production Data Management and Analytics Simplified",
+            "desc": "Streamline your pig farm operations with comprehensive data management",
             
-            "sow_management": {
-                "title": "Sow Management",
-                "desc": "Manage your breeding sows, boars and gilts"
-            },
-                    
-            "breeding_cycles": {
-                "title": "Breeding Cycles Management",
-                "desc": "Track gestation, lactation, and breeding cycles"
-            },
-                    
-            "pig_operations": {
-                "title": "Pig Operations Management",
-                "desc": "Automated reminders for vaccinations, farrowing, weaning, and other important pig operations"
-            },
+            "try": "Try for Free"     
+        },
+        
+        
+        "carousel": {
+            "section_title": "See SuperPig in Action",
+            
+            "items": {
+                "dashboard_overview": {
+                    "title": "Dashboard Overview",
+                    "desc": "Real-time pig farm metrics and numbers at your fingertips"
+                },
                 
-            "traceability": {
-                "title": "Traceability of Pig Operations",
-                "desc": "Clear tracking who did the pig operation and when and what dosages given to pigs"
-            },
+                "sow_management": {
+                    "title": "Sow Management",
+                    "desc": "Manage your breeding sows, boars and gilts"
+                },
+                        
+                "breeding_cycles": {
+                    "title": "Breeding Cycles Management",
+                    "desc": "Track gestation, lactation, and breeding cycles"
+                },
+                        
+                "pig_operations": {
+                    "title": "Pig Operations Management",
+                    "desc": "Automated reminders for vaccinations, farrowing, weaning, and other important pig operations"
+                },
                     
-            "fattening": {
-                "title": "Track and estimate Fatteners feed requirements",
-                "desc": "Record every vaccine, medicine, health issue, history for each production cycle"
-            },
-                    
-            "feed_records": {
-                "title": "Record feeds consumption  per production batch",
-                "desc": "Feed Balance and audit can be recorded anytime."
-            },
-                    
-            "farm_reports": {
-                "title": "Generate Status Report for your Farm",
-                "desc": "Comprehensive reporting to know the status of your pig farm."
+                "traceability": {
+                    "title": "Traceability of Pig Operations",
+                    "desc": "Clear tracking who did the pig operation and when and what dosages given to pigs"
+                },
+                        
+                "fattening": {
+                    "title": "Track and estimate Fatteners feed requirements",
+                    "desc": "Record every vaccine, medicine, health issue, history for each production cycle"
+                },
+                        
+                "feed_records": {
+                    "title": "Record feeds consumption  per production batch",
+                    "desc": "Feed Balance and audit can be recorded anytime."
+                },
+                        
+                "farm_reports": {
+                    "title": "Generate Status Report for your Farm",
+                    "desc": "Comprehensive reporting to know the status of your pig farm."
+                }
             }
+        },
+        
+        "highlights": {
+            "section_title": "Why Choose SuperPig",
             
+            "items": {
+                "all_data_one_place":{
+                    "title": "All Your Pig Production Data in One Place",
+                    "desc":  "Centralized platform for all your farm data - from breeding to harvest, accessible anytime, anywhere."
+                },
+                
+                "complete_data_management":{
+                    "title": "Complete Data Management",
+                    "desc":  "From pig breeding stocks, gestation, lactation, fattening, harvest, feeds, financials and more - all seamlessly integrated."
+                },
+                
+                "data_collaboration": {
+                    "title": "Team-Based Data Management",
+                    "desc":  "Seamless data cooperation between farm management and staff. Farm Staff, managers and owners can input and track pig farm data in real-time."
+                },
+                
+                "pig_operations": {
+                    "title": "No More Missed Vaccinations & Operations",
+                    "desc":  "Automated reminders for vaccinations, farrowing, weaning, and other important pig operations."
+                },
+                    
+                "data_analytics": {
+                    "title": "Simplified Data Analytics", 
+                    "desc":  "Smart algorithms estimate your feed needs at any given time, predict harvest dates, and optimize your production cycle."
+                },
+                    
+                "financial_insights": {
+                    "title": "Financial Insights",
+                    "desc":  "Track costs, revenues, and profitability per batch, per farm, or across your entire operation."
+                }
+            }
+        },
+        
+        "call_to_action":{
+            "title": "Ready to Transform Your Pig Production?",
+            "desc":  "Join hundreds of successful farms using SuperPig",
+            
+            "action_label": "Get started today" 
         }
     },
-    
-    "highlights": {
-        "section_title": "Why Choose SuperPig",
         
-        "items": {
-            "all_data_one_place":{
-                "title": "All Your Pig Production Data in One Place",
-                "desc":  "Centralized platform for all your farm data - from breeding to harvest, accessible anytime, anywhere."
-            },
-            
-            "complete_data_management":{
-                "title": "Complete Data Management",
-                "desc":  "From pig breeding stocks, gestation, lactation, fattening, harvest, feeds, financials and more - all seamlessly integrated."
-            },
-            
-            "data_collaboration": {
-                "title": "Team-Based Data Management",
-                "desc":  "Seamless data cooperation between farm management and staff. Farm Staff, managers and owners can input and track pig farm data in real-time."
-            },
-            
-            "pig_operations": {
-                "title": "No More Missed Vaccinations & Operations",
-                "desc":  "Automated reminders for vaccinations, farrowing, weaning, and other important pig operations."
-            },
-                
-            "data_analytics": {
-                "title": "Simplified Data Analytics", 
-                "desc":  "Smart algorithms estimate your feed needs at any given time, predict harvest dates, and optimize your production cycle."
-            },
-                
-            "financial_insights": {
-                "title": "Financial Insights",
-                "desc":  "Track costs, revenues, and profitability per batch, per farm, or across your entire operation."
-            }
-            
-        }
+    
+    "page_signup":{
+        "signup_to_continue":   "Sign up to continue",
+        
+        "farm_owner":           "Farm Owner",
+        "farm_staff":           "Farm Staff",
+        
+        "farm_owner_desc":      "<strong>Farm Owner or Manager</strong> — You own or manage a pig farm and need full access to manage operations, staff, and financial data.",
+    
+        "terms_text":           "By signing up, I accept the <a href='/terms' id='terms-of-service'>J SysDev Terms of Service</a> and acknowledge the <a href='/privacy' id='privacy-policy'>Privacy Policy</a>."
     
     }
     

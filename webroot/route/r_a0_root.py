@@ -6,6 +6,7 @@ import sys
 import time
 import pprint
 
+import aiohttp
 
 import jwt
 
@@ -267,11 +268,27 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
 
 
 @app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+@app.get("/{lang}", response_class=HTMLResponse, dependencies=[Depends(public_limit)])
 async def root(request: Request, p:str = None, lang:str= None):
     """
+    Handle homepage with language support
+    
+    Language codes supported:
+    - English: en, english
+    - Tagalog: fil, tag, tagalog, tl
+    - Cebuano: ceb, bis, bisaya, cebuano
+    - Chinese: zh, chinese # not yet implemented
+    
+    Language detection priority:
+    1. Explicit URL language (/en, /tag, /bis, /zh)
+    2. Cookie (user's saved preference)
+    3. Browser Accept-Language header
+    4. GeoIP country detection
+    5. Fallback to English
+    
+    
     2026-01-09 Notes:
-    
-    
+
     1.) An account can have several users. 
         The user who registered the account is always admin.
         There can be more than 1 admin user in an account.
@@ -301,14 +318,54 @@ async def root(request: Request, p:str = None, lang:str= None):
 
     """
     
-    """
-    # If there's any path other than empty string, redirect to home
-    if full_path and full_path != "":
-        # Optional: Log invalid path attempts for analytics
-        print(f"Invalid path attempted: {full_path} - redirecting to home")
-        return RedirectResponse(url="/", status_code=302)
-    """
-    
+    # If explicit language in URL, use it
+    if lang:
+        # Map to internal language code
+        internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
+        
+        
+        # Set cookie for future visits
+        
+        
+        response = None
+    else:
+        # No explicit language - detect from cookie, browser, or country
+        internal_lang = None
+        
+        # 1. Check cookie first
+        cookie_lang = request.cookies.get("user_lang")
+        if cookie_lang and cookie_lang in ['en', 'fil', 'ceb', 'zh']:
+            internal_lang = cookie_lang
+        
+        # 2. Detect from browser Accept-Language header
+        if not internal_lang:
+            browser_lang = detect_browser_language(request)
+            if browser_lang:
+                internal_lang = browser_lang
+        
+        # 3. Detect from GeoIP country
+        if not internal_lang:
+            country_lang = await detect_country_language(request)
+            if country_lang:
+                internal_lang = country_lang
+        
+        # 4. Fallback to English
+        if not internal_lang:
+            internal_lang = 'en'
+        
+        # Redirect to language-specific URL for better SEO
+        # Convert internal lang to user-friendly URL code
+        url_lang_map = {
+            'en': 'en',
+            'fil': 'tag',
+            'ceb': 'bis',
+            'zh': 'zh'
+        }
+        url_lang = url_lang_map.get(internal_lang, 'en')
+        
+        # Only redirect if not already on root and not an API request
+        if request.url.path == "/" and not request.headers.get("X-Requested-With"):
+            return RedirectResponse(url=f"/{url_lang}", status_code=302)
     
     result = get_current_uhid(request)
     
@@ -319,38 +376,215 @@ async def root(request: Request, p:str = None, lang:str= None):
     uhid = result
     
     
+    # Get Available langages for language selctor dropdown
+    available_languages = await get_available_languages(request, internal_lang)
+    
+    
+    # This translation is for user already logged in;
+    # For users not logged in, this is provided by View;
+    # This translation is not returned to page if user is not logged in.
     translation = None
     
-    if lang is not None:
+    
+    
+    if internal_lang is not None:
         
-        language_key = controller.get_language_key(lang)
-        if language_key:
-            
-            # Update user language
-            if uhid is not None:
-                res = hashids_user.decrypt(uhid)
-                if len(res) == 0:
-                    return {
-                        'result':{
-                            'num':  ERROR_USER_INVALID_USER_HASHID,
-                            'code': 'ERROR_USER_INVALID_USER_HASHID'
-                        }
+        # Update user language
+        if uhid is not None:
+            res = hashids_user.decrypt(uhid)
+            if len(res) == 0:
+                return {
+                    'result':{
+                        'num':  ERROR_USER_INVALID_USER_HASHID,
+                        'code': 'ERROR_USER_INVALID_USER_HASHID'
                     }
-                
-                user_id = res[0]
-                
-                # No need to save
-                #model['user'].user_update_language(user_id, language_key)
-                
-                
+                }
             
-            translation = controller.get_translation(language_key)
-    
-    
-    page = controller.view['root'].render(uhid = uhid, translation = translation)
+            user_id = res[0]
+            
+            # No need to save
+            #model['user'].user_update_language(user_id, language_key)
+            
+            
+        
+        translation = controller.get_translation(internal_lang)
+
+
+    page = controller.view['root'].render(
+            uhid = uhid, 
+            translation = translation,
+            lang = internal_lang,
+            available_languages = available_languages)
     
     return page
     
+
+
+def detect_browser_language(request: Request) -> str:
+    """Detect language from browser Accept-Language header"""
+    accept_lang = request.headers.get("Accept-Language", "")
+    if not accept_lang:
+        return None
+    
+    # Get primary language (e.g., "en-US,en;q=0.9" -> "en")
+    primary = accept_lang.split(',')[0].split('-')[0].lower()
+    
+    # Map to supported languages
+    lang_map = {
+        'tl': 'fil',    # Tagalog
+        'fil': 'fil',
+        'ceb': 'ceb',
+        'zh': 'zh',
+        'en': 'en'
+    }
+    
+    return lang_map.get(primary)
+
+
+
+async def detect_country_language(request: Request) -> str:
+    """Detect language from GeoIP country code"""
+    # Get client IP (handle proxy headers)
+    client_ip = request.headers.get("X-Forwarded-For")
+    if client_ip:
+        client_ip = client_ip.split(',')[0].strip()
+    else:
+        client_ip = request.client.host if request.client else None
+    
+    if not client_ip or client_ip.startswith('127.') or client_ip.startswith('192.168.'):
+        return None  # Localhost or private IP
+    
+    try:
+        # Use free API (consider caching results)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://ipapi.co/{client_ip}/country/", timeout=aiohttp.ClientTimeout(total=2)) as resp:
+                if resp.status == 200:
+                    country_code = await resp.text()
+                    country_code = country_code.strip()
+                    
+                    # Map country to language
+                    country_map = {
+                        'PH': 'fil',    # Philippines -> Tagalog
+                        'CN': 'zh',     # China -> Chinese
+                        'TW': 'zh',     # Taiwan -> Chinese
+                        'HK': 'zh',     # Hong Kong -> Chinese
+                        'SG': 'en',     # Singapore -> English
+                        'MY': 'en',     # Malaysia -> English
+                        'US': 'en',
+                        'GB': 'en',
+                        'AU': 'en',
+                        'CA': 'en'
+                    }
+                    return country_map.get(country_code)
+    except Exception as e:
+        print(f"GeoIP detection failed: {e}")
+        return None
+
+
+# Define all possible languages
+all_languages = [
+    {'code': 'en', 'url': '/en', 'name': 'English', 'local_name': 'English'},
+    {'code': 'ceb', 'url': '/bis', 'name': 'Bisaya', 'local_name': 'Bisdak'}
+]
+
+#{'code': 'fil', 'url': '/tag', 'name': 'Tagalog', 'local_name': 'Tagalog'},
+    
+
+default_languages =[
+    {'code': 'en', 'url': '/en', 'name': 'English', 'local_name': 'English'}
+]
+
+
+# Optional: Add Chinese for international visitors
+# default_languages = [
+#     {'code': 'en', 'url': '/en', 'name': 'English', 'local_name': 'English'},
+#     {'code': 'zh', 'url': '/zh', 'name': 'Chinese', 'local_name': '中文'}
+# ]
+
+
+
+async def get_available_languages(request: Request, internal_lang: str):
+    """
+    Return available language options based on user's country
+    
+    Parameters
+    ----------
+    internal_lang : string
+        must be already normalized, via 
+        internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
+    
+    Returns
+    -------
+    list : Available language options with 'active' flag
+    
+    """
+    
+    country_code = None
+    
+    # Detect country from route, if user selected local language previously.
+    # Hardcoded known local only in PH; 
+    # will improve later for other countries with known multiple languages 
+    if internal_lang in ('fil', 'ceb'):
+        country_code = 'PH'
+    
+    
+    # Detect country from other methods
+    if country_code is None:
+        country_code = await detect_country(request)
+    
+    
+    # 2026-04-03; At this date, the marketing focus is in PH;
+    # This may change in the future, when more countries are targeted. 
+    #
+    # Filter based on country
+    if country_code == 'PH':
+        # Philippines: Show all languages
+        available_langs = all_languages
+    else:
+        # Other countries: Show only English and Chinese
+        available_langs = default_languages
+    
+    # Mark active language
+    for lang in available_langs:
+        if lang['code'] == internal_lang:
+            lang['active'] = True
+    
+    return available_langs
+
+
+async def detect_country(request: Request) -> str:
+    """Detect country code from request"""
+    
+    # 1. Check CloudFlare header (if using CloudFlare)
+    cf_country = request.headers.get("CF-IPCountry")
+    if cf_country and cf_country != "XX":
+        return cf_country
+    
+    # 2. Check X-Forwarded-For with GeoIP service
+    client_ip = request.headers.get("X-Forwarded-For")
+    if client_ip:
+        client_ip = client_ip.split(',')[0].strip()
+    else:
+        client_ip = request.client.host if request.client else None
+    
+    print('\n\nchecking country origin of: %s' % client_ip)
+    
+    if client_ip and not client_ip.startswith(('127.', '192.168.', '10.', '172.')):
+        try:
+            
+            async with aiohttp.ClientSession() as session:
+                # Using ipapi.co (free, no API key needed)
+                async with session.get(f"https://ipapi.co/{client_ip}/country/", timeout=aiohttp.ClientTimeout(total=2)) as resp:
+                    if resp.status == 200:
+                        country = await resp.text()
+                        return country.strip()
+        except Exception as e:
+            print(f"Country detection failed: {e}")
+    
+    # 3. Default to unknown
+    return "XX"
+
+
 
 # List of suspicious patterns that should return 404
 SUSPICIOUS_PATHS = [
