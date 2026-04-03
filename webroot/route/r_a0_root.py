@@ -536,13 +536,30 @@ async def get_available_languages(request: Request, internal_lang: str):
     # 2026-04-03; At this date, the marketing focus is in PH;
     # This may change in the future, when more countries are targeted. 
     #
-    # Filter based on country
+
+    # Filter based on country - CREATE A NEW LIST (not a reference)
     if country_code == 'PH':
-        # Philippines: Show all languages
-        available_langs = all_languages
+        # Philippines: Show all languages - create new dicts
+        available_langs = []
+        for lang in all_languages:
+            available_langs.append({
+                'code': lang['code'],
+                'url': lang['url'],
+                'name': lang['name'],
+                'local_name': lang['local_name'],
+                'active': False  # Start with False
+            })
     else:
-        # Other countries: Show only English and Chinese
-        available_langs = default_languages
+        # Other countries: Show only default languages - create new dicts
+        available_langs = []
+        for lang in default_languages:
+            available_langs.append({
+                'code': lang['code'],
+                'url': lang['url'],
+                'name': lang['name'],
+                'local_name': lang['local_name'],
+                'active': False
+            })
     
     # Mark active language
     for lang in available_langs:
