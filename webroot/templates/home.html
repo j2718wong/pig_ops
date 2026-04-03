@@ -987,8 +987,8 @@
                     </div>
                 </div>
                 
-                <a href="/login" class="btn btn-login">Login</a>
-                <a href="/signup" class="btn btn-signup">Sign Up</a>
+                <a href="/login?lang={{page_data.lang}}" class="btn btn-login">Login</a>
+                <a href="/signup?lang={{page_data.lang}}" class="btn btn-signup">Sign Up</a>
             </div>
             
             
@@ -1046,8 +1046,8 @@
             </a>
         </div>
         
-        <a href="/login" class="btn btn-login">Login</a>
-        <a href="/signup" class="btn btn-signup">Sign Up</a>
+        <a href="/login?lang={{page_data.lang}}" class="btn btn-login">Login</a>
+        <a href="/signup?lang={{page_data.lang}}" class="btn btn-signup">Sign Up</a>
     </div>
 
     <!-- Main Content -->
@@ -1058,7 +1058,7 @@
             <p class="hero-description">
                 {{ home_translation.hero_section.desc }}
             </p>
-            <a href="/signup" class="btn-primary">{{ home_translation.hero_section.try }}</a>
+            <a href="/signup?lang={{page_data.lang}}" class="btn-primary">{{ home_translation.hero_section.try }}</a>
         </section>
 
 
@@ -1150,7 +1150,7 @@
         <section class="cta-section">
             <h2>{{ home_translation.call_to_action.title }}</h2>
             <p>{{ home_translation.call_to_action.desc }}</p>
-            <a href="/signup" class="btn-primary">{{ home_translation.call_to_action.action_label }}</a>
+            <a href="/signup?lang={{page_data.lang}}" class="btn-primary">{{ home_translation.call_to_action.action_label }}</a>
         </section>
 
         <!-- Footer with Facebook Like and Share -->
@@ -1198,13 +1198,7 @@
 
     <!-- JavaScript -->
     <script>
-        // Global translations object
-        window.SUPERPIG_PUBLIC_PAGES = {{ public_pages if public_pages else 'null' }};
-        
-        console.log('window.SUPERPIG_PUBLIC_PAGES');
-        console.log(window.SUPERPIG_PUBLIC_PAGES);
-        
-        
+
         // Simple language dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Get all language switchers

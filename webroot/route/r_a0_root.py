@@ -53,28 +53,45 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
 
 
 @app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def signup(response: Response):
-    # Add cache control headers to prevent caching
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, private"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    
-    page = controller.view['signup'].render()
-    
-    return page
-    
-
-
 @app.get("/login", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def signup(response: Response):
+async def signup_or_login(request: Request, response: Response):
+    """
+    Unified authentication page for both signup and login.
+    The ManagerLogin JS class determines which mode to show based on URL path.
+    """
+    
     # Add cache control headers to prevent caching
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, private"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
-    page = controller.view['signup'].render()
+    
+    # Get language from query parameter first, then cookie, then default
+    lang = request.query_params.get("lang")
+    
+    if not lang:
+        lang = request.cookies.get("user_lang")
+    
+    if not lang or lang == 'default':
+        lang = 'en'
+    
+    # Get translations
+    translations = controller.get_public_pages_translations(lang)
+    
+    # Remove page_home as this is not needed
+    del translations['page_home']
+    
+    # Get available languages for dropdown
+    available_languages = await get_available_languages(request, lang)
+    
+    page = controller.view['signup'].render(
+        lang=lang,
+        translations=translations,
+        available_languages=available_languages
+    )
     
     return page
+    
     
 
 @app.get("/logout", response_class = HTMLResponse, dependencies=[Depends(public_limit)])

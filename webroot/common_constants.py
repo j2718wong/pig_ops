@@ -21,7 +21,8 @@ LANGUAGE_MAPPING = {
     
     'ceb':      'ceb', 
     'bis':      'ceb', 
-    'bisaya':   'ceb', 
+    'bisaya':   'ceb',
+    'bisdak':   'ceb',
     'cebuano':  'ceb',
     
     'zh':       'zh', 

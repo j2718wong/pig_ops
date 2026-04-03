@@ -32,8 +32,9 @@
     .signup-card {
         width: 360px; /* Fixed width instead of 100% */
         background: white;
-        padding: 32px 24px;
+        padding: 55px 20px 32px 20px;
         margin: 0 auto; /* Center it */
+        position:relative;
     }
 
     /* VARIABLE for corporate blue */
@@ -1016,6 +1017,93 @@
     }
 
     
+/* ======================================== */
+/* LANGUAGE SWITCHER - PUBLIC PAGES (login/signup) */
+/* ======================================== */
+/* Language Switcher - positioned at top-right of the card */
+.lang-switcher-public {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+}
+
+.lang-switcher-public .lang-current {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 40px;
+    background: #f0f2f5;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.lang-switcher-public .lang-current:hover {
+    background: #e4e6e9;
+}
+
+.lang-switcher-public .lang-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 120px;
+    overflow: hidden;
+    z-index: 1002;
+    display: none;
+}
+
+.lang-switcher-public .lang-dropdown.active {
+    display: block;
+}
+
+.lang-switcher-public .lang-option {
+    display: block;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.lang-switcher-public .lang-option:hover {
+    background: #f0f2f5;
+}
+
+.lang-switcher-public .lang-option.active {
+    background: #e6f0ff;
+    color: #1877F2;
+    font-weight: 600;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .lang-switcher-public {
+        top: 12px;
+        right: 12px;
+    }
+    
+    .lang-switcher-public .lang-current {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* For very small screens, ensure card has enough top padding */
+@media (max-width: 380px) {
+    .signup-card {
+        padding: 55px 20px 32px 20px;  /* More top padding to accommodate language switcher */
+    }
+}
+
+
 </style>
   
     <script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>  
@@ -1037,13 +1125,12 @@
 
 <body>
 
-
 <div id="container-signup"              class="hidden-container" style="display:none;"></div>
 <div id="container-verify-code"         class="hidden-container" style="display:none;"></div>
 <div id="container-create-or-join-acc"  class="hidden-container" style="display:none;"></div>
 <div id="container-add-farm"            class="hidden-container" style="display:none;"></div>
 <div id="container-req-join-acc-sent"   class="hidden-container" style="display:none;"></div>
-<div id="container-terms-of-service"    class="hidden-container" style="display:none;"></div>
+
 
 
  
@@ -1072,7 +1159,15 @@
     </div>
 </div>
   
-
+<script type="text/javascript">
+    // Pass language data from server to JavaScript
+    window.SUPERPIG_PUBLIC_PAGES = {{ page_data.translations|tojson }};
+    window.SUPERPIG_CURRENT_LANG = '{{ page_data.lang }}';
+    window.SUPERPIG_AVAILABLE_LANGUAGES = {{ page_data.available_languages|tojson }};
+    
+    console.log('Signup page - Language:', window.SUPERPIG_CURRENT_LANG);
+    console.log('Available languages:', window.SUPERPIG_AVAILABLE_LANGUAGES);
+</script>
   
 </body>
 </html>

@@ -80,13 +80,12 @@ class Controller:
         return LANGUAGE_MAPPING.get(input_lang.lower(), 'en')
         
     
-    
-
-    
     def get_translation(self, language_key):
         """
-        Returns the translation dictionary for the given language key
-        Returns None if no translation exists (use default English from frontend)
+        Returns the translation dictionary when user is already logged in.
+        Returns None if no translation exists (use default English from frontend).
+
+        This translation is loaded on server restart; 
         """
         if language_key is None:
             return None
@@ -99,6 +98,29 @@ class Controller:
         # No translation found - frontend should use default English
         return None
     
+
+    def get_public_pages_translations(self, lang="en"):
+        """
+        Load public pages translations for specific language
+
+        This translation is loaded on in every /  /signup or /login request; 
+        """
+        try:
+            filepath = os.path.join(webroot_directory, "templates", "translations", f"{lang}.json")
+            
+            # Check if file exists
+            if not os.path.exists(filepath):
+                # Fallback to English
+                filepath = os.path.join(webroot_directory, "templates", "translations", "en.json")
+            
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+
+
+        except Exception as e:
+            print(f"Error loading translations for {lang}: {e}")
+            return {}   
+
 
 
     def set_view(self, view):

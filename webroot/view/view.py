@@ -209,12 +209,19 @@ class ViewBase:
     
 
 class SignUp(ViewBase):
-    def render(self, page_data = None):
+    def render(self, lang = 'en', translations = None, available_languages = None ):
+        
         # Mobile version
         template = env.get_template('signup.html')
         
         # Get appropriate JS files based on environment
         files = self.get_js_files('login')
+        
+        page_data = {
+            'lang':             lang,
+            'translations':     translations,
+            'available_languages': available_languages
+        }
         
             
         data    = { 'page_data':        page_data,
@@ -484,7 +491,7 @@ class Root(ViewBase):
             # Load marketing items
             marketing_items = self.load_marketing_highlights_with_lang(lang)
             
-
+            print('\n\nlang=%s' %lang)
             
             page_data = {
                 'app_version':          app_version,
@@ -514,8 +521,8 @@ class Root(ViewBase):
             
             
             # Get public pages translations once; this is a dictionary object
-            public_pages_trans    = self.load_public_pages_translations(lang)
-            public_pages_trans_en = self.load_public_pages_translations('en')
+            public_pages_trans    = self.controller.get_public_pages_translations(lang)
+            public_pages_trans_en = self.controller.get_public_pages_translations('en')
             
             
             # Get home translation; This is populated via jinja templates
@@ -534,18 +541,13 @@ class Root(ViewBase):
             # Add available_languages to public_pages_trans
             public_pages_trans['available_languages'] = available_languages 
             
-            
-            # Convert to json string; this will be embedded to template
-            s_public_pages = json.dumps(public_pages_trans)
-            
                 
             data    = { 'page_data':        page_data,
                         'js_lib':           js_lib,
                         'js_app_text':      js_app_text,
                         'js_app_modules':   js_app_modules,
                         'is_dev':           self.is_dev,
-                        'home_translation': home_translation,
-                        'public_pages':     s_public_pages
+                        'home_translation': home_translation
                     }
             
                     
@@ -563,8 +565,8 @@ class Root(ViewBase):
         carousel_base = self.load_carousel()
         
         # Get translations for this language
-        translations    = self.load_public_pages_translations(lang)
-        translations_en = self.load_public_pages_translations('en')
+        translations    = self.controller.get_public_pages_translations(lang)
+        translations_en = self.controller.get_public_pages_translations('en')
         
         page_home       = translations.get('page_home', {})
         page_home_en    = translations_en.get('page_home', {})
@@ -628,8 +630,8 @@ class Root(ViewBase):
         highlights_base = self.load_marketing_highlights()
         
         # Get translations once
-        translations    = self.load_public_pages_translations(lang)
-        translations_en = self.load_public_pages_translations('en')
+        translations    = self.controller.get_public_pages_translations(lang)
+        translations_en = self.controller.get_public_pages_translations('en')
         
         page_home       = translations.get('page_home', {})
         page_home_en    = translations_en.get('page_home', {})
@@ -677,22 +679,6 @@ class Root(ViewBase):
             return []
 
 
-    def load_public_pages_translations(self, lang="en"):
-        """Load public pages translations for specific language"""
-        try:
-            filepath = os.path.join(webroot_directory, "templates", "translations", f"{lang}.json")
-            
-            # Check if file exists
-            if not os.path.exists(filepath):
-                # Fallback to English
-                filepath = os.path.join(webroot_directory, "templates", "translations", "en.json")
-            
-            with open(filepath, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Error loading translations for {lang}: {e}")
-            return {}    
-    
 
 class AccPigOps(ViewBase):
     def render(self, page_data = None):
