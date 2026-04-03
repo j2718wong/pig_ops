@@ -426,7 +426,7 @@ class Root(ViewBase):
         language_display = 'English'
         if available_languages is not None:
             for cur_entry in available_languages:
-                if 'active' in cur_entry:
+                if 'active' in cur_entry and cur_entry['active']:
                     language_display = cur_entry['local_name']
                     break
         
@@ -530,6 +530,9 @@ class Root(ViewBase):
             
             # Remove page_home from public_pages 
             del public_pages_trans['page_home']
+            
+            # Add available_languages to public_pages_trans
+            public_pages_trans['available_languages'] = available_languages 
             
             
             # Convert to json string; this will be embedded to template

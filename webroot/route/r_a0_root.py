@@ -566,8 +566,6 @@ async def get_available_languages(request: Request, internal_lang: str):
         if lang['code'] == internal_lang:
             lang['active'] = True
     
-    print('\n\navailable_langs')
-    pprint.pprint(available_langs)
     
     return available_langs
 
