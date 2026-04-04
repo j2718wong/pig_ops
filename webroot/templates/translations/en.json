@@ -125,7 +125,41 @@
         
         "create_account":       "<span>Create Account</span>",
         "have_account":         "Already have an account? <span>Login</span>"
+    },
     
+    
+    "page_create_or_join":{
+        "greet_1":              "Hello, you have registered your email {masked_user_email} to SuperPig. Please choose an option to continue.",
+        "greet_2":              "Hello <span>{user_name}</span>, you have registered your email {masked_user_email} to SuperPig.  Please choose an option to continue.",
+        
+        "choose_option":        "Hello, please choose an option",
+        
+        "create_account":       "Create a Pig Farm Account",
+        "admin":                "Admin",
+        
+        "owner_or_manager_desc":"Are you the owner or manager of a pig farm?",
+        "feature_a1":           "You will be an account admin.",
+        "feature_a2":           "You can grant access to other users who wish to access your PigFarm account.",
+        "feature_a3":           "Manage multiple pig farms under one account.",
+        "feature_a4":           "Full access to your data.",
+        
+        "create_account_name":  "Create Farm Account Name",
+        "valid_name":           "Please enter valid name.",
+        
+        "click_to_continue":    "Click to Continue",
+        
+        "join_account":         "Join a Pig Farm Account",
+        "needs_access_code":    "Needs Access Code",
+        
+        "staff_desc":           "You work as staff on a pig farm. Or you want to join a Farm Account.",
+        
+        "feature_b1":           "The PigFarm account admins need to provide you a code.",
+        "feature_b2":           "You may have limited access to the PigFarm account data based on approved role.",
+        
+        "enter_access_code":    "Enter Access Code",
+        "valid_code":           "Please enter valid code.",
+        "ask_farm_admin":       "Ask your farm admins for the code.",
+        
+        "back_to_signup":        "Back to Signup"
     }
-    
 }

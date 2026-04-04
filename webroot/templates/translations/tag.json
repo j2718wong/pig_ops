@@ -124,6 +124,42 @@
         "sign_up":              "Signup",
         
         "create_account":       "<span>Create Account</span>",
-        "have_account":         "Already have an account? <span>Login</span>"
+        "have_account":         "May account na? <span>Login</span>"
+    },
+    
+    
+    "page_create_or_join":{
+        "greet_1":              "Hello, Naka register ang iyong email {masked_user_email} to SuperPig. Pumili ng option.",
+        "greet_2":              "Hello <span>{user_name}</span>, Naka register ang iyong email {masked_user_email} to SuperPig.  Pumili ng option.",
+        
+        "choose_option":        "Hello, pumili ng option",
+        
+        "create_account":       "Mag gawa ng bagong Pig Farm Account",
+        "admin":                "Admin",
+        
+        "owner_or_manager_desc":"May ari kaba o nag manage ng baboyan?",
+        "feature_a1":           "Ikaw ang account admin. Pwede magdagdag ng ibang admin.",
+        "feature_a2":           "Mag approve ng access sa ibang users na gusto mag join sa iyong PigFarm account.",
+        "feature_a3":           "Pwede mag manage sa sobra sa isang baboyan sa iyong account.",
+        "feature_a4":           "Ma access ang lahat ng iyong data.",
+        
+        "create_account_name":  "Bagong Farm Account Name",
+        "valid_name":           "Mag lagay ng tamang na pangalan.",
+        
+        "click_to_continue":    "Click to continue",
+        
+        "join_account":         "Mag Join sa Pig Farm Account",
+        "needs_access_code":    "Kailangan ng Access Code",
+        
+        "staff_desc":           "Nagtratrabaho ka sa baboyan. Or gusto ka mag join sa Pig Farm Account.",
+        
+        "feature_b1":           "Kailangan bigyan ka ng Access Code sa Farm account admin.",
+        "feature_b2":           "Ang iyong data access mag depende sa anong na approvan.",
+        
+        "enter_access_code":    "Ilagay ang Access Code"
+        "valid_code":           "Maglagay ng tamang code.",
+        "ask_farm_admin":       "Magtanong ng inyong farm admin para sa access code.",
+        
+        "back_to_signup":       "Balik sa Signup"
     }
 }

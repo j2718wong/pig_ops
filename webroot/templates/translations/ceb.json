@@ -125,6 +125,41 @@
         
         "create_account":       "<span>Buhat Account</span>",
         "have_account":         "Naa nay account? <span>Login</span>"
-
+    },
+    
+    
+    "page_create_or_join":{
+        "greet_1":              "Hello, Imong gi register imong email {masked_user_email} to SuperPig. Palihug pagpili sa option.",
+        "greet_2":              "Hello <span>{user_name}</span>, Imong gi register imong email {masked_user_email} to SuperPig.  Palihug pagpili sa option.",
+        
+        "choose_option":        "Hello, palihug pagpili",
+        
+        "create_account":       "Magbuhat ug Pig Farm Account",
+        "admin":                "Admin",
+        
+        "owner_or_manager_desc": "Tagiya kaba or nag manage sa baboyan?",
+        "feature_a1":           "Ikaw ang account admin. Pwede magdugang lain admin.",
+        "feature_a2":           "Maka approve kag access sa ubang users na gusto musulod sa imong PigFarm account.",
+        "feature_a3":           "Maka manage sa sobra sa isa ka baboyan sa imong account.",
+        "feature_a4":           "Ma access ang tanan nimo na data.",
+        
+        "create_account_name":  "Buhat Farm Account Name",
+        "valid_name":           "Palihug butang insakto na ngalan.",
+        
+        "click_to_continue":    "E click para mupadayon",
+        
+        "join_account":         "Mo apil sa Pig Farm Account",
+        "needs_access_code":    "Kihahanlan ug Access Code",
+        
+        "staff_desc":           "Nagtrabaho ka sa baboyan. Or gusto ka muapil sa Pig Farm Account.",
+        
+        "feature_b1":           "Kinahanlan tagaan kag Access Code sa Farm account admin.",
+        "feature_b2":           "Ang imong data access mag depende sa unsa ang giapprovan daan.",
+        
+        "enter_access_code":    "Enter Access Code",
+        "valid_code":           "Palihug butang insakto na code.",
+        "ask_farm_admin":       "Pangutanan sa inyong farm admin para sa access code.",
+        
+        "back_to_signup":       "Balik sa Signup"
     }
 }
