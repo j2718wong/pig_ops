@@ -659,11 +659,13 @@ async def detect_country(request: Request) -> str:
                 async with session.get(f"https://ipapi.co/{client_ip}/country/", timeout=aiohttp.ClientTimeout(total=2)) as resp:
                     if resp.status == 200:
                         country = await resp.text()
+                        print('country_code: %s' % country)
                         return country.strip()
         except Exception as e:
             print(f"Country detection failed: {e}")
     
     # 3. Default to unknown
+    print('country_code: XX')
     return "XX"
 
 
