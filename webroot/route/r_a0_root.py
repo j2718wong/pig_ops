@@ -443,6 +443,9 @@ async def root(request: Request, p:str = None, lang:str= None):
     # Get Available langages for language selector dropdown
     available_languages = await get_available_languages(request, internal_lang)
     
+    print('available_languages')
+    pprint.pprint(available_languages)
+    
     
     # This translation is for user already logged in;
     # For users not logged in, this is provided by View;
@@ -595,6 +598,8 @@ async def get_available_languages(request: Request, internal_lang: str):
     # Detect country from other methods
     if country_code is None:
         country_code = await detect_country(request)
+        
+        print('detect_country(request) = %s' %country_code)
     
     
     # 2026-04-03; At this date, the marketing focus is in PH;
