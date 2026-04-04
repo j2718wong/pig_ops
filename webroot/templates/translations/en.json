@@ -107,8 +107,24 @@
         "farm_staff":           "Farm Staff",
         
         "farm_owner_desc":      "<strong>Farm Owner or Manager</strong> — You own or manage a pig farm and need full access to manage operations, staff, and financial data.",
+        "farm_staff_desc":      "<strong>Farm Staff</strong> — You work on a pig farm and need to join an existing farm account. Ask the account admin for the access code.",
+        
+        "terms_text":           "By signing up, I accept the <a href='/terms'>J SysDev Terms of Service</a> and acknowledge the <a href='/privacy'>Privacy Policy</a>.",
     
-        "terms_text":           "By signing up, I accept the <a href='/terms' id='terms-of-service'>J SysDev Terms of Service</a> and acknowledge the <a href='/privacy' id='privacy-policy'>Privacy Policy</a>."
+        "continue_email":       "Or use your email",
+        "enter_email":          "Enter your email",
+        "valid_email":          "Please enter a valid email address",
+    
+        "first_name":           "First Name",
+        "last_name":            "Last Name",
+        "access_code":          "Access Code",
+        "access_code_enter":    "Enter your Access Code",
+        
+        "login":                "Login",
+        "sign_up":              "Sign up",
+        
+        "create_account":       "<span>Create Account</span>",
+        "have_account":         "Already have an account? <span>Login</span>"
     
     }
     

@@ -106,10 +106,25 @@
         "farm_owner":           "Farm Owner",
         "farm_staff":           "Farm Staff",
         
-        "farm_owner_desc":      "<strong>Farm Owner or Manager</strong> — Ikaw ang tagiya or nag manage sa baboyan. Kinanhanlon nimo mag manage sa operations, staff, and financial data.",
+        "farm_owner_desc":      "<strong>Farm Owner or Manager</strong> — Ikaw ang tagiya or nag manage sa baboyan. Kinahanlon nimo mag manage sa operations, staff, ug financial data.",
         "farm_staff_desc":      "<strong>Farm Staff</strong> — Nagtrabaho ka sa baboyan ug kinahanlanon nimo mu apil sa farm account. Pangutana sa account admin para sa access code.",
     
-        "terms_text":           "Sa pag signup, akong gidawat ang <a href='/terms' id='terms-of-service'>J SysDev Terms of Service</a> ug musugot ko sa <a href='/privacy' id='privacy-policy'>Privacy Policy</a>."
+        "terms_text":           "Sa pag signup, akong gidawat ang <a href='/terms'>J SysDev Terms of Service</a> ug musugot ko sa <a href='/privacy'>Privacy Policy</a>.",
     
+        "continue_email":       "Or gamita imong  email",
+        "enter_email":          "Enter imong email",
+        "valid_email":          "Palihug enter ug insakto na email address",
+    
+        "first_name":           "Pangalan",
+        "last_name":            "Apelyido",
+        "access_code":          "Access Code",
+        "access_code_enter":    "Enter imong Access Code",
+        
+        "login":                "Login",
+        "sign_up":              "Signup",
+        
+        "create_account":       "<span>Buhat Account</span>",
+        "have_account":         "Naa nay account? <span>Login</span>"
+
     }
 }
