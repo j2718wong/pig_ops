@@ -341,6 +341,16 @@ async def root(request: Request, p:str = None, lang:str= None):
     - Cebuano: ceb, bis, bisaya, cebuano
     - Chinese: zh, chinese # not yet implemented
     
+    Handle homepage with language support
+    
+    SEO-friendly URLs:
+    - /en - English
+    - /tag - Tagalog  
+    - /bis - Bisaya
+    - /zh - Chinese
+    
+    Also supports ?lang= for backwards compatibility with SPA
+    
     Language detection priority:
     1. Explicit URL language (/en, /tag, /bis, /zh)
     2. Cookie (user's saved preference)
@@ -381,7 +391,7 @@ async def root(request: Request, p:str = None, lang:str= None):
     """
     
     # If explicit language in URL, use it
-    if lang:
+    if lang and lang in ['en', 'tag', 'bis', 'zh']:
         # Map to internal language code
         internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
         
@@ -391,44 +401,65 @@ async def root(request: Request, p:str = None, lang:str= None):
         
         response = None
     else:
-        # No explicit language - detect from cookie, browser, or country
-        internal_lang = None
+        # No path language - detect or use query parameter
+        query_lang = request.query_params.get("lang")
         
-        # 1. Check cookie first
-        cookie_lang = request.cookies.get("user_lang")
-        if cookie_lang and cookie_lang in ['en', 'fil', 'ceb', 'zh']:
-            internal_lang = cookie_lang
+        if query_lang:
+            # Query parameter language (for SPA compatibility)
+            internal_lang = LANGUAGE_MAPPING.get(query_lang.lower(), 'en')
+            
+            # Redirect to SEO-friendly path URL
+            url_lang_map = {
+                'en': 'en',
+                'fil': 'tag',
+                'ceb': 'bis',
+                'zh': 'zh'
+            }
+            url_lang = url_lang_map.get(internal_lang, 'en')
+            
+            return RedirectResponse(url=f"/{url_lang}", status_code=301)  # Permanent redirect for SEO
+            
+        else:
         
-        # 2. Detect from browser Accept-Language header
-        if not internal_lang:
-            browser_lang = detect_browser_language(request)
-            if browser_lang:
-                internal_lang = browser_lang
+            # No explicit language - detect from cookie, browser, or country
+            internal_lang = None
+            
+            
+            # 1. Check cookie first
+            cookie_lang = request.cookies.get("user_lang")
+            if cookie_lang and cookie_lang in ['en', 'fil', 'ceb', 'zh']:
+                internal_lang = cookie_lang
+            
+            # 2. Detect from browser Accept-Language header
+            if not internal_lang:
+                browser_lang = detect_browser_language(request)
+                if browser_lang:
+                    internal_lang = browser_lang
+            
+            # 3. Detect from GeoIP country
+            if not internal_lang:
+                country_lang = await detect_country_language(request)
+                if country_lang:
+                    internal_lang = country_lang
+            
+            # 4. Fallback to English
+            if not internal_lang:
+                internal_lang = 'en'
+            
+            # Redirect to language-specific URL for better SEO
+            # Convert internal lang to user-friendly URL code
+            url_lang_map = {
+                'en': 'en',
+                'fil': 'tag',
+                'ceb': 'bis',
+                'zh': 'zh'
+            }
+            url_lang = url_lang_map.get(internal_lang, 'en')
+            
+            # Only redirect if not already on root and not an API request
+            if request.url.path == "/" and not request.headers.get("X-Requested-With"):
+                return RedirectResponse(url=f"/{url_lang}", status_code=302)
         
-        # 3. Detect from GeoIP country
-        if not internal_lang:
-            country_lang = await detect_country_language(request)
-            if country_lang:
-                internal_lang = country_lang
-        
-        # 4. Fallback to English
-        if not internal_lang:
-            internal_lang = 'en'
-        
-        # Redirect to language-specific URL for better SEO
-        # Convert internal lang to user-friendly URL code
-        url_lang_map = {
-            'en': 'en',
-            'fil': 'tag',
-            'ceb': 'bis',
-            'zh': 'zh'
-        }
-        url_lang = url_lang_map.get(internal_lang, 'en')
-        
-        # Only redirect if not already on root and not an API request
-        if request.url.path == "/" and not request.headers.get("X-Requested-With"):
-            return RedirectResponse(url=f"/{url_lang}", status_code=302)
-    
     
     result = get_current_uhid(request)
     

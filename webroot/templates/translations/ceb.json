@@ -30,7 +30,7 @@
                         
                 "pig_operations": {
                     "title": "Naka record tanan operation sa baboy",
-                    "desc": "Automatic and pag pa timaan sa bakuna, petsa kanus a manganak, lutas ug ubang imporatante na petsa"
+                    "desc": "Automatic ang pag pa timaan sa bakuna, petsa kanus a manganak, lutas ug ubang importante na petsa"
                 },
                 
                 "traceability": {
@@ -159,6 +159,19 @@
         "enter_access_code":    "Enter Access Code",
         "valid_code":           "Palihug butang insakto na code.",
         "ask_farm_admin":       "Pangutanan sa inyong farm admin para sa access code.",
+        
+        "back_to_signup":       "Balik sa Signup"
+    },
+    
+    "page_add_farm":{
+        "min_characters":       "Dapat minimum 8 characters",
+        "add_pig_farm":         "Pirmerong Pig Farm sa Account",
+        "enter_farm_name":      "Enter Farm Name",
+        
+        "name_first_farm":      "Pangalan sa pirmerong baboyan — makadugang ra sunod",
+        "farm_country":         "Farm Country",
+        "different_country":    "Different country?",
+        "country_note":         "Ang nasod asa imong baboyan dapat insakto. The nasod na napilian kay dile na mausab pag human save. Ang detalye sa baboyan ma update ra sunod.",
         
         "back_to_signup":       "Balik sa Signup"
     }

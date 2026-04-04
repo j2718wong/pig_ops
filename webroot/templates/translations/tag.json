@@ -30,16 +30,16 @@
                         
                 "pig_operations": {
                     "title": "Naka record ang lahat na gagawin para sa baboy",
-                    "desc": "Automatic na alarams para sa bakuna, araw kailan manganak, walay at iba pang importante na petsa"
+                    "desc": "Automatic na alarms para sa bakuna, araw kailan manganak, walay at iba pang importante na petsa"
                 },
                 
                 "traceability": {
-                    "title": "Ma trace unsay gibuhat sa baboy",
-                    "desc": "Marecord unsay gi inject, gikapaon sa mga anay. Ug kinsa ang nabuhat sa operation sa baboy."
+                    "title": "Nakalista anong ang ginawa sa baboy",
+                    "desc": "E record ano ang na inject, pinakin na gamot sa mga inahin. At sino ang gumawa sa operation ng baboy."
                 },
                         
                 "fattening": {
-                    "title": "E record Tanan gibuhat sa baboy",
+                    "title": "E record lahat na ginawa sa baboy",
                     "desc": "E record ang mga bakuna, sakit2x, history sa baboy"
                 },
                         

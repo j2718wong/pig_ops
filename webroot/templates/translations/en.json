@@ -160,6 +160,19 @@
         "valid_code":           "Please enter valid code.",
         "ask_farm_admin":       "Ask your farm admins for the code.",
         
-        "back_to_signup":        "Back to Signup"
+        "back_to_signup":       "Back to Signup"
+    },
+    
+    "page_add_farm":{
+        "min_characters":       "Invalid. Minimum 8 characters",
+        "add_pig_farm":         "Add Pig Farm to Account",
+        "enter_farm_name":      "Enter Farm Name",
+        
+        "name_first_farm":      "Name your first farm — you can add more later",
+        "farm_country":         "Farm Country",
+        "different_country":    "Different country?",
+        "country_note":         "The country where your farm is located should be accurate since we connect potential pig buyers near your farm. The country is fixed and cannot be changed after creation. Farm location details can be updated later.",
+        
+        "back_to_signup":       "Back to Signup"
     }
 }
