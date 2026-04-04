@@ -65,27 +65,72 @@ async def signup_or_login(request: Request, response: Response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
+    # Get current path (signup or login)
+    current_path = request.url.path
     
     # Get language from query parameter first, then cookie, then default
     lang = request.query_params.get("lang")
     
-    if not lang:
-        lang = request.cookies.get("user_lang")
+    # If explicit language in URL, use it
+    if lang:
+        # Map to internal language code
+        internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
+        
+        # Set cookie
+        response.set_cookie(key="user_lang", value=internal_lang, max_age=31536000, path="/")
+    else:    
+        # No explicit language - detect from cookie, browser, or country
+        internal_lang = None
+        
+        # 1. Check cookie first
+        cookie_lang = request.cookies.get("user_lang")
+        if cookie_lang and cookie_lang in ['en', 'fil', 'ceb', 'zh']:
+            internal_lang = cookie_lang
+        
+        # 2. Detect from browser Accept-Language header
+        if not internal_lang:
+            browser_lang = detect_browser_language(request)
+            if browser_lang:
+                internal_lang = browser_lang
+        
+        # 3. Detect from GeoIP country
+        if not internal_lang:
+            country_lang = await detect_country_language(request)
+            if country_lang:
+                internal_lang = country_lang
+        
+        # 4. Fallback to English
+        if not internal_lang:
+            internal_lang = 'en'
+        
+        
+        # Map internal language to URL-friendly code
+        url_lang_map = {
+            'en': 'en',
+            'fil': 'tag',
+            'ceb': 'bis',
+            'zh': 'zh'
+        }
+        url_lang = url_lang_map.get(internal_lang, 'en')
+        
+        
+        # Redirect to language-specific URL (preserving signup/login path)
+        # This ensures the URL reflects the detected language
+        redirect_url = f"{current_path}?lang={url_lang}"
+        return RedirectResponse(url=redirect_url, status_code=302)
     
-    if not lang or lang == 'default':
-        lang = 'en'
     
     # Get translations
-    translations = controller.get_public_pages_translations(lang)
+    translations = controller.get_public_pages_translations(internal_lang)
     
     # Remove page_home as this is not needed
     del translations['page_home']
     
     # Get available languages for dropdown
-    available_languages = await get_available_languages(request, lang)
+    available_languages = await get_available_languages(request, internal_lang)
     
     page = controller.view['signup'].render(
-        lang=lang,
+        lang=internal_lang,
         translations=translations,
         available_languages=available_languages
     )
@@ -384,7 +429,9 @@ async def root(request: Request, p:str = None, lang:str= None):
         if request.url.path == "/" and not request.headers.get("X-Requested-With"):
             return RedirectResponse(url=f"/{url_lang}", status_code=302)
     
+    
     result = get_current_uhid(request)
+    
     
     # If result is RedirectResponse, return it immediately
     if isinstance(result, RedirectResponse):
@@ -393,7 +440,7 @@ async def root(request: Request, p:str = None, lang:str= None):
     uhid = result
     
     
-    # Get Available langages for language selctor dropdown
+    # Get Available langages for language selector dropdown
     available_languages = await get_available_languages(request, internal_lang)
     
     
