@@ -582,10 +582,11 @@ async def detect_country_language(request: Request) -> str:
 # Define all possible languages
 all_languages = [
     {'code': 'en', 'url': '/en', 'name': 'English', 'local_name': 'English'},
+    
     {'code': 'ceb', 'url': '/bis', 'name': 'Bisaya', 'local_name': 'Bisdak'}
 ]
 
-#{'code': 'fil', 'url': '/tag', 'name': 'Tagalog', 'local_name': 'Tagalog'},
+# {'code': 'fil', 'url': '/tag', 'name': 'Tagalog', 'local_name': 'Tagalog'},
     
 
 default_languages =[

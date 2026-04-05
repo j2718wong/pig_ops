@@ -1,5 +1,5 @@
 {
-    "language": "PH-BIS",
+    "language": "bis",
     
     
     "common":{
@@ -513,7 +513,7 @@
         "expected_birth":       "Petsa Manganak",
             
         "lactating_sows_title": "Lacta Anay, Nagpatotoy",
-        "lactating_sows":       "Gesta Anay",
+        "lactating_sows":       "Lacta Anay",
         "sow_operations":       "Buhatunon para sa Anay",
         "piglet_operations":    "Buhatunon para sa Baktin",
         "date_of_birth":        "Petsa<br>Paganak",

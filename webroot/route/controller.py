@@ -52,9 +52,9 @@ class Controller:
     def load_translations(self):
         
         # Load Bisaya
-        abspath_ph_bis = os.path.join(locale_dir, 'locale_bisaya.json')
+        abspath = os.path.join(locale_dir, 'locale_bisaya.json')
 
-        f = open(abspath_ph_bis, 'r', encoding='utf-8')
+        f = open(abspath, 'r', encoding='utf-8')
         s = f.read();
         f.close();
         
@@ -69,6 +69,25 @@ class Controller:
             self.translations['ceb'] = translation
 
     
+        # Load Tagalog
+        abspath = os.path.join(locale_dir, 'locale_tagalog.json')
+
+        f = open(abspath, 'r', encoding='utf-8')
+        s = f.read();
+        f.close();
+        
+        translation = None
+        try:
+            translation = json.loads(s)
+        except Exception as e:
+            print('Error Loading translation: ' + str(e))
+
+        
+        if translation is not None:
+            self.translations['fil'] = translation
+
+
+
     def get_language_key(self, input_lang):
         """
         Convert user input language (e.g., 'bis', 'bisaya', 'en') to internal language key
