@@ -298,7 +298,7 @@ lang_image_map = {
     'en':  'mar',
     'zh':  'mar_zh',
     'tag': 'mar_tag',
-    'bis': 'mar_bis'
+    'ceb': 'mar_ceb'
 }
 
 
