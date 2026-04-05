@@ -519,10 +519,14 @@ class Root(ViewBase):
             # These should have type= module
             js_app_modules = []
             
+            print('view lang = %s' % lang)
             
             # Get public pages translations once; this is a dictionary object
             public_pages_trans    = self.controller.get_public_pages_translations(lang)
             public_pages_trans_en = self.controller.get_public_pages_translations('en')
+            
+            
+    
             
             
             # Get home translation; This is populated via jinja templates

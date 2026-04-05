@@ -2,8 +2,8 @@
     "page_home": {
         
         "hero_section":{
-            "title": "Mag manage sa production data sa imong baboyan",
-            "desc": "Mapadali ang pag manage sa imong baboyan bisang pila pa kabuok imong mga anay. Makita tanan ra sa imong cellphone",
+            "title": "Makatabang nimo sa pagmanage sa imong baboyan",
+            "desc": "Mapasayon ang pag manage sa imong baboyan bisang pila pa kabuok imong mga anay. Makita tanan ra sa imong cellphone",
             
             "try": "Sulayi Libre"
         },
@@ -106,7 +106,7 @@
         "farm_owner":           "Farm Owner",
         "farm_staff":           "Farm Staff",
         
-        "farm_owner_desc":      "<strong>Farm Owner or Manager</strong> — Ikaw ang tagiya or nag manage sa baboyan. Kinahanlon nimo mag manage sa operations, staff, ug financial data.",
+        "farm_owner_desc":      "<strong>Farm Owner or Manager</strong> — Ikaw ang tagiya or nag manage sa baboyan. Kinahanlanon nimo mag manage sa operations, staff, ug financial data.",
         "farm_staff_desc":      "<strong>Farm Staff</strong> — Nagtrabaho ka sa baboyan ug kinahanlanon nimo mu apil sa farm account. Pangutana sa account admin para sa access code.",
     
         "terms_text":           "Sa pag signup, akong gidawat ang <a href='/terms'>J SysDev Terms of Service</a> ug musugot ko sa <a href='/privacy'>Privacy Policy</a>.",
