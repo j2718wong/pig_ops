@@ -315,7 +315,7 @@
         "labels":{
             "sow_owner":        "May-ari ng Inahin",
             "date_mate":        "Petsa sa Bembang",
-            "date_expected":    "Petsa Manganganak"
+            "date_expected":    "Petsa Manganak"
         }
         
     },
@@ -430,7 +430,7 @@
     "prod_entry_birth":{
         "labels":{
             "birth_info":       "Detalye sa pag anak ng Inahin",
-            "date_expected":    "Expected petsa Manganganak",
+            "date_expected":    "Expected petsa Manganak",
             "date_birth":       "Petsa kailan Nanganak",
             
             "num_live_female":  "Ilan buhay na babae biik?",
@@ -510,7 +510,7 @@
         "pid_sow":              "PID / Inahin",
         "date_mating":          "Petsa sa Breeding",
         "boar_semen":           "Barako/Semen",
-        "expected_birth":       "Petsa Manganganak",
+        "expected_birth":       "Petsa Manganak",
             
         "lactating_sows_title": "Lacta Inahin, Nagpadede",
         "lactating_sows":       "Lacta Inahin",
