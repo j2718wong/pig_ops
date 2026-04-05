@@ -1,0 +1,552 @@
+{
+    "language": "tag",
+    
+    
+    "common":{
+        "labels":{
+            "add_entry":        "Add Entry",
+            "search":           "Search",
+            
+            "save":             "Save",
+            "save_changes":     "Save",
+            "cancel":           "Cancel",
+            
+            "add":              "Dagdag",
+            "edit":             "Edit",
+            
+            "new":              "Bago",
+            
+            "duplicate_entry":  "Duplicate. Nasa lista na",
+            
+            "please_select":    "Pumili",
+            "select_no_entries":"Walang nakalista",
+            
+            "entry":            "Entry",
+            "entries":          "Entries",
+            "no_entries":       ["Walang nakalista", "Wala, nothing", "Walang laman"],
+            
+            
+            "valid_name":       "Paki lagay ng tamang pangalan",
+            "valid_date":       "Paki lagay ng tamang petsa",
+            "numeric_value":    "Numero lang pwede"
+        },
+        
+        "day_of_week":[
+            "Linggo", "Lunes", "Martes", "Merkules", "Huwebes", "Biyernes", "Sabado"
+        ]
+    },
+    
+    
+    "common_app": {
+        "labels":{
+            "sow":              "Inahin",
+            "boar":             "Barako",
+            "gilt":             "Gilt",
+            "piglets":          "Biik",
+            "wean":             "Walay",
+            "status":           "Status",
+            "age":              "Edad",
+            "output":           "Output",
+            
+            "date":             "Petsa",
+            
+            "today":            "Petsa Ngayon",
+            "year":             "taon",
+            "month":            "bulan",
+            "years":            "taon",
+            "months":           "bulan",
+            
+            "report":           "Report",
+            "notes":            "Notes",
+            
+            
+            "select_sow":       "Inahin",
+            "select_boar":      "Barako",
+            "done_by_me":       "Ako",
+            
+            "num_days":         "Days",
+            "num_pigs":         "Baboy",
+            
+            
+            
+            "new_staff_name":   "Pangalan sa bagong Staff",
+            "done_by_me":       "Ako ang gumawa",
+            "need_to_select":   "Pakipili pag hindi Ikaw ang gumawa"
+            
+        },
+
+        
+        "label_tabs":{
+            "production":       "Prod",
+            "feeds":            "Feeds",
+            "feed_balance":     "Bal",
+            "harvest":          "Harvest",
+            
+            "pigops":           "PigOps",
+            "birth":            "Birth",
+            "wean":             "Walay",
+            "medvac":           "MedVac",
+            "health":           "Health",
+            
+            
+            "feed_summary":     "Feed Summary",
+            "feed_add":         "Feed Add",
+            "notes":            "Notes",
+            "mating":           "Mating",
+            "extra":            "Extra",
+            
+            "status":           "Status"
+        }
+        
+    },
+
+
+    "navigation":{
+        "nav_links":{
+            "Production":       "Production",
+            "SowBoarGilt":      "Inahin at Barako",
+            "Operations":       "Operations",
+            "Financials":       "Pera-Related",
+            "AccountLists":     "Mga Lista",
+            "Settings":         "Settings",
+            "Admin":            "Admin",
+            
+            
+            
+            "Production1":      "Prod Gesta",
+            "Production2":      "Prod Lacta",
+            "Production3":      "Fattening",
+            "Production4":      "Prod History",
+            "Production5":      "Hindi Nabuntis",
+            
+            
+            "SowBoarGilt1":     "Inahin",
+            "SowBoarGilt2":     "Barako",
+            "SowBoarGilt3":     "Gilt",
+            "SowBoarGilt4":     "Disposed",
+            "SowBoarGilt5":     "Parent Trace",
+            
+            
+            "Operations1":      "Feed Balance",
+            "Operations2":      "Binimbang ng Barako",
+            "Operations3":      "Patay na Baboy",
+            "Operations4":      "Summary Report", 
+            
+            "Financials1":      "Lista ng Benta",
+            "Financials2":      "Nabili na Feeds",
+            "Financials3":      "",
+            
+            "AccountLists1":    "Lista ng Staff",
+            "AccountLists2":    "Buyer sa Baboy",
+            "AccountLists3":    "Supplier ng Feeds",
+            "AccountLists4":    "Supplier ng Semen",
+            "AccountLists5":    "Supplier ng Gilt",
+            
+            
+            "Settings1":        "Operations Settings",
+            "Settings2":        "Gesta Settings",
+            "Settings3":        "Biik Settings", 
+            "Settings4":        "Lacta Inahin Settings",
+            "Settings5":        "Walay Inahin Settings",
+            "Settings6":        "Gilt Settings",     
+            
+            "Admin1":           "Lista ng Users",
+            "Admin2":           "Lista ng Access Codes",
+            "Admin3":           ""
+        }
+    },
+    
+    
+    "page_dashboard":{
+        "labels":{
+            "stats_card":{
+                
+                "LactaPiglets":  "Biik", 
+                "FatteningPigs": "Fattening",
+                             
+                "LactaSows":     "Lacta Inahin",
+                "GestaSows":     "Gesta Inahin",
+                             
+                "Boars":         "Barako",
+                "Gilts":         "Gilt",
+                
+                "WeanedSows":    "Walay Inahin",
+                "ToHarvest":     "140 Days+"
+            },
+            
+            "ExpectingSows":     "Manganganak sa loob ng 7 araw"
+            
+        }     
+    },
+    
+    
+    "page_sow_boar_list":{
+        "labels":{
+            "search_pig":       "Pangalan sa Baboy",
+            
+            "sow_list":         "Lista ng Inahin",
+            "boar_list":        "Lista ng Barako",
+            "gilt_list":        "Lista ng Gilt",
+            "disposed_list":    "Lista ng Nadispose",
+            
+            "sow_all":          "Lahat",
+            "sow_gesta":        "Gesta",
+            "sow_lacta":        "Lacta",
+            "sow_wean":         "Walay",
+            "sow_output":       "Output",
+            
+            "status_growing":   "Tambay",
+            "status_gesta":     "Gesta",
+            "status_lacta":     "Lacta",
+            "status_wean":      "Winalay",
+            "status_culled":    "Culled",
+            "status_dead":      "Namatay",
+            "status_sold":      "Bininta",
+            "status_delete":    "Deleted",
+            
+            "due":              "Manganganak",
+            "due_days":         "Araw",
+            "due_soon":         "Malapit nang manganak",
+            "due_today":        "Manganak ngayon",
+            "overdue":          "Overdue na!",
+            
+            
+            "output_at_wean":   "Output sa Walay",
+            "number_births":    "Ilang beses nag anak",
+            
+            "last_mate":        "Huling bembang",
+            "expected":         "Manganak",
+            
+            "target_wean":      "Petsa ng Walay",
+            "num_piglets":      "Biik",
+            "dead_before_wean": "Dedz hindi pa Walay",
+            
+            "date_weaned":      "Petsa ng Walay",
+            "operation":        "Anong gagawin",
+            
+            
+            "live_pigs_birth":  "Buhay Pag anak",
+            "dead_at_birth":    "Dedz Pag anak",
+            "dead_before_wean": "Dedz hindi pa Walay",
+            "live_pigs_wean":   "Ilan ang Nawalay",
+            
+            "boar_mate_count":  "Ilan Bembang",
+            
+            "date_disposed":    "Petsa",
+            "disposed_type":    "Klase",
+            "disposed_name":    "Baboy",
+            
+            "date_mate":        "Petsa ng Bembang",
+            
+            "date_harvest":     "Petsa ng Harvest"
+        }
+    },
+    
+    
+    "page_gesta_lacta_list":{
+        "labels":{
+            "prod_gestating":   "Prod Gesta",
+            "prod_lactating":   "Prod Lacta",
+            
+            "expected":         "Petsa Manganak",
+            "operation":        "Anong Gagawin",
+            "weaning":          "Petsa ng Walay"
+        }
+        
+    },
+    
+    
+    
+    "page_sow_boar_add":{
+        "labels":{
+            "add_sow":              "Bagong Inahin",
+            "edit_sow":             "Edit Inahin",
+            
+            "add_boar":             "Bagong Barako",
+            "edit_boar":            "Edit Barako",
+            
+            "add_gilt":             "Bagong Gilt",
+            "edit_gilt":            "Edit Gilt",
+            
+            
+            "name":                 "Pangalan ng Baboy",
+            "name_invalid":         "Pakilagay ng tamang Pangalan",
+            "name_help":            "Pangalan ng baboy; Sample: Taylor Swift",
+                
+            "number":               "Numero",
+            "number_invalid":       "Pakilagay ng tamang Numero",
+            "number_help":          "Pwede eartag, pwede wala rin",
+            
+            "cannot_be_blank":      "Hindi pwede wala ang Pangalan ug Numero",
+            
+            "date_birth":           "Petsa Gi anak",
+            "date_birth_help":      "Pwede wala. Gamitin sa pag compute ng edad sa baboy",
+            
+            "parent_sow":           "Sinong Mama?",
+            "parent_sow_help":      "Pwede wala",
+            
+            "parent_boar":          "Sinong Papa?",
+            "parent_boar_help":     "Pwede wala",
+            
+            "num_nipples":          "Ilan ang Totoy?",
+            "num_nipples_help":     "Silipin mo na at bilangin mo na",
+            
+            "is_external":          "Barakol ng kapitbahay",
+            "external":             "Kapitbahay ang may-ari sa barako",
+            "is_external_help":     "I check ito pag ginamit nyo barako ng kapitbahay",
+            
+            "ready_for_mating":     "Pwede naba kastahan or mutakal?",       
+            "production_ready":     "Ready na para Production",
+            "ready_help":           "I check ni para ma apil sa pagpili as anay or butakal",
+            
+            "notes":                "Notes",
+            
+            
+            "gilt_add_message": {
+                
+            }
+            
+        }   
+        
+    },
+    
+    
+    "page_boar_external_mates":{
+        "labels":{
+            "sow_owner":        "May-ari ng Inahin",
+            "date_mate":        "Petsa sa Bembang",
+            "date_expected":    "Petsa Manganganak"
+        }
+        
+    },
+    
+    
+    "page_summary_report":{
+        "labels":{
+            "add_summary_report":  "Gawa ng Summary Report",
+            "add_info":         "Magawa ng Pig Farm Summary Report ngayong araw. Makita sa lahat ng users sa Farm.",      
+            "pig_farm_name":    "Pangalan sa Baboyan",
+            "date_report":      "Petsa sa Report"
+        }
+    },
+    
+    
+    "page_gestating_add":{
+        "labels":{
+            "date_mating":      "Petsa sa Bembang or AI",
+            
+            
+            "semen_supplier":   "Supplier ng Semen",
+            "semen_type":       "Klase ng Semen",
+            "semen_type_help":  "Semen galing sa supplier",
+            
+            "semen_cost":       "Gasto sa Semen",
+            "other_cost":       "Magkano iba pa nagasto",
+            
+            
+            "insem_type":       "Klase sa Breeding",
+            "insem_boar":       "Bembang ng Barako",
+            "insem_ai_external": "AI binili ang Semen",
+            "insem_ai_internal": "AI gamit Barako sa farm",
+       
+            
+            "add_semen_type":   "Bagong klase na Semen",
+            "save_semen_type":  "Save",
+            
+            
+            "boar_semen_source": "Barako saan kiniha ang semen",
+            
+            "notes":            "Notes",
+            
+            "add_new_staff":    "Bagong satff ng Farm",
+            "save_new_staff":   "Save",
+            "select_staff":     "Kinsa?",
+            "select_staff_help":"Sino nag pa bembang or nag AI",
+            
+            
+            
+            "breeding_warning":{
+                "header":       "Ang Inahin ay na Breed na",
+                "message":      "Ang Inahin na ito ay na breed sa petsa {date} na may PID: {pid}. Pag e save ito, ang nauna na Gesta Entry ay ma lista as {not_pregnant} at tanggalin sa  {prod_gestating_list}. Tingnan mabuti kung ito ba ang inahin na re heat, nag landi. {cannot_undo}",
+                "cannot_undo":  "Hindi pwede mabalik pag wow mali.",  
+                "not_pregnant": "Hindi Nabuntis",       
+                "prod_gestating_list": "Lista sa Gesta Inahin" 
+            }
+            
+        }   
+        
+    },
+    
+    
+    "prod_entry_pig_ops":{
+        "labels":{
+            "scheduled_pig_ops": "Nakaschedule na PigOps",
+            "operation":        "Anong Gagawin",
+            "done_by":          "Sino ang gumawa",
+            
+            "all":              "Lahat",
+            
+            "hide_completed":   "Itago ang natapos na"
+        }
+    },
+    
+    
+    "prod_pig_ops_edit":{
+        "labels": {
+            "mark_as_done":         "E Update ang PigOps",
+            "edit_pig_ops":         "E Update ang PigOps",
+            "piglets_operation":    "Para sa Biik",
+            "sow_operation":        "Para sa Inahin",
+
+            "date_completed":       "Petsa Natapos",
+            
+            "add_medvac_brand":     "Bagong MedVac Brand",
+            "save_medvac_brand":    "Save MedVac Brand",
+            "select_medvac_brand":  "Anong Brand sa MedVac?",
+            "medvac_brand_help":    "Brand or manufacturer ng MedVac",
+            
+            "add_medvac_type":      "Bagong Klase sa Medvac",
+            "save_medvac_type":     "Save Klase sa Medvac",
+            "select_medvac_type":   "Anong na Klase sa MedVac?",
+            "medvac_type_help":     "Para saan ang MedVac or Generic na Pangalan",
+            
+            "add_medvac_name":      "Bagong na MedVac Pangalan",
+            "save_medvac_name":     "Save Pangalan sa Medvac",
+            "select_medvac_name":   "Anong Ngalan sa Medvac?",
+            "medvac_name_help":     "Pangalan sa MedVac; Product Name",
+            
+            "notes":                "Detalye, Anong ginawa sa baboy",
+            "notes_help":           "Isulat ang dosage ng injection; sample: 2mL injection",
+            
+            
+            "medvac_brand":         "Brand ng MedVac",
+            "medvac_type":          "Klase ng MedVac",
+            "medvac_name":          "Pangalan ng MedVac; Product Name"
+            
+        }
+    },
+    
+    
+    "prod_entry_birth":{
+        "labels":{
+            "birth_info":       "Detalye sa pag anak ng Inahin",
+            "date_expected":    "Expected petsa Manganganak",
+            "date_birth":       "Petsa kailan Nanganak",
+            
+            "num_live_female":  "Ilan buhay na babae biik?",
+            "num_live_male":    "Ilan buhay na lalake biik?",
+            "num_still_birth":  "Ilan ang patay paglabas sa Inahin?",
+            
+            "add_new_staff":    "Bagong Staff sa Farm",
+            "save_new_staff":   "Save",
+            "select_staff":     "Sino nag alaga sa pag anak?",
+            "select_staff_help":"Sino nag doon sa pag anak"
+            
+        },
+        
+        
+        "warning_1": "Pag lalagyan na ng actual na petsa kailan nanganak ang Inahin, mag update ang production entry from Gesta Status to Lacta Status. Ilipat ang Prod Gesta entry to Prod Lacta List. <b><span style=\"color:red;\">Hindi na pwede ibalik to Gesta pagkatapos e-save.</span></b>",
+        
+        "warning_2": "Pag baguhin ang petsa kung kailan nanganak ang Inahin, e calculate automatic ang naka schedule na PigOps na gagawin sa biik at Inahin."
+    },
+    
+    
+    "prod_summary":{
+        "labels":{
+            "pig_count_birth":  "Ilan ang buhay pag anak",    
+            "pig_count_wean":   "Ilan ang buhat pag walay",     
+            "pig_count_latest": "Ilan ang bilang ngayon",   
+            "days_since_birth": "Bilang ng araw simula pag anak",
+            "days_since_wean":  "Bilang ng araw simula pag walay",
+            "days_birth_to_last_harvest": "Bilang ng araw pag anak to harvest",  
+            "target_harvest":   "Target petsa e Harvest",     
+            "pigs_harvested":   "Ilan na ang na harvest",     
+            "pigs_sold":        "Ilan na ang nabenta",          
+            "gilt_boar_harvested": "Ilan na barako, gilt na naharvest",
+            "gilt_boar_sold":   "Ilan na barako, gilt nabenta",     
+            "feeds_cost":       "Gasto sa Feeds",         
+            "total_sales":      "Magkano Kita",        
+            "gross_profit":     "Ginancya, Income minus Feeds",       
+            "gross_profit_pp":  "Ginancya kada baboy"    
+            
+        }
+        
+    },
+    
+    
+    "feed_balance": {
+        "labels":{
+            "feed_balance": "Feed Balance"
+        }
+        
+    },
+    
+    
+    "page_report_list":{
+        "labels":{
+            "rep_type_farm_summary": "Pig Farm Summary"
+        }
+    },
+    
+    "page_report_add":{
+        "labels":{
+            "report_language": "Report Language",
+            "language_help": "Piliin ang report language na magkaintindihan kayong lahat sa baboyan."
+        }
+    },
+    
+    "reports":{
+        "generated_on":         "Petsa Paggawa",
+        
+        "leg_done_on_time":     "Nagawa na",
+        "leg_done_late":        "Na-Late",
+        "leg_done_very_late":   "Matagal nagawa",
+        "leg_overdue":          "Hindi pa nagawa",
+        "leg_sow_operation":    "Para sa Inahin",
+        "leg_piglet_operation": "Para sa Biik",
+        
+        "gestating_sows_title": "Gesta Inahin, Buntis",
+        "gestating_sows":       "Gesta Inahin",
+        "pid_sow":              "PID / Inahin",
+        "date_mating":          "Petsa sa Breeding",
+        "boar_semen":           "Barako/Semen",
+        "expected_birth":       "Petsa Manganganak",
+            
+        "lactating_sows_title": "Lacta Inahin, Nagpadede",
+        "lactating_sows":       "Lacta Inahin",
+        "sow_operations":       "Buhatunon para sa Anay",
+        "piglet_operations":    "Buhatunon para sa Baktin",
+        "date_of_birth":        "Petsa<br>Paganak",
+        "expected_wean":        "Petsa<br>Lutas",
+        "pigs":                 "Baktin",
+        
+        "feed_change_record":   "Petsa Nag bag-o Feeds",
+        
+        "lactating_piglets":    "Baktin",
+        "fattening_pigs":       "Fattening",
+        "total_pigs":           "Total Baboy",
+        "total_piglets":        "Total Baktin",
+        
+        "date_harvest":         "Petsa e Harvest",
+        "target":               "Target",
+            
+        "total_entries":        "Pila ka batch",
+        "batches":              "batch",
+        
+        
+        "prod_feed_consumption": "Consumo sa kada Prod Batch",
+        
+        "pid":                  "PID",
+        "prod_status":          "Prod Status",
+        "feed_bal_date":        "Petsa Balanse",
+        "prod_pig_count":       "Baboy",
+        
+        "balance_total":        "Total Balanse"
+        
+    }
+    
+    
+    
+
+
+}
