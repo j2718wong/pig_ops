@@ -103,6 +103,7 @@ class Account(BaseModel):
                     a.weight_unit,
                     a.currency,
                     a.flag_settings,
+                    a.num_days_move_to_farrow,
                     a.num_days_wean,
                     a.num_days_harvest_from_birth,
                     a.num_days_harvest_from_wean,
@@ -177,28 +178,23 @@ class Account(BaseModel):
                 cur_acc_weight_unit         = row[10]
                 cur_acc_currency            = row[11]
                 cur_acc_settings_flag       = row[12]
-                cur_acc_num_days_wean       = row[13]
-                cur_acc_num_days_harvest_from_birth = row[14]
-                cur_acc_num_days_harvest_from_wean  = row[15]
-                
-                               
-                cur_user_name_last          = row[16]
-                cur_user_name_first         = row[17]
-                cur_settings_last_update    = str(row[18]) if row[18] else None
-                
-                
-                cur_ver_num_gestating_ops           = row[19]
-                cur_ver_num_lactating_piglets_ops   = row[20] 
-                cur_ver_num_lactating_sow_ops       = row[21]     
-                cur_ver_num_gilt_ops                = row[22]              
-                cur_ver_num_weaning_sow_ops         = row[23]       
-                
-                cur_data_ver_num_account            = row[24]
+                cur_acc_num_days_move_to_farrow     = row[13]
+                cur_acc_num_days_wean               = row[14] 
+                cur_acc_num_days_harvest_from_birth = row[15] 
+                cur_acc_num_days_harvest_from_wean  = row[16] 
 
-                
-                
-                
-                
+                cur_user_name_last                  = row[17] 
+                cur_user_name_first                 = row[18] 
+                cur_settings_last_update            = str(row[19]) if row[19] else None 
+
+                cur_ver_num_gestating_ops           = row[20] 
+                cur_ver_num_lactating_piglets_ops   = row[21] 
+                cur_ver_num_lactating_sow_ops       = row[22] 
+                cur_ver_num_gilt_ops                = row[23] 
+                cur_ver_num_weaning_sow_ops         = row[24] 
+
+                cur_data_ver_num_account            = row[25] 
+
                 
                 
                 temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
@@ -251,6 +247,7 @@ class Account(BaseModel):
                         'currency':                     cur_acc_currency,
                         'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
                         'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
+                        'num_days_move_to_farrow':      cur_acc_num_days_move_to_farrow,
                         'num_days_wean':                cur_acc_num_days_wean,
                         'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
                         'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
@@ -407,6 +404,7 @@ class Account(BaseModel):
             in_day_1_on_dob             INT,
             in_day_1_on_insem           INT,
             
+            in_days_move_to_farrow      INT,
             in_days_wean                INT,
             
             in_days_harvest_from_birth  INT,
@@ -420,7 +418,10 @@ class Account(BaseModel):
             data.user_id,
             data.day_1_on_date_of_birth,
             data.day_1_on_date_insem,
+            
+            data.days_move_farrow,
             data.days_wean,
+            
             data.days_harvest_from_birth,
             data.days_harvest_from_wean,
             data.weight_unit                if data.weight_unit and data.weight_unit.strip() else None

@@ -312,6 +312,7 @@ class PigFarm(BaseModel):
                     b.weight_unit,
                     b.currency,
                     b.flag_settings,
+                    b.num_days_move_to_farrow,
                     b.num_days_wean,
                     b.num_days_harvest_from_birth,
                     b.num_days_harvest_from_wean,
@@ -351,14 +352,15 @@ class PigFarm(BaseModel):
             cur_acc_weight_unit         = row[11]
             cur_acc_currency            = row[12]
             cur_acc_settings_flag       = row[13]
-            cur_acc_num_days_wean       = row[14]
-            cur_acc_num_days_harvest_from_birth = row[15]
-            cur_acc_num_days_harvest_from_wean  = row[16]
+            cur_acc_num_days_move_to_farrow     = row[14]
+            cur_acc_num_days_wean               = row[15]
+            cur_acc_num_days_harvest_from_birth = row[16]
+            cur_acc_num_days_harvest_from_wean  = row[17]
             
                            
-            cur_user_name_last          = row[17]
-            cur_user_name_first         = row[18]
-            cur_settings_last_update    = str(row[19]) if row[19] else None
+            cur_user_name_last          = row[18]
+            cur_user_name_first         = row[19]
+            cur_settings_last_update    = str(row[20]) if row[20] else None
             
             
             
@@ -394,6 +396,7 @@ class PigFarm(BaseModel):
                     'currency':                     cur_acc_currency,
                     'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
                     'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
+                    'num_days_move_to_farrow':      cur_acc_num_days_move_to_farrow,
                     'num_days_wean':                cur_acc_num_days_wean,
                     'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
                     'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,

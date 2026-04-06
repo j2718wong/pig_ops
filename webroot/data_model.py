@@ -142,6 +142,7 @@ class DataAccountSettings(BaseModel):
     day_1_on_date_insem:    int = 0
     day_1_on_date_of_birth: int = 1
     
+    days_move_farrow:       int = 10
     days_wean:              int = 42
     days_harvest_from_birth:int = 142
     days_harvest_from_wean: int = 100

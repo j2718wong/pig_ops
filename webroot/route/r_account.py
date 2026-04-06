@@ -36,8 +36,8 @@ from r_a0_security_checks   import (check_if_valid_user_account,
 
 from r_utils                import (get_location_address_names_and_replace_ids,
                                     replace_plain_ids_account,
-                                    replace_plain_ids_user_account)
-
+                                    replace_plain_ids_user_account,
+                                    remove_database_null_description)
 
 
 ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
@@ -339,6 +339,10 @@ async def account_update(request: Request, account_data: dm.DataAccount):
     # Replace with data_account
     res_update['account'] = data_account['account']
     
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+    
     return res_update
     
     
@@ -378,6 +382,8 @@ async def account_update_settings(request: Request, data: dm.DataAccountSettings
             }
         }
     
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
         
     return res_update
 

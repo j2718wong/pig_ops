@@ -258,7 +258,7 @@
     
     "page_fattening_list":{
         "labels":{
-            "min_two_entries":      "Palihug pagpili minimum 2 ka entries para mahiming Group.",
+            "min_two_entries":      "Palihug pagpili minimum 2 ka entries para mahimong Group.",
             "no_group_to_group":    "Dile pwede usahon ang Group to Group. Pwede entries himuon to Group or entries idugang to Group.",
             
             "msg_add_to_group":     "Kani na mga PID e-usa sa Group PID {group_pid}:\n\n{list_pid}\n\nAng tagsa2x na entries dile na makita sa Fattening. Didto ra makita sa Production History.",
