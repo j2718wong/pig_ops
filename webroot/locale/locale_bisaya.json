@@ -256,6 +256,22 @@
     },
     
     
+    "page_fattening_list":{
+        "labels":{
+            "min_two_entries":      "Palihug pagpili minimum 2 ka entries para mahiming Group.",
+            "no_group_to_group":    "Dile pwede usahon ang Group to Group. Pwede entries himuon to Group or entries idugang to Group.",
+            
+            "msg_add_to_group":     "Kani na mga PID e-usa sa Group PID {group_pid}:\n\n{list_pid}\n\nAng tagsa2x na entries dile na makita sa Fattening. Didto ra makita sa Production History.",
+            "save_add_to_group":    "Padayon Save",
+            
+            "msg_create_group":     "Kani na mga PID e-usa na mahimong bag-o na Group:\n\n{list_pid}\n\nAng tagsa2x na entries dile na makita sa Fattening. Didto ra makita sa Production History. Ang bag-o na Group malista sa Fattening.",
+            "save_create_group":    "Padayon Save",
+            
+            "cannot_combine":       "Dile pwede mausa sa Group",
+            "confirm_combine":      "E-confirm na usahon sa Group"
+        }
+    },
+    
     
     "page_sow_boar_add":{
         "labels":{
