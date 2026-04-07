@@ -161,6 +161,8 @@ class SowBoar(BaseModel):
             in_sow_boar_id          INT,
             in_line_id              INT,
             in_sow_status_id        INT,
+            
+            in_num_nipples          INT,
             in_is_external          INT,
             in_is_production_ready  INT,
             
@@ -180,10 +182,14 @@ class SowBoar(BaseModel):
             data.sow_boar_id,
             data.line_id,
             data.sow_status_id,
+            
+            data.num_nipples            if data.num_nipples and data.num_nipples > 0 else None,
             data.is_external,
             data.is_production_ready,
+            
             data.parent_sow_id          if data.parent_sow_id and data.parent_sow_id > 0 else None,
             data.parent_boar_id         if data.parent_boar_id and data.parent_boar_id > 0 else None,
+            
             data.number                 if data.number and data.number.strip() else None,
             data.name                   if data.name and data.name.strip() else None,
             data.date_of_birth          if data.date_of_birth else None,

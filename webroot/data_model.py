@@ -183,6 +183,8 @@ class DataPigFarm(BaseModel, HasAddressLevel):
     
     
     name:                   str
+    
+    num_farrowing_crates:   int = 0
 
 
 class DataPigFarmFeedBuy(BaseModel):

@@ -61,7 +61,9 @@ class PigFarm(BaseModel):
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
             in_latitude             DECIMAL(10,5),
-            in_longitude            DECIMAL(10,5)
+            in_longitude            DECIMAL(10,5),
+            
+            in_num_farrowing_crates INT
     
         )  
         """
@@ -79,7 +81,9 @@ class PigFarm(BaseModel):
             data.level_3_id,
             
             data.latitude           if data.latitude is not None else None,
-            data.longitude          if data.longitude is not None else None
+            data.longitude          if data.longitude is not None else None,
+            
+            data.num_farrowing_crates
         ]
         
         # DEBUG: Print the procedure call string 
@@ -138,7 +142,9 @@ class PigFarm(BaseModel):
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
             in_latitude             DECIMAL(10,5),
-            in_longitude            DECIMAL(10,5)
+            in_longitude            DECIMAL(10,5),
+            
+            in_num_farrowing_crates INT
         )
         """
        
@@ -153,7 +159,9 @@ class PigFarm(BaseModel):
             data.level_3_id,
             
             data.latitude           if data.latitude is not None else None,
-            data.longitude          if data.longitude is not None else None
+            data.longitude          if data.longitude is not None else None,
+            
+            data.num_farrowing_crates
         ]
         
         rows = self._call_procedure('pig_farm_update', params)
@@ -212,7 +220,10 @@ class PigFarm(BaseModel):
                 a.address_level_2_id,
                 a.address_level_3_id,
                 a.latitude,
-                a.longitude
+                a.longitude,
+                
+                a.num_farrowing_crates
+                
             FROM pig_farm a
             LEFT OUTER JOIN account b       ON a.account_id = b.id
             LEFT OUTER JOIN app_country c   ON a.country_id = c.id
@@ -249,11 +260,15 @@ class PigFarm(BaseModel):
             cur_farm_latitude               = row[9]
             cur_farm_longitude              = row[10]
             
+            cur_num_farrowing_crates        = row[11]
+            
+            
             # Build the result dictionary
             cur_entry = {
                 'pig_farm': {
                     'id':           cur_farm_id, 
-                    'name':         cur_farm_name
+                    'name':         cur_farm_name,
+                    'num_farrow_crates': cur_num_farrowing_crates
                 },
                 
                 'account': {
@@ -452,6 +467,8 @@ class PigFarm(BaseModel):
                     a.latitude,
                     a.longitude,
                     
+                    a.num_farrowing_crates,
+                    
                     a.last_summary_report_id,
                     
                     a.data_ver_num_sow,
@@ -493,21 +510,24 @@ class PigFarm(BaseModel):
                 cur_farm_latitude           = float(row[8]) if row[8] else None
                 cur_farm_longitude          = float(row[9]) if row[9] else None
                 
-                cur_summary_report_id       = row[10]
-                
-                cur_data_ver_num_sow        = row[11]
-                cur_data_ver_num_boar       = row[12]   
-                cur_data_ver_num_pig_prod   = row[13]
-                cur_data_ver_num_staff      = row[14]  
-                cur_data_ver_num_feed_buy   = row[15]
-                cur_data_ver_num_feed_balance = row[16]
-                cur_data_ver_num_not_pregnant = row[17]
+                cur_num_farrowing_crates    = row[10] 
+
+                cur_summary_report_id       = row[11]  
+
+                cur_data_ver_num_sow        = row[12]  
+                cur_data_ver_num_boar       = row[13]  
+                cur_data_ver_num_pig_prod   = row[14]  
+                cur_data_ver_num_staff      = row[15]  
+                cur_data_ver_num_feed_buy   = row[16]  
+                cur_data_ver_num_feed_balance = row[17]  
+                cur_data_ver_num_not_pregnant = row[18]  
                 
                 cur_entry = {
                     'pig_farm': {
                         'id':           cur_farm_id, 
                         'flag':         cur_farm_flag,
-                        'name':         cur_farm_name
+                        'name':         cur_farm_name,
+                        'num_farrow_crates': cur_num_farrowing_crates
                     },
                     
                     'location':{
