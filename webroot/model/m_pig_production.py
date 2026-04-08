@@ -1107,35 +1107,35 @@ class PigProduction(BaseModel):
                     },
                     
                     'balance':{
-                        'date_balance': str(cur_feed_bal_date_balance)      if cur_feed_bal_date_balance    is not None else None,
+                        'date_balance': str(cur_feed_bal_date_balance)  if cur_feed_bal_date_balance    is not None else None,
                         
-                        'gestating':    float(cur_feed_bal_gestating)       if cur_feed_bal_gestating       is not None else None,
-                        'lactating':    float(cur_feed_bal_lactating)       if cur_feed_bal_lactating       is not None else None,
-                        'booster':      float(cur_feed_bal_booster)         if cur_feed_bal_booster         is not None else None,
-                        'prestarter':   float(cur_feed_bal_prestarter)      if cur_feed_bal_prestarter      is not None else None,
-                        'starter':      float(cur_feed_bal_starter)         if cur_feed_bal_starter         is not None else None,
-                        'grower':       float(cur_feed_bal_grower)          if cur_feed_bal_grower          is not None else None,
-                        'finisher':     float(cur_feed_bal_finisher)        if cur_feed_bal_finisher        is not None else None
+                        'gestating':    float(cur_feed_bal_gestating)   if cur_feed_bal_gestating       is not None else None,
+                        'lactating':    float(cur_feed_bal_lactating)   if cur_feed_bal_lactating       is not None else None,
+                        'booster':      float(cur_feed_bal_booster)     if cur_feed_bal_booster         is not None else None,
+                        'prestarter':   float(cur_feed_bal_prestarter)  if cur_feed_bal_prestarter      is not None else None,
+                        'starter':      float(cur_feed_bal_starter)     if cur_feed_bal_starter         is not None else None,
+                        'grower':       float(cur_feed_bal_grower)      if cur_feed_bal_grower          is not None else None,
+                        'finisher':     float(cur_feed_bal_finisher)    if cur_feed_bal_finisher        is not None else None
                     },
                     
                     'cost':{
-                        'gestating':    float(cur_prod_cost_gestating)      if cur_prod_cost_gestating      is not None else None,
-                        'lactating':    float(cur_prod_cost_lactating)      if cur_prod_cost_lactating      is not None else None,
-                        'booster':      float(cur_prod_cost_booster)        if cur_prod_cost_booster        is not None else None,
-                        'prestarter':   float(cur_prod_cost_prestarter)     if cur_prod_cost_prestarter     is not None else None,
-                        'starter':      float(cur_prod_cost_starter)        if cur_prod_cost_starter        is not None else None,
-                        'grower':       float(cur_prod_cost_grower)         if cur_prod_cost_grower         is not None else None,
-                        'finisher':     float(cur_prod_cost_finisher)       if cur_prod_cost_finisher       is not None else None
+                        'gestating':    float(cur_prod_cost_gestating)  if cur_prod_cost_gestating      is not None else None,
+                        'lactating':    float(cur_prod_cost_lactating)  if cur_prod_cost_lactating      is not None else None,
+                        'booster':      float(cur_prod_cost_booster)    if cur_prod_cost_booster        is not None else None,
+                        'prestarter':   float(cur_prod_cost_prestarter) if cur_prod_cost_prestarter     is not None else None,
+                        'starter':      float(cur_prod_cost_starter)    if cur_prod_cost_starter        is not None else None,
+                        'grower':       float(cur_prod_cost_grower)     if cur_prod_cost_grower         is not None else None,
+                        'finisher':     float(cur_prod_cost_finisher)   if cur_prod_cost_finisher       is not None else None
                     },
                     
                     'date_change_feed':{
-                        'gestating':    str(cur_prod_date_gestating)        if cur_prod_date_gestating      is not None else None,
-                        'lactating':    str(cur_prod_date_lactating)        if cur_prod_date_lactating      is not None else None,
-                        'booster':      str(cur_prod_date_booster)          if cur_prod_date_booster        is not None else None,
-                        'prestarter':   str(cur_prod_date_prestarter)       if cur_prod_date_prestarter     is not None else None,
-                        'starter':      str(cur_prod_date_starter)          if cur_prod_date_starter        is not None else None,
-                        'grower':       str(cur_prod_date_grower)           if cur_prod_date_grower         is not None else None,
-                        'finisher':     str(cur_prod_date_finisher)         if cur_prod_date_finisher       is not None else None
+                        'gestating':    str(cur_prod_date_gestating)    if cur_prod_date_gestating      is not None else None,
+                        'lactating':    str(cur_prod_date_lactating)    if cur_prod_date_lactating      is not None else None,
+                        'booster':      str(cur_prod_date_booster)      if cur_prod_date_booster        is not None else None,
+                        'prestarter':   str(cur_prod_date_prestarter)   if cur_prod_date_prestarter     is not None else None,
+                        'starter':      str(cur_prod_date_starter)      if cur_prod_date_starter        is not None else None,
+                        'grower':       str(cur_prod_date_grower)       if cur_prod_date_grower         is not None else None,
+                        'finisher':     str(cur_prod_date_finisher)     if cur_prod_date_finisher       is not None else None
                     }
                 
                 },
@@ -1150,7 +1150,6 @@ class PigProduction(BaseModel):
                     'harvest':          cur_data_ver_num_harvest
                 
                 }
-                
             }
             
             
@@ -1165,8 +1164,36 @@ class PigProduction(BaseModel):
                 del cur_entry['birth']['birth_staff_name']
                 
                 
+            if cur_weaning_date is None:
+                del cur_entry['weaning']['num_pigs_m']
+                del cur_entry['weaning']['num_pigs_f']
+                del cur_entry['weaning']['num_pigs']
+                del cur_entry['weaning']['weight']
+                del cur_entry['weaning']['weight_pp']
+                
+                
+            # Remove feeds that are only needed after birth
+            if cur_prod_status_id == PROD_STATUS_ID_GESTATING:
+                del cur_entry['feeds']['bought']['prestarter']
+                del cur_entry['feeds']['bought']['starter']
+                del cur_entry['feeds']['bought']['grower']
+                del cur_entry['feeds']['bought']['finisher']
             
-             
+                del cur_entry['feeds']['balance']['prestarter']
+                del cur_entry['feeds']['balance']['starter']
+                del cur_entry['feeds']['balance']['grower']
+                del cur_entry['feeds']['balance']['finisher']
+            
+                del cur_entry['feeds']['cost']['prestarter']
+                del cur_entry['feeds']['cost']['starter']
+                del cur_entry['feeds']['cost']['grower']
+                del cur_entry['feeds']['cost']['finisher']
+            
+                del cur_entry['feeds']['date_change_feed']['prestarter']
+                del cur_entry['feeds']['date_change_feed']['starter']
+                del cur_entry['feeds']['date_change_feed']['grower']
+                del cur_entry['feeds']['date_change_feed']['finisher']
+
             result.append(cur_entry)
 
         
