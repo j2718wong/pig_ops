@@ -224,14 +224,6 @@ async def pig_prod_add(request: Request, data: dm.DataPigProd):
     res_add['pig_prod']['hid'] = pig_prod_hashid
 
     
-    pig_prod_ai_id = res_add['pig_prod_ai']['id']
-    if pig_prod_ai_id > 0:
-        pig_prod_ai_hashid = hashids_common.encrypt(pig_prod_ai_id)
-        res_add['pig_prod_ai']['hid'] = pig_prod_ai_hashid
-    else:
-        del res_add['pig_prod_ai']
-  
-    
     # Remove optional desc coming from database
     remove_database_null_description(res_add)
     

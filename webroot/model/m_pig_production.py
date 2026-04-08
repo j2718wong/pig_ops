@@ -42,85 +42,39 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_add('
-        sql += '%s,'    % data.user_id
+        is_ai = not (data.boar_id and data.boar_id > 0)
         
-        sql += '%s,'    % data.sow_id
-        
-        if data.boar_id is not None and data.boar_id > 0:
-            sql += '%s,'    % data.boar_id
-            sql += 'NULL,'
-            sql += 'NULL,'
-            sql += 'NULL,'
-            sql += 'NULL,'
-        else:
-            sql += 'NULL,'
+        params = [
+            data.user_id,
             
-            if data.semen_supplier_id is not None:
-                sql += '%s,'    % data.semen_supplier_id
-            else:
-                sql += 'NULL,'
-                
-            if data.semen_sup_semen_id is not None:
-                sql += '%s,'    % data.semen_sup_semen_id
-            else:
-                sql += 'NULL,'
+            data.sow_id,
+            data.boar_id                if not is_ai else None,
             
-            if data.semen_ai_boar_id is not None:
-                sql += '%s,'    % data.semen_ai_boar_id
-            else:
-                sql += 'NULL,'
+            data.semen_supplier_id      if is_ai else None,
+            data.semen_sup_semen_id     if is_ai else None,
+            data.semen_ai_boar_id       if is_ai else None,
             
-            if data.semen_cost is not None:
-                sql += '%s,'    % data.semen_cost
-            else:
-                sql += 'NULL,'
+            data.semen_cost             if is_ai else None,
+            data.insemination_cost,
             
             
-        sql += '%s,'    % data.insem_cost
+            data.comments               if data.comments and data.comments.strip() else None,
+                                        
+            data.insem_staff_id         if data.insem_staff_id and data.insem_staff_id > 0 else None,
+            data.done_by_user,
             
-        if data.insem_notes is not None and len(data.insem_notes) > 0:
-            sql += '"%s",'    % data.insem_notes
-        else:
-            sql += 'NULL,'
+            data.insem_date
+        ]
         
-        if data.insem_staff_id is not None and data.insem_staff_id > 0: 
-            sql += '%s,'    % data.insem_staff_id
-        else:
-            sql += 'NULL,'
-            
-        sql += '%s,'    % data.done_by_user
+        res = self._call_procedure('pig_prod_add', params)
+        
+        if res is None:
+            return None
         
         
-        sql += '"%s");' % data.insem_date
+        row = res[0]
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
         if row is not None:
             return {
                 'result':{
@@ -131,10 +85,6 @@ class PigProduction(BaseModel):
                 
                 'pig_prod': {
                     'id':               row[3]
-                },
-                
-                'pig_prod_ai' :{
-                    'id':               row[4]
                 }
             }
 
@@ -154,39 +104,23 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_fattening_add('
-        sql += '%s,'    % data.user_id        
-        sql += '%s,'    % data.pig_farm_id
-        sql += '%s,'    % data.num_pigs
-        
-        sql += '"%s",'  % data.date_weaning
-        sql += '"%s");'  % data.date_added
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_farm_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add_fattening(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.num_pigs,
+            
+            data.date_weaning,
+            data.date_added
+        ]
+        
+        res = self._call_procedure('pig_prod_fattening_add', params)
+        
+        if res is None:
+            return None
+        
+        row = res[0]
+    
 
         if row is not None:
             return {
@@ -226,77 +160,34 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_update_insem('
-        sql += '%s,'    % data.user_id
+        is_ai = not (data.boar_id and data.boar_id > 0)
         
-        sql += '%s,'    % data.pig_prod_id
-        
-        if data.boar_id is not None and data.boar_id > 0:
-            sql += '%s,'    % data.boar_id
-            sql += 'NULL,'
-            sql += 'NULL,'
-            sql += 'NULL,'
-            sql += 'NULL,'
-        else:
-            sql += 'NULL,'
-            
-            if data.semen_supplier_id is not None:
-                sql += '%s,'    % data.semen_supplier_id
-            else:
-                sql += 'NULL,'
-                
-            if data.semen_sup_semen_id is not None:
-                sql += '%s,'    % data.semen_sup_semen_id
-            else:
-                sql += 'NULL,'
-            
-            if data.semen_ai_boar_id is not None:
-                sql += '%s,'    % data.semen_ai_boar_id
-            else:
-                sql += 'NULL,'
-                
-            if data.semen_cost is not None:
-                sql += '%s,'    % data.semen_cost
-            else:
-                sql += 'NULL,'
-        
-        sql += '%s,'    % data.insem_cost
-        
-        if data.insem_notes is not None:
-            sql += '"%s",'    % data.insem_notes
-        else:
-            sql += 'NULL,'
-            
-        sql += '%s,'    % data.insem_staff_id
-        sql += '"%s");' % data.insem_date
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        params = [
+            data.user_id,
+            data.pig_prod_id,
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.boar_id                if not is_ai else None,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update_insemination(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.semen_supplier_id      if is_ai else None,
+            data.semen_sup_semen_id     if is_ai else None,
+            data.semen_ai_boar_id       if is_ai else None,
+            
+            data.semen_cost             if is_ai else None,
+            data.insemination_cost      if data.insemination_cost is not None else None,
+            
+            data.comments               if data.comments and data.comments.strip() else None,
+            
+            data.insem_staff_id         if data.insem_staff_id and data.insem_staff_id > 0 else None,
+            data.insem_date
+        ]
+        
+        res = self._call_procedure('pig_prod_update_insem', params)
+        
+        if res is None:
+            return None
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -327,44 +218,24 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_update_status('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_prod_id
-        sql += '%s,'    % data.prod_status_id
-        
-        sql += '"%s",'  % data.date_status
-        
-        
-        if data.notes is not None:
-            sql += '"%s");'    % data.notes
-        else:
-            sql += 'NULL);'
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update_birth(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.pig_prod_id,
+            data.prod_status_id,
+            
+            data.date_status,
+            
+            data.notes                  if data.notes and data.notes.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_prod_update_status', params)
+        
+        if res is None:
+            return None
+        
+        row = res[0]
+    
 
         if row is not None:
             return {
@@ -399,49 +270,28 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_update_birth('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.pig_prod_id
-        
-        sql += '"%s",'  % data.date_actual_birth
-        sql += '%s,'    % data.num_pigs_dead
+        params = [
+            data.user_id,
             
-        sql += '%s,'    % data.num_pigs_male
-        sql += '%s,'    % data.num_pigs_female
-        if data.birth_staff_id is not None:
-            sql += '%s,'    % data.birth_staff_id
-        else:
-            sql += 'NULL,'
-        
-        sql += '%s);'   % data.done_by_user
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.pig_prod_id,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.date_actual_birth,
+            data.num_pigs_dead,
+            data.num_pigs_male,
+            data.num_pigs_female,
+            
+            data.birth_staff_id         if data.birth_staff_id and data.birth_staff_id > 0 else None,
+            data.done_by_user
+        ]
+        
+        res = self._call_procedure('pig_prod_update_birth', params)
+        
+        if res is None:
+            return None
 
-        except Exception as e:
-            msg = 'update_birth(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -482,58 +332,32 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_update_weaning('
-        sql += '%s,'    % data.user_id
+        # Determine if we're using per-sex counts or total count
+        use_per_sex = True if data.num_pigs else False
         
-        sql += '%s,'    % data.pig_prod_id
-        sql += '"%s",'  % data.date_weaning
-        
-        if data.num_pigs is None:
-            sql += '%s,'    % data.num_pigs_male
-            sql += '%s,'    % data.num_pigs_female
-            sql += 'NULL,'
-        else:
-            sql += 'NULL,'
-            sql += 'NULL,'
-            sql += '%s,'    % data.num_pigs
-        
-        if data.total_weight is not None:
-            sql += '%s,'    % data.total_weight
-        else:
-            sql += 'NULL,'
-        
-        if data.weight_pp is not None:
-            sql += '"%s");'    % data.weight_pp
-        else:
-            sql += 'NULL);'
-      
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update_weaning(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.pig_prod_id,
+            data.date_weaning,
+            
+            data.num_pigs_female            if use_per_sex else None,
+            data.num_pigs_male              if use_per_sex else None,
+            
+            data.num_pigs                   if not use_per_sex else None,
+            
+            data.total_weight               if data.total_weight is not None else None,
+            data.weight_pp                  if data.weight_pp and data.weight_pp.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_prod_update_weaning', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -564,41 +388,24 @@ class PigProduction(BaseModel):
         )  
         """
         
-        sql =  'CALL pig_prod_update_pig_count('
-        sql += '%s,'    % data.user_id        
-        sql += '%s,'    % data.pig_prod_id
-        
-        sql += '%s,'    % data.num_pigs
-        sql += '"%s",'   % data.date_notes
-        sql += '"%s");'  % data.notes
-       
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_prod_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update_pig_count(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+            data.num_pigs,
+            data.date_notes,
+            data.notes                  if data.notes and data.notes.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_prod_update_pig_count', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
+    
         if row is not None:
             return {
                 'result':{
@@ -626,41 +433,23 @@ class PigProduction(BaseModel):
         )
         """
         
-        sql =  'CALL pig_prod_update_feed_start_date('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.pig_prod_id
-        
-        sql += '%s,'    % data.feed_type_id
-        sql += '"%s");' % data.date_start
-        
-      
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.pig_prod_id,
+            
+            data.feed_type_id,
+            data.date_start
+        ]
+        
+        res = self._call_procedure('pig_prod_update_feed_start_date', params)
+        
+        if res is None:
+            return None
 
-        except Exception as e:
-            msg = 'update_weaning(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
