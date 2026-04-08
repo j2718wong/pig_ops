@@ -4,30 +4,42 @@
             "image_key": "mar_home",
             "key": "dashboard_overview"
         },
+        
         {
             "image_key": "mar_sow_list",
             "key": "sow_management"
         },
+        
         {
             "image_key": "mar_gesta",
             "key": "breeding_cycles"
         },
+        
+        {
+            "image_key": "mar_farrowing",
+            "key": "farrowing_scheduler"
+        },
+        
         {
             "image_key": "mar_lacta",
             "key": "pig_operations"
         },
+        
         {
             "image_key": "mar_pig_ops",
             "key": "traceability"
         },
+        
         {
             "image_key": "mar_fattening",
             "key": "fattening"
         },
+        
         {
             "image_key": "mar_feed_records",
             "key": "feed_records"
         },
+        
         {
             "image_key": "mar_report",
             "key": "farm_reports"

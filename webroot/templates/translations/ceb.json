@@ -27,6 +27,11 @@
                     "title": "Management sa pagtakal ug production",
                     "desc": "E record ang gestation, lactation, ug breeding cycles"
                 },
+                
+                "farrowing_scheduler": {
+                    "title": "Farrowing Scheduler",
+                    "desc": "Automatic mo schedule sa farrowing 3 months in advance para mahibaw-an muigo ba ang paanakan."
+                },
                         
                 "pig_operations": {
                     "title": "Naka record tanan operation sa baboy",

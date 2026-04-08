@@ -27,6 +27,11 @@
                     "title": "Management sa breeding cycles",
                     "desc": "E record ang gestation, lactation, at breeding cycles"
                 },
+                
+                "farrowing_scheduler": {
+                    "title": "Farrowing Scheduler",
+                    "desc": "Automatic na mag schedule sa farrowing 3 months in advance para malaman magkasya ba ang farrowing crates."
+                },
                         
                 "pig_operations": {
                     "title": "Naka record ang lahat na gagawin para sa baboy",

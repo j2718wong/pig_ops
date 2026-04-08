@@ -27,6 +27,11 @@
                     "title": "Breeding Cycles Management",
                     "desc": "Track gestation, lactation, and breeding cycles"
                 },
+                
+                "farrowing_scheduler": {
+                    "title": "Farrowing Scheduler",
+                    "desc": "Automatic farrowing schedule plot 3 months in advance to know farrowing crate availability."
+                },
                         
                 "pig_operations": {
                     "title": "Pig Operations Management",
