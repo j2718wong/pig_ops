@@ -41,7 +41,7 @@ from r_utils                import (replace_plain_ids_user_account,
 
 from r_a0_security_checks   import get_user_account_info
 
-from r_pig_production       import get_page_data_farm_account_pig_prod
+from r_pig_production_get   import get_page_data_farm_account_pig_prod
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0

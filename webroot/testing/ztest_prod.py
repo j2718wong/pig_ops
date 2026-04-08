@@ -787,7 +787,7 @@ class TestAPIPigProd(TestBase):
         
         # Get number of sacks feeds already bought for pig_prod
         list_ids =[pig_prod_id]
-        res = model['pig_prod'].get_list(list_ids = list_ids)
+        res = model['pig_prod_get'].get_list(list_ids = list_ids)
         
         pig_prod = res[0]
         

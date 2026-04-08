@@ -33,7 +33,7 @@ if templates_report_dir not in sys.path:
 
 
 from r_utils                import get_location_address_names_and_replace_ids
-from r_pig_production       import get_pig_prod_list
+from r_pig_production_get   import get_pig_prod_list
  
 
 
@@ -412,7 +412,7 @@ class ReportProdOps(ReportBasic):
         
         
         # Get all active production list (type 5 = all active)
-        pig_prod_list = model['pig_prod'].get_list(pig_farm_id, pig_prod_type=5)
+        pig_prod_list = model['pig_prod_get'].get_list(pig_farm_id, pig_prod_type=5)
         
         # Filter and enhance gestating sows with their operations
         list_gestating  = []

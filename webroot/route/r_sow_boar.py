@@ -838,7 +838,7 @@ async def data_details(request: Request, entry_hid:str, inc_user_audit:int = 0):
     
     if cur_data['sex'] == 'F':
         # This will return a list
-        res_sow_production = model['pig_prod'].get_production_output(
+        res_sow_production = model['pig_prod_get'].get_production_output(
                 sow_id = sow_boar_id)
         
         if res_sow_production and len(res_sow_production) == 1:
@@ -1105,7 +1105,7 @@ async def sow_production_output(request: Request, sow_hid:str = None):
         sow_id = res[0]
     
     
-    res = model['pig_prod'].get_production_output(sow_id = sow_id)
+    res = model['pig_prod_get'].get_production_output(sow_id = sow_id)
     
     
     if res is None:
@@ -1165,7 +1165,7 @@ async def sow_production_output(request: Request, pfhid:str = None):
         pig_farm_id = res[0]
     
     
-    res = model['pig_prod'].get_production_output_group_per_sow(pig_farm_id)
+    res = model['pig_prod_get'].get_production_output_group_per_sow(pig_farm_id)
 
     
     

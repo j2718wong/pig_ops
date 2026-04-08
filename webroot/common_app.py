@@ -89,6 +89,7 @@ from model.m_sow_act            import SowActivity
 
 
 from model.m_pig_production     import PigProduction
+from model.m_pig_production_get import PigProductionGet
 from model.m_pig_prod_notes     import PigProdNotes
 from model.m_pig_prod_pig_dead  import PigProdPigDead
 from model.m_pig_prod_pig_ops   import PigProdPigOps
@@ -159,6 +160,7 @@ model_names_pig_ops = [
    
     
     ('pig_prod',                PigProduction),
+    ('pig_prod_get',            PigProductionGet),
     ('prod_notes',              PigProdNotes),
     ('prod_pig_dead',           PigProdPigDead),
     ('pig_prod_pig_ops',        PigProdPigOps),

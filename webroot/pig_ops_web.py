@@ -52,6 +52,7 @@ from route.r_sow_boar           import *
 from route.r_sow_boar_mate      import *
 
 from route.r_pig_production     import *
+from route.r_pig_production_get import *
 from route.r_pig_prod_notes     import *
 from route.r_pig_prod_pig_dead  import *
 from route.r_pig_prod_pig_ops   import *
