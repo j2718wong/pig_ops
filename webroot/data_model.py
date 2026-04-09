@@ -630,6 +630,7 @@ class DataPigProdWeaning(BaseModel):
     num_pigs_female:        int = None
     
     num_pigs:               int = None
+    num_pigs_xsmall:        int = None
         
     total_weight:           float = None
     weight_pp:              str = None

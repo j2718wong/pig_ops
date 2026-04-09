@@ -188,6 +188,7 @@ class PigProductionGet(BaseModel):
                     a.num_pigs_weaning_m,
                     a.num_pigs_weaning_f,
                     a.num_pigs_weaning,
+                    a.num_pigs_wean_xsmall,
                     a.wean_pigs_weight_total,
                     a.wean_pigs_weight_pp,
                         
@@ -316,52 +317,53 @@ class PigProductionGet(BaseModel):
             cur_weaning_num_pigs_m          = row[38] 
             cur_weaning_num_pigs_f          = row[39] 
             cur_weaning_num_pigs            = row[40] 
-            cur_weaning_weight              = row[41] 
-            cur_weaning_weight_pp           = row[42] 
+            cur_weaning_num_pigs_xsmall     = row[41]
+            cur_weaning_weight              = row[42]  
+            cur_weaning_weight_pp           = row[43]  
 
-            cur_pig_count                   = row[43] 
+            cur_pig_count                   = row[44]  
 
-            cur_prod_num_b_gestating        = row[44] 
-            cur_prod_num_b_lactating        = row[45] 
-            cur_prod_num_b_booster          = row[46] 
-            cur_prod_num_b_prestarter       = row[47] 
-            cur_prod_num_b_starter          = row[48] 
-            cur_prod_num_b_grower           = row[49] 
-            cur_prod_num_b_finisher         = row[50] 
+            cur_prod_num_b_gestating        = row[45]  
+            cur_prod_num_b_lactating        = row[46]  
+            cur_prod_num_b_booster          = row[47]  
+            cur_prod_num_b_prestarter       = row[48]  
+            cur_prod_num_b_starter          = row[49]  
+            cur_prod_num_b_grower           = row[50]  
+            cur_prod_num_b_finisher         = row[51]  
 
-            cur_feed_bal_date_balance       = row[51] 
+            cur_feed_bal_date_balance       = row[52]  
 
-            cur_feed_bal_gestating          = row[52] 
-            cur_feed_bal_lactating          = row[53] 
-            cur_feed_bal_booster            = row[54] 
-            cur_feed_bal_prestarter         = row[55] 
-            cur_feed_bal_starter            = row[56] 
-            cur_feed_bal_grower             = row[57] 
-            cur_feed_bal_finisher           = row[58] 
+            cur_feed_bal_gestating          = row[53]  
+            cur_feed_bal_lactating          = row[54]  
+            cur_feed_bal_booster            = row[55]  
+            cur_feed_bal_prestarter         = row[56]  
+            cur_feed_bal_starter            = row[57]  
+            cur_feed_bal_grower             = row[58]  
+            cur_feed_bal_finisher           = row[59]  
 
-            cur_prod_cost_gestating         = row[59] 
-            cur_prod_cost_lactating         = row[60] 
-            cur_prod_cost_booster           = row[61] 
-            cur_prod_cost_prestarter        = row[62] 
-            cur_prod_cost_starter           = row[63] 
-            cur_prod_cost_grower            = row[64] 
-            cur_prod_cost_finisher          = row[65] 
+            cur_prod_cost_gestating         = row[60]  
+            cur_prod_cost_lactating         = row[61]  
+            cur_prod_cost_booster           = row[62]  
+            cur_prod_cost_prestarter        = row[63]  
+            cur_prod_cost_starter           = row[64]  
+            cur_prod_cost_grower            = row[65]  
+            cur_prod_cost_finisher          = row[66]  
 
-            cur_prod_date_gestating         = row[66] 
-            cur_prod_date_lactating         = row[67] 
-            cur_prod_date_booster           = row[68] 
-            cur_prod_date_prestarter        = row[69] 
-            cur_prod_date_starter           = row[70] 
-            cur_prod_date_grower            = row[71] 
-            cur_prod_date_finisher          = row[72] 
+            cur_prod_date_gestating         = row[67]  
+            cur_prod_date_lactating         = row[68]  
+            cur_prod_date_booster           = row[69]  
+            cur_prod_date_prestarter        = row[70]  
+            cur_prod_date_starter           = row[71]  
+            cur_prod_date_grower            = row[72]  
+            cur_prod_date_finisher          = row[73]  
 
-            cur_data_ver_num_pig_prod       = row[73] 
-            cur_data_ver_num_medvac         = row[74] 
-            cur_data_ver_num_health_notes   = row[75] 
-            cur_data_ver_num_prod_feed      = row[76] 
-            cur_data_ver_num_feed_balance   = row[77] 
-            cur_data_ver_num_harvest        = row[78]  
-            
+            cur_data_ver_num_pig_prod       = row[74]  
+            cur_data_ver_num_medvac         = row[75]  
+            cur_data_ver_num_health_notes   = row[76]  
+            cur_data_ver_num_prod_feed      = row[77]  
+            cur_data_ver_num_feed_balance   = row[78]  
+            cur_data_ver_num_harvest        = row[79]    
+                        
             
             cur_entry = {
                 'pig_production' :{
@@ -436,6 +438,7 @@ class PigProductionGet(BaseModel):
                     'num_pigs_m':       cur_weaning_num_pigs_m,
                     'num_pigs_f':       cur_weaning_num_pigs_f,
                     'num_pigs':         cur_weaning_num_pigs,
+                    'num_pigs_xsmall':  cur_weaning_num_pigs_xsmall,
                     'weight':           cur_weaning_weight,
                     'weight_pp':        cur_weaning_weight_pp      
                 },
@@ -514,9 +517,19 @@ class PigProductionGet(BaseModel):
                 del cur_entry['weaning']['num_pigs_m']
                 del cur_entry['weaning']['num_pigs_f']
                 del cur_entry['weaning']['num_pigs']
+                del cur_entry['weaning']['num_pigs_xsmall']
                 del cur_entry['weaning']['weight']
                 del cur_entry['weaning']['weight_pp']
-                
+            
+            else:
+                if cur_weaning_num_pigs_xsmall is None:
+                    del cur_entry['weaning']['num_pigs_xsmall']
+                  
+                if cur_weaning_weight is None:
+                    del cur_entry['weaning']['weight']
+                        
+                if cur_weaning_weight_pp is None:
+                    del cur_entry['weaning']['weight_pp']
                 
             # Remove feeds that are only needed after birth
             if cur_prod_status_id == PROD_STATUS_ID_GESTATING:

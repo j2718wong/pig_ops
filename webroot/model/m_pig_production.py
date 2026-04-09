@@ -333,7 +333,7 @@ class PigProduction(BaseModel):
         """
         
         # Determine if we're using per-sex counts or total count
-        use_per_sex = True if data.num_pigs else False
+        use_combined = True if data.num_pigs else False
         
         params = [
             data.user_id,
@@ -341,16 +341,18 @@ class PigProduction(BaseModel):
             data.pig_prod_id,
             data.date_weaning,
             
-            data.num_pigs_female            if use_per_sex else None,
-            data.num_pigs_male              if use_per_sex else None,
+            data.num_pigs_female            if not use_combined else None,
+            data.num_pigs_male              if not use_combined else None,
             
-            data.num_pigs                   if not use_per_sex else None,
+            data.num_pigs                   if use_combined else None,
+            data.num_pigs_xsmall            if (data.num_pigs_xsmall and data.num_pigs_xsmall > 0) else None, 
             
             data.total_weight               if data.total_weight is not None else None,
             data.weight_pp                  if data.weight_pp and data.weight_pp.strip() else None
         ]
         
         res = self._call_procedure('pig_prod_update_weaning', params)
+        
         
         if res is None:
             return None
@@ -462,4 +464,95 @@ class PigProduction(BaseModel):
 
         return None
     
+    
+    def create_group(self, data = None):
+        """
+        PROCEDURE production_group_create(
+            in_user_id              INT,
+
+            in_pig_prod_id          INT, /*initial pig_production in the production_group*/
+            
+            in_date_added           VARCHAR(10)
+        ) 
+        """
+        
+        params = [
+            data['user_id'],
+            
+            data['pig_prod_id'],
+            
+            data['date_added']
+        ]
+        
+        res = self._call_procedure('production_group_create', params)
+        
+        if res is None:
+            return None
+
+        
+        row = res[0]
+        
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod':{
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
    
+    def add_to_group(self, data = None):
+        """
+        PROCEDURE production_group_pig_prod_add(
+            in_user_id              INT,
+
+            in_production_group_id  INT,
+            in_pig_prod_id          INT,
+            
+            in_date_added           VARCHAR(10)
+        )  
+        """
+        
+        params = [
+            data['user_id'],
+            
+            data['prod_group_id'],
+            data['pig_prod_id'],
+            
+            data['date_added']
+        ]
+        
+        res = self._call_procedure('production_group_pig_prod_add', params)
+        
+        if res is None:
+            return None
+
+        
+        row = res[0]
+        
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_prod':{
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
+
+

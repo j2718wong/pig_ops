@@ -56,8 +56,7 @@ async def pig_prod_add(request: Request, data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -82,8 +81,7 @@ async def pig_prod_add(request: Request, data: dm.DataPigProd):
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_SOW_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_SOW_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_SOW_HASHID'
             }
         }
     
@@ -726,7 +724,15 @@ async def pig_prod_update_weaning(request: Request, data: dm.DataPigProdWeaning)
     
     pig_prod_id = res[0]
     
-   
+    
+    if data.num_pigs_male is None and data.num_pigs_female is None and data.num_pigs is None:       
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_NUM_PIGS_ALL_NONE,
+                'code': 'ERROR_PIG_PROD_NUM_PIGS_ALL_NONE'
+            }
+        }
+    
     
     data.user_id          = user_id
     data.pig_prod_id      = pig_prod_id
@@ -776,8 +782,7 @@ async def pig_prod_update_feed_start_date(request: Request, data: dm.DataFeedSta
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -818,8 +823,7 @@ async def pig_prod_update_feed_start_date(request: Request, data: dm.DataFeedSta
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_FEED_TYPE_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_FEED_TYPE_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_FEED_TYPE_HASHID'
             }
         }
     
@@ -836,8 +840,7 @@ async def pig_prod_update_feed_start_date(request: Request, data: dm.DataFeedSta
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -864,8 +867,7 @@ async def pig_prod_update_pig_count(request: Request, data: dm.DataPigProdPigCou
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_USER_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_USER_HASHID'
             }
         }
     
@@ -890,8 +892,7 @@ async def pig_prod_update_pig_count(request: Request, data: dm.DataPigProdPigCou
         return {
             'result':{
                 'num':  ERROR_PIG_PROD_INVALID_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_HASHID',
-                'desc': ''
+                'code': 'ERROR_PIG_PROD_INVALID_HASHID'
             }
         }
     
@@ -907,8 +908,7 @@ async def pig_prod_update_pig_count(request: Request, data: dm.DataPigProdPigCou
         return {
             'result':{
                 'num':  ERROR_DATABASE_ERROR,
-                'code': 'ERROR_DATABASE_ERROR',
-                'desc': ''
+                'code': 'ERROR_DATABASE_ERROR'
             }
         }
     
@@ -920,4 +920,163 @@ async def pig_prod_update_pig_count(request: Request, data: dm.DataPigProdPigCou
 
     return res_update
     
+
+@app.post("/production_group/add", tags=["Pig Production"])
+async def production_group_add(request: Request):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_FEED_BALANCE_INVALID_USER_HASHID,
+                'code': 'ERROR_FEED_BALANCE_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+    
+    
+    data = None
+    
+    try:
+        # Parse JSON data from request body
+        data = await request.json()
+    except:
+        data = None
+        
+    
+    
+    group_hid       = data.get('group_hid', None)
+    list_prod_hid   = data.get('list_prod_hid', [])
+    
+    
+    group_id    = None
+    
+    if group_hid is not None:
+        res = hashids_common.decrypt(group_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_HASHID'
+                }
+            }
+        
+        group_id = res[0]
+        
+        
+    list_pig_prod_id = []
+    
+    for cur_entry in list_prod_hid:
+        res = hashids_common.decrypt(cur_entry)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_PIG_PROD_INVALID_HASHID,
+                    'code': 'ERROR_PIG_PROD_INVALID_HASHID'
+                }
+            }
+        
+        pig_prod_id = res[0]
+        
+        list_pig_prod_id.append(pig_prod_id )
+        
+    
+    dt_now          = datetime.now()
+    dt_now_s        = dt_now.strftime('%Y-%m-%d')
+        
+        
+    if group_id is None:
+        res_group   = None
+        
+        prod_group_id = 0
+    
+        # Process the entries
+        count = 0
+        for cur_entry in list_pig_prod_id:
+            if count == 0:
+                data = {
+                    'user_id':      user_id,
+                    'pig_prod_id':  cur_entry,
+                    'date_added':   dt_now_s
+                }
+                
+                res_group = model['pig_prod'].create_group(data)
+                
+                if res_group is None:
+                    return {
+                        'result':{
+                            'num':  ERROR_DATABASE_ERROR,
+                            'code': 'ERROR_DATABASE_ERROR'
+                        }
+                    }
+                
+                prod_group_id = res_group['prod_group']['id']
+                    
+            else:
+                data = {
+                    'user_id':      user_id,
+                    'prod_group_id': prod_group_id,
+                    'pig_prod_id':  cur_entry,
+                    'date_added':   dt_now_s
+                }
+                
+                res_add = model['pig_prod'].add_to_group(data)
+                
+                if res_add is None:
+                    return {
+                        'result':{
+                            'num':  ERROR_DATABASE_ERROR,
+                            'code': 'ERROR_DATABASE_ERROR'
+                        }
+                    }
+                
+                
+            
+            count += 1 
+        
+        
+        # Replace plain id
+        pig_prod_id     = res_group['pig_prod']['id']        
+        pig_prod_hashid = hashids_common.encrypt(pig_prod_id)
+        
+       
+        # remove plain id
+        del res_group['pig_prod']['id']
+        res_group['pig_prod']['hid'] = pig_prod_hashid
+
+
+        # Remove optional desc coming from database
+        remove_database_null_description(res_group)
+
+        return res_group
+        
+    
+
+    return {
+        'result':{
+            'num':  0
+        }
+    }
+
 
