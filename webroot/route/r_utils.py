@@ -462,7 +462,10 @@ def replace_plain_ids_pig_production(cur_entry):
     # - piglets bought externally
     
     # Check if a Production Group
-    cur_flag = cur_entry['pig_production']['flag']
+    cur_flag = 0
+    
+    if 'flag' in cur_entry['pig_production']:
+        cur_flag = cur_entry['pig_production']['flag']
 
 
     if cur_flag & PIG_PROD_FLAG_BIT_IS_A_GROUP > 0:
