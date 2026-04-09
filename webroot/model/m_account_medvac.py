@@ -1,14 +1,23 @@
 # January 14, 2026
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
 
 
-class AccountMedVac:
+class AccountMedVac(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'AccountMedVac'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -22,40 +31,20 @@ class AccountMedVac:
         )  
         """
         
-        sql =  'CALL account_medvac_add('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.medvac_brand_id
-        sql += '%s,'    % data.medvac_type_id
+        params = [
+            data.user_id,
+            data.medvac_brand_id,
+            data.medvac_type_id,
+            data.name                   if data.name and data.name.strip() else None
+        ]
         
+        rows = self._call_procedure('account_medvac_add', params)
         
-        sql += '"%s")'  % data.name
+        if rows is None:
+            return None
         
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        row = rows[0]
+    
 
         if row is not None:
             return {
@@ -260,68 +249,45 @@ class AccountMedVac:
                     """ % where_clause
 
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        if rows is None:
+            return []
             
-            rows = cursor.fetchall()
-            cursor.close()
-            
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
             
-            for row in rows:
+        for row in rows:
+                
+            cur_entry = {
+                'acc_medvac': {
+                    'id':               row[0],
+                    'brand_id':         row[1],
+                    'type_id':          row[2],
+                    'name':             row[3]
+                }
+            }
+            
+            if inc_user_audit > 0:
                     
-                cur_entry = {
-                    'acc_medvac': {
-                        'id':               row[0],
-                        'brand_id':         row[1],
-                        'type_id':          row[2],
-                        'name':             row[3]
-                    }
+                added_by = {
+                    'name_last':        row[4],
+                    'name_first':       row[5],
+                    'dt_entry':         str(row[6])
                 }
                 
-                if inc_user_audit > 0:
-                        
-                    added_by = {
-                        'name_last':        row[4],
-                        'name_first':       row[5],
-                        'dt_entry':         str(row[6])
-                    }
-                    
-                    last_update = {
-                        'name_last':        row[7],
-                        'name_first':       row[8],
-                        'dt_update':        str(row[9]) if row[9] else None
-                    }
-                    
-                    cur_entry['added_by']   = added_by 
-                    cur_entry['last_update'] = last_update
-                    
-                    
-                result.append(cur_entry)
-        
+                last_update = {
+                    'name_last':        row[7],
+                    'name_first':       row[8],
+                    'dt_update':        str(row[9]) if row[9] else None
+                }
+                
+                cur_entry['added_by']   = added_by 
+                cur_entry['last_update'] = last_update
+                
+                
+            result.append(cur_entry)
+    
         return result
     
     
