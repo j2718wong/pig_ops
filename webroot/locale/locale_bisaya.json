@@ -268,6 +268,7 @@
             "msg_create_group":     "Kani na mga PID e-usa na mahimong bag-o na Group:\n\n{list_pid}\n\nAng tagsa2x na entries dile na makita sa Fattening. Didto ra makita sa Production History. Ang bag-o na Group malista sa Fattening.",
             "save_create_group":    "Padayon Save",
             
+            "combine_to_1_pen":     "E-isa sa isa ka Tangkal",
             "cannot_combine":       "Dile pwede mausa sa Group",
             "confirm_combine":      "E-confirm na usahon sa Group"
         }

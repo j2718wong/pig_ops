@@ -484,6 +484,9 @@ class PigProduction(BaseModel):
             data['date_added']
         ]
         
+        sql = self._generate_debug_procedure('production_group_create', params)
+        print('\n\n' + sql)
+        
         res = self._call_procedure('production_group_create', params)
         
         if res is None:
@@ -529,6 +532,10 @@ class PigProduction(BaseModel):
             
             data['date_added']
         ]
+        
+        sql = self._generate_debug_procedure('production_group_pig_prod_add', params)
+        print('\n\n' + sql)
+        
         
         res = self._call_procedure('production_group_pig_prod_add', params)
         

@@ -257,6 +257,23 @@
     },
     
     
+    "page_fattening_list":{
+        "labels":{
+            "min_two_entries":      "Pakipili minimum 2 entries para gawing Group.",
+            "no_group_to_group":    "Hindi pwede Group to Group. Pwede entries gawing Group or entries idagdag to Group.",
+            
+            "msg_add_to_group":     "Itong mga PID isali sa Group PID {group_pid}:\n\n{list_pid}\n\nAng bawat isa na entries ay hindi na mamakita sa Fattening List. Makikita lang sa Production History.",
+            "save_add_to_group":    "Patuloy Save",
+            
+            "msg_create_group":     "Itong mga PID ay gawing bagong Group:\n\n{list_pid}\n\nAng bawat isa na entries ay hindi na mamakita sa Fattening List. Makikita lang sa Production History. Ang bago na Group makikita sa Fattening.",
+            "save_create_group":    "Patuloy Save",
+            
+            "combine_to_1_pen":     "Isama sa isang Kulungan",
+            "cannot_combine":       "Hindi pwede ma dagdag to Group",
+            "confirm_combine":      "E-confirm na gawing Group"
+        }
+    },
+    
     
     "page_sow_boar_add":{
         "labels":{

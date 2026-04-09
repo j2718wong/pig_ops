@@ -1031,7 +1031,7 @@ async def production_group_add(request: Request):
                         }
                     }
                 
-                prod_group_id = res_group['prod_group']['id']
+                prod_group_id = res_group['pig_prod']['id']
                     
             else:
                 data = {

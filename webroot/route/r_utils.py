@@ -444,7 +444,7 @@ def replace_plain_ids_user_account(user_account):
 
 
 
-
+PIG_PROD_FLAG_BIT_IS_A_GROUP        = 2
 
 
 def replace_plain_ids_pig_production(cur_entry):
@@ -457,7 +457,26 @@ def replace_plain_ids_pig_production(cur_entry):
     cur_entry['pig_production']['hid']   = cur_hid
     
     
-    cur_id  = cur_entry['sow']['id']
+    # 2026-04-09; it is possible to have a production with no sow;
+    # - production entries combined to group
+    # - piglets bought externally
+    
+    # Check if a Production Group
+    cur_flag = cur_entry['pig_production']['flag']
+
+
+    if cur_flag & PIG_PROD_FLAG_BIT_IS_A_GROUP > 0:
+        # Delete sow information at all;
+        del cur_entry['sow']
+        
+        # Delete insemination info at all
+        del cur_entry['insemination']
+        
+        return
+        
+        
+    
+    cur_id  = cur_entry['sow']['id']     
     cur_hid = hashids_common.encrypt(cur_id)
     
     del cur_entry['sow']['id']
