@@ -672,37 +672,42 @@ async def get_available_languages(request: Request, internal_lang: str):
 
 
 async def detect_country(request: Request) -> str:
-    """Detect country code from request"""
-    
-    # 1. Check CloudFlare header (if using CloudFlare)
+    # 1. Check CloudFlare header first (this is the fastest and most reliable)
     cf_country = request.headers.get("CF-IPCountry")
     if cf_country and cf_country != "XX":
+        print(f'Country detected via CF header: {cf_country}')
         return cf_country
-    
-    # 2. Check X-Forwarded-For with GeoIP service
+
+    # 2. Fallback to external API (only if CF header is missing or "XX")
     client_ip = request.headers.get("X-Forwarded-For")
     if client_ip:
         client_ip = client_ip.split(',')[0].strip()
     else:
         client_ip = request.client.host if request.client else None
-    
-    print('\n\nchecking country origin of: %s' % client_ip)
-    
+
+    print(f'Falling back to API for IP: {client_ip}')
+
     if client_ip and not client_ip.startswith(('127.', '192.168.', '10.', '172.')):
         try:
-            
             async with aiohttp.ClientSession() as session:
-                # Using ipapi.co (free, no API key needed)
-                async with session.get(f"https://ipapi.co/{client_ip}/country/", timeout=aiohttp.ClientTimeout(total=2)) as resp:
+                # Use ipapi.co to get just the country code
+                api_url = f"https://ipapi.co/{client_ip}/country/"
+                async with session.get(api_url, timeout=aiohttp.ClientTimeout(total=2)) as resp:
                     if resp.status == 200:
-                        country = await resp.text()
-                        print('country_code: %s' % country)
-                        return country.strip()
+                        country = (await resp.text()).strip()
+                        if country:
+                            print(f'Country detected via API: {country}')
+                            return country
         except Exception as e:
-            print(f"Country detection failed: {e}")
-    
-    # 3. Default to unknown
-    print('country_code: XX')
+            print(f"API call failed: {e}")
+
+    # 3. Ultimate fallback for local testing
+    if client_ip and client_ip.startswith('127.'):
+        print('Localhost detected, returning test country PH')
+        return "PH"
+
+    # 4. If everything fails
+    print('Could not detect country, returning default XX')
     return "XX"
 
 
