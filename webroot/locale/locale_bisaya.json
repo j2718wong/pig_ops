@@ -164,7 +164,9 @@
         "fattening_list": "Lista ni sa Fattening Batches. Automatic ni na pagkabuhat. Kung gi update ang petsa sa lutas sa Lacta Entry, automatic maupdate ang Lacta Entry to Fattening Entry. Ang <b>Add Entry</b> para na sa mga baktin na gipalit sa gawas." ,
         "prod_history": "Lista ni sa Fattening Batches na naharvest na. Automatic ni na pagkabuhat. Kung ang tanan baboy sa Fattening batch narecord na naharvest na, maupdate ang Fattening Entry to Production History entry.",
         "sales_history": "Lista ni sa halin sa Fattening Batches na naharvest na. Automatic ni na pagkabuhat. Ang sulod ani, halin ra ug harvest na information sa Production History entry.", 
-        "not_pregnant": "Lista ni sa Anay na nanguwag balik. Automatic ni na pagkabuhat. Kung ang Anay nanguwag balik, ug naay Gesta Entry ang Anay, mahimo ang Gesta Entry na <b>Wala Nabuntis</b>."
+        "not_pregnant": "Lista ni sa Anay na nanguwag balik. Automatic ni na pagkabuhat. Kung ang Anay nanguwag balik, ug naay Gesta Entry ang Anay, mahimo ang Gesta Entry na <b>Wala Nabuntis</b>.",
+    
+        "feed_balance": "Lista ni sa Feed Balance. Pwede i record ang feed balance kada semanha ba kaha para sa kada isa ka Production Entry or para sa tibuok baboyan."
     },
     
     
