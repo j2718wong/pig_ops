@@ -159,7 +159,9 @@
     
     
     "page_info":{
-        "not_pregnant": "Lista ng Sow reheat. Automatic ang paglista nito. Kung ang Inahin ay naglandi balik, at may Gesta Entry ang Inahin, maupdate ang Gesta Entry to <b>Hindi Nabuntis</b>."
+        "gesta_list": "Lista ng Gesta Inahin. Dito mag input para sa pig production.",
+        "lacta_list": "Lista ng nanganak na Inahin. Automatic ang paglista nito. Kapag nag-update ang Gesta Entry kailan nanganak ang inahin, automatic maupdate ang Gesta Entry to Lacta Entry.",
+        "not_pregnant": "Lista ng Inahin na naglandi uli. Automatic ang paglista nito. Kung ang Inahin ay naglandi balik, at may Gesta Entry ang Inahin, maupdate ang Gesta Entry to <b>Hindi Nabuntis</b>."
     },
     
     

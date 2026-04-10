@@ -159,7 +159,9 @@
     
     
     "page_info":{
-        "not_pregnant": "Lista ni sa Sow reheat. Automatic ni na pagbuhat. Kung ang anay nanguwag balik, ug naay Gesta Entry ang anay, mahimo ang Gesta Entry na <b>Wala Nabuntis</b>."
+        "gesta_list": "Lista ni sa natakalan na Anay. Dinhe magsugod pag input para sa pig production.",
+        "lacta_list": "Lista ni sa nanganak na Anay. Automatic ni na pagkabuhat. Kung gi update ang Gesta Entry kanus-a nanganak ang anay, automatic maupdate ang Gesta Entry to Lacta Entry.",
+        "not_pregnant": "Lista ni sa Anay na nanguwag balik. Automatic ni na pagkabuhat. Kung ang Anay nanguwag balik, ug naay Gesta Entry ang Anay, mahimo ang Gesta Entry na <b>Wala Nabuntis</b>."
     },
     
     
