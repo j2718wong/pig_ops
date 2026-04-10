@@ -450,7 +450,9 @@
             "birth_info":       "Detalye sa pag panganak sa Anay",
             "date_expected":    "Expected petsa Manganak",
             "date_birth":       "Petsa kanus-a Nanganak",
+            "gestation_days":   "Pila ka adlaw Gestation?",
             
+            "num_live_total":   "Pila ang buhi tanan baktin?",
             "num_live_female":  "Pila ang buhi na bae baktin?",
             "num_live_male":    "Pila ang buhi na lake baktin?",
             "num_still_birth":  "Pila ang patay daan pag anak sa anay?",

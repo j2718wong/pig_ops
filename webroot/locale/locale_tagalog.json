@@ -450,7 +450,9 @@
             "birth_info":       "Detalye sa pag anak ng Inahin",
             "date_expected":    "Expected petsa Manganak",
             "date_birth":       "Petsa kailan Nanganak",
+            "gestation_days":   "Ilang araw ang Gestation?",
             
+            "num_live_total":   "Ilan lahat buhay biik?",
             "num_live_female":  "Ilan buhay na babae biik?",
             "num_live_male":    "Ilan buhay na lalake biik?",
             "num_still_birth":  "Ilan ang patay paglabas sa Inahin?",
