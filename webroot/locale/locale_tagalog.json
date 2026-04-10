@@ -158,6 +158,11 @@
     },
     
     
+    "page_info":{
+        "not_pregnant": "Lista ng Sow reheat. Automatic ang paglista nito. Kung ang Inahin ay naglandi balik, at may Gesta Entry ang Inahin, maupdate ang Gesta Entry to <b>Hindi Nabuntis</b>."
+    },
+    
+    
     "page_dashboard":{
         "labels":{
             "stats_card":{

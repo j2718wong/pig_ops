@@ -158,6 +158,11 @@
     },
     
     
+    "page_info":{
+        "not_pregnant": "Lista ni sa Sow reheat. Automatic ni na pagbuhat. Kung ang anay nanguwag balik, ug naay Gesta Entry ang anay, mahimo ang Gesta Entry na <b>Wala Nabuntis</b>."
+    },
+    
+    
     "page_dashboard":{
         "labels":{
             "stats_card":{
