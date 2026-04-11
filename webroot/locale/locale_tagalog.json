@@ -168,7 +168,8 @@
         
         "feed_balance": "Lista ng Feed Balance. Pwede i record ang feed balance  para sa bawat isa ng Production Entry or para sa lahat ng baboyan.",
         "farrowing_sched": "Ito ay automatic na mag schedule sa pag gamit sa paanakan(Farrowing Crate) para sa mga Lacta and Gesta Inahin ninyo. Magschedule ito 115 days in advance umpisa ngayon. Para malamam kung sapat ba ang Farrowing Crate sa inyong mga Inahin.",
-        "boar_ext_mate": "Lista ng binembang na mga Inahin sa kapitbahay mo. Gamitin ito pag nag service ka sa mga Inahin sa kapitbahay mo."
+        "boar_ext_mate": "Lista ng binembang na mga Inahin sa kapitbahay mo. Gamitin ito pag nag service ka sa mga Inahin sa kapitbahay mo.",
+        "dead_pigs": "Lista ng namatay na baboy. Kailangan na e-record ang namatay na baboy para tama ang bilang sa baboy sa bawat production batch."
     },
     
     
