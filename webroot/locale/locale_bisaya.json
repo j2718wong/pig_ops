@@ -167,8 +167,8 @@
         "not_pregnant": "Lista ni sa Anay na nanguwag balik. Automatic ni na pagkabuhat. Kung ang Anay nanguwag balik, ug naay Gesta Entry ang Anay, mahimo ang Gesta Entry na <b>Wala Nabuntis</b>.",
     
         "feed_balance": "Lista ni sa Feed Balance. Pwede i record ang feed balance kada semanha ba kaha para sa kada isa ka Production Entry or para sa tibuok baboyan.",
-        "farrowing_sched": "Kani ciya mo automatic schedule sa pag gamit sa paanakan(Farrowing Crate) para sa nag patotoy ug manganakay na Anay. Mo schedule ni cya 115 days in advance usgod karon. Para ni mahibaw-an daan kung muigo ba ang paanakan sa imong mga anay."
-
+        "farrowing_sched": "Kani ciya mo automatic schedule sa pag gamit sa paanakan(Farrowing Crate) para sa nag patotoy ug manganakay na Anay. Mo schedule ni cya 115 days in advance sugod karon. Para ni mahibaw-an daan kung muigo ba ang paanakan sa imong mga anay.",
+        "boar_ext_mate": "Lista ni sa mga gitakalan na Anay sa imong silingan. Gamiton rani kung nagtakal ka sa anay silingan."
     },
     
     

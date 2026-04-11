@@ -167,8 +167,8 @@
         "not_pregnant": "Lista ng Inahin na naglandi uli. Automatic ang paglista nito. Kung ang Inahin ay naglandi balik, at may Gesta Entry ang Inahin, maupdate ang Gesta Entry to <b>Hindi Nabuntis</b>.",
         
         "feed_balance": "Lista ng Feed Balance. Pwede i record ang feed balance  para sa bawat isa ng Production Entry or para sa lahat ng baboyan.",
-        "farrowing_sched": "Ito ay automatic na mag schedule sa pag gamit sa paanakan(Farrowing Crate) para sa mga Lacta and Gesta Inahin ninyo. Magschedule ito 115 days in advance umpisa ngayon. Para malamam kung sapat ba ang Farrowing Crate sa inyong mga Inahin."
-
+        "farrowing_sched": "Ito ay automatic na mag schedule sa pag gamit sa paanakan(Farrowing Crate) para sa mga Lacta and Gesta Inahin ninyo. Magschedule ito 115 days in advance umpisa ngayon. Para malamam kung sapat ba ang Farrowing Crate sa inyong mga Inahin.",
+        "boar_ext_mate": "Lista ng binembang na mga Inahin sa kapitbahay mo. Gamitin ito pag nag service ka sa mga Inahin sa kapitbahay mo."
     },
     
     
