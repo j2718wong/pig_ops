@@ -863,7 +863,6 @@ class DataProductionHarvest(BaseModel):
     uhid:                   str = None
     
     pig_prod_hid:           str = None
-    production_group_hid:   str = None
     harvest_type_hid:       str = None 
     acc_pig_buyer_hid:      str = None
     prod_harvest_hid:       str = None
@@ -871,7 +870,6 @@ class DataProductionHarvest(BaseModel):
     
     user_id:                int = 0
     pig_prod_id:            int = 0
-    production_group_id:    int = 0
     acc_pig_buyer_id:       int = 0
     prod_harvest_id:        int = 0
     

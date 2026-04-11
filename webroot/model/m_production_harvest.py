@@ -1,13 +1,23 @@
 # September 18, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
-class ProductionHarvest:
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class ProductionHarvest(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'ProductionHarvest'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -15,7 +25,6 @@ class ProductionHarvest:
         PROCEDURE production_harvest_add(
             in_user_id              INT,
             in_pig_prod_id          INT,
-            in_production_group_id  INT,
             in_acc_pig_buyer_id     INT,
             
             in_date_harvest         VARCHAR(10),
@@ -39,113 +48,41 @@ class ProductionHarvest:
         )  
         """
         
-        sql =  'CALL production_harvest_add('
-        sql += '%s,'    % data.user_id
-        
-        
-        if data.pig_prod_id is not None and data.pig_prod_id > 0:
-            sql += '%s,'    % data.pig_prod_id
-        else:
-            sql += 'NULL,'
-        
-        if data.production_group_id is not None and data.production_group_id > 0:
-            sql += '%s,'    % data.pig_prod_group_id
-        else:
-            sql += 'NULL,'
+        params = [
+            data.user_id,
             
-        if data.acc_pig_buyer_id is not None and data.acc_pig_buyer_id > 0: 
-            sql += '%s,'    % data.acc_pig_buyer_id
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '"%s",'  % data.date_harvest
-        sql += '%s,'    % data.num_pigs
-        sql += '%s,'    % data.harvest_type_id
-        
-        if data.live_weight is not None:
-            sql += '%s,'    % data.live_weight
-        else:
-            sql += 'NULL,'
-        
-        if data.live_price is not None:
-            sql += '%s,'    % data.live_price
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        if data.slaughter_weight is not None:
-            sql += '%s,'    % data.slaughter_weight
-        else:
-            sql += 'NULL,'
+            data.pig_prod_id,
+            data.acc_pig_buyer_id           if data.acc_pig_buyer_id and data.acc_pig_buyer_id > 0 else None,
             
-        if data.slaughter_minus_weight is not None:
-            sql += '%s,'    % data.slaughter_minus_weight
-        else:
-            sql += 'NULL,'
-          
-        if data.slaughter_price is not None:
-            sql += '%s,'    % data.slaughter_price
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        if data.net_sales is not None:
-            sql += '%s,'    % data.net_sales
-        else:
-            sql += 'NULL,'
+            data.date_harvest,
             
-        if data.harvest_cost is not None:
-            sql += '%s,'    % data.harvest_cost
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.comments is not None:
-            sql += '"%s",'  % data.comments
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.weight_pp_lw_csv is not None:
-            sql += '"%s",'  % data.weight_pp_lw_csv
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.weight_pp_sw_csv is not None:
-            sql += '"%s");'  % data.weight_pp_sw_csv
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.num_pigs,
+            data.harvest_type_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.live_weight                if data.live_weight is not None else None,
+            data.live_price                 if data.live_price is not None else None,
+            
+            data.slaughter_weight           if data.slaughter_weight is not None else None,
+            data.slaughter_minus_weight     if data.slaughter_minus_weight is not None else None,
+            data.slaughter_price            if data.slaughter_price is not None else None,
+            
+            data.net_sales                  if data.net_sales is not None else None,
+            data.harvest_cost               if data.harvest_cost is not None else None,
+            
+            data.comments                   if data.comments and data.comments.strip() else None,
+            
+            data.weight_pp_lw_csv           if data.weight_pp_lw_csv and data.weight_pp_lw_csv.strip() else None,
+            data.weight_pp_sw_csv           if data.weight_pp_sw_csv and data.weight_pp_sw_csv.strip() else None
+        ]
+        
+        rows = self._call_procedure('production_harvest_add', params)
+        
+        
+        if rows is None:
+            return None
+    
+        row = rows[0]
+        
 
         if row is not None:
             return {
@@ -194,106 +131,40 @@ class ProductionHarvest:
         )
         """
        
-        sql =  'CALL production_harvest_update('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.prod_harvest_id
-        
-        if data.acc_pig_buyer_id is not None and data.acc_pig_buyer_id > 0: 
-            sql += '%s,'    % data.acc_pig_buyer_id
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '"%s",'  % data.date_harvest
-        sql += '%s,'    % data.num_pigs
-        sql += '%s,'    % data.harvest_type_id
-        
-        
-        if data.live_weight is not None:
-            sql += '%s,'    % data.live_weight
-        else:
-            sql += 'NULL,'
-        
-        if data.live_price is not None:
-            sql += '%s,'    % data.live_price
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        if data.slaughter_weight is not None:
-            sql += '%s,'    % data.slaughter_weight
-        else:
-            sql += 'NULL,'
+        params = [
+            data.user_id,
             
-        if data.slaughter_minus_weight is not None:
-            sql += '%s,'    % data.slaughter_minus_weight
-        else:
-            sql += 'NULL,'
-          
-        if data.slaughter_price is not None:
-            sql += '%s,'    % data.slaughter_price
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        if data.net_sales is not None:
-            sql += '%s,'    % data.net_sales
-        else:
-            sql += 'NULL,'
+            data.prod_harvest_id,
             
-        if data.harvest_cost is not None:
-            sql += '%s,'    % data.harvest_cost
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.comments is not None:
-            sql += '"%s",'  % data.comments
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.weight_pp_lw_csv is not None:
-            sql += '"%s",'  % data.weight_pp_lw_csv
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.weight_pp_sw_csv is not None:
-            sql += '"%s");'  % data.weight_pp_sw_csv
-        else:
-            sql += 'NULL);'
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.acc_pig_buyer_id           if data.acc_pig_buyer_id and data.acc_pig_buyer_id > 0 else None,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.date_harvest,
+            
+            data.num_pigs,
+            data.harvest_type_id,
+            
+            data.live_weight                if data.live_weight is not None else None,
+            data.live_price                 if data.live_price is not None else None,
+            
+            data.slaughter_weight           if data.slaughter_weight is not None else None,
+            data.slaughter_minus_weight     if data.slaughter_minus_weight is not None else None,
+            data.slaughter_price            if data.slaughter_price is not None else None,
+            
+            data.net_sales                  if data.net_sales is not None else None,
+            data.harvest_cost               if data.harvest_cost is not None else None,
+            
+            data.comments                   if data.comments and data.comments.strip() else None,
+            
+            data.weight_pp_lw_csv           if data.weight_pp_lw_csv and data.weight_pp_lw_csv.strip() else None,
+            data.weight_pp_sw_csv           if data.weight_pp_sw_csv and data.weight_pp_sw_csv.strip() else None
+        ]
+        
+        rows = self._call_procedure('production_harvest_update', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
 
         if row is not None:
             return {
@@ -312,8 +183,7 @@ class ProductionHarvest:
         return None
     
     
-    def get_list(self, pig_farm_id = 0, pig_prod_id = 0, 
-            production_group_id = 0,  inc_user_audit = 0):
+    def get_list(self, pig_farm_id = 0, pig_prod_id = 0, inc_user_audit = 0):
         
         """
         if pig_farm_id is given, the result structure will be different
@@ -335,8 +205,6 @@ class ProductionHarvest:
         if pig_prod_id > 0:
             where_clause = 'WHERE a.pig_prod_id = %s ' % pig_prod_id
         
-        if production_group_id > 0:
-            where_clause = 'WHERE a.production_group_id = %s ' % production_group_id
         
         order_clause = 'ORDER BY a.date_harvest DESC'
         
@@ -435,34 +303,11 @@ class ProductionHarvest:
                     """ % (where_clause, order_clause)
             
            
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
         
         result = []
         if rows is not None:
