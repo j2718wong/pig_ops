@@ -1,45 +1,133 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+**Server Configuration for SuperPig**
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
-
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
-
----
-
-## Edit a file
-
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
-
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+The SuperPig application is hosted in a remote server in a traditional web server
+configuration where the backend program and the databse resides on the same host.
+No docker containers, no CI/CD, just one click deployment to the changes 
+to the serve.r 
 
 ---
 
-## Create a file
+## Project structure
+1. The SuperPig app is divided into 3 repositories;
+    - pig_ops           # FastAPI backend
+    - pig_ops_db        # Stored procedures and migration scripts for any changes of the database
+    - pig_ops_ui_mob    # Front end javascript codes 
 
-Next, you’ll add a new file to this repository.
+2. Directory structure
+root@prod-pig-ops:~/projects/jsys# ls -l
+total 56
+-rw-r--r-- 1 root root     7 Apr 10 23:22 app.pid
+drwxr-xr-x 2 root root  4096 Apr 10 23:22 deploy_logs
+-rwxr-xr-x 1 root root 19974 Mar 29 10:58 deploy.sh
+drwxr-xr-x 4 root root  4096 Mar 27 05:23 pig_ops
+drwxr-xr-x 5 root root  4096 Apr  7 06:59 pig_ops_db
+drwxr-xr-x 6 root root  4096 Mar 19 02:57 pig_ops_ui_mob
+drwxr-xr-x 2 root root  4096 Mar 28 04:19 restart_logs
+-rwxr-xr-x 1 root root  5603 Mar 23 00:49 restart.sh
+-rw-r--r-- 1 root root    10 Apr 10 23:22 version.txt
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+app.pid - generated; current PID of the FastApi program
+deploy.sh - script to one click update server codes; This is copied from 
+    root@prod-pig-ops:~/projects/jsys/pig_ops/webroot/scripts/deploy.sh
+    
+    Any changes of this script should be also manually overwrite  
+        ~/projects/jsys/deploy.sh
+        
+        
+version.txt - generated; This is updated in every execution of deploy.sh
+---
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+## Server Updates
+
+1.  No manual git pull; Just execute ./deploy.sh  
+
 
 ---
 
-## Clone a repository
+## Nginx Config
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+1. Location of Nginx config
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+root@prod-pig-ops:/etc/nginx/sites-available# ls -lt
+total 8
+-rw-r--r-- 1 root root 1936 Mar 20 06:06 superpig
+-rw-r--r-- 1 root root 2412 Nov 30  2023 default
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+2. Static file links
+
+root@prod-pig-ops:/var/www/superpig# ls -lt
+total 0
+lrwxrwxrwx 1 www-data www-data 45 Mar 16 08:47 static_m -> /root/projects/jsys/pig_ops_ui_mob/src/static
+lrwxrwxrwx 1 www-data www-data 41 Mar 16 08:47 static -> /root/projects/jsys/pig_ops_ui_mob/static
+
+3. cat /etc/nginx/sites-available/superpig
+
+root@prod-pig-ops:/etc/nginx/sites-available# cat /etc/nginx/sites-available/superpig
+# Redirect jsysdev.com to superpig.jsysdev.com
+server {
+    listen 80;
+    listen [::]:80;
+    server_name jsysdev.com www.jsysdev.com;
+    return 301 https://superpig.jsysdev.com$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name jsysdev.com www.jsysdev.com;
+    ssl_certificate /etc/letsencrypt/live/superpig.jsysdev.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/superpig.jsysdev.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    return 301 https://superpig.jsysdev.com$request_uri;
+}
+
+server {
+    server_name superpig.jsysdev.com www.superpig.jsysdev.com;
+    
+    # Error pages
+    error_page 502 503 504 /maintenance.html;
+    location = /maintenance.html {
+        root /root/projects/jsys/pig_ops/webroot/templates;
+        internal;
+    }
+    
+    location /static/ {
+        alias /root/projects/jsys/pig_ops_ui_mob/static/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+    
+    location /static_m/ {
+        alias /root/projects/jsys/pig_ops_ui_mob/src/static/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+    
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/superpig.jsysdev.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/superpig.jsysdev.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = superpig.jsysdev.com) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name superpig.jsysdev.com www.superpig.jsysdev.com;
+    return 404;
+}
+
