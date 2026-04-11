@@ -666,13 +666,11 @@ class DataPigProdDeadPig(BaseModel):
     uhid:                   str = None
     
     pig_prod_hid:           str = None
-    pig_prod_group_hid:     str = None
     pig_prod_pig_dead_hid:  str = None
     pig_dead_type_hid:      str
     
     user_id:                int = 0
     pig_prod_id:            int = 0
-    pig_prod_group_id:      int = 0
     pig_prod_pig_dead_id:   int = 0
     pig_dead_type_id:       int = 0
     
@@ -693,8 +691,8 @@ class DataPigProdNotes(BaseModel):
     user_id:                int = 0
     pig_prod_id:            int = 0
     sow_boar_id:            int = 0
-    production_group_id:    int = 0
     pig_prod_notes_id:      int = 0
+    
     date_notes:             str = None
     notes:                  str
 

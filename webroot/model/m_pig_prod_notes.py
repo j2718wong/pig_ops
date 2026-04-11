@@ -29,7 +29,6 @@ class PigProdNotes(BaseModel):
            
             in_pig_prod_id          INT,
             in_sow_boar_id          INT,
-            in_prod_group_id        INT,
             
             in_is_health_issue      INT,
             
@@ -42,7 +41,7 @@ class PigProdNotes(BaseModel):
             data.user_id,
             data.pig_prod_id         if data.pig_prod_id is not None and data.pig_prod_id > 0 else None,
             data.sow_boar_id         if data.sow_boar_id is not None and data.sow_boar_id > 0 else None,
-            data.production_group_id if data.production_group_id is not None and data.production_group_id > 0 else None,
+            
             data.is_health_issue,
             data.date_notes,
             data.notes
@@ -156,7 +155,7 @@ class PigProdNotes(BaseModel):
         return None
     
     
-    def get_list(self, pig_prod_id = 0, sow_boar_id = 0, prod_group_id = 0, 
+    def get_list(self, pig_prod_id = 0, sow_boar_id = 0, 
         inc_deleted = 0, inc_user_audit = 0):
         
         # Note: pig_prod_notes and health_issue is merged;
@@ -170,10 +169,6 @@ class PigProdNotes(BaseModel):
         
         if sow_boar_id > 0:
             where_clause = 'WHERE a.sow_boar_id = %s AND a.notes IS NOT NULL' % sow_boar_id
-        
-        if prod_group_id > 0:
-            where_clause = 'WHERE a.prod_group_id = %s AND a.notes IS NOT NULL' % prod_group_id
-        
         
         if inc_deleted == 0:
             where_clause += ' AND a.flag & 1 = 0'

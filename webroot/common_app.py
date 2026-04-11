@@ -53,6 +53,7 @@ from model.m_user_request       import UserRequest
 from model.m_user_group         import UserGroup
 from model.m_user_pig_farm      import UserPigFarm
 
+from model.m_business           import Business
 
 from model.m_pig_farm           import PigFarm
 from model.m_pig_farm_staff     import PigFarmStaff
@@ -122,6 +123,7 @@ model_names_pig_ops = [
     
     ('public_lookup',           PublicLookup),
     
+    ('business',                Business),
     
     ('pig_farm',                PigFarm),
     ('pig_farm_staff',          PigFarmStaff),

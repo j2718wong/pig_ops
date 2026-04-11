@@ -819,7 +819,7 @@ async def data_details(request: Request, entry_hid:str, inc_user_audit:int = 0):
     
     
     data_pig_medvac     = get_data_pig_medvac(sow_boar_id, 0, 0, 0)
-    data_pig_prod_notes = get_data_pig_prod_notes(0, sow_boar_id, 0, 0, 0)
+    data_pig_prod_notes = get_data_pig_prod_notes(sow_boar_id = sow_boar_id)
     
     
     data_health_issues  = []

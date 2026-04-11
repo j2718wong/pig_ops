@@ -672,9 +672,13 @@ async def pig_prod_cur_pig_count(request: Request, pig_prod_hid:str):
 
 
 @app.get("/pig_prod/entry/{entry_hid}", tags=["Pig Production"])
-async def pig_prod_entry(request: Request, entry_hid:str):
+async def pig_prod_entry(request: Request, entry_hid:str, inc_pig_ops:int=1):
     """
-    Will get pig_production list.
+    Get a single pig production entry by its hashid.
+    
+    This endpoint returns detailed information about a specific pig,
+    including its production status, breeding history, birth/weaning
+    records, and optionally its gestating/lactating operations.
     
     Parameters
     ----------
@@ -682,7 +686,10 @@ async def pig_prod_entry(request: Request, entry_hid:str):
     entry_hid:str
         pig_prod hashid
 
-
+    inc_pig_ops : int, optional (default=1)
+        Include pig operations (gestating_ops, lactating_ops):
+        - 1: Include operations 
+        - 0: Exclude operations 
 
     """
     result = get_uhid_or_redirect(request)
@@ -704,9 +711,12 @@ async def pig_prod_entry(request: Request, entry_hid:str):
             }
         }
     
-    
     pig_prod_id = res[0]
-    res = get_pig_prod_list(pig_prod_id = pig_prod_id, is_mob_view = 1)
+    
+    
+    res = get_pig_prod_list(pig_prod_id = pig_prod_id, 
+                            is_mob_view = 1,
+                            inc_pig_ops = inc_pig_ops)
     
     if len(res) != 1:
         return {
@@ -782,31 +792,59 @@ async def pig_prod_list(request: Request, pfhid:str, pig_prod_type:int = 0,  is_
     
 
     
-def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_prod_id = 0):
+def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, 
+        pig_prod_id = 0, inc_pig_ops = 1):
     """
+    Retrieve pig production entries with their associated operations and details.
+    
+    This function fetches production entries (pigs) based on the specified farm,
+    production type, and view mode. It also loads gestating/lactating operations
+    and, for harvested entries, includes harvest data.
+    
     Parameters
     ----------
     
+    pig_farm_id : int, optional (default=0)
+        The ID of the pig farm. If 0, it is assumed pig_prod_id > 0.
+        The pig_farm_id and pig_prod_id cannot be all > 0.
+    
     pig_prod_type : int
-        1 = pig_prod_status.gestating
-        2 = pig_prod_status.lactating
-        3 = pig_prod_status.gestating, pig_prod_status.lactating
-        4 = pig_prod_status.weaning, pig_prod_status.growing 
-        5 = pig_prod_status.gestating, pig_prod_status.lactating ,pig_prod_status.weaning, pig_prod_status.growing 
-        6 = pig_prod_status.harvested, pig_prod_status.closed 
+        Filters entries by production status:
+        - 1: Gestating only (pregnant sows)
+        - 2: Lactating only (sows with piglets)
+        - 3: Gestating + Lactating (active breeding sows)
+        - 4: Fattening (weaning + growing pigs ready for harvest)
+        - 5: All active (Gestating, Lactating, Fattening)
+        - 6: Harvested + Closed (completed/archived entries)
     
     
-        pig_prod_type = 6, is a special case; will also return harvest data for 
-        each production_entry
+        **Note**: pig_prod_type = 6, is a special case; will also return 
+        harvest data for each production_entry
     
+    
+    is_mob_view : int, optional (default=0)
+        Determines how lactating operations are structured:
+        - 0: Desktop view - separate piglet and sow operations
+        - 1: Mobile view - combined lactating operations list
+    
+    pig_prod_id : int, optional (default=0)
+        If provided, returns only the specific production entry.
+        Useful for fetching details of a single pig.
+    
+    inc_pig_ops : int, optional (default=1)
+        Include pig operations (gestating_ops, lactating_ops):
+        - 1: Include operations 
+        - 0: Exclude operations 
+        
+        Set to 0 for faster list loading.
     """
     
     
     
     res = model['pig_prod_get'].get_list(
-            pig_farm_id = pig_farm_id, 
-            pig_prod_type = pig_prod_type,
-            pig_prod_id = pig_prod_id)
+            pig_farm_id     = pig_farm_id, 
+            pig_prod_type   = pig_prod_type,
+            pig_prod_id     = pig_prod_id)
     
     
     res_harvest = []
@@ -816,13 +854,6 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
      
     for cur_entry in res:
         pig_prod_id     = cur_entry['pig_production']['id']
-        
-        order_by = 0 if is_mob_view == 0 else 1
-        
-        operation_type  = PIG_OPERATION_TYPE_GESTATING
-        gestating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
-            pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = order_by)
-        
         
         
         # Replace plain_id
@@ -835,44 +866,54 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
             
             del cur_entry['birth']['birth_staff_id']
             cur_entry['birth']['birth_staff_hid']   = cur_hid
+        
+        
+        if inc_pig_ops > 0:
+        
+            # Get gestating_ops
+            order_by = 0 if is_mob_view == 0 else 1
             
-        
-        # Replace plain id
-        replace_plain_ids_pig_prod_pig_ops(gestating_ops)
-        cur_entry['gestating_ops'] = gestating_ops
-        
-        
-        # Get Lactating Pig Operations
-        # Initially, the piglets and sow pig operations are requested 
-        # separately. But in mobile web, this is shown as one list.
-        
-        if is_mob_view == 0:
-            operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
-            lactating_piglets_ops = model['pig_prod_pig_ops'].get_list( 
-                operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
+            operation_type  = PIG_OPERATION_TYPE_GESTATING
+            gestating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
+                pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = order_by)
+     
             
             # Replace plain id
-            replace_plain_ids_pig_prod_pig_ops(lactating_piglets_ops)
-            cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
+            replace_plain_ids_pig_prod_pig_ops(gestating_ops)
+            cur_entry['gestating_ops'] = gestating_ops
             
             
-            operation_type  = PIG_OPERATION_TYPE_LACTATING_SOW
-            lactating_sow_ops = model['pig_prod_pig_ops'].get_list( 
-                operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
+            # Get Lactating Pig Operations
+            # Initially, the piglets and sow pig operations are requested 
+            # separately. But in mobile web, this is shown as one list.
             
-            # Replace plain id
-            replace_plain_ids_pig_prod_pig_ops(lactating_sow_ops)
-            cur_entry['lactating_sow_ops'] = lactating_sow_ops
-        
-        else:
-            # Combine lactating pig_ops
+            if is_mob_view == 0:
+                operation_type  = PIG_OPERATION_TYPE_LACTATING_PIGLETS
+                lactating_piglets_ops = model['pig_prod_pig_ops'].get_list( 
+                    operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
+                
+                # Replace plain id
+                replace_plain_ids_pig_prod_pig_ops(lactating_piglets_ops)
+                cur_entry['lactating_piglets_ops'] = lactating_piglets_ops
+                
+                
+                operation_type  = PIG_OPERATION_TYPE_LACTATING_SOW
+                lactating_sow_ops = model['pig_prod_pig_ops'].get_list( 
+                    operation_type, pig_prod_id = pig_prod_id, inc_user_audit = 1)
+                
+                # Replace plain id
+                replace_plain_ids_pig_prod_pig_ops(lactating_sow_ops)
+                cur_entry['lactating_sow_ops'] = lactating_sow_ops
             
-            operation_type  = PIG_OPERATION_TYPE_LACTATING_COMBINED
-            lactating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
-                pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = 1)
-            
-            replace_plain_ids_pig_prod_pig_ops(lactating_ops)
-            cur_entry['lactating_ops'] = lactating_ops
+            else:
+                # Combine lactating pig_ops
+                
+                operation_type  = PIG_OPERATION_TYPE_LACTATING_COMBINED
+                lactating_ops = model['pig_prod_pig_ops'].get_list(operation_type,
+                    pig_prod_id = pig_prod_id, inc_user_audit = 1, order_by = 1)
+                
+                replace_plain_ids_pig_prod_pig_ops(lactating_ops)
+                cur_entry['lactating_ops'] = lactating_ops
             
         
         
@@ -898,8 +939,6 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
                     cur_entry['data_details'] = {}
                     cur_entry['data_details']['list_harvest'] = list_harvest
                     
-                    
-                    
                     break
     
         
@@ -910,6 +949,36 @@ def get_pig_prod_list(pig_farm_id = 0, pig_prod_type = 0, is_mob_view = 0, pig_p
 
 @app.get("/pig_prod/data_details", tags=["Pig Production"])
 async def data_details(request: Request, pig_prod_hid, inc_user_audit:int = 0):
+    """
+    Get lazy-loaded details for a pig production entry.
+    
+    This endpoint returns all supplementary data that is not needed
+    for list views but required for entry detail pages (tabs).
+    
+    Parameters
+    ----------
+    pig_prod_hid : str
+        Hashid of the pig production entry
+    
+    inc_user_audit : int, optional (default=0)
+        Include user audit information (who created/updated)
+    
+    Returns
+    -------
+    dict
+        {
+            'result': {'num': 0},
+            'data': {
+                'list_medvac': [...],        # Medications/vaccinations
+                'list_health_issues': [...], # Health problem records
+                'list_notes': [...],         # General notes
+                'list_prod_feed': [...],     # Feed purchase details
+                'list_feed_balance': [...],  # Feed inventory
+                'list_harvest': [...]        # Harvest/sales records
+            }
+        }
+    """
+    
     result = get_uhid_or_redirect(request)
     
     # If result is RedirectResponse, return it immediately
@@ -935,7 +1004,7 @@ async def data_details(request: Request, pig_prod_hid, inc_user_audit:int = 0):
     # Get MedVac list
     data_pig_medvac = get_data_pig_medvac(0, pig_prod_id, 0, 0)
     
-    data_pig_prod_notes = get_data_pig_prod_notes(pig_prod_id, 0, 0, 0, 0)
+    data_pig_prod_notes = get_data_pig_prod_notes(pig_prod_id = pig_prod_id)
     
     
     # Get Health/Notes list
@@ -963,7 +1032,6 @@ async def data_details(request: Request, pig_prod_hid, inc_user_audit:int = 0):
     
     
     data = {
-        
         'list_medvac':          data_pig_medvac,
         'list_health_issues':   data_health_issues,
         'list_notes':           data_notes,
@@ -971,7 +1039,6 @@ async def data_details(request: Request, pig_prod_hid, inc_user_audit:int = 0):
         'list_feed_balance':    data_feed_balance_list,
         'list_harvest':         data_prod_harvest_list
     }
-    
     
     
     return {

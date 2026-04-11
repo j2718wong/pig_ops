@@ -1,18 +1,28 @@
 # August 23, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
 
-class PigProdPigDead:
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class PigProdPigDead(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PigProdPigDead'
+        super().__init__(model)  # Inherit from BaseModel
     
     
     def get_pig_dead_type_list(self):
-        
-      
+
         sql =   """
                 SELECT 
                     id,
@@ -22,45 +32,22 @@ class PigProdPigDead:
                 ORDER BY id
                 """ 
     
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return []
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_pig_dead_type_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
             
-            for row in rows:
-                
-                cur_entry = {
-                    'id':                   row[0],
-                    'name':                 row[1]
-                }
+        for row in rows:
+            
+            cur_entry = {
+                'id':                   row[0],
+                'name':                 row[1]
+            }
 
-                result.append(cur_entry)
+            result.append(cur_entry)
         
         return result
     
@@ -72,7 +59,6 @@ class PigProdPigDead:
             in_user_id              INT,
            
             in_pig_prod_id          INT,
-            in_pig_prod_group_id    INT,
             
             in_date_dead            VARCHAR(10),
             in_pig_dead_type_id     INT,
@@ -81,47 +67,25 @@ class PigProdPigDead:
         )  
         """
         
-        sql =  'CALL pig_prod_pig_dead_add('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.pig_prod_id
-        sql += '%s,'    % data.pig_prod_group_id
-        
-        sql += '"%s",'  % data.date_dead
-        sql += '%s,'    % data.pig_dead_type_id
-        sql += '%s,'    % data.num_pigs_dead
-        
-        if data.notes is not None and len(data.notes) > 0:
-            sql += '"%s");'   % data.notes
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.pig_prod_id,
+            
+            data.date_dead,
+            data.pig_dead_type_id,
+            data.num_pigs_dead,
+            
+            data.notes                  if data.notes and data.notes.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_prod_pig_dead_add', params)
+        
+        if res is None:
+            return None
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -152,48 +116,27 @@ class PigProdPigDead:
             in_notes                    VARCHAR(160)
         )
         """
-       
-        sql =  'CALL pig_prod_pig_dead_update('
-        sql += '%s,'    % data.user_id
         
-        sql += '%s,'    % data.pig_prod_pig_dead_id
-        sql += '"%s",'  % data.date_dead
-        sql += '%s,'    % data.pig_dead_type_id
-        sql += '%s,'    % data.num_pigs_dead
-                
-        if data.notes is not None and len(data.notes) > 0:
-            sql += '"%s");'   % data.notes
-        else:
-            sql += 'NULL);'
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+            data.pig_prod_pig_dead_id,
+            
+            data.date_dead,
+            data.pig_dead_type_id,
+            data.num_pigs_dead,
+            
+            data.notes                  if data.notes and data.notes.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_prod_pig_dead_update', params)
+        
+        if res is None:
+            return None
+        
+        row = res[0]
+        
+        
         if row is not None:
             return {
                 'result':{
@@ -329,138 +272,115 @@ class PigProdPigDead:
                 """ % pig_farm_id
         
         
+        rows = self._execute_query(sql)
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        if rows is None:
+            return []
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
+
         result = []
-        if rows is not None:
+
             
-            for row in rows:
-                cur_id                  = row[0]
-                cur_date_dead           = str(row[1])
-                cur_num_pigs_dead       = row[2]
-                
-                cur_dead_type_id        = row[3]
-                cur_dead_type           = row[4]
-                
-                cur_pig_prod_id         = row[5]
-                cur_farm_prod_id        = row[6]
-                
-                cur_insemination_type   = row[7]
-                cur_date_actual_birth   = row[8]
-                cur_date_weaning        = row[9]
-                
-                cur_sow_id              = row[10]
-                cur_sow_number          = row[11]
-                cur_sow_name            = row[12]
-                
-                cur_boar_id             = row[13]
-                cur_boar_number         = row[14]
-                cur_boar_name           = row[15]
-                
-                cur_semen_supplier_id   = row[16]
-                cur_semen_supplier_name = row[17]
-                
-                cur_semen_sup_semen_id  = row[18]
-                cur_semen_sup_semen_name= row[19]
-                
-                cur_semen_ai_boar_id    = row[20]
-                cur_semen_ai_boar_number= row[21]
-                cur_semen_ai_boar_name  = row[22]
-                
-                
-                cur_notes               = row[23]
-                
-                cur_entry = {
-                    'pig_dead':{
-                        'id':               cur_id,
-                        'date_dead':        cur_date_dead,
-                        'dead_type_id':     cur_dead_type_id,
-                        'dead_type':        cur_dead_type,
-                        'num_pigs_dead':    cur_num_pigs_dead,
-                        'notes':            cur_notes,
+        for row in rows:
+            cur_id                  = row[0]
+            cur_date_dead           = str(row[1])
+            cur_num_pigs_dead       = row[2]
+            
+            cur_dead_type_id        = row[3]
+            cur_dead_type           = row[4]
+            
+            cur_pig_prod_id         = row[5]
+            cur_farm_prod_id        = row[6]
+            
+            cur_insemination_type   = row[7]
+            cur_date_actual_birth   = row[8]
+            cur_date_weaning        = row[9]
+            
+            cur_sow_id              = row[10]
+            cur_sow_number          = row[11]
+            cur_sow_name            = row[12]
+            
+            cur_boar_id             = row[13]
+            cur_boar_number         = row[14]
+            cur_boar_name           = row[15]
+            
+            cur_semen_supplier_id   = row[16]
+            cur_semen_supplier_name = row[17]
+            
+            cur_semen_sup_semen_id  = row[18]
+            cur_semen_sup_semen_name= row[19]
+            
+            cur_semen_ai_boar_id    = row[20]
+            cur_semen_ai_boar_number= row[21]
+            cur_semen_ai_boar_name  = row[22]
+            
+            
+            cur_notes               = row[23]
+            
+            cur_entry = {
+                'pig_dead':{
+                    'id':               cur_id,
+                    'date_dead':        cur_date_dead,
+                    'dead_type_id':     cur_dead_type_id,
+                    'dead_type':        cur_dead_type,
+                    'num_pigs_dead':    cur_num_pigs_dead,
+                    'notes':            cur_notes,
+                },
+               
+                'production':{
+                    'pig_production' :{
+                        'id':               cur_pig_prod_id, 
+                        'farm_prod_id':     cur_farm_prod_id
                     },
-                   
-                    'production':{
-                        'pig_production' :{
-                            'id':               cur_pig_prod_id, 
-                            'farm_prod_id':     cur_farm_prod_id
+                    
+                    'sow': {
+                        'id':               cur_sow_id,
+                        'number':           cur_sow_number,
+                        'name':             cur_sow_name,
+                    },
+                    
+                    'insemination': {
+                        'insem_type':       cur_insemination_type,
+                        
+                        'boar': {
+                            'id':           cur_boar_id,
+                            'number':       cur_boar_number,
+                            'name':         cur_boar_name
                         },
                         
-                        'sow': {
-                            'id':               cur_sow_id,
-                            'number':           cur_sow_number,
-                            'name':             cur_sow_name,
-                        },
-                        
-                        'insemination': {
-                            'insem_type':       cur_insemination_type,
-                            
-                            'boar': {
-                                'id':           cur_boar_id,
-                                'number':       cur_boar_number,
-                                'name':         cur_boar_name
+                        'ai': {
+                            'semen_supplier':{
+                                'id':       cur_semen_supplier_id,
+                                'name':     cur_semen_supplier_name,
+                                
+                                'semen': {
+                                    'id':   cur_semen_sup_semen_id,
+                                    'name': cur_semen_sup_semen_name
+                                }
                             },
                             
-                            'ai': {
-                                'semen_supplier':{
-                                    'id':       cur_semen_supplier_id,
-                                    'name':     cur_semen_supplier_name,
-                                    
-                                    'semen': {
-                                        'id':   cur_semen_sup_semen_id,
-                                        'name': cur_semen_sup_semen_name
-                                    }
-                                },
-                                
-                                'internal_boar':{
-                                    'id':           cur_semen_ai_boar_id,
-                                    'number':       cur_semen_ai_boar_number,
-                                    'name':         cur_semen_ai_boar_name
-                                },
-                                
-                            }
-                        },
-                        
-                        'birth': {
-                            'date_actual':      cur_date_actual_birth,
-                        },
-                        
-                        'weaning': {
-                            'date_weaning':     cur_date_weaning,
+                            'internal_boar':{
+                                'id':           cur_semen_ai_boar_id,
+                                'number':       cur_semen_ai_boar_number,
+                                'name':         cur_semen_ai_boar_name
+                            },
+                            
                         }
+                    },
+                    
+                    'birth': {
+                        'date_actual':      cur_date_actual_birth,
+                    },
+                    
+                    'weaning': {
+                        'date_weaning':     cur_date_weaning,
                     }
                 }
-            
-                
-                result.append(cur_entry)
+            }
         
+            
+            result.append(cur_entry)
+    
         return result
     
     

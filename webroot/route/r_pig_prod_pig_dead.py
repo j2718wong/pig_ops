@@ -89,22 +89,6 @@ async def prod_pig_dead_add(request: Request, data: dm.DataPigProdDeadPig):
         pig_prod_id = res[0]
         
     
-    pig_prod_group_hid  = data.pig_prod_group_hid
-    pig_prod_group_id   = 0
-    
-    if pig_prod_group_hid is not None:
-        res = hashids_common.decrypt(pig_prod_group_hid)
-        if len(res) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID,
-                    'code': 'ERROR_PIG_DEAD_INVALID_PROD_GROUP_HASHID'
-                }
-            }
-        
-        pig_prod_group_hid = res[0]
-    
-    
     pig_dead_type_hid   = data.pig_dead_type_hid
     pig_dead_type_id    = 0
     
@@ -122,7 +106,6 @@ async def prod_pig_dead_add(request: Request, data: dm.DataPigProdDeadPig):
     
     data.user_id          = user_id
     data.pig_prod_id      = pig_prod_id
-    data.pig_prod_group_id= pig_prod_group_id
     data.pig_dead_type_id = pig_dead_type_id
     
     res_add    =  model['prod_pig_dead'].add(data)

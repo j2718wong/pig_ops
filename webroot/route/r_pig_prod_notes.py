@@ -304,11 +304,14 @@ async def pig_prod_notes_delete(request: Request, ehid: str):
     return res_delete
     
     
-def get_data_pig_prod_notes(pig_prod_id, sow_boar_id, prod_group_id, 
-        inc_deleted, inc_user_audit):
+def get_data_pig_prod_notes(pig_prod_id = 0, sow_boar_id = 0, 
+        inc_deleted = 0, inc_user_audit = 0):
             
-    res = model['prod_notes'].get_list(pig_prod_id, sow_boar_id, prod_group_id, 
-        inc_deleted, inc_user_audit)
+    res = model['prod_notes'].get_list(
+        pig_prod_id     = pig_prod_id, 
+        sow_boar_id     = sow_boar_id, 
+        inc_deleted     = inc_deleted, 
+        inc_user_audit  = inc_user_audit)
     
     if res is None:
         return None
@@ -337,7 +340,7 @@ def get_data_pig_prod_notes(pig_prod_id, sow_boar_id, prod_group_id,
     
 @app.get("/pig_prod_notes/list", tags=["Production Details"])
 async def pig_prod_notes_list(request: Request, pig_prod_hid: str = None, 
-        sow_boar_hid: str = None, prod_group_hid = None, 
+        sow_boar_hid: str = None,  
         inc_deleted: int = 0, inc_user_audit:int = 0):
     
     """
@@ -368,7 +371,6 @@ async def pig_prod_notes_list(request: Request, pig_prod_hid: str = None,
     
     pig_prod_id     = 0
     sow_boar_id     = 0
-    prod_group_id   = 0
     
     
     if pig_prod_hid is not None:
@@ -397,22 +399,9 @@ async def pig_prod_notes_list(request: Request, pig_prod_hid: str = None,
         sow_boar_id = res[0]
     
     
-    if prod_group_hid is not None:
-        res = hashids_common.decrypt(prod_group_id)
-        if len(res) == 0:
-            return {
-                'result':{
-                    'num':  ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID,
-                    'code': 'ERROR_PIG_PROD_NOTES_INVALID_PROD_GROUP_HASHID'
-                }
-            }
         
-        prod_group_id = res[0]
-    
-    
-        
-    res = get_data_pig_prod_notes(pig_prod_id, sow_boar_id, prod_group_id, 
-        inc_deleted, inc_user_audit)
+    res = get_data_pig_prod_notes(pig_prod_id, sow_boar_id, 
+            inc_deleted, inc_user_audit)
     
     
     if res is None:
