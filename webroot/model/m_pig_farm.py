@@ -469,11 +469,10 @@ class PigFarm(BaseModel):
                     
                     a.num_farrowing_crates,
                     
-                    a.last_summary_report_id,
-                    
                     a.data_ver_num_sow,
                     a.data_ver_num_boar,     
                     a.data_ver_num_pig_prod, 
+                    a.data_ver_num_prod_history, 
                     a.data_ver_num_staff,    
                     a.data_ver_num_feed_buy,
                     a.data_ver_num_feed_balance,
@@ -512,15 +511,14 @@ class PigFarm(BaseModel):
                 
                 cur_num_farrowing_crates    = row[10] 
 
-                cur_summary_report_id       = row[11]  
-
-                cur_data_ver_num_sow        = row[12]  
-                cur_data_ver_num_boar       = row[13]  
-                cur_data_ver_num_pig_prod   = row[14]  
-                cur_data_ver_num_staff      = row[15]  
-                cur_data_ver_num_feed_buy   = row[16]  
-                cur_data_ver_num_feed_balance = row[17]  
-                cur_data_ver_num_not_pregnant = row[18]  
+                cur_data_ver_num_sow            = row[11]  
+                cur_data_ver_num_boar           = row[12]  
+                cur_data_ver_num_pig_prod       = row[13]  
+                cur_data_ver_num_prod_history   = row[14]
+                cur_data_ver_num_staff          = row[15]  
+                cur_data_ver_num_feed_buy       = row[16]  
+                cur_data_ver_num_feed_balance   = row[17]  
+                cur_data_ver_num_not_pregnant   = row[18]  
                 
                 cur_entry = {
                     'pig_farm': {
@@ -557,11 +555,10 @@ class PigFarm(BaseModel):
                     },
                     
                     'data_ver_num':{
-                        'summary_report_id': cur_summary_report_id,
-                    
                         'sow':          cur_data_ver_num_sow,       
                         'boar':         cur_data_ver_num_boar,    
                         'pig_prod':     cur_data_ver_num_pig_prod,
+                        'prod_history': cur_data_ver_num_prod_history,
                         'staff':        cur_data_ver_num_staff,   
                         'feed_buy':     cur_data_ver_num_feed_buy,
                         'feed_balance': cur_data_ver_num_feed_balance,
@@ -627,11 +624,10 @@ class PigFarm(BaseModel):
     def get_data_ver_num(self, pig_farm_id, return_array = 0):
         sql =   """
                 SELECT
-                    last_summary_report_id,
-                 
                     data_ver_num_sow,
                     data_ver_num_boar,     
-                    data_ver_num_pig_prod, 
+                    data_ver_num_pig_prod,
+                    data_ver_num_prod_history,
                     data_ver_num_staff,    
                     data_ver_num_feed_buy,
                     data_ver_num_feed_balance,
@@ -649,11 +645,10 @@ class PigFarm(BaseModel):
 
             
         for row in rows:
-            cur_summary_report_id           = row[0]
-            
-            cur_data_ver_num_sow            = row[1]
-            cur_data_ver_num_boar           = row[2]   
-            cur_data_ver_num_pig_prod       = row[3]
+            cur_data_ver_num_sow            = row[0]
+            cur_data_ver_num_boar           = row[1]   
+            cur_data_ver_num_pig_prod       = row[2]
+            cur_data_ver_num_prod_history   = row[3]
             cur_data_ver_num_staff          = row[4]  
             cur_data_ver_num_feed_buy       = row[5]
             cur_data_ver_num_feed_balance   = row[6]
@@ -663,15 +658,14 @@ class PigFarm(BaseModel):
             if return_array == 0:
                 cur_entry = {
                     'data_ver_num': {
-                        'summary_report_id': cur_summary_report_id,
-                        
-                        'sow':               cur_data_ver_num_sow,       
-                        'boar':              cur_data_ver_num_boar,    
-                        'pig_prod':          cur_data_ver_num_pig_prod,
-                        'staff':             cur_data_ver_num_staff,   
-                        'feed_buy':          cur_data_ver_num_feed_buy,
-                        'feed_balance':      cur_data_ver_num_feed_balance,
-                        'not_pregnant':      cur_data_ver_num_not_pregnant
+                        'sow':              cur_data_ver_num_sow,       
+                        'boar':             cur_data_ver_num_boar,    
+                        'pig_prod':         cur_data_ver_num_pig_prod,
+                        'prod_history':     cur_data_ver_num_prod_history,
+                        'staff':            cur_data_ver_num_staff,   
+                        'feed_buy':         cur_data_ver_num_feed_buy,
+                        'feed_balance':     cur_data_ver_num_feed_balance,
+                        'not_pregnant':     cur_data_ver_num_not_pregnant
                     }
                 }
                 
@@ -679,11 +673,10 @@ class PigFarm(BaseModel):
             
             else:
                 return [
-                    cur_summary_report_id,
-                
                     cur_data_ver_num_sow,        
                     cur_data_ver_num_boar,       
-                    cur_data_ver_num_pig_prod,   
+                    cur_data_ver_num_pig_prod,
+                    cur_data_ver_num_prod_history,   
                     cur_data_ver_num_staff,      
                     cur_data_ver_num_feed_buy,
                     cur_data_ver_num_feed_balance,   
