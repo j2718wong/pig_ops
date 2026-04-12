@@ -77,7 +77,7 @@ class PigProductionGet(BaseModel):
             3 = Active sows (status_id = 1, 4) - Gestating + Lactating
             4 = Post-lactation (status_id = 5, 6) - Weaning + Growing
             5 = All active (status_id = 1, 4, 5, 6) - All non-harvested/closed
-            6 = Completed (status_id = 8, 9) - Harvested + Closed
+            6 = Completed (status_id = 7, 8, 9) - Combined + Harvested + Closed
         pig_prod_id : int
             Specific production ID (overrides farm filter)
         
@@ -118,11 +118,10 @@ class PigProductionGet(BaseModel):
                 where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (1, 4, 5, 6) ' % pig_farm_id
                 
             # pig_prod_type = 6: Completed/Harvested
-            # Statuses: 8 = Harvested (sold for meat), 9 = Closed (production ended)
-            # Historical records, sorted by weaning date descending (most recent first)
+            # Statuses: 7 = Combined to Group; 8 = Harvested, 9 = Closed 
             if pig_prod_type == 6:
-                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (8, 9) ' % pig_farm_id
-                order_clause = 'ORDER BY a.date_weaning DESC'
+                where_clause = 'WHERE a.pig_farm_id = %s AND a.prod_status_id IN (7, 8, 9) ' % pig_farm_id
+                order_clause = 'ORDER BY a.id DESC'
             
         else:
             # Get specific production record by ID (overrides all other filters)
