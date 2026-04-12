@@ -34,7 +34,7 @@ class Business(BaseModel):
                     a.id,
                     a.country_id,
                     a.flag,
-                    b.country_name,
+                    b.name,
                     a.currency_code,  
                     a.price_per_head, 
                     a.tax_name_1,     
@@ -42,7 +42,8 @@ class Business(BaseModel):
                     a.tax_rate_1,     
                     a.tax_rate_2
                     
-                FROM biz_pricing 
+                FROM biz_pricing a
+                LEFT OUTER JOIN app_country b ON a.country_id = b.id
                 %s
                 """ % where_clause
     
@@ -60,13 +61,14 @@ class Business(BaseModel):
             cur_id                      = row[0]
             cur_country_id              = row[1]
             cur_flag                    = row[2]
-            cur_currency_code           = row[3]
-            cur_price_per_head          = float(row[4])
+            cur_country_name            = row[3]
+            cur_currency_code           = row[4]
+            cur_price_per_head          = float(row[5])
             
-            cur_tax_name_1              = row[5]
-            cur_tax_name_2              = row[6]
-            cur_tax_rate_1              = float(row[7]) if row[7] is not None else None
-            cur_tax_rate_2              = float(row[8]) if row[8] is not None else None
+            cur_tax_name_1              = row[6]
+            cur_tax_name_2              = row[7]
+            cur_tax_rate_1              = float(row[8]) if row[8] is not None else None
+            cur_tax_rate_2              = float(row[9]) if row[9] is not None else None
             
             
             
@@ -74,6 +76,7 @@ class Business(BaseModel):
                 'pricing': {
                     'id':               cur_id,
                     'country_id':       cur_country_id,
+                    'country_name':     cur_country_name,
                     'flag':             cur_flag,
                     'currency_code':    cur_currency_code,
                     'price_per_head':   cur_price_per_head
