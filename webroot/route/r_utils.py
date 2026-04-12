@@ -387,6 +387,14 @@ def replace_plain_ids_account(data):
     data['account']['hid']   = cur_hid
     
     
+    cur_id  = data['account']['country_id']
+    cur_hid = hashids_common.encrypt(cur_id)
+    
+    del data['account']['country_id']
+    data['account']['country_hid']   = cur_hid
+    
+    
+    
     if 'pig_farms' in data:
         pig_farms = data['pig_farms']
         

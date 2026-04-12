@@ -23,6 +23,12 @@ class Business(BaseModel):
 
     def get_pricing(self, country_id):
         # Note: The country_id = 0, is the default pricing
+        
+        if country_id is not None:
+            where_clause = 'WHERE a.country_id IN (0, %s)' % country_id
+        else:
+            where_clause = 'WHERE a.country_id = 0'
+        
         sql =   """
                 SELECT 
                     a.id,
@@ -37,8 +43,8 @@ class Business(BaseModel):
                     a.tax_rate_2
                     
                 FROM biz_pricing 
-                WHERE a.country_id IN (0, %s)
-                """ % country_id
+                %s
+                """ % where_clause
     
     
         rows = self._execute_query(sql)

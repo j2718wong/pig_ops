@@ -82,6 +82,8 @@ tags_metadata = [
     {"name": "Account Details", "description": "Account Details related operations"},
     {"name": "Location Address","description": "Location Address related operations"},
     
+    {"name": "Business",        "description": "Business related operations"},
+    
     {"name": "Pig Farm",        "description": "Pig Farm related operations"},
     
     {"name": "Sow Boar",        "description": "Sow Boar related operation"},
