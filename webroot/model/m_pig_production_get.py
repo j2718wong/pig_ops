@@ -1604,7 +1604,7 @@ class PigProductionGet(BaseModel):
             cur_num_pigs_current        = row[2]
           
             cur_entry ={
-                'id':               cur_sow_id,
+                'id':               cur_id,
                 'farm_prod_id':     cur_farm_prod_id,     
                 'pigs_join_group':  cur_num_pigs_current
                 
