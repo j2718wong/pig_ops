@@ -295,6 +295,9 @@ class Account(BaseModel):
             in_user_id              INT,
     
             in_country_id           INT,
+            
+            in_referral_id          INT, 
+            
             in_name                 VARCHAR(100)
         )  
         """
@@ -302,6 +305,7 @@ class Account(BaseModel):
         params = [
             data.user_id,
             data.country_id,
+            data.referral_id        if data.referral_id > 0 else None,
             data.name               if data.name and data.name.strip() else None
         ]
         

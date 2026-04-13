@@ -122,6 +122,11 @@ class DataAccount(BaseModel):
     user_id:                int = 0
     name:                   str
     country_id:             int = COUNTRY_ID_PHILIPPINES
+    
+    referral_id:            int = 0
+    
+    referral_code:          str = None
+     
 
 
 class DataAccountAccessCode(BaseModel):
