@@ -15,6 +15,9 @@ if module_directory not in sys.path:
 from base_model             import BaseModel
 
 
+FLAG_BIT_IS_A_GROUP         = 2
+
+
 class PigProductionGet(BaseModel):
     def __init__(self, model):
         super().__init__(model)
@@ -551,6 +554,17 @@ class PigProductionGet(BaseModel):
                 del cur_entry['feeds']['date_change_feed']['starter']
                 del cur_entry['feeds']['date_change_feed']['grower']
                 del cur_entry['feeds']['date_change_feed']['finisher']
+
+
+            # Get Group members if production is a Group
+            if (cur_prod_flag & FLAG_BIT_IS_A_GROUP) > 0:
+                group_members = self.get_production_group_members(
+                    pig_farm_id, cur_prod_id)
+                    
+                if group_members and len(group_members) > 0:
+                    cur_entry['group_members'] = group_members
+                    
+            
 
             result.append(cur_entry)
 
@@ -1563,5 +1577,46 @@ class PigProductionGet(BaseModel):
         return result
     
     
+    def get_production_group_members(self, pig_farm_id, pig_prod_id):
+        
+        sql = """
+        SELECT 
+            id,
+            farm_prod_id,
+            num_pigs_current
+        FROM pig_production 
+        WHERE pig_farm_id = %s AND production_group_id = %s  
+        """ %(pig_farm_id, pig_prod_id)
+            
+            
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return []
+            
+
+        result = []
+          
+        for row in rows:
+            
+            cur_id                      = row[0]
+            cur_farm_prod_id            = row[1]
+            cur_num_pigs_current        = row[2]
+          
+            cur_entry ={
+                'id':               cur_sow_id,
+                'farm_prod_id':     cur_farm_prod_id,     
+                'pigs_join_group':  cur_num_pigs_current
+                
+            }
+                
+            result.append(cur_entry)
+    
+        return result
+    
+    
+    
+        
+
     
         
