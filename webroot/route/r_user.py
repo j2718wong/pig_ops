@@ -282,7 +282,7 @@ async def user_register_or_login(request: Request,
         return res_register
         
         
-    # At this point user is verified
+    # At this point user is verified    
     
     
     # Get user_id and account info

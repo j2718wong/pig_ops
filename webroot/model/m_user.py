@@ -348,6 +348,10 @@ class User(BaseModel):
             data.device_type            if data.device_type and data.device_type.strip() else None
         ]
         
+        sql = self._generate_debug_procedure('user_register_or_login', params)
+        print('\n\n' + sql)
+        
+        
         rows = self._call_procedure('user_register_or_login', params)
         
         if rows is None:
@@ -398,11 +402,9 @@ class User(BaseModel):
             del cur_entry['user']
         
         if cur_user_account_id and cur_user_account_id > 0 and cur_user_id > 0:
-            del cur_entry['user_unverified']
+            if cur_verify_id == 0:
+                del cur_entry['user_unverified']
         
-        if 'user_unverified' in cur_entry:
-             if cur_user_unverified_id == 0:
-                 del cur_entry['user_unverified']
         
         return cur_entry
     
