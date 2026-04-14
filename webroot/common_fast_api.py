@@ -268,7 +268,7 @@ app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
 
 # Public endpoint: 10 requests per minute per IP
 public_limit = RateLimiter(
-    times=12,        # 6 requests
+    times=60,        # 6 requests
     seconds=60,      # per minute
     trust_proxy=True, # Use X-Forwarded-For if behind proxy
     add_headers=True  # Show rate limit info in response headers
@@ -277,7 +277,7 @@ public_limit = RateLimiter(
 
 # More restrictive endpoint for sensitive operations
 strict_limit = RateLimiter(
-    times=8,
+    times=30,
     seconds=60,
     add_headers=True
 )

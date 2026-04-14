@@ -52,8 +52,8 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
 
 
 
-@app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-@app.get("/login", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+@app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(strict_limit)])
+@app.get("/login", response_class = HTMLResponse, dependencies=[Depends(strict_limit)])
 async def signup_or_login(request: Request, response: Response):
     """
     Unified authentication page for both signup and login.
@@ -139,7 +139,7 @@ async def signup_or_login(request: Request, response: Response):
     
     
 
-@app.get("/logout", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+@app.get("/logout", response_class = HTMLResponse, dependencies=[Depends(strict_limit)])
 async def logout(response: Response):
     # Add cache control headers to prevent caching
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, private"
