@@ -16,7 +16,7 @@ from base_model             import BaseModel
 
 
 
-class AccountAccessCode(BaseModel):
+class AccountReferral(BaseModel):
     def __init__(self, model):
         super().__init__(model)
 
