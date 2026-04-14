@@ -400,6 +400,10 @@ class User(BaseModel):
         if cur_user_account_id and cur_user_account_id > 0 and cur_user_id > 0:
             del cur_entry['user_unverified']
         
+        if 'user_unverified' in cur_entry:
+             if cur_user_unverified_id == 0:
+                 del cur_entry['user_unverified']
+        
         return cur_entry
     
     

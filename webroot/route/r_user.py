@@ -214,7 +214,14 @@ async def user_register_or_login(request: Request,
         }
     
     
-    # Get user_id is tehre is any
+    # No token yet at this time; user must address the 
+    # non-zero res_register['result']['num']
+    if res_register['result']['num'] > 0:
+        return res_register
+    
+    
+    
+    # Get user_id is there is any
     user_id = None
     if 'user' in res_register:
         user_id = res_register['user']['id']
@@ -402,9 +409,10 @@ async def user_email_verify_code(request: Request, data: dm.DataUserEmailVerify)
     
     
 @app.get("/user/email/verify_code/resend", tags=["User"])
-async def user_email_verify_resend(uvuhid:str):
+async def user_email_verify_resend(request: Request,
+    background_tasks: BackgroundTasks,
+    uvuhid:str = None, uhid:str = None):
     
-    uvuhid = data.uvuhid
     unverified_user_id = 0
     
     if uvuhid is not None:
@@ -423,7 +431,7 @@ async def user_email_verify_resend(uvuhid:str):
         unverified_user_id = res[0]
         
     
-    uhid = data.uhid
+
     user_id = 0
     
     if uhid is not None:
