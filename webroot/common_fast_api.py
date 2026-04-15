@@ -45,8 +45,9 @@ mimetypes.add_type('text/javascript', '.js')
 
 # Try multiple possible locations for .env file
 env_paths = [
-    Path('.env'),  # current directory
+    Path('.env'),  # current directory, default development
     Path(__file__).parent / '.env',  # same as this file
+    Path('/root/projects/jsys/secure/.env'),  # PRODUCTION - secure directory
     Path.home() / '.pig_ops_env' / '.env',  # user home directory
     Path('/etc/pig_ops/.env'),  # system config (for production)
 ]
