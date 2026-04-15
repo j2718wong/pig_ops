@@ -13,7 +13,7 @@ import math
 
 
 from pathlib    import Path
-from dotenv     import load_dotenv
+
 
 
 # import modules from path_common

@@ -1165,6 +1165,12 @@
     window.SUPERPIG_CURRENT_LANG = '{{ page_data.lang }}';
     window.SUPERPIG_AVAILABLE_LANGUAGES = {{ page_data.available_languages|tojson }};
     
+    // Ui settings
+    window.SUPERPIG_UI_SETTINGS = {{ page_data.app_ui_settings }};
+        
+    console.log('window.SUPERPIG_UI_SETTINGS');
+    console.log(window.SUPERPIG_UI_SETTINGS);
+    
     console.log('Signup page - Language:', window.SUPERPIG_CURRENT_LANG);
     console.log('Available languages:', window.SUPERPIG_AVAILABLE_LANGUAGES);
 </script>

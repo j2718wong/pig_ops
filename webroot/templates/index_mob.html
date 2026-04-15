@@ -829,6 +829,9 @@
         <div id="container-access-code-list"        class="hidden-container" style="display:none;"></div>
         <div id="container-access-code-add-edit"    class="hidden-container" style="display:none;"></div>
         
+        <div id="container-referral-list"           class="hidden-container" style="display:none;"></div>
+        <div id="container-referral-entry"          class="hidden-container" style="display:none;"></div>
+        
         
         <div id="container-join-acc-req-list"       class="hidden-container" style="display:none;"></div>
         <div id="container-join-acc-req-approve"    class="hidden-container" style="display:none;"></div>
@@ -914,11 +917,15 @@
 
 
     <script type="text/javascript">
+        // Ui settings
+        window.SUPERPIG_UI_SETTINGS = {{ page_data.app_ui_settings }};
+        
+        console.log('window.SUPERPIG_UI_SETTINGS');
+        console.log(window.SUPERPIG_UI_SETTINGS);
+        
+        
         // Global translations object
         window.SUPERPIG_TRANSLATIONS = {{ translation if translation else 'null' }};
-        
-        console.log('window.SUPERPIG_TRANSLATIONS');
-        console.log(window.SUPERPIG_TRANSLATIONS);
         
         
         // Also store current language from URL/localStorage if needed

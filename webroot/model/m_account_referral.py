@@ -77,30 +77,19 @@ class AccountReferral(BaseModel):
         
     def get_list(self, account_id):
         
-        where_clause = 'WHERE a.account_id = %s ' %account_id
-        where_clause += ' AND (a.flag & 1) = 0' 
-            
-        
         sql =   """
                 SELECT 
                     a.id,
-                    b.group_num,
+                    b.name,
+                    a.flag,
                     
-                    c.name_last,
-                    c.name_first,
-                    
-                    d.name_last,
-                    d.name_first,
-                    
-                    
+                    a.business_date_active,
                     a.dt_entry
-                FROM account_access_code a
-                LEFT OUTER JOIN user_group b    ON a.user_group_id = b.id
-                LEFT OUTER JOIN user c          ON a.used_by_user_id = c.id
-                LEFT OUTER JOIN user d          ON a.issued_by_user_id = d.id
-                %s
+                FROM account_referral a
+                LEFT OUTER JOIN account b    ON a.referred_account_id = b.id
+                WHERE a.account_id = %s
                 ORDER BY a.id DESC
-                """ % (where_clause)
+                """ % account_id
     
         
         rows = self._execute_query(sql)
@@ -112,22 +101,26 @@ class AccountReferral(BaseModel):
         result = []
             
         for row in rows:
-            name_last =    row[2]
+            cur_id              = row[0]
+            cur_referred_acc    = row[1]
+            cur_flag            = row[2]
+            
+            cur_date_active     = row[3]
+            curdt_entry         = row[4]
             
                 
             cur_entry = {
             
-                'access_code': {
-                    'id':               row[0],
-                    'user_group':{  
-                        'number':       row[1]
+                'account_referral': {
+                    'id':               cur_id,
+                    'flag':             cur_flag,
+                    
+                    'referred_account':{
+                        'name':         cur_referred_acc,
                     },
                     
-                    'used_by_user':{
-                        'name_last':    name_last,
-                        'name_first':   row[3]
-                    },
-                    
+                    'date_active':      cur_date_active,
+                        
                     'dt_entry':         str(row[6])
                 }
             }

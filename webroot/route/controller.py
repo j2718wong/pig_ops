@@ -141,6 +141,39 @@ class Controller:
             return {}   
 
 
+    def get_app_ui_settings(self):
+        enable_manual_email     = 0
+        enable_referral         = 0
+
+        temp = os.getenv('UI_ENABLE_MANUAL_EMAIL_LOGIN')
+        if temp is not None:
+            try:
+                temp_int = int(temp)
+                
+                if temp_int > 0:
+                    enable_manual_email = 1
+            except:
+                test = 1
+
+        temp = os.getenv('UI_ENABLE_ACCOUNT_REFERRAL')
+        if temp is not None:
+            try:
+                temp_int = int(temp)
+                
+                if temp_int > 0:
+                    enable_referral = 1
+            except:
+                test = 1
+
+
+        ui_settings = {
+            'enable_manual_email':  enable_manual_email,
+            'enable_referral':      enable_referral
+        }
+
+        
+        return ui_settings
+
 
     def set_view(self, view):
         self.view = view

@@ -217,10 +217,16 @@ class SignUp(ViewBase):
         # Get appropriate JS files based on environment
         files = self.get_js_files('login')
         
+        # Get app_ui_settings
+        ui_settings     = self.controller.get_app_ui_settings()
+        app_ui_settings = json.dumps(ui_settings)
+
+        
         page_data = {
-            'lang':             lang,
-            'translations':     translations,
-            'available_languages': available_languages
+            'app_ui_settings':      app_ui_settings,
+            'lang':                 lang,
+            'translations':         translations,
+            'available_languages':  available_languages
         }
         
             
@@ -438,6 +444,12 @@ class Root(ViewBase):
                     break
         
         
+        # Get app_ui_settings
+        ui_settings     = self.controller.get_app_ui_settings()
+        app_ui_settings = json.dumps(ui_settings)
+            
+        
+        
         if uhid is not None:
             # Mobile version
             template = env.get_template('index_mob.html')
@@ -462,7 +474,8 @@ class Root(ViewBase):
             
             
             page_data = {
-                'app_version':              self.controller.APP_VERSION
+                'app_version':              self.controller.APP_VERSION,
+                'app_ui_settings':          app_ui_settings
             }
             
             
@@ -491,10 +504,11 @@ class Root(ViewBase):
             # Load marketing items
             marketing_items = self.load_marketing_highlights_with_lang(lang)
             
-            print('\n\nlang=%s' %lang)
             
             page_data = {
                 'app_version':          app_version,
+                'app_ui_settings':      app_ui_settings,
+                
                 'lang':                 lang,
                 'language_display':     language_display,
                 'available_languages':  available_languages,
