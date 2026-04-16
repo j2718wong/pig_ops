@@ -171,23 +171,190 @@ If you didn't request this code, please ignore this email.
         return f"Verify your email for {self.application_name}"
 
 
-# Example: Creating a different company by extending EmailTemplate
-class AnotherCompanyEmailTemplate(EmailTemplate):
-    def __init__(self):
-        super().__init__()
-        self.company_name = "AnotherApp"
-        self.company_website = "https://anotherapp.com"
-        self.support_email = "help@anotherapp.com"
-        self.primary_color = "#667eea"  # Purple
-        self.accent_color = "#764ba2"   # Dark purple
+class EmailAccountNotStartedTrial(EmailTemplate):
+    """
+    Notify user that they have not started their free trial yet.
+    Send reminder to add breeding pigs and start using the app.
+    """
+    
+    def get_email_body(self, user_first_name: str, farm_name: str) -> str:
+        """
+        Generate email body for account not started trial notification
+        """
+        # Image URLs with version for cache busting
+        dashboard_img = f"{self.company_website}/static_m/images/mar/mar_home.png"
+        sow_list_img  = f"{self.company_website}/static_m/images/mar/mar_sow_list.png"
+        gestating_img = f"{self.company_website}/static_m/images/mar/mar_gesta.png"
+        farrowing_img = f"{self.company_website}/static_m/images/mar/mar_farrowing.png"
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Start your free trial for {self.application_name}</title>
+        </head>
+        <body style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; line-height: 1.6; margin: 0; padding: 10px; background: #f5f5f5;">
+            <!-- Main container with white background -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f5f5f5; padding: 10px;">
+                <tr>
+                    <td align="center">
+                        <table width="100%" max-width="500px" cellpadding="0" cellspacing="0" border="0" style="background: {self.white}; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 500px; width: 100%; border: 1px solid {self.border_color};">
+                            
+                            <!-- Header -->
+                            <tr>
+                                <td style="background: {self.primary_color}; padding: 20px; text-align: center; border-radius: 12px 12px 0 0;">
+                                    <h1 style="color: {self.white}; margin: 0; font-size: 24px; font-weight: 600;">{self.application_name}</h1>
+                                </td>
+                            </tr>
+                            
+                            <!-- White content area -->
+                            <tr>
+                                <td style="padding: 24px 20px; background: {self.white};">
+                                    
+                                    <h2 style="color: {self.text_dark}; margin: 0 0 10px 0; font-size: 22px; font-weight: 600;">
+                                        Hello {user_first_name},
+                                    </h2>
+                                    
+                                    <p style="color: {self.text_dark}; margin: 0 0 15px 0; font-size: 16px;">
+                                        We noticed that your account for <strong>{farm_name}</strong> has not started using {self.application_name} yet.
+                                        Feel free to explore by adding your breeding pigs and production entries.
+                                    </p>
+                                    
+                                    <p style="color: {self.text_dark}; margin: 0 0 20px 0; font-size: 16px;">
+                                        Take a look at how {self.application_name} is used in managing pig production data.
+                                    </p>
+                                    
+                                    <!-- Dashboard Preview -->
+                                    <div style="margin: 25px 0;">
+                                        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center;">
+                                            <h3 style="color: {self.primary_color}; margin: 0 0 12px 0; font-size: 18px;">📱 Your Dashboard on Mobile</h3>
+                                            <img src="{dashboard_img}" alt="SuperPig Dashboard" style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid {self.border_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                            <p style="color: {self.text_light}; margin: 12px 0 0 0; font-size: 13px;">Track your farm at a glance</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Sow List Preview -->
+                                    <div style="margin: 25px 0;">
+                                        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center;">
+                                            <h3 style="color: {self.primary_color}; margin: 0 0 12px 0; font-size: 18px;">🐷 Sow List on Your Phone</h3>
+                                            <img src="{sow_list_img}" alt="SuperPig Sow List" style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid {self.border_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                            <p style="color: {self.text_light}; margin: 12px 0 0 0; font-size: 13px;">View all your sows at a glance</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Gestating Info Preview -->
+                                    <div style="margin: 25px 0;">
+                                        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center;">
+                                            <h3 style="color: {self.primary_color}; margin: 0 0 12px 0; font-size: 18px;">🤰 Gestating Info at a Glance</h3>
+                                            <img src="{gestating_img}" alt="SuperPig Gestating Info" style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid {self.border_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                            <p style="color: {self.text_light}; margin: 12px 0 0 0; font-size: 13px;">Track pregnancy progress easily</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Farrowing Schedule Preview -->
+                                    <div style="margin: 25px 0;">
+                                        <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center;">
+                                            <h3 style="color: {self.primary_color}; margin: 0 0 12px 0; font-size: 18px;">🏠 Farrowing Schedule</h3>
+                                            <img src="{farrowing_img}" alt="SuperPig Farrowing Schedule" style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid {self.border_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                            <p style="color: {self.text_light}; margin: 12px 0 0 0; font-size: 13px;">Automatically check if your crates are enough</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Feature List -->
+                                    <div style="margin: 25px 0; background: #f0f7ff; padding: 15px; border-radius: 8px;">
+                                        <p style="color: {self.text_dark}; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">
+                                            ✨ And many more features:
+                                        </p>
+                                        <ul style="color: {self.text_dark}; margin: 0; padding-left: 20px; font-size: 14px;">
+                                            <li style="margin: 8px 0;">📊 Track feed inventory and costs</li>
+                                            <li style="margin: 8px 0;">💊 Manage medications and vaccinations</li>
+                                            <li style="margin: 8px 0;">📈 Monitor harvest and sales data</li>
+                                            <li style="margin: 8px 0;">👥 Share with farm staff</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <p style="color: {self.text_dark}; margin: 20px 0 10px 0; font-size: 16px;">
+                                        All of these can be entered and viewed on your phone and shared with people connected to your farm.
+                                        We also provided local translations so that it is easily fro all people in your farm to follow.
+                                    </p>
+                                    
+                                    <p style="color: {self.text_dark}; margin: 20px 0 10px 0; font-size: 16px;">
+                                        <a href="{self.company_website}/signup" style="background: {self.primary_color}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+                                            Start Your Free Trial Now
+                                        </a>
+                                    </p>
+                                    
+                                    <p style="color: {self.text_light}; margin: 25px 0 0 0; font-size: 13px; text-align: center; border-top: 1px solid {self.border_color}; padding-top: 20px;">
+                                        Need help? <a href="mailto:{self.support_email}" style="color: {self.primary_color}; text-decoration: underline;">Contact Support</a>
+                                    </p>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <!-- Simple footer -->
+                            <tr>
+                                <td style="background: #f8f9fa; padding: 15px 20px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid {self.border_color};">
+                                    <p style="color: {self.text_light}; margin: 0; font-size: 12px;">
+                                        Happy Farming,<br>
+                                        <strong>{self.application_name} Team</strong>
+                                    </p>
+                                    <p style="color: {self.text_light}; margin: 10px 0 0 0; font-size: 11px;">
+                                        &copy; {self.current_year} {self.company_name}. All rights reserved.<br>
+                                        <a href="{self.company_website}" style="color: {self.text_light}; text-decoration: underline;">{self.company_website}</a>
+                                    </p>
+                                </td>
+                            </tr>
+                            
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+    
+    def get_plain_text_body(self, user_first_name: str, farm_name: str) -> str:
+        """Plain text version for email clients that don't support HTML"""
+        return f"""
+============================================
+{self.company_name} - {self.application_name}
+============================================
 
+Hello {user_first_name},
 
-# Now EmailVerificationCode will use the new company settings
-class AnotherAppVerificationCode(AnotherCompanyEmailTemplate, EmailVerificationCode):
-    def __init__(self):
-        # Multiple inheritance - initialize both parents properly
-        AnotherCompanyEmailTemplate.__init__(self)
-        # No need to call EmailVerificationCode.__init__ as it just calls super()
+We noticed that your account for {farm_name} has not started using {self.application_name} yet.
+Feel free to explore by adding your breeding pigs and production entries.
+
+Take a look at how {self.application_name} is used in managing pig production data.
+
+Visit our website to see screenshots:
+{self.company_website}
+
+Features include:
+- Dashboard view of your farm
+- Sow and boar management
+- Gestating and farrowing tracking
+- Feed inventory and costs
+- Medication and vaccination records
+- Harvest and sales data
+- Share with farm staff
+
+All of these can be entered and viewed on your phone and shared with people connected to your farm.
+
+Start your free trial: {self.company_website}/signup
+
+Need help? Contact us: {self.support_email}
+
+Happy Farming,
+{self.application_name} Team
+
+--------------------------------------------
+{self.company_website} | {self.support_email}
+============================================
+        """
     
     def get_email_subject(self) -> str:
-        return f"Verify Your {self.company_name} Account"
+        return f"Start using {self.application_name} - Add your breeding pigs today"
+
