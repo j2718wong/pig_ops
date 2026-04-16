@@ -193,7 +193,7 @@ class EmailAccountNotStartedTrial(EmailTemplate):
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Start your free trial for {self.application_name}</title>
+            <title>Start your free trial using {self.application_name}</title>
         </head>
         <body style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; line-height: 1.6; margin: 0; padding: 10px; background: #f5f5f5;">
             <!-- Main container with white background -->
@@ -314,6 +314,7 @@ class EmailAccountNotStartedTrial(EmailTemplate):
         </body>
         </html>
         """
+    
     
     def get_plain_text_body(self, user_first_name: str, farm_name: str) -> str:
         """Plain text version for email clients that don't support HTML"""
