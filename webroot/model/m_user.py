@@ -77,9 +77,7 @@ class User(BaseModel):
             cur_entry = {
                 'user': {
                     'id':               user_id,
-                    'is_active':        user_is_active,
-                    'is_email_verified': user_is_email_verified,
-                    'is_mobile_verified': user_is_mobile_verified
+                    'flag':             cur_user_flag
                 },
                 
                 'account': {
