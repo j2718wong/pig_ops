@@ -96,6 +96,8 @@ tags_metadata = [
     
     {"name": "Report",          "description": "Report generation"},
     
+    {"name": "System",          "description": "System"},
+    
     {"name": "HashIds",         "description": "HashIds Testing"}
 ]
 

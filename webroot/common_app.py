@@ -86,8 +86,6 @@ from model.m_medvac_type        import MedVacType
 from model.m_sow_boar           import SowBoar
 from model.m_sow_boar_mate      import SowBoarMate
 
-from model.m_sow_act            import SowActivity
-
 
 from model.m_pig_production     import PigProduction
 from model.m_pig_production_get import PigProductionGet
@@ -101,6 +99,9 @@ from model.m_production_harvest import ProductionHarvest
 from model.m_pig_medvac         import PigMedVac
 
 from model.m_report             import Report
+
+from model.m_system             import System
+
 
 from route.controller           import Controller
 
@@ -174,8 +175,7 @@ model_names_pig_ops = [
     
     ('report',                  Report),
     
-    ('sow_act',                 SowActivity)
-    
+    ('system',                  System)
  
 ]
 

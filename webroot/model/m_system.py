@@ -41,26 +41,53 @@ class System(BaseModel):
             cur_count_account       = row[2]
             cur_account_not_started = row[3]
            
-           
-           
-           
-            
             cur_entry = {
                 'sys': {
-                    'count_user':   cur_count_user,
-                    'email':        cur_email,
-                    'name_last':    cur_name_last,
-                    'name_first':   cur_name_first,
-                    'flag':         cur_flag
-                },
-                
-                'user_group': {
-                    'id':           cur_user_group_id,
-                    'group_num':    cur_group_num,
-                    'name':         cur_group_name
+                    'count_user':       cur_count_user,
+                    'user_no_account':  cur_user_no_account,
+                    'count_account':    cur_count_account,
+                    'acc_not_started':  cur_account_not_started
                 }
+            }
+            
+            return cur_entry
+            
+        
+        return None
+    
+    
+    def get_latest_user_list(self, limit= 3):
+        sql = """
+            SELECT 
+                a.email,
+                a.name_last,
+                a.name_first,
+                DATE(a.dt_entry)
+            FROM user a 
+            ORDER BY a.id DESC 
+            LIMIT %s
+        """ %limit
+        
+        rows = self._execute_query(sql, [])
+        
+        if rows is None:
+            return []
+        
+        result = []
+        for row in rows:
+            cur_email               = row[0]
+            cur_name_last           = row[1]
+            cur_name_first          = row[2]
+            cur_dt_entry            = row[3]
+            
+            cur_entry = {
+                'email':        cur_email,
+                'name_last':    cur_name_last,
+                'name_first':   cur_name_first,
+                'dt_entry':     str(cur_dt_entry)
             }
             result.append(cur_entry)
         
         return result
+    
     
