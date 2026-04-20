@@ -1452,6 +1452,9 @@ class PigProductionGet(BaseModel):
         # The number of dead piglets after birth and before weaning should 
         # computed.
         
+        # Exclude production group
+        # DECLARE FLAG_BIT_IS_A_GROUP                     INT             DEFAULT 2;
+        
         sql = """
         SELECT 
             a.sow_id,
@@ -1483,7 +1486,7 @@ class PigProductionGet(BaseModel):
                 SUM(num_pigs_weaning_f) as num_pigs_wean_f,
                 SUM(num_pigs_weaning)   as num_pigs_wean
             FROM pig_production 
-            WHERE pig_farm_id = %s AND date_weaning IS NOT NULL
+            WHERE pig_farm_id = %s AND sow_id IS NOT NULL AND date_weaning IS NOT NULL 
             GROUP BY sow_id
 
             UNION ALL
@@ -1501,7 +1504,7 @@ class PigProductionGet(BaseModel):
                 SUM(num_pigs_live_f) as num_pigs_wean_f,
                 0 as num_pigs_wean
             FROM pig_production 
-            WHERE pig_farm_id = %s AND date_actual_birth IS NOT NULL AND date_weaning IS NULL
+            WHERE pig_farm_id = %s AND sow_id IS NOT NULL AND date_actual_birth IS NOT NULL AND date_weaning IS NULL
             GROUP BY sow_id
 
             ORDER BY sow_id, record_type ASC
