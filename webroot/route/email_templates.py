@@ -7,6 +7,11 @@ import sys
 from datetime                   import  datetime
 
 
+BG_PROCESS_NOTIFY_ACCOUNT_NOT_STARTED_TRIAL         = 1
+BG_PROCESS_NOTIFY_USER_INCOMPLETE_ACCOUNT           = 2
+
+
+
 class EmailTemplate:
     def __init__(self):
         self.company_name       = "JSysDev Limited"
@@ -177,7 +182,7 @@ class EmailAccountNotStartedTrial(EmailTemplate):
     Send reminder to add breeding pigs and start using the app.
     """
     
-    def get_email_body(self, user_first_name: str, farm_name: str) -> str:
+    def get_email_body(self, user_first_name: str, farm_name: str, notify_type_id: int = 1) -> str:
         """
         Generate email body for account not started trial notification
         """
@@ -187,6 +192,36 @@ class EmailAccountNotStartedTrial(EmailTemplate):
         gestating_img = f"{self.company_website}/static_m/images/mar/mar_gesta.png"
         farrowing_img = f"{self.company_website}/static_m/images/mar/mar_farrowing.png"
         
+        html_acc_not_started = f"""
+        <p style="color: {self.text_dark}; margin: 0 0 15px 0; font-size: 16px;">
+            We noticed that your account for <strong>{farm_name}</strong> has not started using {self.application_name} yet.
+            Feel free to explore by adding your breeding pigs and production entries.
+        </p>
+        """
+        
+        
+        html_user_user_no_acc = f"""
+        <p style="color: {self.text_dark}; margin: 0 0 15px 0; font-size: 16px;">
+            We noticed that you have not completed creating your Pig Farm account for <b>{self.application_name}</b> yet.
+            You can continue creating your account and start using {self.application_name}
+            to check how it can help managing you pig farm.
+        </p>
+        
+        <p style="font-size: 16px;">
+            <a href="https://superpig.jsysdev.com/signup">Continue Create your Account </a>
+        </p>
+        """
+        
+        html_message = ''
+        
+        if notify_type_id == BG_PROCESS_NOTIFY_ACCOUNT_NOT_STARTED_TRIAL:
+            html_message = html_acc_not_started
+        
+        
+        if notify_type_id == BG_PROCESS_NOTIFY_USER_INCOMPLETE_ACCOUNT:
+            html_message = html_user_user_no_acc
+        
+        
         return f"""
         <!DOCTYPE html>
         <html>
@@ -195,7 +230,7 @@ class EmailAccountNotStartedTrial(EmailTemplate):
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Start your free trial using {self.application_name}</title>
         </head>
-        <body style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; line-height: 1.6; margin: 0; padding: 10px; background: #f5f5f5;">
+        <body style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; line-height: 1.6; margin: 0; padding: 0; background: #f5f5f5;">
             <!-- Main container with white background -->
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f5f5f5; padding: 10px;">
                 <tr>
@@ -217,13 +252,10 @@ class EmailAccountNotStartedTrial(EmailTemplate):
                                         Hello {user_first_name},
                                     </h2>
                                     
-                                    <p style="color: {self.text_dark}; margin: 0 0 15px 0; font-size: 16px;">
-                                        We noticed that your account for <strong>{farm_name}</strong> has not started using {self.application_name} yet.
-                                        Feel free to explore by adding your breeding pigs and production entries.
-                                    </p>
+                                    {html_message}
                                     
                                     <p style="color: {self.text_dark}; margin: 0 0 20px 0; font-size: 16px;">
-                                        Take a look at how {self.application_name} is used in managing pig production data.
+                                        Take a look at how {self.application_name} is used in managing and atomating your pig production data.
                                     </p>
                                     
                                     <!-- Dashboard Preview -->
@@ -356,6 +388,15 @@ Happy Farming,
 ============================================
         """
     
-    def get_email_subject(self) -> str:
-        return f"Start using {self.application_name} - Add your breeding pigs today"
+    def get_email_subject(self, notify_type_id: int = 1) -> str:
+        if notify_type_id == BG_PROCESS_NOTIFY_ACCOUNT_NOT_STARTED_TRIAL:
+            return f"Start using {self.application_name} - Add your breeding pigs today"
+        
+        
+        if notify_type_id == BG_PROCESS_NOTIFY_USER_INCOMPLETE_ACCOUNT:
+            return f"Start using {self.application_name} - Create your Pig Farm Account"
+        
+        
+        
+        return ''
 

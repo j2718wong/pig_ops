@@ -587,20 +587,20 @@ class DataPigProd(BaseModel):
     
     
     
-class DataPigProdAI(BaseModel):
+class DataPigProdNoSow(BaseModel):
     uhid:                   str = None
         
-    pig_prod_ai_hid:        str = None
-    pig_prod_hid:           str = None
-    semen_source_hid:       str = None
-        
-    date_extracted:         str = None
-    date_expiry:            str
-    date_insemination:      str = None
-    hour_insemination:      int
-        
-    staff_id:               int = None
-    date_insemination:      str
+    pig_farm_hid:           str = None
+    
+    user_id:                int = 0    
+    pig_farm_id:            int = 0
+    
+    num_pigs:               int
+    
+    date_birth:             str = None
+    date_wean:              str = None
+    
+    notes:                  str = None
     
 
 class DataPigProdBirth(BaseModel):
