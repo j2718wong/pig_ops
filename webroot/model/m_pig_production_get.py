@@ -1538,7 +1538,9 @@ class PigProductionGet(BaseModel):
             
             
             # compute total live births
-            cur_pigs_live_birth         =  cur_pigs_live_m + cur_pigs_live_f
+            cur_pigs_live_birth         = 0
+            if cur_pigs_live_m is not None and cur_pigs_live_f is not None:
+                cur_pigs_live_birth     =  cur_pigs_live_m + cur_pigs_live_f
             
             # compute total live pigs at wean
             cur_total_wean = 0
