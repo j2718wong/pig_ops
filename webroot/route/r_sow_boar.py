@@ -298,7 +298,7 @@ async def sow_boar_add(request: Request, data: dm.DataSowBoar):
     parent_boar_id      = 0
     parent_sow_hid      = data.parent_sow_hid
     
-    """
+    
     if parent_sow_hid is not None:
         res = hashids_common.decrypt(parent_sow_hid)
         
@@ -338,7 +338,7 @@ async def sow_boar_add(request: Request, data: dm.DataSowBoar):
             return result
         
         parent_boar_id = res[0]
-    """ 
+    
     
     
     data.user_id       = user_id
