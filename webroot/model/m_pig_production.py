@@ -55,10 +55,10 @@ class PigProduction(BaseModel):
             data.semen_ai_boar_id       if is_ai else None,
             
             data.semen_cost             if is_ai else None,
-            data.insemination_cost,
+            data.insem_cost,
             
             
-            data.comments               if data.comments and data.comments.strip() else None,
+            data.insem_notes            if data.insem_notes and data.insem_notes.strip() else None,
                                         
             data.insem_staff_id         if data.insem_staff_id and data.insem_staff_id > 0 else None,
             data.done_by_user,
@@ -173,9 +173,9 @@ class PigProduction(BaseModel):
             data.semen_ai_boar_id       if is_ai else None,
             
             data.semen_cost             if is_ai else None,
-            data.insemination_cost      if data.insemination_cost is not None else None,
+            data.insem_cost             if data.insem_cost is not None else None,
             
-            data.comments               if data.comments and data.comments.strip() else None,
+            data.insem_notes            if data.insem_notes and data.insem_notes.strip() else None,
             
             data.insem_staff_id         if data.insem_staff_id and data.insem_staff_id > 0 else None,
             data.insem_date
