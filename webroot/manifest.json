@@ -1,0 +1,23 @@
+{
+  "name": "SuperPig",
+  "short_name": "SuperPig",
+  "description": "Pig Farm Management",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1e3a8a",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/static_m/images/logo/superpig_192_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static_m/images/logo/superpig_512_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
