@@ -221,8 +221,11 @@ class SignUp(ViewBase):
         ui_settings     = self.controller.get_app_ui_settings()
         app_ui_settings = json.dumps(ui_settings)
 
+        app_version = self.controller.APP_VERSION
+        
         
         page_data = {
+            'app_version':          app_version,
             'app_ui_settings':      app_ui_settings,
             'lang':                 lang,
             'translations':         translations,
