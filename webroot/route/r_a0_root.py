@@ -340,108 +340,10 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
     
 
 
-@app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def root(request: Request, p:str = None):
-    """
-    Handle homepage
-    
-   
-    
-    2026-01-09 Notes:
-
-    1.) An account can have several users. 
-        The user who registered the account is always admin.
-        There can be more than 1 admin user in an account.
-        
-        Non admin users cannot see billing info.
-        
-    2.) Company Internal users
-        These users are connected to the company. 
-        They are connected to a special company account 
-        but the company account has no pig farm.
-        These users can READ ONLY any account 
-        but cannot write any data to the account.  
-    
-    
-    
-    In Normal case the user is read from token
-    
-    Handle all routes:
-    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
-    - Any other path redirects to "/" (users should navigate by clicking, not typing)
-    
-    Parameters
-    ----------
-    p : str
-        pig farm hid;  if this is given, will decode pig_farm_id
-        
-
-    """
-    
-    result = get_current_uhid(request)
-    
-    
-    # If result is RedirectResponse, return it immediately
-    if isinstance(result, RedirectResponse):
-        return result
-    
-    uhid = result
-    
-    internal_lang = request.cookies.get("user_lang", "en")
-    
-    # Get Available langages for language selector dropdown
-    available_languages = await get_available_languages(request, internal_lang)
-    
-    print('available_languages')
-    pprint.pprint(available_languages)
-    
-    
-    # This translation is for user already logged in;
-    # For users not logged in, this is provided by View;
-    # This translation is not returned to page if user is not logged in.
-    translation = None
-    
-    
-    
-    if internal_lang is not None:
-        
-        # Update user language
-        if uhid is not None:
-            res = hashids_user.decrypt(uhid)
-            if len(res) == 0:
-                return {
-                    'result':{
-                        'num':  ERROR_USER_INVALID_USER_HASHID,
-                        'code': 'ERROR_USER_INVALID_USER_HASHID'
-                    }
-                }
-            
-            user_id = res[0]
-            
-            # No need to save
-            #model['user'].user_update_language(user_id, language_key)
-            
-            
-        
-        translation = controller.get_translation(internal_lang)
-
-
-    page = controller.view['root'].render(
-            uhid = uhid, 
-            translation = translation,
-            lang = internal_lang,
-            available_languages = available_languages)
-    
-    return page
-    
-
-
-
-
 
 
 @app.get("/{lang}", response_class=HTMLResponse, dependencies=[Depends(public_limit)])
-async def root(request: Request, p:str = None, lang:str= None):
+async def root_with_lang(request: Request, p:str = None, lang:str= None):
     """
     Handle homepage with language support
     
@@ -626,6 +528,104 @@ async def root(request: Request, p:str = None, lang:str= None):
     
     return page
     
+
+
+@app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+async def root(request: Request, p:str = None):
+    """
+    Handle homepage
+    
+   
+    
+    2026-01-09 Notes:
+
+    1.) An account can have several users. 
+        The user who registered the account is always admin.
+        There can be more than 1 admin user in an account.
+        
+        Non admin users cannot see billing info.
+        
+    2.) Company Internal users
+        These users are connected to the company. 
+        They are connected to a special company account 
+        but the company account has no pig farm.
+        These users can READ ONLY any account 
+        but cannot write any data to the account.  
+    
+    
+    
+    In Normal case the user is read from token
+    
+    Handle all routes:
+    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
+    - Any other path redirects to "/" (users should navigate by clicking, not typing)
+    
+    Parameters
+    ----------
+    p : str
+        pig farm hid;  if this is given, will decode pig_farm_id
+        
+
+    """
+    
+    result = get_current_uhid(request)
+    
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    uhid = result
+    
+    internal_lang = request.cookies.get("user_lang", "en")
+    
+    # Get Available langages for language selector dropdown
+    available_languages = await get_available_languages(request, internal_lang)
+    
+    print('available_languages')
+    pprint.pprint(available_languages)
+    
+    
+    # This translation is for user already logged in;
+    # For users not logged in, this is provided by View;
+    # This translation is not returned to page if user is not logged in.
+    translation = None
+    
+    
+    
+    if internal_lang is not None:
+        
+        # Update user language
+        if uhid is not None:
+            res = hashids_user.decrypt(uhid)
+            if len(res) == 0:
+                return {
+                    'result':{
+                        'num':  ERROR_USER_INVALID_USER_HASHID,
+                        'code': 'ERROR_USER_INVALID_USER_HASHID'
+                    }
+                }
+            
+            user_id = res[0]
+            
+            # No need to save
+            #model['user'].user_update_language(user_id, language_key)
+            
+            
+        
+        translation = controller.get_translation(internal_lang)
+
+
+    page = controller.view['root'].render(
+            uhid = uhid, 
+            translation = translation,
+            lang = internal_lang,
+            available_languages = available_languages)
+    
+    return page
+    
+
+
 
 
 def detect_browser_language(request: Request) -> str:
