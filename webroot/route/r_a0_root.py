@@ -52,13 +52,13 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
 
 @app.get("/manifest.json")
 async def manifest():
-    return FileResponse("webroot/manifest.json", media_type="application/json")
+    return FileResponse("manifest.json", media_type="application/json")
 
 
 
 @app.get("/service_worker.js")
 async def service_worker():
-    return FileResponse("webroot/service_worker.js", media_type="application/javascript")
+    return FileResponse("service_worker.js", media_type="application/javascript")
 
 
 
