@@ -8,16 +8,6 @@ const urlsToCache = [
 ];
 
 
-// service_worker.js
-const CACHE_NAME = 'superpig-v1';
-const urlsToCache = [
-    '/',
-    '/index_mob.html',
-    '/manifest.json',
-    '/static_m/images/logo/superpig_192_192.png',
-    '/static_m/images/logo/superpig_512_512.png'
-];
-
 // Install event - cache assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
