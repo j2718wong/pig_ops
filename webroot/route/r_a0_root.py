@@ -50,6 +50,17 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
                                 PIG_OPERATION_TYPE_LACTATING_SOW)
 
 
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse("webroot/manifest.json", media_type="application/json")
+
+
+
+@app.get("/service_worker.js")
+async def service_worker():
+    return FileResponse("webroot/service_worker.js", media_type="application/javascript")
+
+
 
 
 @app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(strict_limit)])
@@ -710,17 +721,6 @@ async def detect_country(request: Request) -> str:
     print('Could not detect country, returning default XX')
     return "XX"
 
-
-# Serve static files FIRST
-@app.get("/manifest.json")
-async def manifest():
-    return FileResponse("webroot/manifest.json", media_type="application/json")
-
-
-
-@app.get("/service_worker.js")
-async def service_worker():
-    return FileResponse("webroot/service_worker.js", media_type="application/javascript")
 
 
 
