@@ -711,6 +711,18 @@ async def detect_country(request: Request) -> str:
     return "XX"
 
 
+# Serve static files FIRST
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse("webroot/manifest.json", media_type="application/json")
+
+
+
+@app.get("/service_worker.js")
+async def service_worker():
+    return FileResponse("webroot/service_worker.js", media_type="application/javascript")
+
+
 
 # List of suspicious patterns that should return 404
 SUSPICIOUS_PATHS = [
