@@ -12,7 +12,7 @@ import jwt
 
 from fastapi                import Request, HTTPException, status, Depends, Response
 from fastapi                import BackgroundTasks
-from fastapi.responses      import HTMLResponse, RedirectResponse
+from fastapi.responses      import HTMLResponse, RedirectResponse, FileResponse
 from pydantic               import BaseModel
 
 
