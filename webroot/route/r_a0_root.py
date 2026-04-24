@@ -531,7 +531,7 @@ async def root_with_lang(request: Request, p:str = None, lang:str= None):
 
 
 @app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def root(request: Request, p:str = None):
+async def root(request: Request, p:str = None, lang:str= None):
     """
     Handle homepage
     
@@ -576,6 +576,27 @@ async def root(request: Request, p:str = None):
         return result
     
     uhid = result
+    
+    
+    # No path language - detect or use query parameter
+    query_lang = request.query_params.get("lang")
+    
+    if query_lang:
+        # Query parameter language (for SPA compatibility)
+        internal_lang = LANGUAGE_MAPPING.get(query_lang.lower(), 'en')
+        
+        # Redirect to SEO-friendly path URL
+        url_lang_map = {
+            'en': 'en',
+            'fil': 'tag',
+            'ceb': 'bis',
+            'zh': 'zh'
+        }
+        url_lang = url_lang_map.get(internal_lang, 'en')
+        
+        return RedirectResponse(url=f"/{url_lang}", status_code=301)  # Permanent redirect for SEO
+        
+    
     
     internal_lang = request.cookies.get("user_lang", "en")
     
