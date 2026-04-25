@@ -69,7 +69,7 @@ class Report(BaseModel):
                 },
                 
                 'report': {
-                    'id':               row[0]
+                    'id':               row[3]
                 }
             }
             

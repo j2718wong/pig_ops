@@ -651,3 +651,57 @@ class User(BaseModel):
         
         return cur_entry
 
+
+
+    def add_track_app_install(self, data=None):
+        """
+        PROCEDURE user_track_app_install_add(
+            in_user_id              INT,
+            
+            in_event                VARCHAR(30),
+            
+            in_screen_width         INT,
+            in_screen_height        INT
+        )      
+        """
+        
+        user_agent=  None
+        
+        if data.user_agent is not None:
+            if len(data.user_agent) > 160:
+                user_agent = data.user_agent[0:159]
+            else:
+                user_agent = data.user_agent
+        
+        params = [
+            data.user_id,
+            
+            data.event,
+            
+            data.screen_width           if data.screen_width and data.screen_width > 0  else None,
+            data.screen_height          if data.screen_height and data.screen_height > 0 else None
+        ]
+        
+        rows = self._call_procedure('user_track_app_install_add', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+        
+
+        if row is not None:
+            return {
+                'result': {
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'track_install_id': {
+                    'id':               row[3]
+                }
+            }
+            
+        return None
+    

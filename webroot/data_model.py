@@ -85,7 +85,17 @@ class DataUserLogin(BaseModel):
     device_type:            str = None
 
 
-
+class DataUserTrackAppInstall(BaseModel):
+    uhid:                   str = None
+    
+    user_id:                int = 0
+    
+    event:                  str        
+    user_agent:             str = None   
+    
+    screen_width:           int = None 
+    screen_height:          int = None
+    
 
 class DataUserEmailVerify(BaseModel):
     uhid:                   str = None

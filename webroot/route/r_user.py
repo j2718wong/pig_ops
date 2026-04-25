@@ -40,8 +40,10 @@ if module_directory not in sys.path:
    sys.path.append(module_directory)
 
 
-from r_utils                import (replace_plain_ids_user_account,
+from r_utils                import (remove_database_null_description,
+                                    replace_plain_ids_user_account,
                                     get_browser_info)
+
 
 from r_a0_security_checks   import (check_if_valid_user_account,
                                     get_user_account_info)
@@ -479,7 +481,66 @@ async def user_email_verify_resend(request: Request,
     
     
     
+@app.post("/user/track_app_install", tags=["User"])
+async def user_track_app_install(request: Request, data: dm.DataUserTrackAppInstall):
+    """
+    This is used to track user app install
+    """
     
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    data.user_id        = user_id
+    
+    res_add = model['user'].add_track_app_install(data)
+    
+    
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    cur_id    = res_add['track_install_id']['id']
+    cur_hid   = hashids_common.encrypt(cur_id)
+    
+    # remove plain id
+    del res_add['track_install_id']['id']
+    res_add['track_install_id']['hid'] = cur_hid
+    
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
+
+    return res_add
+    
+    
+
     
     
     
@@ -582,6 +643,11 @@ async def user_login_social(request: Request, user_data: dm.DataUserLogin):
 
     
     return res_login
+    
+    
+    
+    
+    
     
     
     
