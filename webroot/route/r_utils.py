@@ -453,6 +453,7 @@ def replace_plain_ids_user_account(user_account):
 
 
 PIG_PROD_FLAG_BIT_IS_A_GROUP        = 2
+PIG_PROD_FLAG_BIT_EXTERNAL_PIGLETS  = 4
 
 
 def replace_plain_ids_pig_production(cur_entry):
@@ -477,6 +478,16 @@ def replace_plain_ids_pig_production(cur_entry):
 
 
     if cur_flag & PIG_PROD_FLAG_BIT_IS_A_GROUP > 0:
+        # Delete sow information at all;
+        del cur_entry['sow']
+        
+        # Delete insemination info at all
+        del cur_entry['insemination']
+        
+        return
+        
+    
+    if cur_flag & PIG_PROD_FLAG_BIT_EXTERNAL_PIGLETS > 0:
         # Delete sow information at all;
         del cur_entry['sow']
         

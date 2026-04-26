@@ -99,8 +99,10 @@ class PigProduction(BaseModel):
             
             in_num_pigs             INT,
             
-            in_date_weaning         VARCHAR(10),
-            in_date_added           VARCHAR(10)
+            in_date_birth           VARCHAR(10), /* in YYYY-MM-DD format*/
+            in_date_weaning         VARCHAR(10), /* in YYYY-MM-DD format*/
+
+            in_notes                VARCHAR(160)
         )  
         """
         
@@ -110,8 +112,9 @@ class PigProduction(BaseModel):
             
             data.num_pigs,
             
+            data.date_birth,
             data.date_weaning,
-            data.date_added
+            data.notes
         ]
         
         res = self._call_procedure('pig_prod_fattening_add', params)

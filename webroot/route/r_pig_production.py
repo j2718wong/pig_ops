@@ -229,7 +229,7 @@ async def pig_prod_add(request: Request, data: dm.DataPigProd):
     
 
 @app.post("/pig_prod/fattening/add", tags=["Pig Production"])
-async def pig_prod_fattening_add(request: Request, data: dm.DataPigProdFattening):
+async def pig_prod_fattening_add(request: Request, data: dm.DataPigProdNoSow):
     result = get_uhid_or_redirect(request)
     
     # If result is RedirectResponse, return it immediately
@@ -268,13 +268,13 @@ async def pig_prod_fattening_add(request: Request, data: dm.DataPigProdFattening
     pig_farm_hid = data.pig_farm_hid
     
         
-    res = hashids_common.decrypt(insem_staff_hid)
+    res = hashids_common.decrypt(pig_farm_hid)
     if len(res) == 0:
     
         return {
             'result':{
-                'num':  ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID,
-                'code': 'ERROR_PIG_PROD_INVALID_INSEM_STAFF_HASHID'
+                'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID'
             }
         }
     
@@ -309,6 +309,10 @@ async def pig_prod_fattening_add(request: Request, data: dm.DataPigProdFattening
     remove_database_null_description(res_add)
     
     return res_add
+
+
+#@app.post("/pig_prod/pig_add", tags=["Pig Production"])
+
 
 
 @app.post("/pig_prod/update_insem", tags=["Pig Production"])

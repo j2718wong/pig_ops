@@ -608,7 +608,7 @@ class DataPigProdNoSow(BaseModel):
     num_pigs:               int
     
     date_birth:             str = None
-    date_wean:              str = None
+    date_weaning:           str = None
     
     notes:                  str = None
     
@@ -661,20 +661,6 @@ class DataPigProdStatus(BaseModel):
     prod_status_id:         int = 0
     date_status:            str
     notes:                  str = None
-    
-    
-class DataPigProdFattening(BaseModel):
-    uhid:                   str = None
-        
-    pig_farm_hid:           str = None
-    
-    
-    user_id:                int = 0
-    pig_farm_id:            int = 0
-    num_pigs:               int
-    
-    date_weaning:           str
-    date_added:             str
     
     
 class DataPigProdDeadPig(BaseModel):
