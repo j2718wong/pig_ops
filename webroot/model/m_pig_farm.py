@@ -476,7 +476,9 @@ class PigFarm(BaseModel):
                     a.data_ver_num_staff,    
                     a.data_ver_num_feed_buy,
                     a.data_ver_num_feed_balance,
-                    a.data_ver_num_not_pregnant 
+                    a.data_ver_num_not_pregnant,
+                    a.data_ver_num_boar_ext_mate,
+                    a.data_ver_num_pig_dead 
                     
                     
                 FROM pig_farm a
@@ -519,6 +521,8 @@ class PigFarm(BaseModel):
                 cur_data_ver_num_feed_buy       = row[16]  
                 cur_data_ver_num_feed_balance   = row[17]  
                 cur_data_ver_num_not_pregnant   = row[18]  
+                cur_data_ver_num_boar_ext_mate  = row[19]
+                cur_data_ver_num_pig_dead       = row[20]
                 
                 cur_entry = {
                     'pig_farm': {
@@ -555,14 +559,16 @@ class PigFarm(BaseModel):
                     },
                     
                     'data_ver_num':{
-                        'sow':          cur_data_ver_num_sow,       
-                        'boar':         cur_data_ver_num_boar,    
-                        'pig_prod':     cur_data_ver_num_pig_prod,
-                        'prod_history': cur_data_ver_num_prod_history,
-                        'staff':        cur_data_ver_num_staff,   
-                        'feed_buy':     cur_data_ver_num_feed_buy,
-                        'feed_balance': cur_data_ver_num_feed_balance,
-                        'not_pregnant': cur_data_ver_num_not_pregnant
+                        'sow':              cur_data_ver_num_sow,       
+                        'boar':             cur_data_ver_num_boar,    
+                        'pig_prod':         cur_data_ver_num_pig_prod,
+                        'prod_history':     cur_data_ver_num_prod_history,
+                        'staff':            cur_data_ver_num_staff,   
+                        'feed_buy':         cur_data_ver_num_feed_buy,
+                        'feed_balance':     cur_data_ver_num_feed_balance,
+                        'not_pregnant':     cur_data_ver_num_not_pregnant,
+                        'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
+                        'pig_dead':         cur_data_ver_num_pig_dead      
                     }
                     
                 }
@@ -631,7 +637,9 @@ class PigFarm(BaseModel):
                     data_ver_num_staff,    
                     data_ver_num_feed_buy,
                     data_ver_num_feed_balance,
-                    data_ver_num_not_pregnant
+                    data_ver_num_not_pregnant,
+                    data_ver_num_boar_ext_mate,
+                    data_ver_num_pig_dead 
                     
                 FROM pig_farm 
                 WHERE id = %s
@@ -653,6 +661,8 @@ class PigFarm(BaseModel):
             cur_data_ver_num_feed_buy       = row[5]
             cur_data_ver_num_feed_balance   = row[6]
             cur_data_ver_num_not_pregnant   = row[7]
+            cur_data_ver_num_boar_ext_mate  = row[8]
+            cur_data_ver_num_pig_dead       = row[9]
             
             
             if return_array == 0:
@@ -665,7 +675,10 @@ class PigFarm(BaseModel):
                         'staff':            cur_data_ver_num_staff,   
                         'feed_buy':         cur_data_ver_num_feed_buy,
                         'feed_balance':     cur_data_ver_num_feed_balance,
-                        'not_pregnant':     cur_data_ver_num_not_pregnant
+                        'not_pregnant':     cur_data_ver_num_not_pregnant,
+                        'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
+                        'pig_dead':         cur_data_ver_num_pig_dead     
+                        
                     }
                 }
                 
@@ -680,7 +693,9 @@ class PigFarm(BaseModel):
                     cur_data_ver_num_staff,      
                     cur_data_ver_num_feed_buy,
                     cur_data_ver_num_feed_balance,   
-                    cur_data_ver_num_not_pregnant
+                    cur_data_ver_num_not_pregnant,
+                    cur_data_ver_num_boar_ext_mate,
+                    cur_data_ver_num_pig_dead 
                 ]
 
         return None
