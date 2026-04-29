@@ -527,7 +527,7 @@ class SowBoar(BaseModel):
         if order_by == 0:
             sql += " ORDER BY a.date_of_birth DESC"
         else:
-            sql += " ORDER BY a.name ASC, a.number ASC"
+            sql += " ORDER BY a.id DESC"
         
         # Execute query
         rows = self._execute_query(sql, params)
