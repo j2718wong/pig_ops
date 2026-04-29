@@ -61,7 +61,10 @@ class PigMedVac:
         sql += '"%s",'  % data.date_medvac
         
         
-        sql += '%s,'    % data.medvac_brand_id
+        if data.medvac_brand_id and data.medvac_type_id > 0:
+            sql += '%s,'    % data.medvac_brand_id
+        else:
+            sql += 'NULL,'
         
         if data.medvac_type_id is not None and data.medvac_type_id > 0:
             sql += '%s,'    % data.medvac_type_id

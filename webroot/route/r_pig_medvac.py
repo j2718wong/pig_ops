@@ -188,22 +188,23 @@ async def pig_medvac_add(request: Request, data: dm.DataPigMedvac):
     
     medvac_brand_hid = data.medvac_brand_hid
     
-    res = hashids_common.decrypt(medvac_brand_hid)
-    if len(res) == 0:
-        result = {
-            'result':{
-                'num':  ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID,
-                'code': 'ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID'
+    if medvac_brand_hid is not None:
+        res = hashids_common.decrypt(medvac_brand_hid)
+        if len(res) == 0:
+            result = {
+                'result':{
+                    'num':  ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID,
+                    'code': 'ERROR_PIG_MEDVAC_INVALID_MEDVAC_BRAND_HASHID'
+                }
             }
-        }
+            
+            if new_bill_hid is not None:
+                result['result']['new_bill_hid'] = new_bill_hid
+            
+            return result
+            
+        medvac_brand_id = res[0]
         
-        if new_bill_hid is not None:
-            result['result']['new_bill_hid'] = new_bill_hid
-        
-        return result
-        
-    medvac_brand_id = res[0]
-    
 
     
     medvac_type_hid = data.medvac_type_hid
@@ -260,16 +261,16 @@ async def pig_medvac_add(request: Request, data: dm.DataPigMedvac):
         
         
    
-    data.user_id         = user_id
-    data.sow_boar_id     = sow_boar_id
-    data.pig_prod_id     = pig_prod_id
+    data.user_id            = user_id
+    data.sow_boar_id        = sow_boar_id
+    data.pig_prod_id        = pig_prod_id
     data.pig_prod_pig_ops_id = pig_prod_pig_ops_id
-    data.health_issue_id = health_issue_id
-    
-    data.medvac_brand_id = medvac_brand_id
-    data.medvac_type_id  = medvac_type_id
-    data.acc_medvac_id   = acc_medvac_id  
-    data.staff_id        = staff_id
+    data.health_issue_id    = health_issue_id
+        
+    data.medvac_brand_id    = medvac_brand_id
+    data.medvac_type_id     = medvac_type_id
+    data.acc_medvac_id      = acc_medvac_id  
+    data.staff_id           = staff_id
     
     
     res_add    =  model['pig_medvac'].add(data)
