@@ -27,7 +27,6 @@ class FeedBalance(BaseModel):
             
             in_pig_farm_id          INT,    /* IF this is filled up, this is for farm_balance */
             in_pig_prod_id          INT,
-            in_prod_group_id        INT,
             
             in_date_balance         VARCHAR(10),
             
@@ -50,18 +49,15 @@ class FeedBalance(BaseModel):
         if data.pig_farm_id is not None and data.pig_farm_id > 0:
             sql += '%s,'    % data.pig_farm_id
             sql += 'NULL,'
-            sql += 'NULL,'
             
         else:
             if data.pig_prod_id is not None and data.pig_prod_id > 0:
                 sql += 'NULL,'
                 sql += '%s,'    % data.pig_prod_id
-                sql += 'NULL,'
                 
             else:
                 sql += 'NULL,'
                 sql += 'NULL,'
-                sql += '%s,'    % data.pig_prod_group_id
         
         
         sql += '"%s",'  % data.date_balance
