@@ -563,10 +563,13 @@ def get_data_pig_medvac(sow_boar_id, pig_prod_id, inc_deleted, inc_user_audit):
         
         
         cur_id  = cur_entry['medvac']['brand']['id']
-        cur_hid = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['medvac']['brand']['id']
-        cur_entry['medvac']['brand']['hid']   = cur_hid
+        if cur_id and cur_id > 0:
+            cur_hid = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['medvac']['brand']['id']
+            cur_entry['medvac']['brand']['hid']   = cur_hid
+        else:
+            del cur_entry['medvac']['brand']
         
         
         cur_id  = cur_entry['medvac']['type']['id']
