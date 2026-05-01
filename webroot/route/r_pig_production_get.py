@@ -114,9 +114,13 @@ def get_page_data_user_account_pig_prod(user_id, pig_farm_id = None,
     account_id = data_account['account']['id']
     
     
-def get_page_data_farm_account_pig_prod(pig_farm_id, 
+def get_initial_farm_data_by_pig_farm_id(pig_farm_id, 
         inc_pig_prod = 0, inc_user_audit = 0):
-    
+    """
+    Retrieves initial farm data (account + farm) using pig_farm_id.
+    This is the main entry point for loading farm data.
+    """
+
     pig_farm_account= model['pig_farm'].get_pig_farm_account_info(pig_farm_id)
     
     
@@ -125,7 +129,7 @@ def get_page_data_farm_account_pig_prod(pig_farm_id,
     
     account_id = pig_farm_account['account']['id']
     
-    pig_prod_page_data  = get_page_data_pig_prod(account_id, pig_farm_id, 
+    farm_initial_data  = get_pig_farm_initial_data(account_id, pig_farm_id, 
             inc_pig_prod, inc_user_audit = inc_user_audit)
     
     
@@ -148,13 +152,26 @@ def get_page_data_farm_account_pig_prod(pig_farm_id,
         pig_farm_account['account_bill']['hid']   = cur_hid
 
     
-    pig_prod_page_data['account'] = pig_farm_account
+    farm_initial_data['account'] = pig_farm_account
     
-    return pig_prod_page_data
+    return farm_initial_data
 
     
-def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
+def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         inc_user_audit = 0, minimum_info = 1):
+    """
+    Retrieves initial pig farm data needed for frontend application startup.
+    
+    Returns farm account data including:
+    - Account pig operations (acc_pig_ops)
+    - Sow list (breeding females)
+    - Boar list (breeding males)  
+    - Staff list
+    - Optional pig production list (if inc_pig_prod > 0)
+    
+    """
+    
+    
     
     list_acc_pig_ops =  model['account_pig_ops'].get_list(account_id, None, 
         inc_deleted = 0, inc_user_audit = inc_user_audit)
@@ -234,8 +251,7 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
         cur_entry['pig_farm_staff']['hid']   = cur_hid
         
 
-
-    pig_farm_account = {
+    result = {
         'acc_pig_ops':              list_acc_pig_ops,
         
         'sow_list':                 list_sow_list,
@@ -245,9 +261,9 @@ def get_page_data_pig_prod(account_id, pig_farm_id, inc_pig_prod = 0,
     }
     
     if inc_pig_prod > 0:
-        pig_farm_account['pig_production']  = list_pig_prod
+        result['pig_production']  = list_pig_prod
     
-    return pig_farm_account
+    return result
 
 
 @app.get("/pig_prod", response_class = HTMLResponse, tags=["Pig Production"])
@@ -289,7 +305,7 @@ async def pig_prod(request: Request, pfhid:str = None, m:int =0):
     
     t0 = time.time()
     
-    page_data = get_page_data_farm_account_pig_prod(pig_farm_id, inc_pig_prod = 1)
+    page_data = get_initial_farm_data_by_pig_farm_id(pig_farm_id, inc_pig_prod = 1)
 
     t1 = time.time()
     

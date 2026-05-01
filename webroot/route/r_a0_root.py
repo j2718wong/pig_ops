@@ -41,7 +41,7 @@ from r_utils                import (replace_plain_ids_user_account,
 
 from r_a0_security_checks   import get_user_account_info
 
-from r_pig_production_get   import get_page_data_farm_account_pig_prod
+from r_pig_production_get   import get_initial_farm_data_by_pig_farm_id
 
 
 PIG_FARM_ADD_RES_NUM_SUCCESS        = 0
@@ -189,11 +189,11 @@ async def pig_farm_data(request: Request):
     user_id = res[0]
     
     
-    pig_farm_data = get_farm_data(user_id)
+    pig_farm_data = get_initial_farm_data_by_user_id(user_id)
     return pig_farm_data
     
     
-def get_farm_data(user_id):
+def get_initial_farm_data_by_user_id(user_id):
     time_init = time.time()
     
     data_app = get_application_data()
@@ -203,9 +203,9 @@ def get_farm_data(user_id):
     
     if user_account is None:
         data = {
-            'application':      data_app,
-            'user_account':     None,
-            'pig_farm_account': None
+            'application':          data_app,
+            'user_account':         None,
+            'initial_farm_data':    None
         }
         
         return {
@@ -227,9 +227,9 @@ def get_farm_data(user_id):
     if account is None:
         
         data = {
-            'application':      data_app,
-            'user_account':     user_account,
-            'pig_farm_account': None
+            'application':          data_app,
+            'user_account':         user_account,
+            'initial_farm_data':    None
         }
         
         return {
@@ -261,19 +261,17 @@ def get_farm_data(user_id):
         pig_farm_id = user_pig_farms[0]
     
     
-    farm_account = None
+    initial_farm_data = None
 
     if pig_farm_id > 0:  
-        
-          
-        farm_account = get_page_data_farm_account_pig_prod(
+        initial_farm_data = get_initial_farm_data_by_pig_farm_id(
             pig_farm_id, inc_pig_prod = 0, inc_user_audit = 1)
         
     
     data = {
-        'application':      data_app,
-        'user_account':     replace_plain_ids_user_account(user_account),
-        'pig_farm_account': farm_account
+        'application':          data_app,
+        'user_account':         replace_plain_ids_user_account(user_account),
+        'initial_farm_data':    initial_farm_data
     }
     
     
@@ -312,7 +310,7 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
     
 
     
-    pig_farm_data = get_farm_data(user_id)
+    pig_farm_data = get_initial_farm_data_by_user_id(user_id)
     
 
     
