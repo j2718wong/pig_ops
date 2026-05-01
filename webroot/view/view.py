@@ -445,6 +445,13 @@ class Root(ViewBase):
                 if 'active' in cur_entry and cur_entry['active']:
                     language_display = cur_entry['local_name']
                     break
+        else:
+            available_languages = [{'code': 'en', 
+                                    'url': '/en', 
+                                    'name': 'English', 
+                                    'local_name': 'English', 
+                                    'active': True}]
+        
         
         
         # Get app_ui_settings
