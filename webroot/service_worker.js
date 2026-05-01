@@ -1,6 +1,9 @@
 const CACHE_NAME = 'superpig-v1';
 const urlsToCache = [
     '/',
+    '/en',
+    '/bis',
+    '/tag',
     '/index_mob.html',
     '/manifest.json',
     '/static_m/images/logo/superpig_192_192.png',
