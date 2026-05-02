@@ -84,8 +84,8 @@ class User(BaseModel):
                 
                 'account': {
                     'id':               cur_user_account_id,
+                    'flag':             cur_account_flag,
                     'is_enabled':       acc_is_enabled,
-                    'is_company_owned': acc_is_company_owned,
                     'cur_bill_id':      cur_account_bill_id,
                     'cur_bill_status_id': cur_account_bill_status_id
                 }

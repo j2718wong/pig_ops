@@ -13,17 +13,13 @@ const urlsToCache = [
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
+    console.log('Service Worker installing...');
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return Promise.allSettled(
-                urlsToCache.map((url) => {
-                    return cache.add(url).catch((error) => {
-                        console.warn(`Failed to cache ${url}:`, error);
-                    });
-                })
-            );
+            return cache.addAll(urlsToCache);
         })
     );
+    self.skipWaiting(); // Force activation
 });
 
 
@@ -42,9 +38,10 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
+
 // Activate event - clean old caches
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker activating');
+    console.log('Service Worker activating...');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -57,5 +54,5 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    self.clients.claim();
+    return self.clients.claim(); // Take control immediately
 });

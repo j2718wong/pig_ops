@@ -134,166 +134,125 @@ class Account(BaseModel):
                 """ % account_id
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
 
-        # Get database connection
-        conn = self.model.db_conn
-        
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        for row in rows:
+            cur_acc_id                  = row[0]
+            cur_acc_flag                = row[1]
+            cur_acc_status_id           = row[2]
+            cur_acc_country_id          = row[3]
+            cur_acc_country_name        = row[4]
+            cur_acc_account_name        = row[5]
+            cur_acc_date_trial_start    = str(row[6]) if row[6] else None
+            cur_acc_date_trial_end      = str(row[7]) if row[7] else None
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
+            cur_acc_count_sow_boar      = row[8]
+            cur_acc_count_pig_prod      = row[9]
             
-        except Exception as e:
-            msg = 'get_info(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-        
-        result = []
-        if rows is not None:
             
-            for row in rows:
-                cur_acc_id                  = row[0]
-                cur_acc_flag                = row[1]
-                cur_acc_status_id           = row[2]
-                cur_acc_country_id          = row[3]
-                cur_acc_country_name        = row[4]
-                cur_acc_account_name        = row[5]
-                cur_acc_date_trial_start    = str(row[6]) if row[6] else None
-                cur_acc_date_trial_end      = str(row[7]) if row[7] else None
-                
-                cur_acc_count_sow_boar      = row[8]
-                cur_acc_count_pig_prod      = row[9]
-                
-                
-                cur_acc_current_bill_id     = row[10]
-                cur_acc_current_bill_status = row[11]
+            cur_acc_current_bill_id     = row[10]
+            cur_acc_current_bill_status = row[11]
 
-                cur_acc_weight_unit         = row[12]
-                cur_acc_currency            = row[13]
-                cur_acc_settings_flag       = row[14]
-                cur_acc_num_days_move_to_farrow     = row[15]
-                cur_acc_num_days_wean               = row[16]
-                cur_acc_num_days_harvest_from_birth = row[17]
-                cur_acc_num_days_harvest_from_wean  = row[18]
+            cur_acc_weight_unit         = row[12]
+            cur_acc_currency            = row[13]
+            cur_acc_settings_flag       = row[14]
+            cur_acc_num_days_move_to_farrow     = row[15]
+            cur_acc_num_days_wean               = row[16]
+            cur_acc_num_days_harvest_from_birth = row[17]
+            cur_acc_num_days_harvest_from_wean  = row[18]
 
-                cur_user_name_last                  = row[19]
-                cur_user_name_first                 = row[20]
-                cur_settings_last_update            = str(row[21]) if row[21] else None
+            cur_user_name_last                  = row[19]
+            cur_user_name_first                 = row[20]
+            cur_settings_last_update            = str(row[21]) if row[21] else None
 
-                cur_ver_num_gestating_ops           = row[22]
-                cur_ver_num_lactating_piglets_ops   = row[23]
-                cur_ver_num_lactating_sow_ops       = row[24]
-                cur_ver_num_gilt_ops                = row[25]
-                cur_ver_num_weaning_sow_ops         = row[26]
+            cur_ver_num_gestating_ops           = row[22]
+            cur_ver_num_lactating_piglets_ops   = row[23]
+            cur_ver_num_lactating_sow_ops       = row[24]
+            cur_ver_num_gilt_ops                = row[25]
+            cur_ver_num_weaning_sow_ops         = row[26]
 
-                cur_data_ver_num_account            = row[27]
+            cur_data_ver_num_account            = row[27]
 
-                
-                
-                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
-                cur_flag_acc_is_enabled = 1 if temp > 0 else 0
-                
-                
-                temp = cur_acc_flag & FLAG_BIT_FREE_TRIAL_FINISHED
-                cur_flag_acc_free_trial_finished = 1 if temp > 0 else 0
-                
-                
-                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
-                cur_flag_acc_is_bill_exempt = 1 if temp > 0 else 0
-                
-                
-                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED
-                cur_flag_acc_is_company_owned = 1 if temp > 0 else 0
-                
-                
-                
-                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
-                cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
-                
-                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
-                cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
-                
-                
-                cur_entry = {
-                    'account': {
-                        'id':               cur_acc_id,
-                        'name':             cur_acc_account_name,
-                        'flag':             cur_acc_flag,
-                        'status_id':        cur_acc_status_id,
-                        'country_id':       cur_acc_country_id,
-                        'country_name':     cur_acc_country_name,
-                        
-                        'is_enabled':       cur_flag_acc_is_enabled,
-                        'is_trial_finished':cur_flag_acc_free_trial_finished,
-                        
-                        'is_bill_exempt':   cur_flag_acc_is_bill_exempt,
-                        'is_company_owned': cur_flag_acc_is_company_owned,
-                        
-                        'count_sow_boar':   cur_acc_count_sow_boar,
-                        'count_pig_prod':   cur_acc_count_pig_prod,
-                        
-                        'date_trial_start': cur_acc_date_trial_start,
-                        'date_trial_end':   cur_acc_date_trial_end,
-                        
-                        
-                        'current_bill':{
-                            'id':           cur_acc_current_bill_id,
-                            'status_id':    cur_acc_current_bill_status
-                        }
-                    },
+            
+            
+            temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
+            cur_flag_acc_is_enabled = 1 if temp > 0 else 0
+            
+            
+            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+            cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+            
+            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+            cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+            
+            
+            cur_entry = {
+                'account': {
+                    'id':               cur_acc_id,
+                    'name':             cur_acc_account_name,
+                    'flag':             cur_acc_flag,
+                    'status_id':        cur_acc_status_id,
+                    'country_id':       cur_acc_country_id,
+                    'country_name':     cur_acc_country_name,
                     
-                    'settings_operations': {
-                        'weight_unit':                  cur_acc_weight_unit,
-                        'currency':                     cur_acc_currency,
-                        'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
-                        'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
-                        'num_days_move_to_farrow':      cur_acc_num_days_move_to_farrow,
-                        'num_days_wean':                cur_acc_num_days_wean,
-                        'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
-                        'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
+                    'is_enabled':       cur_flag_acc_is_enabled,
                     
-                        'last_update':{
-                            'name_last':    cur_user_name_last,
-                            'name_first':   cur_user_name_first,
-                            'dt_update':    cur_settings_last_update
-                        }
-                    },
                     
-                    'data_ver_num':[
-                        cur_ver_num_gestating_ops,        
-                        cur_ver_num_lactating_piglets_ops,
-                        cur_ver_num_lactating_sow_ops,    
-                        cur_ver_num_gilt_ops,             
-                        cur_ver_num_weaning_sow_ops,      
-                        
-                        cur_data_ver_num_account
-                    ]
-                }
+                    'count_sow_boar':   cur_acc_count_sow_boar,
+                    'count_pig_prod':   cur_acc_count_pig_prod,
+                    
+                    'date_trial_start': cur_acc_date_trial_start,
+                    'date_trial_end':   cur_acc_date_trial_end,
+                    
+                    
+                    'current_bill':{
+                        'id':           cur_acc_current_bill_id,
+                        'status_id':    cur_acc_current_bill_status
+                    }
+                },
                 
+                'settings_operations': {
+                    'weight_unit':                  cur_acc_weight_unit,
+                    'currency':                     cur_acc_currency,
+                    'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
+                    'day_1_on_date_of_insem':       cur_flag_day_1_on_doi,
+                    'num_days_move_to_farrow':      cur_acc_num_days_move_to_farrow,
+                    'num_days_wean':                cur_acc_num_days_wean,
+                    'num_days_harvest_from_birth':  cur_acc_num_days_harvest_from_birth,
+                    'num_days_harvest_from_wean':   cur_acc_num_days_harvest_from_wean,
+                
+                    'last_update':{
+                        'name_last':    cur_user_name_last,
+                        'name_first':   cur_user_name_first,
+                        'dt_update':    cur_settings_last_update
+                    }
+                },
+                
+                'data_ver_num':[
+                    cur_ver_num_gestating_ops,        
+                    cur_ver_num_lactating_piglets_ops,
+                    cur_ver_num_lactating_sow_ops,    
+                    cur_ver_num_gilt_ops,             
+                    cur_ver_num_weaning_sow_ops,      
+                    
+                    cur_data_ver_num_account
+                ]
+            }
+            
 
+            
+            # Get Farm List
+            account_farms = self.model['pig_farm'].get_list(account_id)
+            
+            if account_farms:
+                cur_entry['pig_farms'] = account_farms
+            
                 
-                # Get Farm List
-                account_farms = self.model['pig_farm'].get_list(account_id)
-                
-                if account_farms:
-                    cur_entry['pig_farms'] = account_farms
-                
-                    
-                return cur_entry
+            return cur_entry
         
         return None
     
@@ -565,33 +524,11 @@ class Account(BaseModel):
                 """ % account_id
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list_pig_farm(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
         if rows is not None:
@@ -662,77 +599,50 @@ class Account(BaseModel):
                 """ % account_id
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_data_ver_num(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return None
         
 
-
-        if rows is not None:
+        for row in rows:
+            cur_ver_num_gestating_ops           = row[0]
+            cur_ver_num_lactating_piglets_ops   = row[1]
+            cur_ver_num_lactating_sow_ops       = row[2]    
+            cur_ver_num_gilt_ops                = row[3]             
+            cur_ver_num_weaning_sow_ops         = row[4]      
+            
+            cur_ver_num_account                 = row[5]
+            cur_ver_num_pig_buyer               = row[6]
             
             
-            for row in rows:
-                cur_ver_num_gestating_ops           = row[0]
-                cur_ver_num_lactating_piglets_ops   = row[1]
-                cur_ver_num_lactating_sow_ops       = row[2]    
-                cur_ver_num_gilt_ops                = row[3]             
-                cur_ver_num_weaning_sow_ops         = row[4]      
-                
-                cur_ver_num_account                 = row[5]
-                cur_ver_num_pig_buyer               = row[6]
-                
-                
-                if return_array == 0:
-                    cur_entry = {
-                        'data_ver_num': {
-                            'gesta_ops':            cur_ver_num_gestating_ops,       
-                            'lacta_piglets_ops':    cur_ver_num_lactating_piglets_ops,    
-                            'lacta_sow_ops':        cur_ver_num_lactating_sow_ops,
-                            'gilt_ops':             cur_ver_num_gilt_ops,   
-                            'weaning_sow_ops':      cur_ver_num_weaning_sow_ops,
-                            
-                            'account':              cur_ver_num_account,
-                            'pig_buyer':            cur_ver_num_pig_buyer
-                        }
-                    }
-                    
-                    return cur_entry
-                
-                else:
-                    return [
-                        cur_ver_num_gestating_ops,        
-                        cur_ver_num_lactating_piglets_ops,
-                        cur_ver_num_lactating_sow_ops,    
-                        cur_ver_num_gilt_ops,             
-                        cur_ver_num_weaning_sow_ops,      
+            if return_array == 0:
+                cur_entry = {
+                    'data_ver_num': {
+                        'gesta_ops':            cur_ver_num_gestating_ops,       
+                        'lacta_piglets_ops':    cur_ver_num_lactating_piglets_ops,    
+                        'lacta_sow_ops':        cur_ver_num_lactating_sow_ops,
+                        'gilt_ops':             cur_ver_num_gilt_ops,   
+                        'weaning_sow_ops':      cur_ver_num_weaning_sow_ops,
                         
-                        cur_ver_num_account,
-                        cur_ver_num_pig_buyer              
-                    ]
+                        'account':              cur_ver_num_account,
+                        'pig_buyer':            cur_ver_num_pig_buyer
+                    }
+                }
+                
+                return cur_entry
+            
+            else:
+                return [
+                    cur_ver_num_gestating_ops,        
+                    cur_ver_num_lactating_piglets_ops,
+                    cur_ver_num_lactating_sow_ops,    
+                    cur_ver_num_gilt_ops,             
+                    cur_ver_num_weaning_sow_ops,      
+                    
+                    cur_ver_num_account,
+                    cur_ver_num_pig_buyer              
+                ]
 
         return None
 
