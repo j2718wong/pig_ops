@@ -286,3 +286,48 @@ async def look_up_pig_dead_type_list(request: Request):
     }
 
 
+
+
+@app.get("/lookup/list_of_values", tags=["Common Lookup"])
+async def look_up_list_of_values(request: Request):
+    """
+    Will get list of values.
+    
+    Parameters
+    ----------
+    
+   
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+        
+    res = model['public_lookup'].get_list_of_values()
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR',
+                'desc': ''
+            }
+        }
+            
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res
+    }
+
+
+
+

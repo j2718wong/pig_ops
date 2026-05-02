@@ -97,6 +97,9 @@ class Account(BaseModel):
                     a.date_trial_start,
                     a.date_trial_end,
                     
+                    a.count_sow_boar,
+                    a.count_pig_prod,
+                    
                     a.current_bill_id,
                     c.status_id,
                     
@@ -151,7 +154,7 @@ class Account(BaseModel):
             #conn.close()
             
         except Exception as e:
-            msg = 'get_account_admin(); error in executing query[] = ' + sql
+            msg = 'get_info(); error in executing query[] = ' + sql
             msg += '\n'
             msg += str(e)
             msg += '\n\n'
@@ -169,31 +172,35 @@ class Account(BaseModel):
                 cur_acc_country_id          = row[3]
                 cur_acc_country_name        = row[4]
                 cur_acc_account_name        = row[5]
-                cur_acc_date_trial_start    = str(row[6])
-                cur_acc_date_trial_end      = str(row[7])
+                cur_acc_date_trial_start    = str(row[6]) if row[6] else None
+                cur_acc_date_trial_end      = str(row[7]) if row[7] else None
                 
-                cur_acc_current_bill_id     = row[8]
-                cur_acc_current_bill_status = row[9]
+                cur_acc_count_sow_boar      = row[8]
+                cur_acc_count_pig_prod      = row[9]
                 
-                cur_acc_weight_unit         = row[10]
-                cur_acc_currency            = row[11]
-                cur_acc_settings_flag       = row[12]
-                cur_acc_num_days_move_to_farrow     = row[13]
-                cur_acc_num_days_wean               = row[14] 
-                cur_acc_num_days_harvest_from_birth = row[15] 
-                cur_acc_num_days_harvest_from_wean  = row[16] 
+                
+                cur_acc_current_bill_id     = row[10]
+                cur_acc_current_bill_status = row[11]
 
-                cur_user_name_last                  = row[17] 
-                cur_user_name_first                 = row[18] 
-                cur_settings_last_update            = str(row[19]) if row[19] else None 
+                cur_acc_weight_unit         = row[12]
+                cur_acc_currency            = row[13]
+                cur_acc_settings_flag       = row[14]
+                cur_acc_num_days_move_to_farrow     = row[15]
+                cur_acc_num_days_wean               = row[16]
+                cur_acc_num_days_harvest_from_birth = row[17]
+                cur_acc_num_days_harvest_from_wean  = row[18]
 
-                cur_ver_num_gestating_ops           = row[20] 
-                cur_ver_num_lactating_piglets_ops   = row[21] 
-                cur_ver_num_lactating_sow_ops       = row[22] 
-                cur_ver_num_gilt_ops                = row[23] 
-                cur_ver_num_weaning_sow_ops         = row[24] 
+                cur_user_name_last                  = row[19]
+                cur_user_name_first                 = row[20]
+                cur_settings_last_update            = str(row[21]) if row[21] else None
 
-                cur_data_ver_num_account            = row[25] 
+                cur_ver_num_gestating_ops           = row[22]
+                cur_ver_num_lactating_piglets_ops   = row[23]
+                cur_ver_num_lactating_sow_ops       = row[24]
+                cur_ver_num_gilt_ops                = row[25]
+                cur_ver_num_weaning_sow_ops         = row[26]
+
+                cur_data_ver_num_account            = row[27]
 
                 
                 
@@ -236,6 +243,13 @@ class Account(BaseModel):
                         'is_bill_exempt':   cur_flag_acc_is_bill_exempt,
                         'is_company_owned': cur_flag_acc_is_company_owned,
                         
+                        'count_sow_boar':   cur_acc_count_sow_boar,
+                        'count_pig_prod':   cur_acc_count_pig_prod,
+                        
+                        'date_trial_start': cur_acc_date_trial_start,
+                        'date_trial_end':   cur_acc_date_trial_end,
+                        
+                        
                         'current_bill':{
                             'id':           cur_acc_current_bill_id,
                             'status_id':    cur_acc_current_bill_status
@@ -270,12 +284,7 @@ class Account(BaseModel):
                     ]
                 }
                 
-                
-                if cur_flag_acc_free_trial_finished == 0:
-                    cur_entry['account']['date_trial_start'] = cur_acc_date_trial_start
-                    cur_entry['account']['date_trial_end'] = cur_acc_date_trial_end
-                    
-                
+
                 
                 # Get Farm List
                 account_farms = self.model['pig_farm'].get_list(account_id)

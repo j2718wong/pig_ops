@@ -160,5 +160,33 @@ class PublicLookup(BaseModel):
         
         return result
     
-    
 
+
+    def get_list_of_values(self):
+        """
+        This will return a dictionry, not a list
+        """
+        sql =   """
+                SELECT 
+                    name,
+                    val_int
+                    
+                FROM a01_list_of_values 
+                ORDER BY id
+                """ 
+    
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return []
+        
+        
+        result = {}
+        if rows is not None:
+            
+            for row in rows:
+                result[row[0]] = row[1]
+                
+        return result
+    
+        
