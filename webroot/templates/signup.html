@@ -17,6 +17,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SuperPig">
   
+    <script>
+        // Register service worker immediately
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service_worker.js')
+                    .then(reg => console.log('SW registered on home page:', reg.scope))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
+    
+    <script src="/static_m/js/pwa-handler.js" defer></script>
   
     <link type="text/css"       rel="stylesheet"    href="/static_m/css/all.min.css"/>
   <style>
