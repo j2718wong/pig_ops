@@ -387,13 +387,20 @@ def replace_plain_ids_account(data):
     data['account']['hid']   = cur_hid
     
     
-    cur_id  = data['account']['country_id']
+    cur_id  = data['account']['country']['id']
     cur_hid = hashids_common.encrypt(cur_id)
     
-    del data['account']['country_id']
-    data['account']['country_hid']   = cur_hid
+    del data['account']['country']['id']
+    data['account']['country']['hid']   = cur_hid
     
     
+    if 'current_bill' in data['account']: 
+        cur_id  = data['account']['current_bill']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del data['account']['current_bill']['id']
+        data['account']['current_bill']['hid'] = cur_hid
+        
     
     if 'pig_farms' in data:
         pig_farms = data['pig_farms']
@@ -410,6 +417,8 @@ def replace_plain_ids_account(data):
         
 
 def replace_plain_ids_user_account(user_account):
+    
+
     # Clean user
     cur_id      = user_account['user']['user']['id']
     cur_hid     = hashids_user.encrypt(cur_id)

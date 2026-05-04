@@ -91,8 +91,11 @@ class Account(BaseModel):
                     a.id,
                     a.flag,
                     a.status_id, 
+                    
                     a.country_id,
                     b.name AS country_name,
+                    b.flag,
+                    
                     a.name AS account_name,
                     a.date_trial_start,
                     a.date_trial_end,
@@ -102,6 +105,24 @@ class Account(BaseModel):
                     
                     a.current_bill_id,
                     c.status_id,
+                    c.flag,
+                    c.bill_reference,
+                    c.date_issue,
+                    c.date_due,
+                    
+                    c.num_sow_boar_billed,
+                    d.num_sow,
+                    d.num_boar,
+                    
+                    c.currency_code,
+                    c.tax_rate,
+                    
+                    c.charge_per_pig,
+                    c.amount,
+                    c.deduction,
+                    c.taxable_amount,
+                    c.taxes,
+                    c.total_amount_due,
                     
                     a.weight_unit,
                     a.currency,
@@ -112,8 +133,8 @@ class Account(BaseModel):
                     a.num_days_harvest_from_wean,
                     
                     
-                    d.name_last,
-                    d.name_first,
+                    e.name_last,
+                    e.name_first,
                     a.dt_last_update_settings,
                     
                     
@@ -128,7 +149,8 @@ class Account(BaseModel):
                 FROM account a
                 LEFT OUTER JOIN app_country b   ON a.country_id = b.id
                 LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
-                LEFT OUTER JOIN user d          ON a.last_update_settings_user_id = d.id
+                LEFT OUTER JOIN sow_boar_head_count d  ON c.sow_boar_head_count_id = d.id
+                LEFT OUTER JOIN user e          ON a.last_update_settings_user_id = e.id
                 
                 WHERE a.id = %s
                 """ % account_id
@@ -144,40 +166,61 @@ class Account(BaseModel):
             cur_acc_id                  = row[0]
             cur_acc_flag                = row[1]
             cur_acc_status_id           = row[2]
+            
             cur_acc_country_id          = row[3]
             cur_acc_country_name        = row[4]
-            cur_acc_account_name        = row[5]
-            cur_acc_date_trial_start    = str(row[6]) if row[6] else None
-            cur_acc_date_trial_end      = str(row[7]) if row[7] else None
+            cur_acc_country_flag        = row[5]
+        
+            cur_acc_account_name        = row[6]
+            cur_acc_date_trial_start    = str(row[7]) if row[7] else None
+            cur_acc_date_trial_end      = str(row[8]) if row[8] else None
             
-            cur_acc_count_sow_boar      = row[8]
-            cur_acc_count_pig_prod      = row[9]
+            # Accumlated count for account
+            cur_acc_count_sow_boar      = row[9] 
+            cur_acc_count_pig_prod      = row[10]
             
             
-            cur_acc_current_bill_id     = row[10]
-            cur_acc_current_bill_status = row[11]
+            cur_acc_current_bill_id             = row[11]
+            cur_acc_bill_status                 = row[12]
+            cur_acc_bill_flag                   = row[13]
+            cur_acc_bill_reference              = row[14]
+            cur_acc_bill_date_issue             = row[15]
+            cur_acc_bill_date_due               = row[16]
 
-            cur_acc_weight_unit         = row[12]
-            cur_acc_currency            = row[13]
-            cur_acc_settings_flag       = row[14]
-            cur_acc_num_days_move_to_farrow     = row[15]
-            cur_acc_num_days_wean               = row[16]
-            cur_acc_num_days_harvest_from_birth = row[17]
-            cur_acc_num_days_harvest_from_wean  = row[18]
+            cur_acc_bill_num_sow_boar_billed    = row[17]
+            cur_acc_bill_num_sow                = row[18]
+            cur_acc_bill_num_boar               = row[19]
 
-            cur_user_name_last                  = row[19]
-            cur_user_name_first                 = row[20]
-            cur_settings_last_update            = str(row[21]) if row[21] else None
+            cur_acc_bill_currency_code          = row[20]
+            cur_acc_bill_tax_rate               = row[21]
 
-            cur_ver_num_gestating_ops           = row[22]
-            cur_ver_num_lactating_piglets_ops   = row[23]
-            cur_ver_num_lactating_sow_ops       = row[24]
-            cur_ver_num_gilt_ops                = row[25]
-            cur_ver_num_weaning_sow_ops         = row[26]
+            cur_acc_bill_charge_per_pig         = row[22]
+            cur_acc_bill_amount                 = row[23]
+            cur_acc_bill_deduction              = row[24]
+            cur_acc_bill_taxable_amount         = row[25]
+            cur_acc_bill_taxes                  = row[26]
+            cur_acc_bill_total_amount_due       = row[27]
 
-            cur_data_ver_num_account            = row[27]
+            cur_acc_weight_unit                 = row[28]
+            cur_acc_currency                    = row[29]
+            cur_acc_settings_flag               = row[30]
+            cur_acc_num_days_move_to_farrow     = row[31]
+            cur_acc_num_days_wean               = row[32]
+            cur_acc_num_days_harvest_from_birth = row[33]
+            cur_acc_num_days_harvest_from_wean  = row[34]
 
-            
+            cur_user_name_last                  = row[35]
+            cur_user_name_first                 = row[36]
+            cur_settings_last_update            = str(row[37]) if row[37] else None
+
+            cur_ver_num_gestating_ops           = row[38]
+            cur_ver_num_lactating_piglets_ops   = row[39]
+            cur_ver_num_lactating_sow_ops       = row[40]
+            cur_ver_num_gilt_ops                = row[41]
+            cur_ver_num_weaning_sow_ops         = row[42]
+
+            cur_data_ver_num_account            = row[43]
+
             
             temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
             cur_flag_acc_is_enabled = 1 if temp > 0 else 0
@@ -192,26 +235,50 @@ class Account(BaseModel):
             
             cur_entry = {
                 'account': {
-                    'id':               cur_acc_id,
-                    'name':             cur_acc_account_name,
-                    'flag':             cur_acc_flag,
-                    'status_id':        cur_acc_status_id,
-                    'country_id':       cur_acc_country_id,
-                    'country_name':     cur_acc_country_name,
+                    'id':                   cur_acc_id,
+                    'name':                 cur_acc_account_name,
+                    'flag':                 cur_acc_flag,
+                    'status_id':            cur_acc_status_id,
                     
-                    'is_enabled':       cur_flag_acc_is_enabled,
+                        
+                    'is_enabled':           cur_flag_acc_is_enabled,
+                        
+                        
+                    'count_sow_boar':       cur_acc_count_sow_boar,
+                    'count_pig_prod':       cur_acc_count_pig_prod,
+                        
+                    'date_trial_start':     cur_acc_date_trial_start,
+                    'date_trial_end':       cur_acc_date_trial_end,
                     
-                    
-                    'count_sow_boar':   cur_acc_count_sow_boar,
-                    'count_pig_prod':   cur_acc_count_pig_prod,
-                    
-                    'date_trial_start': cur_acc_date_trial_start,
-                    'date_trial_end':   cur_acc_date_trial_end,
+                    'country':  {
+                        'id':               cur_acc_country_id,
+                        'name':             cur_acc_country_name,
+                        'flag':             cur_acc_country_flag
+                    },
                     
                     
                     'current_bill':{
-                        'id':           cur_acc_current_bill_id,
-                        'status_id':    cur_acc_current_bill_status
+                        'id':               cur_acc_current_bill_id,
+                        'status_id':        cur_acc_bill_status,
+                        
+                        'flag':             cur_acc_bill_flag,
+                        'bill_reference':   cur_acc_bill_reference,
+                        'date_issue':       cur_acc_bill_date_issue,
+                        'date_due':         cur_acc_bill_date_due,
+                        
+                        'num_billed':       cur_acc_bill_num_sow_boar_billed,
+                        'num_sow':          cur_acc_bill_num_sow,
+                        'num_boar':         cur_acc_bill_num_boar,
+                        
+                        'currency_code':    cur_acc_bill_currency_code,
+                        'tax_rate':         cur_acc_bill_tax_rate,
+                        
+                        'charge_per_pig':   cur_acc_bill_charge_per_pig,
+                        'amount':           cur_acc_bill_amount,
+                        'deduction':        cur_acc_bill_deduction,
+                        'taxes':            cur_acc_bill_taxes,
+                        'taxable_amount':   cur_acc_bill_taxable_amount,
+                        'total_amount_due': cur_acc_bill_total_amount_due
                     }
                 },
                 
@@ -243,6 +310,10 @@ class Account(BaseModel):
                 ]
             }
             
+
+            if cur_acc_current_bill_id == 0:
+                del cur_entry['account']['current_bill']
+
 
             
             # Get Farm List
