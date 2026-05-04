@@ -191,7 +191,6 @@ async def account_register(request: Request, account_data: dm.DataAccount):
     
     # Remove not useful data
     del data_user_account['account']['settings_operations']
-    del data_user_account['account']['account']['current_bill']
     
 
     
