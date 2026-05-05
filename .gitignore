@@ -54,3 +54,5 @@ Thumbs.db
 *.mov
 *.wmv
 
+# All files ignored in this directory
+webroot/data/

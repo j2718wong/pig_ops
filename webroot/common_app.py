@@ -41,7 +41,7 @@ from model.m_app_analytics      import AppAnalytics
 
 from model.m_account            import Account
 from model.m_account_access_code import AccountAccessCode
-
+from model.m_account_bill       import AccountBill
 
 from model.m_a0_public_lookup   import PublicLookup
 
@@ -114,6 +114,7 @@ model_names_pig_ops = [
 
     ('account',                 Account),
     ('access_code',             AccountAccessCode),
+    ('account_bill',            AccountBill),
     
     ('cust_feedback',           CustomerFeedback), 
     

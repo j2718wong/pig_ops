@@ -146,9 +146,7 @@ class DataAccountAccessCode(BaseModel):
     user_id:                int = 0
     group_num:              int = 0
     access_code_id:         int = 0
-    
-
-    
+        
 
 class DataAccountSettings(BaseModel):
     uhid:                   str = None

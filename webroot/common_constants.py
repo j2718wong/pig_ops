@@ -135,7 +135,7 @@ ERROR_SERVER_ERROR                                  = 0x02
 ERROR_USER_EMAIL                                    = 0x03
 ERROR_USER_INACTIVE                                 = 0x04
 
-                        
+ERROR_FILE_SAVE_FAILED                              = 0x05
 
 
 ERROR_ACCOUNT_DISABLED                              = 0x08
@@ -405,5 +405,13 @@ ERROR_SOW_BOAR_MATE_INVALID_PIG_FARM_HASHID         = 0x14C
 
 ERROR_REPORT_FILE_NOT_FOUND                         = 0x154
 ERROR_REPORT_READ_ERROR                             = 0x155
+
+
+
+
+ERROR_ACCOUNT_BILL_INVALID_USER_HASHID              = 0x160
+ERROR_ACCOUNT_BILL_INVALID_HASHID                   = 0x161
+
+
 
 

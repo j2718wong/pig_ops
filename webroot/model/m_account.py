@@ -124,6 +124,12 @@ class Account(BaseModel):
                     c.taxes,
                     c.total_amount_due,
                     
+                    e.file_path,
+                    e.dt_entry,
+                    f.name_last,
+                    f.name_first,
+                    
+                    
                     a.weight_unit,
                     a.currency,
                     a.flag_settings,
@@ -133,8 +139,8 @@ class Account(BaseModel):
                     a.num_days_harvest_from_wean,
                     
                     
-                    e.name_last,
-                    e.name_first,
+                    g.name_last,
+                    g.name_first,
                     a.dt_last_update_settings,
                     
                     
@@ -148,9 +154,13 @@ class Account(BaseModel):
                     
                 FROM account a
                 LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                
                 LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
-                LEFT OUTER JOIN sow_boar_head_count d  ON c.sow_boar_head_count_id = d.id
-                LEFT OUTER JOIN user e          ON a.last_update_settings_user_id = e.id
+                LEFT OUTER JOIN sow_boar_head_count d       ON c.sow_boar_head_count_id = d.id
+                LEFT OUTER JOIN account_upload_receipt e    ON c.upload_receipt_id = e.id
+                LEFT OUTER JOIN user f          ON e.added_by_user_id = f.id
+                
+                LEFT OUTER JOIN user g          ON a.last_update_settings_user_id = g.id
                 
                 WHERE a.id = %s
                 """ % account_id
@@ -175,13 +185,13 @@ class Account(BaseModel):
             cur_acc_date_trial_start    = str(row[7]) if row[7] else None
             cur_acc_date_trial_end      = str(row[8]) if row[8] else None
             
-            # Accumlated count for account
+            # Accumulated count for account
             cur_acc_count_sow_boar      = row[9] 
             cur_acc_count_pig_prod      = row[10]
             
             
             cur_acc_current_bill_id             = row[11]
-            cur_acc_bill_status                 = row[12]
+            cur_acc_bill_status_id              = row[12]
             cur_acc_bill_flag                   = row[13]
             cur_acc_bill_reference              = row[14]
             cur_acc_bill_date_issue             = row[15]
@@ -200,26 +210,37 @@ class Account(BaseModel):
             cur_acc_bill_taxable_amount         = row[25]
             cur_acc_bill_taxes                  = row[26]
             cur_acc_bill_total_amount_due       = row[27]
+            
+            
+            # Receipt upload fields (indices 28-31)
+            cur_upload_receipt_path             = row[28]
+            cur_upload_receipt_dt_entry         = str(row[29]) if row[29] else None
+            cur_upload_receipt_user_name_last   = row[30]
+            cur_upload_receipt_user_name_first  = row[31]
+            
+            # Account settings (indices 32-39)
+            cur_acc_weight_unit                 = row[32]
+            cur_acc_currency                    = row[33]
+            cur_acc_settings_flag               = row[34]
+            cur_acc_num_days_move_to_farrow     = row[35]
+            cur_acc_num_days_wean               = row[36]
+            cur_acc_num_days_harvest_from_birth = row[37]
+            cur_acc_num_days_harvest_from_wean  = row[38]
 
-            cur_acc_weight_unit                 = row[28]
-            cur_acc_currency                    = row[29]
-            cur_acc_settings_flag               = row[30]
-            cur_acc_num_days_move_to_farrow     = row[31]
-            cur_acc_num_days_wean               = row[32]
-            cur_acc_num_days_harvest_from_birth = row[33]
-            cur_acc_num_days_harvest_from_wean  = row[34]
+            # User who last updated settings (indices 39-41)
+            cur_user_name_last                  = row[39]
+            cur_user_name_first                 = row[40]
+            cur_settings_last_update            = str(row[41]) if row[41] else None
 
-            cur_user_name_last                  = row[35]
-            cur_user_name_first                 = row[36]
-            cur_settings_last_update            = str(row[37]) if row[37] else None
+            # Version numbers (indices 42-47)
+            cur_ver_num_gestating_ops           = row[42]
+            cur_ver_num_lactating_piglets_ops   = row[43]
+            cur_ver_num_lactating_sow_ops       = row[44]
+            cur_ver_num_gilt_ops                = row[45]
+            cur_ver_num_weaning_sow_ops         = row[46]
 
-            cur_ver_num_gestating_ops           = row[38]
-            cur_ver_num_lactating_piglets_ops   = row[39]
-            cur_ver_num_lactating_sow_ops       = row[40]
-            cur_ver_num_gilt_ops                = row[41]
-            cur_ver_num_weaning_sow_ops         = row[42]
+            cur_data_ver_num_account            = row[47]
 
-            cur_data_ver_num_account            = row[43]
 
             
             temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
@@ -259,7 +280,7 @@ class Account(BaseModel):
                     
                     'current_bill':{
                         'id':               cur_acc_current_bill_id,
-                        'status_id':        cur_acc_bill_status,
+                        'status_id':        cur_acc_bill_status_id,
                         
                         'flag':             cur_acc_bill_flag,
                         'bill_reference':   cur_acc_bill_reference,
@@ -278,7 +299,14 @@ class Account(BaseModel):
                         'deduction':        cur_acc_bill_deduction,
                         'taxes':            cur_acc_bill_taxes,
                         'taxable_amount':   cur_acc_bill_taxable_amount,
-                        'total_amount_due': cur_acc_bill_total_amount_due
+                        'total_amount_due': cur_acc_bill_total_amount_due,
+                        
+                        'uploaded_receipt': {
+                            'path':         cur_upload_receipt_path,
+                            'dt_entry':     cur_upload_receipt_dt_entry,
+                            'name_last':    cur_upload_receipt_user_name_last,
+                            'name_first':   cur_upload_receipt_user_name_first
+                        }
                     }
                 },
                 
@@ -309,6 +337,10 @@ class Account(BaseModel):
                     cur_data_ver_num_account
                 ]
             }
+            
+            
+            if cur_upload_receipt_path is None:
+                del cur_entry['account']['current_bill']['uploaded_receipt']
             
 
             if cur_acc_current_bill_id == 0:
