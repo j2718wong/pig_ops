@@ -518,7 +518,7 @@ def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
 def send_email(recipient: str, subject: str, body: str):
     
     if app_envi == 'production':
-        return send_email_smtp2go(recipient, subject, body)
+        return send_email_smtp2go_sync(recipient, subject, body)
         
     else:
         return send_email_smtp(recipient, subject, body)
