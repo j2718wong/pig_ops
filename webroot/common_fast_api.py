@@ -470,48 +470,51 @@ SMTP2GO_API_KEY = os.environ.get("SMTP2GO_API_KEY")
 
 def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
     """
-    Send email using SMTP2GO API (synchronous wrapper)
+    Send email using SMTP2GO API (synchronous)
     """
-    async def _send():
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://api.smtp2go.com/v3/email/send",
-                headers={
-                    "Content-Type": "application/json",
-                    "X-Smtp2go-Api-Key": SMTP2GO_API_KEY,
-                    "accept": "application/json"
-                },
-                json={
-                    "sender": "SuperPig <contact@jsysdev.com>",
-                    "to": [recipient],
-                    "subject": subject,
-                    "html_body": body,
-                    "text_body": "Please view this email in a modern email client"
-                }
-            )
-            return response.json()
+    if not SMTP2GO_API_KEY:
+        raise ValueError("SMTP2GO_API_KEY environment variable not set")
+    
+    payload = {
+        "sender": "SuperPig <contact@jsysdev.com>",
+        "to": [recipient],
+        "subject": subject,
+        "html_body": body,
+        "text_body": "Please view this email in a modern email client"
+    }
+    
+    headers = {
+        "Content-Type": "application/json",
+        "X-Smtp2go-Api-Key": SMTP2GO_API_KEY,
+        "accept": "application/json"
+    }
     
     try:
-        # Run the async function
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+        with httpx.Client() as client:
+            response = client.post(
+                "https://api.smtp2go.com/v3/email/send",
+                headers=headers,
+                json=payload,
+                timeout=30.0  # Add timeout to avoid hanging
+            )
         
-        result = loop.run_until_complete(_send())
+        result = response.json()
         
         if response.status_code == 200 and result.get("data", {}).get("succeeded", 0) > 0:
-            print(f"Email sent via SMTP2GO to {recipient}")
-            return {"success": True, "method": "smtp2go", "email_id": result["data"].get("email_id")}
+            email_id = result["data"].get("email_id")
+            print(f"Email sent via SMTP2GO to {recipient}, email_id: {email_id}")
+            return {"success": True, "email_id": email_id}
         else:
-            error_msg = result.get("data", {}).get("error", "Unknown error")
+            error_msg = result.get("data", {}).get("error", result.get("error", "Unknown error"))
             print(f"SMTP2GO error: {error_msg}")
             return {"success": False, "error": error_msg}
             
+    except httpx.TimeoutException:
+        print(f"Timeout sending email to {recipient}")
+        return {"success": False, "error": "Request timeout"}
     except Exception as e:
         print(f"Error sending email via SMTP2GO: {e}")
-        raise
+        return {"success": False, "error": str(e)}
 
 
 
