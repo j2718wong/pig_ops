@@ -102,6 +102,13 @@ tags_metadata = [
 ]
 
 
+
+# Possible APP_ENVI values
+# development   - using development (development)
+# local         - using local       (development), the database is a sync copy of production
+# production    - using production  (production)
+
+
 # Get APP_ENVI
 app_envi = os.getenv('APP_ENVI', 'development')
 
@@ -414,9 +421,11 @@ config_email = ConnectionConfig(
 
 
 import asyncio
+import httpx
 
-# This is your required function signature
-def send_email(recipient: str, subject: str, body: str):
+
+
+def send_email_smtp(recipient: str, subject: str, body: str):
     """
     Synchronous function that sends email to a single recipient
     This matches your required signature
@@ -446,17 +455,83 @@ def send_email(recipient: str, subject: str, body: str):
         
         # Run the async function
         loop.run_until_complete(fm.send_message(message))
+        
+        print(f"Email sent via SMTP to {recipient}")
+        return {"success": True, "method": "smtp"}
+    
     except Exception as e:
         print(f"Error sending email: {e}")
         raise
 
 
 
+SMTP2GO_API_KEY = os.environ.get("SMTP2GO_API_KEY")
+
+
+def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
+    """
+    Send email using SMTP2GO API (synchronous wrapper)
+    """
+    async def _send():
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.smtp2go.com/v3/email/send",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Smtp2go-Api-Key": SMTP2GO_API_KEY,
+                    "accept": "application/json"
+                },
+                json={
+                    "sender": "SuperPig <contact@jsysdev.com>",
+                    "to": [recipient],
+                    "subject": subject,
+                    "html_body": body,
+                    "text_body": "Please view this email in a modern email client"
+                }
+            )
+            return response.json()
+    
+    try:
+        # Run the async function
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        result = loop.run_until_complete(_send())
+        
+        if response.status_code == 200 and result.get("data", {}).get("succeeded", 0) > 0:
+            print(f"Email sent via SMTP2GO to {recipient}")
+            return {"success": True, "method": "smtp2go", "email_id": result["data"].get("email_id")}
+        else:
+            error_msg = result.get("data", {}).get("error", "Unknown error")
+            print(f"SMTP2GO error: {error_msg}")
+            return {"success": False, "error": error_msg}
+            
+    except Exception as e:
+        print(f"Error sending email via SMTP2GO: {e}")
+        raise
+
+
+
+def send_email(recipient: str, subject: str, body: str):
+    
+    if app_envi == 'production':
+        return send_email_smtp2go(recipient, subject, body)
+        
+    else:
+        return send_email_smtp(recipient, subject, body)
+    
+    
+    
+    
+
 def get_application_data():
     return {
         "product_name":     "SuperPig",
         "contact_whatsapp": "+85260615575",
-        "contact_email":    "jsysdev.contact@gmail.com",
+        "contact_email":    "contact@jsysdev.com",
         "privacy_officer":  "Jack Wong",
         "privacy_email":    "privacy@jsysdev.com",
         "website":          "https://superpig.jsysdev.com",
@@ -469,6 +544,10 @@ def get_application_data():
         "rt_updates_enabled": 0
     }
 
+
+
+
+    
 
 
 

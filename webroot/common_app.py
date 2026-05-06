@@ -189,10 +189,15 @@ USING_PRODUCTION_DB             = 0
 DB_INFO                         = ''
 
 
+# Possible APP_ENVI values
+# development   - using development (development)
+# local         - using local       (development), the database is a sync copy of production
+# production    - using production  (production)
+
 
 # Get APP_ENVI
 app_envi = os.getenv('APP_ENVI', 'development')
-if app_envi == 'production':
+if app_envi == 'production' or app_envi == 'local':
     USING_PRODUCTION_DB = 1
 else:
     USING_PRODUCTION_DB = 0

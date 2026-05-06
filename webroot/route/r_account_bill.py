@@ -5,6 +5,8 @@ import os
 import sys
 import pprint
 import shutil
+import base64
+import mimetypes
 
 
 from fastapi                import Request, HTTPException, status, Depends
@@ -123,8 +125,6 @@ async def account_bill_payment_proof_submit(request: Request,
     drwxr-xr-x  2 root root 4096 May  5 02:10 account
 
     
-    TODO save file and populate file_path
-    
     the file_path should start at account/...
     """
     
@@ -210,3 +210,54 @@ async def account_bill_payment_proof_submit(request: Request,
     
 
     
+@app.get("/account_bill/receipt/{year}/{upload_type}/{account_id}/{filename}")
+async def get_receipt_image(
+    request: Request,
+    year: str,
+    upload_type: str,
+    account_id: str,
+    filename: str
+):
+    """
+    Serve uploaded receipt images.
+    URL pattern: /account_bill/receipt/2026/payment_upload/0001/20260505_122949.png
+    """
+    
+    
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    """
+    
+    # Build the file path
+    file_path = Path(f"webroot/data/account/{year}/{upload_type}/{account_id}/{filename}")
+    
+    # Security: Ensure the path is within the allowed directory
+    allowed_dir = Path("webroot/data/account")
+    try:
+        file_path.resolve().relative_to(allowed_dir.resolve())
+    except ValueError:
+        raise HTTPException(status_code=403, detail="Invalid file path")
+    
+    # Check if file exists
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    # Determine content type
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    if not content_type:
+        content_type = "image/png"
+    
+    return FileResponse(
+        path=file_path,
+        media_type=content_type,
+        headers={"Cache-Control": "public, max-age=86400"}  # Cache for 1 day
+    )
+
+

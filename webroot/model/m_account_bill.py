@@ -3,6 +3,7 @@
 import os
 import sys
 
+
 from common_constants       import *
 
 # Include the directory where this file is located 
@@ -61,4 +62,43 @@ class AccountBill(BaseModel):
 
         return None
     
+    
+    
+    def get_uploaded_receipt(self, account_bill_id):
+        
+        sql =   """
+                SELECT 
+                    b.file_path
+                    
+                FROM account_bill a
+                LEFT OUTER JOIN account_upload_receipt b    ON a.upload_receipt_id = b.id
+                WHERE a.id = %s
+                """ % (account_bill_id)
+    
+        
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
+        
+            
+        for row in rows:
+    
+                
+            cur_entry = {
+            
+                'upload_receipt': {
+                    'path':         row[0]
+                    
+                }
+            }
+            
+            
+            return cur_entry
+            
+        return None
+    
+    
+
     
