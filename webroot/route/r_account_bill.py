@@ -10,7 +10,7 @@ import mimetypes
 
 
 from fastapi                import Request, HTTPException, status, Depends
-from fastapi.responses      import HTMLResponse, RedirectResponse
+from fastapi.responses      import HTMLResponse, RedirectResponse, FileResponse
 
 from fastapi                import File, UploadFile, Form
 
@@ -235,11 +235,19 @@ async def get_receipt_image(
     uhid = result
     """
     
-    # Build the file path
-    file_path = Path(f"webroot/data/account/{year}/{upload_type}/{account_id}/{filename}")
+    
+    
+    # Get the absolute path to webroot
+    # This file is in: /path/to/pig_ops/webroot/route/r_account_bill.py
+    current_file = Path(__file__).resolve()  # /path/to/pig_ops/webroot/route/r_account_bill.py
+    webroot_dir = current_file.parent.parent  # /path/to/pig_ops/webroot/
+    
+    # Build the absolute file path
+    file_path = webroot_dir / "data" / "account" / year / upload_type / account_id / filename
+    
     
     # Security: Ensure the path is within the allowed directory
-    allowed_dir = Path("webroot/data/account")
+    allowed_dir = webroot_dir / "data" / "account"
     try:
         file_path.resolve().relative_to(allowed_dir.resolve())
     except ValueError:
@@ -247,7 +255,8 @@ async def get_receipt_image(
     
     # Check if file exists
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(status_code=404, detail=f"Image not found: {file_path}")
+    
     
     # Determine content type
     content_type, _ = mimetypes.guess_type(str(file_path))

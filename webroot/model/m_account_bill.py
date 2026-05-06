@@ -65,14 +65,21 @@ class AccountBill(BaseModel):
     
     
     def get_uploaded_receipt(self, account_bill_id):
+        """
+        Note: It is possible for an account_bill id to have multiple receipts
+        uploaded;
+        """
+        
         
         sql =   """
-                SELECT 
-                    b.file_path
+                SELECT
+                    id,
+                    status_id,
+                    flag,
+                    file_path
                     
-                FROM account_bill a
-                LEFT OUTER JOIN account_upload_receipt b    ON a.upload_receipt_id = b.id
-                WHERE a.id = %s
+                FROM account_upload_receipt
+                WHERE account_bill_id = %s
                 """ % (account_bill_id)
     
         
@@ -82,6 +89,7 @@ class AccountBill(BaseModel):
             return None
         
         
+        result 
             
         for row in rows:
     
@@ -89,7 +97,11 @@ class AccountBill(BaseModel):
             cur_entry = {
             
                 'upload_receipt': {
-                    'path':         row[0]
+                    'id':           row[0],
+                    'status_id':    row[1],
+                    'flag':         row[2],
+                    
+                    'path':         row[3]
                     
                 }
             }

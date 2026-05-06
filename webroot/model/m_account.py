@@ -125,6 +125,8 @@ class Account(BaseModel):
                     c.total_amount_due,
                     
                     e.file_path,
+                    e.status_id,
+                    e.flag,
                     e.dt_entry,
                     f.name_last,
                     f.name_first,
@@ -212,34 +214,36 @@ class Account(BaseModel):
             cur_acc_bill_total_amount_due       = row[27]
             
             
-            # Receipt upload fields (indices 28-31)
+            # Receipt upload fields (indices 28-33)
             cur_upload_receipt_path             = row[28]
-            cur_upload_receipt_dt_entry         = str(row[29]) if row[29] else None
-            cur_upload_receipt_user_name_last   = row[30]
-            cur_upload_receipt_user_name_first  = row[31]
-            
-            # Account settings (indices 32-39)
-            cur_acc_weight_unit                 = row[32]
-            cur_acc_currency                    = row[33]
-            cur_acc_settings_flag               = row[34]
-            cur_acc_num_days_move_to_farrow     = row[35]
-            cur_acc_num_days_wean               = row[36]
-            cur_acc_num_days_harvest_from_birth = row[37]
-            cur_acc_num_days_harvest_from_wean  = row[38]
+            cur_upload_receipt_status_id        = row[29]
+            cur_upload_receipt_flag             = row[30]
+            cur_upload_receipt_dt_entry         = str(row[31]) if row[31] else None
+            cur_upload_receipt_user_name_last   = row[32]
+            cur_upload_receipt_user_name_first  = row[33]
 
-            # User who last updated settings (indices 39-41)
-            cur_user_name_last                  = row[39]
-            cur_user_name_first                 = row[40]
-            cur_settings_last_update            = str(row[41]) if row[41] else None
+            # Account settings (indices 34-40)
+            cur_acc_weight_unit                 = row[34]
+            cur_acc_currency                    = row[35]
+            cur_acc_settings_flag               = row[36]
+            cur_acc_num_days_move_to_farrow     = row[37]
+            cur_acc_num_days_wean               = row[38]
+            cur_acc_num_days_harvest_from_birth = row[39]
+            cur_acc_num_days_harvest_from_wean  = row[40]
 
-            # Version numbers (indices 42-47)
-            cur_ver_num_gestating_ops           = row[42]
-            cur_ver_num_lactating_piglets_ops   = row[43]
-            cur_ver_num_lactating_sow_ops       = row[44]
-            cur_ver_num_gilt_ops                = row[45]
-            cur_ver_num_weaning_sow_ops         = row[46]
+            # User who last updated settings (indices 41-43)
+            cur_user_name_last                  = row[41]
+            cur_user_name_first                 = row[42]
+            cur_settings_last_update            = str(row[43]) if row[43] else None
 
-            cur_data_ver_num_account            = row[47]
+            # Version numbers (indices 44-49)
+            cur_ver_num_gestating_ops           = row[44]
+            cur_ver_num_lactating_piglets_ops   = row[45]
+            cur_ver_num_lactating_sow_ops       = row[46]
+            cur_ver_num_gilt_ops                = row[47]
+            cur_ver_num_weaning_sow_ops         = row[48]
+
+            cur_data_ver_num_account            = row[49]
 
 
             
@@ -303,6 +307,8 @@ class Account(BaseModel):
                         
                         'uploaded_receipt': {
                             'path':         cur_upload_receipt_path,
+                            'status_id':    cur_upload_receipt_status_id,
+                            'flag':         cur_upload_receipt_flag,     
                             'dt_entry':     cur_upload_receipt_dt_entry,
                             'name_last':    cur_upload_receipt_user_name_last,
                             'name_first':   cur_upload_receipt_user_name_first
