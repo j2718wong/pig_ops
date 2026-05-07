@@ -143,6 +143,7 @@ BUILD_NEEDED=false
 RESTART_NEEDED=false
 FRONTEND_COMMIT=""
 BACKEND_COMMIT=""
+BKOPS_COMMIT=""  # Added for bkops tracking
 
 # Store app log file path for summary
 APP_LOG_FILE=""
@@ -300,8 +301,42 @@ else
     exit 1
 fi
 
-# ============= NEW: INSTALL/UPDATE PYTHON PACKAGES =============
-section "STEP 5.5: Installing/updating Python packages"
+# ============= NEW: UPDATE BACKGROUND OPS (pig_ops_bkops) =============
+section "STEP 5.1: Updating background ops (pig_ops_bkops)"
+BKOPs_DIR="/root/projects/jsys/pig_ops_bkops"
+if [ -d "$BKOPs_DIR" ]; then
+    cd "$BKOPs_DIR"
+    
+    # Get current commit hash before pull
+    BEFORE_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no_commits")
+    echo "Current bkops commit: ${BEFORE_HASH:0:7}"
+    
+    echo "Pulling latest changes from Bitbucket..."
+    git pull origin main 2>/dev/null || echo "   No changes or not a git repo"
+    
+    # Get new commit hash after pull
+    AFTER_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no_commits")
+    BKOPS_COMMIT="$AFTER_HASH"
+    echo "New bkops commit: ${AFTER_HASH:0:7}"
+    
+    # Check if changes were pulled (only if we have commits)
+    if [ "$BEFORE_HASH" != "no_commits" ] && [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
+        log_success "Background ops changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
+        # Note: bkops runs independently, no need to restart main app
+        # No version tracking for bkops
+    else
+        log_success "No background ops changes detected"
+        BKOPS_COMMIT="$BEFORE_HASH"
+    fi
+    
+    cd /root/projects/jsys
+else
+    log_warning "pig_ops_bkops directory not found at $BKOPs_DIR - skipping"
+fi
+# =========================================================
+
+# 5.2️⃣ INSTALL/UPDATE PYTHON PACKAGES
+section "STEP 5.2: Installing/updating Python packages"
 cd pig_ops
 
 # Check if requirements.txt exists
@@ -340,10 +375,10 @@ else
 fi
 
 cd /root/projects/jsys
-# =============================================================
+# =========================================================
 
 # ============= RUN DATABASE MIGRATIONS =============
-section "STEP 5.6: Running database migrations"
+section "STEP 5.3: Running database migrations"
 
 DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
 MIGRATION_APPLIED_FILE="/root/.db_migrations_prod_last_run"
@@ -552,6 +587,7 @@ echo "📊 Summary:"
 echo "  • Frontend changes: $FRONTEND_CHANGED"
 echo "  • Frontend build: $BUILD_NEEDED"
 echo "  • Backend changes: $BACKEND_CHANGED"
+echo "  • Background ops pull: performed"
 echo "  • Database migrations: applied"
 echo "  • Restart performed: $RESTART_NEEDED"
 echo "  • App Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
@@ -569,8 +605,9 @@ else
 fi
 echo ""
 echo "📝 Git Commit Hashes:"
-echo "  • Frontend: ${FRONTEND_COMMIT:0:8}"
-echo "  • Backend:  ${BACKEND_COMMIT:0:8}"
+echo "  • Frontend:       ${FRONTEND_COMMIT:0:8}"
+echo "  • Backend:        ${BACKEND_COMMIT:0:8}"
+echo "  • Background Ops: ${BKOPS_COMMIT:0:8}"
 echo ""
 echo "📝 Deployment Logs:"
 echo "  • This log: $DEPLOY_LOG_FILE"
@@ -592,6 +629,7 @@ echo "   Frontend changed: $FRONTEND_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Backend changed: $BACKEND_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Frontend commit: ${FRONTEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
 echo "   Backend commit: ${BACKEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
+echo "   Background ops commit: ${BKOPS_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
 echo "   App Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" >> "$DEPLOY_LOG_FILE"
 echo "   Restart needed: $RESTART_NEEDED" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
