@@ -35,6 +35,9 @@ class Controller:
         self.is_prod_envi       = False
         
         self.use_minified_js    = 1
+
+
+        self.vapid_public_key   = None
         
         self.logger             = logger
         

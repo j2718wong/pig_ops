@@ -525,12 +525,12 @@ async def user_track_app_install(request: Request, data: dm.DataUserTrackAppInst
         }
     
     
-    cur_id    = res_add['track_install_id']['id']
+    cur_id    = res_add['track_install']['id']
     cur_hid   = hashids_common.encrypt(cur_id)
     
     # remove plain id
-    del res_add['track_install_id']['id']
-    res_add['track_install_id']['hid'] = cur_hid
+    del res_add['track_install']['id']
+    res_add['track_install']['hid'] = cur_hid
     
     
     
@@ -540,6 +540,67 @@ async def user_track_app_install(request: Request, data: dm.DataUserTrackAppInst
     return res_add
     
     
+    
+@app.post("/user/push_susbcription_add", tags=["User"])
+async def user_push_susbcription_add(request: Request, data: dm.DataUserPushSubscription):
+    """
+    This is used to track user app install
+    """
+    
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    data.user_id        = user_id
+    
+    res_add = model['user'].add_push_subscription(data)
+    
+    
+    if res_add is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    cur_id    = res_add['push_susbcription']['id']
+    cur_hid   = hashids_common.encrypt(cur_id)
+    
+    # remove plain id
+    del res_add['push_susbcription']['id']
+    res_add['push_susbcription']['hid'] = cur_hid
+    
+    
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_add)
+
+    return res_add
+    
+    
+
 
     
     
@@ -720,6 +781,7 @@ async def user_info(uhid:str):
     }
     
 
+
 @app.get("/user/list", tags=["User"])
 async def user_list(request: Request, ahid: str, inc_deleted : int = 0):
     """
@@ -795,6 +857,72 @@ async def user_list(request: Request, ahid: str, inc_deleted : int = 0):
     }
     
 
+
+@app.get("/user/push_susbcription/list", tags=["User"])
+async def user_push_susbcription_list(request: Request):
+    """
+    Will get user push subcription list.
+    
+    Parameters
+    ----------
+    
+        
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID',
+                'desc': ''
+            }
+        }
+    
+    
+    user_id = res[0]
+    
+    
+    res                 = model['user'].get_push_subscription_list(user_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+
+    
+    for cur_entry in res:
+        
+        cur_id      = cur_entry['push_subscription']['id']
+        cur_hid     = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['push_subscription']['id']
+        cur_entry['push_subscription']['hid'] = cur_hid
+        
+        
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res
+    }
 
 
 

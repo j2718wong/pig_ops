@@ -705,3 +705,95 @@ class User(BaseModel):
             
         return None
     
+    
+    def add_push_subscription(self, data=None):
+        """
+        PROCEDURE user_push_susbcription_add(
+            in_user_id              INT,
+    
+            in_subscription_endpoint        VARCHAR(500),
+            in_subscription_keys_p256dh     VARCHAR(200),
+            in_subscription_keys_auth       VARCHAR(100),
+
+            in_device_name                  VARCHAR(100), 
+            in_browser_name                 VARCHAR(50),
+            in_os_name                      VARCHAR(50) 
+        )      
+        """
+        
+        
+        params = [
+            data.user_id,
+            
+            data.subs_endpoint,
+            data.subs_keys_p256dh,
+            data.subs_keys_auth,
+            
+            data.device_name, 
+            data.browser_name,
+            data.os_name          
+        ]
+        
+        rows = self._call_procedure('user_push_susbcription_add', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+        
+
+        if row is not None:
+            return {
+                'result': {
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'push_susbcription': {
+                    'id':               row[3]
+                }
+            }
+            
+        return None
+    
+
+    def get_push_subscription_list(self, user_id):
+        """
+        Get user list for an account
+        """
+        sql = """
+            SELECT 
+                id,
+                flag,
+                subscription_endpoint
+                
+            FROM user_push_subscription 
+            WHERE user_id = %s
+        """ 
+        
+        params = [user_id]
+        
+        rows = self._execute_query(sql, params)
+        
+        if rows is None:
+            return []
+        
+        result = []
+        for row in rows:
+            cur_id                  = row[0]
+            cur_flag                = row[1]
+            cur_endpoint            = row[2]
+            
+            cur_entry = {
+                'push_subscription': {
+                    'id':           cur_id,
+                    'flag':         cur_flag,
+                    'endpoint':     cur_endpoint
+                }
+            }
+            result.append(cur_entry)
+        
+        return result
+    
+    

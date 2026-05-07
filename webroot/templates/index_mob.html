@@ -74,6 +74,13 @@
 {% for script in js_app_modules %}
     <script type="module" src="{{ script }}"></script>    
 {% endfor %}
+
+    <script>
+        // Public VAPID key for push notifications
+        window.PUBLIC_VAPID_KEY = `{{ page_data.vapid_public_key }}`;
+    </script>
+
+
 </head>
 
 
@@ -132,20 +139,27 @@
                         </div>
                                                 
                         
-                        
                         <!-- Dropdown Items -->
                         <div class="user-dropdown-item" id="desktop-my-account">
                             <i class="fas fa-user-circle" style="color: var(--icon-blue);"></i>
                             <span>My Account</span>
                         </div>
+                        
                         <div class="user-dropdown-item dropdown-alert" id="desktop-bill-new">
                             <i class="fas fa-exclamation-circle" style="color: var(--icon-red);"></i>
                             <span>New Bill Available</span>
                         </div>
+                        
                         <div class="user-dropdown-item" id="desktop-bill-history">
                             <i class="fas fa-file-invoice-dollar" style="color: var(--icon-green);"></i>
-                            <span>Billing</span>
+                            <span>Bill History</span>
                         </div>
+                        
+                        <div class="user-dropdown-item" id="desktop-settings">
+                            <i class="fas fa-cog" style="color: var(--icon-blue);"></i>
+                            <span>Settings</span>
+                        </div>
+                        
                         <div class="user-dropdown-item" id="desktop-user-logout">
                             <i class="fas fa-sign-out-alt" style="color: var(--icon-red);"></i>
                             <span>Logout</span>
@@ -323,7 +337,7 @@
                     <div class="nav-menu" id="desktop-nav-settings">
                         <button class="nav-menu-btn">
                             <i class="fas fa-cogs" style="color: var(--icon-blue);"></i>
-                            <span class="nav-label">Settings</span>
+                            <span class="nav-label">PigOps Settings</span>
                         </button>
                         <div class="nav-submenu">
                             <div class="submenu-item" id="desktop-nav-settings-1">
@@ -698,7 +712,7 @@
             <div class="mobile-menu-title" data-submenu="mobile-subnav-settings">
                 <span>
                     <i class="fas fa-cogs" style="color: var(--icon-blue); margin-right:10px;"></i>
-                    <span class="nav-label">Settings</span>
+                    <span class="nav-label">PigOps Settings</span>
                 </span>
                 <i class="fas fa-chevron-down"></i>
             </div>
@@ -784,6 +798,7 @@
         <div id="container-my-account"              class="hidden-container" style="display:none;"></div>
         <div id="container-customer-pricing"        class="hidden-container" style="display:none;"></div>
         <div id="container-new-bill"                class="hidden-container" style="display:none;"></div>
+        <div id="container-user-settings"           class="hidden-container" style="display:none;"></div>
             
         <!-- User control pages --> 
         <div id="container-account-disabled"        class="hidden-container" style="display:none;"></div>
@@ -947,7 +962,7 @@
                     <li><a href="/privacy">Privacy</a></li>
                     <li><a href="/terms">Terms</a></li>
                     <li id="contact-whatsapp-show"><a href="#" id="contact-whatsapp">Whatsapp: +852 60615575</a></li>
-                    <li><a href="#" id="contact-email">Email: jsysdev.contact@gmail.com</a></li>
+                    <li><a href="#" id="contact-email">Email: contact@jsysdev.com</a></li>
                 </ul>
             </div>
             

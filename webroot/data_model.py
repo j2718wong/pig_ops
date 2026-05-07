@@ -111,6 +111,21 @@ class DataUserEmailVerify(BaseModel):
     ip_address:             str = None
 
 
+class DataUserPushSubscription(BaseModel):
+    uhid:                   str = None
+    
+    
+    user_id:                int = 0
+    
+    subs_endpoint:          str = None   
+    subs_keys_p256dh:       str = None
+    subs_keys_auth:         str = None  
+    
+    device_name:            str = None
+    browser_name:           str = None
+    os_name:                str = None
+
+
 class DataApproveUserReq(BaseModel):
     uhid:                   str = None
     user_req_hid:           str = None 

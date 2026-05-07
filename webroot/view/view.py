@@ -481,11 +481,13 @@ class Root(ViewBase):
                 s_translation = json.dumps(translation)
             
             
+            vapid_public_key    = self.controller.vapid_public_key
             
             
             page_data = {
                 'app_version':              self.controller.APP_VERSION,
-                'app_ui_settings':          app_ui_settings
+                'app_ui_settings':          app_ui_settings,
+                'vapid_public_key':         vapid_public_key
             }
             
             
