@@ -708,7 +708,7 @@ class User(BaseModel):
     
     def add_push_subscription(self, data=None):
         """
-        PROCEDURE user_push_susbcription_add(
+        PROCEDURE user_push_subscription_add(
             in_user_id              INT,
     
             in_subscription_endpoint        VARCHAR(500),
@@ -734,7 +734,7 @@ class User(BaseModel):
             data.os_name          
         ]
         
-        rows = self._call_procedure('user_push_susbcription_add', params)
+        rows = self._call_procedure('user_push_subscription_add', params)
         
         if rows is None:
             return None
@@ -747,7 +747,7 @@ class User(BaseModel):
                 'result': {
                     'num':              row[0],
                     'code':             row[1],
-                    'desc':             row[2],
+                    'desc':             row[2]
                 },
                 
                 'push_susbcription': {

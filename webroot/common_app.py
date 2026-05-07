@@ -468,27 +468,12 @@ view = View(controller)
 
 
 
-def get_vapid_private_key():
-    key = os.environ.get("VAPID_PRIVATE_KEY", "")
-    # Convert literal \n to actual newlines
-    if '\\n' in key:
-        key = key.replace('\\n', '\n')
-    return key
-
-def get_vapid_public_key():
-    key = os.environ.get("VAPID_PUBLIC_KEY", "")
-    if '\\n' in key:
-        key = key.replace('\\n', '\n')
-    return key
-
-
 # These will be used in your webpush calls
-VAPID_PRIVATE_KEY   = get_vapid_private_key()
-VAPID_PUBLIC_KEY    = get_vapid_public_key()
+VAPID_PRIVATE_KEY   = os.environ.get("VAPID_PRIVATE_KEY", "")
+VAPID_PUBLIC_KEY    = os.environ.get("VAPID_PUBLIC_KEY", "")
 VAPID_CLAIMS_SUB    = os.environ.get("VAPID_CLAIMS_SUB", "mailto:admin@jsysdev.com")
 
 
-print('VAPID_PUBLIC_KEY = %s' % VAPID_PUBLIC_KEY)
 
 controller.vapid_public_key = VAPID_PUBLIC_KEY
 
