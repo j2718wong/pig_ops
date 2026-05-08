@@ -425,7 +425,7 @@ import httpx
 
 
 
-def send_email_smtp(recipient: str, subject: str, body: str):
+def send_email_smtp(list_email_to, subject, body):
     """
     Synchronous function that sends email to a single recipient
     This matches your required signature
@@ -433,7 +433,7 @@ def send_email_smtp(recipient: str, subject: str, body: str):
     # Create message
     message = MessageSchema(
         subject=subject,
-        recipients=[recipient],  # Single recipient as list
+        recipients=list_email_to,
         body=body,
         subtype=MessageType.html,
         reply_to=["no-reply@jsysdev.com"] 
@@ -456,8 +456,8 @@ def send_email_smtp(recipient: str, subject: str, body: str):
         # Run the async function
         loop.run_until_complete(fm.send_message(message))
         
-        print(f"Email sent via SMTP to {recipient}")
-        return {"success": True, "method": "smtp"}
+        print(f"Email sent via SMTP to {len(list_email_to)} recipient(s)")
+        return {"success": True, "method": "smtp", "recipients": len(list_email_to)}
     
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -468,7 +468,7 @@ def send_email_smtp(recipient: str, subject: str, body: str):
 SMTP2GO_API_KEY = os.environ.get("SMTP2GO_API_KEY")
 
 
-def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
+def send_email_smtp2go_sync(list_email_to, subject: str, body: str):
     """
     Send email using SMTP2GO API (synchronous)
     """
@@ -477,7 +477,7 @@ def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
     
     payload = {
         "sender": "SuperPig <contact@jsysdev.com>",
-        "to": [recipient],
+        "to": list_email_to,
         "subject": subject,
         "html_body": body,
         "text_body": "Please view this email in a modern email client"
@@ -502,15 +502,15 @@ def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
         
         if response.status_code == 200 and result.get("data", {}).get("succeeded", 0) > 0:
             email_id = result["data"].get("email_id")
-            print(f"Email sent via SMTP2GO to {recipient}, email_id: {email_id}")
-            return {"success": True, "email_id": email_id}
+            print(f"Email sent via SMTP2GO to {len(list_email_to)} recipient(s), email_id: {email_id}")
+            return {"success": True, "email_id": email_id, "recipients": len(list_email_to)}
         else:
             error_msg = result.get("data", {}).get("error", result.get("error", "Unknown error"))
             print(f"SMTP2GO error: {error_msg}")
             return {"success": False, "error": error_msg}
             
     except httpx.TimeoutException:
-        print(f"Timeout sending email to {recipient}")
+        print(f"Timeout sending email to {len(list_email_to)} recipient(s)")
         return {"success": False, "error": "Request timeout"}
     except Exception as e:
         print(f"Error sending email via SMTP2GO: {e}")
@@ -518,13 +518,13 @@ def send_email_smtp2go_sync(recipient: str, subject: str, body: str):
 
 
 
-def send_email(recipient: str, subject: str, body: str):
+def send_email(list_email_to, subject,  body):
     
     if app_envi == 'production':
-        return send_email_smtp2go_sync(recipient, subject, body)
+        return send_email_smtp2go_sync(list_email_to, subject, body)
         
     else:
-        return send_email_smtp(recipient, subject, body)
+        return send_email_smtp(list_email_to, subject, body)
     
     
     

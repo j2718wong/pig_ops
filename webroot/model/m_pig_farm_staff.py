@@ -1,13 +1,24 @@
 # August 26, 2025
 # Jack Wong
+import os
+import sys
+
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
-class PigFarmStaff:
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class PigFarmStaff(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PigFarmStaff'
+        super().__init__(model)  # Inherit from BaseModel
 
 
     def add(self, data = None):
@@ -21,43 +32,23 @@ class PigFarmStaff:
         )  
         """
         
-        sql =  'CALL pig_farm_staff_add('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.pig_farm_id
-        sql += '%s,'    % data.set_user_as_staff
-        
-        if data.name is not None:
-            sql += '"%s");' % data.name
-        else:
-            sql += 'NULL);'
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_farm_id,
+            data.set_user_as_staff,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+            data.name           if data.name and data.name.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_farm_staff_add', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
+        
         if row is not None:
             return {
                 'result':{
@@ -88,40 +79,23 @@ class PigFarmStaff:
         )
         """
        
-        sql =  'CALL pig_farm_staff_update('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_farm_staff_id
-        sql += '%s,'    % data.staff_user_id
-        
-        sql += '"%s");' % data.name
-        
-                
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_farm_staff_id,
+            data.staff_user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+            data.name           if data.name and data.name.strip() else None
+        ]
+        
+        res = self._call_procedure('pig_farm_staff_update', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
+        
         if row is not None:
             return {
                 'result':{
@@ -253,79 +227,56 @@ class PigFarmStaff:
                     """ % where_clause
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        if rows is None:
+            return []
             
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
             
-            for row in rows:
-                if inc_user_audit == 0:
-                    if minimum_info == 0:
-                        cur_entry = {
-                            'pig_farm_staff': {
-                                'id':               row[0],
-                                'name':             row[1],
-                                'user_id':          row[2]
-                            }
-                        }
-                    else:
-                        cur_entry = {
-                            'pig_farm_staff': {
-                                'id':               row[0],
-                                'name':             row[1]
-                            }
-                        }
-                    
-                else:
+        for row in rows:
+            if inc_user_audit == 0:
+                if minimum_info == 0:
                     cur_entry = {
                         'pig_farm_staff': {
                             'id':               row[0],
                             'name':             row[1],
                             'user_id':          row[2]
-                        },
-                        
-                        'added_by': {
-                            'name_last':        row[3],
-                            'name_first':       row[4],
-                            'dt_entry':         row[5]
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[6],
-                            'name_first':       row[7],
-                            'dt_update':        str(row[8]) if row[8] else None
+                        }
+                    }
+                else:
+                    cur_entry = {
+                        'pig_farm_staff': {
+                            'id':               row[0],
+                            'name':             row[1]
                         }
                     }
                 
+            else:
+                cur_entry = {
+                    'pig_farm_staff': {
+                        'id':               row[0],
+                        'name':             row[1],
+                        'user_id':          row[2]
+                    },
                     
-                result.append(cur_entry)
-        
+                    'added_by': {
+                        'name_last':        row[3],
+                        'name_first':       row[4],
+                        'dt_entry':         row[5]
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[6],
+                        'name_first':       row[7],
+                        'dt_update':        str(row[8]) if row[8] else None
+                    }
+                }
+            
+                
+            result.append(cur_entry)
+    
         return result
     
     

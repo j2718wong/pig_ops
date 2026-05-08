@@ -279,7 +279,7 @@ async def user_register_or_login(request: Request,
         user_email  = user_data.email
         print('\n\nAbout to send verification email to: %s' % user_email)
         
-        background_tasks.add_task(send_email, user_email, subject, msg_body)
+        background_tasks.add_task(send_email, [user_email], subject, msg_body)
         
         return res_register
         
@@ -475,7 +475,7 @@ async def user_email_verify_resend(request: Request,
     msg_body    = template.get_email_body(verification_code, expiry_minutes)
     
     
-    background_tasks.add_task(send_email, user_email, subject, msg_body)
+    background_tasks.add_task(send_email, [user_email], subject, msg_body)
     
     return res
     
@@ -1300,7 +1300,7 @@ async def google_auth(request: Request, token_data: dm.GoogleToken):
     res_login['user_picture'] = user_picture
     
     # tEST
-    #background_tasks.add_task(send_email, 'j2718wong@gmail.com','login in app', 'Test message')
+    #background_tasks.add_task(send_email, ['j2718wong@gmail.com'],'login in app', 'Test message')
     
     return res_login
     

@@ -41,6 +41,16 @@ class BaseModel:
         except Exception as e:
             proc_call = self._generate_debug_procedure(proc_name, params)
             
+            # Send error email to devs
+            if self.model.controller is not None:
+                subject = 'PigOps: Error procedure call'
+                body    = 'Error at: %s\n' % self.TAG
+                body    += 'Proc Call: %s\n' % proc_call
+                body    += 'Error: %s' % str(e)
+                
+                self.model.controller.send_email_to_devs(subject, body)
+            
+            # Log error
             self.model.logger.append(
                 log_level=LOG_FATAL,
                 tag=self.TAG,
@@ -106,6 +116,18 @@ class BaseModel:
                 debug_sql = self._generate_debug_query(sql, params)
             else:
                 debug_sql = sql
+                
+                
+            # Send error email to devs
+            if self.model.controller is not None:
+                subject = 'PigOps: Error query'
+                body    = 'Error at: %s\n' % self.TAG
+                body    += 'SQL: \n'
+                body    += debug_sql
+                body    += '\nError: %s' % str(e)
+                
+                self.model.controller.send_email_to_devs(subject, body)
+            
             
             self.model.logger.append(
                 log_level=LOG_FATAL,

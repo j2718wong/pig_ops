@@ -96,6 +96,8 @@ class Model:
         self.database_id        = database_id
         
         self.logger             = logger
+        
+        self.controller         = None
 
         self.db_conn            = None
         

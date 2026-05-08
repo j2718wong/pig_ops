@@ -1,4 +1,4 @@
-# December 5, 2024
+# December 5, 2025
 # Jack Wong (zhaoshan99@gmail.com)
 
 import os
@@ -24,6 +24,8 @@ from common_constants       import *
 from model.database_conn    import *
 
 from address_manager        import AddressManager
+
+from common_fast_api        import send_email
 
 
 cur_path        = os.getcwd()
@@ -445,10 +447,19 @@ def get_is_prod_environment():
     return 0
     
 
+
+# Create Controller
 controller = Controller(logger, model)
 
 if get_is_prod_environment() > 0:
     controller.is_prod_envi = True
+
+
+#  Attache send_email function to controller
+controller.send_email = send_email
+
+# Attach controller to model
+model.controller        = controller
 
 
 
@@ -531,6 +542,7 @@ def get_app_version():
     
     
 
+# Attach APP_VERSION
 controller.APP_VERSION = get_app_version()
 
 

@@ -5,8 +5,10 @@ import os
 import sys
 import json
 import pprint
+import threading
 
 from datetime               import datetime, timedelta
+
 
 
 # Include the directory where this file is located 
@@ -24,21 +26,33 @@ if locale_dir not in sys.path:
 from common_constants       import *
 
 
+DEVELOPERS_EMAIL    = [
+'j2718wong@gmail.com'
+
+]
+
+
 
 class Controller:
     
     def __init__(self, logger = None, model = None):
         self.TAG                = 'Controller'
 
+        # This is read from an external file; The APP_VERSION is updated during ./deploy.sh
         self.APP_VERSION        = ''
+
         
+        # This is computed based from .env
         self.is_prod_envi       = False
+
         
         self.use_minified_js    = 1
 
 
+        # This is read from .env
         self.vapid_public_key   = None
         
+
         self.logger             = logger
         
         self.model              = model
@@ -46,6 +60,10 @@ class Controller:
         
         self.view               = None
         
+
+        # Reference to a function to send email
+        self.send_email         = None
+
 
         self.translations       = {}
         
@@ -181,6 +199,21 @@ class Controller:
     def set_view(self, view):
         self.view = view
         
+
+    def send_email_to_devs(self, subject, msg_body):
+        """
+        Use this to send error to devs
+        """
+        if self.send_email is not None:
+            # Run in a separate thread (not async, but works anywhere)
+            thread = threading.Thread(
+                target=self.send_email,
+                args=(DEVELOPERS_EMAIL, subject, msg_body)
+            )
+            thread.daemon = True
+            thread.start()
+
+
 
     def get_directory_where_to_save_report_file(self, pig_farm_id, 
         report_type_id, report_date):
