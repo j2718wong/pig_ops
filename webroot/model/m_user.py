@@ -698,7 +698,7 @@ class User(BaseModel):
                     'desc':             row[2],
                 },
                 
-                'track_install_id': {
+                'track_install': {
                     'id':               row[3]
                 }
             }
