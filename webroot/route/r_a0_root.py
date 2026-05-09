@@ -592,7 +592,24 @@ async def root(request: Request, p:str = None, lang:str= None):
         }
         url_lang = url_lang_map.get(internal_lang, 'en')
         
-        return RedirectResponse(url=f"/{url_lang}", status_code=301)  # Permanent redirect for SEO
+        
+        # PRESERVE other query parameters (like bill)
+        other_params = []
+        for key, value in request.query_params.items():
+            if key != 'lang':
+                other_params.append(f"{key}={value}")
+        
+        if other_params:
+            redirect_url = f"/{url_lang}?{'&'.join(other_params)}"
+        else:
+            redirect_url = f"/{url_lang}"
+        
+        
+        # Set cookie and redirect
+        response = RedirectResponse(url=redirect_url, status_code=301)
+        response.set_cookie(key="user_lang", value=internal_lang, max_age=31536000, path="/")
+        
+        return response  
         
     
     

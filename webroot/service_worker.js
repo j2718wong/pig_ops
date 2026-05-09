@@ -81,7 +81,8 @@ self.addEventListener('push', (event) => {
         badge: '/static_m/images/logo/superpig_192_192.png',
         tag: data.tag || 'default', // Prevents duplicate notifications
         data: {
-            url: data.url || '/' // Where to take the user when they click
+            action: data.data?.action,
+            payload: data.data?.payload
         }
     };
 
@@ -91,29 +92,41 @@ self.addEventListener('push', (event) => {
     );
 });
 
-// Handle user clicking on the notification
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close(); // Close the notification popup
 
-    // Open or focus the SuperPig app
-    event.waitUntil(
-        clients.matchAll({
-            type: 'window',
-            includeUncontrolled: true
-        })
-        .then(windowClients => {
-            // If app window is already open, focus it
-            for (let client of windowClients) {
-                if (client.url === event.notification.data.url && 'focus' in client) {
-                    return client.focus();
-                }
-            }
-            // Otherwise open a new window/tab
-            if (clients.openWindow) {
-                return clients.openWindow(event.notification.data.url);
-            }
-        })
-    );
+// Handle user clicking on the notification
+self.addEventListener('notificationclick', async (event) => {
+    event.notification.close();
+    
+        const action    = event.notification.data?.action;
+        const payload   = event.notification.data?.payload;
+    
+        event.waitUntil(
+            clients.matchAll({ type: 'window', includeUncontrolled: true })
+                .then(clientList => {
+                    let data_to_client = null;
+                    
+                    const data_to_client = { action, payload };
+                    
+                    
+                    if (clientList.length > 0) {
+                        // App is open - send message (no page reload)
+                        if (data_to_client){
+                            clientList[0].postMessage(data_to_client);
+                        }
+                        
+                        return clientList[0].focus();
+                    } else {
+                        // App not open - store pending action then load
+                        if (data_to_client) {
+                            const cache = await caches.open('superpig-pending');
+                            await cache.put('pending-action', new Response(JSON.stringify(data_to_client)));
+                        }
+                        
+                        // App not open - need to load (this is the only time you load)
+                        return clients.openWindow('/');
+                    }
+                })
+        );
 });
 
 
