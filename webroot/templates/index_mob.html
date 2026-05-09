@@ -29,10 +29,12 @@
     
     
     <script>
+        const APP_VERSION = '{{ page_data.app_version }}'; 
+        
         // Register service worker immediately
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service_worker.js')
+                navigator.serviceWorker.register(`/service_worker.js?v=${APP_VERSION}`)
                     .then(reg => console.log('SW registered on home page:', reg.scope))
                     .catch(err => console.log('SW registration failed:', err));
             });
