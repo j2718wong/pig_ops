@@ -427,8 +427,7 @@ import httpx
 
 def send_email_smtp(list_email_to, subject, body):
     """
-    Synchronous function that sends email to a single recipient
-    This matches your required signature
+    Synchronous function that sends email to a list of recipient
     """
     # Create message
     message = MessageSchema(
@@ -472,6 +471,9 @@ def send_email_smtp2go_sync(list_email_to, subject: str, body: str):
     """
     Send email using SMTP2GO API (synchronous)
     """
+    
+    
+    
     if not SMTP2GO_API_KEY:
         raise ValueError("SMTP2GO_API_KEY environment variable not set")
     
@@ -519,6 +521,19 @@ def send_email_smtp2go_sync(list_email_to, subject: str, body: str):
 
 
 def send_email(list_email_to, subject,  body):
+    """
+    Send email to one or multiple recipients.
+    
+    Args:
+        list_email_to: Either a single email string or a list of email strings
+        subject: Email subject
+        body: HTML email body
+    """
+    
+    # Convert single string to list
+    if isinstance(list_email_to, str):
+        list_email_to = [list_email_to]
+    
     
     if app_envi == 'production':
         return send_email_smtp2go_sync(list_email_to, subject, body)
