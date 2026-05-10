@@ -106,7 +106,7 @@
             
             <div class="nav-right">
                 <!-- Alerts -->
-                <div class="alerts-container" id="alertContainer" style="display:none;">
+                <div class="alerts-container" id="alertContainer">
                     <div class="alert-icon" id="alertIcon">
                         <i class="fas fa-bell"></i>
                     </div>
@@ -409,112 +409,15 @@
     <div class="alert-modal" id="alertModal">
         <div class="alert-modal-content">
             <div class="alert-modal-header">
-                <div class="alert-modal-title">Farm Alerts & Notifications</div>
+                <div class="alert-modal-title">Alerts</div>
                 <button class="close-alert-modal" id="closeAlertModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="alert-modal-body">
-                <!-- Critical Alerts -->
-                <h3 style="color: var(--critical-color); margin-bottom: 15px;">
-                    <i class="fas fa-exclamation-circle"></i> Critical Alerts
-                </h3>
-                <div class="alert-item">
-                    <div class="alert-icon-small" style="color: var(--critical-color);">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div>
-                            <span class="alert-category alert-critical">CRITICAL</span>
-                            <span class="alert-title">Pig Health Issue Reported</span>
-                        </div>
-                        <div class="alert-description">Multiple piglets in Nursery Section 3 showing signs of respiratory distress. Immediate veterinary attention required.</div>
-                        <div class="alert-time">Reported 2 hours ago by Farm Staff</div>
-                    </div>
-                </div>
                 
-                <!-- Warning Alerts -->
-                <h3 style="color: var(--warning-color); margin-bottom: 15px; margin-top: 25px;">
-                    <i class="fas fa-exclamation-triangle"></i> Warning Alerts
-                </h3>
-                
-                <div class="alert-item">
-                    <div class="alert-icon-small" style="color: var(--warning-color);">
-                        <i class="fas fa-syringe"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div>
-                            <span class="alert-category alert-warning">WARNING</span>
-                            <span class="alert-title">Vaccination Due for Piglets</span>
-                        </div>
-                        <div class="alert-description">45 piglets in Nursery Section 2 due for parvovirus vaccination today. Vaccine inventory available.</div>
-                        <div class="alert-time">Due today</div>
-                    </div>
-                </div>
-                
-                <div class="alert-item">
-                    <div class="alert-icon-small" style="color: var(--warning-color);">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div>
-                            <span class="alert-category alert-warning">WARNING</span>
-                            <span class="alert-title">Feeds for Production Almost Depleted</span>
-                        </div>
-                        <div class="alert-description">Starter feed inventory at 15% capacity. Only 2 days of supply remaining for piglets.</div>
-                        <div class="alert-time">Updated 4 hours ago</div>
-                    </div>
-                </div>
-                
-                <div class="alert-item">
-                    <div class="alert-icon-small" style="color: var(--warning-color);">
-                        <i class="fas fa-baby"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div>
-                            <span class="alert-category alert-warning">WARNING</span>
-                            <span class="alert-title">Sow Birth Checklist Alert</span>
-                        </div>
-                        <div class="alert-description">Sow #2345 (Bertha) due in 3 days. Farrowing crate needs preparation and equipment sterilization.</div>
-                        <div class="alert-time">Due in 3 days</div>
-                    </div>
-                </div>
-                
-                <!-- Info Alerts -->
-                <h3 style="color: var(--info-color); margin-bottom: 15px; margin-top: 25px;">
-                    <i class="fas fa-info-circle"></i> Information Alerts
-                </h3>
-                
-                <div class="alert-item">
-                    <div class="alert-icon-small" style="color: var(--info-color);">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div>
-                            <span class="alert-category alert-info">INFO</span>
-                            <span class="alert-title">Upcoming Pig Birth</span>
-                        </div>
-                        <div class="alert-description">Sow #2312 (Daisy) expected to farrow tomorrow morning. Monitor for farrowing signs tonight.</div>
-                        <div class="alert-time">Expected tomorrow</div>
-                    </div>
-                </div>
-                
-                <div class="alert-item">
-                    <div class="alert-icon-small" style="color: var(--info-color);">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div>
-                            <span class="alert-category alert-info">INFO</span>
-                            <span class="alert-title">Missed Feed Inventory Entry</span>
-                        </div>
-                        <div class="alert-description">Yesterday's feed consumption for Grower Section B was not recorded. Please update inventory logs.</div>
-                        <div class="alert-time">Missed yesterday</div>
-                    </div>
-                </div>
                 
                 <div class="alert-actions">
-                    <button class="alert-btn alert-btn-mark-all" id="markAllAsRead">Mark All as Read</button>
                     <button class="alert-btn alert-btn-close" id="closeAlertModalBtn">Close</button>
                 </div>
             </div>
@@ -1122,54 +1025,7 @@
                 e.stopPropagation();
             });
         }
-        
-
-        
-        // Alert Modal Functionality
-        const alertIcon = document.getElementById('alertIcon');
-        const alertModal = document.getElementById('alertModal');
-        const closeAlertModal = document.getElementById('closeAlertModal');
-        const closeAlertModalBtn = document.getElementById('closeAlertModalBtn');
-        const markAllAsRead = document.getElementById('markAllAsRead');
-        const alertCount = document.getElementById('alertCount');
-        
-        // Open alert modal from desktop
-        alertIcon.addEventListener('click', () => {
-            alertModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        
-        // Close alert modal
-        closeAlertModal.addEventListener('click', () => {
-            alertModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-        
-        closeAlertModalBtn.addEventListener('click', () => {
-            alertModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-        
-        // Close alert modal when clicking outside
-        alertModal.addEventListener('click', (e) => {
-            if (e.target === alertModal) {
-                alertModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        });
-        
-        // Mark all alerts as read
-        markAllAsRead.addEventListener('click', () => {
-            alertCount.textContent = '0';
-            mobileAlertCount.textContent = '0';
-            alertModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            
-            // Show confirmation
-            alert('All alerts have been marked as read. The alert counter has been reset.');
-        });
-        
+      
         
         function copyWebsiteLink(button) {
             const link = 'https://superpig.jsysdev.com';
