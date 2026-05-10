@@ -478,6 +478,75 @@ async def pig_prod_pig_ops_list(request: Request, prod_hid: str, operation_type:
         'data': res
     }
     
+
+@app.get("/gesta_pig_ops_medvac/prep_list", tags=["Production Details"])
+async def gesta_pig_ops_prep_list(request: Request, ahid:str):
+    """
+    Get gestating MedVac operations scheduled for 
+        TODAY + account.num_days_prep_lead  pig_ops.date_target.
+    
+    Parameters
+    ----------
+    
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID'
+            }
+        }
+    
+    account_id = res[0]
+    
+    
+    res = model['pig_prod_pig_ops'].get_list_medvac_pig_ops_before_date_target(account_id)
+    
+    
+    for cur_entry in res:
+        cur_id  = cur_entry['pig_prod_pig_ops']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_prod_pig_ops']['id']
+        cur_entry['pig_prod_pig_ops']['hid']   = cur_hid
+        
+    
+        cur_id  = cur_entry['pig_production']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_production']['id']
+        cur_entry['pig_production']['hid']   = cur_hid
+        
+    
+        cur_id  = cur_entry['pig_production']['sow']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del cur_entry['pig_production']['sow']['id']
+        cur_entry['pig_production']['sow']['hid']   = cur_hid
+        
+    
+    
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res
+    }
+
+
+
     
 
 @app.get("/pig_prod_pig_ops/entry/{entry_hid}", tags=["Production Details"])

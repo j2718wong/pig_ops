@@ -39,10 +39,12 @@ class PigProdNotes(BaseModel):
         
         params = [
             data.user_id,
+            
             data.pig_prod_id         if data.pig_prod_id is not None and data.pig_prod_id > 0 else None,
             data.sow_boar_id         if data.sow_boar_id is not None and data.sow_boar_id > 0 else None,
             
             data.is_health_issue,
+            
             data.date_notes,
             data.notes
         ]
