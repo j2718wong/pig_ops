@@ -31,7 +31,7 @@ FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT = 16
 
 class User(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
     
     
     def get_user_account_info(self, user_id):

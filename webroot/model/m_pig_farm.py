@@ -42,7 +42,7 @@ FLAG_BIT_DAY_1_ON_DATE_OF_INSEM     = 2
 
 class PigFarm(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
         
         
     def add(self, data = None):

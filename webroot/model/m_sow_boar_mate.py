@@ -22,7 +22,7 @@ from base_model             import BaseModel
 
 class SowBoarMate(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
 
     
     def add_boar_external_mate(self, data = None):

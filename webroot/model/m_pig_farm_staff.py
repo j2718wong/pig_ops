@@ -18,7 +18,7 @@ from base_model             import BaseModel
 
 class PigFarmStaff(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
 
 
     def add(self, data = None):

@@ -18,7 +18,7 @@ from base_model             import BaseModel
 
 class PigProdPigDead(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
     
     
     def get_pig_dead_type_list(self):

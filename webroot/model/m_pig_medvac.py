@@ -1,13 +1,23 @@
 # January 8, 2026
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
 
-class PigMedVac:
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class PigMedVac(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PigMedVac'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -32,84 +42,32 @@ class PigMedVac:
         )    
         """
         
-        sql =  'CALL pig_medvac_add('
-        sql += '%s,'    % data.user_id
-        
-        if data.sow_boar_id is not None and data.sow_boar_id > 0:
-            sql += '%s,'    % data.sow_boar_id
-        else:
-            sql += 'NULL,'
-        
-        if data.pig_prod_id is not None and data.pig_prod_id > 0:
-            sql += '%s,'    % data.pig_prod_id
-        else:
-            sql += 'NULL,'
-        
-        if data.pig_prod_pig_ops_id is not None and data.pig_prod_pig_ops_id > 0:
-            sql += '%s,'    % data.pig_prod_pig_ops_id
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.health_issue_id is not None and data.health_issue_id > 0:
-            sql += '%s,'    % data.health_issue_id
-        else:
-            sql += 'NULL,'
-        
-        
-        
-        sql += '"%s",'  % data.date_medvac
-        
-        
-        if data.medvac_brand_id and data.medvac_type_id > 0:
-            sql += '%s,'    % data.medvac_brand_id
-        else:
-            sql += 'NULL,'
-        
-        if data.medvac_type_id is not None and data.medvac_type_id > 0:
-            sql += '%s,'    % data.medvac_type_id
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '%s,'    % data.acc_medvac_id
-       
-        
-        sql += '%s,'    % data.staff_id
-        sql += '%s,'    % data.done_by_user
-        
-        if data.notes is not None and len(data.notes) > 0:
-            sql += '"%s");'  % data.notes
-        
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.sow_boar_id            if data.sow_boar_id is not None and data.sow_boar_id > 0 else None,
+            data.pig_prod_id            if data.pig_prod_id is not None and data.pig_prod_id > 0 else None,
+            data.pig_prod_pig_ops_id    if data.pig_prod_pig_ops_id is not None and data.pig_prod_pig_ops_id > 0 else None,
+            data.health_issue_id        if data.health_issue_id is not None and data.health_issue_id > 0 else None,
+            
+            data.date_medvac,
+            data.medvac_brand_id        if data.medvac_brand_id is not None and data.medvac_brand_id > 0 else None,
+            data.medvac_type_id         if data.medvac_type_id is not None and data.medvac_type_id > 0 else None,
+            data.acc_medvac_id,
+            
+            data.staff_id,
+            data.done_by_user,
+            data.notes                  if data.notes and data.notes.strip() else None
+        ]
 
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        res = self._call_procedure('pig_medvac_add', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+
 
         if row is not None:
             return {
@@ -143,58 +101,27 @@ class PigMedVac:
         )    
         """
         
-        sql =  'CALL pig_medvac_update('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.pig_medvac_id 
-        
-        sql += '"%s",'  % data.date_medvac
-        
-        sql += '%s,'    % data.medvac_brand_id
-        
-        if data.medvac_type_id is not None and data.medvac_type_id > 0:
-            sql += '%s,'    % data.medvac_type_id
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '%s,'    % data.acc_medvac_id
-       
-        
-        sql += '%s,'    % data.staff_id
-        
-        if data.notes is not None and len(data.notes) > 0:
-            sql += '"%s");'  % data.notes
-        
-        else:
-            sql += 'NULL);'
-
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_medvac_id,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.date_medvac,
+            data.medvac_brand_id,
+            data.medvac_type_id     if data.medvac_type_id is not None and data.medvac_type_id > 0 else None,
+            data.acc_medvac_id,
+            data.staff_id,
+            
+            data.notes if data.notes and data.notes.strip() else None
+        ]
 
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        res = self._call_procedure('pig_medvac_update', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -219,37 +146,21 @@ class PigMedVac:
             in_pig_race_line_id         INT
         )
         """
-       
-        sql =  'CALL pig_race_line_delete('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % pig_race_line_id
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        params = [
+            user_id,
+            pig_race_line_id
+        ]
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'delete(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+        res = self._call_procedure('pig_race_line_delete', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
+        
         if row is not None:
             return {
                 'result':{
@@ -353,122 +264,99 @@ class PigMedVac:
                     ORDER BY a.date_medvac DESC
                     """ % where_clause
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
             
-            for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'medvac': {
-                            'id':               row[0],
-                            
-                            'prod_pig_ops_id':  row[1],
-                            'health_issue_id':  row[2],
-                            
-                            'date_medvac':      str(row[3]),
+        for row in rows:
+            if inc_user_audit == 0:
+                cur_entry = {
+                    'medvac': {
+                        'id':               row[0],
                         
-                            'brand':{
-                                'id':           row[4],
-                                'name':         row[5]
-                            },
-                            
-                            'type':{
-                                'id':           row[6],
-                                'name':         row[7]
-                            },
-                            
-                            'acc_medvac':{
-                                'id':           row[8],
-                                'name':         row[9]
-                            },
-                            
-                            'staff':{
-                                'id':           row[10],
-                                'name':         row[11]
-                            },
-                            
-                            'notes':            row[12]
-                        }
-                    }
+                        'prod_pig_ops_id':  row[1],
+                        'health_issue_id':  row[2],
+                        
+                        'date_medvac':      str(row[3]),
                     
-                else:
-                    cur_entry = {
-                        'medvac': {
-                            'id':               row[0],
-                            
-                            'prod_pig_ops_id':  row[1],
-                            'health_issue_id':  row[2],
-                            
-                            
-                            'date_medvac':      str(row[3]),
-                        
-                            'brand':{
-                                'id':           row[4],
-                                'name':         row[5]
-                            },
-                            
-                            'type':{
-                                'id':           row[6],
-                                'name':         row[7]
-                            },
-                            
-                            'acc_medvac':{
-                                'id':           row[8],
-                                'name':         row[9]
-                            },
-                            
-                            'staff':{
-                                'id':           row[10],
-                                'name':         row[11]
-                            },
-                            
-                            'notes':            row[12]
+                        'brand':{
+                            'id':           row[4],
+                            'name':         row[5]
                         },
                         
-                        'added_by': {
-                            'name_last':        row[13],
-                            'name_first':       row[14],
-                            'dt_entry':         row[15]
+                        'type':{
+                            'id':           row[6],
+                            'name':         row[7]
                         },
                         
-                        'last_update':{
-                            'name_last':        row[16],
-                            'name_first':       row[17],
-                            'dt_update':        str(row[18]) if row[18] else None
-                        }
+                        'acc_medvac':{
+                            'id':           row[8],
+                            'name':         row[9]
+                        },
+                        
+                        'staff':{
+                            'id':           row[10],
+                            'name':         row[11]
+                        },
+                        
+                        'notes':            row[12]
                     }
+                }
                 
+            else:
+                cur_entry = {
+                    'medvac': {
+                        'id':               row[0],
+                        
+                        'prod_pig_ops_id':  row[1],
+                        'health_issue_id':  row[2],
+                        
+                        
+                        'date_medvac':      str(row[3]),
                     
-                result.append(cur_entry)
-        
+                        'brand':{
+                            'id':           row[4],
+                            'name':         row[5]
+                        },
+                        
+                        'type':{
+                            'id':           row[6],
+                            'name':         row[7]
+                        },
+                        
+                        'acc_medvac':{
+                            'id':           row[8],
+                            'name':         row[9]
+                        },
+                        
+                        'staff':{
+                            'id':           row[10],
+                            'name':         row[11]
+                        },
+                        
+                        'notes':            row[12]
+                    },
+                    
+                    'added_by': {
+                        'name_last':        row[13],
+                        'name_first':       row[14],
+                        'dt_entry':         row[15]
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[16],
+                        'name_first':       row[17],
+                        'dt_update':        str(row[18]) if row[18] else None
+                    }
+                }
+            
+                
+            result.append(cur_entry)
+    
         return result
     
     
@@ -484,49 +372,29 @@ class PigMedVac:
         )  
         """
         
+        params = [
+            account_id,
+            search_str
+        ]
         
-        sql =  'CALL pig_medvac_search_keys('
-        sql += '%s,'    % account_id
-        sql += '"%s");' % search_str
+        rows = self._call_procedure('pig_medvac_search_keys', params)
+        
+        if res is None:
+            return []
         
         
+        row = res[0]
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'get_search_top_keys; error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
-
         result = []
-        if rows is not None:
             
-            for row in rows:
-                cur_entry = {
-                    'key':              row[0],
-                    'hits':             row[1]
-                }
-                
-                result.append(cur_entry)
+        for row in rows:
+            cur_entry = {
+                'key':              row[0],
+                'hits':             row[1]
+            }
+            
+            result.append(cur_entry)
 
         return result
     
@@ -568,42 +436,21 @@ class PigMedVac:
                 """
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'get_search_top_keys; error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return []
+        
 
         result = []
-        if rows is not None:
             
-            for row in rows:
-                cur_entry = {
-                    'key':              row[0],
-                    'hits':             row[1]
-                }
-                
-                result.append(cur_entry)
+        for row in rows:
+            cur_entry = {
+                'key':              row[0],
+                'hits':             row[1]
+            }
+            
+            result.append(cur_entry)
 
         return result
     

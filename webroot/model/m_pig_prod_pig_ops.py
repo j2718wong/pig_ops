@@ -28,7 +28,7 @@ FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC      = 2
 
 class PigProdPigOps(BaseModel):
     def __init__(self, model):
-        super().__init__(model)  # Inherit from BaseModel
+        super().__init__(model)
 
     
     def update(self, data = None):
