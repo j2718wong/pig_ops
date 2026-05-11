@@ -95,39 +95,38 @@ self.addEventListener('push', (event) => {
 
 // Handle user clicking on the notification
 self.addEventListener('notificationclick', async (event) => {
+    console.log('🔔 Notification clicked');
+    console.log('Notification data:', event.notification.data);
+    
     event.notification.close();
     
-        const action    = event.notification.data?.action;
-        const payload   = event.notification.data?.payload;
-    
-        event.waitUntil(
-            clients.matchAll({ type: 'window', includeUncontrolled: true })
-                .then(clientList => {
-                    let data_to_client = null;
-                    
-                    const data_to_client = { action, payload };
-                    
-                    
-                    if (clientList.length > 0) {
-                        // App is open - send message (no page reload)
-                        if (data_to_client){
-                            clientList[0].postMessage(data_to_client);
-                        }
-                        
-                        return clientList[0].focus();
-                    } else {
-                        // App not open - store pending action then load
-                        if (data_to_client) {
-                            const cache = await caches.open('superpig-pending');
-                            await cache.put('pending-action', new Response(JSON.stringify(data_to_client)));
-                        }
-                        
-                        // App not open - need to load (this is the only time you load)
-                        return clients.openWindow('/');
-                    }
-                })
-        );
-});
+    const action = event.notification.data?.action;
+    const payload = event.notification.data?.payload;
 
+    console.log('Action:', action);
+    console.log('Payload:', payload);
+
+    const data_to_client = { action, payload };
+    
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then(async (clientList) => {
+                if (clientList.length > 0) {
+                    // App is open - send message
+                    console.log('📨 Sending message to client:', data_to_client);
+                    clientList[0].postMessage(data_to_client);
+                    return clientList[0].focus();
+                } else {
+                    // App not open - store pending action
+                    console.log('📦 No clients, storing pending action');
+                    if (data_to_client && data_to_client.action) {
+                        const cache = await caches.open('superpig-pending');
+                        await cache.put('pending-action', new Response(JSON.stringify(data_to_client)));
+                    }
+                    return clients.openWindow('/');
+                }
+            })
+    );
+});
 
 
