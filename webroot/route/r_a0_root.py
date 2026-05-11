@@ -61,8 +61,6 @@ async def service_worker():
     return FileResponse("service_worker.js", media_type="application/javascript")
 
 
-
-
 @app.get("/signup", response_class = HTMLResponse, dependencies=[Depends(strict_limit)])
 @app.get("/login", response_class = HTMLResponse, dependencies=[Depends(strict_limit)])
 async def signup_or_login(request: Request, response: Response):

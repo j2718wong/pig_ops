@@ -51,6 +51,7 @@ env = Environment(loader=FileSystemLoader('templates'))
 
 view_names = [
             ('signup',              'SignUp'),
+            ('contact',             'Contact'),
             
             ('privacy',             'Privacy'),
             ('terms',               'Terms'), 
@@ -271,6 +272,33 @@ class Privacy(ViewBase):
                 
         return template.render(data)
    
+
+
+class Contact(ViewBase):
+    def render(self, page_data = None):
+        # Mobile version
+        template = env.get_template('contact.html')
+        
+        application_data = get_application_data()
+        
+        current_year    = datetime.now().year
+        
+        
+        page_data ={
+            'app_version':          self.controller.APP_VERSION,
+            'current_year':         current_year,
+            'contact_email':        application_data['contact_email'],
+            'contact_whatsapp':     application_data['contact_whatsapp']
+        }
+        
+            
+        data    = { 'page_data':        page_data}
+        
+                
+        return template.render(data)
+
+
+
 
 class Terms(ViewBase):
     def render(self, page_data = None):

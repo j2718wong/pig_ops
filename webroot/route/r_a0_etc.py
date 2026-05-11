@@ -81,3 +81,12 @@ async def term(response: Response):
     page = controller.view['terms'].render()
     
     return page
+
+
+@app.get("/contact", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
+async def term(response: Response):
+    
+    page = controller.view['contact'].render()
+    
+    return page
+
