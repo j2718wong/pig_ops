@@ -43,7 +43,9 @@ class HasContactDetails:
     messenger:              str = None
     
 
-
+class DataUserInternalLogin(BaseModel):
+    email:                  str
+    
 
 class DataUserLogin(BaseModel):
     access_code_hid:        str = None

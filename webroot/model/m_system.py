@@ -40,13 +40,15 @@ class System(BaseModel):
             cur_user_no_account     = row[1]
             cur_count_account       = row[2]
             cur_account_not_started = row[3]
+            cur_account_no_sow_boar = row[4]
            
             cur_entry = {
                 'sys': {
                     'count_user':       cur_count_user,
                     'user_no_account':  cur_user_no_account,
                     'count_account':    cur_count_account,
-                    'acc_not_started':  cur_account_not_started
+                    'acc_not_started':  cur_account_not_started,
+                    'acc_no_sow_boar':  cur_account_no_sow_boar
                 }
             }
             

@@ -617,13 +617,44 @@ async def user_push_susbcription_add(request: Request, data: dm.DataUserPushSubs
     
 
 
+@app.post("/user_internal/login", tags=["User"])
+async def user_internal_login(request: Request, user_data: dm.DataUserInternalLogin):
+    """
+    This is for login only of internal users.
+    """
+    
+    
+    res_login = model['user'].user_internal_login(user_data)
+    if res_login == None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    if res_login['result']['num'] > 0:
+        del res_login['user']
+
+        del res_login['verify_code']
+        
+        return res_login
+    
+    
+
+    
+    
+    
+    
+    
     
     
     
 @app.post("/user/login_social", tags=["User"])
 async def user_login_social(request: Request, user_data: dm.DataUserLogin):
     """
-    This is signup or login using scoial media.
+    This is signup or login using social media.
     """
     
     
@@ -991,6 +1022,34 @@ async def google_callback(
         }
         
         async with httpx.AsyncClient() as client:
+         for row in rows:
+            if inc_user_audit == 0:
+                cur_entry = {
+                    'id':                   row[0],
+                    'name':                 row[1]
+                }
+                
+            else:
+                cur_entry = {
+                    'id':                   row[0],
+                    'name':                 row[1],
+                    
+                    'added_by': {
+                        'name_last':        row[2],
+                        'name_first':       row[3],
+                        'dt_entry':         str(row[4])
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[5],
+                        'name_first':       row[6],
+                        'dt_update':        str(row[7]) if row[7] else None
+                    }
+                }
+            
+                
+            result.append(cur_entry)
+    
             token_response = await client.post(token_url, data=data)
             
             if token_response.status_code != 200:

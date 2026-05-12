@@ -493,7 +493,7 @@ class User(BaseModel):
         }
     
     
-    def user_internal_login(self, email):
+    def user_internal_login(self, data=None):
         """
         PROCEDURE user_internal_login(
             in_email                VARCHAR(50)
@@ -501,7 +501,7 @@ class User(BaseModel):
         """
         
         params = [
-            email
+            data.email
         ]
         
         rows = self._call_procedure('user_internal_login', params)
