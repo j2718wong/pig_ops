@@ -21,7 +21,14 @@ FLAG_BIT_USER_IS_ACTIVE                 = 1
 FLAG_BIT_USER_EMAIL_VERIFIED            = 2
 FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
 FLAG_BIT_USER_IS_DELETED                = 8
+
 FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
+FLAG_BIT_USER_IS_INTERNAL_DATA_ENTRY    = 32
+FLAG_BIT_USER_IS_INTERNAL_FINANCE       = 64
+FLAG_BIT_USER_IS_TEST_USER              = 128
+
+FLAG_BIT_USER_IS_SYS_ADMIN              = 256
+
 
 #/* account.flag bits */
 FLAG_BIT_ACCOUNT_ENABLE                 = 1
@@ -486,6 +493,66 @@ class User(BaseModel):
         }
     
     
+    def user_internal_login(self, email):
+        """
+        PROCEDURE user_internal_login(
+            in_email                VARCHAR(50)
+        ) 
+        """
+        
+        params = [
+            email
+        ]
+        
+        rows = self._call_procedure('user_internal_login', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+        
+        cur_result_num              = row[0]
+        cur_result_code             = row[1]
+        cur_result_desc             = row[2]
+        
+        cur_user_id                 = row[3]
+        cur_user_account_id         = row[4]
+        cur_user_flag               = row[5]
+        
+        cur_verify_id               = row[6]
+        cur_verify_code             = row[7]
+        cur_verify_ts_expiry        = row[8]
+        cur_verify_dt_expiry        = str(row[9]) if row[9] else None
+        cur_expiry_minutes          = row[10]
+        
+        
+        cur_entry = {
+            'result': {
+                'num':              cur_result_num,
+                'code':             cur_result_code,
+                'desc':             cur_result_desc,
+            },
+            
+            'user': {
+                'id':               cur_user_id,
+                'account_id':       cur_user_account_id,
+                'flag':             cur_user_flag
+            },
+            
+            'verify_code': {
+                'verify_id':        cur_verify_id,
+                'verify_code':      str(cur_verify_code),
+                'verify_ts_expiry': cur_verify_ts_expiry,
+                'verify_dt_expiry': cur_verify_dt_expiry,
+                'expiry_minutes':   cur_expiry_minutes
+            }
+        }
+        
+        return cur_entry
+    
+        
+    
+    
     def user_verify_email(self, data=None):
         """
         PROCEDURE user_verify_email(
@@ -650,7 +717,6 @@ class User(BaseModel):
         
         
         return cur_entry
-
 
 
     def add_track_app_install(self, data=None):

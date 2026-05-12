@@ -1,14 +1,25 @@
 # August 24, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
 
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
 FLAG_BIT_COMMON_SUPPLIER_IS_VERIFIED    = 2;
 
-class CommonSupplier:
+class CommonSupplier(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'CommonSupplier'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -34,81 +45,38 @@ class CommonSupplier:
             in_messenger            VARCHAR(50)
         )  
         """
-        
-        sql =  'CALL common_supplier_add('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.country_id
-        sql += '%s,'    % data.level_1_id
-        sql += '%s,'    % data.level_2_id
-        
-        if data.level_3_id is not None and data.level_3_id > 0:
-            sql += '%s,'    % data.level_3_id
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '%s,'    % data.is_feed_supplier
-        sql += '%s,'    % data.is_gilt_supplier
-        sql += '%s,'    % data.is_semen_supplier
-
-        
-        if data.latitude is not None and data.latitude > 0:
-            sql += '%s,'    % data.latitude
-        else:
-            sql += 'NULL,'
-        
-        if data.longitude is not None and data.longitude > 0:
-            sql += '%s,'    % data.longitude
-        else:
-            sql += 'NULL,'
+      
+        params = [
+            data.user_id,
             
-        
-        sql += '"%s",'  % data.name
-        
-        if data.contact_number is not None and len(data.contact_number) > 0:
-            sql += '"%s",'  % data.contact_number
-        else:
-            sql += 'NULL,'
-        
-        if data.whatsapp is not None and len(data.whatsapp) > 0:
-            sql += '"%s",'  % data.whatsapp
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.messenger is not None and len(data.messenger) > 0:
-            sql += '"%s");' % data.messenger
-        else:
-            sql += 'NULL);'
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+            data.country_id,
+            data.level_1_id,
+            data.level_2_id,
+            data.level_3_id            if data.level_3_id is not None and data.level_3_id > 0 else None,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.is_feed_supplier,
+            data.is_gilt_supplier,
+            data.is_semen_supplier,
+            
+            data.latitude              if data.latitude is not None and data.latitude != 0 else None,
+            data.longitude             if data.longitude is not None and data.longitude != 0 else None,
+            
+            data.name,
+            data.contact_number        if data.contact_number is not None and data.contact_number.strip() else None,
+            data.whatsapp              if data.whatsapp is not None and data.whatsapp.strip() else None,
+            data.messenger             if data.messenger is not None and data.messenger.strip() else None
+        ]
 
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+
+        res = self._call_procedure('common_supplier_add', params)
+
+
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
 
         if row is not None:
             cur_flag = row[4]
@@ -190,79 +158,35 @@ class CommonSupplier:
         )  
         """
         
-        sql =  'CALL common_supplier_update('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.supplier_id
-        
-        
-        if data.level_3_id is not None and data.level_3_id > 0:
-            sql += '%s,'    % data.level_3_id
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '%s,'    % data.is_feed_supplier
-        sql += '%s,'    % data.is_gilt_supplier
-        sql += '%s,'    % data.is_semen_supplier
-        
-        
-        if data.latitude is not None and data.latitude > 0:
-            sql += '%s,'    % data.latitude
-        else:
-            sql += 'NULL,'
-        
-        if data.longitude is not None and data.longitude > 0:
-            sql += '%s,'    % data.longitude
-        else:
-            sql += 'NULL,'
-        
-        
-        sql += '"%s",'  % data.name
-        
-        if data.contact_number is not None and len(data.contact_number) > 0:
-            sql += '"%s",'  % data.contact_number
-        else:
-            sql += 'NULL,'
-        
-        if data.whatsapp is not None and len(data.whatsapp) > 0:
-            sql += '"%s",'  % data.whatsapp
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.messenger is not None and len(data.messenger) > 0:
-            sql += '"%s");' % data.messenger
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.supplier_id,
+            
+            data.level_3_id            if data.level_3_id is not None and data.level_3_id > 0 else None,
+            
+            data.is_feed_supplier,
+            data.is_gilt_supplier,
+            data.is_semen_supplier,
+            
+            data.latitude              if data.latitude is not None and data.latitude != 0 else None,
+            data.longitude             if data.longitude is not None and data.longitude != 0 else None,
+            
+            data.name,
+            data.contact_number        if data.contact_number is not None and data.contact_number.strip() else None,
+            data.whatsapp              if data.whatsapp is not None and data.whatsapp.strip() else None,
+            data.messenger             if data.messenger is not None and data.messenger.strip() else None
+        ]
 
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+        res = self._call_procedure('common_supplier_update', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
+        
         if row is not None:
             cur_res_num             = row[0]
             cur_res_code            = row[1]
@@ -544,131 +468,109 @@ class CommonSupplier:
                 """% account_id
             
        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
+        
+        
+        for row in rows:
+                
+            cur_supplier_id         = row[0]
+            cur_flag                = row[1]
+            cur_name                = row[2]
+            cur_contact_number      = row[3]
+            cur_whatsapp            = row[4]
+            cur_messenger           = row[5]
+                
+            cur_country_id          = row[6]
+            cur_address_level_1_id  = row[7]
+            cur_address_level_2_id  = row[8]
+            cur_address_level_3_id  = row[9]
             
-            for row in rows:
-                    
-                cur_supplier_id         = row[0]
-                cur_flag                = row[1]
-                cur_name                = row[2]
-                cur_contact_number      = row[3]
-                cur_whatsapp            = row[4]
-                cur_messenger           = row[5]
-                    
-                cur_country_id          = row[6]
-                cur_address_level_1_id  = row[7]
-                cur_address_level_2_id  = row[8]
-                cur_address_level_3_id  = row[9]
-                
-                cur_address_latitude    = float(row[10]) if row[10] is not None else None
-                cur_address_longitude   = float(row[11]) if row[11] is not None else None
+            cur_address_latitude    = float(row[10]) if row[10] is not None else None
+            cur_address_longitude   = float(row[11]) if row[11] is not None else None
+        
+            cur_is_feed_supplier    = row[12]
+            cur_is_gilt_supplier    = row[13]
+            cur_is_semen_supplier   = row[14]
             
-                cur_is_feed_supplier    = row[12]
-                cur_is_gilt_supplier    = row[13]
-                cur_is_semen_supplier   = row[14]
+            is_verified = 0
+            if cur_flag & FLAG_BIT_COMMON_SUPPLIER_IS_VERIFIED > 0:
+                is_verified = 1
+            
+            cur_entry = {
+                'supplier': {
+                    'id':               cur_supplier_id,
+                    'name':             cur_name,
+                    'contact_number':   cur_contact_number,
+                    'whatsapp':         cur_whatsapp,
+                    'messenger':        cur_messenger,
+                    
+                    'is_verified':      is_verified,
+                    
+                    'is_fs':            cur_is_feed_supplier,
+                    'is_gs':            cur_is_gilt_supplier,
+                    'is_ss':            cur_is_semen_supplier
+                },
                 
-                is_verified = 0
-                if cur_flag & FLAG_BIT_COMMON_SUPPLIER_IS_VERIFIED > 0:
-                    is_verified = 1
-                
-                cur_entry = {
-                    'supplier': {
-                        'id':               cur_supplier_id,
-                        'name':             cur_name,
-                        'contact_number':   cur_contact_number,
-                        'whatsapp':         cur_whatsapp,
-                        'messenger':        cur_messenger,
-                        
-                        'is_verified':      is_verified,
-                        
-                        'is_fs':            cur_is_feed_supplier,
-                        'is_gs':            cur_is_gilt_supplier,
-                        'is_ss':            cur_is_semen_supplier
+                'location':{
+                    
+                    'country': {
+                        'id':           cur_country_id
                     },
                     
-                    'location':{
-                        
-                        'country': {
-                            'id':           cur_country_id
+                    'address': {
+                        'level_1':{
+                            'id':       cur_address_level_1_id
+                        },
+                    
+                        'level_2':{
+                            'id':       cur_address_level_2_id
                         },
                         
-                        'address': {
-                            'level_1':{
-                                'id':       cur_address_level_1_id
-                            },
+                        'level_3':{
+                            'id':       cur_address_level_3_id
+                        },
                         
-                            'level_2':{
-                                'id':       cur_address_level_2_id
-                            },
-                            
-                            'level_3':{
-                                'id':       cur_address_level_3_id
-                            },
-                            
-                            'geoloc':{
-                                'latitude':     cur_address_latitude,
-                                'longitude':    cur_address_longitude
-                            }
-                            
+                        'geoloc':{
+                            'latitude':     cur_address_latitude,
+                            'longitude':    cur_address_longitude
                         }
+                        
                     }
                 }
-                
-                
-                if cur_entry['supplier']['contact_number'] is None:
+            }
+            
+            
+            if cur_entry['supplier']['contact_number'] is None:
+                del cur_entry['supplier']['contact_number']
+            else:
+                if len(cur_entry['supplier']['contact_number']) == 0:
                     del cur_entry['supplier']['contact_number']
-                else:
-                    if len(cur_entry['supplier']['contact_number']) == 0:
-                        del cur_entry['supplier']['contact_number']
-                   
-                   
-                if cur_entry['supplier']['whatsapp'] is None:
+               
+               
+            if cur_entry['supplier']['whatsapp'] is None:
+                del cur_entry['supplier']['whatsapp']
+            else:
+                if len(cur_entry['supplier']['whatsapp']) == 0:
                     del cur_entry['supplier']['whatsapp']
-                else:
-                    if len(cur_entry['supplier']['whatsapp']) == 0:
-                        del cur_entry['supplier']['whatsapp']
-                
-                
-                if cur_entry['supplier']['messenger'] is None:
+            
+            
+            if cur_entry['supplier']['messenger'] is None:
+                del cur_entry['supplier']['messenger']
+            else:
+                if len(cur_entry['supplier']['messenger']) == 0:
                     del cur_entry['supplier']['messenger']
-                else:
-                    if len(cur_entry['supplier']['messenger']) == 0:
-                        del cur_entry['supplier']['messenger']
+            
+            
+            if cur_entry['location']['address']['geoloc']['latitude'] is None:
+                del cur_entry['location']['address']['geoloc']
                 
-                
-                if cur_entry['location']['address']['geoloc']['latitude'] is None:
-                    del cur_entry['location']['address']['geoloc']
-                    
-                result.append(cur_entry)
+            result.append(cur_entry)
         
         return result
     
@@ -723,43 +625,22 @@ class CommonSupplier:
                     """ % where_clause
         
                 
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        rows = None
+        if rows is None:
+            return []
         
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_supplier_count(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
-            
-            for row in rows:
-                cur_entry = {
-                    'id':               row[0],
-                    'count':            row[1]
-                }
-                
-                result.append(cur_entry)
         
+            
+        for row in rows:
+            cur_entry = {
+                'id':               row[0],
+                'count':            row[1]
+            }
+            
+            result.append(cur_entry)
+    
         return result
     

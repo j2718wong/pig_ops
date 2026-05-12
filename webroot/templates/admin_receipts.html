@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperPig - Manual Receipt Data Entry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 0.8rem;
+        }
+
+        /* Top Section: Receipts Table (Horizontal) */
+        .top-section {
+            flex: 0 0 40%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .section-title {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e3a8a;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-greeting {
+            font-size: 0.8rem;
+            font-weight: normal;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: #1e3a8a;
+        }
+
+        .table-wrapper {
+            flex: 1;
+            overflow: auto;
+            min-height: 0;
+        }
+
+        .receipts-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .receipts-table th,
+        .receipts-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .receipts-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .receipts-table tr:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .receipts-table tr.selected {
+            background: #e3f2fd;
+            border-left: 3px solid #1e3a8a;
+        }
+
+        /* Bottom Section: Image + Form (Side by side) */
+        .bottom-section {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        /* Left: Image Preview */
+        .image-preview-container {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .image-preview-container .section-title {
+            flex-shrink: 0;
+        }
+
+        .image-preview-area {
+            flex: 1;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 16px;
+        }
+
+        .image-preview-area img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview-area .no-image {
+            color: #999;
+            text-align: center;
+        }
+
+        /* Right: Data Entry Form */
+        .data-entry-container {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .data-entry-container .section-title {
+            flex-shrink: 0;
+        }
+
+        .form-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group label .required {
+            color: #dc3545;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30,58,138,0.1);
+        }
+
+        .datetime-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .datetime-row .form-group {
+            flex: 1;
+        }
+
+        .btn-save {
+            width: 100%;
+            background: #2e7d64;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-save:hover {
+            background: #1a5c4a;
+        }
+
+        .btn-save:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            margin-top: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+
+        .badge-gcash {
+            background: #007aff;
+            color: white;
+        }
+
+        .badge-bank {
+            background: #6c757d;
+            color: white;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .pagination button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .pagination button:hover {
+            background: #f0f0f0;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e9ecef;
+            background: #1e3a8a;
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-modal {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #152e6e;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .hidden-div {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-top: 16px;
+            display: none;
+            border-left: 4px solid #dc3545;
+        }
+
+        .hidden-div.show {
+            display: block;
+        }
+
+        .verification-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .code-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .code-row .form-control {
+            flex: 1;
+        }
+
+        .btn-send-code {
+            background: #2e7d64;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .btn-send-code:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .success-text {
+            color: #155724;
+            background: #d4edda;
+        }
+
+        @media (max-width: 900px) {
+            .bottom-section {
+                flex-direction: column;
+            }
+            
+            .image-preview-container {
+                flex: 0 0 40%;
+            }
+            
+            .data-entry-container {
+                flex: 0 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Top Section: Receipts Table with user greeting -->
+    <div class="top-section">
+        <div class="section-title">
+            <span>📋 Pending Receipts</span>
+            <span class="user-greeting" id="userGreeting">Hello Guest</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="receipts-table" id="receiptsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Account</th>
+                        <th>Bill Ref</th>
+                        <th>Channel</th>
+                        <th>Payment Ref</th>
+                        <th>Amount</th>
+                        <th>Uploaded</th>
+                    </tr>
+                </thead>
+                <tbody id="receiptsTableBody">
+                    <tr class="loading">
+                        <td colspan="7">Loading receipts...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination" id="pagination">
+            <button id="prevPage" disabled>← Previous</button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button id="nextPage" disabled>Next →</button>
+        </div>
+    </div>
+
+    <!-- Bottom Section: Image + Form side by side -->
+    <div class="bottom-section">
+        <div class="image-preview-container">
+            <div class="section-title">🖼️ Receipt Image</div>
+            <div class="image-preview-area" id="receiptImagePreview">
+                <div class="no-image">Select a receipt to view image</div>
+            </div>
+        </div>
+
+        <div class="data-entry-container">
+            <div class="section-title">✏️ Data Entry</div>
+            <div class="form-wrapper">
+                <div class="form-group">
+                    <label>Payment Channel <span class="required">*</span></label>
+                    <select id="paymentChannel" class="form-control">
+                        <option value="">Select payment channel</option>
+                        <option value="gcash">GCash</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Reference <span class="required">*</span></label>
+                    <input type="text" id="paymentReference" class="form-control" placeholder="e.g., GCash-1234567890">
+                </div>
+
+                <div class="datetime-row">
+                    <div class="form-group">
+                        <label>Receipt Date <span class="required">*</span></label>
+                        <input type="date" id="receiptDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Receipt Time</label>
+                        <input type="time" id="receiptTime" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Amount (₱) <span class="required">*</span></label>
+                    <input type="number" id="amountReceipt" class="form-control" placeholder="0.00" step="0.01">
+                </div>
+
+                <button id="saveBtn" class="btn-save">💾 Save Data Entry</button>
+                <div id="statusMessage" class="status-message"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Authentication Modal -->
+<div id="authModal" class="modal-overlay" style="display: flex;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>🔐 Authorization Required</h3>
+        </div>
+        <div class="modal-body">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="modalEmail" class="form-control" placeholder="Enter your email" autocomplete="email">
+            </div>
+            <button id="sendCodeBtn" class="btn-send-code" style="width: 100%;">📧 Send Code</button>
+            
+            <!-- Hidden div for unauthorized entry -->
+            <div id="unauthorizedDiv" class="hidden-div">
+                ⚠️ Unauthorized Entry: Invalid credentials or expired session.
+            </div>
+            
+            <div class="verification-section" id="verificationSection" style="display: none;">
+                <div class="input-group">
+                    <label>Verification Code</label>
+                    <div class="code-row">
+                        <input type="text" id="verificationCode" class="form-control" placeholder="Enter 6-digit code" maxlength="6">
+                        <button id="verifyCodeBtn" class="btn-send-code">Verify</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="closeModalBtn" class="btn-modal btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const API_BASE = window.location.origin;
+    const ITEMS_PER_PAGE = 15;
+    
+    let currentPage = 1;
+    let totalPages = 1;
+    let receiptsData = [];
+    let selectedReceiptId = null;
+    
+    // Authentication state
+    let isAuthenticated = false;
+    let currentUser = null;
+    let pendingEmail = null;
+    let generatedCode = null;
+    let codeExpiry = null;
+
+    // Helper functions
+    function getAuthToken() {
+        return localStorage.getItem('access_token');
+    }
+    
+    function setAuthToken(token) {
+        if (token) {
+            localStorage.setItem('access_token', token);
+        } else {
+            localStorage.removeItem('access_token');
+        }
+    }
+    
+    function setUserInfo(user) {
+        if (user) {
+            localStorage.setItem('user_name', user.name || user.email || 'User');
+            localStorage.setItem('user_email', user.email || '');
+            currentUser = user;
+        } else {
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_email');
+            currentUser = null;
+        }
+        updateUserGreeting();
+    }
+    
+    function getUserName() {
+        return localStorage.getItem('user_name') || 'Guest';
+    }
+    
+    function updateUserGreeting() {
+        const name = getUserName();
+        const greetingElem = document.getElementById('userGreeting');
+        if (greetingElem) {
+            greetingElem.textContent = `👤 Hello ${name}`;
+        }
+    }
+    
+    function showStatus(message, type) {
+        const statusDiv = document.getElementById('statusMessage');
+        statusDiv.textContent = message;
+        statusDiv.className = `status-message ${type}`;
+        setTimeout(() => {
+            if (statusDiv.textContent === message) {
+                statusDiv.textContent = '';
+                statusDiv.className = 'status-message';
+            }
+        }, 4000);
+    }
+    
+    function showUnauthorizedMessage(show = true, customMessage = null) {
+        const div = document.getElementById('unauthorizedDiv');
+        if (show) {
+            if (customMessage) {
+                div.textContent = customMessage;
+            } else {
+                div.textContent = '⚠️ Unauthorized Entry: Invalid credentials or expired session.';
+            }
+            div.classList.add('show');
+        } else {
+            div.classList.remove('show');
+        }
+    }
+    
+    // Simulated API calls for authentication (demo mode with mock backend)
+    // In real implementation, replace with actual endpoints
+    async function sendVerificationCode(email) {
+        // Mock API - simulate sending code
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Generate random 6-digit code for demo
+                const code = Math.floor(100000 + Math.random() * 900000).toString();
+                generatedCode = code;
+                codeExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+                console.log(`[DEMO] Verification code for ${email}: ${code}`);
+                resolve({ success: true, message: 'Code sent successfully' });
+            }, 800);
+        });
+    }
+    
+    async function verifyCode(email, code) {
+        // Mock verification
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const isValid = generatedCode && code === generatedCode && Date.now() < codeExpiry;
+                if (isValid) {
+                    // Mock user data
+                    const mockUser = {
+                        name: email.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        email: email,
+                        role: 'admin'
+                    };
+                    // Mock token
+                    const mockToken = 'mock_jwt_token_' + Date.now();
+                    resolve({ success: true, user: mockUser, token: mockToken });
+                } else {
+                    let errorMsg = 'Invalid verification code';
+                    if (Date.now() >= codeExpiry && codeExpiry) errorMsg = 'Code has expired. Please request a new code.';
+                    resolve({ success: false, error: errorMsg });
+                }
+            }, 600);
+        });
+    }
+    
+    async function loadReceipts() {
+        if (!isAuthenticated) {
+            // Don't load receipts if not authenticated, but keep modal open
+            return;
+        }
+        
+        const tbody = document.getElementById('receiptsTableBody');
+        tbody.innerHTML = '<tr class="loading"><td colspan="7">Loading receipts...</td></tr>';
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/receipts/pending?page=${currentPage}&limit=${ITEMS_PER_PAGE}`, {
+                headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+            });
+            
+            const result = await response.json();
+            
+            if (result.result && result.result.num === 0) {
+                receiptsData = result.data || [];
+                totalPages = result.total_pages || 1;
+                renderReceiptsTable();
+                updatePagination();
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7">No pending receipts found</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error loading receipts:', error);
+            tbody.innerHTML = '<tr><td colspan="7">Error loading receipts</td></tr>';
+        }
+    }
+    
+    function renderReceiptsTable() {
+        const tbody = document.getElementById('receiptsTableBody');
+        
+        if (!receiptsData || receiptsData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">No pending receipts found</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        
+        for (let i = 0; i < receiptsData.length; i++) {
+            const receipt = receiptsData[i];
+            const row = document.createElement('tr');
+            row.dataset.id = receipt.id;
+            row.className = selectedReceiptId === receipt.id ? 'selected' : '';
+            
+            row.innerHTML = `
+                <td>${receipt.id || '-'}</td>
+                <td>${escapeHtml(receipt.account_name || '-')}</td>
+                <td>${escapeHtml(receipt.bill_reference || '-')}</td>
+                <td><span class="badge ${receipt.payment_channel === 'gcash' ? 'badge-gcash' : 'badge-bank'}">${receipt.payment_channel === 'gcash' ? 'GCash' : (receipt.payment_channel === 'bank_transfer' ? 'Bank Transfer' : '-')}</span></td>
+                <td>${escapeHtml(receipt.payment_reference || '-')}</td>
+                <td>${receipt.amount_receipt ? '₱' + parseFloat(receipt.amount_receipt).toFixed(2) : '-'}</td>
+                <td>${receipt.uploaded_at ? new Date(receipt.uploaded_at).toLocaleDateString() : '-'}</td>
+            `;
+            
+            row.addEventListener('click', (function(rec) {
+                return function() { selectReceipt(rec.id); };
+            })(receipt));
+            
+            tbody.appendChild(row);
+        }
+    }
+    
+    function selectReceipt(receiptId) {
+        if (!isAuthenticated) {
+            showStatus('Please complete authentication first', 'error');
+            return;
+        }
+        const receipt = receiptsData.find(r => r.id === receiptId);
+        if (!receipt) return;
+        
+        selectedReceiptId = receiptId;
+        
+        document.querySelectorAll('#receiptsTableBody tr').forEach(row => {
+            row.classList.remove('selected');
+            if (row.dataset.id == receiptId) {
+                row.classList.add('selected');
+            }
+        });
+        
+        document.getElementById('paymentChannel').value = receipt.payment_channel || '';
+        document.getElementById('paymentReference').value = receipt.payment_reference || '';
+        document.getElementById('receiptDate').value = receipt.receipt_date || '';
+        document.getElementById('receiptTime').value = receipt.receipt_time || '';
+        document.getElementById('amountReceipt').value = receipt.amount_receipt || '';
+        
+        const previewArea = document.getElementById('receiptImagePreview');
+        if (receipt.image_url) {
+            previewArea.innerHTML = `<img src="${receipt.image_url}" alt="Receipt Image" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image failed to load</div>'">`;
+        } else {
+            previewArea.innerHTML = '<div class="no-image">No image available for this receipt</div>';
+        }
+        
+        document.getElementById('statusMessage').textContent = '';
+        document.getElementById('statusMessage').className = 'status-message';
+    }
+    
+    async function saveDataEntry() {
+        if (!isAuthenticated) {
+            showStatus('Session expired. Please re-authenticate.', 'error');
+            openAuthModal();
+            return;
+        }
+        
+        if (!selectedReceiptId) {
+            showStatus('Please select a receipt first', 'error');
+            return;
+        }
+        
+        const paymentChannel = document.getElementById('paymentChannel').value;
+        const paymentReference = document.getElementById('paymentReference').value.trim();
+        const receiptDate = document.getElementById('receiptDate').value;
+        const receiptTime = document.getElementById('receiptTime').value;
+        const amountReceipt = parseFloat(document.getElementById('amountReceipt').value);
+        
+        if (!paymentChannel) {
+            showStatus('Please select payment channel', 'error');
+            return;
+        }
+        if (!paymentReference) {
+            showStatus('Please enter payment reference', 'error');
+            return;
+        }
+        if (!receiptDate) {
+            showStatus('Please select receipt date', 'error');
+            return;
+        }
+        if (isNaN(amountReceipt) || amountReceipt <= 0) {
+            showStatus('Please enter valid amount', 'error');
+            return;
+        }
+        
+        let receiptDatetime = receiptDate;
+        if (receiptTime) {
+            receiptDatetime = `${receiptDate} ${receiptTime}:00`;
+        } else {
+            receiptDatetime = `${receiptDate} 00:00:00`;
+        }
+        
+        const data = {
+            upload_receipt_id: selectedReceiptId,
+            payment_channel: paymentChannel,
+            payment_reference: paymentReference,
+            dt_receipt: receiptDatetime,
+            amount_receipt: amountReceipt
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/receipts/data_entry`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getAuthToken()}`
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.result && result.result.num === 0) {
+                showStatus('Data entry saved!', 'success');
+                await loadReceipts();
+                selectedReceiptId = null;
+                
+                document.getElementById('paymentChannel').value = '';
+                document.getElementById('paymentReference').value = '';
+                document.getElementById('receiptDate').value = '';
+                document.getElementById('receiptTime').value = '';
+                document.getElementById('amountReceipt').value = '';
+                document.getElementById('receiptImagePreview').innerHTML = '<div class="no-image">Select a receipt to view image</div>';
+            } else {
+                showStatus(result.result.desc || 'Failed to save', 'error');
+                if (result.result && result.result.code === 401) {
+                    isAuthenticated = false;
+                    openAuthModal();
+                }
+            }
+        } catch (error) {
+            console.error('Error saving:', error);
+            showStatus('Network error. Please try again.', 'error');
+        }
+    }
+    
+    function updatePagination() {
+        document.getElementById('prevPage').disabled = currentPage <= 1;
+        document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+    
+    function previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            loadReceipts();
+        }
+    }
+    
+    function nextPage() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadReceipts();
+        }
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Modal authentication logic
+    function openAuthModal() {
+        const modal = document.getElementById('authModal');
+        modal.style.display = 'flex';
+        // Reset modal fields
+        document.getElementById('modalEmail').value = '';
+        document.getElementById('verificationCode').value = '';
+        document.getElementById('verificationSection').style.display = 'none';
+        showUnauthorizedMessage(false);
+        generatedCode = null;
+        codeExpiry = null;
+        pendingEmail = null;
+    }
+    
+    function closeAuthModal() {
+        const modal = document.getElementById('authModal');
+        modal.style.display = 'none';
+        if (!isAuthenticated) {
+            // If still not authenticated, keep trying but show message
+            showStatus('Authentication required to access data', 'error');
+        }
+    }
+    
+    async function handleSendCode() {
+        const emailInput = document.getElementById('modalEmail');
+        const email = emailInput.value.trim();
+        
+        if (!email || !email.includes('@')) {
+            showUnauthorizedMessage(true, 'Please enter a valid email address');
+            return;
+        }
+        
+        const sendBtn = document.getElementById('sendCodeBtn');
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
+        showUnauthorizedMessage(false);
+        
+        try {
+            const result = await sendVerificationCode(email);
+            if (result.success) {
+                pendingEmail = email;
+                document.getElementById('verificationSection').style.display = 'block';
+                showUnauthorizedMessage(false);
+                // Auto-hide any previous error
+                const msgDiv = document.getElementById('unauthorizedDiv');
+                msgDiv.classList.remove('show');
+                // Show success hint in status (temporary)
+                const successHint = document.createElement('div');
+                // Not persistent but use modal status? Use hidden div as success then auto clear.
+                msgDiv.textContent = '✓ Verification code sent! Check console for demo code.';
+                msgDiv.style.background = '#d4edda';
+                msgDiv.style.color = '#155724';
+                msgDiv.style.borderLeftColor = '#28a745';
+                msgDiv.classList.add('show');
+                setTimeout(() => {
+                    if (msgDiv.textContent === '✓ Verification code sent! Check console for demo code.') {
+                        msgDiv.classList.remove('show');
+                        msgDiv.style.background = '#f8d7da';
+                        msgDiv.style.color = '#721c24';
+                        msgDiv.style.borderLeftColor = '#dc3545';
+                    }
+                }, 3000);
+            } else {
+                showUnauthorizedMessage(true, result.message || 'Failed to send code');
+            }
+        } catch (err) {
+            showUnauthorizedMessage(true, 'Network error. Please try again.');
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.textContent = '📧 Send Code';
+        }
+    }
+    
+    async function handleVerifyCode() {
+        const codeInput = document.getElementById('verificationCode');
+        const code = codeInput.value.trim();
+        
+        if (!code || code.length < 4) {
+            showUnauthorizedMessage(true, 'Please enter the verification code');
+            return;
+        }
+        
+        if (!pendingEmail) {
+            showUnauthorizedMessage(true, 'Please request a code first');
+            return;
+        }
+        
+        const verifyBtn = document.getElementById('verifyCodeBtn');
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying...';
+        
+        try {
+            const result = await verifyCode(pendingEmail, code);
+            if (result.success) {
+                isAuthenticated = true;
+                setAuthToken(result.token);
+                setUserInfo(result.user);
+                updateUserGreeting();
+                closeAuthModal();
+                showStatus(`Welcome ${result.user.name}! Authentication successful.`, 'success');
+                // Reset pagination and load receipts
+                currentPage = 1;
+                loadReceipts();
+            } else {
+                showUnauthorizedMessage(true, result.error || 'Verification failed');
+                isAuthenticated = false;
+            }
+        } catch (err) {
+            showUnauthorizedMessage(true, 'Verification error. Please try again.');
+        } finally {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Verify';
+        }
+    }
+    
+    // Check existing session mock
+    function checkExistingSession() {
+        const token = getAuthToken();
+        const userName = localStorage.getItem('user_name');
+        if (token && userName) {
+            isAuthenticated = true;
+            currentUser = { name: userName };
+            updateUserGreeting();
+            closeAuthModal();
+            loadReceipts();
+        } else {
+            openAuthModal();
+        }
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        checkExistingSession();
+        document.getElementById('prevPage').addEventListener('click', previousPage);
+        document.getElementById('nextPage').addEventListener('click', nextPage);
+        document.getElementById('saveBtn').addEventListener('click', saveDataEntry);
+        document.getElementById('sendCodeBtn').addEventListener('click', handleSendCode);
+        document.getElementById('verifyCodeBtn').addEventListener('click', handleVerifyCode);
+        document.getElementById('closeModalBtn').addEventListener('click', closeAuthModal);
+        // Allow Enter key in verification code field
+        document.getElementById('verificationCode')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleVerifyCode();
+        });
+        document.getElementById('modalEmail')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSendCode();
+        });
+    });
+</script>
+</body>
+</html>

@@ -122,7 +122,20 @@ def write_user_flag_bits(user, user_flag):
 
 
 @app.get("/user/verify_token", tags=["User"])
-async def user_verify_token(request: Request):
+async def user_verify_token(request: Request, ap:int = 0):
+    """
+    Will verify access_token of the user;
+    
+    Normal users with ap = 0, will return user_account_info
+    
+    Parameters
+    ----------
+    
+    ap: int
+        1 = Check if user is allowed to view Receipt data entry
+    
+    
+    """
     result = get_uhid_or_redirect(request)
     
     # If result is RedirectResponse, return it immediately
@@ -143,6 +156,8 @@ async def user_verify_token(request: Request):
         }
     
     user_id = res[0]
+    
+    
     
     
     data_user_account = get_user_account_info(user_id)

@@ -55,6 +55,9 @@ view_names = [
             
             ('privacy',             'Privacy'),
             ('terms',               'Terms'), 
+            
+            ('receipts',            'AdminReceipts'),
+            
             ('root',                'Root')            
         ]
 
@@ -299,7 +302,6 @@ class Contact(ViewBase):
 
 
 
-
 class Terms(ViewBase):
     def render(self, page_data = None):
         # Mobile version
@@ -322,7 +324,29 @@ class Terms(ViewBase):
         return template.render(data)
 
 
-   
+
+class AdminReceipts(ViewBase):
+    def render(self, page_data = None):
+        # Mobile version
+        template = env.get_template('admin_receipts.html')
+        
+        application_data = get_application_data()
+        
+        current_year    = datetime.now().year
+        
+        
+        page_data ={
+            'app_version':          self.controller.APP_VERSION
+        }
+        
+            
+        data    = { 'page_data':        page_data}
+        
+                
+        return template.render(data)
+
+
+
     
 #
 # Views

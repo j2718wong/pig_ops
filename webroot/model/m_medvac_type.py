@@ -1,12 +1,23 @@
 # January 12, 2026
+import os
+import sys
 
 from common_constants       import *
 
-class MedVacType:
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
+
+class MedVacType(BaseModel):
 
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'MedVacType'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -19,39 +30,21 @@ class MedVacType:
         )  
         """
         
-        sql =  'CALL medvac_type_add('
-        sql += '%s,'    % data.user_id
+        params =[
+            data.user_id,
+            data.name
+        ]
         
         
-        sql += '"%s")'  % data.name
+        res = self._call_procedure('medvac_type_add', params)
+        
+        if res is None:
+            return None
         
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        row = res[0]
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+        
         if row is not None:
             return {
                 'result':{
@@ -108,65 +101,42 @@ class MedVacType:
                     ORDER BY a.name
                     """ % where_clause
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
+        if rows is None:
+            return []
         
         result = []
-        if rows is not None:
+
             
-            for row in rows:
-                if inc_user_audit == 0:
-                    cur_entry = {
-                        'id':                   row[0],
-                        'name':                 row[1]
-                    }
-                    
-                else:
-                    cur_entry = {
-                        'id':                   row[0],
-                        'name':                 row[1],
-                        
-                        'added_by': {
-                            'name_last':        row[2],
-                            'name_first':       row[3],
-                            'dt_entry':         str(row[4])
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[5],
-                            'name_first':       row[6],
-                            'dt_update':        str(row[7]) if row[7] else None
-                        }
-                    }
+        for row in rows:
+            if inc_user_audit == 0:
+                cur_entry = {
+                    'id':                   row[0],
+                    'name':                 row[1]
+                }
                 
+            else:
+                cur_entry = {
+                    'id':                   row[0],
+                    'name':                 row[1],
                     
-                result.append(cur_entry)
-        
+                    'added_by': {
+                        'name_last':        row[2],
+                        'name_first':       row[3],
+                        'dt_entry':         str(row[4])
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[5],
+                        'name_first':       row[6],
+                        'dt_update':        str(row[7]) if row[7] else None
+                    }
+                }
+            
+                
+            result.append(cur_entry)
+    
         return result
     
     

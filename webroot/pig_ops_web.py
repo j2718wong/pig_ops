@@ -74,6 +74,7 @@ from route.r_system             import *
 
 from route.r_testing            import *
 
+from route.r_a0_admin           import *
 
 from route.r_a0_root            import *
 
