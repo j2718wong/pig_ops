@@ -81,8 +81,10 @@ class DataUserLogin(BaseModel):
     browser:                str = None
     browser_version:        str = None
     webview_platform:       str = None
+    
     os:                     str = None
     os_version:             str = None
+    
     device:                 str = None
     device_type:            str = None
 
@@ -97,6 +99,20 @@ class DataUserTrackAppInstall(BaseModel):
     
     screen_width:           int = None 
     screen_height:          int = None
+    
+    is_webview:             int = None
+    
+    browser:                str = None
+    browser_version:        str = None
+    webview_platform:       str = None
+    
+    os:                     str = None
+    os_version:             str = None
+    
+    device_type:            str = None
+    
+    
+    
     
 
 class DataUserEmailVerify(BaseModel):

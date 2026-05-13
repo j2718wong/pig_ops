@@ -349,8 +349,10 @@ class User(BaseModel):
             data.browser                if data.browser and data.browser.strip() else None,
             data.browser_version        if data.browser_version and data.browser_version.strip() else None,
             data.webview_platform       if data.webview_platform and data.webview_platform.strip() else None,
+            
             data.os                     if data.os and data.os.strip() else None,
             data.os_version             if data.os_version and data.os_version.strip() else None,
+            
             data.device                 if data.device and data.device.strip() else None,
             data.device_type            if data.device_type and data.device_type.strip() else None
         ]
@@ -526,6 +528,9 @@ class User(BaseModel):
         cur_expiry_minutes          = row[10]
         
         
+        # The cur_entry['user_unverified'] has deliberately no 'id'
+        # as the user is already in the system but needs to verify email.
+        
         cur_entry = {
             'result': {
                 'num':              cur_result_num,
@@ -539,7 +544,7 @@ class User(BaseModel):
                 'flag':             cur_user_flag
             },
             
-            'verify_code': {
+            'user_unverified': {
                 'verify_id':        cur_verify_id,
                 'verify_code':      str(cur_verify_code),
                 'verify_ts_expiry': cur_verify_ts_expiry,
@@ -725,9 +730,20 @@ class User(BaseModel):
             in_user_id              INT,
             
             in_event                VARCHAR(30),
-            
+    
             in_screen_width         INT,
-            in_screen_height        INT
+            in_screen_height        INT,
+            
+            in_is_webview           INT,
+            
+            in_browser              VARCHAR(50),
+            in_browser_version      VARCHAR(20),
+            in_webview_platform     VARCHAR(30),
+            
+            in_os                   VARCHAR(50),
+            in_os_version           VARCHAR(20),
+            
+            in_device_type          VARCHAR(20)
         )      
         """
         
@@ -745,7 +761,19 @@ class User(BaseModel):
             data.event,
             
             data.screen_width           if data.screen_width and data.screen_width > 0  else None,
-            data.screen_height          if data.screen_height and data.screen_height > 0 else None
+            data.screen_height          if data.screen_height and data.screen_height > 0 else None,
+            
+            data.is_webview             if data.is_webview is not None else None,
+            
+            data.browser                if data.browser and data.browser.strip() else None,
+            data.browser_version        if data.browser_version and data.browser_version.strip() else None,
+            data.webview_platform       if data.webview_platform and data.webview_platform.strip() else None,
+            
+            data.os                     if data.os and data.os.strip() else None,
+            data.os_version             if data.os_version and data.os_version.strip() else None,
+            
+            data.device_type            if data.device_type and data.device_type.strip() else None
+            
         ]
         
         rows = self._call_procedure('user_track_app_install_add', params)

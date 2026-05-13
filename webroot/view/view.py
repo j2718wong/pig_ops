@@ -62,6 +62,11 @@ view_names = [
         ]
 
 
+PAGE_TYPE_LOGIN             = 'login'
+PAGE_TYPE_CORE_APP          = 'core'
+PAGE_TYPE_RECEIPT_DATA      = 'receipt_data_entry'
+
+
 class View:
     def __init__(self, controller):
         controller.set_view(self)
@@ -85,9 +90,10 @@ class ViewBase:
         self.manifest_path      = dir_static + '/js/manifest.json'
         self.css_manifest_path  = dir_static + '/css/manifest.json'
         self.default_manifest   = {
-            'login':    'bundle.min.js',
-            'core':     'bundle.core.min.js',
-            'main_css': 'main.min.css'  # Default CSS fallback
+            'login':                'bundle.min.js',
+            'core':                 'bundle.core.min.js',
+            'receipt_data_entry':   'bundle.receipt_data_entry.min.js',  
+            'main_css':             'main.min.css'  # Default CSS fallback
         }
         
         self.is_dev = False
@@ -98,7 +104,7 @@ class ViewBase:
     
     
     
-    def get_js_files(self, page_type='core'):
+    def get_js_files(self, page_type = PAGE_TYPE_CORE_APP):
         """
         Return appropriate JS files based on environment
         """
@@ -115,7 +121,7 @@ class ViewBase:
             
             
     
-    def _get_prod_js_files(self, page_type='core'):
+    def _get_prod_js_files(self, page_type = PAGE_TYPE_CORE_APP):
         """Production: just the minified bundle"""
         try:
             if os.path.exists(self.manifest_path):
@@ -141,20 +147,27 @@ class ViewBase:
         
         
     
-    def _get_dev_js_files(self, page_type='core'):
+    def _get_dev_js_files(self, page_type = PAGE_TYPE_CORE_APP):
         """Development: return all individual modules for debugging"""
-        if page_type == 'login':
+        if page_type == PAGE_TYPE_LOGIN:
             # Login page modules
             return {
                 'text':    [],
                 'module':  ["/static_m/js/app.js"]
             }
             
-        else:  # core/dashboard
+        if page_type == PAGE_TYPE_CORE_APP:
             # Core navigation and all other modules
             return {
                 'text':     [],
                 'module':  ["/static_m/js/app_core.js"]
+            }
+            
+        if page_type == PAGE_TYPE_RECEIPT_DATA:
+            # Receipt data entry and all other modules
+            return {
+                'text':     [],
+                'module':  ["/static_m/js/admin_receipt_data_entry.js"]
             }
     
     
@@ -219,7 +232,7 @@ class SignUp(ViewBase):
         template = env.get_template('signup.html')
         
         # Get appropriate JS files based on environment
-        files = self.get_js_files('login')
+        files = self.get_js_files(PAGE_TYPE_LOGIN)
         
         # Get app_ui_settings
         ui_settings     = self.controller.get_app_ui_settings()
@@ -334,13 +347,24 @@ class AdminReceipts(ViewBase):
         
         current_year    = datetime.now().year
         
+        # Get appropriate JS files for receipt data entry
+        files = self.get_js_files(PAGE_TYPE_RECEIPT_DATA)
+        
+        css_files   = []
+        js_lib      = []
         
         page_data ={
             'app_version':          self.controller.APP_VERSION
         }
         
             
-        data    = { 'page_data':        page_data}
+        data    = { 'page_data':        page_data,
+                    'css_files':        css_files,
+                    'js_lib':           js_lib,
+                    'js_app_text':      files['text'],
+                    'js_app_modules':   files['module'],
+        
+        }
         
                 
         return template.render(data)
@@ -517,7 +541,7 @@ class Root(ViewBase):
             template = env.get_template('index_mob.html')
             
             # Get appropriate JS files based on environment
-            files = self.get_js_files('core')
+            files = self.get_js_files(PAGE_TYPE_CORE_APP)
             
             css_files = self.get_css_files()
             

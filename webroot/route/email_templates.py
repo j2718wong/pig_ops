@@ -93,7 +93,7 @@ class EmailVerificationCode(EmailTemplate):
                                     <h2 style="color: {self.text_dark}; margin: 0 0 10px 0; font-size: 22px; font-weight: 600;">Verify Your Email</h2>
                                     
                                     <p style="color: {self.text_dark}; margin: 0 0 15px 0; font-size: 16px;">
-                                        Thank you for signing up! Please use the verification code below:
+                                        Please use the verification code below:
                                     </p>
                                     
                                     <!-- Code box with light background -->

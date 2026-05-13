@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuperPig - Manual Receipt Data Entry</title>
+    
+    
+    <script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>  
+
+{% for script in js_app_text %}
+    <!-- Production: regular script with bundled code -->
+    <script type="text/javascript" src="{{ script }}"></script>    
+{% endfor %}
+
+
+{% for script in js_app_modules %}
+    <!-- Development: use module type for ES6 imports -->
+    <script type="module" src="{{ script }}"></script>    
+{% endfor %}
+
+    
     <style>
         * {
             margin: 0;
@@ -211,7 +227,7 @@
             padding: 8px 10px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 1.1rem;
             font-family: inherit;
         }
 
@@ -366,7 +382,7 @@
         }
 
         .modal-header h3 {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
         }
 
@@ -403,6 +419,7 @@
         .btn-secondary {
             background: #e9ecef;
             color: #333;
+            font-size: 1.1rem;
         }
 
         .btn-secondary:hover {
@@ -414,7 +431,7 @@
             color: #721c24;
             padding: 10px 14px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size:1.1rem;
             margin-top: 16px;
             display: none;
             border-left: 4px solid #dc3545;
@@ -436,7 +453,7 @@
 
         .input-group label {
             display: block;
-            font-size: 0.8rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 5px;
             color: #333;
@@ -459,7 +476,7 @@
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 1.2rem;
             white-space: nowrap;
         }
 
@@ -472,6 +489,14 @@
             color: #155724;
             background: #d4edda;
         }
+
+        .server-error-msg {
+            margin-top:4px;
+            margin-bottom:4px;
+            color:red;
+            display:none;
+        }
+
 
         @media (max-width: 900px) {
             .bottom-section {
@@ -489,119 +514,125 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <!-- Top Section: Receipts Table with user greeting -->
-    <div class="top-section">
-        <div class="section-title">
-            <span>📋 Pending Receipts</span>
-            <span class="user-greeting" id="userGreeting">Hello Guest</span>
+    
+<div id = "container-receipt-entry">
+    <div class="container">
+        <!-- Top Section: Receipts Table with user greeting -->
+        <div class="top-section">
+            <div class="section-title">
+                <span>📋 Pending Receipts</span>
+                <span class="user-greeting" id="userGreeting">Hello Guest</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="receipts-table" id="receiptsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Account</th>
+                            <th>Bill Ref</th>
+                            <th>Channel</th>
+                            <th>Payment Ref</th>
+                            <th>Amount</th>
+                            <th>Uploaded</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receiptsTableBody">
+                        <tr class="loading">
+                            <td colspan="7">Loading receipts...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination">
+                <button id="prevPage" disabled>← Previous</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button id="nextPage" disabled>Next →</button>
+            </div>
         </div>
-        <div class="table-wrapper">
-            <table class="receipts-table" id="receiptsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Account</th>
-                        <th>Bill Ref</th>
-                        <th>Channel</th>
-                        <th>Payment Ref</th>
-                        <th>Amount</th>
-                        <th>Uploaded</th>
-                    </tr>
-                </thead>
-                <tbody id="receiptsTableBody">
-                    <tr class="loading">
-                        <td colspan="7">Loading receipts...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination" id="pagination">
-            <button id="prevPage" disabled>← Previous</button>
-            <span id="pageInfo">Page 1 of 1</span>
-            <button id="nextPage" disabled>Next →</button>
+
+        <!-- Bottom Section: Image + Form side by side -->
+        <div class="bottom-section">
+            <div class="image-preview-container">
+                <div class="section-title">🖼️ Receipt Image</div>
+                <div class="image-preview-area" id="receiptImagePreview">
+                    <div class="no-image">Select a receipt to view image</div>
+                </div>
+            </div>
+
+            <div class="data-entry-container">
+                <div class="section-title">✏️ Data Entry</div>
+                <div class="form-wrapper">
+                    <div class="form-group">
+                        <label>Payment Channel <span class="required">*</span></label>
+                        <select id="paymentChannel" class="form-control">
+                            <option value="">Select payment channel</option>
+                            <option value="gcash">GCash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Reference <span class="required">*</span></label>
+                        <input type="text" id="paymentReference" class="form-control" placeholder="e.g., GCash-1234567890">
+                    </div>
+
+                    <div class="datetime-row">
+                        <div class="form-group">
+                            <label>Receipt Date <span class="required">*</span></label>
+                            <input type="date" id="receiptDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Receipt Time</label>
+                            <input type="time" id="receiptTime" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount (₱) <span class="required">*</span></label>
+                        <input type="number" id="amountReceipt" class="form-control" placeholder="0.00" step="0.01">
+                    </div>
+
+                    <button id="saveBtn" class="btn-save">💾 Save Data Entry</button>
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Bottom Section: Image + Form side by side -->
-    <div class="bottom-section">
-        <div class="image-preview-container">
-            <div class="section-title">🖼️ Receipt Image</div>
-            <div class="image-preview-area" id="receiptImagePreview">
-                <div class="no-image">Select a receipt to view image</div>
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal-overlay" style="display: flex;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🔐 Authorization Required</h3>
             </div>
-        </div>
-
-        <div class="data-entry-container">
-            <div class="section-title">✏️ Data Entry</div>
-            <div class="form-wrapper">
-                <div class="form-group">
-                    <label>Payment Channel <span class="required">*</span></label>
-                    <select id="paymentChannel" class="form-control">
-                        <option value="">Select payment channel</option>
-                        <option value="gcash">GCash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Payment Reference <span class="required">*</span></label>
-                    <input type="text" id="paymentReference" class="form-control" placeholder="e.g., GCash-1234567890">
-                </div>
-
-                <div class="datetime-row">
-                    <div class="form-group">
-                        <label>Receipt Date <span class="required">*</span></label>
-                        <input type="date" id="receiptDate" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Receipt Time</label>
-                        <input type="time" id="receiptTime" class="form-control">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Amount (₱) <span class="required">*</span></label>
-                    <input type="number" id="amountReceipt" class="form-control" placeholder="0.00" step="0.01">
-                </div>
-
-                <button id="saveBtn" class="btn-save">💾 Save Data Entry</button>
-                <div id="statusMessage" class="status-message"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Authentication Modal -->
-<div id="authModal" class="modal-overlay" style="display: flex;">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3>🔐 Authorization Required</h3>
-        </div>
-        <div class="modal-body">
-            <div class="input-group">
-                <label>Email Address</label>
-                <input type="email" id="modalEmail" class="form-control" placeholder="Enter your email" autocomplete="email">
-            </div>
-            <button id="sendCodeBtn" class="btn-send-code" style="width: 100%;">📧 Send Code</button>
-            
-            <!-- Hidden div for unauthorized entry -->
-            <div id="unauthorizedDiv" class="hidden-div">
-                ⚠️ Unauthorized Entry: Invalid credentials or expired session.
-            </div>
-            
-            <div class="verification-section" id="verificationSection" style="display: none;">
+            <div class="modal-body">
                 <div class="input-group">
-                    <label>Verification Code</label>
-                    <div class="code-row">
-                        <input type="text" id="verificationCode" class="form-control" placeholder="Enter 6-digit code" maxlength="6">
-                        <button id="verifyCodeBtn" class="btn-send-code">Verify</button>
+                    <label>Email Address</label>
+                    <input type="email" id="modalEmail" class="form-control" placeholder="Enter your email" autocomplete="email">
+                </div>
+                <button id="sendCodeBtn" class="btn-send-code" style="width: 100%;">📧 Send Code</button>
+                
+                <!-- Hidden div for unauthorized entry -->
+                <div id="unauthorizedDiv" class="hidden-div">
+                    ⚠️ Unauthorized Entry: Invalid email or authorization.
+                </div>
+                
+                <div class="verification-section" id="verificationSection" style="display: none;">
+                    <div class="input-group">
+                        <label>Verification Code</label>
+                        <div class="code-row">
+                            <input type="text" id="verificationCode" class="form-control" placeholder="Enter 6-digit code" maxlength="6">
+                            <button id="verifyCodeBtn" class="btn-send-code">Verify</button>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="server-error-msg" id="serverErrorMsg"></div>
+                
             </div>
-        </div>
-        <div class="modal-footer">
-            <button id="closeModalBtn" class="btn-modal btn-secondary">Close</button>
+            <div class="modal-footer">
+                <button id="closeModalBtn" class="btn-modal btn-secondary">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -687,45 +718,7 @@
         }
     }
     
-    // Simulated API calls for authentication (demo mode with mock backend)
-    // In real implementation, replace with actual endpoints
-    async function sendVerificationCode(email) {
-        // Mock API - simulate sending code
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // Generate random 6-digit code for demo
-                const code = Math.floor(100000 + Math.random() * 900000).toString();
-                generatedCode = code;
-                codeExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
-                console.log(`[DEMO] Verification code for ${email}: ${code}`);
-                resolve({ success: true, message: 'Code sent successfully' });
-            }, 800);
-        });
-    }
     
-    async function verifyCode(email, code) {
-        // Mock verification
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const isValid = generatedCode && code === generatedCode && Date.now() < codeExpiry;
-                if (isValid) {
-                    // Mock user data
-                    const mockUser = {
-                        name: email.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                        email: email,
-                        role: 'admin'
-                    };
-                    // Mock token
-                    const mockToken = 'mock_jwt_token_' + Date.now();
-                    resolve({ success: true, user: mockUser, token: mockToken });
-                } else {
-                    let errorMsg = 'Invalid verification code';
-                    if (Date.now() >= codeExpiry && codeExpiry) errorMsg = 'Code has expired. Please request a new code.';
-                    resolve({ success: false, error: errorMsg });
-                }
-            }, 600);
-        });
-    }
     
     async function loadReceipts() {
         if (!isAuthenticated) {
@@ -961,97 +954,6 @@
         }
     }
     
-    async function handleSendCode() {
-        const emailInput = document.getElementById('modalEmail');
-        const email = emailInput.value.trim();
-        
-        if (!email || !email.includes('@')) {
-            showUnauthorizedMessage(true, 'Please enter a valid email address');
-            return;
-        }
-        
-        const sendBtn = document.getElementById('sendCodeBtn');
-        sendBtn.disabled = true;
-        sendBtn.textContent = 'Sending...';
-        showUnauthorizedMessage(false);
-        
-        try {
-            const result = await sendVerificationCode(email);
-            if (result.success) {
-                pendingEmail = email;
-                document.getElementById('verificationSection').style.display = 'block';
-                showUnauthorizedMessage(false);
-                // Auto-hide any previous error
-                const msgDiv = document.getElementById('unauthorizedDiv');
-                msgDiv.classList.remove('show');
-                // Show success hint in status (temporary)
-                const successHint = document.createElement('div');
-                // Not persistent but use modal status? Use hidden div as success then auto clear.
-                msgDiv.textContent = '✓ Verification code sent! Check console for demo code.';
-                msgDiv.style.background = '#d4edda';
-                msgDiv.style.color = '#155724';
-                msgDiv.style.borderLeftColor = '#28a745';
-                msgDiv.classList.add('show');
-                setTimeout(() => {
-                    if (msgDiv.textContent === '✓ Verification code sent! Check console for demo code.') {
-                        msgDiv.classList.remove('show');
-                        msgDiv.style.background = '#f8d7da';
-                        msgDiv.style.color = '#721c24';
-                        msgDiv.style.borderLeftColor = '#dc3545';
-                    }
-                }, 3000);
-            } else {
-                showUnauthorizedMessage(true, result.message || 'Failed to send code');
-            }
-        } catch (err) {
-            showUnauthorizedMessage(true, 'Network error. Please try again.');
-        } finally {
-            sendBtn.disabled = false;
-            sendBtn.textContent = '📧 Send Code';
-        }
-    }
-    
-    async function handleVerifyCode() {
-        const codeInput = document.getElementById('verificationCode');
-        const code = codeInput.value.trim();
-        
-        if (!code || code.length < 4) {
-            showUnauthorizedMessage(true, 'Please enter the verification code');
-            return;
-        }
-        
-        if (!pendingEmail) {
-            showUnauthorizedMessage(true, 'Please request a code first');
-            return;
-        }
-        
-        const verifyBtn = document.getElementById('verifyCodeBtn');
-        verifyBtn.disabled = true;
-        verifyBtn.textContent = 'Verifying...';
-        
-        try {
-            const result = await verifyCode(pendingEmail, code);
-            if (result.success) {
-                isAuthenticated = true;
-                setAuthToken(result.token);
-                setUserInfo(result.user);
-                updateUserGreeting();
-                closeAuthModal();
-                showStatus(`Welcome ${result.user.name}! Authentication successful.`, 'success');
-                // Reset pagination and load receipts
-                currentPage = 1;
-                loadReceipts();
-            } else {
-                showUnauthorizedMessage(true, result.error || 'Verification failed');
-                isAuthenticated = false;
-            }
-        } catch (err) {
-            showUnauthorizedMessage(true, 'Verification error. Please try again.');
-        } finally {
-            verifyBtn.disabled = false;
-            verifyBtn.textContent = 'Verify';
-        }
-    }
     
     // Check existing session mock
     function checkExistingSession() {
@@ -1074,16 +976,13 @@
         document.getElementById('prevPage').addEventListener('click', previousPage);
         document.getElementById('nextPage').addEventListener('click', nextPage);
         document.getElementById('saveBtn').addEventListener('click', saveDataEntry);
-        document.getElementById('sendCodeBtn').addEventListener('click', handleSendCode);
-        document.getElementById('verifyCodeBtn').addEventListener('click', handleVerifyCode);
+        
         document.getElementById('closeModalBtn').addEventListener('click', closeAuthModal);
         // Allow Enter key in verification code field
         document.getElementById('verificationCode')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleVerifyCode();
         });
-        document.getElementById('modalEmail')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSendCode();
-        });
+       
     });
 </script>
 </body>

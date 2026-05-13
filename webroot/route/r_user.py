@@ -526,7 +526,23 @@ async def user_track_app_install(request: Request, data: dm.DataUserTrackAppInst
     user_id = res[0]
     
     
-    data.user_id        = user_id
+    data.user_id            = user_id
+    
+    
+    # Get browser info 
+    browser_info            = get_browser_info(request)
+    
+    data.is_webview         = 1 if browser_info['is_webview'] else 0
+        
+    data.browser            = browser_info['browser']
+    data.browser_version    = browser_info['browser_version']
+    data.webview_platform   = browser_info['webview_platform']
+        
+    data.os                 = browser_info['os']
+    data.os_version         = browser_info['os_version']
+    data.device_type        = browser_info['device_type'] 
+    
+
     
     res_add = model['user'].add_track_app_install(data)
     
@@ -618,11 +634,16 @@ async def user_push_susbcription_add(request: Request, data: dm.DataUserPushSubs
 
 
 @app.post("/user_internal/login", tags=["User"])
-async def user_internal_login(request: Request, user_data: dm.DataUserInternalLogin):
+async def user_internal_login(request: Request, 
+        background_tasks: BackgroundTasks,
+        user_data: dm.DataUserInternalLogin):
+            
     """
     This is for login only of internal users.
+    All user internal login needs email verification.
     """
     
+    user_email = user_data.email
     
     res_login = model['user'].user_internal_login(user_data)
     if res_login == None:
@@ -637,12 +658,54 @@ async def user_internal_login(request: Request, user_data: dm.DataUserInternalLo
     if res_login['result']['num'] > 0:
         del res_login['user']
 
-        del res_login['verify_code']
+        del res_login['user_unverified']
         
         return res_login
     
     
+    user_id = res_login['user']['id']
+    
+    user_unverified = res_login['user_unverified']
+    
+    
+    # The user already in the system but needs email authentication.
+    if user_id is not None:
+        cur_id      = user_id  
+        cur_hid     = hashids_user.encrypt(cur_id)
+        
+        # Need to add this 
+        user_unverified['uhid'] = cur_hid
+    
+        
+        """
+        res_login['user_unverified']['uhid'] -> needs to authenticate user
+        """
+        
+    # Delete res_login['user']; 
+    del res_login['user']
+    
+        
+    del user_unverified['verify_id']
+    
+    verification_code   = user_unverified['verify_code']
+    expiry_minutes      = user_unverified['expiry_minutes']
+    
+    del user_unverified['verify_code']
 
+    
+    # Send verification code email to user
+    template    = EmailVerificationCode()
+    subject     = template.get_email_subject()
+    msg_body    = template.get_email_body(verification_code, expiry_minutes)
+    
+    user_email  = user_data.email
+    print('\n\nAbout to send verification email to: %s' % user_email)
+    
+    background_tasks.add_task(send_email, [user_email], subject, msg_body)
+    
+    return res_login
+        
+        
     
     
     
