@@ -1085,33 +1085,6 @@ async def google_callback(
         }
         
         async with httpx.AsyncClient() as client:
-         for row in rows:
-            if inc_user_audit == 0:
-                cur_entry = {
-                    'id':                   row[0],
-                    'name':                 row[1]
-                }
-                
-            else:
-                cur_entry = {
-                    'id':                   row[0],
-                    'name':                 row[1],
-                    
-                    'added_by': {
-                        'name_last':        row[2],
-                        'name_first':       row[3],
-                        'dt_entry':         str(row[4])
-                    },
-                    
-                    'last_update':{
-                        'name_last':        row[5],
-                        'name_first':       row[6],
-                        'dt_update':        str(row[7]) if row[7] else None
-                    }
-                }
-            
-                
-            result.append(cur_entry)
     
             token_response = await client.post(token_url, data=data)
             
