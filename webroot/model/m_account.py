@@ -117,6 +117,8 @@ class Account(BaseModel):
                     c.currency_code,
                     c.tax_rate,
                     
+                    c.prev_amount_balance,
+                    
                     c.charge_per_pig,
                     c.amount,
                     c.deduction,
@@ -206,44 +208,46 @@ class Account(BaseModel):
             cur_acc_bill_currency_code          = row[20]
             cur_acc_bill_tax_rate               = row[21]
 
-            cur_acc_bill_charge_per_pig         = row[22]
-            cur_acc_bill_amount                 = row[23]
-            cur_acc_bill_deduction              = row[24]
-            cur_acc_bill_taxable_amount         = row[25]
-            cur_acc_bill_taxes                  = row[26]
-            cur_acc_bill_total_amount_due       = row[27]
-            
-            
-            # Receipt upload fields (indices 28-33)
-            cur_upload_receipt_path             = row[28]
-            cur_upload_receipt_status_id        = row[29]
-            cur_upload_receipt_flag             = row[30]
-            cur_upload_receipt_dt_entry         = str(row[31]) if row[31] else None
-            cur_upload_receipt_user_name_last   = row[32]
-            cur_upload_receipt_user_name_first  = row[33]
+            cur_acc_bill_prev_balance           = float(row[22]) if row[22] else 0.0
 
-            # Account settings (indices 34-40)
-            cur_acc_weight_unit                 = row[34]
-            cur_acc_currency                    = row[35]
-            cur_acc_settings_flag               = row[36]
-            cur_acc_num_days_move_to_farrow     = row[37]
-            cur_acc_num_days_wean               = row[38]
-            cur_acc_num_days_harvest_from_birth = row[39]
-            cur_acc_num_days_harvest_from_wean  = row[40]
+            cur_acc_bill_charge_per_pig         = row[23]
+            cur_acc_bill_amount                 = row[24]
+            cur_acc_bill_deduction              = row[25]
+            cur_acc_bill_taxable_amount         = row[26]
+            cur_acc_bill_taxes                  = row[27]
+            cur_acc_bill_total_amount_due       = row[28]
 
-            # User who last updated settings (indices 41-43)
-            cur_user_name_last                  = row[41]
-            cur_user_name_first                 = row[42]
-            cur_settings_last_update            = str(row[43]) if row[43] else None
 
-            # Version numbers (indices 44-49)
-            cur_ver_num_gestating_ops           = row[44]
-            cur_ver_num_lactating_piglets_ops   = row[45]
-            cur_ver_num_lactating_sow_ops       = row[46]
-            cur_ver_num_gilt_ops                = row[47]
-            cur_ver_num_weaning_sow_ops         = row[48]
+            # Receipt upload fields (indices 29-34) - Fixed offsets
+            cur_upload_receipt_path             = row[29]
+            cur_upload_receipt_status_id        = row[30]
+            cur_upload_receipt_flag             = row[31]
+            cur_upload_receipt_dt_entry         = str(row[32]) if row[32] else None
+            cur_upload_receipt_user_name_last   = row[33]
+            cur_upload_receipt_user_name_first  = row[34]
 
-            cur_data_ver_num_account            = row[49]
+            # Account settings (indices 35-41) - Fixed offsets
+            cur_acc_weight_unit                 = row[35]
+            cur_acc_currency                    = row[36]
+            cur_acc_settings_flag               = row[37]
+            cur_acc_num_days_move_to_farrow     = row[38]
+            cur_acc_num_days_wean               = row[39]
+            cur_acc_num_days_harvest_from_birth = row[40]
+            cur_acc_num_days_harvest_from_wean  = row[41]
+
+            # User who last updated settings (indices 42-44) - Fixed offsets
+            cur_user_name_last                  = row[42]
+            cur_user_name_first                 = row[43]
+            cur_settings_last_update            = str(row[44]) if row[44] else None
+
+            # Version numbers (indices 45-49) - Fixed offsets
+            cur_ver_num_gestating_ops           = row[45] 
+            cur_ver_num_lactating_piglets_ops   = row[46] 
+            cur_ver_num_lactating_sow_ops       = row[47] 
+            cur_ver_num_gilt_ops                = row[48] 
+            cur_ver_num_weaning_sow_ops         = row[49] 
+
+            cur_data_ver_num_account            = row[50] 
 
 
             
@@ -290,6 +294,8 @@ class Account(BaseModel):
                         'bill_reference':   cur_acc_bill_reference,
                         'date_issue':       cur_acc_bill_date_issue,
                         'date_due':         cur_acc_bill_date_due,
+                        
+                        'prev_balance':     cur_acc_bill_prev_balance,
                         
                         'num_billed':       cur_acc_bill_num_sow_boar_billed,
                         'num_sow':          cur_acc_bill_num_sow,
