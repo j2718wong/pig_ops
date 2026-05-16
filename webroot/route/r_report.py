@@ -367,9 +367,6 @@ async def report_download(request: Request, rhid:str):
     )
 
 
-    
-    
-
 
 
 @app.post("/report/pig_farm/summary/add", tags=["Report"])

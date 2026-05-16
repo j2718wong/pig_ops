@@ -35,7 +35,7 @@ from r_utils                import remove_database_null_description
 
 
    
-@app.post("/cust_feedback/add", tags=["Account"])
+@app.post("/customer/feedback/add", tags=["Account"])
 async def cust_feedback_add(request: Request, data: dm.DataCustomerFeedback):
     result = get_uhid_or_redirect(request)
     

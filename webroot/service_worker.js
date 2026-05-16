@@ -1,3 +1,5 @@
+// service_worker.js
+
 const CACHE_NAME = 'superpig-v1';
 const urlsToCache = [
     '/',
@@ -25,6 +27,65 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve cached or network
 self.addEventListener('fetch', (event) => {
+    const url   = new URL(event.request.url);
+    const path  = url.pathname;
+    
+    // Skip API calls - let them fail normally; app handles offline
+    if (path.startsWith('/country/')            ||
+        path.startsWith('/lookup/')             ||
+        path.startsWith('/pig_farm/')           ||
+        path.startsWith('/account/')            ||
+        path.startsWith('/user/')               ||
+        path.startsWith('/sow_boar/')           ||
+        path.startsWith('/pig_prod/')           ||
+        
+        
+        path.startsWith('/access_code/')        ||
+        path.startsWith('/account_bill/')       ||
+        path.startsWith('/account_medvac/')     ||
+        path.startsWith('/account_pig_buyer/')  ||
+        path.startsWith('/account_pig_ops/')    ||
+        
+        path.startsWith('/address/')            ||
+        
+        path.startsWith('/b/')                  ||
+        
+        path.startsWith('/supplier/')           ||
+        path.startsWith('/customer/')           ||
+        
+        path.startsWith('/feed_balance/')       ||
+        path.startsWith('/feed_brand/')         ||
+        path.startsWith('/feed_buy/')           ||
+        
+        path.startsWith('/medvac_brand/')       ||
+        path.startsWith('/medvac_type/')        ||
+        
+        path.startsWith('/pf_feed_buy/')        ||
+        path.startsWith('/pf_feed_buy_item/')   ||
+        path.startsWith('/pig_farm_staff/')     ||
+        path.startsWith('/pig_medvac/')         ||
+        
+        path.startsWith('/pig_prod_feed/')      ||
+        path.startsWith('/pig_prod_notes/')     ||
+        path.startsWith('/prod_pig_dead/')      ||
+        path.startsWith('/pig_prod_pig_ops/')   ||
+        path.startsWith('/prod_harvest/')       ||
+        
+        path.startsWith('/report/')             ||
+        path.startsWith('/semen_sup_semen/')    ||
+        
+        path.startsWith('/boar_ext_mate/')      ||
+        path.startsWith('/sow_boar_mate/')      ||
+        
+        path.startsWith('/system/')
+    )
+    
+    {
+        // Don't intercept API calls
+        return;
+    }
+    
+    
     event.respondWith(
         caches.match(event.request)
             .then((response) => {

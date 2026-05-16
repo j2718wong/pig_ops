@@ -27,7 +27,7 @@ async def admin_receipts(response: Response):
     return page
 
 
-@app.get("/payment_channel/list", tags=["Admin"])
+@app.get("/admin/payment_channel/list", tags=["Admin"])
 async def payment_channel_list(request: Request ):
     """
     Will get pig_production status list.

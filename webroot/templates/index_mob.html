@@ -134,8 +134,8 @@
 
 <body>
     <div id="offlineIndicator" class="offline-mode-indicator">
-        <span id="offlineMessage">Offline Mode - No Internet Connection</span>
-        <button id="offlineRetryBtn" class="retry-btn" onclick="checkConnectionAndReload()">
+        <span id="offlineMessage">Offline Mode - No Internet</span>
+        <button id="offlineRetryBtn" class="retry-btn">
             <i class="fas fa-sync-alt"></i> Retry
         </button>
     </div>
@@ -1151,22 +1151,7 @@
             });
         });
         
-        // Quick action buttons
-        const quickActionButtons = document.querySelectorAll('.content-card .special-button');
-        quickActionButtons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const actions = [
-                    "Opening new entry form...",
-                    "Loading today's tasks...",
-                    "Generating farm reports...",
-                    "Opening feed calculator..."
-                ];
-                
-                if (index < actions.length) {
-                    alert(actions[index]);
-                }
-            });
-        });
+        
     </script>
 
     
