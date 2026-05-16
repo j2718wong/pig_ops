@@ -544,7 +544,6 @@ def get_app_version():
 controller.APP_VERSION = get_app_version()
 
 
-
 print('\n\nSuperPig APP_VERSION = %s\n\n' % controller.APP_VERSION)
 
 
