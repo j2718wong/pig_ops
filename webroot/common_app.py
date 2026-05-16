@@ -431,11 +431,6 @@ adrs_level_mngr = AddressManager(logger)
 
 
 
-
-
-
-
-
 def get_is_prod_environment():
     """
     This may change in the future; currently this is temporary
