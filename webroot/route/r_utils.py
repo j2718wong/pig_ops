@@ -387,11 +387,12 @@ def replace_plain_ids_account(data):
     data['account']['hid']   = cur_hid
     
     
-    cur_id  = data['account']['country']['id']
-    cur_hid = hashids_common.encrypt(cur_id)
-    
-    del data['account']['country']['id']
-    data['account']['country']['hid']   = cur_hid
+    if 'country' in data['account']:
+        cur_id  = data['account']['country']['id']
+        cur_hid = hashids_common.encrypt(cur_id)
+        
+        del data['account']['country']['id']
+        data['account']['country']['hid']   = cur_hid
     
     
     if 'current_bill' in data['account']: 

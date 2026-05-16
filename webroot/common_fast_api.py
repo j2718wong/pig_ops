@@ -98,6 +98,8 @@ tags_metadata = [
     
     {"name": "System",          "description": "System"},
     
+    {"name": "Admin",           "description": "Admin related"},
+    
     {"name": "HashIds",         "description": "HashIds Testing"}
 ]
 
@@ -260,18 +262,40 @@ GOOGLE_CLIENT_SECRET    = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI     = '/auth/google/callback'
 
 
-# This is in separate directory
+# This is in separate directory; This is the directory of the pig_ops_ui_mob repo
+# This should be in absolute path.
 FRONT_END_DIRECTORY = os.getenv('FRONT_END_DIRECTORY')
 
 
-# JS bundles
+# This is in separate directory; This is the directory of the pig_ops_admin repo
+# This should be in absolute path.
+FRONT_END_DIRECTORY_ADMIN = os.getenv('FRONT_END_DIRECTORY_ADMIN')
+
+
+
+# ============= EXISTING (DO NOT CHANGE - Breaks production) =============
+# SPA application JS bundles
 dir_static = '%s/static' % FRONT_END_DIRECTORY
 app.mount('/static', StaticFiles(directory=dir_static), name='static')
 
 
-# New mobile first static directory
+# SPA application static directory
 dir_static_m = '%s/src/static' % FRONT_END_DIRECTORY
 app.mount('/static_m', StaticFiles(directory=dir_static_m), name='static_m')
+
+
+
+
+# ============= ADMIN PAGES (Clear naming) =============
+# Admin application JS bundles (production)
+dir_admin_static = '%s/static' % FRONT_END_DIRECTORY_ADMIN
+app.mount('/admin/static', StaticFiles(directory=dir_admin_static), name='admin_static')
+
+# Admin application source directory (development)
+dir_admin_src = '%s/src/static' % FRONT_END_DIRECTORY_ADMIN
+app.mount('/admin/dev', StaticFiles(directory=dir_admin_src), name='admin_dev')
+
+
 
 
 

@@ -18,44 +18,6 @@ from base_model             import BaseModel
 
 
 
-"""
-account.flag bits
-
-bit 0: FLAG_BIT_ACCOUNT_ENABLE
-bit 1: FLAG_BIT_FREE_TRIAL_FINISHED
-bit 2:
-bit 3:  
-
-bit 4:  FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
-0 = not exempted has to pay bill
-1 = exempted
-
-
-
-bit 16: COMPANY_OWNED ACCOUNT
-"""
-
-FLAG_BIT_ACCOUNT_ENABLE                 = 1
-FLAG_BIT_FREE_TRIAL_FINISHED            = 2
-
-FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 1<<4
-            
-
-FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED       = 1<<16
-
-
-
-
-
-FLAG_BIT_USER_IS_ACTIVE                 = 1
-FLAG_BIT_USER_EMAIL_VERIFIED            = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
-FLAG_BIT_USER_IS_DELETED                = 8
-                                        
-FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
-
-
-
 # The account.flag_settings will be broken down so that
 # it will be easier to read in the application level.
 # See account_register.sql for updated flag bits definition.
@@ -357,7 +319,19 @@ class Account(BaseModel):
 
             if cur_acc_current_bill_id == 0:
                 del cur_entry['account']['current_bill']
-
+            
+            
+            # Special case for Company owned  account with no pigs or farm.
+            # For admin only.
+            if cur_acc_flag & FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED > 0:
+                del cur_entry['account']['count_sow_boar']  
+                del cur_entry['account']['count_pig_prod']  
+                                 
+                del cur_entry['account']['date_trial_start']
+                del cur_entry['account']['date_trial_end']
+                del cur_entry['account']['country']
+                
+                del cur_entry['settings_operations']
 
             
             # Get Farm List

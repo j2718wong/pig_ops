@@ -16,25 +16,6 @@ if module_directory not in sys.path:
 from base_model             import BaseModel
 
 
-#/* user.flag bits*/
-FLAG_BIT_USER_IS_ACTIVE                 = 1
-FLAG_BIT_USER_EMAIL_VERIFIED            = 2
-FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
-FLAG_BIT_USER_IS_DELETED                = 8
-
-FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
-FLAG_BIT_USER_IS_INTERNAL_DATA_ENTRY    = 32
-FLAG_BIT_USER_IS_INTERNAL_FINANCE       = 64
-FLAG_BIT_USER_IS_TEST_USER              = 128
-
-FLAG_BIT_USER_IS_SYS_ADMIN              = 256
-
-
-#/* account.flag bits */
-FLAG_BIT_ACCOUNT_ENABLE                 = 1
-FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT = 16
-
-
 
 class User(BaseModel):
     def __init__(self, model):
@@ -76,10 +57,11 @@ class User(BaseModel):
             user_is_email_verified      = 1 if cur_user_flag & FLAG_BIT_USER_EMAIL_VERIFIED > 0 else 0
             user_is_mobile_verified     = 1 if cur_user_flag & FLAG_BIT_USER_MOBILE_NUM_VERIFIED > 0 else 0
             user_is_deleted             = 1 if cur_user_flag & FLAG_BIT_USER_IS_DELETED > 0 else 0
+            
             user_is_account_admin       = 1 if cur_user_flag & FLAG_BIT_USER_IS_ACCOUNT_ADMIN > 0 else 0
             
             acc_is_enabled              = 1 if cur_account_flag & FLAG_BIT_ACCOUNT_ENABLE > 0 else 0
-            acc_is_company_owned        = 1 if cur_account_flag & FLAG_BIT_FLAG_BIT_COMPANY_OWNED_ACCOUNT > 0 else 0
+            acc_is_company_owned        = 1 if cur_account_flag & FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED > 0 else 0
             
             cur_entry = {
                 'user': {
@@ -587,6 +569,9 @@ class User(BaseModel):
         ]
         
         rows = self._call_procedure('user_verify_email', params)
+        
+        sql = self._generate_debug_procedure('user_verify_email', params)
+ 
         
         if rows is None:
             return None

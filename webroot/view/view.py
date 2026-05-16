@@ -39,7 +39,7 @@ if module_directory not in sys.path:
 
 from jinja2             import Environment, FileSystemLoader
 
-from common_fast_api    import dir_static, dir_static_m, get_application_data
+from common_fast_api    import dir_static, dir_static_m, dir_admin_static, get_application_data
 
 
 from datetime           import datetime
@@ -87,92 +87,120 @@ class ViewBase:
         self.view = view
         self.controller = view.controller
         
+        # SPA (Farmer App) paths
         self.manifest_path      = dir_static + '/js/manifest.json'
         self.css_manifest_path  = dir_static + '/css/manifest.json'
-        self.default_manifest   = {
+        
+        # Admin App paths
+        self.admin_manifest_path = dir_admin_static + '/js/manifest.json'
+        
+        self.default_manifest = {
             'login':                'bundle.min.js',
             'core':                 'bundle.core.min.js',
             'receipt_data_entry':   'bundle.receipt_data_entry.min.js',  
-            'main_css':             'main.min.css'  # Default CSS fallback
+            'main_css':             'main.min.css'
         }
         
-        self.is_dev = False
-        
-        if self.controller.is_prod_envi == False:
-            self.is_dev = True
-      
     
     
-    
-    def get_js_files(self, page_type = PAGE_TYPE_CORE_APP):
+    def get_js_files(self, page_type=PAGE_TYPE_CORE_APP):
         """
         Return appropriate JS files based on environment
         """
-        if self.is_dev == True:
-            # DEVELOPMENT: Return all individual modules for easy debugging
-            return self._get_dev_js_files(page_type)
-        else:
-            # PRODUCTION: Return minified bundle
-            if self.controller.use_minified_js > 0:
-                return self._get_prod_js_files(page_type)
-            
-            # Overide to not to use minified JS
-            return self._get_dev_js_files(page_type)
-            
-            
+        # Admin pages use separate build
+        if page_type == PAGE_TYPE_RECEIPT_DATA:
+            return self._get_admin_js_files(page_type)
+        
+        if self.controller.use_minified_js > 0:
+            return self._get_prod_js_files(page_type)
+        
+        return self._get_dev_js_files(page_type)
     
-    def _get_prod_js_files(self, page_type = PAGE_TYPE_CORE_APP):
-        """Production: just the minified bundle"""
+    
+    def _get_admin_js_files(self, page_type=PAGE_TYPE_RECEIPT_DATA):
+        """
+        Get admin app JS files (separate from SPA)
+        """
+        if self.controller.use_minified_js == 0:
+            # Development: use source file from admin repo
+            return {
+                'text':    [],
+                'module':  ["/admin/dev/js/app_receipt_data_entry.js"]
+            }
+        else:
+            # Production: use minified bundle with versioning
+            try:
+                if os.path.exists(self.admin_manifest_path):
+                    with open(self.admin_manifest_path, 'r') as f:
+                        manifest = json.load(f)
+                    
+                    filename = manifest.get(page_type, self.default_manifest.get(page_type, 'bundle.receipt_data_entry.min.js'))
+                    
+                    return {
+                        'text':    [f"/admin/static/js/{filename}"],
+                        'module':  []
+                    }
+            except Exception as e:
+                print(f"Error reading admin manifest: {e}")
+            
+            # Fallback to non-versioned file
+            return {
+                'text':    ["/admin/static/js/bundle.receipt_data_entry.min.js"],
+                'module':  []
+            }
+    
+    
+    def _get_prod_js_files(self, page_type=PAGE_TYPE_CORE_APP):
+        """Production: just the minified bundle for SPA"""
         try:
             if os.path.exists(self.manifest_path):
                 with open(self.manifest_path, 'r') as f:
                     manifest = json.load(f)
                 
-                
                 filename = manifest.get(page_type, self.default_manifest[page_type])
                 
-
                 return {
                     'text':    [f"/static/js/{filename}"],
                     'module':  []
                 }
         except:
             pass
-            
-
+        
         return {
             'text':    [f"/static/js/{self.default_manifest[page_type]}"],
             'module':  []
         }
-        
-        
     
-    def _get_dev_js_files(self, page_type = PAGE_TYPE_CORE_APP):
+    
+    def _get_dev_js_files(self, page_type=PAGE_TYPE_CORE_APP):
         """Development: return all individual modules for debugging"""
         if page_type == PAGE_TYPE_LOGIN:
-            # Login page modules
             return {
                 'text':    [],
                 'module':  ["/static_m/js/app.js"]
             }
-            
+        
         if page_type == PAGE_TYPE_CORE_APP:
-            # Core navigation and all other modules
             return {
                 'text':     [],
                 'module':  ["/static_m/js/app_core.js"]
             }
-            
+        
         if page_type == PAGE_TYPE_RECEIPT_DATA:
-            # Receipt data entry and all other modules
+            # This shouldn't reach here anymore (handled by _get_admin_js_files)
             return {
                 'text':     [],
-                'module':  ["/static_m/js/admin_receipt_data_entry.js"]
+                'module':  ["/admin/dev/js/app_receipt_data_entry.js"]
             }
-    
+        
+        # Default fallback
+        return {
+            'text':     [],
+            'module':   []
+        }
     
     def get_manifest(self):
-        """Always read manifest from disk - simplest, always fresh"""
+        """Always read manifest from disk for SPA"""
         manifest_path = dir_static + '/js/manifest.json'
         
         try:
@@ -182,10 +210,23 @@ class ViewBase:
         except Exception as e:
             print(f"Error reading manifest: {e}")
         
-        # Fallback defaults
         return {
             'login': 'bundle.min.js',
             'core': 'bundle.core.min.js'
+        }
+    
+    
+    def get_admin_manifest(self):
+        """Read admin app manifest"""
+        try:
+            if os.path.exists(self.admin_manifest_path):
+                with open(self.admin_manifest_path, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Error reading admin manifest: {e}")
+        
+        return {
+            'receipt_data_entry': 'bundle.receipt_data_entry.min.js'
         }
     
     
@@ -198,7 +239,6 @@ class ViewBase:
         except Exception as e:
             print(f"Error reading CSS manifest: {e}")
         
-        # Fallback defaults
         return {
             'main_css': 'main.min.css'
         }
@@ -207,20 +247,13 @@ class ViewBase:
     def get_css_files(self):
         """
         Return appropriate CSS files based on environment
-        Returns list of CSS files to include
         """
-        if self.is_dev:
-            # DEVELOPMENT: Return original CSS for debugging
-            return ["/static_m/css/main.css"]
+        if self.controller.use_minified_js > 0:
+            manifest = self.get_css_manifest()
+            css_file = manifest.get('main_css', self.default_manifest['main_css'])
+            return [f"/static/css/{css_file}"]
         else:
-            # PRODUCTION: Return versioned/minified CSS
-            if self.controller.use_minified_js > 0:
-                manifest = self.get_css_manifest()
-                css_file = manifest.get('main_css', self.default_manifest['main_css'])
-                return [f"/static/css/{css_file}"]
-            else:
-                # Override to use unminified CSS
-                return ["/static_m/css/main.css"]
+            return ["/static_m/css/main.css"]
     
     
     
@@ -253,8 +286,8 @@ class SignUp(ViewBase):
         data    = { 'page_data':        page_data,
                     'js_lib':           [],
                     'js_app_text':      files['text'],
-                    'js_app_modules':   files['module'],
-                    'is_dev':           self.is_dev}
+                    'js_app_modules':   files['module']
+                    }
         
                 
         return template.render(data)
@@ -652,7 +685,6 @@ class Root(ViewBase):
                         'js_lib':           js_lib,
                         'js_app_text':      js_app_text,
                         'js_app_modules':   js_app_modules,
-                        'is_dev':           self.is_dev,
                         'home_translation': home_translation
                     }
             

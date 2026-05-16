@@ -124,6 +124,48 @@ DEFAULT_KG_PER_FEED_UNIT = {
 
 
 
+"""
+account.flag bits
+
+bit 0: FLAG_BIT_ACCOUNT_ENABLE
+bit 1: FLAG_BIT_FREE_TRIAL_FINISHED
+bit 2:
+bit 3:  
+
+bit 4:  FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED
+0 = not exempted has to pay bill
+1 = exempted
+
+
+bit 6: COMPANY_OWNED ACCOUNT
+"""
+
+FLAG_BIT_ACCOUNT_ENABLE                 = 1
+FLAG_BIT_FREE_TRIAL_FINISHED            = 2
+
+FLAG_BIT_ACCOUNT_IS_BILL_EXEMPTED       = 16
+FLAG_BIT_ACCOUNT_IS_TEST_ACCOUNT        = 32
+FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED       = 64
+
+
+
+
+
+#/* user.flag bits*/
+FLAG_BIT_USER_IS_ACTIVE                 = 1
+FLAG_BIT_USER_EMAIL_VERIFIED            = 2
+FLAG_BIT_USER_MOBILE_NUM_VERIFIED       = 4
+FLAG_BIT_USER_IS_DELETED                = 8
+
+FLAG_BIT_USER_IS_ACCOUNT_ADMIN          = 16
+FLAG_BIT_USER_IS_INTERNAL_DATA_ENTRY    = 32
+FLAG_BIT_USER_IS_INTERNAL_FINANCE       = 64
+FLAG_BIT_USER_IS_TEST_USER              = 128
+
+FLAG_BIT_USER_IS_SYS_ADMIN              = 256
+
+
+
 REQUEST_ACCESS_DENIED    = "Access denied"
 
 
@@ -411,6 +453,12 @@ ERROR_REPORT_READ_ERROR                             = 0x155
 
 ERROR_ACCOUNT_BILL_INVALID_USER_HASHID              = 0x160
 ERROR_ACCOUNT_BILL_INVALID_HASHID                   = 0x161
+
+
+
+ERROR_ADMIN_INVALID_USER_HASHID                     = 0x180
+ERROR_ADMIN_INVALID_ACCOUNT                         = 0x181
+ERROR_ADMIN_INVALID_USER                            = 0x182
 
 
 

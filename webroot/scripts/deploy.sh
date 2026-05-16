@@ -1,4 +1,5 @@
 #!/bin/bash
+# deploy.sh
 # SuperPig Complete Deployment Script
 # Run this whenever you need to deploy updates
 
@@ -19,14 +20,11 @@ DEPLOY_LOG_DIR="/root/projects/jsys/deploy_logs"
 mkdir -p "$DEPLOY_LOG_DIR"
 
 # ============= LOG ROTATION: KEEP ONLY LAST 3 =============
-# Delete old deployment logs, keep only the 3 most recent
 if [ -d "$DEPLOY_LOG_DIR" ]; then
-    # Count number of log files (excluding latest symlink)
     LOG_COUNT=$(ls -1 "$DEPLOY_LOG_DIR"/deploy_*.log 2>/dev/null | wc -l)
     
     if [ "$LOG_COUNT" -gt 3 ]; then
         echo "🧹 Cleaning up old deployment logs (keeping last 3)..."
-        # List files by modification time, skip the newest 3, delete the rest
         ls -1t "$DEPLOY_LOG_DIR"/deploy_*.log 2>/dev/null | tail -n +4 | while read old_log; do
             echo "   Removing: $(basename "$old_log")"
             rm -f "$old_log"
@@ -91,8 +89,9 @@ check_success() { if [ $? -eq 0 ]; then log_success "$1"; else log_error "$1"; e
 
 # ============= VERSION MANAGEMENT =============
 VERSION_FILE="/root/projects/jsys/version.txt"
+VERSION_ADMIN_FILE="/root/projects/jsys/version_admin.txt"
 
-# Read current version
+# Read current version (SPA)
 read_version() {
     if [ -f "$VERSION_FILE" ]; then
         IFS='.' read -r MAJOR DB_VER BACKEND_VER FRONTEND_VER < "$VERSION_FILE"
@@ -105,45 +104,83 @@ read_version() {
     fi
 }
 
-# Write version back
+# Write version back (SPA)
 write_version() {
     echo "$MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" > "$VERSION_FILE"
-    log_message "📦 Version updated to: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
+    log_message "📦 SPA version updated to: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
 }
 
-# Increment database version
+# Read admin version
+read_admin_version() {
+    if [ -f "$VERSION_ADMIN_FILE" ]; then
+        IFS='.' read -r MAJOR DB_VER BACKEND_VER ADMIN_VER < "$VERSION_ADMIN_FILE"
+    else
+        MAJOR=1
+        DB_VER=0
+        BACKEND_VER=0
+        ADMIN_VER=0
+        echo "$MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER" > "$VERSION_ADMIN_FILE"
+    fi
+}
+
+# Write admin version back
+write_admin_version() {
+    echo "$MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER" > "$VERSION_ADMIN_FILE"
+    log_message "📦 Admin version updated to: $MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER"
+}
+
+# Increment database version (shared between SPA and Admin)
 inc_db_version() {
     read_version
     DB_VER=$((DB_VER + 1))
     write_version
-    log_success "Database version incremented to $DB_VER"
+    
+    # Also update admin version with same DB_VER
+    read_admin_version
+    # Keep MAJOR, BACKEND_VER, ADMIN_VER same, update DB_VER
+    echo "$MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER" > "$VERSION_ADMIN_FILE"
+    log_success "Database version incremented to $DB_VER (SPA & Admin)"
 }
 
-# Increment backend version
+# Increment backend version (shared)
 inc_backend_version() {
     read_version
     BACKEND_VER=$((BACKEND_VER + 1))
     write_version
-    log_success "Backend version incremented to $BACKEND_VER"
+    
+    # Also update admin version with same BACKEND_VER
+    read_admin_version
+    echo "$MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER" > "$VERSION_ADMIN_FILE"
+    log_success "Backend version incremented to $BACKEND_VER (SPA & Admin)"
 }
 
-# Increment frontend version
+# Increment frontend version (SPA only)
 inc_frontend_version() {
     read_version
     FRONTEND_VER=$((FRONTEND_VER + 1))
     write_version
-    log_success "Frontend version incremented to $FRONTEND_VER"
+    log_success "Frontend (SPA) version incremented to $FRONTEND_VER"
+}
+
+# Increment admin version (Admin only)
+inc_admin_version() {
+    read_admin_version
+    ADMIN_VER=$((ADMIN_VER + 1))
+    write_admin_version
+    log_success "Admin version incremented to $ADMIN_VER"
 }
 # ================================================
 
 # Initialize flags and store commit hashes
 FRONTEND_CHANGED=false
 BACKEND_CHANGED=false
+ADMIN_CHANGED=false
 BUILD_NEEDED=false
 RESTART_NEEDED=false
 FRONTEND_COMMIT=""
 BACKEND_COMMIT=""
-BKOPS_COMMIT=""  # Added for bkops tracking
+ADMIN_COMMIT=""
+BKOPS_COMMIT=""
 
 # Store app log file path for summary
 APP_LOG_FILE=""
@@ -155,33 +192,28 @@ echo "Current directory: $(pwd)"
 check_success "Changed to project root"
 
 # 2️⃣ FRONTEND: Git pull and build if changes
-section "STEP 2: Updating frontend (pig_ops_ui_mob)"
+section "STEP 2: Updating frontend SPA (pig_ops_ui_mob)"
 if [ -d "pig_ops_ui_mob" ]; then
     cd pig_ops_ui_mob
     
-    # Get current commit hash before pull
     BEFORE_HASH=$(git rev-parse HEAD)
     echo "Current frontend commit: ${BEFORE_HASH:0:7}"
     
-    # Stash any local changes (optional)
     git stash > /dev/null 2>&1 || true
     
     echo "Pulling latest changes from Bitbucket..."
     git pull origin main
     
-    # Get new commit hash after pull
     AFTER_HASH=$(git rev-parse HEAD)
     FRONTEND_COMMIT="$AFTER_HASH"
     echo "New frontend commit: ${AFTER_HASH:0:7}"
     
-    # Check if changes were pulled
     if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
         FRONTEND_CHANGED=true
         BUILD_NEEDED=true
-        RESTART_NEEDED=true  # Frontend changes affect templates, so restart needed
+        RESTART_NEEDED=true
         log_success "Frontend changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
         
-        # Show summary of changes
         echo ""
         echo "📋 Frontend changes:"
         git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
@@ -190,32 +222,28 @@ if [ -d "pig_ops_ui_mob" ]; then
         FRONTEND_COMMIT="$BEFORE_HASH"
     fi
     
-    # Go back to project root
     cd /root/projects/jsys
 else
     log_error "pig_ops_ui_mob directory not found!"
     exit 1
 fi
 
-# 3️⃣ BUILD FRONTEND (only if changes detected)
-section "STEP 3: Building frontend JS bundles"
+# 3️⃣ BUILD FRONTEND SPA (only if changes detected)
+section "STEP 3: Building frontend SPA bundles"
 if [ "$BUILD_NEEDED" = true ]; then
     cd pig_ops_ui_mob
     
-    # Activate virtual environment
     source /root/projects/jsys/.venv/bin/activate 2>/dev/null || true
     
     if [ -f "build.py" ]; then
         echo "Building JavaScript bundles (changes detected)..."
         
-        # Build with versioning
         echo "Running: python build.py --version"
         python build.py --version
         
         if [ $? -eq 0 ]; then
-            log_success "Frontend JS bundles built successfully"
+            log_success "Frontend SPA bundles built successfully"
             
-            # Show generated files
             echo ""
             echo "📦 Generated files in static/js/:"
             ls -la static/js/ | grep -E "bundle.*\.min\.js|manifest\.json" | sed 's/^/   /'
@@ -224,20 +252,16 @@ if [ "$BUILD_NEEDED" = true ]; then
             echo "📦 Generated files in static/css/:"
             ls -la static/css/ 2>/dev/null | grep -E "main.*\.min\.css|manifest\.json" | sed 's/^/   /' || echo "   No CSS files found"
             
-            # Increment frontend version
             inc_frontend_version
         else
-            log_error "Frontend build failed!"
+            log_error "Frontend SPA build failed!"
             exit 1
         fi
     else
         log_warning "build.py not found - skipping JS build"
     fi
     
-    # Deactivate virtual environment
     deactivate 2>/dev/null || true
-    
-    # Go back to project root
     cd /root/projects/jsys
 else
     log_success "No frontend changes - skipping build"
@@ -261,69 +285,121 @@ section "STEP 5: Updating backend (pig_ops)"
 if [ -d "pig_ops" ]; then
     cd pig_ops
     
-    # Get current commit hash before pull
     BEFORE_HASH=$(git rev-parse HEAD)
     echo "Current backend commit: ${BEFORE_HASH:0:7}"
     
-    # Stash any local changes (optional)
     git stash > /dev/null 2>&1 || true
     
     echo "Pulling latest changes from Bitbucket..."
     git pull origin main
     
-    # Get new commit hash after pull
     AFTER_HASH=$(git rev-parse HEAD)
     BACKEND_COMMIT="$AFTER_HASH"
     echo "New backend commit: ${AFTER_HASH:0:7}"
     
-    # Check if changes were pulled
     if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
         BACKEND_CHANGED=true
         RESTART_NEEDED=true
         log_success "Backend changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
         
-        # Show summary of changes
         echo ""
         echo "📋 Backend changes:"
         git log --oneline --decorate --stat HEAD@{1}..HEAD | head -10
         
-        # Increment backend version
         inc_backend_version
     else
         log_success "No backend changes detected (already up to date)"
         BACKEND_COMMIT="$BEFORE_HASH"
     fi
     
-    # Go back to project root
     cd /root/projects/jsys
 else
     log_error "pig_ops directory not found!"
     exit 1
 fi
 
-# ============= NEW: UPDATE BACKGROUND OPS (pig_ops_bkops) =============
-section "STEP 5.1: Updating background ops (pig_ops_bkops)"
+# ============= ADMIN APP: Git pull and build =============
+section "STEP 5.1: Updating admin app (pig_ops_admin)"
+ADMIN_DIR="/root/projects/jsys/pig_ops_admin"
+if [ -d "$ADMIN_DIR" ]; then
+    cd "$ADMIN_DIR"
+    
+    # Check if it's a git repo
+    if [ -d ".git" ]; then
+        BEFORE_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no_commits")
+        echo "Current admin commit: ${BEFORE_HASH:0:7}"
+        
+        echo "Pulling latest changes from Bitbucket..."
+        git pull origin main 2>/dev/null || echo "   No changes or not a git repo"
+        
+        AFTER_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no_commits")
+        ADMIN_COMMIT="$AFTER_HASH"
+        echo "New admin commit: ${AFTER_HASH:0:7}"
+        
+        if [ "$BEFORE_HASH" != "no_commits" ] && [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
+            ADMIN_CHANGED=true
+            RESTART_NEEDED=true  # Admin is separate, but templates may need refresh
+            log_success "Admin changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
+        else
+            log_success "No admin changes detected"
+            ADMIN_COMMIT="$BEFORE_HASH"
+        fi
+    else
+        log_warning "pig_ops_admin is not a git repository"
+        ADMIN_COMMIT="no_git"
+    fi
+    
+    # Build admin if changes detected OR build_admin.py exists and we want fresh build
+    if [ "$ADMIN_CHANGED" = true ]; then
+        echo "Building admin bundles..."
+        
+        source /root/projects/jsys/.venv/bin/activate 2>/dev/null || true
+        
+        if [ -f "build_admin.py" ]; then
+            python build_admin.py --version
+            if [ $? -eq 0 ]; then
+                log_success "Admin JS bundles built successfully"
+                inc_admin_version
+            else
+                log_error "Admin build failed!"
+                exit 1
+            fi
+        else
+            log_warning "build_admin.py not found - copying source directly"
+            # Fallback: copy source file directly
+            mkdir -p static/js
+            cp src/static/js/admin_receipt_data_entry.js static/js/ 2>/dev/null || true
+        fi
+        
+        deactivate 2>/dev/null || true
+    else
+        log_success "No admin changes - skipping admin build"
+    fi
+    
+    cd /root/projects/jsys
+else
+    log_warning "pig_ops_admin directory not found at $ADMIN_DIR - skipping"
+fi
+# =========================================================
+
+# ============= BACKGROUND OPS (pig_ops_bkops) =============
+section "STEP 5.2: Updating background ops (pig_ops_bkops)"
 BKOPs_DIR="/root/projects/jsys/pig_ops_bkops"
 if [ -d "$BKOPs_DIR" ]; then
     cd "$BKOPs_DIR"
     
-    # Get current commit hash before pull
     BEFORE_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no_commits")
     echo "Current bkops commit: ${BEFORE_HASH:0:7}"
     
     echo "Pulling latest changes from Bitbucket..."
     git pull origin main 2>/dev/null || echo "   No changes or not a git repo"
     
-    # Get new commit hash after pull
     AFTER_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no_commits")
     BKOPS_COMMIT="$AFTER_HASH"
     echo "New bkops commit: ${AFTER_HASH:0:7}"
     
-    # Check if changes were pulled (only if we have commits)
     if [ "$BEFORE_HASH" != "no_commits" ] && [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
         log_success "Background ops changes detected (${BEFORE_HASH:0:7} → ${AFTER_HASH:0:7})"
-        # Note: bkops runs independently, no need to restart main app
-        # No version tracking for bkops
     else
         log_success "No background ops changes detected"
         BKOPS_COMMIT="$BEFORE_HASH"
@@ -335,18 +411,15 @@ else
 fi
 # =========================================================
 
-# 5.2️⃣ INSTALL/UPDATE PYTHON PACKAGES
-section "STEP 5.2: Installing/updating Python packages"
+# 5.3️⃣ INSTALL/UPDATE PYTHON PACKAGES
+section "STEP 5.3: Installing/updating Python packages"
 cd pig_ops
 
-# Check if requirements.txt exists
 if [ -f "requirements.txt" ]; then
-    # Activate virtual environment
     source /root/projects/jsys/.venv/bin/activate
     
     echo "Checking for Python package changes..."
     
-    # Check if requirements.txt has changed since last deploy
     REQ_HASH_FILE="/root/projects/jsys/.requirements_hash"
     CURRENT_HASH=$(md5sum requirements.txt | cut -d' ' -f1)
     
@@ -354,21 +427,13 @@ if [ -f "requirements.txt" ]; then
         echo "✅ requirements.txt unchanged - skipping package installation"
     else
         echo "📦 requirements.txt changed - installing/updating packages..."
-        echo "   This may take a moment..."
         
-        # Install/update packages from requirements.txt
         pip install --upgrade -r requirements.txt
         
-        # Show what was installed (optional)
-        echo "   Latest packages installed:"
-        pip list | grep -E "$(cat requirements.txt | grep -v '^#' | cut -d'=' -f1 | tr '\n' '|' | sed 's/|$//')" 2>/dev/null || true
-        
-        # Save hash for next run
         echo "$CURRENT_HASH" > "$REQ_HASH_FILE"
         log_success "Python packages updated"
     fi
     
-    # Deactivate virtual environment
     deactivate
 else
     log_warning "requirements.txt not found - skipping package installation"
@@ -378,13 +443,12 @@ cd /root/projects/jsys
 # =========================================================
 
 # ============= RUN DATABASE MIGRATIONS =============
-section "STEP 5.3: Running database migrations"
+section "STEP 5.4: Running database migrations"
 
 DB_REPO_DIR="/root/projects/jsys/pig_ops_db"
 MIGRATION_APPLIED_FILE="/root/.db_migrations_prod_last_run"
 OLD_TIMESTAMP=""
 
-# Store old timestamp if exists
 if [ -f "$MIGRATION_APPLIED_FILE" ]; then
     OLD_TIMESTAMP=$(cat "$MIGRATION_APPLIED_FILE")
 fi
@@ -392,29 +456,24 @@ fi
 if [ -d "$DB_REPO_DIR" ]; then
     cd "$DB_REPO_DIR"
     
-    # Pull latest database changes
     echo "Pulling latest database changes from Bitbucket..."
     git pull origin main
     check_success "Database git pull completed"
     
-    # Run migrations for production
     if [ -f "migrate.sh" ]; then
         echo "Running database migrations..."
         
-        # Temporarily disable exit-on-error to prevent migration from killing script
         set +e
         ./migrate.sh prod
         MIGRATION_EXIT=$?
         set -e
         
-        # Check if new timestamp was created (meaning migrations were applied)
         NEW_TIMESTAMP=""
         if [ -f "$MIGRATION_APPLIED_FILE" ]; then
             NEW_TIMESTAMP=$(cat "$MIGRATION_APPLIED_FILE")
         fi
         
         if [ $MIGRATION_EXIT -eq 0 ]; then
-            # Compare timestamps to see if migrations were actually applied
             if [ "$OLD_TIMESTAMP" != "$NEW_TIMESTAMP" ]; then
                 log_success "Database migrations applied"
                 inc_db_version
@@ -499,7 +558,6 @@ if [ "$RESTART_NEEDED" = true ]; then
             echo $APP_PID > /root/projects/jsys/app.pid
             echo "  💾 PID saved"
             
-            # 🔗 CREATE SYMLINK TO CURRENT APP LOG (FIX)
             cd logs
             ln -sf "$(basename "$APP_LOG_FILE")" current.log
             cd ..
@@ -540,7 +598,7 @@ else
     log_warning "manage_logs.py not found - skipping log management"
 fi
 
-# 🔟 SHOW APP LOG PREVIEW (always show if app is running)
+# 🔟 SHOW APP LOG PREVIEW
 section "STEP 10: App Log Preview"
 if [ -n "$APP_LOG_FILE" ] && [ -f "pig_ops/webroot/$APP_LOG_FILE" ]; then
     echo "📋 Last 20 lines of app log ($APP_LOG_FILE):"
@@ -551,7 +609,6 @@ if [ -n "$APP_LOG_FILE" ] && [ -f "pig_ops/webroot/$APP_LOG_FILE" ]; then
     echo "🔍 To follow logs in real-time:"
     echo "   tail -f /root/projects/jsys/pig_ops/webroot/logs/current.log"
 elif [ -f "pig_ops/webroot/logs/current.log" ]; then
-    # Fallback to current.log symlink if exists
     echo "📋 Last 20 lines of current app log:"
     echo "----------------------------------------"
     tail -20 "pig_ops/webroot/logs/current.log" 2>/dev/null | sed 's/^/   /' || echo "   No logs available"
@@ -560,7 +617,6 @@ elif [ -f "pig_ops/webroot/logs/current.log" ]; then
     echo "🔍 To follow logs in real-time:"
     echo "   tail -f /root/projects/jsys/pig_ops/webroot/logs/current.log"
 else
-    # Try to find the most recent log file
     LATEST_LOG=$(ls -t /root/projects/jsys/pig_ops/webroot/logs/app_*.log 2>/dev/null | head -1)
     if [ -n "$LATEST_LOG" ]; then
         echo "📋 Last 20 lines of most recent log ($(basename "$LATEST_LOG")):"
@@ -581,33 +637,42 @@ echo -e "${GREEN}Started at: $(date)${NC}"
 echo -e "${GREEN}Completed at: $(date)${NC}"
 echo ""
 
-# Read final version for summary
+# Read final versions for summary
 read_version
+read_admin_version
+
 echo "📊 Summary:"
-echo "  • Frontend changes: $FRONTEND_CHANGED"
-echo "  • Frontend build: $BUILD_NEEDED"
+echo "  • Frontend changes (SPA): $FRONTEND_CHANGED"
+echo "  • Frontend build (SPA): $BUILD_NEEDED"
 echo "  • Backend changes: $BACKEND_CHANGED"
+echo "  • Admin changes: $ADMIN_CHANGED"
 echo "  • Background ops pull: performed"
 echo "  • Database migrations: applied"
 echo "  • Restart performed: $RESTART_NEEDED"
-echo "  • App Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
+echo ""
+echo "📦 Version Numbers:"
+echo "  • SPA Version:   $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
+echo "  • Admin Version: $MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER"
+
 if [ "$RESTART_NEEDED" = true ]; then
+    echo ""
     echo "  • App PID: $APP_PID"
     echo "  • App log: /root/projects/jsys/pig_ops/webroot/$APP_LOG_FILE"
     echo "  • App log symlink: logs/current.log"
 else
-    echo "  • App: Already running (no changes)"
-    # Find current app PID
+    echo ""
     CURRENT_PID=$(pgrep -f "python.*pig_ops_web.py" | head -1)
     if [ -n "$CURRENT_PID" ]; then
         echo "  • App PID: $CURRENT_PID"
     fi
 fi
+
 echo ""
 echo "📝 Git Commit Hashes:"
-echo "  • Frontend:       ${FRONTEND_COMMIT:0:8}"
-echo "  • Backend:        ${BACKEND_COMMIT:0:8}"
-echo "  • Background Ops: ${BKOPS_COMMIT:0:8}"
+echo "  • Frontend (SPA):   ${FRONTEND_COMMIT:0:8}"
+echo "  • Backend:          ${BACKEND_COMMIT:0:8}"
+echo "  • Admin:            ${ADMIN_COMMIT:0:8}"
+echo "  • Background Ops:   ${BKOPS_COMMIT:0:8}"
 echo ""
 echo "📝 Deployment Logs:"
 echo "  • This log: $DEPLOY_LOG_FILE"
@@ -625,17 +690,19 @@ echo ""
 echo "" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
 echo "✅ Deployment completed at $(date)" >> "$DEPLOY_LOG_FILE"
-echo "   Frontend changed: $FRONTEND_CHANGED" >> "$DEPLOY_LOG_FILE"
+echo "   Frontend changed (SPA): $FRONTEND_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Backend changed: $BACKEND_CHANGED" >> "$DEPLOY_LOG_FILE"
+echo "   Admin changed: $ADMIN_CHANGED" >> "$DEPLOY_LOG_FILE"
 echo "   Frontend commit: ${FRONTEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
 echo "   Backend commit: ${BACKEND_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
+echo "   Admin commit: ${ADMIN_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
 echo "   Background ops commit: ${BKOPS_COMMIT:0:8}" >> "$DEPLOY_LOG_FILE"
-echo "   App Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" >> "$DEPLOY_LOG_FILE"
+echo "   SPA Version: $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER" >> "$DEPLOY_LOG_FILE"
+echo "   Admin Version: $MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER" >> "$DEPLOY_LOG_FILE"
 echo "   Restart needed: $RESTART_NEEDED" >> "$DEPLOY_LOG_FILE"
 echo "========================================" >> "$DEPLOY_LOG_FILE"
 
-# Force log rotation by removing any remaining old logs that might have been missed
-# This runs again to ensure only 3 remain
+# Force log rotation
 cd "$DEPLOY_LOG_DIR"
 ls -1t deploy_*.log 2>/dev/null | tail -n +4 | while read old_log; do
     rm -f "$old_log"

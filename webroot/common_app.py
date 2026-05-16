@@ -104,6 +104,7 @@ from model.m_report             import Report
 
 from model.m_system             import System
 
+from model.m_admin              import Admin
 
 from route.controller           import Controller
 
@@ -178,7 +179,9 @@ model_names_pig_ops = [
     
     ('report',                  Report),
     
-    ('system',                  System)
+    ('system',                  System),
+    
+    ('admin',                   Admin)
  
 ]
 
