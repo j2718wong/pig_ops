@@ -21,12 +21,12 @@ FILE_CONFIGS = {
     '.py': {
         'comment_start': '# ',
         'comment_end': '',
-        'pattern': r'^# .*\.py$'
+        'pattern': r'^# [a-zA-Z0-9_\-\.]+\.py$'  # More specific: must end with .py
     },
     '.js': {
         'comment_start': '// ',
         'comment_end': '',
-        'pattern': r'^// .*\.js$'
+        'pattern': r'^// [a-zA-Z0-9_\-\.]+\.js$'  # More specific: must end with .js
     }
 }
 
@@ -39,7 +39,7 @@ def get_filename_comment(file_path, file_ext):
     return f"{config['comment_start']}{filename}{config['comment_end']}"
 
 
-def has_filename_comment(content, file_ext):
+def has_filename_comment(content, file_ext, filename):
     """Check if the file already has a filename comment at the top."""
     if not content:
         return False
@@ -47,21 +47,39 @@ def has_filename_comment(content, file_ext):
     config = FILE_CONFIGS[file_ext]
     lines = content.split('\n')
     
-    # Check first non-empty line
-    for line in lines:
-        if line.strip():  # Skip empty lines
-            # Check if line matches the pattern
-            if re.match(config['pattern'], line.strip()):
+    # Check first few lines (skip empty lines, shebang, encoding)
+    for line in lines[:10]:  # Check first 10 lines max
+        stripped = line.strip()
+        if not stripped:
+            continue
+        
+        # Skip shebang for Python
+        if file_ext == '.py' and stripped.startswith('#!'):
+            continue
+        
+        # Skip encoding declaration
+        if file_ext == '.py' and '# -*- coding:' in stripped:
+            continue
+        
+        # Check if line exactly matches the filename comment pattern
+        if re.match(config['pattern'], stripped):
+            return True
+        
+        # Also check if line contains the exact filename
+        if stripped.startswith(config['comment_start']):
+            comment_content = stripped[len(config['comment_start']):].strip()
+            if comment_content == filename:
                 return True
-            # Also check if line starts with comment and contains filename
-            # (more flexible check)
-            if line.strip().startswith(config['comment_start']):
-                # Extract the filename from the comment
-                comment_content = line.strip()[len(config['comment_start']):].strip()
-                if os.path.basename(comment_content) == os.path.basename(comment_content):
-                    # Looks like a filename
-                    return True
-            break  # Only check first non-empty line
+        
+        # If we find a comment that's not a filename comment, stop checking
+        # (This prevents false positives with date comments)
+        if stripped.startswith(config['comment_start']):
+            # This is a comment but not a filename comment
+            # Continue checking next lines for filename comment
+            continue
+        
+        # If we hit non-comment code, stop checking
+        break
     
     return False
 
@@ -77,7 +95,9 @@ def add_filename_comment(file_path, dry_run=False):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        if has_filename_comment(content, file_ext):
+        filename = os.path.basename(file_path)
+        
+        if has_filename_comment(content, file_ext, filename):
             return False, "Already has filename comment"
         
         # Generate the filename comment
@@ -217,7 +237,6 @@ Examples:
     %(prog)s /path/to/project           # Add comments to all .py and .js files
     %(prog)s . --dry-run                # Preview changes without modifying
     %(prog)s ./src --verbose            # Show detailed output
-    %(prog)s . --exclude tests/         # Skip tests directory
         """
     )
     

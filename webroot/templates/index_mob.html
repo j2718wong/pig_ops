@@ -82,11 +82,64 @@
         window.PUBLIC_VAPID_KEY = `{{ page_data.vapid_public_key }}`;
     </script>
 
+    <style>
+/* Offline Mode Floating Indicator - Bottom */
+.offline-mode-indicator {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #dc3545;
+    color: white;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    z-index: 10000;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.offline-mode-indicator.show {
+    transform: translateY(0);
+}
+
+.offline-mode-indicator i {
+    font-size: 16px;
+}
+
+.offline-mode-indicator .retry-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin-left: 8px;
+}
+
+.offline-mode-indicator .retry-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+    </style>
 
 </head>
 
 
 <body>
+    <div id="offlineIndicator" class="offline-mode-indicator">
+        <span id="offlineMessage">Offline Mode - No Internet Connection</span>
+        <button id="offlineRetryBtn" class="retry-btn" onclick="checkConnectionAndReload()">
+            <i class="fas fa-sync-alt"></i> Retry
+        </button>
+    </div>
+    
 <!-- Top Navigation Container -->
     <div class="top-nav-container">
         <!-- First Line Navigation -->
@@ -695,10 +748,6 @@
             <div>Please Wait</div>
         </div>
 
-        
-        <div id="container-no-connection"           class="" style="display:none;">
-            <span>No Internet connection.</span>
-        </div>
         
         <div id="container-my-account"              class="hidden-container" style="display:none;"></div>
         <div id="container-customer-pricing"        class="hidden-container" style="display:none;"></div>
