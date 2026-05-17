@@ -1280,6 +1280,15 @@
         // Check if there is a access_token stored
         const bearer_token = localStorage.getItem('access_token');
         
+
+        if (bearer_token && !navigator.onLine) {
+            console.log('Offline with token - redirecting to dashboard immediately');
+            window.location.href = '/';
+            // Stop execution
+            throw new Error('Redirecting offline');
+        }
+
+        
         if (bearer_token) {
             
             console.log('Token found, requesting authenticated homepage...');
