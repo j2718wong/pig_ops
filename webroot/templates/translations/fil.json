@@ -52,6 +52,11 @@
                     "title": "Recording sa feeds tracking per batch",
                     "desc": "Makaestimate pa ng kailanganing feeds sa given na petsa."
                 },
+                
+                "no_internet": {
+                    "title": "Pwede basahin ang data kahit walang internet",
+                    "desc": "Gumagana ang SuperPig App maski walang internet"
+                },
                         
                 "farm_reports": {
                     "title": "Mag gawa ng farm reports",

@@ -52,6 +52,11 @@
                     "title": "Recording sa lawog na konsumo kada batch",
                     "desc": "Maestimate pajud ang kinahanlanon na lawog sa kanus a na petsa sa kada batch."
                 },
+                
+                "no_internet": {
+                    "title": "Mabasa ra ang data maski walay internet",
+                    "desc": "Moandar ra ang SuperPig App maski walay internet"
+                },
                         
                 "farm_reports": {
                     "title": "Maka buhat ug farm reports",

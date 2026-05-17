@@ -52,6 +52,11 @@
                     "title": "Record feeds consumption  per production batch",
                     "desc": "Feed Balance and audit can be recorded anytime."
                 },
+                
+                "no_internet": {
+                    "title": "Can read pig data even without internet",
+                    "desc": "Has data access even without internet"
+                },
                         
                 "farm_reports": {
                     "title": "Generate Status Report for your Farm",

@@ -41,6 +41,11 @@
         },
         
         {
+            "image_key": "mar_no_internet",
+            "key": "no_internet"
+        },
+        
+        {
             "image_key": "mar_report",
             "key": "farm_reports"
         }
