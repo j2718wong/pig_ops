@@ -278,7 +278,7 @@ class EmailAccountNotStartedTrial(EmailTemplate):
                                     {html_message}
                                     
                                     <p style="color: {self.text_dark}; margin: 0 0 20px 0; font-size: 16px;">
-                                        Take a look at how {self.application_name} is used in managing and atomating your pig production data.
+                                        Take a look at how {self.application_name} is used in managing and automating your pig production data.
                                     </p>
                                     
                                     
@@ -337,7 +337,7 @@ class EmailAccountNotStartedTrial(EmailTemplate):
                                     
                                     <p style="color: {self.text_dark}; margin: 20px 0 10px 0; font-size: 16px;">
                                         All of these can be entered and viewed on your phone and shared with people connected to your farm.
-                                        We also provided local translations so that it is easily fro all people in your farm to follow.
+                                        We also provided local translations so that it is easily for all people in your farm to follow.
                                     </p>
                                     
                                     <p style="color: {self.text_dark}; margin: 20px 0 10px 0; font-size: 16px;">
