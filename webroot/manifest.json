@@ -2,7 +2,7 @@
   "name": "SuperPig",
   "short_name": "SuperPig",
   "description": "Pig Farm Management",
-  "start_url": "/",
+  "start_url": "/app?lang=en",
   "display": "standalone",
   "theme_color": "#1e3a8a",
   "background_color": "#ffffff",

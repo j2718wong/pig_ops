@@ -199,7 +199,7 @@ self.addEventListener('notificationclick', async (event) => {
                         const cache = await caches.open('superpig-pending');
                         await cache.put('pending-action', new Response(JSON.stringify(data_to_client)));
                     }
-                    return clients.openWindow('/');
+                    return clients.openWindow('/app');
                 }
             })
     );
