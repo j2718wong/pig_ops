@@ -320,9 +320,20 @@ strict_limit = RateLimiter(
 
 # Dependency function
 def get_current_uhid(request: Request) -> str:
-    token = request.headers.get("authorization", "").replace("Bearer ", "")
+    # Try Authorization header first (what /user/verify_token uses)
+    auth_header = request.headers.get("authorization", "")
+    token = auth_header.replace("Bearer ", "")
+    
+    # If not in header, try cookie
+    if not token:
+        token = request.cookies.get("access_token")
+    
+    # If not in cookie, try query parameter (for debugging)
+    if not token:
+        token = request.query_params.get("token")
     
     if not token:
+        print("get_current_uhid: No token found")
         return None
     
     try:
@@ -331,18 +342,14 @@ def get_current_uhid(request: Request) -> str:
         
         if uhid is None:
             return None
-            
+        
+        print(f"get_current_uhid: Found uhid = {uhid}")
+        
         return uhid
         
-    except jwt.ExpiredSignatureError:
-        # You might want different behavior for API vs web endpoints
-        return RedirectResponse(url="/login", status_code=302)
-        
-    except jwt.InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Invalid token"
-        )
+    except Exception as e:
+        print(f"get_current_uhid: Error - {e}")
+        return None
 
 
 

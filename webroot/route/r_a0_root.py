@@ -50,6 +50,12 @@ COMBINED_LACTATING_PIG_OPS  = (PIG_OPERATION_TYPE_LACTATING_PIGLETS,
                                 PIG_OPERATION_TYPE_LACTATING_SOW)
 
 
+@app.get("/test123", response_class=HTMLResponse)
+async def test_route(request: Request):
+    print("=== TEST ROUTE CALLED ===")
+    return HTMLResponse(content="<h1>TEST WORKS!</h1>")
+    
+
 @app.get("/manifest.json")
 async def manifest():
     return FileResponse("manifest.json", media_type="application/json")
@@ -336,11 +342,60 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
     
 
 
+@app.get("/app", response_class=HTMLResponse)
+async def spa_dashboard(request: Request, lang: str = None):
+    """
+    SPA Dashboard - requires authentication
+    Supports language parameter: /app?lang=bis
+    """
+    
+    uhid = get_current_uhid(request)
+    
+    if not uhid:
+        # No token, redirect to login with language
+        redirect_lang = lang or request.cookies.get("user_lang", "en")
+        url_lang_map = {'en': 'en', 'fil': 'tag', 'ceb': 'bis', 'zh': 'zh'}
+        url_lang = url_lang_map.get(redirect_lang, 'en')
+        return RedirectResponse(url=f"/login?lang={url_lang}", status_code=302)
+    
+    # Determine language (priority: URL param > cookie > default)
+    if not lang:
+        lang = request.cookies.get("user_lang", "en")
+    
+    # Map to internal language code
+    internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
+    
+    # Set cookie for future visits
+    response = None
+    
+    # Get translation for SPA
+    translation = controller.get_translation(internal_lang)
+    
+    # Get available languages for dropdown
+    available_languages = await get_available_languages(request, internal_lang)
+    
+    # Render SPA
+    page = controller.view['root'].render(
+        uhid=uhid,
+        translation=translation,
+        lang=internal_lang,
+        available_languages=available_languages
+    )
+    
+    # Set language cookie if we have a response object
+    if isinstance(page, HTMLResponse):
+        page.set_cookie(key="user_lang", value=internal_lang, max_age=31536000, path="/")
+    
+    return page
+
+
 
 
 @app.get("/{lang}", response_class=HTMLResponse, dependencies=[Depends(public_limit)])
-async def root_with_lang(request: Request, p:str = None, lang:str= None):
+async def root_with_lang(request: Request, lang: str):
     """
+    Marketing homepage with language - always shows marketing content
+    
     Handle homepage with language support
     
     Language codes supported:
@@ -365,300 +420,57 @@ async def root_with_lang(request: Request, p:str = None, lang:str= None):
     3. Browser Accept-Language header
     4. GeoIP country detection
     5. Fallback to English
-    
-    
-    2026-01-09 Notes:
-
-    1.) An account can have several users. 
-        The user who registered the account is always admin.
-        There can be more than 1 admin user in an account.
-        
-        Non admin users cannot see billing info.
-        
-    2.) Company Internal users
-        These users are connected to the company. 
-        They are connected to a special company account 
-        but the company account has no pig farm.
-        These users can READ ONLY any account 
-        but cannot write any data to the account.  
-    
-    
-    
-    In Normal case the user is read from token
-    
-    Handle all routes:
-    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
-    - Any other path redirects to "/" (users should navigate by clicking, not typing)
-    
-    Parameters
-    ----------
-    p : str
-        pig farm hid;  if this is given, will decode pig_farm_id
-        
-
     """
     
-    # If explicit language in URL, use it
-    if lang and lang in ['en', 'tag', 'bis', 'zh']:
-        # Map to internal language code
-        internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
-        
-        
-        # Set cookie for future visits
-        
-        
-        response = None
-    else:
-        # No path language - detect or use query parameter
-        query_lang = request.query_params.get("lang")
-        
-        if query_lang:
-            # Query parameter language (for SPA compatibility)
-            internal_lang = LANGUAGE_MAPPING.get(query_lang.lower(), 'en')
-            
-            # Redirect to SEO-friendly path URL
-            url_lang_map = {
-                'en': 'en',
-                'fil': 'tag',
-                'ceb': 'bis',
-                'zh': 'zh'
-            }
-            url_lang = url_lang_map.get(internal_lang, 'en')
-            
-            return RedirectResponse(url=f"/{url_lang}", status_code=301)  # Permanent redirect for SEO
-            
-        else:
-        
-            # No explicit language - detect from cookie, browser, or country
-            internal_lang = None
-            
-            
-            # 1. Check cookie first
-            cookie_lang = request.cookies.get("user_lang")
-            if cookie_lang and cookie_lang in ['en', 'fil', 'ceb', 'zh']:
-                internal_lang = cookie_lang
-            
-            # 2. Detect from browser Accept-Language header
-            if not internal_lang:
-                browser_lang = detect_browser_language(request)
-                if browser_lang:
-                    internal_lang = browser_lang
-            
-            # 3. Detect from GeoIP country
-            if not internal_lang:
-                country_lang = await detect_country_language(request)
-                if country_lang:
-                    internal_lang = country_lang
-            
-            # 4. Fallback to English
-            if not internal_lang:
-                internal_lang = 'en'
-            
-            # Redirect to language-specific URL for better SEO
-            # Convert internal lang to user-friendly URL code
-            url_lang_map = {
-                'en': 'en',
-                'fil': 'tag',
-                'ceb': 'bis',
-                'zh': 'zh'
-            }
-            url_lang = url_lang_map.get(internal_lang, 'en')
-            
-            # Only redirect if not already on root and not an API request
-            if request.url.path == "/" and not request.headers.get("X-Requested-With"):
-                return RedirectResponse(url=f"/{url_lang}", status_code=302)
-        
+    print('went root_with_lang')
+
     
-    result = get_current_uhid(request)
+    # Map URL lang to internal language
+    internal_lang = LANGUAGE_MAPPING.get(lang.lower(), 'en')
     
+    # Set cookie
+    response = None
     
-    # If result is RedirectResponse, return it immediately
-    if isinstance(result, RedirectResponse):
-        return result
-    
-    uhid = result
-    
-    
-    # Get Available langages for language selector dropdown
+    # Get available languages
     available_languages = await get_available_languages(request, internal_lang)
     
-    print('available_languages')
-    pprint.pprint(available_languages)
-    
-    
-    # This translation is for user already logged in;
-    # For users not logged in, this is provided by View;
-    # This translation is not returned to page if user is not logged in.
-    translation = None
-    
-    
-    
-    if internal_lang is not None:
-        
-        # Update user language
-        if uhid is not None:
-            res = hashids_user.decrypt(uhid)
-            if len(res) == 0:
-                return {
-                    'result':{
-                        'num':  ERROR_USER_INVALID_USER_HASHID,
-                        'code': 'ERROR_USER_INVALID_USER_HASHID'
-                    }
-                }
-            
-            user_id = res[0]
-            
-            # No need to save
-            #model['user'].user_update_language(user_id, language_key)
-            
-            
-        
-        translation = controller.get_translation(internal_lang)
-
-
+    # Always render marketing page (ignore token)
     page = controller.view['root'].render(
-            uhid = uhid, 
-            translation = translation,
-            lang = internal_lang,
-            available_languages = available_languages)
+        uhid=None,  # Force no user
+        translation=None,
+        lang=internal_lang,
+        available_languages=available_languages
+    )
+    
+    # If we have a response object, set cookie
+    if isinstance(page, HTMLResponse):
+        page.set_cookie(key="user_lang", value=internal_lang, max_age=31536000, path="/")
     
     return page
-    
 
 
-@app.get("/", response_class = HTMLResponse, dependencies=[Depends(public_limit)])
-async def root(request: Request, p:str = None, lang:str= None):
-    """
-    Handle homepage
-    
-   
-    
-    2026-01-09 Notes:
 
-    1.) An account can have several users. 
-        The user who registered the account is always admin.
-        There can be more than 1 admin user in an account.
-        
-        Non admin users cannot see billing info.
-        
-    2.) Company Internal users
-        These users are connected to the company. 
-        They are connected to a special company account 
-        but the company account has no pig farm.
-        These users can READ ONLY any account 
-        but cannot write any data to the account.  
+@app.get("/", response_class=HTMLResponse, dependencies=[Depends(public_limit)])
+async def root(request: Request):
+    """Marketing homepage - always shows marketing content, never SPA"""
     
+    print('went root')
     
-    
-    In Normal case the user is read from token
-    
-    Handle all routes:
-    - "/" is the ONLY valid route for now (shows home or dashboard based on auth)
-    - Any other path redirects to "/" (users should navigate by clicking, not typing)
-    
-    Parameters
-    ----------
-    p : str
-        pig farm hid;  if this is given, will decode pig_farm_id
-        
-
-    """
-    
-    result = get_current_uhid(request)
-    
-    
-    # If result is RedirectResponse, return it immediately
-    if isinstance(result, RedirectResponse):
-        return result
-    
-    uhid = result
-    
-    
-    # No path language - detect or use query parameter
-    query_lang = request.query_params.get("lang")
-    
-    if query_lang:
-        # Query parameter language (for SPA compatibility)
-        internal_lang = LANGUAGE_MAPPING.get(query_lang.lower(), 'en')
-        
-        # Redirect to SEO-friendly path URL
-        url_lang_map = {
-            'en': 'en',
-            'fil': 'tag',
-            'ceb': 'bis',
-            'zh': 'zh'
-        }
-        url_lang = url_lang_map.get(internal_lang, 'en')
-        
-        
-        # PRESERVE other query parameters (like bill)
-        other_params = []
-        for key, value in request.query_params.items():
-            if key != 'lang':
-                other_params.append(f"{key}={value}")
-        
-        if other_params:
-            redirect_url = f"/{url_lang}?{'&'.join(other_params)}"
-        else:
-            redirect_url = f"/{url_lang}"
-        
-        
-        # Set cookie and redirect
-        response = RedirectResponse(url=redirect_url, status_code=301)
-        response.set_cookie(key="user_lang", value=internal_lang, max_age=31536000, path="/")
-        
-        return response  
-        
-    
-    
+    # Get language from cookie or detect
     internal_lang = request.cookies.get("user_lang", "en")
     
-    # Get Available langages for language selector dropdown
+    # Get available languages
     available_languages = await get_available_languages(request, internal_lang)
     
-    print('available_languages')
-    pprint.pprint(available_languages)
-    
-    
-    # This translation is for user already logged in;
-    # For users not logged in, this is provided by View;
-    # This translation is not returned to page if user is not logged in.
-    translation = None
-    
-    
-    
-    if internal_lang is not None:
-        
-        # Update user language
-        if uhid is not None:
-            res = hashids_user.decrypt(uhid)
-            if len(res) == 0:
-                return {
-                    'result':{
-                        'num':  ERROR_USER_INVALID_USER_HASHID,
-                        'code': 'ERROR_USER_INVALID_USER_HASHID'
-                    }
-                }
-            
-            user_id = res[0]
-            
-            # No need to save
-            #model['user'].user_update_language(user_id, language_key)
-            
-            
-        
-        translation = controller.get_translation(internal_lang)
-
-
+    # Always render marketing page (ignore token)
     page = controller.view['root'].render(
-            uhid = uhid, 
-            translation = translation,
-            lang = internal_lang,
-            available_languages = available_languages)
+        uhid=None,  # Force no user
+        translation=None,
+        lang=internal_lang,
+        available_languages=available_languages
+    )
     
     return page
-    
-
 
 
 
@@ -730,7 +542,7 @@ all_languages = [
     {'code': 'ceb', 'url': '/bis', 'name': 'Bisaya', 'local_name': 'Bisdak'}
 ]
 
-# 
+
     
 
 default_languages =[
@@ -857,6 +669,7 @@ async def detect_country(request: Request) -> str:
 
 
 
+
 # List of suspicious patterns that should return 404
 SUSPICIOUS_PATHS = [
     '.env', '.git', 'config', 'secret', 'backup', '.sql', '.ini',
@@ -864,12 +677,15 @@ SUSPICIOUS_PATHS = [
     'api/.env', 'app/.env', 'admin', 'login', 'cgi-bin'
 ]
 
+
     
 @app.get("/{full_path:path}", response_class=HTMLResponse, dependencies=[Depends(strict_limit)])
 async def catch_all_frontend(request: Request, full_path: str = None):
     """
     This catches any route not matched above and serves the frontend
     """
+    
+    return HTMLResponse(content="<h1>404 - Page Not Found</h1>", status_code=404)
     
     # Check for suspicious paths that should not serve the app
     if full_path:

@@ -1280,74 +1280,25 @@
         // Check if there is a access_token stored
         const bearer_token = localStorage.getItem('access_token');
         
-
-        /*
-        if (bearer_token && !navigator.onLine) {
-            console.log('Offline with token - redirecting to dashboard immediately');
-            window.location.href = '/';
-            // Stop execution
-            throw new Error('Redirecting offline');
-        }*/
-
-        
         if (bearer_token) {
-            
-            console.log('Token found, requesting authenticated homepage...');
-            document.body.style.opacity = '0.5';
-            
-            // Get language preference
+            // Get saved language from localStorage
             const savedLang = localStorage.getItem('user_language');
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlLang = urlParams.get('lang');
-            const lang = urlLang || savedLang;
             
-            // Build URL with language parameter
-            let fetchUrl = '/';
-            if (lang && lang !== 'default' && lang !== 'null') {
-                fetchUrl = '/?lang=' + lang;
-                console.log('Fetching with language:', lang);
+            // Map internal language to URL language code
+            let urlLang = 'en';  // default
+            
+            if (savedLang === 'fil') {
+                urlLang = 'tag';
+            } else if (savedLang === 'ceb') {
+                urlLang = 'bis';
             } else {
-                console.log('Fetching without language');
+                urlLang = 'en';
             }
             
-            fetch(fetchUrl, {  // Use the URL with language parameter
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${bearer_token}`,
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                } else if (response.status === 401) {
-                    console.log('Token invalid/expired');
-                    localStorage.removeItem('access_token');
-                    document.body.style.opacity = '1';
-                    throw new Error('Unauthorized');
-                } else {
-                    throw new Error('Server error');
-                }
-            })
-            .then(html => {
-                document.open();
-                document.write(html);
-                document.close();
-                
-                // Update URL to include language if needed
-                if (lang && lang !== 'default' && lang !== 'null') {
-                    const newUrl = window.location.pathname + '?lang=' + lang;
-                    window.history.pushState({}, '', newUrl);
-                }
-            })
-            .catch(error => {
-                console.error('Auth error:', error);
-                document.body.style.opacity = '1';
-            });
-            
-        } else {
-            console.log('No token, showing public homepage');
+            // Redirect to SPA with language parameter
+            window.location.href = `/app?lang=${urlLang}`;
         }
+        
         
         // Copy website link function
         function copyWebsiteLink(button) {
