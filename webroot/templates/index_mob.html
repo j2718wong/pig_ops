@@ -29,6 +29,14 @@
     
     
     <script>
+        // If offline and token exists, ensure we're at the right page
+        if (!navigator.onLine && localStorage.getItem('access_token') && window.location.pathname !== '/app') {
+            console.log('Offline with token - redirecting to /app');
+            window.location.href = '/app?lang=' + (localStorage.getItem('user_language') || 'en');
+            return;
+        }
+        
+        
         const APP_VERSION = '{{ page_data.app_version }}'; 
         
         // Register service worker immediately
@@ -39,13 +47,7 @@
                     .catch(err => console.log('SW registration failed:', err));
             });
         }
-
         
-        // If offline and token exists, ensure we're at the right page
-        if (!navigator.onLine && localStorage.getItem('access_token') && window.location.pathname !== '/app') {
-            console.log('Offline with token - redirecting to /app');
-            window.location.href = '/app?lang=' + (localStorage.getItem('user_language') || 'en');
-        }
     </script>
     
     <script src="/static_m/js/pwa-handler.js" defer></script>
@@ -142,9 +144,6 @@
 <body>
     <div id="offlineIndicator" class="offline-mode-indicator">
         <span id="offlineMessage">Offline Mode - No Internet</span>
-        <button id="offlineRetryBtn" class="retry-btn">
-            <i class="fas fa-sync-alt"></i> Retry
-        </button>
     </div>
     
 <!-- Top Navigation Container -->

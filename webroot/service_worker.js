@@ -1,6 +1,6 @@
 // service_worker.js
 
-const CACHE_NAME = 'superpig-v1';
+const CACHE_NAME = 'superpig-v2';
 const urlsToCache = [
     '/app',
     '/en',
@@ -90,8 +90,13 @@ self.addEventListener('fetch', (event) => {
     // --- 2. Handle HTML Navigation (Cache First) ---
     if (request.mode === 'navigate') {
         event.respondWith(
-            fetch(request).catch(() => {
-                // If the network request fails (offline), serve the cached SPA shell.
+            fetch(request).catch(async () => {
+                // If offline, try to serve /app first
+                const appCache = await caches.match('/app');
+                if (appCache) {
+                    return appCache;
+                }
+                // Fallback to SPA shell
                 return caches.match('/index_mob.html');
             })
         );
