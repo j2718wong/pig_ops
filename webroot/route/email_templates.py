@@ -212,6 +212,29 @@ class EmailAccountNotStartedTrial(EmailTemplate):
         </p>
         """
         
+        
+        # Login Button HTML (added before images)
+        login_button = f"""
+        <div style="text-align: center; margin: 20px 0 30px 0;">
+            <a href="{self.company_website}/login" style="
+                background: {self.primary_color}; 
+                color: white; 
+                padding: 14px 32px; 
+                text-decoration: none; 
+                border-radius: 50px; 
+                display: inline-block; 
+                font-weight: bold; 
+                font-size: 18px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            ">
+                🔐 Login to SuperPig
+            </a>
+        </div>
+        """
+        
+        html_message = ''
+        
+        
         html_message = ''
         
         if notify_type_id == BG_PROCESS_NOTIFY_ACCOUNT_NOT_STARTED_TRIAL:
@@ -257,6 +280,11 @@ class EmailAccountNotStartedTrial(EmailTemplate):
                                     <p style="color: {self.text_dark}; margin: 0 0 20px 0; font-size: 16px;">
                                         Take a look at how {self.application_name} is used in managing and atomating your pig production data.
                                     </p>
+                                    
+                                    
+                                    <!-- LOGIN BUTTON - Added before images -->
+                                    {login_button}
+                                    
                                     
                                     <!-- Dashboard Preview -->
                                     <div style="margin: 25px 0;">
