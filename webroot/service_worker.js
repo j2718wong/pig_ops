@@ -27,10 +27,11 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve cached or network
 self.addEventListener('fetch', (event) => {
-    const url   = new URL(event.request.url);
-    const path  = url.pathname;
+    const url       = new URL(event.request.url);
+    const path      = url.pathname;
+    const request   = event.request;
     
-    // Skip API calls - let them fail normally; app handles offline
+    // 1.) Skip API calls - let them fail normally; app handles offline
     if (path.startsWith('/country/')            ||
         path.startsWith('/lookup/')             ||
         path.startsWith('/pig_farm/')           ||
@@ -86,6 +87,19 @@ self.addEventListener('fetch', (event) => {
     }
     
     
+    // --- 2. Handle HTML Navigation (Cache First) ---
+    if (request.mode === 'navigate') {
+        event.respondWith(
+            fetch(request).catch(() => {
+                // If the network request fails (offline), serve the cached SPA shell.
+                return caches.match('/index_mob.html');
+            })
+        );
+        return;
+    }
+    
+    
+    // --- 3. Handle static assets (Cache First) ---
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
