@@ -2,7 +2,6 @@
 
 const CACHE_NAME = 'superpig-v1';
 const urlsToCache = [
-    '/',
     '/app',
     '/en',
     '/bis',

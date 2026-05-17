@@ -39,6 +39,13 @@
                     .catch(err => console.log('SW registration failed:', err));
             });
         }
+
+        
+        // If offline and token exists, ensure we're at the right page
+        if (!navigator.onLine && localStorage.getItem('access_token') && window.location.pathname !== '/app') {
+            console.log('Offline with token - redirecting to /app');
+            window.location.href = '/app?lang=' + (localStorage.getItem('user_language') || 'en');
+        }
     </script>
     
     <script src="/static_m/js/pwa-handler.js" defer></script>
