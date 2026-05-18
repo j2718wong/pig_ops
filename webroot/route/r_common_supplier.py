@@ -99,45 +99,47 @@ async def supplier_add(request: Request, data: dm.DataCommonSupplier):
     
     
     level_1_hid = data.level_1_hid
-    res = hashids_common.decrypt(level_1_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
-                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1'
-            }
-        }
-        
-    level_1_id = res[0]
-    
-    
-    level_2_hid = data.level_2_hid
-    res = hashids_common.decrypt(level_2_hid)
-    if len(res) == 0:
-        return {
-            'result':{
-                'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
-                'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2'
-            }
-        }
-    
-    level_2_id = res[0]
-    
-    
-    level_3_hid = data.level_3_hid
-    
-    if level_3_hid is not None:
-        res = hashids_common.decrypt(level_3_hid)
+    if level_1_hid is not None:
+        res = hashids_common.decrypt(level_1_hid)
         if len(res) == 0:
             return {
                 'result':{
-                    'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
-                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3'
+                    'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1,
+                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_1'
+                }
+            }
+            
+        level_1_id = res[0]
+    
+    
+    level_2_hid = data.level_2_hid
+    if level_2_hid is not None:
+        res = hashids_common.decrypt(level_2_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2,
+                    'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_2'
                 }
             }
         
-        level_3_id = res[0]
+        level_2_id = res[0]
     
+    
+    level_3_hid = data.level_3_hid
+    if level_3_hid is not None:
+        if level_3_hid is not None:
+            res = hashids_common.decrypt(level_3_hid)
+            if len(res) == 0:
+                return {
+                    'result':{
+                        'num':  ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3,
+                        'code': 'ERROR_SUPPLIER_INVALID_ADDRESS_LEVEL_3'
+                    }
+                }
+            
+            level_3_id = res[0]
+        
     
     
     
