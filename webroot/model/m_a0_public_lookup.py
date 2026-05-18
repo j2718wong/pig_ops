@@ -17,6 +17,22 @@ if module_directory not in sys.path:
 from base_model             import BaseModel
 
 
+"""
+/* app_country.flag
+bit 0: FLAG_BIT_SELECTABLE
+0 = cannot be selected in countries dropdown
+1 = Can be selected in Selct Countries drop down; default
+
+bit 1: FLAG_BIT_HAS_ADDRESS_LEVELS
+0 = No address levels
+1 = Has address level;
+
+
+*/
+
+"""
+
+
 class PublicLookup(BaseModel):
     def __init__(self, model):
         super().__init__(model)

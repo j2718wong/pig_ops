@@ -137,7 +137,6 @@ class PigFarm(BaseModel):
 
             in_name                 VARCHAR(50),
             
-            in_country_id           INT, 
             in_address_level_1_id   INT,
             in_address_level_2_id   INT,
             in_address_level_3_id   INT,
@@ -153,7 +152,6 @@ class PigFarm(BaseModel):
             data.pig_farm_id,
             data.name               if data.name and data.name.strip() else None,
             
-            data.country_id,
             data.level_1_id,
             data.level_2_id,
             data.level_3_id,
@@ -215,6 +213,7 @@ class PigFarm(BaseModel):
                 
                 a.country_id,
                 c.name,
+                c.flag,
                 
                 a.address_level_1_id,
                 a.address_level_2_id,
@@ -250,17 +249,18 @@ class PigFarm(BaseModel):
             # Country info
             cur_country_id                  = row[4]
             cur_country_name                = row[5]
+            cur_country_flag                = row[6]
             
             # Address levels
-            cur_address_level_1_id          = row[6]
-            cur_address_level_2_id          = row[7]
-            cur_address_level_3_id          = row[8]
-            
+            cur_address_level_1_id          = row[7]  
+            cur_address_level_2_id          = row[8]  
+            cur_address_level_3_id          = row[9]  
+
             # Location
-            cur_farm_latitude               = row[9]
-            cur_farm_longitude              = row[10]
-            
-            cur_num_farrowing_crates        = row[11]
+            cur_farm_latitude               = row[10] 
+            cur_farm_longitude              = row[11] 
+
+            cur_num_farrowing_crates        = row[12] 
             
             
             # Build the result dictionary
@@ -280,6 +280,7 @@ class PigFarm(BaseModel):
                     'country': {
                         'id':       cur_country_id,
                         'name':     cur_country_name,
+                        'flag':     cur_country_flag
                     },
                     
                     'address':{
@@ -459,8 +460,11 @@ class PigFarm(BaseModel):
                     a.id,
                     a.flag,
                     a.name,
+                    
                     a.country_id,
                     b.name AS country_name,
+                    b.flag AS country_flag,
+                    
                     a.address_level_1_id,
                     a.address_level_2_id,
                     a.address_level_3_id,
@@ -498,31 +502,34 @@ class PigFarm(BaseModel):
             
             
             for row in rows:
-                cur_farm_id             = row[0]
-                cur_farm_flag           = row[1]
-                cur_farm_name           = row[2]
-                
-                cur_country_id          = row[3]
-                cur_country_name        = row[4]
-                
-                cur_farm_address_level_1_id = row[5]
-                cur_farm_address_level_2_id = row[6]
-                cur_farm_address_level_3_id = row[7]
-                cur_farm_latitude           = float(row[8]) if row[8] else None
-                cur_farm_longitude          = float(row[9]) if row[9] else None
-                
-                cur_num_farrowing_crates    = row[10] 
+                cur_farm_id                     = row[0]
+                cur_farm_flag                   = row[1]
+                cur_farm_name                   = row[2]
+                        
+                cur_country_id                  = row[3]
+                cur_country_name                = row[4]
+                cur_country_flag                = row[5]
 
-                cur_data_ver_num_sow            = row[11]  
-                cur_data_ver_num_boar           = row[12]  
-                cur_data_ver_num_pig_prod       = row[13]  
-                cur_data_ver_num_prod_history   = row[14]
-                cur_data_ver_num_staff          = row[15]  
-                cur_data_ver_num_feed_buy       = row[16]  
-                cur_data_ver_num_feed_balance   = row[17]  
-                cur_data_ver_num_not_pregnant   = row[18]  
-                cur_data_ver_num_boar_ext_mate  = row[19]
-                cur_data_ver_num_pig_dead       = row[20]
+                cur_farm_address_level_1_id     = row[6]
+                cur_farm_address_level_2_id     = row[7]
+                cur_farm_address_level_3_id     = row[8]
+                cur_farm_latitude               = float(row[9]) if row[9] else None
+                cur_farm_longitude              = float(row[10]) if row[10] else None
+
+                cur_num_farrowing_crates        = row[11]
+
+                cur_data_ver_num_sow            = row[12]
+                cur_data_ver_num_boar           = row[13]
+                cur_data_ver_num_pig_prod       = row[14]
+                cur_data_ver_num_prod_history   = row[15]
+                cur_data_ver_num_staff          = row[16]
+                cur_data_ver_num_feed_buy       = row[17]
+                cur_data_ver_num_feed_balance   = row[18]
+                cur_data_ver_num_not_pregnant   = row[19]
+                cur_data_ver_num_boar_ext_mate  = row[20]
+                cur_data_ver_num_pig_dead       = row[21]
+
+
                 
                 cur_entry = {
                     'pig_farm': {
@@ -536,6 +543,7 @@ class PigFarm(BaseModel):
                         'country': {
                             'id':       cur_country_id,
                             'name':     cur_country_name,
+                            'flag':     cur_country_flag
                         },
                         
                         'address':{
