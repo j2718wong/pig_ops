@@ -250,6 +250,10 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         del cur_entry['pig_farm_staff']['id']
         cur_entry['pig_farm_staff']['hid']   = cur_hid
         
+        
+    # Check for pig_farm sow_due_chklst 
+    sow_due_chklst = model['pf_sow_due_chklst'].get_active_list(pig_farm_id)
+    
 
     result = {
         'acc_pig_ops':              list_acc_pig_ops,
@@ -259,6 +263,19 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         'staff_list':               list_staff
         
     }
+    
+    if sow_due_chklst and len(sow_due_chklst) > 0:
+        
+        for cur_entry in sow_due_chklst:
+            cur_id      = cur_entry['id']
+            cur_hid     = hashids_common.encrypt(cur_id)
+            
+            del cur_entry['id']
+            cur_entry['hid']   = cur_hid
+        
+        
+        result['sow_due_chklst'] = sow_due_chklst
+    
     
     if inc_pig_prod > 0:
         result['pig_production']  = list_pig_prod

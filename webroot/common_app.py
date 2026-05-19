@@ -62,6 +62,8 @@ from model.m_pig_farm_staff     import PigFarmStaff
 from model.m_pig_farm_feed_buy  import PigFarmFeedBuy
 from model.m_pig_farm_feed_buy_item  import PigFarmFeedBuyItem
 
+from model.m_pig_farm_sow_due_chklst import PigFarmSowDueChklst
+
 
 from model.m_account_selection  import AccountSelection
 from model.m_account_pig_ops    import AccountPigOps
@@ -134,6 +136,8 @@ model_names_pig_ops = [
     ('pig_farm_staff',          PigFarmStaff),
     ('pf_feed_buy',             PigFarmFeedBuy),
     ('pf_feed_buy_item',        PigFarmFeedBuyItem),
+    
+    ('pf_sow_due_chklst',       PigFarmSowDueChklst),
     
     
     ('account_selection',       AccountSelection),
