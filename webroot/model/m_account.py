@@ -362,9 +362,13 @@ class Account(BaseModel):
         params = [
             data.user_id,
             data.country_id,
-            data.referred_by_account_id    if data.referred_by_account_id > 0 else None,
-            data.name               if data.name and data.name.strip() else None
+            data.referred_by_account_id     if data.referred_by_account_id > 0 else None,
+            data.name                       if data.name and data.name.strip() else None
         ]
+        
+        sql = self._generate_debug_procedure('account_register', params)
+        print('\n\n' + sql)
+        
         
         rows = self._call_procedure('account_register', params)
         
@@ -387,10 +391,7 @@ class Account(BaseModel):
                     'id':               row[3],
                     'name':             row[4],
                     'flag':             row[5],
-                    'status_id':        row[6],
-                    'status_name':      row[7],
-                    'dt_trial_start':   row[8],
-                    'dt_trial_end':     row[9]
+                    'status_id':        row[6]
                 }
             }
 

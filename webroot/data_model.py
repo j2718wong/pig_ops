@@ -162,9 +162,11 @@ class DataApproveUserReq(BaseModel):
 
 class DataAccount(BaseModel):
     uhid:                   str = None
+    country_hid:            str = None
+    
     user_id:                int = 0
     name:                   str
-    country_id:             int = COUNTRY_ID_PHILIPPINES
+    country_id:             int = 0
     
     referred_by_account_id: int = 0
     

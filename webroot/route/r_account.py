@@ -146,17 +146,33 @@ async def account_register(request: Request, account_data: dm.DataAccount):
             }
         }
     
-    
     user_id = res[0]
+    
+    
+    
+    country_hid = account_data.country_hid
+    country_id  = 0
+    
+    if country_hid is not None: 
+        res = hashids_common.decrypt(country_hid)
+        if len(res) == 0:
+            return {
+                'result':{
+                    'num':  ERROR_ADDRESS_COUNTRY_HID,
+                    'code': 'ERROR_ADDRESS_COUNTRY_HID'
+                }
+            }
+        
+        country_id = res[0]
 
     
     account_data.name       = name 
     account_data.user_id    = user_id
+    account_data.country_id = country_id
     
     res_register    =  model['account'].register(account_data)
     
-    
-    
+
     if res_register is None:
         return {
             'result':{

@@ -165,6 +165,8 @@ class Controller:
     def get_app_ui_settings(self):
         enable_manual_email     = 0
         enable_referral         = 0
+        joint_account_pig_farm_create = 0
+
 
         temp = os.getenv('UI_ENABLE_MANUAL_EMAIL_LOGIN')
         if temp is not None:
@@ -176,6 +178,7 @@ class Controller:
             except:
                 test = 1
 
+
         temp = os.getenv('UI_ENABLE_ACCOUNT_REFERRAL')
         if temp is not None:
             try:
@@ -186,10 +189,26 @@ class Controller:
             except:
                 test = 1
 
+        
+        temp = os.getenv('UI_ENABLE_JOINT_ACCOUNT_PIG_FARM_CREATE')
+        if temp is not None:
+            try:
+                temp_int = int(temp)
+                
+                if temp_int > 0:
+                    joint_account_pig_farm_create = 1
+            except:
+                test = 1
+
+        
+
+        
+
 
         ui_settings = {
             'enable_manual_email':  enable_manual_email,
-            'enable_referral':      enable_referral
+            'enable_referral':      enable_referral,
+            'joint_account_pig_farm_create': joint_account_pig_farm_create
         }
 
         
