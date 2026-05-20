@@ -78,7 +78,7 @@ class AccountPigOps:
                 'result':{
                     'num':              row[0],
                     'code':             row[1],
-                    'desc':             row[2],
+                    'desc':             row[2]
                 },
                 
                 'account_pig_ops': {
@@ -157,7 +157,7 @@ class AccountPigOps:
                 'result':{
                     'num':              row[0],
                     'code':             row[1],
-                    'desc':             row[2],
+                    'desc':             row[2]
                 },
                 
                 'account_pig_ops': {
@@ -217,7 +217,7 @@ class AccountPigOps:
                 'result':{
                     'num':              row[0],
                     'code':             row[1],
-                    'desc':             row[2],
+                    'desc':             row[2]
                 },
                 
                 'account_pig_ops': {

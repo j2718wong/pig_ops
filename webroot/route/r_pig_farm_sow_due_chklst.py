@@ -37,15 +37,15 @@ from r_pig_farm_feed_buy    import replace_plain_ids_feed_item
   
 
 
-@app.get("/pf_sow_due_chklst/list", tags=["Pig Farm"])
-async def pig_farm_sow_due_chklst_list(request: Request, pf_chklst_hid: str):
+@app.get("/pf_sow_due_chklst", tags=["Pig Farm"])
+async def pig_farm_sow_due_chklst(request: Request, pfhid: str):
     """
     Will get pig farm sow due checklist list.
     
     Parameters
     ----------
     
-    pf_chklst_hid:str
+    pfhid:str
         pig_farm  sow due checklist hid
 
         
@@ -60,21 +60,21 @@ async def pig_farm_sow_due_chklst_list(request: Request, pf_chklst_hid: str):
     uhid = result
     
     
-    res = hashids_common.decrypt(pf_feed_buy_hid)
+    res = hashids_common.decrypt(pfhid)
     if len(res) == 0:
         result =  {
             'result':{
-                'num':  ERROR_FEED_BUY_INVALID_PIG_FARM_HASHID,
-                'code': 'ERROR_FEED_BUY_INVALID_PIG_FARM_HASHID'
+                'num':  ERROR_PIG_FARM_INVALID_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
             }
         }
         
         return result
         
-    pf_feed_buy_id = res[0]
+    pig_farm_id = res[0]
 
 
-    res = model['pf_feed_buy'].get_list_items(pf_feed_buy_id)
+    res = model['pf_sow_due_chklst'].get_active_list(pig_farm_id)
     
     if res is None:
         return {
@@ -85,14 +85,17 @@ async def pig_farm_sow_due_chklst_list(request: Request, pf_chklst_hid: str):
         }
     
     
-
-    
     # Replace plain id
     for cur_entry in res:
-        replace_plain_ids_feed_item(cur_entry)
+        # Replace plain ids
+        cur_id     = cur_entry['id']
+        cur_hid    = hashids_common.encrypt(cur_id)
         
-        
-            
+    
+        del cur_entry['id']
+        cur_entry['hid'] = cur_hid
+
+
     return {
         'result':{
             'num':  0
@@ -100,4 +103,80 @@ async def pig_farm_sow_due_chklst_list(request: Request, pf_chklst_hid: str):
         
         'data': res
     }
+
+
+
+@app.post("/pf_sow_due_chklst_item/update", tags=["Account"])
+async def pf_sow_due_chklst_item_update(request: Request, data: dm.DataPigFarmChecklistItem):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    name    = data.name
+
+    
+    name    = name.strip() if name else None 
+    
+    if name is None or len(name) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_MEDVAC_INVALID_NAME,
+                'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_NAME'
+            }
+        }
+        
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_MEDVAC_INVALID_USER_HASHID,
+                'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    
+    # Checks if user is valid, if account is valid, if account has due bill
+    res_check = check_if_valid_user_account(user_id)
+
+    if res_check['inv_result'] != None:
+        return res_check['inv_result']
+        
+    new_bill_hid = res_check['new_bill_hid']
+    
+
+
+    
+    
+    
+    data.name      = name
+    data.user_id   = user_id
+
+    
+    res_update    =  model['account_medvac'].update(data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+    
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+
+        
+    return res_update
 

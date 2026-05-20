@@ -482,7 +482,8 @@ class PigFarm(BaseModel):
                     a.data_ver_num_feed_balance,
                     a.data_ver_num_not_pregnant,
                     a.data_ver_num_boar_ext_mate,
-                    a.data_ver_num_pig_dead 
+                    a.data_ver_num_pig_dead,
+                    a.data_ver_num_sd_chklst 
                     
                     
                 FROM pig_farm a
@@ -528,7 +529,7 @@ class PigFarm(BaseModel):
                 cur_data_ver_num_not_pregnant   = row[19]
                 cur_data_ver_num_boar_ext_mate  = row[20]
                 cur_data_ver_num_pig_dead       = row[21]
-
+                cur_data_ver_num_sd_chklst      = row[22]
 
                 
                 cur_entry = {
@@ -576,7 +577,8 @@ class PigFarm(BaseModel):
                         'feed_balance':     cur_data_ver_num_feed_balance,
                         'not_pregnant':     cur_data_ver_num_not_pregnant,
                         'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
-                        'pig_dead':         cur_data_ver_num_pig_dead      
+                        'pig_dead':         cur_data_ver_num_pig_dead,
+                        'checklist':        cur_data_ver_num_sd_chklst      
                     }
                     
                 }
@@ -647,7 +649,8 @@ class PigFarm(BaseModel):
                     data_ver_num_feed_balance,
                     data_ver_num_not_pregnant,
                     data_ver_num_boar_ext_mate,
-                    data_ver_num_pig_dead 
+                    data_ver_num_pig_dead,
+                    data_ver_num_sd_chklst 
                     
                 FROM pig_farm 
                 WHERE id = %s
@@ -671,6 +674,7 @@ class PigFarm(BaseModel):
             cur_data_ver_num_not_pregnant   = row[7]
             cur_data_ver_num_boar_ext_mate  = row[8]
             cur_data_ver_num_pig_dead       = row[9]
+            cur_data_ver_num_sd_chklst      = row[10]
             
             
             if return_array == 0:
@@ -685,7 +689,8 @@ class PigFarm(BaseModel):
                         'feed_balance':     cur_data_ver_num_feed_balance,
                         'not_pregnant':     cur_data_ver_num_not_pregnant,
                         'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
-                        'pig_dead':         cur_data_ver_num_pig_dead     
+                        'pig_dead':         cur_data_ver_num_pig_dead,
+                        'checklist':        cur_data_ver_num_sd_chklst     
                         
                     }
                 }
@@ -703,7 +708,8 @@ class PigFarm(BaseModel):
                     cur_data_ver_num_feed_balance,   
                     cur_data_ver_num_not_pregnant,
                     cur_data_ver_num_boar_ext_mate,
-                    cur_data_ver_num_pig_dead 
+                    cur_data_ver_num_pig_dead,
+                    cur_data_ver_num_sd_chklst 
                 ]
 
         return None

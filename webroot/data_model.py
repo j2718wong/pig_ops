@@ -281,7 +281,15 @@ class DataPigFarmFeedBuyItem(BaseModel):
     total_cost:             float
 
 
+class DataPigFarmChecklistItem(BaseModel):
+    uhid:                   str = None
     
+    checklist_item_hid:     str = None
+    
+    user_id:                int = 0
+    checklist_item_id:      int = 0
+    is_checked:             int = 0
+
 
 
 

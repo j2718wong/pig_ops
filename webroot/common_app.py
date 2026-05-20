@@ -69,6 +69,8 @@ from model.m_account_selection  import AccountSelection
 from model.m_account_pig_ops    import AccountPigOps
 from model.m_account_medvac     import AccountMedVac
 from model.m_account_pig_buyer  import AccountPigBuyer
+from model.m_account_sow_due_chklst   import AccountSowDueChklst    
+
 
 from model.m_common_supplier    import CommonSupplier
 from model.m_public_report      import PublicReport
@@ -145,6 +147,9 @@ model_names_pig_ops = [
     ('account_medvac',          AccountMedVac),
     
     ('account_pig_buyer',       AccountPigBuyer),
+    ('acc_sow_due_chklst',      AccountSowDueChklst),
+    
+    
     
     ('supplier',                CommonSupplier),
     ('public_report',           PublicReport),
