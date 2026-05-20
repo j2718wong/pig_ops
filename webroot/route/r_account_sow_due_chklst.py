@@ -36,7 +36,7 @@ from r_utils                import remove_database_null_description
 
     
 @app.post("/acc_sow_due_chklst/add", tags=["Account"])
-async def acc_sow_due_chklst_add(request: Request, data: dm.DataAccountPigOps):
+async def acc_sow_due_chklst_add(request: Request, data: dm.DataAccountChecklist):
     result = get_uhid_or_redirect(request)
     
     # If result is RedirectResponse, return it immediately
@@ -61,49 +61,7 @@ async def acc_sow_due_chklst_add(request: Request, data: dm.DataAccountPigOps):
             }
         }
         
-    
-    operation_type  = data.operation_type
-    
-    if operation_type not in PIG_OPERATION_TYPES:
-        return {
-            'result':{
-                'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE,
-                'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_OPERATION_TYPE'
-            }
-        }
-        
 
-    num_days_since = data.num_days_since
-    
-    if operation_type == PIG_OPERATION_TYPE_GESTATING:
-        if num_days_since < 0 and num_days_since > 115:
-            return {
-                'result':{
-                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
-                }
-            }
-            
-    
-    if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
-        if num_days_since < 0 and num_days_since > 45:
-            return {
-                'result':{
-                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
-                }
-            }
-    
-    
-    if operation_type == PIG_OPERATION_TYPE_GILT:
-        if num_days_since < 0 and num_days_since > 300:
-            return {
-                'result':{
-                    'num':  ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS,
-                    'code': 'ERROR_ACCOUNT_PIG_OPS_INVALID_NUMDAYS'
-                }
-            }
-    
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
@@ -142,12 +100,12 @@ async def acc_sow_due_chklst_add(request: Request, data: dm.DataAccountPigOps):
         }
     
     
-    acc_sow_due_chklst_id  = res_add['acc_sow_due_chklst']['id']
-    acc_sow_due_chklst_hid = hashids_common.encrypt(acc_sow_due_chklst_id)
+    cur_id  = res_add['account_checklist']['id']
+    cur_hid = hashids_common.encrypt(cur_id)
     
     # remove plain id
-    del res_add['acc_sow_due_chklst']['id']
-    res_add['acc_sow_due_chklst']['hid'] = acc_sow_due_chklst_hid
+    del res_add['account_checklist']['id']
+    res_add['account_checklist']['hid'] = cur_hid
 
 
     # Remove optional desc coming from database

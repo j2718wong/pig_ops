@@ -310,6 +310,19 @@ class DataAccountPigOps(BaseModel):
     short_name:             str = None
     description:            str = None 
     
+
+
+class DataAccountChecklist(BaseModel):
+    uhid:                   str = None
+    account_checklist_hid:  str = None
+    
+    
+    user_id:                int = 0
+    account_checklist_id:   int = 0
+    name:                   str
+
+
+
     
 class DataAccountMedVac(BaseModel):
     uhid:                   str = None
