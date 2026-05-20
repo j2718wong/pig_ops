@@ -17,10 +17,9 @@ from base_model             import BaseModel
 
 
 
-class AccountSowDueChklst:
+class AccountSowDueChklst(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'AccountSowDueChklst'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -141,9 +140,10 @@ class AccountSowDueChklst:
     
     def get_list(self, account_id, inc_deleted = 0, inc_user_audit = 0):
         
+        where_clause = 'WHERE account_id = %s' % account_id
             
         if inc_deleted == 0:
-            where_clause += ' AND (a.flag & 1) = 0' 
+            where_clause += ' AND (flag & 1) = 0' 
             
 
         sql =   """

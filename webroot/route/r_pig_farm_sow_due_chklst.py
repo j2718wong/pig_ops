@@ -106,7 +106,7 @@ async def pig_farm_sow_due_chklst(request: Request, pfhid: str):
 
 
 
-@app.post("/pf_sow_due_chklst_item/update", tags=["Account"])
+@app.post("/pf_sow_due_chklst_item/update", tags=["Pig Farm"])
 async def pf_sow_due_chklst_item_update(request: Request, data: dm.DataPigFarmChecklistItem):
     result = get_uhid_or_redirect(request)
     
@@ -118,31 +118,31 @@ async def pf_sow_due_chklst_item_update(request: Request, data: dm.DataPigFarmCh
     uhid = result
     
     
-    name    = data.name
-
-    
-    name    = name.strip() if name else None 
-    
-    if name is None or len(name) == 0:
-        return {
-            'result':{
-                'num':  ERROR_ACCOUNT_MEDVAC_INVALID_NAME,
-                'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_NAME'
-            }
-        }
-        
-    
     
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_ACCOUNT_MEDVAC_INVALID_USER_HASHID,
-                'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_USER_HASHID'
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
             }
         }
     
     user_id = res[0]
+    
+    
+    checklist_item_hid = data.checklist_item_hid
+    res = hashids_common.decrypt(checklist_item_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_MEDVAC_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_MEDVAC_INVALID_HASHID'
+            }
+        }
+    
+    checklist_item_id = res[0]
+    
     
     
     
@@ -155,15 +155,13 @@ async def pf_sow_due_chklst_item_update(request: Request, data: dm.DataPigFarmCh
     new_bill_hid = res_check['new_bill_hid']
     
 
+    
+    
+    data.user_id            = user_id
+    data.checklist_item_id  = checklist_item_id
 
     
-    
-    
-    data.name      = name
-    data.user_id   = user_id
-
-    
-    res_update    =  model['account_medvac'].update(data)
+    res_update    =  model['pf_sow_due_chklst'].update_checklist_item(data)
     
     if res_update is None:
         return {

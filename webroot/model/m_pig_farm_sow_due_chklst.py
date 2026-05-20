@@ -72,7 +72,7 @@ class PigFarmSowDueChklst(BaseModel):
         params = [
             data.user_id,
         
-            data.chklst_item_id,
+            data.checklist_item_id,
             data.is_checked
         ]
        
