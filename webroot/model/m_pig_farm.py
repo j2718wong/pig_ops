@@ -690,7 +690,7 @@ class PigFarm(BaseModel):
                         'not_pregnant':     cur_data_ver_num_not_pregnant,
                         'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
                         'pig_dead':         cur_data_ver_num_pig_dead,
-                        'checklist':        cur_data_ver_num_sd_chklst     
+                        'sow_due_checklist':cur_data_ver_num_sd_chklst     
                         
                     }
                 }

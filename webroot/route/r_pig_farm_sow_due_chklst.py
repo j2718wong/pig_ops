@@ -96,15 +96,29 @@ async def pig_farm_sow_due_chklst(request: Request, pfhid: str):
         cur_entry['hid'] = cur_hid
 
 
-    return {
+    # Get pig_farm.sow_due_checklist data_ver_num 
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'sow_due_checklist': pig_farm_ver_num['data_ver_num']['sow_due_checklist']
+        }
+    }
+
+
+    result =  {
         'result':{
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'data_ver_num': data_ver_num
     }
 
-
+    
+    return result
+    
 
 @app.post("/pf_sow_due_chklst_item/update", tags=["Pig Farm"])
 async def pf_sow_due_chklst_item_update(request: Request, data: dm.DataPigFarmChecklistItem):

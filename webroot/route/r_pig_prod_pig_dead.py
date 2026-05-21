@@ -299,6 +299,8 @@ async def prod_pig_dead_list(request: Request, pfhid: str = None,
         }
     
     
+    data_ver_num = None
+    
     if pig_farm_id > 0:
         for cur_entry in res:
             cur_id  = cur_entry['pig_dead']['id']
@@ -308,16 +310,31 @@ async def prod_pig_dead_list(request: Request, pfhid: str = None,
             cur_entry['pig_dead']['hid']   = cur_hid
             
             replace_plain_ids_pig_production(cur_entry['production'])
+         
             
+        # Get pig_farm.pig_dead data_ver_num data_ver_num
+        pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+        
+        data_ver_num = {
+            'pig_farm':{
+                'pig_dead': pig_farm_ver_num['data_ver_num']['pig_dead']
+            }
+        }
         
         
-    return {
+    result = {
         'result':{
             'num':  0
         },
         
         'data': res
     }
+    
+    if data_ver_num is not None:
+        result['data_ver_num'] = data_ver_num
+        
+        
+    return result
     
     
 

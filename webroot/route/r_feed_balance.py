@@ -539,14 +539,31 @@ async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_far
             }
         }
     
+    
+    data_ver_num = None
+    
+    if pig_farm_id > 0:
+        # Get pig_farm.feed_balance data_ver_num 
+        pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
         
-    return {
+        data_ver_num = {
+            'pig_farm':{
+                'feed_balance': pig_farm_ver_num['data_ver_num']['feed_balance']
+            }
+        }
+        
+    result = {
         'result':{
             'num':  0
         },
         
         'data': res
     }
+    
+    if data_ver_num is not None:
+        result['data_ver_num'] = data_ver_num
+    
+    return result
     
     
 

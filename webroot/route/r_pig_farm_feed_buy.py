@@ -341,12 +341,24 @@ async def pf_feed_buy_list(request: Request, pfhid: str, page_number = 1):
         for cur_item in cur_entry['feed_items']:
             replace_plain_ids_feed_item(cur_item)
             
+    
+    # Get pig_farm.feed_buy data_ver_num data_ver_num
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'feed_buy': pig_farm_ver_num['data_ver_num']['feed_buy']
+        }
+    }
+    
             
     return {
         'result':{
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'data_ver_num': data_ver_num
     }
     

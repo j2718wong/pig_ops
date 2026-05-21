@@ -376,12 +376,25 @@ async def sow_boar_mate_list(request: Request, sow_boar_hid:str = None,
         }
     
     
+    
+    # Get pig_farm.boar_ext_mate data_ver_num 
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'boar_ext_mate': pig_farm_ver_num['data_ver_num']['boar_ext_mate']
+        }
+    }
+    
         
     return {
         'result':{
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'data_ver_num': data_ver_num
     }
+    
 

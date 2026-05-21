@@ -380,13 +380,25 @@ async def acc_sow_due_chklst_list(request: Request, ahid: str,
         del cur_entry['id']
         cur_entry['hid']   = cur_hid
         
+    
+    # Get account.sow_due_checklist data_ver_num 
+    account_ver_num = model['account'].get_data_ver_num(account_id)
+    
+    data_ver_num = {
+        'account':{
+            'sow_due_checklist': account_ver_num['data_ver_num']['sow_due_checklist']
+        }
+    }
+
             
     return {
         'result':{
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'account_ver_num': account_ver_num
     }
     
     

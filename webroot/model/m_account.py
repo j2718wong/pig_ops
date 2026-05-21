@@ -116,7 +116,9 @@ class Account(BaseModel):
                     a.ver_num_gilt_ops,              
                     a.ver_num_weaning_sow_ops,       
                     
-                    a.data_ver_num_account
+                    a.data_ver_num_account,
+                    a.data_ver_num_pig_buyer,
+                    a.data_ver_num_sd_chklst
                     
                 FROM account a
                 LEFT OUTER JOIN app_country b   ON a.country_id = b.id
@@ -210,7 +212,8 @@ class Account(BaseModel):
             cur_ver_num_weaning_sow_ops         = row[49] 
 
             cur_data_ver_num_account            = row[50] 
-
+            cur_data_ver_num_pig_buyer          = row[51]
+            cur_data_ver_num_sd_chklst          = row[52]
 
             
             temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
@@ -308,7 +311,10 @@ class Account(BaseModel):
                     cur_ver_num_gilt_ops,             
                     cur_ver_num_weaning_sow_ops,      
                     
-                    cur_data_ver_num_account
+                    cur_data_ver_num_account,
+                    cur_data_ver_num_pig_buyer,
+                    cur_data_ver_num_sd_chklst
+                    
                 ]
             }
             
@@ -682,7 +688,8 @@ class Account(BaseModel):
                     ver_num_weaning_sow_ops,      
                     
                     data_ver_num_account,
-                    data_ver_num_pig_buyer
+                    data_ver_num_pig_buyer,
+                    data_ver_num_sd_chklst
                     
                 FROM account 
                 WHERE id = %s
@@ -704,6 +711,7 @@ class Account(BaseModel):
             
             cur_ver_num_account                 = row[5]
             cur_ver_num_pig_buyer               = row[6]
+            cur_ver_num_sd_chklst               = row[7]
             
             
             if return_array == 0:
@@ -716,7 +724,8 @@ class Account(BaseModel):
                         'weaning_sow_ops':      cur_ver_num_weaning_sow_ops,
                         
                         'account':              cur_ver_num_account,
-                        'pig_buyer':            cur_ver_num_pig_buyer
+                        'pig_buyer':            cur_ver_num_pig_buyer,
+                        'sow_due_checklist':    cur_ver_num_sd_chklst
                     }
                 }
                 
@@ -731,7 +740,8 @@ class Account(BaseModel):
                     cur_ver_num_weaning_sow_ops,      
                     
                     cur_ver_num_account,
-                    cur_ver_num_pig_buyer              
+                    cur_ver_num_pig_buyer,
+                    cur_ver_num_sd_chklst
                 ]
 
         return None

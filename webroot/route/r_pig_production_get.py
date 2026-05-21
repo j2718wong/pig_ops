@@ -1135,12 +1135,24 @@ async def pig_prod_not_pregnant(request: Request, pfhid:str):
         replace_plain_ids_pig_production(cur_entry)
     
     
+    # Get pig_farm.not_pregnant data_ver_num 
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'not_pregnant': pig_farm_ver_num['data_ver_num']['not_pregnant']
+        }
+    }
+    
+    
     return {
         'result':{
             'num':  0
         },
         
-        'data': res 
+        'data': res,
+        
+        'data_ver_num': data_ver_num 
     }
     
 
