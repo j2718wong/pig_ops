@@ -459,6 +459,8 @@ def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0,
     
     return None
     
+
+DAYS_SINCE_FEED_BALANCE = 30
     
 @app.get("/feed_balance/list", tags=["Production Details"])
 async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_farm_hid = None, 
@@ -525,6 +527,12 @@ async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_far
         
         pig_farm_id = res[0]
     
+    
+    if date_since is None:
+        # Only request data since 30 days ago
+        dt_now      = datetime.now()
+        dt_since    = dt_now - timedelta(days = DAYS_SINCE_FEED_BALANCE)
+        date_since  = datetime.strftime(dt_since, '%Y-%m-%d')
     
         
     res = get_data_feed_balance(pig_prod_id = pig_prod_id, 
