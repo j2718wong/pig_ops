@@ -314,11 +314,11 @@ class DataAccountPigOps(BaseModel):
 
 class DataAccountChecklist(BaseModel):
     uhid:                   str = None
-    account_checklist_hid:  str = None
+    checklist_hid:          str = None
     
     
     user_id:                int = 0
-    account_checklist_id:   int = 0
+    checklist_id:           int = 0
     name:                   str
 
 

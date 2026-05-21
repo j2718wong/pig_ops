@@ -71,7 +71,7 @@ class AccountSowDueChklst(BaseModel):
        
         params = [
             data.user_id,
-            data.acc_chklst_id,
+            data.checklist_id,
             data.name
         ]
         
