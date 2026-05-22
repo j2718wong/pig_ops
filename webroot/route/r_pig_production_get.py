@@ -166,7 +166,6 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
     - Account pig operations (acc_pig_ops)
     - Sow list (breeding females)
     - Boar list (breeding males)  
-    - Staff list
     - Optional pig production list (if inc_pig_prod > 0)
     
     """
@@ -201,15 +200,6 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         return None
 
     
-    # Get farm_staff list
-    list_staff = model['pig_farm_staff'].get_list(pig_farm_id, 
-        minimum_info = minimum_info)
-    if list_staff == None:
-        # TODO what to do in case no result
-        print('Error 12')
-        return None
-        
-    
     list_pig_prod = None
     if inc_pig_prod > 0:
     
@@ -243,13 +233,6 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         replace_plain_ids_sow_boar_entry(cur_entry)
         
 
-    for cur_entry in list_staff:
-        cur_id      = cur_entry['pig_farm_staff']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['pig_farm_staff']['id']
-        cur_entry['pig_farm_staff']['hid']   = cur_hid
-        
         
     # Check for pig_farm sow_due_chklst 
     sow_due_chklst = model['pf_sow_due_chklst'].get_active_list(pig_farm_id)
@@ -259,10 +242,9 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         'acc_pig_ops':              list_acc_pig_ops,
         
         'sow_list':                 list_sow_list,
-        'boar_list':                list_boar_list,
-        'staff_list':               list_staff
-        
+        'boar_list':                list_boar_list
     }
+    
     
     if sow_due_chklst and len(sow_due_chklst) > 0:
         

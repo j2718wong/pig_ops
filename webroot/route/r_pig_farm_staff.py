@@ -384,13 +384,24 @@ async def pig_farm_staff_list(request: Request, pfhid: str,
         del cur_entry['pig_farm_staff']['user_id']
         cur_entry['pig_farm_staff']['user_hid']   = cur_hid
         
+    
+    # Get pig_farm.pig_dead data_ver_num data_ver_num
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'staff': pig_farm_ver_num['data_ver_num']['staff']
+        }
+    }
         
     return {
         'result':{
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'data_ver_num':data_ver_num
     }
     
     
