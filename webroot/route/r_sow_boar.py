@@ -1034,14 +1034,12 @@ async def sow_boar_list(request: Request, pfhid:str, sex:str = None,
     
     pig_farm_id = res[0]
     
-    
 
     if is_disposed > 0:
         res = model['sow_boar'].get_list_disposed(pig_farm_id)
     else:
         res = model['sow_boar'].get_list(pig_farm_id = pig_farm_id,
                 sex = sex, inc_user_audit = inc_user_audit, order_by = order_by)
-                    
             
             
     if res is None:
@@ -1051,6 +1049,20 @@ async def sow_boar_list(request: Request, pfhid:str, sex:str = None,
                 'code': 'ERROR_DATABASE_ERROR'
             }
         }
+    
+    
+    data_ver_num = None
+    
+    if is_disposed > 0:
+        # Get pig_farm.sow_boar_disposed data_ver_num data_ver_num
+        pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+        
+        data_ver_num = {
+            'pig_farm':{
+                'sow_boar_disposed': pig_farm_ver_num['data_ver_num']['sow_boar_disposed']
+            }
+        }
+    
         
         
     # Replace plain id
@@ -1058,13 +1070,19 @@ async def sow_boar_list(request: Request, pfhid:str, sex:str = None,
         replace_plain_ids_sow_boar_entry(cur_entry)
 
         
-    return {
+    result = {
         'result':{
             'num':  0
         },
         
         'data': res
     }
+    
+    if data_ver_num is not None:
+        result['data_ver_num'] = data_ver_num
+    
+    return result
+    
 
 
 @app.get("/sow/piglets_output", tags=["Sow Boar"])
