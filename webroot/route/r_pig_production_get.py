@@ -163,22 +163,11 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
     Retrieves initial pig farm data needed for frontend application startup.
     
     Returns farm account data including:
-    - Account pig operations (acc_pig_ops)
     - Sow list (breeding females)
     - Boar list (breeding males)  
     - Optional pig production list (if inc_pig_prod > 0)
     
     """
-    
-    
-    
-    list_acc_pig_ops =  model['account_pig_ops'].get_list(account_id, None, 
-        inc_deleted = 0, inc_user_audit = inc_user_audit)
-    if list_acc_pig_ops == None:
-        # TODO what to do in case no result
-        print('Error 8')
-        return None
-    
 
     # Get pig_farm sow list
     list_sow_list = model['sow_boar'].get_list(
@@ -216,15 +205,6 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
 
     # Remove plain_ids and not useful data blocks
     
-    for cur_entry in list_acc_pig_ops:
-        cur_id      = cur_entry['acc_pig_ops']['id']
-        cur_hid     = hashids_common.encrypt(cur_id)
-        
-        del cur_entry['acc_pig_ops']['id']
-        cur_entry['acc_pig_ops']['hid']   = cur_hid
-    
-    
-    
     for cur_entry in list_sow_list:
         replace_plain_ids_sow_boar_entry(cur_entry)
         
@@ -236,11 +216,9 @@ def get_pig_farm_initial_data(account_id, pig_farm_id, inc_pig_prod = 0,
         
     # Check for pig_farm sow_due_chklst 
     sow_due_chklst = model['pf_sow_due_chklst'].get_active_list(pig_farm_id)
-    
+
 
     result = {
-        'acc_pig_ops':              list_acc_pig_ops,
-        
         'sow_list':                 list_sow_list,
         'boar_list':                list_boar_list
     }

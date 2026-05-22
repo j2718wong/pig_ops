@@ -457,7 +457,12 @@ async def account_pig_ops_list(request: Request, ahid: str, operation_type: int 
         account hashid
         
     operation_type :int
-        1 = GESTATING; 2 = LACTATING_PIGLETS; 3 = LACTATING_SOW; 4 = GILTS
+        1 = GESTATING; 
+        2 = LACTATING_PIGLETS; 
+        3 = LACTATING_SOW; 
+        4 = GILTS
+        5 = WEANING_SOWS 
+        
         if None, will get all.
     
     inc_deleted: int
@@ -509,13 +514,70 @@ async def account_pig_ops_list(request: Request, ahid: str, operation_type: int 
         del cur_entry['acc_pig_ops']['id']
         cur_entry['acc_pig_ops']['hid']   = cur_hid
         
-            
+        
+    # Get account data_ver_num
+    res_ver_num     = model['account'].get_data_ver_num(account_id)
+    account_ver_num = res_ver_num['data_ver_num']
+    
+    
+    data_ver_num    = None
+    
+    if operation_type is None:
+        data_ver_num = {
+            'account':{
+                'gestating_ops':        account_ver_num['gesta_ops'],
+                'lactating_piglets_ops':account_ver_num['lacta_piglets_ops'],
+                'lactating_sow_ops':    account_ver_num['lacta_sow_ops'],
+                'gilt_ops':             account_ver_num['gilt_ops'],
+                'weaning_sow_ops':      account_ver_num['weaning_sow_ops']
+            }
+        }
+    
+    else:
+        if operation_type == PIG_OPERATION_TYPE_GESTATING:
+            data_ver_num = {
+                'account':{
+                    'gestating_ops':    account_ver_num['gesta_ops']
+                }
+            }
+        
+        if operation_type == PIG_OPERATION_TYPE_LACTATING_PIGLETS:
+            data_ver_num = {
+                'account':{
+                    'lactating_piglets_ops':account_ver_num['lacta_piglets_ops']
+                }
+            }
+        
+        if operation_type == PIG_OPERATION_TYPE_LACTATING_SOW:
+            data_ver_num = {
+                'account':{
+                    'lactating_sow_ops':    account_ver_num['lacta_sow_ops']
+                }
+            }
+
+        if operation_type == PIG_OPERATION_TYPE_GILT:
+            data_ver_num = {
+                'account':{
+                    'gilt_ops':         account_ver_num['gilt_ops']
+                }
+            }
+
+        if operation_type == PIG_OPERATION_TYPE_WEANING_SOW:
+            data_ver_num = {
+                'account':{
+                    'weaning_sow_ops':  account_ver_num['weaning_sow_ops']
+                }
+            }
+
+
     return {
         'result':{
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'data_ver_num': data_ver_num
     }
     
     

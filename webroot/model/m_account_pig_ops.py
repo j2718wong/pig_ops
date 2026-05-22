@@ -1,16 +1,27 @@
 # September 1, 2025
 # Jack Wong
+import os
+import sys
 
 from common_constants       import *
+
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+from base_model             import BaseModel
+
 
 # /* account_pig_ops.flag bits*/
 FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC      = 2
 
 
-class AccountPigOps:
+class AccountPigOps(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'AccountPigOps'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -28,50 +39,25 @@ class AccountPigOps:
         )  
         """
         
-        sql =  'CALL account_pig_ops_add('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.operation_type
-        sql += '%s,'    % data.num_days_since
-        sql += '%s,'    % data.is_medvac
-        
-        sql += '"%s",'  % data.name
-        
-        if data.short_name is not None and len(data.short_name) > 0:
-            sql += '"%s",'   % data.short_name
-        else:
-            sql += 'NULL,'
-        
-        if data.description is not None and len(data.description) > 0:
-            sql += '"%s");'   % data.description
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.operation_type,
+            data.num_days_since,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.is_medvac,
+            
+            data.name,
+            data.short_name        if data.short_name is not None and len(data.short_name.strip()) > 0 else None,
+            data.description       if data.description is not None and len(data.description.strip()) > 0 else None
+        ]
 
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        res = self._call_procedure('account_pig_ops_add', params)
+
+        if res is None:
+            return None
+
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -106,52 +92,28 @@ class AccountPigOps:
             in_description          VARCHAR(160)
         )
         """
-       
-        sql =  'CALL account_pig_ops_update('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.account_pig_ops_id
-        sql += '%s,'    % data.num_days_since
-        sql += '%s,'    % data.is_medvac
         
-        sql += '"%s",'  % data.name
-        
-        if data.short_name is not None and len(data.short_name) > 0:
-            sql += '"%s",'   % data.short_name
-        else:
-            sql += 'NULL,'
-        
-        if data.description is not None:
-            sql += '"%s");'   % data.description
-        else:
-            sql += 'NULL);'
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.account_pig_ops_id,
+            data.num_days_since,
+            
+            data.is_medvac,
+            
+            data.name,
+            data.short_name        if data.short_name is not None and len(data.short_name.strip()) > 0 else None,
+            data.description       if data.description is not None and len(data.description.strip()) > 0 else None
+        ]
 
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+        res = self._call_procedure('account_pig_ops_update', params)
 
+        if res is None:
+            return None
+
+        row = res[0]
+        
+        
         if row is not None:
             return {
                 'result':{
@@ -181,37 +143,20 @@ class AccountPigOps:
             in_account_pig_ops_id     INT
         )
         """
-       
-        sql =  'CALL account_pig_ops_delete('
-        sql += '%s,'    % user_id
-        sql += '%s);'   % account_pig_ops_id
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
+        params = [
+            user_id,
+            account_pig_ops_id
+        ]
 
-        # Get database connection
-        conn = self.model.db_conn
+        res = self._call_procedure('account_pig_ops_delete', params)
+
+        if res is None:
+            return None
+
+        row = res[0]
         
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'delete(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
-
+        
         if row is not None:
             return {
                 'result':{
@@ -292,91 +237,69 @@ class AccountPigOps:
                     """ % where_clause
 
         
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        if rows is None:
+            return []
             
-            rows = cursor.fetchall()
-            cursor.close()
-            
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
-            
-            for row in rows:
-                cur_flag = row[4]
-                    
-                is_medvac   = 0
-                if cur_flag & FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC > 0:
-                    is_medvac   =   1
-                    
-                
-                if inc_user_audit == 0:
-                    
-                    cur_entry = {
-                        'acc_pig_ops': {
-                            'id':               row[0],
-                            'num_days_since':   row[1],
-                            'version_num':      row[2],
-                            'operation_type':   row[3],
-                            'is_medvac':        is_medvac,
-                            
-                            'name':             row[5],
-                            'short_name':       row[6],
-                            'desc':             row[7]
-                        }
-                    }
-                
-                else:
-                    
-                    cur_entry = {
-                        'acc_pig_ops': {
-                            'id':               row[0],
-                            'num_days_since':   row[1],
-                            'version_num':      row[2],
-                            'operation_type':   row[3],
-                            'is_medvac':        is_medvac,
-                            
-                            'name':             row[5],
-                            'short_name':       row[6],
-                            'desc':             row[7]
-                        },
-                        
-                        'added_by': {
-                            'name_last':        row[8],
-                            'name_first':       row[9],
-                            'dt_entry':         str(row[10]) if row[10] else None
-                        },
-                        
-                        'last_update':{
-                            'name_last':        row[11],
-                            'name_first':       row[12],
-                            'dt_update':        str(row[13]) if row[13] else None
-                        }
-                    }
-                    
-                result.append(cur_entry)
         
+            
+        for row in rows:
+            cur_flag = row[4]
+                
+            is_medvac   = 0
+            if cur_flag & FLAG_BIT_ACCOUNT_PIG_OPS_IS_MEDVAC > 0:
+                is_medvac   =   1
+                
+            
+            if inc_user_audit == 0:
+                
+                cur_entry = {
+                    'acc_pig_ops': {
+                        'id':               row[0],
+                        'num_days_since':   row[1],
+                        'version_num':      row[2],
+                        'operation_type':   row[3],
+                        'is_medvac':        is_medvac,
+                        
+                        'name':             row[5],
+                        'short_name':       row[6],
+                        'desc':             row[7]
+                    }
+                }
+            
+            else:
+                
+                cur_entry = {
+                    'acc_pig_ops': {
+                        'id':               row[0],
+                        'num_days_since':   row[1],
+                        'version_num':      row[2],
+                        'operation_type':   row[3],
+                        'is_medvac':        is_medvac,
+                        
+                        'name':             row[5],
+                        'short_name':       row[6],
+                        'desc':             row[7]
+                    },
+                    
+                    'added_by': {
+                        'name_last':        row[8],
+                        'name_first':       row[9],
+                        'dt_entry':         str(row[10]) if row[10] else None
+                    },
+                    
+                    'last_update':{
+                        'name_last':        row[11],
+                        'name_first':       row[12],
+                        'dt_update':        str(row[13]) if row[13] else None
+                    }
+                }
+                
+            result.append(cur_entry)
+    
         return result
     
     

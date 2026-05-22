@@ -430,7 +430,7 @@ async def account_data_ver_num(request: Request, ahid: str, r: int = 0):
     uhid = result
     
     
-    res = hashids_account.decrypt(pfhid)
+    res = hashids_account.decrypt(ahid)
     if len(res) == 0:
         return {
             'result':{
