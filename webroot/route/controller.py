@@ -166,6 +166,7 @@ class Controller:
         enable_manual_email     = 0
         enable_referral         = 0
         joint_account_pig_farm_create = 0
+        enable_pig_prod_cache   = 0
 
 
         temp = os.getenv('UI_ENABLE_MANUAL_EMAIL_LOGIN')
@@ -201,14 +202,22 @@ class Controller:
                 test = 1
 
         
-
-        
+        temp = os.getenv('UI_ENABLE_PIG_PRODUCTION_CACHE')
+        if temp is not None:
+            try:
+                temp_int = int(temp)
+                
+                if temp_int > 0:
+                    enable_pig_prod_cache = 1
+            except:
+                test = 1
 
 
         ui_settings = {
-            'enable_manual_email':  enable_manual_email,
-            'enable_referral':      enable_referral,
-            'joint_account_pig_farm_create': joint_account_pig_farm_create
+            'enable_manual_email':      enable_manual_email,
+            'enable_referral':          enable_referral,
+            'joint_account_pig_farm_create': joint_account_pig_farm_create,
+            'enable_pig_prod_cache':    enable_pig_prod_cache
         }
 
         

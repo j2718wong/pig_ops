@@ -743,13 +743,12 @@ async def pig_prod_list(request: Request, pfhid:str, pig_prod_type:int = 0,  is_
 
 
     pig_prod_type: int
-        combination of flag bits
-        
-        1 = PROD_TYPE_GESTA
-        2 = PROD_TYPE_LACTA
-        4 = PROD_TYPE_FATTENING
-    
-
+        - 1: Gestating only (pregnant sows)
+        - 2: Lactating only (sows with piglets)
+        - 3: Gestating + Lactating (active breeding sows)
+        - 4: Fattening (weaning + growing pigs ready for harvest)
+        - 5: All active (Gestating, Lactating, Fattening)
+        - 6: Harvested + Closed (completed/archived entries)
 
     """
     result = get_uhid_or_redirect(request)
@@ -775,12 +774,30 @@ async def pig_prod_list(request: Request, pfhid:str, pig_prod_type:int = 0,  is_
     pig_farm_id = res[0]
     res = get_pig_prod_list(pig_farm_id, pig_prod_type, is_mob_view)
     
+    
+    # Get pig_farm production data_ver_num
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'pig_prod':     pig_farm_ver_num['data_ver_num']['pig_prod'],
+            'prod_history': pig_farm_ver_num['data_ver_num']['prod_history'],
+            'prod_gesta':   pig_farm_ver_num['data_ver_num']['prod_gesta'],
+            'prod_lacta':   pig_farm_ver_num['data_ver_num']['prod_lacta'],
+            'prod_fatten':  pig_farm_ver_num['data_ver_num']['prod_fatten']
+        }
+    }
+
+    
+    
     return {
         'result':{
             'num':  0
         },
         
-        'data': res 
+        'data': res,
+        
+        'data_ver_num': data_ver_num 
     }
     
 

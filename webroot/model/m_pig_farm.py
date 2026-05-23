@@ -478,14 +478,18 @@ class PigFarm(BaseModel):
                     a.data_ver_num_pig_prod, 
                     a.data_ver_num_prod_history, 
                     a.data_ver_num_staff,    
+                    
                     a.data_ver_num_feed_buy,
                     a.data_ver_num_feed_balance,
                     a.data_ver_num_not_pregnant,
                     a.data_ver_num_boar_ext_mate,
                     a.data_ver_num_pig_dead,
-                    a.data_ver_num_sd_chklst,
-                    a.data_ver_num_sb_disposed 
                     
+                    a.data_ver_num_sd_chklst,
+                    a.data_ver_num_sb_disposed,
+                    a.data_ver_num_prod_gesta, 
+                    a.data_ver_num_prod_lacta,  
+                    a.data_ver_num_prod_fatten
                     
                 FROM pig_farm a
                 LEFT OUTER JOIN app_country b ON a.country_id = b.id
@@ -525,13 +529,19 @@ class PigFarm(BaseModel):
                 cur_data_ver_num_pig_prod       = row[14]
                 cur_data_ver_num_prod_history   = row[15]
                 cur_data_ver_num_staff          = row[16]
+                
                 cur_data_ver_num_feed_buy       = row[17]
                 cur_data_ver_num_feed_balance   = row[18]
                 cur_data_ver_num_not_pregnant   = row[19]
                 cur_data_ver_num_boar_ext_mate  = row[20]
                 cur_data_ver_num_pig_dead       = row[21]
+                
                 cur_data_ver_num_sd_chklst      = row[22]
                 cur_data_ver_num_sb_disposed    = row[23]
+                cur_data_ver_num_prod_gesta     = row[24]
+                cur_data_ver_num_prod_lacta     = row[25]
+                cur_data_ver_num_prod_fatten    = row[26]
+                
                 
                 
                 cur_entry = {
@@ -575,13 +585,19 @@ class PigFarm(BaseModel):
                         'pig_prod':         cur_data_ver_num_pig_prod,
                         'prod_history':     cur_data_ver_num_prod_history,
                         'staff':            cur_data_ver_num_staff,   
+                        
                         'feed_buy':         cur_data_ver_num_feed_buy,
                         'feed_balance':     cur_data_ver_num_feed_balance,
                         'not_pregnant':     cur_data_ver_num_not_pregnant,
                         'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
                         'pig_dead':         cur_data_ver_num_pig_dead,
+                        
                         'checklist':        cur_data_ver_num_sd_chklst,  
-                        'sb_disposed':      cur_data_ver_num_sb_disposed    
+                        'sb_disposed':      cur_data_ver_num_sb_disposed,
+                        'prod_gesta':       cur_data_ver_num_prod_gesta, 
+                        'prod_lacta':       cur_data_ver_num_prod_lacta, 
+                        'prod_fatten':      cur_data_ver_num_prod_fatten
+                            
                     }
                     
                 }
@@ -647,14 +663,19 @@ class PigFarm(BaseModel):
                     data_ver_num_boar,     
                     data_ver_num_pig_prod,
                     data_ver_num_prod_history,
-                    data_ver_num_staff,    
+                    data_ver_num_staff, 
+                       
                     data_ver_num_feed_buy,
                     data_ver_num_feed_balance,
                     data_ver_num_not_pregnant,
                     data_ver_num_boar_ext_mate,
                     data_ver_num_pig_dead,
+                    
                     data_ver_num_sd_chklst,
-                    data_ver_num_sb_disposed 
+                    data_ver_num_sb_disposed,
+                    data_ver_num_prod_gesta, 
+                    data_ver_num_prod_lacta,  
+                    data_ver_num_prod_fatten
                     
                 FROM pig_farm 
                 WHERE id = %s
@@ -672,15 +693,20 @@ class PigFarm(BaseModel):
             cur_data_ver_num_boar           = row[1]   
             cur_data_ver_num_pig_prod       = row[2]
             cur_data_ver_num_prod_history   = row[3]
-            cur_data_ver_num_staff          = row[4]  
+            cur_data_ver_num_staff          = row[4]
+              
             cur_data_ver_num_feed_buy       = row[5]
             cur_data_ver_num_feed_balance   = row[6]
             cur_data_ver_num_not_pregnant   = row[7]
             cur_data_ver_num_boar_ext_mate  = row[8]
             cur_data_ver_num_pig_dead       = row[9]
+            
             cur_data_ver_num_sd_chklst      = row[10]
             cur_data_ver_num_sb_disposed    = row[11]
-            
+            cur_data_ver_num_prod_gesta     = row[12]
+            cur_data_ver_num_prod_lacta     = row[13]
+            cur_data_ver_num_prod_fatten    = row[14]
+
             
             if return_array == 0:
                 cur_entry = {
@@ -690,13 +716,18 @@ class PigFarm(BaseModel):
                         'pig_prod':         cur_data_ver_num_pig_prod,
                         'prod_history':     cur_data_ver_num_prod_history,
                         'staff':            cur_data_ver_num_staff,   
+                        
                         'feed_buy':         cur_data_ver_num_feed_buy,
                         'feed_balance':     cur_data_ver_num_feed_balance,
                         'not_pregnant':     cur_data_ver_num_not_pregnant,
                         'boar_ext_mate':    cur_data_ver_num_boar_ext_mate,
                         'pig_dead':         cur_data_ver_num_pig_dead,
+                        
                         'sow_due_checklist':cur_data_ver_num_sd_chklst,
-                        'sow_boar_disposed':cur_data_ver_num_sb_disposed     
+                        'sow_boar_disposed':cur_data_ver_num_sb_disposed,
+                        'prod_gesta':       cur_data_ver_num_prod_gesta, 
+                        'prod_lacta':       cur_data_ver_num_prod_lacta, 
+                        'prod_fatten':      cur_data_ver_num_prod_fatten     
                         
                     }
                 }
@@ -709,14 +740,19 @@ class PigFarm(BaseModel):
                     cur_data_ver_num_boar,       
                     cur_data_ver_num_pig_prod,
                     cur_data_ver_num_prod_history,   
-                    cur_data_ver_num_staff,      
+                    cur_data_ver_num_staff,
+                          
                     cur_data_ver_num_feed_buy,
                     cur_data_ver_num_feed_balance,   
                     cur_data_ver_num_not_pregnant,
                     cur_data_ver_num_boar_ext_mate,
                     cur_data_ver_num_pig_dead,
+                    
                     cur_data_ver_num_sd_chklst,
-                    cur_data_ver_num_sb_disposed 
+                    cur_data_ver_num_sb_disposed,
+                    cur_data_ver_num_prod_gesta, 
+                    cur_data_ver_num_prod_lacta, 
+                    cur_data_ver_num_prod_fatten 
                 ]
 
         return None
