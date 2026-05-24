@@ -348,8 +348,12 @@ async def spa_dashboard(request: Request, lang: str = None):
     SPA Dashboard - requires authentication
     Supports language parameter: /app?lang=bis
     """
+    print(f"/app Cookies: {request.cookies}")
+    print(f"/app Authorization header: {request.headers.get('authorization')}")
     
     uhid = get_current_uhid(request)
+    
+    print(f"/app uhid: {uhid}")
     
     if not uhid:
         # No token, redirect to login with language
