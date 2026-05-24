@@ -30,6 +30,13 @@
     
     <script>
         const APP_VERSION = '{{ page_data.app_version }}'; 
+        
+        // At the very top of index_mob.html script
+        const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+        if (token && !localStorage.getItem('access_token')) {
+            // Restore from sessionStorage
+            localStorage.setItem('access_token', token);
+        }
     
         // If offline and token exists, ensure we're at the right page
         if (!navigator.onLine && localStorage.getItem('access_token') && window.location.pathname !== '/app') {

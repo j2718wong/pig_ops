@@ -1295,6 +1295,9 @@
                 urlLang = 'en';
             }
             
+            // Ensure sessionStorage has the token for the redirect
+            sessionStorage.setItem('access_token', bearer_token);
+            
             // Redirect to SPA with language parameter
             window.location.href = `/app?lang=${urlLang}`;
         }
