@@ -56,9 +56,9 @@ INS_STATUS_ID_TERMINATED                            = 2
 
 
 ACC_BILL_STATUS = {
-    'NEW':      1,
-    'OVERDUE':  2,
-    'PAID':     3
+    'NEW':      0,
+    'OVERDUE':  1,
+    'PAID':     2
 }
 
 

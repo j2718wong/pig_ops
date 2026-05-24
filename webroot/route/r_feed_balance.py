@@ -405,9 +405,6 @@ async def feed_balance_all_add(request: Request):
 
 
 
-
-
-
 def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0, 
         date_since = None, inc_user_audit:int = 0): 
     """

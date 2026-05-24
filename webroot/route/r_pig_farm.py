@@ -515,7 +515,6 @@ async def pig_farm_last_feed_balance(request: Request, pfhid: str):
     
     pig_farm_id = res[0]
         
-        
 
     res = model['feed_balance'].get_last_feed_balance(pig_farm_id)
 
@@ -527,6 +526,16 @@ async def pig_farm_last_feed_balance(request: Request, pfhid: str):
                 'code': 'ERROR_DATABASE_ERROR'
             }
         }
+
+    
+    # Get pig_farm.pig_dead data_ver_num data_ver_num
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'feed_balance': pig_farm_ver_num['data_ver_num']['feed_balance']
+        }
+    }
     
             
     return {
@@ -534,7 +543,9 @@ async def pig_farm_last_feed_balance(request: Request, pfhid: str):
             'num':  0
         },
         
-        'data': res
+        'data': res,
+        
+        'data_ver_num': data_ver_num
     }
     
 

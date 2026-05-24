@@ -175,6 +175,13 @@
     
     "page_dashboard":{
         "labels":{
+            "account_locked":{
+                "title":        "Account Locked",
+                "view_bill":    "View Bill"
+                
+                
+            },
+            
             "stats_card":{
                 
                 "LactaPiglets":  "Baktin", 
