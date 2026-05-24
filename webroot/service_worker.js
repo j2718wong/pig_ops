@@ -1,15 +1,22 @@
 // service_worker.js
 
-const CACHE_NAME = 'superpig-v2';
-const urlsToCache = [
-    '/app',
-    '/en',
-    '/bis',
-    '/tag',
-    '/index_mob.html',
+const CACHE_NAME    = 'superpig-v4';
+const SHELL_CACHE   = 'superpig-shell-v1';
+
+
+const STATIC_ASSETS = [
     '/manifest.json',
     '/static_m/images/logo/superpig_192_192.png',
     '/static_m/images/logo/superpig_512_512.png'
+];
+
+// App shell files (cached for offline)
+const SHELL_FILES = [
+    '/index_mob.html',
+    '/app',
+    '/en',
+    '/bis',
+    '/tag'
 ];
 
 
@@ -17,9 +24,17 @@ const urlsToCache = [
 self.addEventListener('install', (event) => {
     console.log('Service Worker installing...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(urlsToCache);
-        })
+        Promise.all([
+            // Cache static assets
+            caches.open(CACHE_NAME).then((cache) => {
+                return cache.addAll(STATIC_ASSETS);
+            }),
+            
+            // Cache app shell for offline
+            caches.open(SHELL_CACHE).then((cache) => {
+                return cache.addAll(SHELL_FILES);
+            })
+        ])
     );
     self.skipWaiting(); // Force activation
 });
@@ -79,9 +94,7 @@ self.addEventListener('fetch', (event) => {
         path.startsWith('/sow_boar_mate/')      ||
         
         path.startsWith('/system/')
-    )
-    
-    {
+    ){
         // Don't intercept API calls
         return;
     }
@@ -90,15 +103,30 @@ self.addEventListener('fetch', (event) => {
     // --- 2. Handle HTML Navigation (Cache First) ---
     if (request.mode === 'navigate') {
         event.respondWith(
-            fetch(request).catch(async () => {
-                // If offline, try to serve /app first
-                const appCache = await caches.match('/app');
-                if (appCache) {
-                    return appCache;
-                }
-                // Fallback to SPA shell
-                return caches.match('/index_mob.html');
-            })
+            fetch(request)
+                .then(async (response) => {
+                    // Cache fresh version in background
+                    const cache = await caches.open(SHELL_CACHE);
+                    cache.put(request, response.clone());
+                    return response;
+                })
+                .catch(async () => {
+                    // Offline - serve cached app shell
+                    const cachedShell = await caches.match('/index_mob.html');
+                    if (cachedShell) {
+                        // Add special header to indicate offline mode
+                        const modifiedResponse = new Response(cachedShell.body, {
+                            status: 200,
+                            statusText: 'OK',
+                            headers: {
+                                ...cachedShell.headers,
+                                'X-Offline-Mode': 'true'
+                            }
+                        });
+                        return modifiedResponse;
+                    }
+                    return new Response('Offline - App not available', { status: 503 });
+                })
         );
         return;
     }
@@ -108,12 +136,21 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
-                // Return cached response if found
                 if (response) {
+                    // Background update for static assets
+                    fetch(event.request).then(async (freshResponse) => {
+                        if (freshResponse && freshResponse.status === 200) {
+                            const cache = await caches.open(CACHE_NAME);
+                            cache.put(event.request, freshResponse);
+                        }
+                    }).catch(() => {});
                     return response;
                 }
-                // Otherwise fetch from network
-                return fetch(event.request);
+                return fetch(event.request).then(async (networkResponse) => {
+                    const cache = await caches.open(CACHE_NAME);
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                });
             })
     );
 });
@@ -123,18 +160,41 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('activate', (event) => {
     console.log('Service Worker activating...');
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+        Promise.all([
+            caches.keys().then((cacheNames) => {
+                return Promise.all(
+                    cacheNames.map((cacheName) => {
+                        if (cacheName !== CACHE_NAME && cacheName !== SHELL_CACHE) {
+                            console.log('Deleting old cache:', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            }),
+            // Claim clients immediately
+            self.clients.claim()
+        ])
     );
-    return self.clients.claim(); // Take control immediately
+});
+
+
+// Listen for messages from the app
+self.addEventListener('message', (event) => {
+    if (event.data === 'skipWaiting') {
+        self.skipWaiting();
+    }
+    if (event.data === 'clearAuthCache') {
+        // Clear sensitive cached data on logout
+        caches.open(SHELL_CACHE).then(cache => {
+            cache.keys().then(keys => {
+                keys.forEach(key => {
+                    if (key.url.includes('/app') || key.url.includes('/user/')) {
+                        cache.delete(key);
+                    }
+                });
+            });
+        });
+    }
 });
 
 
