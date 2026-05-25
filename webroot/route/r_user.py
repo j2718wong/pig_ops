@@ -1049,6 +1049,12 @@ import os
 from urllib.parse import urlencode
 
 
+
+"""
+Handle the Google OAuth redirect callback
+"""
+    
+# Check for error from Google
 @app.get("/auth/google/callback", response_class=HTMLResponse)
 async def google_callback(
     request: Request, 
@@ -1057,16 +1063,49 @@ async def google_callback(
     state: str = None,
     error: str = None
 ):
-    """
-    Handle the Google OAuth redirect callback
-    """
+    print("=" * 50)
+    print("CALLBACK ENDPOINT CALLED")
+    print(f"Full request URL: {request.url}")
+    print(f"Query params: {request.query_params}")
+    print(f"Code received: {code is not None}")
+    print(f"State received: {state}")
+    print(f"Error received: {error}")
+    
+    # Check cookies
+    cookies = request.cookies
+    print(f"Cookies received: {list(cookies.keys())}")
+    stored_state = cookies.get("oauth_state")
+    print(f"Stored state from cookie: {stored_state}")
+    
     # Check for error from Google
     if error:
-        print(f"Google OAuth error: {error}")
-        return RedirectResponse(url="/login?error=google_auth_failed")
+        print(f"❌ Google OAuth error: {error}")
+        return RedirectResponse(url="/?error=google_auth_failed")
     
     if not code:
-        return RedirectResponse(url="/login?error=no_code")
+        print("❌ No code received from Google")
+        return RedirectResponse(url="/?error=no_code")
+    
+    # Verify state parameter
+    if not stored_state or not state or stored_state != state:
+        print(f"❌ State mismatch!")
+        print(f"   Stored state: {stored_state}")
+        print(f"   Received state: {state}")
+        return RedirectResponse(url="/?error=csrf_mismatch")
+    
+    print("✅ State verification passed")
+    print("=" * 50)
+    
+    # Clear the state cookie
+    response = RedirectResponse(url="/")
+    response.delete_cookie("oauth_state")
+    
+    
+    
+    # Clear the state cookie
+    response = RedirectResponse(url="/")
+    response.delete_cookie("oauth_state")
+    
     
     try:
         # Exchange authorization code for tokens
@@ -1176,21 +1215,68 @@ async def google_callback(
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Redirecting...</title>
+                <title>Logging you in...</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        background: #f5f5f5;
+                    }}
+                    .container {{
+                        text-align: center;
+                        padding: 20px;
+                    }}
+                    .spinner {{
+                        width: 40px;
+                        height: 40px;
+                        border: 3px solid #f3f3f3;
+                        border-top: 3px solid #1e3a8a;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 20px;
+                    }}
+                    @keyframes spin {{
+                        0% {{ transform: rotate(0deg); }}
+                        100% {{ transform: rotate(360deg); }}
+                    }}
+                    p {{ color: #666; }}
+                </style>
             </head>
             <body>
+                <div class="container">
+                    <div class="spinner"></div>
+                    <p>Logging you in...</p>
+                </div>
                 <script>
-                    // Store tokens in localStorage
-                    localStorage.setItem('access_token', '{access_token}');
-                    localStorage.setItem('user_picture', '{user_picture}');
+                    // Save token to ALL storage locations (for PWA)
+                    const token = '{access_token}';
                     
-                    // Also set cookie for server-side auth (optional, can be removed)
-                    document.cookie = "access_token={access_token}; path=/; max-age=" + 60*60*24*7;
+                    // localStorage (primary for PWA)
+                    localStorage.setItem('access_token', token);
                     
-                    // Redirect to home page
-                    window.location.href = '/login';
+                    // sessionStorage (backup)
+                    sessionStorage.setItem('access_token', token);
+                    
+                    // Cookie (for server-side)
+                    document.cookie = "access_token=" + token + "; path=/; max-age=" + (60 * 60 * 24 * 30) + "; SameSite=Lax";
+                    
+                    // Save user picture if available
+                    if ('{user_picture}') {{
+                        localStorage.setItem('user_picture', '{user_picture}');
+                    }}
+                    
+                    // Get language preference
+                    const savedLang = localStorage.getItem('user_language') || 'en';
+                    
+                    // Redirect to app (NOT login!)
+                    console.log('Google auth successful, redirecting to /app');
+                    window.location.href = '/app?lang=' + savedLang;
                 </script>
-                <p>Redirecting to home page...</p>
             </body>
             </html>
             """
@@ -1205,6 +1291,10 @@ async def google_callback(
         return RedirectResponse(url=f"/login?error={str(e)}")    
 
 
+from urllib.parse import urlencode
+import secrets
+from fastapi import Request
+from fastapi.responses import RedirectResponse
 
 
 @app.get("/auth/google/login")
@@ -1212,26 +1302,48 @@ async def google_login(request: Request):
     """
     Initiate Google OAuth login flow
     """
-    encoded = urlencode({
-                'client_id': GOOGLE_CLIENT_ID,
-                'redirect_uri': f"{str(request.base_url).rstrip('/')}{GOOGLE_REDIRECT_URI}",
-                'response_type': 'code',
-                'scope': 'email profile openid',
-                'access_type': 'offline',
-                'prompt': 'consent'
-            })
-            
-    # Store viewport dimensions in cookies for later use
+    # Generate a random CSRF token
+    state_token = secrets.token_urlsafe(32)
+    
+    
+    # Build the params dictionary first (cleaner and avoids syntax errors)
+    params = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'redirect_uri': f"{str(request.base_url).rstrip('/')}{GOOGLE_REDIRECT_URI}",
+        'response_type': 'code',
+        'scope': 'email profile openid',
+        'access_type': 'offline',
+        'prompt': 'consent',
+        'state': state_token
+    }
+    
+    # Encode the params
+    encoded_params = urlencode(params)
+    
+    
+    # Create the redirect response
     response = RedirectResponse(
-        url=f"https://accounts.google.com/o/oauth2/v2/auth?{encoded}"
+        url=f"https://accounts.google.com/o/oauth2/v2/auth?{encoded_params}",
+        status_code=302  # Explicitly use 302 instead of default 307
     )
     
-    # Store viewport dimensions if passed as query params
+    
+    # Store state in a cookie to verify on callback
+    response.set_cookie(
+        key="oauth_state",
+        value=state_token,
+        max_age=600,  # 10 minutes should be enough
+        httponly=True,
+        secure=False,  # Set to True in production with HTTPS
+        samesite="lax"
+    )
+    
+    # Store viewport dimensions
     if request.query_params.get('viewport_width'):
         response.set_cookie(
             key="viewport_width",
             value=request.query_params.get('viewport_width'),
-            max_age=60,  # Short-lived, just for the callback
+            max_age=60,
             httponly=True
         )
     if request.query_params.get('viewport_height'):
@@ -1242,7 +1354,11 @@ async def google_login(request: Request):
             httponly=True
         )
     
+
+
     return response
+
+
 
 
 

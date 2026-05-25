@@ -54,6 +54,17 @@ self.addEventListener('fetch', (event) => {
     const path      = url.pathname;
     const request   = event.request;
     
+    // Skip OAuth and authentication endpoints
+    if (url.pathname.startsWith('/auth/') || 
+        url.pathname.startsWith('/login') ||
+        url.pathname.startsWith('/logout') ||
+        url.hostname.includes('accounts.google.com') ||
+        url.hostname.includes('googleapis.com')) {
+        // Don't intercept - let the browser handle normally
+        return;
+    }
+    
+    
     // 1.) Skip API calls - let them fail normally; app handles offline
     if (path.startsWith('/country/')            ||
         path.startsWith('/lookup/')             ||
