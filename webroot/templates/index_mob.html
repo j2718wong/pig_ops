@@ -953,17 +953,6 @@
 
 
     <script type="text/javascript">
-        const bearer_token = localStorage.getItem('access_token');
-
-        if (!bearer_token) {
-            // No token, redirect to login
-            window.location.href = '/login';
-        } else {
-            // Token exists, just load the SPA (NO REDIRECT TO /app)
-            console.log('Token found, loading SPA');
-            // Your normal SPA initialization code here
-        }
-                
         
         // Ui settings
         window.SUPERPIG_UI_SETTINGS = {{ page_data.app_ui_settings }};

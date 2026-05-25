@@ -127,6 +127,12 @@ self.addEventListener('fetch', (event) => {
     }
     
     
+    if (request.method !== 'GET') {
+        // Don't cache POST, PUT, DELETE, etc.
+        return;
+    }
+    
+    
     // 1.) Skip API calls - let them fail normally; app handles offline
     if (path.startsWith('/country/')            ||
         path.startsWith('/lookup/')             ||
