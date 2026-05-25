@@ -8,7 +8,20 @@ const STATIC_ASSETS = [
     '/manifest.json',
     '/static_m/images/logo/superpig_192_192.png',
     '/static_m/images/logo/superpig_512_512.png',
-    '/static_m/js/pwa-handler.js'
+    '/static_m/js/pwa-handler.js',
+    
+    
+    // Add MAR images
+    '/static_m/images/mar/mar_home.png',
+    '/static_m/images/mar/mar_sow_list.png',
+    '/static_m/images/mar/mar_gesta.png',
+    '/static_m/images/mar/mar_farrowing.png',
+    '/static_m/images/mar/mar_lacta.png',
+    '/static_m/images/mar/mar_pig_ops.png',
+    '/static_m/images/mar/mar_fattening.png',
+    '/static_m/images/mar/mar_feed_records.png',
+    '/static_m/images/mar/mar_no_internet.png',
+    '/static_m/images/mar/mar_report.png'
 ];
 
 // App shell files (cached for offline)
@@ -178,33 +191,50 @@ self.addEventListener('fetch', (event) => {
     // --- 3. Handle static assets with STALE-WHILE-REVALIDATE (best for offline) ---
     event.respondWith(
         (async () => {
-            const cache = await caches.open(CACHE_NAME);
-            const cachedResponse = await cache.match(event.request);
-            
-            // Return cached response immediately if available
-            if (cachedResponse) {
-                // But update cache in background
-                fetch(event.request).then(async (networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        await cache.put(event.request, networkResponse);
-                    }
-                }).catch(() => {
-                    // Network error, keep using cached version
-                });
-                return cachedResponse;
-            }
-            
-            // Not in cache, try network
             try {
-                const networkResponse = await fetch(event.request);
-                if (networkResponse && networkResponse.status === 200) {
-                    await cache.put(event.request, networkResponse.clone());
+                const cache = await caches.open(CACHE_NAME);
+                const cachedResponse = await cache.match(event.request);
+                
+                // Return cached response immediately if available
+                if (cachedResponse) {
+                    // But update cache in background (don't await, don't crash)
+                    fetch(event.request).then(async (networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            await cache.put(event.request, networkResponse.clone());
+                        }
+                    }).catch((err) => {
+                        // Silently fail - we have cache
+                        console.log('Background update failed:', err.message);
+                    });
+                    return cachedResponse;
                 }
-                return networkResponse;
+                
+                // Not in cache, try network
+                try {
+                    const networkResponse = await fetch(event.request);
+                    if (networkResponse && networkResponse.status === 200) {
+                        await cache.put(event.request, networkResponse.clone());
+                    }
+                    return networkResponse;
+                } catch (error) {
+                    console.log('Failed to fetch:', event.request.url);
+                    // Return a simple error response instead of crashing
+                    return new Response('Resource not available offline', { 
+                        status: 404,
+                        headers: { 'Content-Type': 'text/plain' }
+                    });
+                }
             } catch (error) {
-                // Network error and not in cache
-                console.log('Failed to fetch:', event.request.url);
-                return new Response('Resource not available offline', { status: 404 });
+                // Catch any unexpected errors in the whole handler
+                console.error('Service worker fetch error:', error);
+                console.error('Failed URL:', event.request.url);
+                
+                // Try network as fallback
+                try {
+                    return await fetch(event.request);
+                } catch (e) {
+                    return new Response('Service worker error', { status: 500 });
+                }
             }
         })()
     );
