@@ -29,7 +29,7 @@
     
     
     <script>
-        const APP_VERSION = '1.60.201.234'; 
+        const APP_VERSION = '{{ page_data.app_version }}'; 
         
         // At the very top of index_mob.html script
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
