@@ -1189,13 +1189,34 @@
         
     </script>
 
-<!-- Simple Debug Panel - Plain Text -->
-<div id="pwa-debug" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: black; color: lime; font-family: monospace; font-size: 11px; padding: 8px; z-index: 999999; max-height: 200px; overflow: auto; white-space: pre; opacity: 0.9;">
+
+<!-- Simple Debug Panel with Copy Button - Plain Text -->
+<div id="pwa-debug" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: black; color: lime; font-family: monospace; font-size: 11px; padding: 8px; z-index: 999999; max-height: 250px; overflow: auto; white-space: pre; opacity: 0.95; border-radius: 8px;">
 </div>
 
 <script>
 (function() {
     const debugDiv = document.getElementById('pwa-debug');
+    let currentDebugText = "";
+    
+    // Create copy button
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = '📋 Copy';
+    copyBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1e3a8a; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-family: monospace; font-size: 11px; cursor: pointer; z-index: 1000000;';
+    copyBtn.onclick = function() {
+        navigator.clipboard.writeText(currentDebugText).then(() => {
+            copyBtn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = '📋 Copy';
+            }, 2000);
+        }).catch(() => {
+            copyBtn.textContent = '❌ Failed';
+            setTimeout(() => {
+                copyBtn.textContent = '📋 Copy';
+            }, 2000);
+        });
+    };
+    document.body.appendChild(copyBtn);
     
     async function updateDebug() {
         let lines = [];
@@ -1267,14 +1288,15 @@
             lines.push("Cache API not supported");
         }
         
-        debugDiv.textContent = lines.join("\n");
+        currentDebugText = lines.join("\n");
+        debugDiv.textContent = currentDebugText;
     }
     
     // Update every 3 seconds
     updateDebug();
     setInterval(updateDebug, 3000);
 })();
-</script>    
+</script>   
 
  
 </body>
