@@ -49,6 +49,17 @@
 
     <script src="/static_m/js/pwa-handler.js?v={{ page_data.app_version }}" defer></script>
     
+    <script>
+    // Fallback registration in case pwa-handler fails
+    if ('serviceWorker' in navigator && !window.swRegistration) {
+        setTimeout(() => {
+            navigator.serviceWorker.register('/service_worker.js', { scope: '/' })
+                .then(reg => console.log('✅ Fallback SW registered:', reg))
+                .catch(err => console.error('❌ Fallback SW failed:', err));
+        }, 1000);
+    }
+    </script>
+    
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
