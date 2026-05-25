@@ -29,7 +29,7 @@
     
     
     <script>
-        const APP_VERSION = '{{ page_data.app_version }}'; 
+        const APP_VERSION = '1.60.201.234'; 
         
         // At the very top of index_mob.html script
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
@@ -48,6 +48,21 @@
     </script>
 
     <script src="/static_m/js/pwa-handler.js?v={{ page_data.app_version }}" defer></script>
+    
+    <script>
+        console.log('Checking pwa-handler.js...');
+        console.log('__pwaHandlerInitialized:', window.__pwaHandlerInitialized);
+        
+        if (!window.__pwaHandlerInitialized) {
+            console.log('ERROR: pwa-handler.js failed to initialize!');
+            // Manually register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service_worker.js')
+                    .then(reg => console.log('Manual SW register success:', reg))
+                    .catch(err => console.log('Manual SW register failed:', err));
+            }
+        }
+    </script>
     
     <script>
     // Fallback registration in case pwa-handler fails
@@ -1174,7 +1189,93 @@
         
     </script>
 
+<!-- Simple Debug Panel - Plain Text -->
+<div id="pwa-debug" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: black; color: lime; font-family: monospace; font-size: 11px; padding: 8px; z-index: 999999; max-height: 200px; overflow: auto; white-space: pre; opacity: 0.9;">
+</div>
+
+<script>
+(function() {
+    const debugDiv = document.getElementById('pwa-debug');
     
+    async function updateDebug() {
+        let lines = [];
+        
+        lines.push("=== PWA DEBUG ===");
+        lines.push("Time: " + new Date().toLocaleTimeString());
+        lines.push("");
+        
+        // Service Worker
+        lines.push("[SERVICE WORKER]");
+        lines.push("navigator.onLine: " + (navigator.onLine ? "ONLINE" : "OFFLINE"));
+        lines.push("SW supported: " + ('serviceWorker' in navigator ? "YES" : "NO"));
+        lines.push("SW registered: " + (window.swRegistration ? "YES" : "NO"));
+        
+        // Get registration status
+        if ('serviceWorker' in navigator) {
+            try {
+                const reg = await navigator.serviceWorker.getRegistration();
+                if (reg) {
+                    lines.push("SW active: " + (reg.active ? "YES" : "NO"));
+                    lines.push("SW scope: " + reg.scope);
+                } else {
+                    lines.push("SW active: NO REGISTRATION");
+                }
+            } catch(e) {
+                lines.push("SW error: " + e.message);
+            }
+        }
+        lines.push("");
+        
+        // Token
+        lines.push("[AUTH TOKEN]");
+        const token = localStorage.getItem('access_token');
+        lines.push("Token exists: " + (token ? "YES (" + token.substring(0,20) + "...)" : "NO"));
+        lines.push("");
+        
+        // PWA Handler
+        lines.push("[PWA HANDLER]");
+        lines.push("Handler initialized: " + (window.__pwaHandlerInitialized ? "YES" : "NO"));
+        lines.push("APP_VERSION: " + (window.APP_VERSION || "MISSING"));
+        lines.push("");
+        
+        // PWA Mode
+        lines.push("[PWA MODE]");
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        lines.push("Standalone mode: " + (isStandalone ? "YES (PWA)" : "NO (Browser)"));
+        lines.push("");
+        
+        // Caches
+        lines.push("[CACHES]");
+        if ('caches' in window) {
+            try {
+                const keys = await caches.keys();
+                lines.push("Cache names: " + (keys.length ? keys.join(", ") : "(empty)"));
+                
+                // Check main cache
+                const cache = await caches.open('superpig-v6');
+                const cachedKeys = await cache.keys();
+                lines.push("superpig-v6 items: " + cachedKeys.length);
+                
+                // Count JS files
+                const jsCount = cachedKeys.filter(k => k.url.includes('.js')).length;
+                lines.push("  - JS files: " + jsCount);
+                
+            } catch(e) {
+                lines.push("Cache error: " + e.message);
+            }
+        } else {
+            lines.push("Cache API not supported");
+        }
+        
+        debugDiv.textContent = lines.join("\n");
+    }
+    
+    // Update every 3 seconds
+    updateDebug();
+    setInterval(updateDebug, 3000);
+})();
+</script>    
+
  
 </body>
 
