@@ -1,7 +1,7 @@
 // service_worker.js
 
-const CACHE_NAME    = 'superpig-v5';
-const SHELL_CACHE   = 'superpig-shell-v2';
+const CACHE_NAME    = 'superpig-v6';
+const SHELL_CACHE   = 'superpig-shell-v3';
 
 
 const STATIC_ASSETS = [
