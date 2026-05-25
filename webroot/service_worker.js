@@ -11,7 +11,7 @@ const STATIC_ASSETS = [
     '/static_m/js/pwa-handler.js',
     
     
-    // Add MAR images
+    // MAR images
     '/static_m/images/mar/mar_home.png',
     '/static_m/images/mar/mar_sow_list.png',
     '/static_m/images/mar/mar_gesta.png',
@@ -24,6 +24,7 @@ const STATIC_ASSETS = [
     '/static_m/images/mar/mar_report.png'
 ];
 
+
 // App shell files (cached for offline)
 const SHELL_FILES = [
     '/index_mob.html',
@@ -33,6 +34,8 @@ const SHELL_FILES = [
     '/tag',
     '/static_m/js/pwa-handler.js'
 ];
+
+
 
 
 // Auth-related paths that should NEVER be cached
@@ -47,19 +50,63 @@ const AUTH_PATHS = [
 self.addEventListener('install', (event) => {
     console.log('Service Worker installing...');
     event.waitUntil(
-        Promise.all([
-            // Cache static assets
-            caches.open(CACHE_NAME).then((cache) => {
-                return cache.addAll(STATIC_ASSETS);
-            }),
+        (async () => {
+            const cache = await caches.open(CACHE_NAME);
             
-            // Cache app shell for offline
-            caches.open(SHELL_CACHE).then((cache) => {
-                return cache.addAll(SHELL_FILES);
-            })
-        ])
+            // 1. Cache static assets (these don't change)
+            try {
+                await cache.addAll(STATIC_ASSETS);
+                console.log('✅ Static assets cached');
+            } catch (e) {
+                console.error('Failed to cache static assets:', e);
+            }
+            
+            // 2. Dynamically get current bundle names from manifest.json
+            try {
+                // Use a timeout to avoid hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const manifestRes = await fetch('/static_m/js/manifest.json', {
+                    signal: controller.signal,
+                    cache: 'no-store'
+                });
+                clearTimeout(timeoutId);
+                
+                if (manifestRes.ok) {
+                    const manifest = await manifestRes.json();
+                    console.log('📦 Manifest loaded:', manifest);
+                    
+                    // Cache core bundle
+                    if (manifest.core) {
+                        const coreUrl = `/static_m/js/${manifest.core}`;
+                        await cache.add(coreUrl);
+                        console.log('✅ Cached core bundle:', manifest.core);
+                    }
+                    
+                    // Cache login bundle  
+                    if (manifest.login) {
+                        const loginUrl = `/static_m/js/${manifest.login}`;
+                        await cache.add(loginUrl);
+                        console.log('✅ Cached login bundle:', manifest.login);
+                    }
+                    
+                    // Cache CSS
+                    if (manifest.main_css) {
+                        const cssUrl = `/static_m/css/${manifest.main_css}`;
+                        await cache.add(cssUrl);
+                        console.log('✅ Cached CSS:', manifest.main_css);
+                    }
+                } else {
+                    console.warn('Manifest not found, bundles may not be cached');
+                }
+            } catch (e) {
+                console.error('Failed to cache dynamic bundles:', e);
+                // Don't fail the entire install - static assets are cached
+            }
+        })()
     );
-    self.skipWaiting(); // Force activation
+    self.skipWaiting();
 });
 
 
