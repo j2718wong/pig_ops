@@ -1,7 +1,7 @@
 // service_worker.js
 
-const CACHE_NAME    = 'superpig-v4';
-const SHELL_CACHE   = 'superpig-shell-v1';
+const CACHE_NAME    = 'superpig-v5';
+const SHELL_CACHE   = 'superpig-shell-v2';
 
 
 const STATIC_ASSETS = [
@@ -17,6 +17,14 @@ const SHELL_FILES = [
     '/en',
     '/bis',
     '/tag'
+];
+
+
+// Auth-related paths that should NEVER be cached
+const AUTH_PATHS = [
+    '/login',
+    '/logout',
+    '/user/verify_token'
 ];
 
 
@@ -93,7 +101,9 @@ self.addEventListener('fetch', (event) => {
         path.startsWith('/boar_ext_mate/')      ||
         path.startsWith('/sow_boar_mate/')      ||
         
-        path.startsWith('/system/')
+        path.startsWith('/system/')             ||
+        
+        AUTH_PATHS.some(authPath => path === authPath || path.startsWith(authPath + '?'))
     ){
         // Don't intercept API calls
         return;
@@ -103,55 +113,101 @@ self.addEventListener('fetch', (event) => {
     // --- 2. Handle HTML Navigation (Cache First) ---
     if (request.mode === 'navigate') {
         event.respondWith(
-            fetch(request)
-                .then(async (response) => {
-                    // Cache fresh version in background
-                    const cache = await caches.open(SHELL_CACHE);
-                    cache.put(request, response.clone());
-                    return response;
-                })
-                .catch(async () => {
-                    // Offline - serve cached app shell
-                    const cachedShell = await caches.match('/index_mob.html');
-                    if (cachedShell) {
-                        // Add special header to indicate offline mode
-                        const modifiedResponse = new Response(cachedShell.body, {
-                            status: 200,
-                            statusText: 'OK',
-                            headers: {
-                                ...cachedShell.headers,
-                                'X-Offline-Mode': 'true'
-                            }
-                        });
-                        return modifiedResponse;
+            (async () => {
+                // First, try to get the cached shell (for offline)
+                const cachedShell = await caches.match('/index_mob.html');
+                
+                // Try network first for fresh content (but don't fail if offline)
+                try {
+                    const networkResponse = await fetch(request);
+                    
+                    // If we got a valid response, update cache in background
+                    if (networkResponse && networkResponse.status === 200) {
+                        const cache = await caches.open(SHELL_CACHE);
+                        
+                        // FIX: Clone the response before using it
+                        // Because response body can only be used once
+                        const responseToCache = networkResponse.clone();
+                        const responseToReturn = networkResponse.clone();
+                        
+                        cache.put(request, responseToCache);
+                        
+                        // Also update the shell cache if this is the main shell
+                        if (cachedShell && request.url.includes('/app')) {
+                            cache.put('/index_mob.html', responseToCache);
+                        }
+                        
+                        return responseToReturn;
                     }
-                    return new Response('Offline - App not available', { status: 503 });
-                })
+                    
+                    // If status is not 200 (like 302 redirect), return as is
+                    if (networkResponse) {
+                        return networkResponse;
+                    }
+                } catch (networkError) {
+                    console.log('Network unavailable, using cached version');
+                }
+                
+                // If we're offline or network failed, serve cached shell
+                if (cachedShell) {
+                    console.log('Serving cached app shell (offline mode)');
+                    
+                    // Clone the cached response
+                    const cachedClone = cachedShell.clone();
+                    
+                    // Add a header so the app knows it's offline mode
+                    const offlineResponse = new Response(cachedClone.body, {
+                        status: 200,
+                        statusText: 'OK',
+                        headers: new Headers({
+                            'Content-Type': cachedClone.headers.get('Content-Type') || 'text/html',
+                            'X-Offline-Mode': 'true',
+                            'Cache-Control': 'no-cache'
+                        })
+                    });
+                    return offlineResponse;
+                }
+                
+                // Ultimate fallback
+                return new Response('Offline - App not available', { status: 503 });
+            })()
         );
         return;
     }
     
     
-    // --- 3. Handle static assets (Cache First) ---
+    // --- 3. Handle static assets with STALE-WHILE-REVALIDATE (best for offline) ---
     event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                if (response) {
-                    // Background update for static assets
-                    fetch(event.request).then(async (freshResponse) => {
-                        if (freshResponse && freshResponse.status === 200) {
-                            const cache = await caches.open(CACHE_NAME);
-                            cache.put(event.request, freshResponse);
-                        }
-                    }).catch(() => {});
-                    return response;
-                }
-                return fetch(event.request).then(async (networkResponse) => {
-                    const cache = await caches.open(CACHE_NAME);
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
+        (async () => {
+            const cache = await caches.open(CACHE_NAME);
+            const cachedResponse = await cache.match(event.request);
+            
+            // Return cached response immediately if available
+            if (cachedResponse) {
+                // But update cache in background
+                fetch(event.request).then(async (networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        await cache.put(event.request, networkResponse);
+                    }
+                }).catch(() => {
+                    // Network error, keep using cached version
                 });
-            })
+                return cachedResponse;
+            }
+            
+            // Not in cache, try network
+            try {
+                const networkResponse = await fetch(event.request);
+                if (networkResponse && networkResponse.status === 200) {
+                    await cache.put(event.request, networkResponse.clone());
+                }
+                return networkResponse;
+            } catch (error) {
+                // Network error and not in cache
+                console.log('Failed to fetch:', event.request.url);
+                return new Response('Resource not available offline', { status: 404 });
+            }
+        })()
     );
 });
 
@@ -183,12 +239,14 @@ self.addEventListener('message', (event) => {
     if (event.data === 'skipWaiting') {
         self.skipWaiting();
     }
+    
     if (event.data === 'clearAuthCache') {
-        // Clear sensitive cached data on logout
+        // Only clear auth-related caches, keep shell
         caches.open(SHELL_CACHE).then(cache => {
             cache.keys().then(keys => {
                 keys.forEach(key => {
-                    if (key.url.includes('/app') || key.url.includes('/user/')) {
+                    if (key.url.includes('/login') || 
+                        key.url.includes('/user/')) {
                         cache.delete(key);
                     }
                 });

@@ -37,24 +37,16 @@
             // Restore from sessionStorage
             localStorage.setItem('access_token', token);
         }
-    
+        
         // If offline and token exists, ensure we're at the right page
         if (!navigator.onLine && localStorage.getItem('access_token') && window.location.pathname !== '/app') {
             console.log('Offline with token - redirecting to /app');
             window.location.href = '/app?lang=' + (localStorage.getItem('user_language') || 'en');
-        } else {
-            // Only register service worker if not redirecting
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register(`/service_worker.js?v=${APP_VERSION}`)
-                        .then(reg => console.log('SW registered on home page:', reg.scope))
-                        .catch(err => console.log('SW registration failed:', err));
-                });
-            }
         }
         
+        // DO NOT register service worker here - pwa-handler.js handles it
     </script>
-    
+
     <script src="/static_m/js/pwa-handler.js?v={{ page_data.app_version }}" defer></script>
     
     <script type="application/ld+json">
