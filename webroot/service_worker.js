@@ -114,58 +114,33 @@ self.addEventListener('fetch', (event) => {
     if (request.mode === 'navigate') {
         event.respondWith(
             (async () => {
-                // First, try to get the cached shell (for offline)
-                const cachedShell = await caches.match('/index_mob.html');
+                // Check if we're offline using navigator.onLine (available in service worker)
+                const isOnline = navigator.onLine;
                 
-                // Try network first for fresh content (but don't fail if offline)
+                // If offline, serve cache IMMEDIATELY - no network attempt
+                if (!isOnline) {
+                    console.log('SW: Offline detected - serving from cache immediately');
+                    const cachedShell = await caches.match('/index_mob.html');
+                    if (cachedShell) {
+                        return cachedShell;
+                    }
+                    return new Response('Offline - App not available', { status: 503 });
+                }
+                
+                // Only try network if online
                 try {
                     const networkResponse = await fetch(request);
-                    
-                    // If we got a valid response, update cache in background
                     if (networkResponse && networkResponse.status === 200) {
                         const cache = await caches.open(SHELL_CACHE);
-                        
-                        // FIX: Clone the response before using it
-                        // Because response body can only be used once
-                        const responseToCache = networkResponse.clone();
-                        const responseToReturn = networkResponse.clone();
-                        
-                        cache.put(request, responseToCache);
-                        
-                        // Also update the shell cache if this is the main shell
-                        if (cachedShell && request.url.includes('/app')) {
-                            cache.put('/index_mob.html', responseToCache);
-                        }
-                        
-                        return responseToReturn;
-                    }
-                    
-                    // If status is not 200 (like 302 redirect), return as is
-                    if (networkResponse) {
+                        cache.put(request, networkResponse.clone());
                         return networkResponse;
                     }
                 } catch (networkError) {
-                    console.log('Network unavailable, using cached version');
-                }
-                
-                // If we're offline or network failed, serve cached shell
-                if (cachedShell) {
-                    console.log('Serving cached app shell (offline mode)');
-                    
-                    // Clone the cached response
-                    const cachedClone = cachedShell.clone();
-                    
-                    // Add a header so the app knows it's offline mode
-                    const offlineResponse = new Response(cachedClone.body, {
-                        status: 200,
-                        statusText: 'OK',
-                        headers: new Headers({
-                            'Content-Type': cachedClone.headers.get('Content-Type') || 'text/html',
-                            'X-Offline-Mode': 'true',
-                            'Cache-Control': 'no-cache'
-                        })
-                    });
-                    return offlineResponse;
+                    console.log('SW: Network failed, falling back to cache');
+                    const cachedShell = await caches.match('/index_mob.html');
+                    if (cachedShell) {
+                        return cachedShell;
+                    }
                 }
                 
                 // Ultimate fallback
@@ -174,7 +149,7 @@ self.addEventListener('fetch', (event) => {
         );
         return;
     }
-    
+        
     
     // --- 3. Handle static assets with STALE-WHILE-REVALIDATE (best for offline) ---
     event.respondWith(
