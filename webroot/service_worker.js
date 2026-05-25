@@ -110,41 +110,52 @@ self.addEventListener('fetch', (event) => {
     }
     
     
-    // --- 2. Handle HTML Navigation (Cache First) ---
+    // --- 2. Handle HTML Navigation (Cache First) ---    
     if (request.mode === 'navigate') {
         event.respondWith(
             (async () => {
-                // Check if we're offline using navigator.onLine (available in service worker)
-                const isOnline = navigator.onLine;
+                // Get cached shell immediately (do this first)
+                const cachedShell = await caches.match('/index_mob.html');
                 
-                // If offline, serve cache IMMEDIATELY - no network attempt
-                if (!isOnline) {
-                    console.log('SW: Offline detected - serving from cache immediately');
-                    const cachedShell = await caches.match('/index_mob.html');
-                    if (cachedShell) {
-                        return cachedShell;
-                    }
-                    return new Response('Offline - App not available', { status: 503 });
+                // Check online status
+                let isOnline = true;
+                try {
+                    // Quick online check
+                    await fetch('/favicon.ico?t=' + Date.now(), { method: 'HEAD', cache: 'no-store', mode: 'no-cors' });
+                } catch (e) {
+                    isOnline = false;
                 }
                 
-                // Only try network if online
+                // If offline, serve cache immediately
+                if (!isOnline && cachedShell) {
+                    console.log('SW: Offline - serving cached shell');
+                    return cachedShell;
+                }
+                
+                // Try network but with timeout
                 try {
-                    const networkResponse = await fetch(request);
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2000);
+                    
+                    const networkResponse = await fetch(request, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
                     if (networkResponse && networkResponse.status === 200) {
                         const cache = await caches.open(SHELL_CACHE);
                         cache.put(request, networkResponse.clone());
                         return networkResponse;
                     }
-                } catch (networkError) {
-                    console.log('SW: Network failed, falling back to cache');
-                    const cachedShell = await caches.match('/index_mob.html');
-                    if (cachedShell) {
-                        return cachedShell;
-                    }
+                } catch (error) {
+                    console.log('SW: Network timeout/error');
                 }
                 
-                // Ultimate fallback
-                return new Response('Offline - App not available', { status: 503 });
+                // Fallback to cache
+                if (cachedShell) {
+                    console.log('SW: Falling back to cached shell');
+                    return cachedShell;
+                }
+                
+                return new Response('App unavailable offline', { status: 503 });
             })()
         );
         return;
@@ -187,9 +198,9 @@ self.addEventListener('fetch', (event) => {
 });
 
 
-// Activate event - clean old caches
+// Activate event - clean old caches AND check version
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker activating...');
+    console.log('Service Worker activating... v5');
     event.waitUntil(
         Promise.all([
             caches.keys().then((cacheNames) => {
@@ -201,6 +212,14 @@ self.addEventListener('activate', (event) => {
                         }
                     })
                 );
+            }),
+            // Ensure shell cache has minimum files
+            caches.open(SHELL_CACHE).then(async (cache) => {
+                const hasIndex = await cache.match('/index_mob.html');
+                if (!hasIndex) {
+                    console.log('Re-adding shell files to cache');
+                    await cache.addAll(SHELL_FILES);
+                }
             }),
             // Claim clients immediately
             self.clients.claim()
