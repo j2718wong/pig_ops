@@ -151,6 +151,7 @@ self.addEventListener('fetch', (event) => {
         path.startsWith('/customer/')           ||
         
         path.startsWith('/feed_balance/')       ||
+        path.startsWith('/feed_balance_all/')   ||
         path.startsWith('/feed_brand/')         ||
         path.startsWith('/feed_buy/')           ||
         

@@ -246,7 +246,6 @@ async def feed_balance_all_add(request: Request):
     uhid = result
     
     
-    
     res = hashids_user.decrypt(uhid)
     if len(res) == 0:
         return {
