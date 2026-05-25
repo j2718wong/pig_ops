@@ -7,7 +7,8 @@ const SHELL_CACHE   = 'superpig-shell-v3';
 const STATIC_ASSETS = [
     '/manifest.json',
     '/static_m/images/logo/superpig_192_192.png',
-    '/static_m/images/logo/superpig_512_512.png'
+    '/static_m/images/logo/superpig_512_512.png',
+    '/static_m/js/pwa-handler.js'
 ];
 
 // App shell files (cached for offline)
@@ -16,7 +17,8 @@ const SHELL_FILES = [
     '/app',
     '/en',
     '/bis',
-    '/tag'
+    '/tag',
+    '/static_m/js/pwa-handler.js'
 ];
 
 
