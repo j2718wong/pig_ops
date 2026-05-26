@@ -27,7 +27,6 @@ const STATIC_ASSETS = [
 
 // App shell files (cached for offline)
 const SHELL_FILES = [
-    '/index_mob.html',
     '/app',
     '/en',
     '/bis',
@@ -195,7 +194,7 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             (async () => {
                 // Get cached shell immediately (do this first)
-                const cachedShell = await caches.match('/index_mob.html');
+                const cachedShell = await caches.match('/app');
                 
                 // Check online status
                 let isOnline = true;
