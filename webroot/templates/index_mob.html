@@ -936,7 +936,10 @@
         </div>
         
         <div class="version-display">
-            <span class="version-badge" id="app-version">Ver <span class="version-hash">{{ page_data.app_version }}</span></span>
+            <span class="version-badge" id="app-version">
+                Ver <span>{{ page_data.app_version }}</span> 
+                - <span id="core-js-version"></span>
+            </span>
         </div>
         
     </footer>
@@ -977,9 +980,12 @@
     <script>
         
         // Language Switcher with URL Redirect
-        const langSwitch = document.getElementById('languageSwitch');
-        const langDropdown = document.getElementById('languageDropdown');
-        const currentLangSpan = document.getElementById('currentLang');
+        const langSwitch        = document.getElementById('languageSwitch');
+        const langDropdown      = document.getElementById('languageDropdown');
+        const currentLangSpan   = document.getElementById('currentLang');
+        
+        const coreJsVersion     = document.getElementById('core-js-version');
+
 
         if (langSwitch) {
             // Toggle dropdown
@@ -1149,6 +1155,17 @@
             document.body.removeChild(textarea);
         }
         
+        
+        function getCoreBundleVersion() {
+            const scripts = document.querySelectorAll('script[src*="/static/js/bundle.core."]');
+            for (const script of scripts) {
+                const match = script.src.match(/bundle\.core\.([a-f0-9]+)\.min\.js/);
+                if (match) {
+                    return match[1];
+                }
+            }
+            return null;
+        }
         
 
         
