@@ -509,16 +509,20 @@ class Root(ViewBase):
 
     
     def render(self, uhid = None, translation = None, lang = None,
-            available_languages = None):
+            available_languages = None, return_spa_app = 0):
         """
-        Will render root page "/"
+        Will render 
         
-        if uhid is None:
-            should return home page; user not logged in
+        if return_spa_app > 0:
+            return SPA, regardless user is logged in or not; 
         
         else:
-            should return SPA; user is logged in
+            if uhid is None:
+                should return home page; user not logged in
             
+            else:
+                should return SPA; user is logged in
+                
         Parameters
         ----------
         
@@ -568,8 +572,19 @@ class Root(ViewBase):
         app_ui_settings = json.dumps(ui_settings)
             
         
+        RETURN_HOME_PAGE    = 0
+        RETURN_SPA_APP      = 1
         
-        if uhid is not None:
+        return_page = RETURN_HOME_PAGE
+        
+        if return_spa_app > 0:
+            return_page = RETURN_SPA_APP
+        else:
+            if uhid is not None:
+                return_page = RETURN_SPA_APP
+        
+        
+        if return_page == RETURN_SPA_APP:
             # Mobile version
             template = env.get_template('index_mob.html')
             

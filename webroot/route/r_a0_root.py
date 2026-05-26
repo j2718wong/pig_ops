@@ -341,26 +341,35 @@ async def pig_farm_data_post(request: Request, user_data: dm.DataUserLogin):
     return pig_farm_data
     
 
+"""
+2026-05-26 Notes:
+1.) Up until to this date, the /app route which returns the index_mob.html
+will always require uhid read from token; No token will redirect to /login 
 
+2.) This will be changed to optional; This is because the /app
+route is cached in service_worker.js; The cache data is wrong instead of the
+index_mob.html taht should be return when requesting from cache.
+ 
+"""
 @app.get("/app", response_class=HTMLResponse)
 async def spa_dashboard(request: Request, lang: str = None):
     """
-    SPA Dashboard - requires authentication
     Supports language parameter: /app?lang=bis
     """
-    print(f"/app Cookies: {request.cookies}")
-    print(f"/app Authorization header: {request.headers.get('authorization')}")
+
     
     uhid = get_current_uhid(request)
     
     print(f"/app uhid: {uhid}")
     
+    """
     if not uhid:
         # No token, redirect to login with language
         redirect_lang = lang or request.cookies.get("user_lang", "en")
         url_lang_map = {'en': 'en', 'fil': 'tag', 'ceb': 'bis', 'zh': 'zh'}
         url_lang = url_lang_map.get(redirect_lang, 'en')
         return RedirectResponse(url=f"/login?lang={url_lang}", status_code=302)
+    """
     
     # Determine language (priority: URL param > cookie > default)
     if not lang:
@@ -378,12 +387,13 @@ async def spa_dashboard(request: Request, lang: str = None):
     # Get available languages for dropdown
     available_languages = await get_available_languages(request, internal_lang)
     
-    # Render SPA
+    # Render SPA; The return_spa_app > 0 will force to return the SPA APP
     page = controller.view['root'].render(
-        uhid=uhid,
-        translation=translation,
-        lang=internal_lang,
-        available_languages=available_languages
+        uhid            = uhid,
+        translation     = translation,
+        lang            = internal_lang,
+        available_languages=available_languages,
+        return_spa_app  = 1
     )
     
     # Set language cookie if we have a response object
