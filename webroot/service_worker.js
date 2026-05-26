@@ -1,7 +1,7 @@
 // service_worker.js
 
-const CACHE_NAME    = 'superpig-v6';
-const SHELL_CACHE   = 'superpig-shell-v3';
+const CACHE_NAME    = 'superpig-v7';
+const SHELL_CACHE   = 'superpig-shell-v4';
 
 
 const STATIC_ASSETS = [
@@ -326,27 +326,55 @@ self.addEventListener('activate', (event) => {
                 await shellCache.addAll(SHELL_FILES);
             }
             
-            // 3. Clean old bundles from main cache
+            // Fetch fresh /app and update cache
+            try {
+                const freshApp = await fetch('/app', { cache: 'no-store' });
+                if (freshApp.ok) {
+                    await shellCache.put('/app', freshApp);
+                    console.log('✅ Updated /app cache to latest version');
+                }
+            } catch (e) {
+                console.log('Could not refresh /app cache:', e);
+            }
+            
+            // 3. Clean old bundles and versioned files from main cache
             try {
                 const manifestRes = await fetch('/static/js/manifest.json');
+                const mainCache = await caches.open(CACHE_NAME);
+                const keys = await mainCache.keys();
+                
+                // Get current bundle names from manifest if available
+                let currentBundles = [];
                 if (manifestRes.ok) {
                     const manifest = await manifestRes.json();
-                    const currentBundles = [manifest.core, manifest.login];
+                    currentBundles = [manifest.core, manifest.login];
+                    console.log('📦 Current bundles:', currentBundles);
+                }
+                
+                for (const key of keys) {
+                    const url = key.url;
+                    let shouldDelete = false;
                     
-                    const mainCache = await caches.open(CACHE_NAME);
-                    const keys = await mainCache.keys();
-                    
-                    for (const key of keys) {
-                        const url = key.url;
-                        if (url.includes('/static/js/bundle.') && 
-                            !currentBundles.some(bundle => url.includes(bundle))) {
-                            await mainCache.delete(key);
-                            console.log('Deleted old bundle:', url);
+                    // Delete old bundles not in current manifest
+                    if (url.includes('/static/js/bundle.') && currentBundles.length > 0) {
+                        if (!currentBundles.some(bundle => url.includes(bundle))) {
+                            shouldDelete = true;
+                            console.log('Deleting old bundle:', url);
                         }
+                    }
+                    
+                    // Delete any cached file that has a query parameter (?v= or ?t=)
+                    if (url.includes('?v=') || url.includes('?t=')) {
+                        shouldDelete = true;
+                        console.log('Deleting versioned file:', url);
+                    }
+                    
+                    if (shouldDelete) {
+                        await mainCache.delete(key);
                     }
                 }
             } catch (e) {
-                console.log('Could not clean old bundles:', e);
+                console.log('Could not clean old bundles/versioned files:', e);
             }
             
             // 4. Claim clients immediately
