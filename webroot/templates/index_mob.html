@@ -49,32 +49,7 @@
 
     <script src="/static_m/js/pwa-handler.js?v={{ page_data.app_version }}" defer></script>
     
-    <script>
-        console.log('Checking pwa-handler.js...');
-        console.log('__pwaHandlerInitialized:', window.__pwaHandlerInitialized);
-        
-        if (!window.__pwaHandlerInitialized) {
-            console.log('ERROR: pwa-handler.js failed to initialize!');
-            // Manually register service worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/service_worker.js')
-                    .then(reg => console.log('Manual SW register success:', reg))
-                    .catch(err => console.log('Manual SW register failed:', err));
-            }
-        }
-    </script>
-    
-    <script>
-    // Fallback registration in case pwa-handler fails
-    if ('serviceWorker' in navigator && !window.swRegistration) {
-        setTimeout(() => {
-            navigator.serviceWorker.register('/service_worker.js', { scope: '/' })
-                .then(reg => console.log('✅ Fallback SW registered:', reg))
-                .catch(err => console.error('❌ Fallback SW failed:', err));
-        }, 1000);
-    }
-    </script>
-    
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
