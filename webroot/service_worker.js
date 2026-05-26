@@ -66,7 +66,7 @@ self.addEventListener('install', (event) => {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
-                const manifestRes = await fetch('/static_m/js/manifest.json', {
+                const manifestRes = await fetch('/static/js/manifest.json', {
                     signal: controller.signal,
                     cache: 'no-store'
                 });
@@ -78,21 +78,21 @@ self.addEventListener('install', (event) => {
                     
                     // Cache core bundle
                     if (manifest.core) {
-                        const coreUrl = `/static_m/js/${manifest.core}`;
+                        const coreUrl = `/static/js/${manifest.core}`;
                         await cache.add(coreUrl);
                         console.log('✅ Cached core bundle:', manifest.core);
                     }
                     
                     // Cache login bundle  
                     if (manifest.login) {
-                        const loginUrl = `/static_m/js/${manifest.login}`;
+                        const loginUrl = `/static/js/${manifest.login}`;
                         await cache.add(loginUrl);
                         console.log('✅ Cached login bundle:', manifest.login);
                     }
                     
                     // Cache CSS
                     if (manifest.main_css) {
-                        const cssUrl = `/static_m/css/${manifest.main_css}`;
+                        const cssUrl = `/static/css/${manifest.main_css}`;
                         await cache.add(cssUrl);
                         console.log('✅ Cached CSS:', manifest.main_css);
                     }
