@@ -115,6 +115,13 @@ self.addEventListener('fetch', (event) => {
     const path      = url.pathname;
     const request   = event.request;
     
+    
+    // Dont include timestamped requests
+    if (url.search && (url.search.includes('t=') || url.search.includes('timestamp'))) {
+        // Don't intercept or cache - let browser handle normally
+        return;
+    }
+    
     // Skip OAuth and authentication endpoints
     if (url.pathname.startsWith('/auth/') || 
         url.pathname.startsWith('/login') ||
@@ -294,32 +301,57 @@ self.addEventListener('fetch', (event) => {
 });
 
 
+
 // Activate event - clean old caches AND check version
 self.addEventListener('activate', (event) => {
     console.log('Service Worker activating... v5');
     event.waitUntil(
-        Promise.all([
-            caches.keys().then((cacheNames) => {
-                return Promise.all(
-                    cacheNames.map((cacheName) => {
-                        if (cacheName !== CACHE_NAME && cacheName !== SHELL_CACHE) {
-                            console.log('Deleting old cache:', cacheName);
-                            return caches.delete(cacheName);
+        (async () => {
+            // 1. Delete old caches
+            const cacheNames = await caches.keys();
+            await Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME && cacheName !== SHELL_CACHE) {
+                        console.log('Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+            
+            // 2. Ensure shell cache has minimum files
+            const shellCache = await caches.open(SHELL_CACHE);
+            const hasIndex = await shellCache.match('/app');
+            if (!hasIndex) {
+                console.log('Re-adding shell files to cache');
+                await shellCache.addAll(SHELL_FILES);
+            }
+            
+            // 3. Clean old bundles from main cache
+            try {
+                const manifestRes = await fetch('/static/js/manifest.json');
+                if (manifestRes.ok) {
+                    const manifest = await manifestRes.json();
+                    const currentBundles = [manifest.core, manifest.login];
+                    
+                    const mainCache = await caches.open(CACHE_NAME);
+                    const keys = await mainCache.keys();
+                    
+                    for (const key of keys) {
+                        const url = key.url;
+                        if (url.includes('/static/js/bundle.') && 
+                            !currentBundles.some(bundle => url.includes(bundle))) {
+                            await mainCache.delete(key);
+                            console.log('Deleted old bundle:', url);
                         }
-                    })
-                );
-            }),
-            // Ensure shell cache has minimum files
-            caches.open(SHELL_CACHE).then(async (cache) => {
-                const hasIndex = await cache.match('/index_mob.html');
-                if (!hasIndex) {
-                    console.log('Re-adding shell files to cache');
-                    await cache.addAll(SHELL_FILES);
+                    }
                 }
-            }),
-            // Claim clients immediately
-            self.clients.claim()
-        ])
+            } catch (e) {
+                console.log('Could not clean old bundles:', e);
+            }
+            
+            // 4. Claim clients immediately
+            await self.clients.claim();
+        })()
     );
 });
 
