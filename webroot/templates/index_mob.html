@@ -30,6 +30,7 @@
     
     <script>
         const APP_VERSION = '{{ page_data.app_version }}'; 
+        window.APP_VERSION =  APP_VERSION;
         
         // At the very top of index_mob.html script
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
