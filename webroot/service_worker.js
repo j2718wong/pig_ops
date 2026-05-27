@@ -1,7 +1,7 @@
 // service_worker.js
 
 // Add at the very first line
-console.log('🔵 Service worker script starting...');
+console.log('Service worker script starting...');
 
 // Add error handler at the top
 self.addEventListener('error', (e) => {
