@@ -1,7 +1,20 @@
 // service_worker.js
 
-const CACHE_NAME    = 'superpig-v16';
-const SHELL_CACHE   = 'superpig-shell-v13';
+// Add at the very first line
+console.log('🔵 Service worker script starting...');
+
+// Add error handler at the top
+self.addEventListener('error', (e) => {
+    console.error('SW Error:', e.error);
+});
+
+self.addEventListener('unhandledrejection', (e) => {
+    console.error('SW Unhandled rejection:', e.reason);
+});
+
+
+const CACHE_NAME    = 'superpig-v17';
+const SHELL_CACHE   = 'superpig-shell-v14';
 
 
 const STATIC_ASSETS = [
