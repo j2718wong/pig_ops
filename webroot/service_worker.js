@@ -1,7 +1,7 @@
 // service_worker.js
 
-const CACHE_NAME    = 'superpig-v11';
-const SHELL_CACHE   = 'superpig-shell-v8';
+const CACHE_NAME    = 'superpig-v12';
+const SHELL_CACHE   = 'superpig-shell-v9';
 
 
 const STATIC_ASSETS = [
@@ -10,6 +10,21 @@ const STATIC_ASSETS = [
     '/static_m/images/logo/superpig_512_512.png',
     '/static_m/js/pwa-handler.js',
     
+    
+     // CSS files
+    '/static_m/css/all.min.css',
+    '/static_m/css/bootstrap.min.css',
+    '/static_m/css/bootstrap-datepicker.min.css',
+    '/static_m/css/bootstrap-icons.css',
+    
+    // JavaScript libraries
+    '/static_m/js/jquery/jquery.min-3.7.1.js',
+    '/static_m/js/jquery/jquery-ui.min-1.14.1.js',
+    '/static_m/js/library/bootstrap.bundle.min.js',
+    '/static_m/js/library/bootstrap-datepicker.min.js',
+    
+    // Images
+    '/static_m/images/box_check.png',
     
     // MAR images
     '/static_m/images/mar/mar_home.png',
