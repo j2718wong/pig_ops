@@ -400,6 +400,11 @@ async def spa_dashboard(request: Request, lang: str = None):
     if isinstance(page, HTMLResponse):
         page.set_cookie(key="user_lang", value=internal_lang, max_age=31536000, path="/")
     
+        # Prevent browser from caching the HTML
+        page.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        page.headers["Pragma"] = "no-cache"
+        page.headers["Expires"] = "0"
+    
     return page
 
 
