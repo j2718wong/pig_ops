@@ -1,7 +1,7 @@
 // service_worker.js
 
-const CACHE_NAME    = 'superpig-v7';
-const SHELL_CACHE   = 'superpig-shell-v4';
+const CACHE_NAME    = 'superpig-v10';
+const SHELL_CACHE   = 'superpig-shell-v7';
 
 
 const STATIC_ASSETS = [
@@ -327,16 +327,18 @@ self.addEventListener('activate', (event) => {
             }
             
             // Fetch fresh /app and update cache
-            try {
-                const freshApp = await fetch('/app', { cache: 'no-store' });
-                if (freshApp.ok) {
-                    await shellCache.put('/app', freshApp);
-                    console.log('✅ Updated /app cache to latest version');
+            if (navigator.onLine) {
+                try {
+                    const freshApp = await fetch('/app', { cache: 'no-store' });
+                    if (freshApp.ok) {
+                        await shellCache.put('/app', freshApp);
+                        console.log('✅ Updated /app cache to latest version');
+                    }
+                } catch (e) {
+                    console.log('Could not refresh /app cache:', e);
                 }
-            } catch (e) {
-                console.log('Could not refresh /app cache:', e);
             }
-            
+        
             // 3. Clean old bundles and versioned files from main cache
             try {
                 const manifestRes = await fetch('/static/js/manifest.json');
