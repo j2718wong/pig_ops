@@ -38,6 +38,14 @@
             localStorage.setItem('access_token', token);
         }
         
+        if (!token && navigator.onLine) {
+            // No token and online - redirect to login immediately
+            const lang = localStorage.getItem('user_language') || 'en';
+            window.location.href = '/login?lang=' + lang;
+            return;
+        }
+        
+        
         // If offline and token exists, ensure we're at the right page
         if (!navigator.onLine && localStorage.getItem('access_token') && window.location.pathname !== '/app') {
             console.log('Offline with token - redirecting to /app');
