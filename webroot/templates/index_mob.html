@@ -31,8 +31,10 @@
     <script>
         const APP_VERSION = '{{ page_data.app_version }}'; 
         window.APP_VERSION =  APP_VERSION;
-        
-        // At the very top of index_mob.html script
+    </script>
+    
+    
+    <script>
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
         if (token && !localStorage.getItem('access_token')) {
             // Restore from sessionStorage
@@ -51,8 +53,6 @@
             console.log('Offline with token - redirecting to /app');
             window.location.href = '/app?lang=' + (localStorage.getItem('user_language') || 'en');
         }
-        
-        // DO NOT register service worker here - pwa-handler.js handles it
     </script>
 
     <script src="/static_m/js/pwa-handler.js" defer></script>
