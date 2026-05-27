@@ -352,6 +352,7 @@ index_mob.html taht should be return when requesting from cache.
  
 """
 @app.get("/app", response_class=HTMLResponse)
+@app.head("/app", response_class=HTMLResponse)
 async def spa_dashboard(request: Request, lang: str = None):
     """
     Supports language parameter: /app?lang=bis
