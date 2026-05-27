@@ -353,18 +353,38 @@ self.addEventListener('activate', (event) => {
                 console.log('Re-adding shell files to cache');
                 await shellCache.addAll(SHELL_FILES);
             }
+
             
             // Fetch fresh /app and update cache
             try {
-                const freshApp = await fetch('/app', { cache: 'no-store' });
+                console.log('Attempting to fetch fresh /app...');
+                const freshApp = await fetch('/app', { 
+                    cache: 'no-store',
+                    credentials: 'include'  // Important: send cookies
+                });
+                console.log('Fetch /app response status:', freshApp.status);
+                console.log('Fetch /app response ok:', freshApp.ok);
+                
                 if (freshApp.ok) {
-                    await shellCache.put('/app', freshApp);
+                    // Get the HTML to check version
+                    const html = await freshApp.text();
+                    const versionMatch = html.match(/APP_VERSION = '([^']+)'/);
+                    console.log('Fresh /app version:', versionMatch ? versionMatch[1] : 'not found');
+                    
+                    // Put it back (need to recreate response because text() consumed it)
+                    await shellCache.put('/app', new Response(html, {
+                        headers: freshApp.headers
+                    }));
                     console.log('✅ Updated /app cache to latest version');
+                } else {
+                    console.log('Fetch /app failed with status:', freshApp.status);
                 }
             } catch (e) {
                 console.log('Could not refresh /app cache:', e);
+                console.log('Error details:', e.message);
             }
-        
+
+                    
             // 3. Clean old bundles and versioned files from main cache
             try {
                 const manifestRes = await fetch('/static/js/manifest.json');
