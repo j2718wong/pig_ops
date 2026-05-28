@@ -1051,11 +1051,16 @@
         
         
         // Mobile navigation toggle
-        const mobileToggle = document.getElementById('mobileToggle');
-        const closeMobileNav = document.getElementById('closeMobileNav');
-        const mobileNav = document.getElementById('mobileNav');
+        const mobileToggle      = document.getElementById('mobileToggle');
+        const closeMobileNav    = document.getElementById('closeMobileNav');
+        const mobileNav         = document.getElementById('mobileNav');
         
         mobileToggle.addEventListener('click', () => {
+            console.log('mobileToggle is clicked');
+            
+            const isLocked = globalThis.navigation.userControl.isAccountLocked();
+            if (isLocked){return;}
+            
             mobileNav.classList.add('active');
             document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
         });
@@ -1074,6 +1079,7 @@
                 document.body.style.overflow = 'auto';
             }
         });
+        
         
         // Desktop user control dropdown
         const userControl = document.getElementById('userControl');

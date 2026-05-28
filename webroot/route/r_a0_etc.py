@@ -90,3 +90,12 @@ async def term(response: Response):
     
     return page
 
+
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "timestamp": time.time(),
+        "port": int(os.getenv('PORT_WEB', '8080'))
+    }
+
