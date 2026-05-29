@@ -46,93 +46,150 @@ class Account(BaseModel):
         super().__init__(model)
         
     
-    def get_info(self, account_id):
+    def get_info(self, account_id, account_only = 0):
+        """
+        Will return account info;
         
-        sql =   """
-                SELECT 
-                    a.id,
-                    a.flag,
-                    a.status_id, 
-                    
-                    a.country_id,
-                    b.name AS country_name,
-                    b.flag,
-                    
-                    a.name AS account_name,
-                    a.date_trial_start,
-                    a.date_trial_end,
-                    
-                    a.count_sow_boar,
-                    a.count_pig_prod,
-                    
-                    a.current_bill_id,
-                    c.status_id,
-                    c.flag,
-                    c.bill_reference,
-                    c.date_issue,
-                    c.date_due,
-                    
-                    c.num_sow_boar_billed,
-                    d.num_sow,
-                    d.num_boar,
-                    
-                    c.currency_code,
-                    c.tax_rate,
-                    
-                    c.prev_amount_balance,
-                    
-                    c.charge_per_pig,
-                    c.amount,
-                    c.deduction,
-                    c.taxable_amount,
-                    c.taxes,
-                    c.total_amount_due,
-                    
-                    e.file_path,
-                    e.status_id,
-                    e.flag,
-                    e.dt_entry,
-                    f.name_last,
-                    f.name_first,
-                    
-                    
-                    a.weight_unit,
-                    a.currency,
-                    a.flag_settings,
-                    a.num_days_move_to_farrow,
-                    a.num_days_wean,
-                    a.num_days_harvest_from_birth,
-                    a.num_days_harvest_from_wean,
-                    
-                    
-                    g.name_last,
-                    g.name_first,
-                    a.dt_last_update_settings,
-                    
-                    
-                    a.ver_num_gestating_ops,
-                    a.ver_num_lactating_piglets_ops, 
-                    a.ver_num_lactating_sow_ops,     
-                    a.ver_num_gilt_ops,              
-                    a.ver_num_weaning_sow_ops,       
-                    
-                    a.data_ver_num_account,
-                    a.data_ver_num_pig_buyer,
-                    a.data_ver_num_sd_chklst
-                    
-                FROM account a
-                LEFT OUTER JOIN app_country b   ON a.country_id = b.id
-                
-                LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
-                LEFT OUTER JOIN sow_boar_head_count d       ON c.sow_boar_head_count_id = d.id
-                LEFT OUTER JOIN account_upload_receipt e    ON c.upload_receipt_id = e.id
-                LEFT OUTER JOIN user f          ON e.added_by_user_id = f.id
-                
-                LEFT OUTER JOIN user g          ON a.last_update_settings_user_id = g.id
-                
-                WHERE a.id = %s
-                """ % account_id
+        Parameters
+        ----------
+        account_only : int
+            if == 0, will return account, settings_operations, data_vernum blocks
+            if > 0, will return account only data block;
         
+        """
+        
+        if account_only == 0:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.flag,
+                        a.status_id, 
+                        
+                        a.country_id,
+                        b.name AS country_name,
+                        b.flag,
+                        
+                        a.name AS account_name,
+                        a.date_trial_start,
+                        a.date_trial_end,
+                        
+                        a.count_sow_boar,
+                        a.count_pig_prod,
+                        
+                        a.current_bill_id,
+                        c.status_id,
+                        c.flag,
+                        c.bill_reference,
+                        c.date_issue,
+                        c.date_due,
+                        
+                        c.num_sow_boar_billed,
+                        d.num_sow,
+                        d.num_boar,
+                        
+                        c.currency_code,
+                        c.tax_rate,
+                        
+                        c.prev_amount_balance,
+                        
+                        c.charge_per_pig,
+                        c.amount,
+                        c.deduction,
+                        c.taxable_amount,
+                        c.taxes,
+                        c.total_amount_due,
+                        
+                        c.upload_receipt_count,
+                        
+                        
+                        a.weight_unit,
+                        a.currency,
+                        a.flag_settings,
+                        a.num_days_move_to_farrow,
+                        a.num_days_wean,
+                        a.num_days_harvest_from_birth,
+                        a.num_days_harvest_from_wean,
+                        
+                        
+                        e.name_last,
+                        e.name_first,
+                        a.dt_last_update_settings,
+                        
+                        
+                        a.ver_num_gestating_ops,
+                        a.ver_num_lactating_piglets_ops, 
+                        a.ver_num_lactating_sow_ops,     
+                        a.ver_num_gilt_ops,              
+                        a.ver_num_weaning_sow_ops,       
+                        
+                        a.data_ver_num_account,
+                        a.data_ver_num_pig_buyer,
+                        a.data_ver_num_sd_chklst
+                        
+                    FROM account a
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                    
+                    LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
+                    LEFT OUTER JOIN sow_boar_head_count d       ON c.sow_boar_head_count_id = d.id
+     
+                    
+                    LEFT OUTER JOIN user e          ON a.last_update_settings_user_id = e.id
+                    
+                    WHERE a.id = %s
+                    """ % account_id
+        
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        a.flag,
+                        a.status_id, 
+                        
+                        a.country_id,
+                        b.name AS country_name,
+                        b.flag,
+                        
+                        a.name AS account_name,
+                        a.date_trial_start,
+                        a.date_trial_end,
+                        
+                        a.count_sow_boar,
+                        a.count_pig_prod,
+                        
+                        a.current_bill_id,
+                        c.status_id,
+                        c.flag,
+                        c.bill_reference,
+                        c.date_issue,
+                        c.date_due,
+                        
+                        c.num_sow_boar_billed,
+                        d.num_sow,
+                        d.num_boar,
+                        
+                        c.currency_code,
+                        c.tax_rate,
+                        
+                        c.prev_amount_balance,
+                        
+                        c.charge_per_pig,
+                        c.amount,
+                        c.deduction,
+                        c.taxable_amount,
+                        c.taxes,
+                        c.total_amount_due,
+                        
+                        c.upload_receipt_count
+                        
+                    FROM account a
+                    LEFT OUTER JOIN app_country b   ON a.country_id = b.id
+                    
+                    LEFT OUTER JOIN account_bill c  ON a.current_bill_id = c.id
+                    LEFT OUTER JOIN sow_boar_head_count d       ON c.sow_boar_head_count_id = d.id
+      
+                   
+                    WHERE a.id = %s
+                    """ % account_id
         
         rows = self._execute_query(sql)
         
@@ -182,50 +239,48 @@ class Account(BaseModel):
             cur_acc_bill_total_amount_due       = row[28]
 
 
-            # Receipt upload fields (indices 29-34) - Fixed offsets
-            cur_upload_receipt_path             = row[29]
-            cur_upload_receipt_status_id        = row[30]
-            cur_upload_receipt_flag             = row[31]
-            cur_upload_receipt_dt_entry         = str(row[32]) if row[32] else None
-            cur_upload_receipt_user_name_last   = row[33]
-            cur_upload_receipt_user_name_first  = row[34]
-
-            # Account settings (indices 35-41) - Fixed offsets
-            cur_acc_weight_unit                 = row[35]
-            cur_acc_currency                    = row[36]
-            cur_acc_settings_flag               = row[37]
-            cur_acc_num_days_move_to_farrow     = row[38]
-            cur_acc_num_days_wean               = row[39]
-            cur_acc_num_days_harvest_from_birth = row[40]
-            cur_acc_num_days_harvest_from_wean  = row[41]
-
-            # User who last updated settings (indices 42-44) - Fixed offsets
-            cur_user_name_last                  = row[42]
-            cur_user_name_first                 = row[43]
-            cur_settings_last_update            = str(row[44]) if row[44] else None
-
-            # Version numbers (indices 45-49) - Fixed offsets
-            cur_ver_num_gestating_ops           = row[45] 
-            cur_ver_num_lactating_piglets_ops   = row[46] 
-            cur_ver_num_lactating_sow_ops       = row[47] 
-            cur_ver_num_gilt_ops                = row[48] 
-            cur_ver_num_weaning_sow_ops         = row[49] 
-
-            cur_data_ver_num_account            = row[50] 
-            cur_data_ver_num_pig_buyer          = row[51]
-            cur_data_ver_num_sd_chklst          = row[52]
-
-            
-            temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
-            cur_flag_acc_is_enabled = 1 if temp > 0 else 0
+            cur_upload_receipt_count            = row[29]
             
             
-            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
-            cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+            if account_only == 0:
             
-            temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
-            cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
-            
+                # Account settings (indices 30-36) - Corrected offsets
+                cur_acc_weight_unit                 = row[30]
+                cur_acc_currency                    = row[31]
+                cur_acc_settings_flag               = row[32]
+                cur_acc_num_days_move_to_farrow     = row[33]
+                cur_acc_num_days_wean               = row[34]
+                cur_acc_num_days_harvest_from_birth = row[35]
+                cur_acc_num_days_harvest_from_wean  = row[36]
+
+                # User who last updated settings (indices 37-39) - Corrected offsets
+                cur_user_name_last                  = row[37]
+                cur_user_name_first                 = row[38]
+                cur_settings_last_update            = str(row[39]) if row[39] else None
+
+                # Version numbers (indices 40-47) - Corrected offsets
+                cur_ver_num_gestating_ops           = row[40] 
+                cur_ver_num_lactating_piglets_ops   = row[41] 
+                cur_ver_num_lactating_sow_ops       = row[42] 
+                cur_ver_num_gilt_ops                = row[43] 
+                cur_ver_num_weaning_sow_ops         = row[44] 
+
+                cur_data_ver_num_account            = row[45] 
+                cur_data_ver_num_pig_buyer          = row[46]
+                cur_data_ver_num_sd_chklst          = row[47]
+
+
+                
+                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
+                cur_flag_acc_is_enabled = 1 if temp > 0 else 0
+                
+                
+                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
+                cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
+                
+                temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_INSEM
+                cur_flag_day_1_on_doi   = 1 if temp > 0 else 0
+                
             
             cur_entry = {
                 'account': {
@@ -274,20 +329,14 @@ class Account(BaseModel):
                         'deduction':        cur_acc_bill_deduction,
                         'taxes':            cur_acc_bill_taxes,
                         'taxable_amount':   cur_acc_bill_taxable_amount,
-                        'total_amount_due': cur_acc_bill_total_amount_due,
-                        
-                        'uploaded_receipt': {
-                            'path':         cur_upload_receipt_path,
-                            'status_id':    cur_upload_receipt_status_id,
-                            'flag':         cur_upload_receipt_flag,     
-                            'dt_entry':     cur_upload_receipt_dt_entry,
-                            'name_last':    cur_upload_receipt_user_name_last,
-                            'name_first':   cur_upload_receipt_user_name_first
-                        }
+                        'total_amount_due': cur_acc_bill_total_amount_due
                     }
-                },
-                
-                'settings_operations': {
+                }
+            }
+            
+            
+            if account_only == 0:
+                settings_operations = {
                     'weight_unit':                  cur_acc_weight_unit,
                     'currency':                     cur_acc_currency,
                     'day_1_on_date_of_birth':       cur_flag_day_1_on_dob,
@@ -302,9 +351,10 @@ class Account(BaseModel):
                         'name_first':   cur_user_name_first,
                         'dt_update':    cur_settings_last_update
                     }
-                },
+                }
                 
-                'data_ver_num':[
+                
+                data_ver_num = [
                     cur_ver_num_gestating_ops,        
                     cur_ver_num_lactating_piglets_ops,
                     cur_ver_num_lactating_sow_ops,    
@@ -316,15 +366,25 @@ class Account(BaseModel):
                     cur_data_ver_num_sd_chklst
                     
                 ]
-            }
-            
-            
-            if cur_upload_receipt_path is None:
-                del cur_entry['account']['current_bill']['uploaded_receipt']
+                
+                
+                
+                cur_entry['settings_operations'] = settings_operations
+                cur_entry['data_ver_num'] = data_ver_num
+                
+                
             
 
             if cur_acc_current_bill_id == 0:
                 del cur_entry['account']['current_bill']
+            else:
+                # Get uploaded receipts if there are any;
+                # It is possible for users to upload multiple receipts for a bill
+                
+                if cur_upload_receipt_count is not None and cur_upload_receipt_count > 0:
+                    receipts = self.model['account_bill'].get_uploaded_receipt(cur_acc_current_bill_id)
+                    
+                    cur_entry['account']['current_bill']['receipts'] = receipts
             
             
             # Special case for Company owned  account with no pigs or farm.
@@ -337,16 +397,21 @@ class Account(BaseModel):
                 del cur_entry['account']['date_trial_end']
                 del cur_entry['account']['country']
                 
-                del cur_entry['settings_operations']
+                if account_only == 0:
+                    del cur_entry['settings_operations']
+                    del cur_entry['data_ver_num']
 
             
-            # Get Farm List
-            account_farms = self.model['pig_farm'].get_list(account_id)
-            
-            if account_farms:
-                cur_entry['pig_farms'] = account_farms
-            
-                
+            if account_only == 0:            
+                if cur_acc_flag & FLAG_BIT_ACCOUNT_IS_COMPANY_OWNED == 0:
+                    
+                    # Get Farm List
+                    account_farms = self.model['pig_farm'].get_list(account_id)
+                    
+                    if account_farms:
+                        cur_entry['pig_farms'] = account_farms
+                    
+                    
             return cur_entry
         
         return None

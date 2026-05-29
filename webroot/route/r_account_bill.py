@@ -46,6 +46,7 @@ WEBROOT_DIR         = Path(webroot_directory)
 UPLOAD_BASE_DIR     = WEBROOT_DIR / "data" / "account"
 
 
+
     
 @app.post("/account_bill/payment_proof/submit", tags=["Account"])
 async def account_bill_payment_proof_submit(request: Request,
@@ -211,7 +212,7 @@ async def account_bill_payment_proof_submit(request: Request,
 
     
 @app.get("/account_bill/receipt/{year}/{upload_type}/{account_id}/{filename}")
-async def get_receipt_image(
+async def account_bill_get_receipt_image(
     request: Request,
     year: str,
     upload_type: str,

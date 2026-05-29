@@ -72,8 +72,11 @@ async def payment_channel_list(request: Request ):
 
 
 
-@app.get("/admin/receipts_load", response_class = HTMLResponse)
-async def admin_receipts_load(response: Response):
+@app.get("/admin/receipts_load")
+async def admin_receipts_load(request: Request):
+    result = get_uhid_or_redirect(request)
+    
+    
     # If result is RedirectResponse, return it immediately
     if isinstance(result, RedirectResponse):
         return result

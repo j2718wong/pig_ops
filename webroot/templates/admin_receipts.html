@@ -619,7 +619,7 @@
         <!-- Top Section: Receipts Table with user greeting -->
         <div class="top-section">
             <div class="section-title">
-                <span>📋 Pending Receipts</span>
+                <span id="tableTitle">📋 Pending Receipts</span>
                 <span class="user-greeting" id="userGreeting">Hello Guest</span>
             </div>
             <div class="table-wrapper">
@@ -845,36 +845,7 @@
     }
     
     
-    
-    async function loadReceipts() {
-        if (!isAuthenticated) {
-            // Don't load receipts if not authenticated, but keep modal open
-            return;
-        }
-        
-        const tbody = document.getElementById('receiptsTableBody');
-        tbody.innerHTML = '<tr class="loading"><td colspan="7">Loading receipts...</td></tr>';
-        
-        try {
-            const response = await fetch(`${API_BASE}/admin/receipts/pending?page=${currentPage}&limit=${ITEMS_PER_PAGE}`, {
-                headers: { 'Authorization': `Bearer ${getAuthToken()}` }
-            });
-            
-            const result = await response.json();
-            
-            if (result.result && result.result.num === 0) {
-                receiptsData = result.data || [];
-                totalPages = result.total_pages || 1;
-                renderReceiptsTable();
-                updatePagination();
-            } else {
-                tbody.innerHTML = '<tr><td colspan="7">No pending receipts found</td></tr>';
-            }
-        } catch (error) {
-            console.error('Error loading receipts:', error);
-            tbody.innerHTML = '<tr><td colspan="7">Error loading receipts</td></tr>';
-        }
-    }
+   
     
     function renderReceiptsTable() {
         const tbody = document.getElementById('receiptsTableBody');

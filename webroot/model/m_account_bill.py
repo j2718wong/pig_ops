@@ -73,13 +73,19 @@ class AccountBill(BaseModel):
         
         sql =   """
                 SELECT
-                    id,
-                    status_id,
-                    flag,
-                    file_path
+                    a.id,
+                    a.status_id,
+                    a.flag,
+                    a.file_path,
+                    a.dt_entry,
                     
-                FROM account_upload_receipt
-                WHERE account_bill_id = %s
+                    b.name_last,
+                    b.name_first
+                    
+                FROM account_upload_receipt a
+                LEFT OUTER JOIN user b      ON b.added_by_user_id = a.id
+                WHERE a.account_bill_id = %s
+                ORDER BY a.id DESC
                 """ % (account_bill_id)
     
         
@@ -89,27 +95,25 @@ class AccountBill(BaseModel):
             return None
         
         
-        result 
+        result = []
             
         for row in rows:
-    
                 
             cur_entry = {
-            
-                'upload_receipt': {
-                    'id':           row[0],
-                    'status_id':    row[1],
-                    'flag':         row[2],
-                    
-                    'path':         row[3]
-                    
-                }
+                'id':           row[0],
+                'status_id':    row[1],
+                'flag':         row[2],
+                
+                'path':         row[3],
+                'dt_entry':     str(row[4]),
+                
+                'name_last':    row[5],
+                'name_first':   row[6]
             }
             
+            result.append(cur_entry)
             
-            return cur_entry
-            
-        return None
+        return result
     
     
 

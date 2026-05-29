@@ -402,6 +402,16 @@ def replace_plain_ids_account(data):
         del data['account']['current_bill']['id']
         data['account']['current_bill']['hid'] = cur_hid
         
+        
+        if 'receipts' in data['account']['current_bill']:
+            receipts = data['account']['current_bill']['receipts']
+            for cur_entry in receipts:
+                cur_id  = cur_entry['id']
+                cur_hid = hashids_common.encrypt(cur_id)
+                
+                del cur_entry['id']
+                cur_entry['hid']   = cur_hid
+         
     
     if 'pig_farms' in data:
         pig_farms = data['pig_farms']
