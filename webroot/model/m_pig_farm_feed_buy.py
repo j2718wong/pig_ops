@@ -189,7 +189,7 @@ class PigFarmFeedBuy:
                         
                     FROM pig_farm_feed_buy a 
                     LEFT OUTER JOIN common_supplier b     ON a.feed_supplier_id = b.id
-                    WHERE a.pig_farm_id = %s AND a.date_buy <= "%s" 
+                    WHERE a.pig_farm_id = %s AND a.date_buy >= "%s" 
                     ORDER BY a.date_buy DESC
                     """ % (pig_farm_id, date_since)
         

@@ -459,8 +459,8 @@ def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0,
 DAYS_SINCE_FEED_BALANCE = 30
     
 @app.get("/feed_balance/list", tags=["Production Details"])
-async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_farm_hid = None, 
-    date_since = None, inc_user_audit:int = 0):
+async def feed_balance_list(request: Request,  pig_prod_hid: str = None,  
+    pfhid = None, date_since = None, inc_user_audit:int = 0):
     """
     Will get feed_balance list.
     
@@ -471,7 +471,7 @@ async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_far
         pig_prod hashid
         
         
-    pig_farm_hid :str    
+    pfhid :str    
         pig_farm hashid
     
     date_since: str
@@ -510,9 +510,9 @@ async def feed_balance_list(request: Request,  pig_prod_hid: str = None, pig_far
     
     pig_farm_id = 0
     
-    if pig_farm_hid is not None:
+    if pfhid is not None:
     
-        res = hashids_common.decrypt(pig_farm_hid)
+        res = hashids_common.decrypt(pfhid)
         if len(res) == 0:
             return {
                 'result':{

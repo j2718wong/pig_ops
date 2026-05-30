@@ -273,7 +273,8 @@ def replace_plain_ids_feed_item(cur_entry):
     
     
 @app.get("/pf_feed_buy/list", tags=["Pig Farm"])
-async def pf_feed_buy_list(request: Request, pfhid: str, page_number = 1):
+async def pf_feed_buy_list(request: Request, pfhid: str, page_number = 1, 
+        date_since = None):
     """
     Will get pig farm feed_buy list.
     
@@ -309,7 +310,9 @@ async def pf_feed_buy_list(request: Request, pfhid: str, page_number = 1):
     pig_farm_id = res[0]
 
 
-    res = model['pf_feed_buy'].get_list(pig_farm_id, page_number)
+    res = model['pf_feed_buy'].get_list(pig_farm_id, 
+        page_number = page_number, 
+        date_since = date_since)
     
     if res is None:
         return {
