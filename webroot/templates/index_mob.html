@@ -1058,7 +1058,7 @@
         mobileToggle.addEventListener('click', () => {
             console.log('mobileToggle is clicked');
             
-            const isLocked = globalThis.navigation.userControl.isAccountLocked();
+            const isLocked = window.navigation.userControl.isAccountLocked();
             if (isLocked){return;}
             
             mobileNav.classList.add('active');
