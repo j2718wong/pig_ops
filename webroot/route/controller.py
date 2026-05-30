@@ -163,10 +163,10 @@ class Controller:
 
 
     def get_app_ui_settings(self):
-        enable_manual_email     = 0
-        enable_referral         = 0
+        enable_manual_email         = 0
+        enable_referral             = 0
         joint_account_pig_farm_create = 0
-        enable_pig_prod_cache   = 0
+        inc_feed_buy_in_feed_bal    = 0
 
 
         temp = os.getenv('UI_ENABLE_MANUAL_EMAIL_LOGIN')
@@ -202,22 +202,24 @@ class Controller:
                 test = 1
 
         
-        temp = os.getenv('UI_ENABLE_PIG_PRODUCTION_CACHE')
+        temp = os.getenv('UI_INC_FEED_BUY_IN_FEED_BAL')
         if temp is not None:
             try:
                 temp_int = int(temp)
                 
                 if temp_int > 0:
-                    enable_pig_prod_cache = 1
+                    inc_feed_buy_in_feed_bal = 1
             except:
                 test = 1
+
+        
 
 
         ui_settings = {
             'enable_manual_email':      enable_manual_email,
             'enable_referral':          enable_referral,
             'joint_account_pig_farm_create': joint_account_pig_farm_create,
-            'enable_pig_prod_cache':    enable_pig_prod_cache
+            'inc_feed_buy_in_feed_bal': inc_feed_buy_in_feed_bal
         }
 
         

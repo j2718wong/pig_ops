@@ -46,7 +46,7 @@ ACCOUNT_REGISTER_RES_NUM_SUCCESS        = 0
     
 
 @app.get("/account/info", tags=["Account"])
-async def user_account_info(request: Request, ahid: str):
+async def user_account_info(request: Request, ahid: str, acc_only:int = 0):
     """
     Will get account info
 
@@ -81,7 +81,7 @@ async def user_account_info(request: Request, ahid: str):
     account_id = res[0]
     
     
-    res = model['account'].get_info(account_id)
+    res = model['account'].get_info(account_id, acc_only)
     
     
     if res is None:

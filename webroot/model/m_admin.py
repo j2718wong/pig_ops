@@ -60,12 +60,11 @@ class Admin(BaseModel):
     
 
 
-    def get_uploaded_receipts_for_reading(self, user_id_data_entry = 0, 
-            number_last_read = 10):
+    def get_uploaded_receipts_for_reading(self, not_yet_read = 1, 
+            user_id_data_entry = 0, number_last_read = 10):
         
-        sql = """
-            SELECT * FROM (
-                -- Query 1: Unread receipts (status_id = 0)
+        if not_yet_read > 0:
+            sql = """
                 SELECT
                     id,
                     status_id,
@@ -76,13 +75,14 @@ class Admin(BaseModel):
                     amount_receipt,
                     payment_reference,
                     dt_receipt,
-                    dt_input_data_entry
+                    dt_input_data_entry,
+                    dt_entry
                 FROM account_upload_receipt
-                WHERE status_id = 0
+                WHERE status_id IS  NULL;
+                """
                 
-                UNION ALL
-                
-                -- Query 2: Read receipts by this user (limited)
+        else:
+            sql = """
                 SELECT
                     id,
                     status_id,
@@ -93,16 +93,16 @@ class Admin(BaseModel):
                     amount_receipt,
                     payment_reference,
                     dt_receipt,
-                    dt_input_data_entry
+                    dt_input_data_entry,
+                    dt_entry
                 FROM account_upload_receipt
                 WHERE data_entry_user_id = %s
                 ORDER BY id DESC
                 LIMIT %s
-            ) AS combined
-            ORDER BY id DESC
-        """ %(user_id_data_entry, number_last_read)
+            
+            """ %(user_id_data_entry, number_last_read)
         
-        
+        print(sql)
         
         rows = self._execute_query(sql)
         
@@ -122,26 +122,28 @@ class Admin(BaseModel):
             cur_amount_receipt      = float(row[5]) if row[5] else None
             cur_payment_reference   = row[6]
             cur_dt_receipt          = str(row[7])   if row[7] else None 
-            cur_dt_input_data_entry = str(row[8])
+            cur_dt_input_data_entry = str(row[8])   if row[8] else None
+            cur_dt_data_entry       = str(row[9])
                 
             cur_entry = {
-                'id':                    cur_id,                             
-                'status_id':             cur_status_id,          
-                'flag':                  cur_flag,               
-                'file_path':             cur_file_path,          
-                'payment_channel_id':    cur_payment_channel_id, 
-                                         
-                'amount_receipt':        cur_amount_receipt,     
-                'payment_reference':     cur_payment_reference,  
-                'dt_receipt':            cur_dt_receipt,         
-                'dt_input_data_entry':   cur_dt_input_data_entry
+                'id':                   cur_id,                             
+                'status_id':            cur_status_id,          
+                'flag':                 cur_flag,               
+                'file_path':            cur_file_path,          
+                'payment_channel_id':   cur_payment_channel_id, 
+                                        
+                'amount_receipt':       cur_amount_receipt,     
+                'payment_reference':    cur_payment_reference,  
+                'dt_receipt':           cur_dt_receipt,         
+                'dt_input_data_entry':  cur_dt_input_data_entry,
+                'dt_entry':             cur_dt_data_entry
                 
             }
             
             
-            return cur_entry
+            result.append(cur_entry)
             
-        return None
+        return result
     
     
 

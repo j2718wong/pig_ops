@@ -242,6 +242,11 @@ class Account(BaseModel):
             cur_upload_receipt_count            = row[29]
             
             
+            temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
+            cur_flag_acc_is_enabled = 1 if temp > 0 else 0
+                
+            
+            
             if account_only == 0:
             
                 # Account settings (indices 30-36) - Corrected offsets
@@ -269,10 +274,6 @@ class Account(BaseModel):
                 cur_data_ver_num_pig_buyer          = row[46]
                 cur_data_ver_num_sd_chklst          = row[47]
 
-
-                
-                temp = cur_acc_flag & FLAG_BIT_ACCOUNT_ENABLE
-                cur_flag_acc_is_enabled = 1 if temp > 0 else 0
                 
                 
                 temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH

@@ -148,28 +148,50 @@ class PigFarmFeedBuy:
         return None
     
     
-    def get_list(self, pig_farm_id, page_number = 1, limit =  50):
+    def get_list(self, pig_farm_id, page_number = 1, limit =  50, 
+            date_since = None):
         
-        offset = (page_number - 1) * limit
+        if date_since is None:
         
-        sql =   """
-                SELECT 
-                    a.id,
-                    
-                    a.date_buy,
-                    
-                    a.total_feed_cost,
-                    a.other_cost,
-                    
-                    a.feed_supplier_id,
-                    b.name AS feed_supplier_name
-                    
-                FROM pig_farm_feed_buy a 
-                LEFT OUTER JOIN common_supplier b     ON a.feed_supplier_id = b.id
-                WHERE a.pig_farm_id = %s
-                ORDER BY a.date_buy DESC
-                LIMIT %s OFFSET %s 
-                """ % (pig_farm_id, limit, offset)
+            offset = (page_number - 1) * limit
+            
+            sql =   """
+                    SELECT 
+                        a.id,
+                        
+                        a.date_buy,
+                        
+                        a.total_feed_cost,
+                        a.other_cost,
+                        
+                        a.feed_supplier_id,
+                        b.name AS feed_supplier_name
+                        
+                    FROM pig_farm_feed_buy a 
+                    LEFT OUTER JOIN common_supplier b     ON a.feed_supplier_id = b.id
+                    WHERE a.pig_farm_id = %s
+                    ORDER BY a.date_buy DESC
+                    LIMIT %s OFFSET %s 
+                    """ % (pig_farm_id, limit, offset)
+        
+        else:
+            sql =   """
+                    SELECT 
+                        a.id,
+                        
+                        a.date_buy,
+                        
+                        a.total_feed_cost,
+                        a.other_cost,
+                        
+                        a.feed_supplier_id,
+                        b.name AS feed_supplier_name
+                        
+                    FROM pig_farm_feed_buy a 
+                    LEFT OUTER JOIN common_supplier b     ON a.feed_supplier_id = b.id
+                    WHERE a.pig_farm_id = %s AND a.date_buy <= "%s" 
+                    ORDER BY a.date_buy DESC
+                    """ % (pig_farm_id, date_since)
         
             
         # Check if still connected to database
@@ -189,7 +211,7 @@ class PigFarmFeedBuy:
             
             rows = cursor.fetchall()
             cursor.close()
-            #conn.close()
+
             
         except Exception as e:
             msg = 'get_list(); error in executing query[] = ' + sql

@@ -83,7 +83,7 @@ class AccountBill(BaseModel):
                     b.name_first
                     
                 FROM account_upload_receipt a
-                LEFT OUTER JOIN user b      ON b.added_by_user_id = a.id
+                LEFT OUTER JOIN user b      ON a.added_by_user_id = b.id
                 WHERE a.account_bill_id = %s
                 ORDER BY a.id DESC
                 """ % (account_bill_id)

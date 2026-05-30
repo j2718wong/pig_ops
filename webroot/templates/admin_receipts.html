@@ -2,24 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SuperPig - Manual Receipt Data Entry</title>
     
-    
-    <script type = "text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>  
+    <script type="text/javascript" src="/static_m/js/jquery/jquery.min-3.7.1.js"></script>
 
-{% for script in js_app_text %}
-    <!-- Production: regular script with bundled code -->
+    {% for script in js_app_text %}
     <script type="text/javascript" src="{{ script }}"></script>    
-{% endfor %}
+    {% endfor %}
 
-
-{% for script in js_app_modules %}
-    <!-- Development: use module type for ES6 imports -->
+    {% for script in js_app_modules %}
     <script type="module" src="{{ script }}"></script>    
-{% endfor %}
+    {% endfor %}
 
-    
     <style>
         * {
             margin: 0;
@@ -66,9 +61,28 @@
             font-size: 0.8rem;
         }
 
-        /* Top Section: Receipts Table (Horizontal) */
+        /* TWO COLUMN LAYOUT */
+        .two-column-layout {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* LEFT COLUMN: Table (top) + Form (bottom) */
+        .left-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Top Section inside left column: Receipts Table */
         .top-section {
-            flex: 0 0 40%;
+            flex: 1;
             background: white;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -83,7 +97,7 @@
             background: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1.3rem;
             color: #1e3a8a;
             flex-shrink: 0;
             display: flex;
@@ -92,7 +106,7 @@
         }
 
         .user-greeting {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             font-weight: normal;
             color: #1e3a8a;
         }
@@ -134,72 +148,67 @@
             border-left: 3px solid #1e3a8a;
         }
 
-        /* Bottom Section: Image + Form (Side by side) */
-        .bottom-section {
-            flex: 1;
+        /* Pagination */
+        .pagination-controls {
             display: flex;
-            gap: 20px;
-            min-height: 0;
-        }
-
-        /* Left: Image Preview */
-        .image-preview-container {
-            flex: 1;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .image-preview-container .section-title {
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
             flex-shrink: 0;
         }
 
-        .image-preview-area {
-            flex: 1;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-            padding: 16px;
+        .pagination-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3a8a;
+            transition: all 0.2s ease;
+            min-width: 70px;
         }
 
-        .image-preview-area img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .pagination-btn:hover:not(:disabled) {
+            background: #1e3a8a;
+            border-color: #1e3a8a;
+            color: white;
         }
 
-        .image-preview-area .no-image {
-            color: #999;
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .page-indicator {
+            font-size: 0.8rem;
+            color: #495057;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            min-width: 80px;
             text-align: center;
         }
 
-        /* Right: Data Entry Form */
+        /* Bottom Section inside left column: Data Entry Form */
         .data-entry-container {
-            flex: 1;
             background: white;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-        }
-
-        .data-entry-container .section-title {
             flex-shrink: 0;
         }
 
         .form-wrapper {
-            flex: 1;
-            overflow-y: auto;
             padding: 20px;
         }
 
@@ -210,7 +219,7 @@
         .form-group label {
             display: block;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 1.2rem;
             margin-bottom: 5px;
             color: #333;
         }
@@ -224,7 +233,7 @@
             padding: 8px 10px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-family: inherit;
         }
 
@@ -234,13 +243,45 @@
             box-shadow: 0 0 0 2px rgba(30,58,138,0.1);
         }
 
+        /* Time select row - three dropdowns side by side */
+        .time-select-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .time-select-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .time-select-row .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+
+        .time-separator {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #666;
+            padding-bottom: 5px;
+        }
+
         .datetime-row {
             display: flex;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .datetime-row .form-group {
             flex: 1;
+            min-width: 120px;
         }
 
         .btn-save {
@@ -283,6 +324,90 @@
             color: #721c24;
         }
 
+        /* RIGHT COLUMN: Image Preview (fixed width 400px) */
+        .right-column {
+            width: 400px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .image-preview-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .image-preview-area {
+            flex: 1;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 8px;
+            min-height: 0;
+        }
+
+        .image-preview-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview-area .no-image {
+            color: #999;
+            text-align: center;
+        }
+
+        /* Image zoom controls */
+        .image-zoom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            flex-shrink: 0;
+        }
+
+        .zoom-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3a8a;
+        }
+
+        .zoom-btn:hover {
+            background: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+
+        /* Responsive: on small screens, stack columns */
+        @media (max-width: 900px) {
+            .two-column-layout {
+                flex-direction: column;
+            }
+            
+            .right-column {
+                width: 100%;
+                min-height: 300px;
+            }
+        }
+
+        /* Badge styles */
         .badge {
             display: inline-block;
             padding: 2px 6px;
@@ -301,70 +426,19 @@
             color: white;
         }
 
-        
-
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            flex-shrink: 0;
+        .badge-pending {
+            background: #ffc107;
+            color: #212529;
         }
 
-        .pagination-btn {
-            background: white;
-            border: 1px solid #dee2e6;
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #1e3a8a;
-            transition: all 0.2s ease;
-            min-width: 70px;
-        }
-
-        .pagination-btn:hover:not(:disabled) {
-            background: #1e3a8a;
-            border-color: #1e3a8a;
+        .badge-approved {
+            background: #198754;
             color: white;
         }
 
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #e9ecef;
-            color: #6c757d;
-        }
-
-        .page-indicator {
-            font-size: 0.85rem;
-            color: #495057;
-            background: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #dee2e6;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        /* For empty state - hide pagination */
-        .pagination-controls.empty {
-            display: none;
-        }
-
-
-
-
-
-
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: #666;
+        .badge-rejected {
+            background: #dc3545;
+            color: white;
         }
 
         /* Modal Styles */
@@ -411,7 +485,7 @@
         }
 
         .modal-header h3 {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 600;
         }
 
@@ -448,7 +522,6 @@
         .btn-secondary {
             background: #e9ecef;
             color: #333;
-            font-size: 1.1rem;
         }
 
         .btn-secondary:hover {
@@ -460,7 +533,7 @@
             color: #721c24;
             padding: 10px 14px;
             border-radius: 8px;
-            font-size:1.1rem;
+            font-size: 0.9rem;
             margin-top: 16px;
             display: none;
             border-left: 4px solid #dc3545;
@@ -482,7 +555,7 @@
 
         .input-group label {
             display: block;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 5px;
             color: #333;
@@ -505,7 +578,7 @@
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             white-space: nowrap;
         }
 
@@ -514,201 +587,230 @@
             cursor: not-allowed;
         }
 
-        .success-text {
-            color: #155724;
-            background: #d4edda;
-        }
-
         .server-error-msg {
-            margin-top:4px;
-            margin-bottom:4px;
-            color:red;
-            display:none;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            color: red;
+            display: none;
         }
 
-
-        @media (max-width: 900px) {
-            .bottom-section {
-                flex-direction: column;
-            }
-            
-            .image-preview-container {
-                flex: 0 0 40%;
-            }
-            
-            .data-entry-container {
-                flex: 0 0 auto;
-            }
-        }
-        
-        
-        /* Server Message Modal - Info and Error Variants */
+        /* Server Message Modal Variants */
         .server-msg-modal-info .modal-header {
             background: #0d6efd;
-            color: white;
         }
-
-        .server-msg-modal-info .modal-header h3::before {
-            content: "ℹ️ ";
-        }
-
         .server-msg-modal-error .modal-header {
             background: #dc3545;
-            color: white;
         }
-
-        .server-msg-modal-error .modal-header h3::before {
-            content: "⚠️ ";
-        }
-
         .server-msg-modal-success .modal-header {
             background: #198754;
-            color: white;
         }
-
-        .server-msg-modal-success .modal-header h3::before {
-            content: "✅ ";
-        }
-
         .server-msg-modal-warning .modal-header {
             background: #ffc107;
             color: #212529;
         }
-
-        .server-msg-modal-warning .modal-header h3::before {
-            content: "⚠️ ";
-        }
-
-        /* Modal body message styling */
-        .server-msg-modal-info .modal-body,
-        .server-msg-modal-error .modal-body,
-        .server-msg-modal-success .modal-body,
-        .server-msg-modal-warning .modal-body {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            color: #212529;
-        }
-
-        /* Optional: Add icon to body as well */
-        .server-msg-modal-info #server-msg-body::before {
-            content: "📢 ";
-            font-size: 1.2rem;
-        }
-
-        .server-msg-modal-error #server-msg-body::before {
-            content: "❌ ";
-            font-size: 1.2rem;
-        }
-
-        .server-msg-modal-success #server-msg-body::before {
-            content: "🎉 ";
-            font-size: 1.2rem;
-        }
-
-        .server-msg-modal-warning #server-msg-body::before {
-            content: "⚠️ ";
-            font-size: 1.2rem;
-        }
-        
     </style>
 </head>
 <body>
-    
-<div id = "container-receipt-entry">
+
+<div id="container-receipt-entry">
     <div class="container">
-        <!-- Top Section: Receipts Table with user greeting -->
-        <div class="top-section">
-            <div class="section-title">
-                <span id="tableTitle">📋 Pending Receipts</span>
-                <span class="user-greeting" id="userGreeting">Hello Guest</span>
-            </div>
-            <div class="table-wrapper">
-                <table class="receipts-table" id="receiptsTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Status</th>
-                            <th>Bill Ref</th>
-                            <th>Channel</th>
-                            <th>Payment Ref</th>
-                            <th>Amount</th>
-                            <th>Date Read</th>
-                            <th>Uploaded</th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody id="receipt-table-tbody">    
-                    </tbody>
-                </table>
-            </div>
-            
-            <!--The pagination controls is hidden until row_count > settings.itemsPerPage --> 
-            <div class="pagination-controls" id="receipt-table-pagination">
-                <button class="pagination-btn" id="receipt-table-prev" disabled>
-                    Previous
-                </button>
-                <span class="page-indicator">
-                    <span id="receipt-table-current-page">1</span> / <span id="receipt-table-total-pages">0</span>
-                </span>
-                <button class="pagination-btn" id="receipt-table-next">
-                    Next
-                </button>
-            </div>
-            
-            
+        <!-- Header -->
+        <div class="header">
+            <h1>SuperPig - Manual Receipt Data Entry</h1>
         </div>
 
-        <!-- Bottom Section: Image + Form side by side -->
-        <div class="bottom-section">
-            <div class="image-preview-container">
-                <div class="section-title">🖼️ Receipt Image</div>
-                <div class="image-preview-area" id="receiptImagePreview">
-                    <div class="no-image">Select a receipt to view image</div>
+        <!-- TWO COLUMN LAYOUT -->
+        <div class="two-column-layout">
+            
+            <!-- LEFT COLUMN: Table (top) + Form (bottom) -->
+            <div class="left-column">
+                
+                <!-- Top: Receipts Table -->
+                <div class="top-section">
+                    <div class="section-title">
+                        <span>📋 Pending Receipts</span>
+                        <span class="user-greeting" id="userGreeting">👤 Hello Guest</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="receipts-table" id="receiptsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Status</th>
+                                    <th>Bill Ref</th>
+                                    <th>Channel</th>
+                                    <th>Payment Ref</th>
+                                    <th>Amount</th>
+                                    <th>Date Read</th>
+                                    <th>Uploaded</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receipt-table-tbody">
+                                <tr><td colspan="8" class="loading">Loading receipts...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination-controls" id="receipt-table-pagination" style="display: none;">
+                        <button class="pagination-btn" id="receipt-table-prev" disabled>Previous</button>
+                        <span class="page-indicator">
+                            <span id="receipt-table-current-page">1</span> / <span id="receipt-table-total-pages">0</span>
+                        </span>
+                        <button class="pagination-btn" id="receipt-table-next">Next</button>
+                    </div>
+                </div>
+
+                <!-- Bottom: Data Entry Form -->
+                <div class="data-entry-container">
+                    <div class="section-title">✏️ Manual Data Entry</div>
+                    <div class="form-wrapper">
+                        <div class="form-group">
+                            <label>Payment Channel <span class="required">*</span></label>
+                            <select id="paymentChannel" class="form-control">
+                                <option value="">Select payment channel</option>
+                                <option value="gcash">📱 GCash</option>
+                                <option value="bank_transfer">🏦 Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Payment Reference <span class="required">*</span></label>
+                            <input type="text" id="paymentReference" class="form-control" placeholder="e.g., GCash-1234567890 or bank reference number">
+                        </div>
+
+                        <div class="datetime-row">
+                            <div class="form-group">
+                                <label>Receipt Date <span class="required">*</span></label>
+                                <input type="date" id="receiptDate" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Receipt Time (optional)</label>
+                                <div class="time-select-row">
+                                    <div class="form-group">
+                                        <select id="receiptHour" class="form-control">
+                                            <option value="">Hour</option>
+                                            <option value="1">01</option>
+                                            <option value="2">02</option>
+                                            <option value="3">03</option>
+                                            <option value="4">04</option>
+                                            <option value="5">05</option>
+                                            <option value="6">06</option>
+                                            <option value="7">07</option>
+                                            <option value="8">08</option>
+                                            <option value="9">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </div>
+                                    <span class="time-separator">:</span>
+                                    <div class="form-group">
+                                        <select id="receiptMinute" class="form-control">
+                                            <option value="">Min</option>
+                                            <option value="00">00</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="24">24</option>
+                                            <option value="25">25</option>
+                                            <option value="26">26</option>
+                                            <option value="27">27</option>
+                                            <option value="28">28</option>
+                                            <option value="29">29</option>
+                                            <option value="30">30</option>
+                                            <option value="31">31</option>
+                                            <option value="32">32</option>
+                                            <option value="33">33</option>
+                                            <option value="34">34</option>
+                                            <option value="35">35</option>
+                                            <option value="36">36</option>
+                                            <option value="37">37</option>
+                                            <option value="38">38</option>
+                                            <option value="39">39</option>
+                                            <option value="40">40</option>
+                                            <option value="41">41</option>
+                                            <option value="42">42</option>
+                                            <option value="43">43</option>
+                                            <option value="44">44</option>
+                                            <option value="45">45</option>
+                                            <option value="46">46</option>
+                                            <option value="47">47</option>
+                                            <option value="48">48</option>
+                                            <option value="49">49</option>
+                                            <option value="50">50</option>
+                                            <option value="51">51</option>
+                                            <option value="52">52</option>
+                                            <option value="53">53</option>
+                                            <option value="54">54</option>
+                                            <option value="55">55</option>
+                                            <option value="56">56</option>
+                                            <option value="57">57</option>
+                                            <option value="58">58</option>
+                                            <option value="59">59</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <select id="receiptAmPm" class="form-control">
+                                            <option value="">AM/PM</option>
+                                            <option value="AM">AM</option>
+                                            <option value="PM">PM</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Amount (₱) <span class="required">*</span></label>
+                            <input type="number" id="amountReceipt" class="form-control" placeholder="0.00" step="0.01">
+                        </div>
+
+                        <button id="saveBtn" class="btn-save">💾 Save Data Entry</button>
+                        <div id="statusMessage" class="status-message"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="data-entry-container">
-                <div class="section-title">✏️ Data Entry</div>
-                <div class="form-wrapper">
-                    <div class="form-group">
-                        <label>Payment Channel <span class="required">*</span></label>
-                        <select id="paymentChannel" class="form-control">
-                            <option value="">Select payment channel</option>
-                            <option value="gcash">GCash</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                        </select>
+            <!-- RIGHT COLUMN: Image Preview (fixed 400px width) -->
+            <div class="right-column">
+                <div class="image-preview-container">
+                    <div class="section-title">🖼️ Receipt Image</div>
+                    <div class="image-preview-area" id="receiptImagePreview">
+                        <div class="no-image">📷 Select a receipt to view image</div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Payment Reference <span class="required">*</span></label>
-                        <input type="text" id="paymentReference" class="form-control" placeholder="e.g., GCash-1234567890">
+                    <div class="image-zoom-controls">
+                        <button class="zoom-btn" id="zoomOutBtn" disabled>🔍- Zoom Out</button>
+                        <button class="zoom-btn" id="zoomResetBtn" disabled>⟳ Reset</button>
+                        <button class="zoom-btn" id="zoomInBtn" disabled>🔍+ Zoom In</button>
                     </div>
-
-                    <div class="datetime-row">
-                        <div class="form-group">
-                            <label>Receipt Date <span class="required">*</span></label>
-                            <input type="date" id="receiptDate" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Receipt Time</label>
-                            <input type="time" id="receiptTime" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Amount (₱) <span class="required">*</span></label>
-                        <input type="number" id="amountReceipt" class="form-control" placeholder="0.00" step="0.01">
-                    </div>
-
-                    <button id="saveBtn" class="btn-save">💾 Save Data Entry</button>
-                    <div id="statusMessage" class="status-message"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Authentication Modal -->
-    <div id="authModal" class="modal-overlay" style="display: flex;">
+    <div id="authModal" class="modal-overlay" style="display: none;">
         <div class="modal-container">
             <div class="modal-header">
                 <h3>🔐 Authorization Required</h3>
@@ -720,7 +822,6 @@
                 </div>
                 <button id="sendCodeBtn" class="btn-send-code" style="width: 100%;">📧 Send Code</button>
                 
-                <!-- Hidden div for unauthorized entry -->
                 <div id="unauthorizedDiv" class="hidden-div">
                     ⚠️ Unauthorized Entry: Invalid email or authorization.
                 </div>
@@ -736,15 +837,13 @@
                 </div>
                 
                 <div class="server-error-msg" id="serverErrorMsg"></div>
-                
             </div>
             <div class="modal-footer">
                 <button id="closeModalBtn" class="btn-modal btn-secondary">Close</button>
             </div>
         </div>
     </div>
-    
-    
+
     <!-- Server Message Modal -->
     <div id="server-msg-modal" class="modal-overlay" style="display: none;">
         <div class="modal-container">
@@ -752,15 +851,13 @@
                 <h3 id="server-msg-modal-header"></h3>
             </div>
             <div class="modal-body">
-                <div id="server-msg-body"><div>
-                
+                <div id="server-msg-body"></div>
             </div>
             <div class="modal-footer">
                 <button id="server-msg-modal-close" class="btn-modal btn-secondary">Close</button>
             </div>
         </div>
     </div>
-    
 </div>
 
 <script>
@@ -772,46 +869,15 @@
     let totalPages = 1;
     let receiptsData = [];
     let selectedReceiptId = null;
+    let currentZoom = 1;
     
     // Authentication state
     let isAuthenticated = false;
     let currentUser = null;
-    let pendingEmail = null;
-    let generatedCode = null;
-    let codeExpiry = null;
-
+    
     // Helper functions
-    function getAuthToken() {
-        return localStorage.getItem('access_token');
-    }
-    
-    function setAuthToken(token) {
-        if (token) {
-            localStorage.setItem('access_token', token);
-        } else {
-            localStorage.removeItem('access_token');
-        }
-    }
-    
-    function setUserInfo(user) {
-        if (user) {
-            localStorage.setItem('user_name', user.name || user.email || 'User');
-            localStorage.setItem('user_email', user.email || '');
-            currentUser = user;
-        } else {
-            localStorage.removeItem('user_name');
-            localStorage.removeItem('user_email');
-            currentUser = null;
-        }
-        updateUserGreeting();
-    }
-    
-    function getUserName() {
-        return localStorage.getItem('user_name') || 'Guest';
-    }
-    
     function updateUserGreeting() {
-        const name = getUserName();
+        const name = localStorage.getItem('user_name') || 'Guest';
         const greetingElem = document.getElementById('userGreeting');
         if (greetingElem) {
             greetingElem.textContent = `👤 Hello ${name}`;
@@ -830,235 +896,25 @@
         }, 4000);
     }
     
-    function showUnauthorizedMessage(show = true, customMessage = null) {
-        const div = document.getElementById('unauthorizedDiv');
-        if (show) {
-            if (customMessage) {
-                div.textContent = customMessage;
-            } else {
-                div.textContent = '⚠️ Unauthorized Entry: Invalid credentials or expired session.';
-            }
-            div.classList.add('show');
-        } else {
-            div.classList.remove('show');
+    
+    // Zoom functions
+    function updateZoom(zoomLevel, imgElement) {
+        if (!imgElement) return;
+        currentZoom = Math.min(Math.max(zoomLevel, 0.5), 3);
+        imgElement.style.transform = `scale(${currentZoom})`;
+        imgElement.style.transformOrigin = 'top left';
+    }
+    
+    function resetZoom(imgElement) {
+        currentZoom = 1;
+        if (imgElement) {
+            imgElement.style.transform = 'scale(1)';
+            imgElement.style.transformOrigin = 'top left';
         }
     }
     
-    
-   
-    
-    function renderReceiptsTable() {
-        const tbody = document.getElementById('receiptsTableBody');
-        
-        if (!receiptsData || receiptsData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7">No pending receipts found</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = '';
-        
-        for (let i = 0; i < receiptsData.length; i++) {
-            const receipt = receiptsData[i];
-            const row = document.createElement('tr');
-            row.dataset.id = receipt.id;
-            row.className = selectedReceiptId === receipt.id ? 'selected' : '';
-            
-            row.innerHTML = `
-                <td>${receipt.id || '-'}</td>
-                <td>${escapeHtml(receipt.account_name || '-')}</td>
-                <td>${escapeHtml(receipt.bill_reference || '-')}</td>
-                <td><span class="badge ${receipt.payment_channel === 'gcash' ? 'badge-gcash' : 'badge-bank'}">${receipt.payment_channel === 'gcash' ? 'GCash' : (receipt.payment_channel === 'bank_transfer' ? 'Bank Transfer' : '-')}</span></td>
-                <td>${escapeHtml(receipt.payment_reference || '-')}</td>
-                <td>${receipt.amount_receipt ? '₱' + parseFloat(receipt.amount_receipt).toFixed(2) : '-'}</td>
-                <td>${receipt.uploaded_at ? new Date(receipt.uploaded_at).toLocaleDateString() : '-'}</td>
-            `;
-            
-            row.addEventListener('click', (function(rec) {
-                return function() { selectReceipt(rec.id); };
-            })(receipt));
-            
-            tbody.appendChild(row);
-        }
-    }
-    
-    function selectReceipt(receiptId) {
-        if (!isAuthenticated) {
-            showStatus('Please complete authentication first', 'error');
-            return;
-        }
-        const receipt = receiptsData.find(r => r.id === receiptId);
-        if (!receipt) return;
-        
-        selectedReceiptId = receiptId;
-        
-        document.querySelectorAll('#receiptsTableBody tr').forEach(row => {
-            row.classList.remove('selected');
-            if (row.dataset.id == receiptId) {
-                row.classList.add('selected');
-            }
-        });
-        
-        document.getElementById('paymentChannel').value = receipt.payment_channel || '';
-        document.getElementById('paymentReference').value = receipt.payment_reference || '';
-        document.getElementById('receiptDate').value = receipt.receipt_date || '';
-        document.getElementById('receiptTime').value = receipt.receipt_time || '';
-        document.getElementById('amountReceipt').value = receipt.amount_receipt || '';
-        
-        const previewArea = document.getElementById('receiptImagePreview');
-        if (receipt.image_url) {
-            previewArea.innerHTML = `<img src="${receipt.image_url}" alt="Receipt Image" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image failed to load</div>'">`;
-        } else {
-            previewArea.innerHTML = '<div class="no-image">No image available for this receipt</div>';
-        }
-        
-        document.getElementById('statusMessage').textContent = '';
-        document.getElementById('statusMessage').className = 'status-message';
-    }
-    
-    async function saveDataEntry() {
-        if (!isAuthenticated) {
-            showStatus('Session expired. Please re-authenticate.', 'error');
-            openAuthModal();
-            return;
-        }
-        
-        if (!selectedReceiptId) {
-            showStatus('Please select a receipt first', 'error');
-            return;
-        }
-        
-        const paymentChannel = document.getElementById('paymentChannel').value;
-        const paymentReference = document.getElementById('paymentReference').value.trim();
-        const receiptDate = document.getElementById('receiptDate').value;
-        const receiptTime = document.getElementById('receiptTime').value;
-        const amountReceipt = parseFloat(document.getElementById('amountReceipt').value);
-        
-        if (!paymentChannel) {
-            showStatus('Please select payment channel', 'error');
-            return;
-        }
-        if (!paymentReference) {
-            showStatus('Please enter payment reference', 'error');
-            return;
-        }
-        if (!receiptDate) {
-            showStatus('Please select receipt date', 'error');
-            return;
-        }
-        if (isNaN(amountReceipt) || amountReceipt <= 0) {
-            showStatus('Please enter valid amount', 'error');
-            return;
-        }
-        
-        let receiptDatetime = receiptDate;
-        if (receiptTime) {
-            receiptDatetime = `${receiptDate} ${receiptTime}:00`;
-        } else {
-            receiptDatetime = `${receiptDate} 00:00:00`;
-        }
-        
-        const data = {
-            upload_receipt_id: selectedReceiptId,
-            payment_channel: paymentChannel,
-            payment_reference: paymentReference,
-            dt_receipt: receiptDatetime,
-            amount_receipt: amountReceipt
-        };
-        
-        try {
-            const response = await fetch(`${API_BASE}/admin/receipts/data_entry`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getAuthToken()}`
-                },
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            
-            if (result.result && result.result.num === 0) {
-                showStatus('Data entry saved!', 'success');
-                await loadReceipts();
-                selectedReceiptId = null;
-                
-                document.getElementById('paymentChannel').value = '';
-                document.getElementById('paymentReference').value = '';
-                document.getElementById('receiptDate').value = '';
-                document.getElementById('receiptTime').value = '';
-                document.getElementById('amountReceipt').value = '';
-                document.getElementById('receiptImagePreview').innerHTML = '<div class="no-image">Select a receipt to view image</div>';
-            } else {
-                showStatus(result.result.desc || 'Failed to save', 'error');
-                if (result.result && result.result.code === 401) {
-                    isAuthenticated = false;
-                    openAuthModal();
-                }
-            }
-        } catch (error) {
-            console.error('Error saving:', error);
-            showStatus('Network error. Please try again.', 'error');
-        }
-    }
-
-    
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    // Modal authentication logic
-    function openAuthModal() {
-        const modal = document.getElementById('authModal');
-        modal.style.display = 'flex';
-        // Reset modal fields
-        document.getElementById('modalEmail').value = '';
-        document.getElementById('verificationCode').value = '';
-        document.getElementById('verificationSection').style.display = 'none';
-        showUnauthorizedMessage(false);
-        generatedCode = null;
-        codeExpiry = null;
-        pendingEmail = null;
-    }
-    
-    function closeAuthModal() {
-        const modal = document.getElementById('authModal');
-        modal.style.display = 'none';
-        if (!isAuthenticated) {
-            // If still not authenticated, keep trying but show message
-            showStatus('Authentication required to access data', 'error');
-        }
-    }
-    
-    
-    // Check existing session mock
-    function checkExistingSession() {
-        const token = getAuthToken();
-        const userName = localStorage.getItem('user_name');
-        if (token && userName) {
-            isAuthenticated = true;
-            currentUser = { name: userName };
-            updateUserGreeting();
-            closeAuthModal();
-            loadReceipts();
-        } else {
-            openAuthModal();
-        }
-    }
-    
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-        checkExistingSession();
-
-        document.getElementById('saveBtn').addEventListener('click', saveDataEntry);
-        
-        document.getElementById('closeModalBtn').addEventListener('click', closeAuthModal);
-        // Allow Enter key in verification code field
-        
-       
-    });
+    updateUserGreeting();
 </script>
+
 </body>
 </html>
