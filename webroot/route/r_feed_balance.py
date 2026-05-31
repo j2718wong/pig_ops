@@ -456,7 +456,7 @@ def get_data_feed_balance(pig_prod_id = 0, pig_farm_id = 0,
     return None
     
 
-DAYS_SINCE_FEED_BALANCE = 30
+DAYS_SINCE_FEED_BALANCE = 90
     
 @app.get("/feed_balance/list", tags=["Production Details"])
 async def feed_balance_list(request: Request,  pig_prod_hid: str = None,  
