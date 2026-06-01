@@ -53,6 +53,11 @@
                     "desc": "Feed Balance and audit can be recorded anytime."
                 },
                 
+                "feeds_consumed": {
+                    "title": "Automatic calculation of actual feeds consumed",
+                    "desc": "This can estimate feed requirements next month."
+                },
+                
                 "no_internet": {
                     "title": "Can read pig data even without internet",
                     "desc": "Has data access even without internet"

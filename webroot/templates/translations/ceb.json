@@ -53,6 +53,11 @@
                     "desc": "Maestimate pajud ang kinahanlanon na lawog sa kanus a na petsa sa kada batch."
                 },
                 
+                "feeds_consumed": {
+                    "title": "Automatic mo kwenta sa na konsumo na lawog",
+                    "desc": "Para dali maestimate ang kinahanlan na feeds sunod bulan."
+                },
+                
                 "no_internet": {
                     "title": "Mabasa ra ang data maski walay internet",
                     "desc": "Moandar ra ang SuperPig App maski walay internet"

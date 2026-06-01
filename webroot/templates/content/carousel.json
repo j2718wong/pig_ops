@@ -41,6 +41,11 @@
         },
         
         {
+            "image_key": "mar_feeds_consumed",
+            "key": "feeds_consumed"
+        },
+        
+        {
             "image_key": "mar_no_internet",
             "key": "no_internet"
         },

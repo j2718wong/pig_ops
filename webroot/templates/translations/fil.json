@@ -53,6 +53,11 @@
                     "desc": "Makaestimate pa ng kailanganing feeds sa given na petsa."
                 },
                 
+                "feeds_consumed": {
+                    "title": "Automatic na magkwenta sa consumed feeds",
+                    "desc": "Para madali maestimate ang kailanganin na feeds sumusunod na buwan."
+                },
+                
                 "no_internet": {
                     "title": "Pwede basahin ang data kahit walang internet",
                     "desc": "Gumagana ang SuperPig App maski walang internet"
