@@ -961,3 +961,21 @@ class DataReport(BaseModel):
     notes:                  str = None
     file_path:              str = None
     
+
+
+# Admin data classes here
+
+class DataReceiptRead(BaseModel):
+    uhid:                   str = None           
+    receipt_hid:            str = None
+    
+    user_id:                int = 0           
+
+    receipt_id:             int = 0
+
+    read_status_id:         int = 0    
+
+    payment_channel_id:     int = 0
+    amount_receipt:         float = None    
+    payment_reference:      str = None 
+    dt_receipt:             str = None        

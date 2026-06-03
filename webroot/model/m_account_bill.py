@@ -116,5 +116,60 @@ class AccountBill(BaseModel):
         return result
     
     
+    
+    def read_upload_receipt(self, data = None):
+        """
+        PROCEDURE account_upload_receipt_read(
+            in_user_id              INT,
+            
+            in_account_receipt_id   INT,
+    
+            is_read_status_id       INT,
+    
+            
+            in_payment_channel_id   INT,
+            in_amount_receipt       DECIMAL(8,2),    
+            in_payment_reference    VARCHAR(32), 
+            in_dt_receipt           VARCHAR(20)
+            
+        )    
+        """
+        
+        params = [
+            data.user_id,
+            data.receipt_id,
+            data.read_status_id,
+            
+            data.read_status_id     if data.read_status_id is not None and data.read_status_id > 0 else None,
+            data.amount_receipt,
+            data.payment_reference,
+            data.dt_receipt     
+        ]
+        
+        res = self._call_procedure('account_upload_receipt_read', params)
+        
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
+        
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'upload_receipt': {
+                    'id':               row[3]
+                }
+            }
+
+        return None
+    
+    
 
     
