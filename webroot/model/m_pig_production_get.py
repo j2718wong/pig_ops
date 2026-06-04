@@ -1084,6 +1084,7 @@ class PigProductionGet(BaseModel):
                     b.date_dispose AS sow_date_dispose, 
                     
                     a.insemination_type,
+                    a.date_insemination,
                     
                     a.boar_id,
                     c.name AS boar_name,
@@ -1151,36 +1152,39 @@ class PigProductionGet(BaseModel):
             cur_sow_number              = row[5]  
             cur_sow_date_dispose        = str(row[6]) if row[6] else None  
 
-            cur_insemination_type       = row[7]  
+            cur_insemination_type       = row[7]
+            cur_date_insemination       = row[8]  
+            
 
-            cur_boar_id                 = row[8]  
-            cur_boar_name               = row[9]  
-            cur_boar_number             = row[10] 
-            cur_boar_date_dispose       = str(row[11]) if row[11] else None
+            cur_boar_id                 = row[9] 
+            cur_boar_name               = row[10]
+            cur_boar_number             = row[11]
+            cur_boar_date_dispose       = str(row[12]) if row[12] else None
 
-            cur_semen_supplier_id       = row[12] 
-            cur_semen_supplier_name     = row[13] 
+            cur_semen_supplier_id       = row[13]
+            cur_semen_supplier_name     = row[14]
 
-            cur_semen_sup_semen_id      = row[14] 
-            cur_semen_sup_semen_name    = row[15] 
+            cur_semen_sup_semen_id      = row[15]
+            cur_semen_sup_semen_name    = row[16]
 
-            cur_semen_ai_boar_id        = row[16] 
-            cur_semen_ai_boar_name      = row[17] 
-            cur_semen_ai_boar_number    = row[18] 
-            cur_semen_ai_boar_date_dispose = str(row[19]) if row[19] else None  
+            cur_semen_ai_boar_id        = row[17]
+            cur_semen_ai_boar_name      = row[18]
+            cur_semen_ai_boar_number    = row[19]
+            cur_semen_ai_boar_date_dispose = str(row[20]) if row[20] else None
 
-            cur_date_actual_birth       = str(row[20]) 
-            cur_pigs_live_m             = row[21] 
-            cur_pigs_live_f             = row[22] 
-            cur_dead_at_birth           = row[23] 
-            cur_dead_after_birth        = row[24] 
+            cur_date_actual_birth       = str(row[21])
+            cur_pigs_live_m             = row[22] 
+            cur_pigs_live_f             = row[23] 
+            cur_dead_at_birth           = row[24] 
+            cur_dead_after_birth        = row[25] 
 
-            cur_weaning_date            = row[25] 
-            cur_weaning_pigs_m          = int(row[26])   if row[26] is not None else None  
-            cur_weaning_pigs_f          = int(row[27])   if row[27] is not None else None  
-            cur_weaning_pigs            = int(row[28])   if row[28] is not None else None  
-            cur_weaning_pigs_weight     = float(row[29]) if row[29] is not None else None  
-           
+            cur_weaning_date            = row[26] 
+            cur_weaning_pigs_m          = int(row[27])   if row[27] is not None else None 
+            cur_weaning_pigs_f          = int(row[28])   if row[28] is not None else None 
+            cur_weaning_pigs            = int(row[29])   if row[29] is not None else None 
+            cur_weaning_pigs_weight     = float(row[30]) if row[30] is not None else None 
+
+ 
            
             if last_sow_id is None or last_sow_id !=  cur_sow_id:
                 last_sow_id = cur_sow_id
@@ -1209,6 +1213,7 @@ class PigProductionGet(BaseModel):
                 
                 'insemination': {
                     'insem_type':       cur_insemination_type,
+                    'insem_date':       cur_date_insemination,
                     
                     'boar': {
                         'id':           cur_boar_id,
