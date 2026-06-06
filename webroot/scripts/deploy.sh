@@ -633,6 +633,11 @@ fi
 
 # 1️⃣1️⃣ SUMMARY
 section "✅ DEPLOYMENT COMPLETE"
+
+# Read final versions
+FINAL_SPA_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "1.0.0.0")
+FINAL_ADMIN_VERSION=$(cat "$VERSION_ADMIN_FILE" 2>/dev/null || echo "1.0.0.0")
+
 echo -e "${GREEN}Started at: $(date)${NC}"
 echo -e "${GREEN}Completed at: $(date)${NC}"
 echo ""
@@ -651,8 +656,8 @@ echo "  • Database migrations: applied"
 echo "  • Restart performed: $RESTART_NEEDED"
 echo ""
 echo "📦 Version Numbers:"
-echo "  • SPA Version:   $MAJOR.$DB_VER.$BACKEND_VER.$FRONTEND_VER"
-echo "  • Admin Version: $MAJOR.$DB_VER.$BACKEND_VER.$ADMIN_VER"
+echo "  • SPA Version:   $FINAL_SPA_VERSION"
+echo "  • Admin Version: $FINAL_ADMIN_VERSION"
 
 if [ "$RESTART_NEEDED" = true ]; then
     echo ""
