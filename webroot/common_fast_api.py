@@ -391,46 +391,6 @@ def get_uhid_or_redirect(request: Request) -> Union[str, RedirectResponse]:
 
 
 
-ACCESS_TOKEN_EXPIRE_DAYS        = 300
-
-
-def generate_csrf_token(data) -> str:
-    """Generate a CSRF token"""
-    # Create a unique token
-    random_string = secrets.token_urlsafe(32)
-    
-    
-    days_expiry = ACCESS_TOKEN_EXPIRE_DAYS
-    
-    if data:
-        if 'days_expiry' in data:
-            days_expiry = data['days_expiry']
-    
-    
-    # Create JWT token
-    payload = {
-        "csrf_token": random_string,
-        "exp": datetime.utcnow() + timedelta(days=days_expiry)
-    }
-    
-    return jwt.encode(payload, APP_SECRET_KEY, algorithm=JWT_ALGORITHM)
-
-
-
-def validate_csrf_token(token: str) -> bool:
-    """Validate CSRF token"""
-    try:
-        # Decode and verify JWT
-        payload = jwt.decode(token, APP_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        return bool(payload.get("csrf_token"))
-    except jwt.InvalidTokenError:
-        return False
-
-
-
-
-
-
 
 
 # Email configuration

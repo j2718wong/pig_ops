@@ -13,8 +13,8 @@ self.addEventListener('unhandledrejection', (e) => {
 });
 
 
-const CACHE_NAME    = 'superpig-v23';
-const SHELL_CACHE   = 'superpig-shell-v20';
+const CACHE_NAME    = 'superpig-v24';
+const SHELL_CACHE   = 'superpig-shell-v21';
 
 
 const STATIC_ASSETS = [
@@ -182,6 +182,7 @@ self.addEventListener('fetch', (event) => {
         path.startsWith('/account_medvac/')     ||
         path.startsWith('/account_pig_buyer/')  ||
         path.startsWith('/account_pig_ops/')    ||
+        path.startsWith('/acc_sow_due_chklst')  ||
         
         path.startsWith('/address/')            ||
         
