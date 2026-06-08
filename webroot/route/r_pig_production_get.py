@@ -1133,6 +1133,76 @@ async def pig_prod_not_pregnant(request: Request, pfhid:str):
     }
     
 
+@app.get("/pig_prod/output_per_year", tags=["Pig Production"])
+async def pig_prod_output_per_year(request: Request, pfhid:str):
+    """
+    Will get pig_production per year.
+    
+    Parameters
+    ----------
+    
+    pfhid:str
+        pig_farm hashid
+
+
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID,
+                'code': 'ERROR_PIG_PROD_INVALID_PIG_FARM_HASHID'
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+    res = model['pig_prod_get'].get_production_output_group_per_year(pig_farm_id)
+    
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    
+    # Get pig_farm.not_pregnant data_ver_num 
+    pig_farm_ver_num = model['pig_farm'].get_data_ver_num(pig_farm_id)
+    
+    data_ver_num = {
+        'pig_farm':{
+            'pig_prod': pig_farm_ver_num['data_ver_num']['pig_prod']
+        }
+    }
+    
+    
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res,
+        
+        'data_ver_num': data_ver_num 
+    }
+    
+
+
+
 
 @app.get("/pig_prod/data_ver_num", tags=["Pig Production"])
 async def data_ver_num(request: Request, pig_prod_hid: str):

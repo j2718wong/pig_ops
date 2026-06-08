@@ -2,6 +2,7 @@
 # Jack Wong
 import os
 import sys
+import pprint
 
 from common_constants       import *
 
@@ -1586,6 +1587,76 @@ class PigProductionGet(BaseModel):
     
         return result
     
+    
+    def get_production_output_group_per_year(self, pig_farm_id=0):
+        """
+        Returns combined production output per year:
+        - Weaned pigs (from date_weaning)
+        - Lactating pigs (currently nursing, from date_actual_birth)
+        """
+        
+        # Query 1: Weaned pigs
+        sql_weaned = """
+            SELECT 
+                YEAR(date_weaning) AS year,
+                SUM(COALESCE(num_pigs_weaning_m, 0) + 
+                    COALESCE(num_pigs_weaning_f, 0) + 
+                    COALESCE(num_pigs_weaning, 0)) AS total_weaned
+            FROM pig_production
+            WHERE pig_farm_id = %s 
+                AND date_actual_birth IS NOT NULL 
+                AND date_weaning IS NOT NULL
+            GROUP BY YEAR(date_weaning)
+            ORDER BY YEAR(date_weaning)
+        """
+        
+        # Query 2: Currently lactating pigs (still nursing)
+        sql_lactating = """
+            SELECT 
+                YEAR(date_actual_birth) AS year,
+                SUM(COALESCE(num_pigs_live_m, 0) + COALESCE(num_pigs_live_f, 0)) AS total_lactating
+            FROM pig_production
+            WHERE pig_farm_id = %s 
+                AND prod_status_id = 4
+            GROUP BY YEAR(date_actual_birth)
+            ORDER BY YEAR(date_actual_birth)
+        """
+        
+        weaned_rows     = self._execute_query(sql_weaned % pig_farm_id)
+        lactating_rows  = self._execute_query(sql_lactating % pig_farm_id)
+        
+        
+        # Merge results
+        result = {}
+
+        for row in weaned_rows:
+            year = row[0]  # First column is year
+            total_weaned = row[1]  # Second column is total_weaned
+            
+            if year not in result:
+                result[year] = {'total_weaned': 0, 'total_lactating': 0}
+            result[year]['total_weaned'] = total_weaned
+
+        for row in lactating_rows:
+            year = row[0]  # First column is year
+            total_lactating = row[1]  # Second column is total_lactating
+            
+            if year not in result:
+                result[year] = {'total_weaned': 0, 'total_lactating': 0}
+            result[year]['total_lactating'] = total_lactating
+
+        # Convert to list
+        output = []
+        for year, data in sorted(result.items()):
+            output.append({
+                'year': year,
+                'total_weaned': data['total_weaned'],
+                'total_lactating': data['total_lactating'],
+                'total_pigs_output': data['total_weaned'] + data['total_lactating']
+            })
+
+        return output
+            
     
     def get_production_group_members(self, pig_farm_id, pig_prod_id):
         
