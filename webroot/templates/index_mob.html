@@ -1065,7 +1065,7 @@
         }
         initLanguageSwitch();
 
-        
+        /*
         function initMobileNav(){
             // Mobile navigation toggle
             const mobileToggle      = document.getElementById('mobileToggle');
@@ -1142,7 +1142,50 @@
                     }
                 });
             });
+        }*/
+        
+        function initMobileNav(){
+            // Mobile navigation toggle
+            const mobileToggle      = document.getElementById('mobileToggle');
+            const closeMobileNav    = document.getElementById('closeMobileNav');
+            const mobileNav         = document.getElementById('mobileNav');
+            
+            mobileToggle.addEventListener('click', () => {
+                console.log('mobileToggle is clicked');
+                
+                const isLocked = window.navigation.userControl.isAccountLocked();
+                if (isLocked){return;}
+                
+                mobileNav.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            });
+            
+            closeMobileNav.addEventListener('click', () => {
+                mobileNav.classList.remove('active');
+                document.body.style.overflow = 'auto'; // Restore scrolling
+            });
+            
+            // Close mobile nav when clicking outside
+            document.addEventListener('click', (event) => {
+                if (mobileNav.classList.contains('active') && 
+                    !mobileNav.contains(event.target) && 
+                    !mobileToggle.contains(event.target)) {
+                    mobileNav.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            
+            // Close mobile nav when clicking on a menu item (optional)
+            const mobileMenuItems = document.querySelectorAll('.mobile-submenu-item');
+            mobileMenuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
         }
+        
         initMobileNav();
             
         
