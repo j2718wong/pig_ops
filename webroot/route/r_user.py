@@ -76,6 +76,9 @@ ALLOWED_SOCIAL_MEDIA_LOGIN = [
 ]
 
 
+ACCESS_TOKEN_EXPIRE_DAYS = 300
+
+
 
 def create_access_token(data: dict):
     to_encode   = data.copy()
