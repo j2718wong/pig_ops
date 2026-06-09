@@ -1,7 +1,0 @@
-jsysdev.contact@gmail.com
-
-CLIENT_ID
-466858490005-irmhmqrbnmtkmah0baa27sgorivueu6g.apps.googleusercontent.com
-
-CLIENT SECRET
-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
