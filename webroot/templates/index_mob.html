@@ -1065,13 +1065,13 @@
         }
         initLanguageSwitch();
 
-        /*
+
+        
         function initMobileNav(){
             // Mobile navigation toggle
             const mobileToggle      = document.getElementById('mobileToggle');
             const closeMobileNav    = document.getElementById('closeMobileNav');
             const mobileNav         = document.getElementById('mobileNav');
-            let menuOpenStatePushed = false;
             
             mobileToggle.addEventListener('click', () => {
                 console.log('mobileToggle is clicked');
@@ -1081,23 +1081,11 @@
                 
                 mobileNav.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                
-                // Push a dummy state so back button closes menu instead of exiting app
-                if (!menuOpenStatePushed) {
-                    history.pushState({ menuOpen: true }, '');
-                    menuOpenStatePushed = true;
-                }
             });
             
             closeMobileNav.addEventListener('click', () => {
                 mobileNav.classList.remove('active');
                 document.body.style.overflow = 'auto';
-                
-                // Remove the dummy state if it exists
-                if (menuOpenStatePushed) {
-                    history.back();
-                    menuOpenStatePushed = false;
-                }
             });
             
             // Close mobile nav when clicking outside
@@ -1107,24 +1095,14 @@
                     !mobileToggle.contains(event.target)) {
                     mobileNav.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    
-                    // Remove the dummy state if it exists
-                    if (menuOpenStatePushed) {
-                        history.back();
-                        menuOpenStatePushed = false;
-                    }
                 }
             });
             
             // Close mobile nav when phone back button is pressed
-            window.addEventListener('popstate', (event) => {
+            window.addEventListener('popstate', () => {
                 if (mobileNav.classList.contains('active')) {
-                    // Menu is open, just close it, don't navigate
                     mobileNav.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    menuOpenStatePushed = false;
-                    // Prevent the back navigation by pushing the state back
-                    history.pushState({ menuOpen: false }, '');
                 }
             });
             
@@ -1134,16 +1112,12 @@
                 item.addEventListener('click', () => {
                     mobileNav.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    
-                    // Remove the dummy state if it exists
-                    if (menuOpenStatePushed) {
-                        history.back();
-                        menuOpenStatePushed = false;
-                    }
                 });
             });
-        }*/
+        }
+                
         
+        /* // Original - do not delete
         function initMobileNav(){
             // Mobile navigation toggle
             const mobileToggle      = document.getElementById('mobileToggle');
@@ -1185,7 +1159,7 @@
                 });
             });
         }
-        
+        */
         initMobileNav();
             
         
