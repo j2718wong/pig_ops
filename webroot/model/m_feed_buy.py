@@ -17,9 +17,7 @@ class FeedBuy:
             
             in_pig_farm_id          INT,
             in_pig_prod_id          INT,
-            in_prod_group_id        INT,
             
-    
             in_date_buy             VARCHAR(10),
             in_feed_type_id         INT,
             in_feed_brand_id        INT,
@@ -38,18 +36,15 @@ class FeedBuy:
         if data.pig_farm_id is not None and data.pig_farm_id > 0:
             sql += '%s,'    % data.pig_farm_id
             sql += 'NULL,'
-            sql += 'NULL,'
         
         else:
             if data.pig_prod_id is not None and data.pig_prod_id > 0:
                 sql += 'NULL,'
                 sql += '%s,'    % data.pig_prod_id
-                sql += 'NULL,'
                 
             else:
                 sql += 'NULL,'
                 sql += 'NULL,'
-                sql += '%s,'    % data.pig_prod_group_id
                 
         
         sql += '"%s",'  % data.date_buy
