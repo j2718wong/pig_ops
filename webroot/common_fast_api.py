@@ -116,9 +116,9 @@ app_envi = os.getenv('APP_ENVI', 'development')
 
 app = FastAPI(
     openapi_tags    = tags_metadata,
-    docs_url        = "/docs"           if app_envi == "development" else None,
-    redoc_url       = "/redoc"          if app_envi == "development" else None,
-    openapi_url     = "/openapi.json"   if app_envi == "development" else None
+    docs_url        = "/docs"           if app_envi in ["development", "local"] else None,
+    redoc_url       = "/redoc"          if app_envi in ["development", "local"] else None,
+    openapi_url     = "/openapi.json"   if app_envi in ["development", "local"] else None
 )
 
 
