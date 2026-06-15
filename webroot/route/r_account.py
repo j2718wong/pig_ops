@@ -404,6 +404,86 @@ async def account_update_settings(request: Request, data: dm.DataAccountSettings
 
 
 
+@app.get("/account/feed_price_puwt", tags=["Account"])
+async def account_data_ver_num(request: Request, ahid: str, r: int = 0):
+    """
+    Will get account data_ver_num.
+    
+    Parameters
+    ----------
+    
+    ahid:str
+        account hashid
+    
+    r : int
+        return type; 0 = json object; 1 = array of integers
+        
+        
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_account.decrypt(ahid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_ACCOUNT_INVALID_HASHID,
+                'code': 'ERROR_ACCOUNT_INVALID_HASHID'
+            }
+        }
+    
+    
+    account_id = res[0]
+        
+        
+    return_array = 0
+    if r > 0:
+        return_array = 1
+
+    res = model['account'].get_last_feed_price_per_unit_wt(account_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+    # Get account.data_ver_num_last_feed_price data_ver_num 
+    account_ver_num = model['account'].get_data_ver_num(account_id)
+    
+    data_ver_num = {
+        'account':{
+            'last_feed_price': account_ver_num['data_ver_num']['last_feed_price']
+        }
+    }
+    
+    
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res,
+        
+        'data_ver_num': data_ver_num 
+    }
+    
+
+
+
+
 @app.get("/account/data_ver_num", tags=["Account"])
 async def account_data_ver_num(request: Request, ahid: str, r: int = 0):
     """

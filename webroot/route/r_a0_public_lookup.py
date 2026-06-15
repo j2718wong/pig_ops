@@ -133,6 +133,63 @@ async def country_details(request: Request, entry_hid:str):
 
 
 
+@app.get("/country/ave_feed_puwt/{entry_hid}", tags=["Common Lookup"])
+async def country_ave_feed_puwt(request: Request, entry_hid:str):
+    """
+    Will get active app_country average feed price per unit weight.
+    
+    Parameters
+    ----------
+    entry_hid : str
+        country_hid
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_common.decrypt(entry_hid)
+    if len(res) == 0:
+    
+        return {
+            'result':{
+                'num':  ERROR_ADDRESS_COUNTRY_HID,
+                'code': 'ERROR_ADDRESS_COUNTRY_HID'
+            }
+        }
+    
+    country_id = res[0]
+
+    
+    
+    
+    res     = model['public_lookup'].get_country_ave_feed_price(country_id)
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+    
+    
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res
+    }
+
+
+
 
 
 

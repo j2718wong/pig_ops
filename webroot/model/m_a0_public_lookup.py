@@ -109,6 +109,56 @@ class PublicLookup(BaseModel):
         return None
     
     
+    def get_country_ave_feed_price(self, country_id):
+        sql =   """
+                SELECT 
+                    ave_price_puwt_gestating, 
+                    ave_price_puwt_lactating, 
+                    ave_price_puwt_booster,   
+                    ave_price_puwt_prestarter,
+                    ave_price_puwt_starter,   
+                    ave_price_puwt_grower,    
+                    ave_price_puwt_finisher  
+
+                    
+                FROM app_country
+                WHERE id = %s 
+                """ %country_id
+        
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
+        
+        
+        if rows is not None:
+            cur_ave_price_puwt_gestating    = row[0] 
+            cur_ave_price_puwt_lactating    = row[1] 
+            cur_ave_price_puwt_booster      = row[2]   
+            cur_ave_price_puwt_prestarter   = row[3]
+            cur_ave_price_puwt_starter      = row[4]   
+            cur_ave_price_puwt_grower       = row[5]    
+            cur_ave_price_puwt_finisher     = row[6]
+            
+            
+            for row in rows:
+                cur_entry = [
+                    cur_ave_price_puwt_gestating, 
+                    cur_ave_price_puwt_lactating, 
+                    cur_ave_price_puwt_booster,   
+                    cur_ave_price_puwt_prestarter,
+                    cur_ave_price_puwt_starter,   
+                    cur_ave_price_puwt_grower,    
+                    cur_ave_price_puwt_finisher  
+                ]
+                
+                return cur_entry
+
+        return None
+    
+    
+    
     
     def get_list_feed_type(self):
         

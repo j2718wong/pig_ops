@@ -124,7 +124,18 @@ class Account(BaseModel):
                         
                         a.data_ver_num_account,
                         a.data_ver_num_pig_buyer,
-                        a.data_ver_num_sd_chklst
+                        a.data_ver_num_sd_chklst,
+                        a.data_ver_num_last_feed_price,
+                        
+                        
+                        f.price_puwt_gestating,
+                        f.price_puwt_lactating, 
+                        f.price_puwt_booster,   
+                        f.price_puwt_prestarter,
+                        f.price_puwt_starter,   
+                        f.price_puwt_grower,    
+                        f.price_puwt_finisher   
+                        
                         
                     FROM account a
                     LEFT OUTER JOIN app_country b   ON a.country_id = b.id
@@ -134,6 +145,9 @@ class Account(BaseModel):
      
                     
                     LEFT OUTER JOIN user e          ON a.last_update_settings_user_id = e.id
+                    
+                    LEFT OUTER JOIN account_last_feed_price f ON a.last_feed_price_id = f.id
+                    
                     
                     WHERE a.id = %s
                     """ % account_id
@@ -273,8 +287,18 @@ class Account(BaseModel):
                 cur_data_ver_num_account            = row[45] 
                 cur_data_ver_num_pig_buyer          = row[46]
                 cur_data_ver_num_sd_chklst          = row[47]
+                cur_data_ver_num_last_feed_price    = row[48]
 
                 
+                cur_price_puwt_gestating            = float(row[49]) if row[49] else None
+                cur_price_puwt_lactating            = float(row[50]) if row[50] else None
+                cur_price_puwt_booster              = float(row[51]) if row[51] else None
+                cur_price_puwt_prestarter           = float(row[52]) if row[52] else None
+                cur_price_puwt_starter              = float(row[53]) if row[53] else None
+                cur_price_puwt_grower               = float(row[54]) if row[54] else None
+                cur_price_puwt_finisher             = float(row[55]) if row[55] else None
+                    
+
                 
                 temp = cur_acc_settings_flag & FLAG_BIT_DAY_1_ON_DATE_OF_BIRTH
                 cur_flag_day_1_on_dob   = 1 if temp > 0 else 0
@@ -364,15 +388,26 @@ class Account(BaseModel):
                     
                     cur_data_ver_num_account,
                     cur_data_ver_num_pig_buyer,
-                    cur_data_ver_num_sd_chklst
+                    cur_data_ver_num_sd_chklst,
+                    cur_data_ver_num_last_feed_price
                     
                 ]
                 
                 
+                last_feed_price_puwt = [
+                    cur_price_puwt_gestating, 
+                    cur_price_puwt_lactating, 
+                    cur_price_puwt_booster,   
+                    cur_price_puwt_prestarter,
+                    cur_price_puwt_starter,   
+                    cur_price_puwt_grower,    
+                    cur_price_puwt_finisher,  
+                ]
                 
-                cur_entry['settings_operations'] = settings_operations
-                cur_entry['data_ver_num'] = data_ver_num
                 
+                cur_entry['settings_operations']    = settings_operations
+                cur_entry['data_ver_num']           = data_ver_num
+                cur_entry['last_feed_price_puwt']   = last_feed_price_puwt
                 
             
 
@@ -755,7 +790,8 @@ class Account(BaseModel):
                     
                     data_ver_num_account,
                     data_ver_num_pig_buyer,
-                    data_ver_num_sd_chklst
+                    data_ver_num_sd_chklst,
+                    data_ver_num_last_feed_price
                     
                 FROM account 
                 WHERE id = %s
@@ -778,7 +814,7 @@ class Account(BaseModel):
             cur_ver_num_account                 = row[5]
             cur_ver_num_pig_buyer               = row[6]
             cur_ver_num_sd_chklst               = row[7]
-            
+            cur_ver_num_last_feed_price         = row[8]
             
             if return_array == 0:
                 cur_entry = {
@@ -791,7 +827,8 @@ class Account(BaseModel):
                         
                         'account':              cur_ver_num_account,
                         'pig_buyer':            cur_ver_num_pig_buyer,
-                        'sow_due_checklist':    cur_ver_num_sd_chklst
+                        'sow_due_checklist':    cur_ver_num_sd_chklst,
+                        'last_feed_price':      cur_ver_num_last_feed_price
                     }
                 }
                 
@@ -807,8 +844,54 @@ class Account(BaseModel):
                     
                     cur_ver_num_account,
                     cur_ver_num_pig_buyer,
-                    cur_ver_num_sd_chklst
+                    cur_ver_num_sd_chklst,
+                    cur_ver_num_last_feed_price
                 ]
 
         return None
 
+
+    def get_last_feed_price_per_unit_wt(self, account_id):
+        sql =   """
+                SELECT 
+                    b.price_puwt_gestating,
+                    b.price_puwt_lactating,   
+                    b.price_puwt_booster,     
+                    b.price_puwt_prestarter,  
+                    b.price_puwt_starter,     
+                    b.price_puwt_grower,      
+                    b.price_puwt_finisher    
+                    
+                FROM account a
+                LEFT OUTER JOIN account_last_feed_price b ON a.last_feed_price_id = b.id 
+                WHERE a.id = %s
+                """ % account_id
+        
+        
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
+
+        for row in rows:
+            cur_price_puwt_gestating        = float(row[0]) if row[0] else None
+            cur_price_puwt_lactating        = float(row[1]) if row[1] else None
+            cur_price_puwt_booster          = float(row[2]) if row[2] else None
+            cur_price_puwt_prestarter       = float(row[3]) if row[3] else None
+            cur_price_puwt_starter          = float(row[4]) if row[4] else None
+            cur_price_puwt_grower           = float(row[5]) if row[5] else None
+            cur_price_puwt_finisher         = float(row[6]) if row[6] else None
+            
+            return [
+                cur_price_puwt_gestating, 
+                cur_price_puwt_lactating, 
+                cur_price_puwt_booster,   
+                cur_price_puwt_prestarter,
+                cur_price_puwt_starter,   
+                cur_price_puwt_grower,    
+                cur_price_puwt_finisher  
+            ]
+            
+
+        return None
