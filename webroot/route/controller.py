@@ -202,13 +202,13 @@ class Controller:
                 test = 1
 
         
-        temp = os.getenv('UI_INC_FEED_BUY_IN_FEED_BAL')
+        temp = os.getenv('UI_INC_FEEDS_ESTIMATE')
         if temp is not None:
             try:
                 temp_int = int(temp)
                 
                 if temp_int > 0:
-                    inc_feed_buy_in_feed_bal = 1
+                    inc_feeds_estimate = 1
             except:
                 test = 1
 
@@ -219,7 +219,7 @@ class Controller:
             'enable_manual_email':      enable_manual_email,
             'enable_referral':          enable_referral,
             'joint_account_pig_farm_create': joint_account_pig_farm_create,
-            'inc_feed_buy_in_feed_bal': inc_feed_buy_in_feed_bal
+            'inc_feeds_estimate':       inc_feeds_estimate
         }
 
         

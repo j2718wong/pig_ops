@@ -206,6 +206,16 @@ class PigProductionGet(BaseModel):
                     a.num_b_grower,
                     a.num_b_finisher,
                     
+                    
+                    a.num_b_kg_gestating,
+                    a.num_b_kg_lactating,
+                    a.num_b_kg_booster,
+                    a.num_b_kg_prestarter,
+                    a.num_b_kg_starter,
+                    a.num_b_kg_grower,
+                    a.num_b_kg_finisher,
+                    
+                    
                     k.date_balance,
                     k.num_gestating,
                     k.num_lactating,
@@ -333,39 +343,47 @@ class PigProductionGet(BaseModel):
             cur_prod_num_b_starter          = row[49]  
             cur_prod_num_b_grower           = row[50]  
             cur_prod_num_b_finisher         = row[51]  
+            
+            cur_prod_num_b_kg_gestating     = row[52]  
+            cur_prod_num_b_kg_lactating     = row[53]  
+            cur_prod_num_b_kg_booster       = row[54]  
+            cur_prod_num_b_kg_prestarter    = row[55]  
+            cur_prod_num_b_kg_starter       = row[56]  
+            cur_prod_num_b_kg_grower        = row[57]  
+            cur_prod_num_b_kg_finisher      = row[58]  
 
-            cur_feed_bal_date_balance       = row[52]  
+            cur_feed_bal_date_balance       = row[59]  
 
-            cur_feed_bal_gestating          = row[53]  
-            cur_feed_bal_lactating          = row[54]  
-            cur_feed_bal_booster            = row[55]  
-            cur_feed_bal_prestarter         = row[56]  
-            cur_feed_bal_starter            = row[57]  
-            cur_feed_bal_grower             = row[58]  
-            cur_feed_bal_finisher           = row[59]  
+            cur_feed_bal_gestating          = row[60]  
+            cur_feed_bal_lactating          = row[61]  
+            cur_feed_bal_booster            = row[62]  
+            cur_feed_bal_prestarter         = row[63]  
+            cur_feed_bal_starter            = row[64]  
+            cur_feed_bal_grower             = row[65]  
+            cur_feed_bal_finisher           = row[66]  
 
-            cur_prod_cost_gestating         = row[60]  
-            cur_prod_cost_lactating         = row[61]  
-            cur_prod_cost_booster           = row[62]  
-            cur_prod_cost_prestarter        = row[63]  
-            cur_prod_cost_starter           = row[64]  
-            cur_prod_cost_grower            = row[65]  
-            cur_prod_cost_finisher          = row[66]  
+            cur_prod_cost_gestating         = row[67]  
+            cur_prod_cost_lactating         = row[68]  
+            cur_prod_cost_booster           = row[69]  
+            cur_prod_cost_prestarter        = row[70]  
+            cur_prod_cost_starter           = row[71]  
+            cur_prod_cost_grower            = row[72]  
+            cur_prod_cost_finisher          = row[73]  
 
-            cur_prod_date_gestating         = row[67]  
-            cur_prod_date_lactating         = row[68]  
-            cur_prod_date_booster           = row[69]  
-            cur_prod_date_prestarter        = row[70]  
-            cur_prod_date_starter           = row[71]  
-            cur_prod_date_grower            = row[72]  
-            cur_prod_date_finisher          = row[73]  
+            cur_prod_date_gestating         = row[74]  
+            cur_prod_date_lactating         = row[75]  
+            cur_prod_date_booster           = row[76]  
+            cur_prod_date_prestarter        = row[77]  
+            cur_prod_date_starter           = row[78]  
+            cur_prod_date_grower            = row[79]  
+            cur_prod_date_finisher          = row[80]  
 
-            cur_data_ver_num_pig_prod       = row[74]  
-            cur_data_ver_num_medvac         = row[75]  
-            cur_data_ver_num_health_notes   = row[76]  
-            cur_data_ver_num_prod_feed      = row[77]  
-            cur_data_ver_num_feed_balance   = row[78]  
-            cur_data_ver_num_harvest        = row[79]    
+            cur_data_ver_num_pig_prod       = row[81]  
+            cur_data_ver_num_medvac         = row[82]  
+            cur_data_ver_num_health_notes   = row[83]  
+            cur_data_ver_num_prod_feed      = row[84]  
+            cur_data_ver_num_feed_balance   = row[85]  
+            cur_data_ver_num_harvest        = row[86]   
                         
             
             cur_entry = {
@@ -458,6 +476,16 @@ class PigProductionGet(BaseModel):
                         'finisher':     cur_prod_num_b_finisher
                     },
                     
+                    'bought_kg':{
+                        'gestating':    cur_prod_num_b_kg_gestating,
+                        'lactating':    cur_prod_num_b_kg_lactating,
+                        'booster':      cur_prod_num_b_kg_booster,
+                        'prestarter':   cur_prod_num_b_kg_prestarter,
+                        'starter':      cur_prod_num_b_kg_starter,
+                        'grower':       cur_prod_num_b_kg_grower,
+                        'finisher':     cur_prod_num_b_kg_finisher
+                    },
+                    
                     'balance':{
                         'date_balance': str(cur_feed_bal_date_balance)  if cur_feed_bal_date_balance    is not None else None,
                         
@@ -500,7 +528,6 @@ class PigProductionGet(BaseModel):
                     'prod_feed':        cur_data_ver_num_prod_feed,
                     'feed_balance':     cur_data_ver_num_feed_balance,
                     'harvest':          cur_data_ver_num_harvest
-                
                 }
             }
             
@@ -533,13 +560,21 @@ class PigProductionGet(BaseModel):
                         
                 if cur_weaning_weight_pp is None:
                     del cur_entry['weaning']['weight_pp']
-                
+            
+            
             # Remove feeds that are only needed after birth
             if cur_prod_status_id == PROD_STATUS_ID_GESTATING:
                 del cur_entry['feeds']['bought']['prestarter']
                 del cur_entry['feeds']['bought']['starter']
                 del cur_entry['feeds']['bought']['grower']
                 del cur_entry['feeds']['bought']['finisher']
+            
+                
+                del cur_entry['feeds']['bought_kg']['prestarter']
+                del cur_entry['feeds']['bought_kg']['starter']
+                del cur_entry['feeds']['bought_kg']['grower']
+                del cur_entry['feeds']['bought_kg']['finisher']
+            
             
                 del cur_entry['feeds']['balance']['prestarter']
                 del cur_entry['feeds']['balance']['starter']
@@ -556,7 +591,25 @@ class PigProductionGet(BaseModel):
                 del cur_entry['feeds']['date_change_feed']['grower']
                 del cur_entry['feeds']['date_change_feed']['finisher']
 
-
+            
+            # Remove feeds that are not yet needed
+            if cur_prod_status_id == PROD_STATUS_ID_LACTATING:
+                del cur_entry['feeds']['bought']['grower']
+                del cur_entry['feeds']['bought']['finisher']
+            
+                del cur_entry['feeds']['bought_kg']['grower']
+                del cur_entry['feeds']['bought_kg']['finisher']
+            
+                del cur_entry['feeds']['balance']['grower']
+                del cur_entry['feeds']['balance']['finisher']
+            
+                del cur_entry['feeds']['cost']['grower']
+                del cur_entry['feeds']['cost']['finisher']
+            
+                del cur_entry['feeds']['date_change_feed']['grower']
+                del cur_entry['feeds']['date_change_feed']['finisher']
+            
+            
             # Get Group members if production is a Group
             if (cur_prod_flag & FLAG_BIT_IS_A_GROUP) > 0:
                 group_members = self.get_production_group_members(
@@ -584,6 +637,14 @@ class PigProductionGet(BaseModel):
                     a.num_b_starter,
                     a.num_b_grower,
                     a.num_b_finisher,
+                    
+                    a.num_b_kg_gestating,
+                    a.num_b_kg_lactating,
+                    a.num_b_kg_booster,
+                    a.num_b_kg_prestarter,
+                    a.num_b_kg_starter,
+                    a.num_b_kg_grower,
+                    a.num_b_kg_finisher,
                     
                     i.date_balance,
                     i.num_gestating,
@@ -635,31 +696,39 @@ class PigProductionGet(BaseModel):
             cur_prod_num_b_grower       = row[5]
             cur_prod_num_b_finisher     = row[6]
             
-            cur_feed_bal_date_balance   = row[7]
-            
-            cur_feed_bal_gestating      = row[8]
-            cur_feed_bal_lactating      = row[9]
-            cur_feed_bal_booster        = row[10]
-            cur_feed_bal_prestarter     = row[11]
-            cur_feed_bal_starter        = row[12]
-            cur_feed_bal_grower         = row[13]
-            cur_feed_bal_finisher       = row[14]
-            
-            cur_prod_cost_gestating     = row[15]
-            cur_prod_cost_lactating     = row[16]
-            cur_prod_cost_booster       = row[17]
-            cur_prod_cost_prestarter    = row[18]
-            cur_prod_cost_starter       = row[19]
-            cur_prod_cost_grower        = row[20]
-            cur_prod_cost_finisher      = row[21]
-            
-            cur_prod_date_gestating     = row[22]
-            cur_prod_date_lactating     = row[23]
-            cur_prod_date_booster       = row[24]
-            cur_prod_date_prestarter    = row[25]
-            cur_prod_date_starter       = row[26]
-            cur_prod_date_grower        = row[27]
-            cur_prod_date_finisher      = row[28]
+            cur_prod_num_b_kg_gestating     = row[7]  
+            cur_prod_num_b_kg_lactating     = row[8]  
+            cur_prod_num_b_kg_booster       = row[9]  
+            cur_prod_num_b_kg_prestarter    = row[10]  
+            cur_prod_num_b_kg_starter       = row[11]  
+            cur_prod_num_b_kg_grower        = row[12]  
+            cur_prod_num_b_kg_finisher      = row[13]  
+
+            cur_feed_bal_date_balance       = row[14]
+
+            cur_feed_bal_gestating          = row[15]
+            cur_feed_bal_lactating          = row[16]
+            cur_feed_bal_booster            = row[17]
+            cur_feed_bal_prestarter         = row[18]
+            cur_feed_bal_starter            = row[19]
+            cur_feed_bal_grower             = row[20]
+            cur_feed_bal_finisher           = row[21]
+
+            cur_prod_cost_gestating         = row[22]
+            cur_prod_cost_lactating         = row[23]
+            cur_prod_cost_booster           = row[24]
+            cur_prod_cost_prestarter        = row[25]
+            cur_prod_cost_starter           = row[26]
+            cur_prod_cost_grower            = row[27]
+            cur_prod_cost_finisher          = row[28]
+
+            cur_prod_date_gestating         = row[29]
+            cur_prod_date_lactating         = row[30]
+            cur_prod_date_booster           = row[31]
+            cur_prod_date_prestarter        = row[32]
+            cur_prod_date_starter           = row[33]
+            cur_prod_date_grower            = row[34]
+            cur_prod_date_finisher          = row[35]
         
             
             cur_entry = {
@@ -673,6 +742,16 @@ class PigProductionGet(BaseModel):
                         'starter':      cur_prod_num_b_starter,
                         'grower':       cur_prod_num_b_grower,
                         'finisher':     cur_prod_num_b_finisher
+                    },
+                    
+                    'bought_kg':{
+                        'gestating':    cur_prod_num_b_kg_gestating,
+                        'lactating':    cur_prod_num_b_kg_lactating,
+                        'booster':      cur_prod_num_b_kg_booster,
+                        'prestarter':   cur_prod_num_b_kg_prestarter,
+                        'starter':      cur_prod_num_b_kg_starter,
+                        'grower':       cur_prod_num_b_kg_grower,
+                        'finisher':     cur_prod_num_b_kg_finisher
                     },
                     
                     'balance':{
@@ -843,6 +922,13 @@ class PigProductionGet(BaseModel):
                     a.num_b_grower,
                     a.num_b_finisher,
                     
+                    a.num_b_kg_lactating,
+                    a.num_b_kg_booster,
+                    a.num_b_kg_prestarter,
+                    a.num_b_kg_starter,
+                    a.num_b_kg_grower,
+                    a.num_b_kg_finisher,
+                    
                     d.date_balance,
                     d.num_lactating,
                     d.num_booster,
@@ -911,22 +997,30 @@ class PigProductionGet(BaseModel):
             cur_num_b_grower        = row[24]
             cur_num_b_finisher      = row[25]
             
-            cur_feed_date_balance   = str(row[26])   if row[26] is not None else None
-            cur_num_l_lactating     = float(row[27]) if row[27] is not None else None
-            cur_num_l_booster       = float(row[28]) if row[28] is not None else None
-            cur_num_l_prestarter    = float(row[29]) if row[29] is not None else None
-            cur_num_l_starter       = float(row[30]) if row[30] is not None else None
-            cur_num_l_grower        = float(row[31]) if row[31] is not None else None
-            cur_num_l_finisher      = float(row[32]) if row[32] is not None else None
+            cur_num_b_kg_lactating  = row[26]
+            cur_num_b_kg_booster    = row[27]
+            cur_num_b_kg_prestarter = row[28]
+            cur_num_b_kg_starter    = row[29]
+            cur_num_b_kg_grower     = row[30]
+            cur_num_b_kg_finisher   = row[31]
             
-            cur_cost_lactating      = float(row[33]) if row[33] is not None else None
-            cur_cost_booster        = float(row[34]) if row[34] is not None else None
-            cur_cost_prestarter     = float(row[35]) if row[35] is not None else None
-            cur_cost_starter        = float(row[36]) if row[36] is not None else None
-            cur_cost_grower         = float(row[37]) if row[37] is not None else None
-            cur_cost_finisher       = float(row[38]) if row[38] is not None else None
+            cur_feed_date_balance   = str(row[32])   if row[32] is not None else None
             
-            cur_date_harvest        = str(row[39]) if row[39] else None
+            cur_num_l_lactating     = float(row[33]) if row[33] is not None else None
+            cur_num_l_booster       = float(row[34]) if row[34] is not None else None
+            cur_num_l_prestarter    = float(row[35]) if row[35] is not None else None
+            cur_num_l_starter       = float(row[36]) if row[36] is not None else None
+            cur_num_l_grower        = float(row[37]) if row[37] is not None else None
+            cur_num_l_finisher      = float(row[38]) if row[38] is not None else None
+
+            cur_cost_lactating      = float(row[39]) if row[39] is not None else None
+            cur_cost_booster        = float(row[40]) if row[40] is not None else None
+            cur_cost_prestarter     = float(row[41]) if row[41] is not None else None
+            cur_cost_starter        = float(row[42]) if row[42] is not None else None
+            cur_cost_grower         = float(row[43]) if row[43] is not None else None
+            cur_cost_finisher       = float(row[44]) if row[44] is not None else None
+
+            cur_date_harvest        = str(row[45]) if row[45] else None
             
             
             cur_num_c_lactating     = None
@@ -992,41 +1086,49 @@ class PigProductionGet(BaseModel):
                     'harvest':      cur_date_harvest
                 },
                 
+                  
+                
                 'num_feeds': {
                     'date_balance': cur_feed_date_balance,
                 
                     'lactating': {
                         'bought':   cur_num_b_lactating,
+                        'bought_kg':cur_num_b_kg_lactating,
                         'consumed': cur_num_c_lactating,
                         'left':     cur_num_l_lactating
                     },
                     
                     'booster': {
                         'bought':   cur_num_b_booster,
+                        'bought_kg':cur_num_b_kg_booster,
                         'consumed': cur_num_c_booster,
                         'left':     cur_num_l_booster
                     },
                         
                     'prestarter': {
                         'bought':   cur_num_b_prestarter,
+                        'bought_kg':cur_num_b_kg_prestarter,
                         'consumed': cur_num_c_prestarter,
                         'left':     cur_num_l_prestarter
                     },
                         
                     'starter': {     
                         'bought':   cur_num_b_starter,
+                        'bought_kg':cur_num_b_kg_starter,
                         'consumed': cur_num_c_starter,
                         'left':     cur_num_l_starter
                     },
                     
                     'grower': {
                         'bought':   cur_num_b_grower,
+                        'bought_kg':cur_num_b_kg_grower,
                         'consumed': cur_num_c_grower,
                         'left':     cur_num_l_grower
                     },
                     
                     'finisher': {    
                         'bought':   cur_num_b_finisher,
+                        'bought_kg':cur_num_b_kg_finisher,
                         'consumed': cur_num_c_finisher,
                         'left':     cur_num_l_finisher
                     }
@@ -1694,10 +1796,4 @@ class PigProductionGet(BaseModel):
             result.append(cur_entry)
     
         return result
-    
-    
-    
-        
 
-    
-        

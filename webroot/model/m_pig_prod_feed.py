@@ -1,13 +1,27 @@
 # February 13, 2026
 # Jack Wong
 
+import os
+import sys
+
+
 from common_constants       import *
 
 
-class PigProdFeed:
+# Include the directory where this file is located 
+module_file_path            = os.path.abspath(__file__)
+module_directory            = os.path.dirname(module_file_path)
+
+if module_directory not in sys.path:
+   sys.path.append(module_directory)
+
+
+from base_model             import BaseModel
+
+
+class PigProdFeed(BaseModel):
     def __init__(self, model):
-        self.model              = model
-        self.TAG                = 'PigProdFeed'
+        super().__init__(model)
 
 
     def add(self, data = None):
@@ -31,83 +45,28 @@ class PigProdFeed:
         )  
         """
         
-        sql =  'CALL pig_prod_feed_add('
-        sql += '%s,'    % data.user_id
-        
-        sql += '%s,'    % data.pig_prod_id
-        sql += '%s,'    % data.pig_farm_feed_buy_id
-        
-        sql += '"%s",'  % data.date_add
-        
-        
-        if data.num_gesta is not None and data.num_gesta > 0:
-            sql += '%s,'    % data.num_gesta
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.num_lacta is not None and data.num_lacta > 0:
-            sql += '%s,'    % data.num_lacta
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.num_booster is not None and data.num_booster > 0:
-            sql += '%s,'    % data.num_booster
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.num_prestarter is not None and data.num_prestarter > 0:
-            sql += '%s,'    % data.num_prestarter
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.num_starter is not None and data.num_starter > 0:
-            sql += '%s,'    % data.num_starter
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.num_grower is not None and data.num_grower > 0:
-            sql += '%s,'    % data.num_grower
-        else:
-            sql += 'NULL,'
-        
-        
-        if data.num_finisher is not None and data.num_finisher > 0:
-            sql += '%s);'    % data.num_finisher
-        else:
-            sql += 'NULL);'
-        
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_prod_id,
+            data.pig_farm_feed_buy_id,
+            data.date_add,
             
-            row = cursor.fetchone()
-            cursor.close()
+            data.num_gesta       if data.num_gesta and data.num_gesta > 0 else None,
+            data.num_lacta       if data.num_lacta and data.num_lacta > 0 else None,
+            data.num_booster     if data.num_booster and data.num_booster > 0 else None,
+            data.num_prestarter  if data.num_prestarter and data.num_prestarter > 0 else None,
+            data.num_starter     if data.num_starter and data.num_starter > 0 else None,
+            data.num_grower      if data.num_grower and data.num_grower > 0 else None,
+            data.num_finisher    if data.num_finisher and data.num_finisher > 0 else None
+        ]
+        
+        res = self._call_procedure('pig_prod_feed_add', params)
+        if res is None:
+            return None
+            
+            
+        row = res[0]
 
-        except Exception as e:
-            msg = 'add(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
 
         if row is not None:
             return {
@@ -146,47 +105,27 @@ class PigProdFeed:
         )  
         """
         
-        sql =  'CALL pig_prod_feed_update('
-        sql += '%s,'    % data.user_id
-        sql += '%s,'    % data.pig_prod_feed_id
-        
-        sql += '"%s",'  % data.date_add
-        
-        
-        sql += '%s,'    % data.num_gesta
-        sql += '%s,'    % data.num_lacta
-        sql += '%s,'    % data.num_booster
-        sql += '%s,'    % data.num_prestarter
-        sql += '%s,'    % data.num_starter
-        sql += '%s,'    % data.num_grower
-        sql += '%s);'   % data.num_finisher
-        
-        
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
-        
-        row = None
-
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
+        params = [
+            data.user_id,
+            data.pig_prod_feed_id,
+            data.date_add,
             
-            row = cursor.fetchone()
-            cursor.close()
-
-        except Exception as e:
-            msg = 'update(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            row = None
+            data.num_gesta,
+            data.num_lacta,
+            data.num_booster,
+            data.num_prestarter,
+            data.num_starter,
+            data.num_grower,
+            data.num_finisher
+        ]
+        
+        res = self._call_procedure('pig_prod_feed_update', params)
+        if res is None:
+            return None
+        
+        
+        row = res[0]
+        
 
         if row is not None:
             return {
@@ -204,8 +143,54 @@ class PigProdFeed:
         return None
     
     
-    def get_list(self, pig_prod_id):
+    def change_feed_date(self, data = None):
+        """
+        PROCEDURE pig_prod_feed_change_date(
+            in_user_id              INT,
+            in_pig_prod_id          INT,
+            
+            in_feed_type_id         INT,
+            
+            in_date_change          VARCHAR(10)
+        )  
+        """
         
+        params = [
+            data.user_id,
+            data.pig_prod_id,
+            data.feed_type_id,
+            data.date_change
+        ]
+    
+        res = self._call_procedure('pig_prod_feed_change_date', params)
+        if res is None:
+            return None
+
+        
+        row = res[0]
+
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2]
+                },
+                
+                'feed_change_date': {
+                    'booster':          str(row[3]) if row[3] else None, 
+                    'prestarter':       str(row[4]) if row[4] else None,
+                    'starter':          str(row[5]) if row[5] else None,
+                    'grower':           str(row[6]) if row[6] else None,
+                    'finisher':         str(row[7]) if row[7] else None
+                }
+            }
+
+        return None
+    
+    
+    def get_list(self, pig_prod_id):
         
         sql =   """
                 SELECT 
@@ -223,65 +208,40 @@ class PigProdFeed:
                 """ % (pig_prod_id)
         
             
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        rows = self._execute_query(sql)
         
+        if rows is None:
+            return []
         
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-
-
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
             
+        for row in rows:
+            cur_id                      = row[0]
+            cur_pig_farm_feed_buy_id    = row[1]
+            cur_feed_supplier_id        = row[2]
+            cur_feed_supplier_name      = row[3]
+            cur_date_add                = str(row[4])
             
-            for row in rows:
-                cur_id                      = row[0]
-                cur_pig_farm_feed_buy_id    = row[1]
-                cur_feed_supplier_id        = row[2]
-                cur_feed_supplier_name      = row[3]
-                cur_date_add                = str(row[4])
+           
+            cur_entry = {
+                'pig_prod_feed': {
+                    'id':               cur_id,
+                    'pf_feed_buy_id':   cur_pig_farm_feed_buy_id,
+                    'date_add':         cur_date_add
+                },
                 
-               
-                cur_entry = {
-                    'pig_prod_feed': {
-                        'id':               cur_id,
-                        'pf_feed_buy_id':   cur_pig_farm_feed_buy_id,
-                        'date_add':         cur_date_add
-                    },
-                    
-                    'feed_supplier': {
-                        'id':           cur_feed_supplier_id,
-                        'name':         cur_feed_supplier_name
-                    } 
-                }
+                'feed_supplier': {
+                    'id':           cur_feed_supplier_id,
+                    'name':         cur_feed_supplier_name
+                } 
+            }
+            
+            feed_items = self.get_list_items(cur_id)
+            cur_entry['feed_items'] = feed_items
+            
+            result.append(cur_entry)
                 
-                feed_items = self.get_list_items(cur_id)
-                cur_entry['feed_items'] = feed_items
-                
-                result.append(cur_entry)
-                    
 
         return result
     
@@ -314,84 +274,58 @@ class PigProdFeed:
         
                 """ % (pig_prod_feed_id)
         
+        rows = self._execute_query(sql)
         
-            
-        # Check if still connected to database
-        if self.model.check_if_connected() == False:
-            # Make new connection
-            self.model.connect_to_db()
-
-        # Get database connection
-        conn = self.model.db_conn
+        if rows is None:
+            return []
         
-        
-        rows = None
-        
-        try:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            
-            rows = cursor.fetchall()
-            cursor.close()
-            #conn.close()
-            
-        except Exception as e:
-            msg = 'get_list(); error in executing query[] = ' + sql
-            msg += '\n'
-            msg += str(e)
-            msg += '\n\n'
-            self.model.logger.append(
-                log_level = LOG_FATAL, tag = self.TAG, msg = msg)
-            rows = None
         
         result = []
-        if rows is not None:
+        
+        for row in rows:
+            cur_id                  = row[0]
             
-            
-            for row in rows:
-                cur_id                  = row[0]
-                
-                cur_feed_type_id        = row[1]
-                cur_feed_brand_id       = row[2]
+            cur_feed_type_id        = row[1]
+            cur_feed_brand_id       = row[2]
 
-                cur_quantity            = row[3]
-                cur_kg_per_unit         = row[4]
-                cur_kg_total            = row[5]
+            cur_quantity            = row[3]
+            cur_kg_per_unit         = row[4]
+            cur_kg_total            = row[5]
+        
+            cur_unit_cost           = float(row[6]) if row[6] is not None else None
+            cur_total_cost          = float(row[7]) if row[7] is not None else None
             
-                cur_unit_cost           = float(row[6]) if row[6] is not None else None
-                cur_total_cost          = float(row[7]) if row[7] is not None else None
+            cur_feed_type_name      = row[8]
+            cur_feed_brand_name     = row[9]
+            
+            
+            cur_entry = {
                 
-                cur_feed_type_name      = row[8]
-                cur_feed_brand_name     = row[9]
+                'feed_item':{
+                    'id':           cur_id,
+                    'quantity':     cur_quantity,
+                    'kg_per_unit':  cur_kg_per_unit,
+                    'kg_total':     cur_kg_total,
+                    
+                    'unit_cost':    cur_unit_cost,
+                    'total_cost':   cur_total_cost,
+                },
                 
                 
-                cur_entry = {
-                    
-                    'feed_item':{
-                        'id':           cur_id,
-                        'quantity':     cur_quantity,
-                        'kg_per_unit':  cur_kg_per_unit,
-                        'kg_total':     cur_kg_total,
-                        
-                        'unit_cost':    cur_unit_cost,
-                        'total_cost':   cur_total_cost,
-                    },
-                    
-                    
-                    'feed_type':{
-                        'id':           cur_feed_type_id,
-                        'name':         cur_feed_type_name 
-                    },
-                    
-                    'feed_brand':{
-                        'id':           cur_feed_brand_id,
-                        'name':         cur_feed_brand_name
-                    }
-                    
+                'feed_type':{
+                    'id':           cur_feed_type_id,
+                    'name':         cur_feed_type_name 
+                },
+                
+                'feed_brand':{
+                    'id':           cur_feed_brand_id,
+                    'name':         cur_feed_brand_name
                 }
                 
-                result.append(cur_entry)
-                
+            }
+            
+            result.append(cur_entry)
+            
               
         return result
     

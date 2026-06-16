@@ -777,7 +777,20 @@ class DataPigProdFeed(BaseModel):
     num_grower:             int = None
     num_finisher:           int = None
 
+
+class DataFeedChangeDate(BaseModel):
+    uhid:                   str = None
+        
+    pig_prod_hid:           str = None
     
+    
+    user_id:                int = 0
+    pig_prod_id:            int = 0
+    feed_type_id:           int = 0
+    
+    date_change:            str = None
+    
+
 
 
 class DataMedVacBrand(BaseModel):

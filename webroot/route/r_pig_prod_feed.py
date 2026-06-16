@@ -224,6 +224,69 @@ async def pig_prod_feed_update(request: Request, data: dm.DataPigProdFeed):
     return res_update
     
 
+@app.post("/pig_prod_feed/change_date", tags=["Production Details"])
+async def pig_prod_feed_change_date(request: Request, data: dm.DataFeedChangeDate):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    #uhid    = data.uhid
+
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_FEED_INVALID_USER_HASHID,
+                'code': 'ERROR_PIG_PROD_FEED_INVALID_USER_HASHID'
+            }
+        }
+    
+    user_id = res[0]
+    
+    
+    pig_prod_hid    = data.pig_prod_hid
+
+    res = hashids_common.decrypt(pig_prod_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_PROD_FEED_INVALID_PIG_PROD_HASHID,
+                'code': 'ERROR_PIG_PROD_FEED_INVALID_PIG_PROD_HASHID'
+            }
+        }
+    
+    pig_prod_id = res[0]
+    
+    
+    
+    data.user_id   = user_id
+    data.pig_prod_id = pig_prod_id
+    
+    
+    res_update    =  model['pig_prod_feed'].change_feed_date(data)
+    
+    if res_update is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+        
+    # Remove optional desc coming from database
+    remove_database_null_description(res_update)
+    
+    return res_update
+    
+
+
+
 @app.get("/pig_prod_feed/delete", tags=["Production Details"])
 async def pig_prod_feed_delete(request: Request, ehid: str):
     result = get_uhid_or_redirect(request)
@@ -288,6 +351,7 @@ async def pig_prod_feed_delete(request: Request, ehid: str):
     
     
     return res_delete
+    
     
     
 def get_data_pig_prod_feed(pig_prod_id):

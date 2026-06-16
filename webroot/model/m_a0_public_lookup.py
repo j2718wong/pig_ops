@@ -133,16 +133,17 @@ class PublicLookup(BaseModel):
         
         
         if rows is not None:
-            cur_ave_price_puwt_gestating    = row[0] 
-            cur_ave_price_puwt_lactating    = row[1] 
-            cur_ave_price_puwt_booster      = row[2]   
-            cur_ave_price_puwt_prestarter   = row[3]
-            cur_ave_price_puwt_starter      = row[4]   
-            cur_ave_price_puwt_grower       = row[5]    
-            cur_ave_price_puwt_finisher     = row[6]
-            
             
             for row in rows:
+                cur_ave_price_puwt_gestating    = row[0] 
+                cur_ave_price_puwt_lactating    = row[1] 
+                cur_ave_price_puwt_booster      = row[2]   
+                cur_ave_price_puwt_prestarter   = row[3]
+                cur_ave_price_puwt_starter      = row[4]   
+                cur_ave_price_puwt_grower       = row[5]    
+                cur_ave_price_puwt_finisher     = row[6]
+            
+                
                 cur_entry = [
                     cur_ave_price_puwt_gestating, 
                     cur_ave_price_puwt_lactating, 
