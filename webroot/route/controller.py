@@ -166,7 +166,8 @@ class Controller:
         enable_manual_email         = 0
         enable_referral             = 0
         joint_account_pig_farm_create = 0
-        inc_feed_buy_in_feed_bal    = 0
+        
+        inc_feeds_estimate          = 0
 
 
         temp = os.getenv('UI_ENABLE_MANUAL_EMAIL_LOGIN')
