@@ -173,7 +173,9 @@
         "feed_balance": "Lista ni sa Feed Balance. Pwede e-record ang feed balance kada semanha ba kaha para sa kada isa ka Production Entry or para sa tibuok baboyan.",
         "farrowing_sched": "Kani ciya mo automatic schedule sa pag gamit sa paanakan(Farrowing Crate) para sa nag patotoy ug manganakay na Anay. Mo schedule ni cya 115 days in advance sugod karon. Para ni mahibaw-an daan kung muigo ba ang paanakan sa imong mga anay.",
         "boar_ext_mate": "Lista ni sa mga gitakalan na Anay sa imong silingan. Gamiton rani kung nagtakal ka sa anay silingan.",
-        "dead_pigs": "Lista ni sa namatay na baboy. Importante na e-record ang namatay na baboy para mainsakto ang ihap sa baboy kada production batch."
+        "dead_pigs": "Lista ni sa namatay na baboy. Importante na e-record ang namatay na baboy para mainsakto ang ihap sa baboy kada production batch.",
+        
+        "feeds_estimate": "Makatabang ni sa pag estimate sa gasto sa feeds sa sunod 4 ka bulan. Ang estimate apil ang anay/butakal ug fattening na baboy." 
     },
     
     
