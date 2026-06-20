@@ -13,8 +13,8 @@ self.addEventListener('unhandledrejection', (e) => {
 });
 
 
-const CACHE_NAME    = 'superpig-v35';
-const SHELL_CACHE   = 'superpig-shell-v32';
+const CACHE_NAME    = 'superpig-v36';
+const SHELL_CACHE   = 'superpig-shell-v33';
 
 
 const STATIC_ASSETS = [
