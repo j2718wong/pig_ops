@@ -46,6 +46,11 @@
         },
         
         {
+            "image_key": "mar_feeds_estimate",
+            "key": "feeds_estimate"
+        },
+        
+        {
             "image_key": "mar_no_internet",
             "key": "no_internet"
         },

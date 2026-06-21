@@ -58,6 +58,11 @@
                     "desc": "This can estimate feed requirements next month."
                 },
                 
+                "feeds_estimate": {
+                    "title": "Automatic feed estimate 4 months in advance",
+                    "desc": "The monthly feeds cost is computed for 4 months in advance."
+                },
+                
                 "no_internet": {
                     "title": "Can read pig data even without internet",
                     "desc": "Has data access even without internet"

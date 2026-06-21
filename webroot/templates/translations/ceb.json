@@ -58,6 +58,11 @@
                     "desc": "Para dali maestimate ang kinahanlan na feeds sunod bulan."
                 },
                 
+                "feeds_estimate": {
+                    "title": "Automatic mo estimate  sa feeds 4 months advance",
+                    "desc": "The binulan na gasto sa feeds automatic ma compute 4 months advance."
+                },
+                
                 "no_internet": {
                     "title": "Mabasa ra ang data maski walay internet",
                     "desc": "Moandar ra ang SuperPig App maski walay internet"
