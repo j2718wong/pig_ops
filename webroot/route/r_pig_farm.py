@@ -507,8 +507,8 @@ async def pig_farm_last_feed_balance(request: Request, pfhid: str):
     if len(res) == 0:
         return {
             'result':{
-                'num':  ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID,
-                'code': 'ERROR_PIG_FARM_INVALID_ACCOUNT_HASHID'
+                'num':  ERROR_PIG_FARM_INVALID_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
             }
         }
     
@@ -548,5 +548,75 @@ async def pig_farm_last_feed_balance(request: Request, pfhid: str):
         'data_ver_num': data_ver_num
     }
     
+
+@app.get("/pig_farm/fixed_expenses", tags=["Pig Farm"])
+async def pig_farm_fixed_expenses(request: Request, pfhid: str):
+    """
+    Will get pig farm fixed expenses.
+    
+    Parameters
+    ----------
+    
+    pfhid:str
+        pig farm hashid
+    
+
+        
+    """
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_common.decrypt(pfhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_FARM_INVALID_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+        
+
+    res = model['pig_farm'].get_pig_farm_fixed_expenses(pig_farm_id)
+
+    
+    if res is None:
+        return {
+            'result':{
+                'num':  ERROR_DATABASE_ERROR,
+                'code': 'ERROR_DATABASE_ERROR'
+            }
+        }
+
+
+    
+    data_ver_num = {
+        'pig_farm':{
+            'fixed_expenses': res['data_ver_num']['fixed_expenses']
+        }
+    }
+    
+    del res['data_ver_num']
+    
+            
+    return {
+        'result':{
+            'num':  0
+        },
+        
+        'data': res,
+        
+        'data_ver_num': data_ver_num
+    }
+
 
 

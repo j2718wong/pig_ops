@@ -168,6 +168,7 @@ class Controller:
         joint_account_pig_farm_create = 0
         
         inc_feeds_estimate          = 0
+        inc_fixed_expenses          = 0
 
 
         temp = os.getenv('UI_ENABLE_MANUAL_EMAIL_LOGIN')
@@ -214,13 +215,25 @@ class Controller:
                 test = 1
 
         
+        temp = os.getenv('UI_INC_FIXED_EXPENSES')
+        if temp is not None:
+            try:
+                temp_int = int(temp)
+                
+                if temp_int > 0:
+                    inc_fixed_expenses = 1
+            except:
+                test = 1
+
+        
 
 
         ui_settings = {
             'enable_manual_email':      enable_manual_email,
             'enable_referral':          enable_referral,
             'joint_account_pig_farm_create': joint_account_pig_farm_create,
-            'inc_feeds_estimate':       inc_feeds_estimate
+            'inc_feeds_estimate':       inc_feeds_estimate,
+            'inc_fixed_expenses':       inc_fixed_expenses
         }
 
         

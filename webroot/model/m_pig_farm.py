@@ -186,7 +186,63 @@ class PigFarm(BaseModel):
                 
             
         return None
+    
+    
+    def update_fixed_expenses(self, data = None):
+        """
+        PROCEDURE pig_farm_update_fixed_expense(
+            in_user_id              INT,
+            in_pig_farm_id          INT,
+            
+            
+            in_budget_electric      DECIMAL(8,2),
+            in_budget_water         DECIMAL(8,2),
+            in_budget_internet      DECIMAL(8,2),
+            in_budget_staff         DECIMAL(8,2),
+            in_budget_fuel          DECIMAL(8,2),
+            in_budget_supplies      DECIMAL(8,2),
+            in_budget_other         DECIMAL(8,2)
+        )
+        """
+       
+        params = [
+            data.user_id,
+            data.pig_farm_id,
+            
+            data.budget_electric    if data.budget_electric  else None,
+            data.budget_water       if data.budget_water  else None,
+            data.budget_internet    if data.budget_internet  else None,
+            data.budget_staff       if data.budget_staff  else None,
+            data.budget_fuel        if data.budget_fuel  else None,
+            data.budget_supplies    if data.budget_supplies else None,
+            data.budget_other       if data.budget_other else None
+        ]
         
+        rows = self._call_procedure('pig_farm_update_fixed_expense', params)
+        
+        if rows is None:
+            return None
+        
+        row = rows[0]
+
+        if row is not None:
+            return {
+                'result':{
+                    'num':              row[0],
+                    'code':             row[1],
+                    'desc':             row[2],
+                },
+                
+                'pig_farm': {
+                    'id':               row[3],
+                    'flag':             row[4],
+                    'name':             row[5]
+                }
+            }
+                
+            
+        return None
+
     
     def get_pig_farm_info(self, pig_farm_id):
         """
@@ -430,6 +486,79 @@ class PigFarm(BaseModel):
         return None
         
     
+    def get_pig_farm_fixed_expenses(self, pig_farm_id):
+        """
+        Get pig farm fixed expenses.
+        
+        Parameters
+        ==========
+        pig_farm_id : int
+            The ID of the pig farm to retrieve
+        
+        Returns
+        -------
+        dict
+            
+        """
+        
+        sql = """
+            SELECT 
+                fixed_expense_electric,    
+                fixed_expense_water,       
+                fixed_expense_internet,    
+                fixed_expense_staff,       
+                fixed_expense_fuel,        
+                fixed_expense_supplies,    
+                fixed_expense_other,
+                
+                data_ver_num_fixed_expense
+                
+            FROM pig_farm
+            WHERE id = %s
+        """ % pig_farm_id
+
+        
+        rows = self._execute_query(sql)
+        
+        if rows is None:
+            return None
+        
+        
+        
+        for row in rows:
+            cur_expense_electric            = float(row[0]) if row[0] else 0.0    
+            cur_expense_water               = float(row[1]) if row[1] else 0.0      
+            cur_expense_internet            = float(row[2]) if row[2] else 0.0   
+            cur_expense_staff               = float(row[3]) if row[3] else 0.0      
+            cur_expense_fuel                = float(row[4]) if row[4] else 0.0       
+            cur_expense_supplies            = float(row[5]) if row[5] else 0.0   
+            cur_expense_other               = float(row[6]) if row[6] else 0.0
+            
+            cur_ver_num_fixed_expense       = row[7]
+            
+            
+            # Build the result dictionary
+            cur_entry = {
+                'fixed_expense': {
+                    'electric':     cur_expense_electric,
+                    'water':        cur_expense_water,   
+                    'internet':     cur_expense_internet,
+                    'staff':        cur_expense_staff,   
+                    'fuel':         cur_expense_fuel,    
+                    'supplies':     cur_expense_supplies,
+                    'other':        cur_expense_other
+                },
+                
+                'data_ver_num': {
+                    'fixed_expenses': cur_ver_num_fixed_expense
+                }
+            }
+            
+            return cur_entry
+    
+        return None
+    
+    
     def get_list(self, account_id = 0, id_list = None):
         """
         Will get pig farm list.
@@ -489,7 +618,9 @@ class PigFarm(BaseModel):
                     a.data_ver_num_sb_disposed,
                     a.data_ver_num_prod_gesta, 
                     a.data_ver_num_prod_lacta,  
-                    a.data_ver_num_prod_fatten
+                    a.data_ver_num_prod_fatten,
+                    
+                    a.data_ver_num_fixed_expense
                     
                 FROM pig_farm a
                 LEFT OUTER JOIN app_country b ON a.country_id = b.id
@@ -541,6 +672,8 @@ class PigFarm(BaseModel):
                 cur_data_ver_num_prod_gesta     = row[24]
                 cur_data_ver_num_prod_lacta     = row[25]
                 cur_data_ver_num_prod_fatten    = row[26]
+                
+                cur_data_ver_num_fixed_expense  = row[27]
                 
                 
                 
@@ -596,7 +729,9 @@ class PigFarm(BaseModel):
                         'sb_disposed':      cur_data_ver_num_sb_disposed,
                         'prod_gesta':       cur_data_ver_num_prod_gesta, 
                         'prod_lacta':       cur_data_ver_num_prod_lacta, 
-                        'prod_fatten':      cur_data_ver_num_prod_fatten
+                        'prod_fatten':      cur_data_ver_num_prod_fatten,
+                        
+                        'fixed_expense':    cur_data_ver_num_fixed_expense
                             
                     }
                     
@@ -675,7 +810,9 @@ class PigFarm(BaseModel):
                     data_ver_num_sb_disposed,
                     data_ver_num_prod_gesta, 
                     data_ver_num_prod_lacta,  
-                    data_ver_num_prod_fatten
+                    data_ver_num_prod_fatten,
+                    
+                    data_ver_num_fixed_expense
                     
                 FROM pig_farm 
                 WHERE id = %s
@@ -706,6 +843,8 @@ class PigFarm(BaseModel):
             cur_data_ver_num_prod_gesta     = row[12]
             cur_data_ver_num_prod_lacta     = row[13]
             cur_data_ver_num_prod_fatten    = row[14]
+            
+            cur_data_ver_num_fixed_expense  = row[15]
 
             
             if return_array == 0:
@@ -727,7 +866,9 @@ class PigFarm(BaseModel):
                         'sow_boar_disposed':cur_data_ver_num_sb_disposed,
                         'prod_gesta':       cur_data_ver_num_prod_gesta, 
                         'prod_lacta':       cur_data_ver_num_prod_lacta, 
-                        'prod_fatten':      cur_data_ver_num_prod_fatten     
+                        'prod_fatten':      cur_data_ver_num_prod_fatten,
+                        
+                        'fixed_expense':    cur_data_ver_num_fixed_expense     
                         
                     }
                 }
@@ -752,7 +893,9 @@ class PigFarm(BaseModel):
                     cur_data_ver_num_sb_disposed,
                     cur_data_ver_num_prod_gesta, 
                     cur_data_ver_num_prod_lacta, 
-                    cur_data_ver_num_prod_fatten 
+                    cur_data_ver_num_prod_fatten,
+                    
+                    cur_data_ver_num_fixed_expense 
                 ]
 
         return None
