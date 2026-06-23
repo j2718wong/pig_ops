@@ -539,7 +539,7 @@ class PigFarm(BaseModel):
             
             # Build the result dictionary
             cur_entry = {
-                'fixed_expense': {
+                'fixed_expenses': {
                     'electric':     cur_expense_electric,
                     'water':        cur_expense_water,   
                     'internet':     cur_expense_internet,
