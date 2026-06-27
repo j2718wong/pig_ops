@@ -37,6 +37,7 @@ class Business(BaseModel):
                     b.name,
                     a.currency_code,  
                     a.price_per_head, 
+                    a.price_per_farm,
                     a.tax_name_1,     
                     a.tax_name_2,     
                     a.tax_rate_1,     
@@ -64,11 +65,12 @@ class Business(BaseModel):
             cur_country_name            = row[3]
             cur_currency_code           = row[4]
             cur_price_per_head          = float(row[5])
+            cur_price_per_farm          = float(row[6])
             
-            cur_tax_name_1              = row[6]
-            cur_tax_name_2              = row[7]
-            cur_tax_rate_1              = float(row[8]) if row[8] is not None else None
-            cur_tax_rate_2              = float(row[9]) if row[9] is not None else None
+            cur_tax_name_1              = row[7]
+            cur_tax_name_2              = row[8]
+            cur_tax_rate_1              = float(row[9])     if row[9] is not None else None
+            cur_tax_rate_2              = float(row[10])    if row[10] is not None else None
             
             
             
@@ -79,7 +81,8 @@ class Business(BaseModel):
                     'country_name':     cur_country_name,
                     'flag':             cur_flag,
                     'currency_code':    cur_currency_code,
-                    'price_per_head':   cur_price_per_head
+                    'price_per_head':   cur_price_per_head,
+                    'price_per_farm':   cur_price_per_farm
                 }
                 
             }
