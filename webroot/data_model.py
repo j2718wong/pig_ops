@@ -243,13 +243,13 @@ class DataPigFarmFixedExpense(BaseModel):
     user_id:                int = 0
     pig_farm_id:            int = 0
         
-    budget_electric:        float = None
-    budget_water:           float = None
-    budget_internet:        float = None
-    budget_staff:           float = None
-    budget_fuel:            float = None
-    budget_supplies:        float = None
-    budget_other:           float = None
+    electric:               float = None
+    water:                  float = None
+    internet:               float = None
+    staff:                  float = None
+    fuel:                   float = None
+    supplies:               float = None
+    other:                  float = None
     
     
 

@@ -209,13 +209,13 @@ class PigFarm(BaseModel):
             data.user_id,
             data.pig_farm_id,
             
-            data.budget_electric    if data.budget_electric  else None,
-            data.budget_water       if data.budget_water  else None,
-            data.budget_internet    if data.budget_internet  else None,
-            data.budget_staff       if data.budget_staff  else None,
-            data.budget_fuel        if data.budget_fuel  else None,
-            data.budget_supplies    if data.budget_supplies else None,
-            data.budget_other       if data.budget_other else None
+            data.electric    if data.electric  else None,
+            data.water       if data.water  else None,
+            data.internet    if data.internet  else None,
+            data.staff       if data.staff  else None,
+            data.fuel        if data.fuel  else None,
+            data.supplies    if data.supplies else None,
+            data.other       if data.other else None
         ]
         
         rows = self._call_procedure('pig_farm_update_fixed_expense', params)
@@ -226,6 +226,18 @@ class PigFarm(BaseModel):
         row = rows[0]
 
         if row is not None:
+            cur_expense_electric            = float(row[3]) if row[3] else 0.0    
+            cur_expense_water               = float(row[4]) if row[4] else 0.0      
+            cur_expense_internet            = float(row[5]) if row[5] else 0.0   
+            cur_expense_staff               = float(row[6]) if row[6] else 0.0      
+            cur_expense_fuel                = float(row[7]) if row[7] else 0.0       
+            cur_expense_supplies            = float(row[8]) if row[8] else 0.0   
+            cur_expense_other               = float(row[9]) if row[9] else 0.0
+            
+            cur_ver_num_fixed_expense       = row[10]
+            
+            
+            
             return {
                 'result':{
                     'num':              row[0],
@@ -233,10 +245,20 @@ class PigFarm(BaseModel):
                     'desc':             row[2],
                 },
                 
-                'pig_farm': {
-                    'id':               row[3],
-                    'flag':             row[4],
-                    'name':             row[5]
+                'fixed_expenses':{
+                    'electric':     cur_expense_electric,
+                    'water':        cur_expense_water,   
+                    'internet':     cur_expense_internet,
+                    'staff':        cur_expense_staff,   
+                    'fuel':         cur_expense_fuel,    
+                    'supplies':     cur_expense_supplies,
+                    'other':        cur_expense_other
+                },
+                
+                'data_ver_num': {
+                    'pig_farm': {
+                        'fixed_expenses': cur_ver_num_fixed_expense
+                    }
                 }
             }
                 

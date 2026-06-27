@@ -312,6 +312,56 @@ async def pig_farm_update(request: Request, data: dm.DataPigFarm):
         'data': res
     }
     
+
+@app.post("/pig_farm/fixed_expenses/update", tags=["Pig Farm"])
+async def pig_farm_fixed_expenses_update(request: Request, data: dm.DataPigFarmFixedExpense):
+    result = get_uhid_or_redirect(request)
+    
+    # If result is RedirectResponse, return it immediately
+    if isinstance(result, RedirectResponse):
+        return result
+    
+    
+    uhid = result
+    
+    
+    res = hashids_user.decrypt(uhid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_USER_INVALID_USER_HASHID,
+                'code': 'ERROR_USER_INVALID_USER_HASHID'
+            }
+        }
+    
+    
+    user_id = res[0]
+    
+    
+    pig_farm_hid = data.pig_farm_hid
+    
+    
+    res = hashids_common.decrypt(pig_farm_hid)
+    if len(res) == 0:
+        return {
+            'result':{
+                'num':  ERROR_PIG_FARM_INVALID_HASHID,
+                'code': 'ERROR_PIG_FARM_INVALID_HASHID'
+            }
+        }
+    
+    
+    pig_farm_id = res[0]
+    
+    
+    data.user_id       = user_id
+    data.pig_farm_id   = pig_farm_id
+    
+    
+    res_update    =  model['pig_farm'].update_fixed_expenses(data)
+    
+    return res_update
+    
     
 
 @app.get("/pig_farm/list", tags=["Pig Farm"])
