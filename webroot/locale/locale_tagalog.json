@@ -236,7 +236,7 @@
             "output_at_wean":   "Output sa Walay",
             "number_births":    "Ilang beses nag anak",
             
-            "last_mate":        "Huling bembang",
+            "last_mate":        "Huling Barako",
             "expected":         "Manganak",
             
             "target_wean":      "Petsa ng Walay",
@@ -252,13 +252,13 @@
             "dead_before_wean": "Dedz hindi pa Walay",
             "live_pigs_wean":   "Ilan ang Nawalay",
             
-            "boar_mate_count":  "Ilan Bembang",
+            "boar_mate_count":  "Ilan Barako",
             
             "date_disposed":    "Petsa",
             "disposed_type":    "Klase",
             "disposed_name":    "Baboy",
             
-            "date_mate":        "Petsa ng Bembang",
+            "date_mate":        "Petsa Barako",
             
             "date_harvest":     "Petsa ng Harvest"
         }
@@ -353,7 +353,7 @@
     "page_boar_external_mates":{
         "labels":{
             "sow_owner":        "May-ari ng Inahin",
-            "date_mate":        "Petsa sa Bembang",
+            "date_mate":        "Petsa Barako",
             "date_expected":    "Petsa Manganak"
         }
         
@@ -372,7 +372,7 @@
     
     "page_gestating_add":{
         "labels":{
-            "date_mating":      "Petsa sa Bembang or AI",
+            "date_mating":      "Petsa sa Barako or AI",
             
             
             "semen_supplier":   "Supplier ng Semen",
@@ -384,7 +384,7 @@
             
             
             "insem_type":       "Klase sa Breeding",
-            "insem_boar":       "Bembang ng Barako",
+            "insem_boar":       "Barako",
             "insem_ai_external": "AI binili ang Semen",
             "insem_ai_internal": "AI gamit Barako sa farm",
        
@@ -400,7 +400,7 @@
             "add_new_staff":    "Bagong satff ng Farm",
             "save_new_staff":   "Save",
             "select_staff":     "Kinsa?",
-            "select_staff_help":"Sino nag pa bembang or nag AI",
+            "select_staff_help":"Sino nagpabarako or nag AI",
             
             
             
