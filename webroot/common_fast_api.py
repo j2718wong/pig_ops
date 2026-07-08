@@ -131,7 +131,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 # Tell FastAPI to trust X-Forwarded-* headers from your proxy
 app.add_middleware(
     TrustedHostMiddleware, 
-    allowed_hosts=["jsysdev.com", "*.jsysdev.com", "localhost"]  # Add your domains
+    allowed_hosts=["jsysdev.com", "*.jsysdev.com", "localhost", "192.168.0.168"]  # Add your domains
 )
 
 
