@@ -4,6 +4,39 @@
 📱 **End-to-End System Demo:** [Watch the Video Walkthrough](https://drive.google.com/file/d/1moiiK67ppN8WbLEFblpvwnY6eVgztEGi/view?usp=drive_link)  
 ⚙️ **Backend & Database Infrastructure Tour:** [Watch the Engineering Breakdown](https://drive.google.com/file/d/1Dp_shk55O44uMWjzsAeiwKjaBKpnitRS/view?usp=drive_link)
 
+
+## 📊 Codebase Metrics & Git Repository Breakdown
+
+Below is the definitive performance and composition audit across the 5 decoupled repositories comprising the SuperPig ecosystem.
+
+```text
+========================================================================
+📂 REPOSITORY TOPOGRAPHY & COMMIT VOLUME
+========================================================================
+  📦 pig_ops         │ 729 Commits  │ Core FastAPI Backend Engine
+  📦 pig_ops_ui_mob  │ 626 Commits  │ Zero-Dependency PWA Frontend
+  📦 pig_ops_db      │ 269 Commits  │ Transactional Schemas & Migrations
+  📦 pig_ops_bkops   │  51 Commits  │ Asynchronous Background Workers
+  📦 pig_ops_admin   │   5 Commits  │ Payment Settlement Gateway
+  ───────────────────┴──────────────┴────────────────────────────────────
+  📈 GRAND TOTAL     │ 1,680 Commits │ Continuous Lifespan: September 2025 to April 2026
+```
+
+### 🛠️ Language & Structural Composition
+
+| Component / Layer | File Type | Files | Total Lines | Avg Lines/File | Structural Purpose |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **Database Transactional Layer** | MySQL Stored Procedures | 143 | **30,030** | 210 | Core business logic execution & ACID safety |
+| **Schema State Control** | DB Migrations | 69 | **3,702** | 53 | Immutable database version tracking |
+| **Core Asynchronous Backend** | Python (FastAPI) | 135 | **52,907** | 391 | High-throughput API endpoint architecture |
+| **Distributed Task Processing** | Python (Background Ops) | 27 | **5,070** | 187 | Decoupled cron workflows & data processing |
+| **Framework-Agnostic UI** | JavaScript (Vanilla SPA) | 195 | **101,324** | 519 | Lightweight, zero-runtime frontend layout |
+| **System Interface Templates** | HTML / JSON / CSS | 25 | **15,092** | 603 | Presentation layer & caching configurations |
+| **Infrastructure Controls** | Shell Scripts | 19 | **3,012** | 158 | Bare-metal deployment & lifecycle automation |
+| **🧮 SYSTEM AGGREGATE** | **All Modules Combined** | **623** | **214,713** | **344** | **Production-grade scalable architecture** |
+
+
+
 ---
 
 This document details the production environment for SuperPig. Architected as a **lean, bare-metal monolith**, the entire ecosystem executes directly on a single host. By consolidating the asynchronous Python backend, optimized MySQL relational database, and background processing systems onto a unified server, network latency is dropped to absolute zero, maximizing data processing speed while drastically lowering resource overhead.
