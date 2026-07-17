@@ -1,134 +1,144 @@
-# SuperPig: Bare-Metal Production Infrastructure & Systems Engineering
+# SuperPig
 
-🧠 **Production Application:** [https://superpig.jsysdev.com](https://superpig.jsysdev.com)  
-📱 **End-to-End System Demo:** [Watch the Video Walkthrough](https://drive.google.com/file/d/1moiiK67ppN8WbLEFblpvwnY6eVgztEGi/view?usp=drive_link)  
-⚙️ **Backend & Database Infrastructure Tour:** [Watch the Engineering Breakdown](https://drive.google.com/file/d/1Dp_shk55O44uMWjzsAeiwKjaBKpnitRS/view?usp=drive_link)
+SuperPig is a **mobile-first pig farm management platform** originally built to help manage my family's pig farm remotely. It was designed around the operational realities of small farms, where workers primarily use smartphones, internet connectivity is often unreliable, and business events such as breeding, vaccinations, inventory, and sales require strict transactional accuracy.
 
+These constraints shaped the architecture, resulting in an offline-capable Progressive Web App (PWA), a FastAPI backend, asynchronous processing services, and a transaction-centric MySQL database.
 
-## 📊 Codebase Metrics & Git Repository Breakdown
+## Live System
 
-Below is the definitive performance and composition audit across the 5 decoupled repositories comprising the SuperPig ecosystem.
+🧠 Production Application: https://superpig.jsysdev.com
 
-```text
-========================================================================
-📂 REPOSITORY TOPOGRAPHY & COMMIT VOLUME
-========================================================================
-  📦 pig_ops         │ 729 Commits  │ Core FastAPI Backend Engine
-  📦 pig_ops_ui_mob  │ 626 Commits  │ Zero-Dependency PWA Frontend
-  📦 pig_ops_db      │ 269 Commits  │ Transactional Schemas & Migrations
-  📦 pig_ops_bkops   │  51 Commits  │ Asynchronous Background Workers
-  📦 pig_ops_admin   │   5 Commits  │ Payment Settlement Gateway
-  ───────────────────┴──────────────┴────────────────────────────────────
-  📈 GRAND TOTAL     │ 1,680 Commits │ Continuous Lifespan: September 2025 to April 2026
-```
+📱 End-to-End Demo:
+https://drive.google.com/file/d/1moiiK67ppN8WbLEFblpvwnY6eVgztEGi/view?usp=drive_link
 
-### 🛠️ Language & Structural Composition
-
-| Component / Layer | File Type | Files | Total Lines | Avg Lines/File | Structural Purpose |
-| :--- | :--- | :---: | :---: | :---: | :--- |
-| **Database Transactional Layer** | MySQL Stored Procedures | 143 | **30,030** | 210 | Core business logic execution & ACID safety |
-| **Schema State Control** | DB Migrations | 69 | **3,702** | 53 | Immutable database version tracking |
-| **Core Asynchronous Backend** | Python (FastAPI) | 135 | **52,907** | 391 | High-throughput API endpoint architecture |
-| **Distributed Task Processing** | Python (Background Ops) | 27 | **5,070** | 187 | Decoupled cron workflows & data processing |
-| **Framework-Agnostic UI** | JavaScript (Vanilla SPA) | 195 | **101,324** | 519 | Lightweight, zero-runtime frontend layout |
-| **System Interface Templates** | HTML / JSON / CSS | 25 | **15,092** | 603 | Presentation layer & caching configurations |
-| **Infrastructure Controls** | Shell Scripts | 19 | **3,012** | 158 | Bare-metal deployment & lifecycle automation |
-| **🧮 SYSTEM AGGREGATE** | **All Modules Combined** | **623** | **214,713** | **344** | **Production-grade scalable architecture** |
-
-
+⚙️ Backend & Infrastructure Walkthrough:
+https://drive.google.com/file/d/1Dp_shk55O44uMWjzsAeiwKjaBKpnitRS/view?usp=drive_link
 
 ---
 
-This document details the production environment for SuperPig. Architected as a **lean, bare-metal monolith**, the entire ecosystem executes directly on a single host. By consolidating the asynchronous Python backend, optimized MySQL relational database, and background processing systems onto a unified server, network latency is dropped to absolute zero, maximizing data processing speed while drastically lowering resource overhead.
+# Why SuperPig Exists
+
+SuperPig was originally developed to solve a real operational problem on my family's pig farm.
+
+The project later evolved into a reusable platform for small and medium-sized pig farms. Although it was originally intended to become a commercial SaaS product, it is now fully open source and serves as a public demonstration of my approach to backend engineering, database design, and system architecture.
 
 ---
 
-### 🧠 Architectural Paradigm: The Pragmatic Monolith
+# Engineering Constraints
 
-While modern trends default to heavy container orchestration, SuperPig deliberately implements a **zero-overhead, containerless deployment pattern**. 
-* **Zero Latency:** Shared memory space and Unix socket loops provide instantaneous backend-to-database execution.
-* **Atomic Velocity:** Code changes are verified and promoted via a highly optimized, custom shell engine. 
-* **Predictable Security:** Nginx acts as an uncompromised reverse-proxy handling SSL termination, static file caching, and custom edge failovers.
+Rather than choosing technologies first, the platform was designed around several operational constraints.
+
+### Mobile-first
+
+Farm workers primarily interact with the system using smartphones while working around the farm. Every workflow was therefore designed for mobile devices first.
+
+### Offline-capable
+
+Internet connectivity inside pig farms is often unreliable.
+
+The application continues to function when connectivity is lost and synchronizes data when the connection returns.
+
+### Data Integrity
+
+Breeding schedules, vaccinations, inventory, financial records, and pig movements must remain accurate.
+
+Critical business rules are therefore implemented as transactional MySQL stored procedures to ensure ACID-compliant consistency regardless of which API endpoint modifies the data.
+
+### Operational Simplicity
+
+The production environment intentionally favors a lean deployment model with minimal operational overhead.
 
 ---
 
-### 📂 Multi-Repository Production Topography
+# System Architecture
 
-The system runs out of a unified, decoupled project tree (`~/projects/jsys`), breaking down into 5 functional, atomic repositories:
+SuperPig consists of five independently maintained repositories.
+
+| Repository | Purpose |
+|------------|---------|
+| pig_ops | FastAPI backend |
+| pig_ops_ui_mob | Mobile-first PWA frontend |
+| pig_ops_db | Database schema, migrations and stored procedures |
+| pig_ops_bkops | Background processing services |
+| pig_ops_admin | Administrative portal |
+
+---
+
+# Technology Stack
+
+Backend
+
+- FastAPI
+- Python
+- REST APIs
+- Asynchronous background workers
+
+Frontend
+
+- Vanilla JavaScript
+- Progressive Web App (PWA)
+- Mobile-first SPA
+
+Database
+
+- MySQL
+- 143 Stored Procedures
+- 69 Database Migrations
+
+Infrastructure
+
+- Nginx
+- Shell deployment scripts
+- Bare-metal Linux deployment
+
+---
+
+# Project Scale
+
+| Metric | Value |
+|--------|------:|
+| Public Repositories | 5 |
+| Git Commits | 1,680 |
+| Source Files | 623 |
+| Lines of Code | 214,713 |
+| MySQL Stored Procedures | 143 |
+| Database Tables | 80+ |
+| Background Worker Services | 27 |
+
+---
+
+# Deployment Philosophy
+
+Rather than deploying with Kubernetes or Docker, SuperPig intentionally uses a lean bare-metal deployment.
+
+The FastAPI backend, MySQL database, background workers, and Nginx reverse proxy execute on a single Linux host. This architecture minimizes operational complexity while remaining appropriate for the expected deployment scale.
+
+Deployment is handled using custom shell scripts which:
+
+- synchronize all repositories
+- invalidate frontend caches
+- restart application services
+- maintain deployment logs
+
+---
+
+# Repository Layout
 
 ```text
 ~/projects/jsys/
-├── app.pid              # Active Process ID of the asynchronous FastAPI runtime
-├── deploy_logs/         # Automated logs for code updates
-├── deploy.sh*           # High-velocity deployment engine
-├── restart_logs/        # High-availability runtime logging
-├── restart.sh*          # Process lifecycle automation controller
-├── version.txt          # Active production immutable build tag
-│
-├── pig_ops/             # Core Backend (FastAPI, business logic routes)
-├── pig_ops_db/          # Database Layer (143 Stored Procedures, schema migrations)
-├── pig_ops_ui_mob/      # Mobile Frontend (101k lines of modular Vanilla JS SPA)
-├── pig_ops_bkops/       # Background Ops (Asynchronous background processing workers)
-└── pig_ops_admin/       # Administrative Gateway (Manual payment handling & ledger settlement)
+├── pig_ops/
+├── pig_ops_db/
+├── pig_ops_ui_mob/
+├── pig_ops_bkops/
+└── pig_ops_admin/
 ```
 
 ---
 
-### 🚀 Zero-Downtime Deployment Automation (`deploy.sh`)
+# Additional Documentation
 
-To eliminate the bloat of external third-party CI/CD runners, production releases are controlled by a custom shell orchestration engine. Running `./deploy.sh` initiates an automated multi-step update pipeline:
-
-1. **State Isolation:** Tracks and captures the live FastAPI runtime process via `app.pid`.
-2. **Atomic Synchronization:** Pulls structural revisions across the decoupled repositories cleanly.
-3. **Cache Invalidation:** Updates the `version.txt` tag to forcefully bust static assets at the user edge.
-4. **Graceful Reloading:** Invokes `./restart.sh` to safely flush process buffers and cycle the server instance.
-
----
-
-### 🌐 Reverse Proxy & Edge Infrastructure (Nginx Topology)
-
-Nginx handles edge traffic, enforcing HTTP/2 protocol optimizations, caching policies, and an automated upstream fallback mechanism.
-
-#### 1. Static Asset Caching Layer
-To bypass backend compute cycles, Nginx maps directly to the decoupled mobile frontend repository (`pig_ops_ui_mob`), serving raw Single Page Application assets directly from the filesystem with optimized HTTP cache control headers:
-
-```nginx
-location /static/ {
-    alias /root/projects/jsys/pig_ops_ui_mob/static/;
-    expires 30d;
-    add_header Cache-Control "public, no-transform";
-}
-
-location /static_m/ {
-    alias /root/projects/jsys/pig_ops_ui_mob/src/static/;
-    expires 30d;
-    add_header Cache-Control "public, no-transform";
-}
-```
-
-#### 2. High-Availability Maintenance Injection
-If the upstream FastAPI program resets during updates, Nginx intercepts the `502/503/504` errors at the edge, instantaneously serving an isolated maintenance layout without crashing the client's progressive web app:
-
-```nginx
-error_page 502 503 504 /maintenance.html;
-location = /maintenance.html {
-    root /root/projects/jsys/pig_ops/webroot/templates;
-    internal;
-}
-```
-
-#### 3. Core Upstream Routing
-All root application traffic is proxied directly into the local loopback interface (`127.0.0.1:8080`), passing clean client telemetry up to FastAPI:
-
-```nginx
-location / {
-    proxy_pass http://127.0.0.1:8080;
-    proxy_set_header Host \$host;
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto \$scheme;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade \$http_upgrade;
-    proxy_set_header Connection "upgrade";
-}
-```
+- Backend architecture walkthrough
+- Database design
+- Deployment scripts
+- Reverse proxy configuration
+- Source code
