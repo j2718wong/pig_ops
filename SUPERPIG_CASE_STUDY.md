@@ -223,7 +223,7 @@ The overall architectural philosophy remained consistent throughout my career.
 
 | System               | Database           | Business Layer           | Application Layer |
 | -------------------- | ------------------ | ------------------------ | ----------------- |
-| ERG Transit Systems  | Oracle             | PL/SQL Stored Procedures | pyWeb2            |
+| ERG Transit Systems  | Oracle             | PL/SQL Stored Procedures | web2py            |
 | Liricco Technologies | PostgreSQL / MySQL | Stored Procedures        | Flask             |
 | SuperPig             | MySQL              | Stored Procedures        | FastAPI           |
 
